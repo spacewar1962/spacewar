@@ -29,7 +29,7 @@ div.spacewar {
 }
 
 canvas.spacewar {
- background: black);
+ background: black;
  position: absolute;
  width: auto;
  height: auto;
