@@ -13,23 +13,25 @@ body {
 }
 
 div.frame {
- position: relative;
- width: 650px;
- height: 650px;
-}
+  margin-left: 10px;
+  margin-right: 10px;
+  position: relative;
+  width: 650px;
+  height: 650px;
+ }
 
 div.spacewar {
  position: absolute;
- width: 100px;
- height: 100px;
+ width: 650px;
+ height: 650px;
  overflow: hidden;
 }
 
 canvas.spacewar {
  background: rgb(26, 26, 26);
  position: absolute;
- width: 100px;
- height: 100px;
- top: 100px;
- left: 100px;
+ width: 550px;
+ height: 550px;
+ top: 0px;
+ left: 0px;
 }
