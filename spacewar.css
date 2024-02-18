@@ -21,19 +21,17 @@ div.frame {
  }
 
 div.spacewar {
- position: absolute;
- width: auto;
- height: auto;
+ position: relative;
+ width: 560;
+ height: 560;
  overflow: hidden;
  box-sizing: padding-box;
 }
 
 canvas.spacewar {
  background: black;
- position: absolute;
- width: auto;
- height: auto;
- top: auto;
- left: auto;
+ position: relative;
+ width: 550;
+ height: 550;
  box-sizing: padding-box;
 }
