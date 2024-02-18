@@ -17,15 +17,15 @@ div.frame {
   position: relative;
   width: 650px;
   height: 650px;
- }
- 
- div.spacewar {
+}
+
+div.spacewar {
   position: relative;
   width: 650px;
   height: 650px;
   box-sizing: padding-box;
- }
- 
+}
+
 canvas.spacewar {
   background: black;
   position: relative;
@@ -33,5 +33,4 @@ canvas.spacewar {
   height: 550px;
   top: 0px;
   left: 0px;
- }
- 
+}
