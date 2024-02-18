@@ -13,25 +13,25 @@ body {
 }
 
 div.frame {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 10px;
   position: relative;
-  width: auto;
-  height: auto;
+  width: 650px;
+  height: 650px;
  }
-
-div.spacewar {
- position: relative;
- width: 560;
- height: 560;
- overflow: hidden;
- box-sizing: padding-box;
-}
-
+ 
+ div.spacewar {
+  position: relative;
+  width: 650px;
+  height: 650px;
+  box-sizing: padding-box;
+ }
+ 
 canvas.spacewar {
- background: black;
- position: relative;
- width: 550;
- height: 550;
- box-sizing: padding-box;
-}
+  background: black;
+  position: relative;
+  width: 550px;
+  height: 550px;
+  top: 0px;
+  left: 0px;
+ }
+ 
