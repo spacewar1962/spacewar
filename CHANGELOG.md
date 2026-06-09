@@ -2,6 +2,14 @@
 
 All notable changes to the _Spacewar!_ Critical Code Studies website. Versions follow the GitHub releases.
 
+## v1.2.0 — 2026-06-10
+
+- Rewrote the repository README into a full project front page (banner, badges, the object, the reading, provenance) and expanded the project description with plans, including the monograph that grows from the reading and the code-and-image visual analysis.
+- Two alternate front pages, linked from a view switcher: a 1990s text-only version (`index-text.html`) and a vector-display version (`index-vector.html`).
+- Issue and pull-request templates for the protected-`main` workflow.
+- Public `docs/` reading area (reading log and close-reading memos) and a `code/` workspace for programming as scholarship.
+- Front-page copy edits; Wikipedia links now open in new tabs.
+
 ## v1.1.0 — 2026-06-10
 
 - Brand assets for link previews: `assets/og-card.png` (Open Graph card), `assets/social-preview.png` (repo social card, 1280×640), `assets/org-avatar.png` (organisation mark).
