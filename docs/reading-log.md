@@ -5,7 +5,7 @@ A running, reverse-chronological log of the reading. Newest entries on top. Each
 ## Entry template
 
 ```
-## YYYY-MM-DD — short title
+## YYYY-MM-DD: short title
 
 **Looked at:** spacewar.mac L<start>–L<end> (and/or feature, paratext)
 **Found:** the observation.
@@ -14,7 +14,7 @@ A running, reverse-chronological log of the reading. Newest entries on top. Each
 
 ---
 
-## 2026-06-10 — Project set up
+## 2026-06-10: Project set up
 
 **Looked at:** the repository as a whole.
 **Found:** the original `spacewar.mac` MIDAS source, the `spacewar.lst` listing with octal addresses, the provenance snapshot, and a working emulator are all in place; the reading can move between text and execution.

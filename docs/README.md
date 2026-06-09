@@ -4,8 +4,8 @@ Public-facing notes for the critical code reading of _Spacewar!_. This is where 
 
 ## Contents
 
-- [`reading-log.md`](reading-log.md) — a dated, reverse-chronological log of reading sessions: what was looked at, what was found, what it opened.
-- [`readings/`](readings/) — close-reading memos, one per code fragment, each keyed to a line range in [`spacewar.mac`](../spacewar.mac) and the corresponding octal block in [`spacewar.lst`](../spacewar.lst).
+- [`reading-log.md`](reading-log.md): a dated, reverse-chronological log of reading sessions: what was looked at, what was found, what it opened.
+- [`readings/`](readings/): close-reading memos, one per code fragment, each keyed to a line range in [`spacewar.mac`](../spacewar.mac) and the corresponding octal block in [`spacewar.lst`](../spacewar.lst).
 
 ## Method
 

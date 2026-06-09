@@ -5,7 +5,7 @@ One memo per code fragment, keyed to a line range in [`../../spacewar.mac`](../.
 ## Template
 
 ```markdown
-# <slug> — <short title>
+# <slug>: <short title>
 
 **Source:** spacewar.mac L<start>–L<end> · **Listing:** spacewar.lst octal <addr>–<addr>
 
@@ -31,8 +31,8 @@ _(none yet)_
 
 Candidates, in rough reading order:
 
-- `macro-defines` — the MIDAS `define` block at the head of the source.
-- `outline-compiler` — the spaceship-outline drawing scheme.
-- `expensive-planetarium` — Samson's star background.
-- `gravity` — Edwards's central-star gravity.
-- `hyperspace` — the random-jump panic button.
+- `macro-defines`: the MIDAS `define` block at the head of the source.
+- `outline-compiler`: the spaceship-outline drawing scheme.
+- `expensive-planetarium`: Samson's star background.
+- `gravity`: Edwards's central-star gravity.
+- `hyperspace`: the random-jump panic button.
