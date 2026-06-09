@@ -81,6 +81,9 @@ body::after { /* vignette + flicker */
 
 .wrap { width: min(var(--wrap), 92vw); margin: 0 auto; }
 
+/* offset anchor jumps so the sticky header doesn't cover the target heading */
+section[id], [id]:target { scroll-margin-top: 92px; }
+
 /* ---------- links ---------- */
 a { color: var(--beam); text-decoration: none; }
 a:hover { color: var(--bright); text-shadow: var(--glow); }
