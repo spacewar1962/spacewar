@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://spacewar1962.github.io/spacewar/">
-    <img src="assets/social-preview.png" alt="Spacewar! — A Critical Code Studies Reading" width="820">
+    <img src="assets/social-preview.png" alt="Spacewar! A Critical Code Studies Reading" width="820">
   </a>
 </p>
 
