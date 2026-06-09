@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SPACEWAR! (1962) — Vector display</title>
+  <meta name="description" content="A critical code reading of Spacewar!, the 1962 PDP-1 game. Vector display version.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <style>
+    :root{ --v:#52ff8e; --vdim:#2f9c58; --bg:#020503; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; background:var(--bg); color:var(--v);
+      font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:15px; line-height:1.6;
+      text-shadow:0 0 4px rgba(82,255,142,.7),0 0 9px rgba(82,255,142,.35); overflow-x:hidden; }
+    /* faint vector grid + flicker overlay */
+    body::before{ content:""; position:fixed; inset:0; pointer-events:none; z-index:50;
+      background:
+        linear-gradient(rgba(82,255,142,.05) 1px, transparent 1px) 0 0/100% 44px,
+        linear-gradient(90deg, rgba(82,255,142,.05) 1px, transparent 1px) 0 0/44px 100%,
+        radial-gradient(ellipse 80% 70% at 50% 45%, transparent 55%, rgba(0,0,0,.7) 100%); }
+    body::after{ content:""; position:fixed; inset:0; pointer-events:none; z-index:51;
+      background:rgba(82,255,142,.015); animation:flick 4.2s infinite steps(50); }
+    @keyframes flick{ 0%,100%{opacity:1} 48%{opacity:.75} 49%{opacity:1} 92%{opacity:.85} }
+    @media (prefers-reduced-motion: reduce){ body::after{ animation:none } }
+    .wrap{ max-width:880px; margin:0 auto; padding:28px 26px 70px; position:relative; z-index:1; }
+    a{ color:var(--v); text-decoration:none; border-bottom:1px solid rgba(82,255,142,.4); }
+    a:hover{ text-shadow:0 0 8px var(--v),0 0 18px var(--v); border-bottom-color:var(--v); }
+    .top{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12px; letter-spacing:1px; color:var(--vdim); border-bottom:1px solid rgba(82,255,142,.3); padding-bottom:10px; }
+    .top a{ border:0; color:var(--vdim); } .top a:hover{ color:var(--v); }
+    .hero{ text-align:center; padding:46px 0 30px; }
+    .hero svg{ width:84px; height:84px; filter:drop-shadow(0 0 6px var(--v)); }
+    h1{ font-size:clamp(48px,13vw,104px); line-height:.9; margin:14px 0 0; letter-spacing:4px; font-weight:400;
+      color:transparent; -webkit-text-stroke:1.6px var(--v); text-stroke:1.6px var(--v);
+      filter:drop-shadow(0 0 8px rgba(82,255,142,.7)) drop-shadow(0 0 24px rgba(82,255,142,.4)); }
+    .sub{ letter-spacing:5px; text-transform:uppercase; font-size:13px; color:var(--v); margin-top:14px; }
+    .panel{ border:1px solid rgba(82,255,142,.45); border-radius:2px; padding:18px 20px; margin:18px 0;
+      box-shadow:0 0 10px rgba(82,255,142,.12), inset 0 0 14px rgba(82,255,142,.05); }
+    h2{ font-size:15px; letter-spacing:3px; text-transform:uppercase; font-weight:400; margin:0 0 10px;
+      color:transparent; -webkit-text-stroke:.7px var(--v); text-stroke:.7px var(--v);
+      filter:drop-shadow(0 0 5px rgba(82,255,142,.6)); }
+    p{ margin:0 0 10px; max-width:70ch; }
+    ul,ol{ margin:6px 0; padding-left:22px; } li{ margin:3px 0; }
+    pre{ font-size:12px; color:var(--v); border:1px dashed rgba(82,255,142,.4); padding:12px; overflow-x:auto; }
+    .actions{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-top:24px; }
+    .btn{ border:1px solid var(--v); padding:10px 20px; letter-spacing:2px; text-transform:uppercase; font-size:13px; border-radius:2px; }
+    .btn:hover{ background:rgba(82,255,142,.12); box-shadow:0 0 12px var(--v); }
+    .foot{ color:var(--vdim); font-size:12px; letter-spacing:1px; margin-top:30px; border-top:1px solid rgba(82,255,142,.3); padding-top:12px; }
+    .foot a{ color:var(--vdim); border:0; } .foot a:hover{ color:var(--v); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <span>PDP-1 · TYPE 30 · VECTOR DISPLAY</span>
+    <span>view: <a href="index.html">default</a> · <a href="index-text.html">text</a> · vector</span>
+  </div>
+
+  <div class="hero">
+    <svg viewBox="0 0 32 40" aria-hidden="true"><path d="M16 3 L27 37 L16 30 L5 37 Z" fill="none" stroke="#52ff8e" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    <h1>SPACEWAR!</h1>
+    <div class="sub">Reading the code at the origin of computational play</div>
+    <div class="actions">
+      <a class="btn" href="play.html">&#9654; Play</a>
+      <a class="btn" href="bibliography.html">Bibliography</a>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>The argument</h2>
+    <p><i>Spacewar!</i> is where code first becomes play. Written across 1961-62 by Steve Russell and a circle of MIT hackers for the DEC PDP-1, in roughly two thousand words of MIDAS macro-assembly it gave the computer a starfield, two ships, gravity, and a panic button. This project reads that program as a cultural text, in the tradition of Critical Code Studies: at once literature, mechanism, spatial form, and a repository of the social formation that produced it.</p>
+  </div>
+
+  <div class="panel">
+    <h2>The object</h2>
+    <ul>
+      <li>spacewar.mac &mdash; original MIDAS source (~2,057 lines)</li>
+      <li>spacewar.lst &mdash; assembler listing, octal addresses + machine words</li>
+      <li>originsources.zip &mdash; dated provenance snapshot</li>
+      <li>spacewar.js &mdash; the PDP-1 emulator (<a href="play.html">play it</a>)</li>
+    </ul>
+    <pre>/macro spacewar! - pdp-1 midas source, 1962
+  define senseswitch A
+  repeat 3, A=A+A
+  szs A
+  term
+007652  640500    szm=sza sma-szf</pre>
+  </div>
+
+  <div class="panel">
+    <h2>The machine</h2>
+    <p>1962 · 18-bit words · 4096 words of core · Type 30 CRT at 1024 x 1024 points, P7 phosphor · PDP-1 ~$120,000. The Type 30 was a point-plotting vector display derived from radar. This page is rendered in its spirit.</p>
+  </div>
+
+  <div class="panel">
+    <h2>The reading</h2>
+    <ol>
+      <li><b>The machine that owns itself.</b></li>
+      <li><b>A language for ships</b> (the MIDAS macros and outline compiler).</li>
+      <li><b>The Expensive Planetarium</b> (Samson's real sky; Edwards's gravity).</li>
+      <li><b>Hyperspace</b>, or the random jump.</li>
+      <li><b>The demo and the gift.</b></li>
+      <li><b>The founding myth</b> and what it means for <i>Spacewar!</i></li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <h2>Contacts</h2>
+    <p>A collaboration bringing together critical code studies scholars and others.</p>
+    <ul>
+      <li>Prof. David M. Berry, Sussex (<a href="mailto:d.m.berry@sussex.ac.uk">d.m.berry@sussex.ac.uk</a>)</li>
+      <li>Prof. Mark C. Marino, USC (<a href="mailto:mcmarino@usc.edu">mcmarino@usc.edu</a>)</li>
+    </ul>
+  </div>
+
+  <div class="foot">
+    A Critical Code Studies project initiated by David M. Berry and Mark C. Marino · <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · companion to <i>Inventing ELIZA</i> (MIT Press, 2026)
+  </div>
+
+</div>
+</body>
+</html>

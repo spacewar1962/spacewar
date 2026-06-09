@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spacewar! (1962) - A Critical Code Studies Reading [text]</title>
+  <meta name="description" content="A critical code reading of Spacewar!, the 1962 PDP-1 game. Text-only version.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <style>
+    body { background:#ffffff; color:#000000; font-family:"Times New Roman",Times,serif; font-size:17px; line-height:1.5; margin:0; }
+    .page { max-width:720px; margin:0 auto; padding:24px 28px 60px; }
+    a { color:#0000ee; }
+    a:visited { color:#551a8b; }
+    h1 { font-size:30px; text-align:center; margin:0.2em 0 0; }
+    .byline { text-align:center; font-style:italic; margin:0.3em 0 0; }
+    h2 { font-size:21px; margin-top:1.6em; border-bottom:1px solid #999; padding-bottom:2px; }
+    pre { font-family:"Courier New",Courier,monospace; font-size:13px; background:#f4f4f4; border:1px solid #cccccc; padding:10px; overflow-x:auto; }
+    .nav { text-align:center; font-family:"Courier New",Courier,monospace; font-size:14px; margin:10px 0; }
+    .small { font-size:13px; color:#444; }
+    hr { border:0; border-top:1px solid #999; margin:1.4em 0; }
+    ul { margin:0.4em 0; }
+    .ship { text-align:center; font-family:"Courier New",Courier,monospace; font-size:12px; line-height:1.1; color:#444; white-space:pre; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <div class="ship">      /\
+     /  \
+    / /\ \
+   /_/  \_\
+   \      /
+    \____/</div>
+
+  <h1>SPACEWAR! (1962)</h1>
+  <p class="byline">A Critical Code Studies Reading</p>
+
+  <div class="nav">[ <a href="play.html">Play</a> | <a href="bibliography.html">Bibliography</a> | <a href="https://github.com/spacewar1962/spacewar">Code</a> ]</div>
+  <div class="nav small">View this page as: Default (<a href="index.html">graphical</a>) | Text (this page) | <a href="index-vector.html">Vector display</a></div>
+
+  <hr>
+
+  <p><i>Spacewar!</i> is where code first becomes play. Written across 1961-62 by Steve Russell and a circle of MIT hackers for the DEC PDP-1, in roughly two thousand words of MIDAS macro-assembly it gave the computer a starfield, two ships, gravity, and a panic button. It is one of the founding objects of computational culture: real-time interactive graphics, the hacker ethic, the demo, and the free circulation of source.</p>
+
+  <p>This project reads that program as a cultural text. Following Critical Code Studies, the source is approached in its multiplicity, as literature, as mechanism, as spatial form, and as a repository of the social formation that produced it. Reading about the origins of computing is not the same as reading the origin's code, and the aim here is the latter.</p>
+
+  <h2>Critical Code Studies</h2>
+  <p>Critical Code Studies (CCS) applies the interpretive methods of the humanities to computer source code, reading code, architecture, and documentation within their sociohistorical context. Its premise is that lines of code are not value-neutral: meaning grows out of what the code does but is never exhausted by it.</p>
+  <ul>
+    <li><a href="https://electronicbookreview.com/essay/critical-code-studies/">Mark C. Marino, "Critical Code Studies"</a> (Electronic Book Review, 2006)</li>
+    <li><a href="https://mitpress.mit.edu/9780262043656/critical-code-studies/">Mark C. Marino, <i>Critical Code Studies</i></a> (MIT Press, 2020)</li>
+    <li><a href="https://stunlaw.blogspot.com/2024/12/reflections-on-method-for-critical-code.html">David M. Berry, "Reflections on Method for Critical Code Studies"</a></li>
+  </ul>
+
+  <h2>A companion to Inventing ELIZA</h2>
+  <p>This study is a companion to <i>Inventing ELIZA: How the First Chatbot Shaped the Future of AI</i> (Sarah Ciston, David M. Berry, Anthony C. Hay, Mark C. Marino, Peter Millican, Jeff Shrager, Arthur I. Schwarz and Peggy Weil, MIT Press, 2026). They are two foundational programs of the long 1960s, read side by side: ELIZA teaches the machine to talk, <i>Spacewar!</i> teaches it to play.</p>
+
+  <h2>A short history of Spacewar!</h2>
+  <p><i>Spacewar!</i> was conceived in 1961 by Martin Graetz, Wayne Wiitanen, and Steve Russell, members of the circle around MIT's Tech Model Railroad Club. Russell wrote the core over the winter of 1961-62. Peter Samson replaced the random background with the <i>Expensive Planetarium</i>, the actual night sky; Dan Edwards added a central star whose gravity pulled both ships toward it; Graetz added hyperspace, a panic button. By spring 1962 Alan Kotok and Bob Saunders had built dedicated control boxes. Almost as soon as it existed it circulated, copied from PDP-1 to PDP-1, an open artefact decades before "open source" had a name.</p>
+
+  <h2>The object</h2>
+  <ul>
+    <li><b>spacewar.mac</b> - the original MIDAS macro-assembly source (~2,057 lines). The primary close-reading text.</li>
+    <li><b>spacewar.lst</b> - the assembler listing: octal addresses and machine words beside each line.</li>
+    <li><b>originsources.zip</b> - a dated upstream snapshot tracing the source through the Silverman / Gerasimov emulator.</li>
+    <li><b>spacewar.js</b> - the PDP-1 emulator. <a href="play.html">Play it</a>.</li>
+  </ul>
+
+  <pre>/macro spacewar! - pdp-1 midas source, 1962
+
+  define senseswitch A
+  repeat 3, A=A+A
+  szs A
+  term
+
+007652  640500    szm=sza sma-szf</pre>
+
+  <h2>The machine, in numbers</h2>
+  <ul>
+    <li>First played: 1962</li>
+    <li>Word length: 18-bit</li>
+    <li>Core memory: 4096 words</li>
+    <li>Type 30 CRT: 1024 x 1024 points, P7 phosphor</li>
+    <li>PDP-1 price: ~$120,000</li>
+  </ul>
+
+  <h2>The reading</h2>
+  <p>The study works across the registers of Critical Code Studies, pairing close technical explication of a code fragment with the cultural constellation that spirals out from it. Six movements:</p>
+  <ol>
+    <li><b>The machine that owns itself.</b> A self-contained program with the whole PDP-1 to itself.</li>
+    <li><b>A language for ships.</b> The MIDAS macros and the outline compiler as a small language Russell built to write the game in.</li>
+    <li><b>The expensive planetarium.</b> Samson's real star catalogue; Edwards's gravity.</li>
+    <li><b>Hyperspace, or the random jump.</b> Contingency and risk designed into a deterministic machine.</li>
+    <li><b>The demo and the gift.</b> Collective authorship and the free circulation of the source.</li>
+    <li><b>The founding myth.</b> A critical reading of the origin story of hacker culture and what it means for <i>Spacewar!</i></li>
+  </ol>
+
+  <h2>Contacts</h2>
+  <p>The <i>Spacewar!</i> reading is a collaboration bringing together critical code studies scholars and others.</p>
+  <ul>
+    <li>Professor David M. Berry, University of Sussex (<a href="mailto:d.m.berry@sussex.ac.uk">d.m.berry@sussex.ac.uk</a>)</li>
+    <li>Professor Mark C. Marino, University of Southern California (<a href="mailto:mcmarino@usc.edu">mcmarino@usc.edu</a>)</li>
+  </ul>
+
+  <hr>
+  <p class="small">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. Source at <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a>. Emulator after Silverman &amp; Gerasimov.<br>
+  Last updated: 10 June 2026. Best viewed with any browser.</p>
+
+</div>
+</body>
+</html>
