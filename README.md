@@ -39,6 +39,8 @@ The primary text is the original MIDAS macro-assembly source, preserved here alo
 | `index.html`, `play.html`, `bibliography.html` | The project website (served via GitHub Pages). |
 | `assets/`, `*.css` | Site styling and brand assets. |
 | `bibliography.source.md`, `build-bibliography.py` | The bibliography and the generator that renders it. |
+| [`docs/`](docs/) | Public reading notes: the reading log and close-reading memos. |
+| [`code/`](code/) | Working space for programming as scholarship (modifications, variations, ports). For future use. |
 
 ## The reading
 
