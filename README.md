@@ -12,7 +12,13 @@
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
 </p>
 
-A critical code reading of **_Spacewar!_**, the space-combat game written for the DEC PDP-1 at MIT in 1961–62. We read the original MIDAS assembly source as a cultural text, in the tradition of Critical Code Studies: at once literature, mechanism, spatial form, and a repository of the social formation that produced it. This repository holds the source, a runnable emulator, and the project website. It is a companion to _Inventing ELIZA: How the First Chatbot Shaped the Future of AI_ (MIT Press, 2026).
+A critical code reading of **_Spacewar!_**, the space-combat game written for the DEC PDP-1 at MIT in 1961–62. We read the original MIDAS assembly source as a cultural text, in the tradition of Critical Code Studies: at once literature, mechanism, spatial form, and a repository of the social formation that produced it.
+
+This repository holds the original source, a runnable PDP-1 emulator, and the project website, so the reading can move between the text and its execution. _Spacewar!_ sits at an origin point of computational culture: real-time interactive graphics, the hacker ethic, the demo, and the free circulation of code all condense in roughly two thousand words of macro-assembly. Reading about the origins of computing is not the same as reading the origin's code, and the aim here is the latter, to sit with the listing, the macros, the octal addresses, and the running artefact, and to ask what this code knows, what it assumes, and what its founding myth leaves out.
+
+The project develops along several lines. Its principal output is a **monograph** that grows from the close reading, working through the source movement by movement and setting each fragment in its cultural constellation. Around the writing we treat programming as scholarship, using the emulator to run, modify, and port the program so that interpretation is tested against the artefact, and we read the visual register of the Type 30 display in conjunction with the code that produces it, binding critical code studies to a visual and media-archaeological analysis. Further threads include a variorum across the surviving versions and ports, a fuller account of the paratexts, and the political economy of the gift economy that circulated the source inside a Cold-War research budget.
+
+The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the Future of AI_ (MIT Press, 2026). They are two foundational programs of the long 1960s, read side by side: ELIZA teaches the machine to talk, _Spacewar!_ teaches it to play.
 
 ## Explore
 
@@ -70,4 +76,4 @@ _Spacewar!_ was created in 1961–62 by Steve Russell, Martin Graetz, Wayne Wiit
 
 ## Acknowledgements
 
-This reading builds on the Critical Code Studies tradition established by Mark C. Marino and developed in David M. Berry's materialist-phenomenological method, and on the work of the historians and preservationists who recovered and ran this code.
+This reading builds on the Critical Code Studies tradition developed by Mark C. Marino and David M. Berry, and on the work of the historians and preservationists who recovered and ran this code.

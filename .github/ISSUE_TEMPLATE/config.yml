@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Email the project leads
+    url: https://spacewar1962.github.io/spacewar/#contact
+    about: For anything that is not best raised as a public issue, contact David M. Berry or Mark C. Marino.
