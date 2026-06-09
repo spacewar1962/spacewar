@@ -1,57 +1,291 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-  <meta charset="UTF-8" />
-  <title>Spacewar! - Original 1962 code on PDP-1 emulator</title>
-  <meta name="description" content="Spacewar! - Original 1962 code on PDP-1 emulator">
-  <meta name="keywords" content="Spacewar! - Original 1962 code on PDP-1 emulator">
-  <meta name="generator" content="Spacewar! - Original 1962 code on PDP-1 emulator">
-  <meta name="referrer" content="no-referrer">
-  <meta name="robots" content="noarchive">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="HandheldFriendly" content="False">
-  <style type="text/css">
-    @import "spacewar.css";
-  </style>
-  <script type="text/javascript" src="spacewar.js"></script>
-  <script type="text/javascript" src="spacewar.bin.js"></script>
-  <script type="text/javascript">
-    if (!document.createElement('canvas').getContext) {
-      window.location = "nocanvas.html";
-    }
-  </script>
-  <script>
-    function toggleLightMode() {
-      var element = document.body;
-      element.classList.toggle("light-mode");
-    }
-  </script>
+  <title>Spacewar! (1962) — A Critical Code Studies Reading</title>
+  <meta name="description" content="A critical code reading of Spacewar!, the space-combat game written for the DEC PDP-1 in 1962. Reading the original MIDAS assembly source as cultural text at the origin of computational play.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="Spacewar! (1962) — A Critical Code Studies Reading">
+  <meta property="og:description" content="Reading the original 1962 PDP-1 Spacewar! source as cultural text.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="assets/css/site.css">
 </head>
+<body>
 
-<body onload="setup();">
-  <center>
-    <h1>
-      <font face="Arial">
-        <font size="5">Spacewar!</font><br>
-        <a href="readme.html">
-          <font size="3">Original 1962 game code running on a PDP-1 emulator in JavaScript</font>
-        </a>
-        <br>
-        The "w", "a", "s", "d" keys control one of the spaceships.
-        The "i", "j", "k", "l" keys control the other.
-        The controls are shoot, spin left, thrust, spin right.
-        <br>
-        <button onclick="toggleLightMode()">Toggle Light/Dark Mode</button>
-      </font>
-    </h1>
-    <div class="frame" id="frame">
-      <div class="spacewar">
-        <canvas class="spacewar" id="swcanvas"></canvas>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <nav class="site-nav">
+        <a href="#ccs">CCS</a>
+        <a href="#history">History</a>
+        <a href="#object">Object</a>
+        <a href="#reading">Reading</a>
+        <a href="bibliography.html">Biblio</a>
+        <a href="play.html">Play</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <canvas id="starfield" aria-hidden="true"></canvas>
+    <div class="wrap hero-inner">
+      <p class="boot">PDP-1 · MIDAS macro assembly · MIT, 1961–62 <span class="cursor"></span></p>
+      <h1>SPACEWAR<span class="bang">!</span></h1>
+      <p class="sub">Reading the code at the origin of computational play</p>
+      <p class="tagline">A critical code study of the space-combat program written for the DEC&nbsp;PDP-1 at MIT in 1962, read line by line as a cultural text.</p>
+      <div class="hero-actions">
+        <a class="btn" href="play.html">▶ Play the original</a>
+        <a class="btn ghost" href="#object">Read the project</a>
       </div>
     </div>
-  </center>
-</body>
+  </section>
 
+  <main class="wrap content">
+
+    <!-- ===================== LEDE ===================== -->
+    <section class="block lede" id="about">
+      <span class="kicker">The argument</span>
+      <p><i>Spacewar!</i> is where code first becomes play. Written across 1961–62 by Steve Russell and a circle of MIT hackers for the DEC&nbsp;PDP-1, in roughly two thousand words of MIDAS macro-assembly it gave the computer a starfield, two ships, gravity, and a panic button. It is one of the founding objects of computational culture: real-time interactive graphics, the hacker ethos, the demo, the free circulation of source, all condense here, on a machine whose lineage runs back through Lincoln Laboratory and the Cold-War air-defence project SAGE.</p>
+      <p>This project reads that program as a cultural text. Following Critical Code Studies, the source is approached in its multiplicity, as literature, as mechanism, as spatial form, and as a repository of the social formation that produced it. Reading <i>about</i> the origins of computing is not the same as reading the origin's code. The aim is to do the latter: to sit with the listing, the macros, the octal addresses, and the running artefact, and to ask what this code knows, what it assumes, and what its founding myth leaves out.</p>
+    </section>
+
+    <div class="rule"><span>read · spiral outward</span></div>
+
+    <!-- ===================== CRITICAL CODE STUDIES ===================== -->
+    <section class="block" id="ccs">
+      <span class="kicker">The field</span>
+      <h2>Critical Code Studies</h2>
+      <p>Critical Code Studies (CCS) applies the interpretive methods of the humanities to computer source code, reading code, architecture, and documentation within their sociohistorical context. Its premise is that lines of code are not value-neutral: meaning grows out of what the code does but is never exhausted by it. Code can be close-read like any other text, attended to for its naming, its comments, its silences, and the assumptions it encodes, while still being held to its material test, that it must compile and run.</p>
+      <p>This reading works in the tradition set out by Mark C. Marino and developed in David M. Berry's materialist-phenomenological method, reading code at once as literature, mechanism, spatial form, and social repository.</p>
+      <ul class="links">
+        <li><a href="https://electronicbookreview.com/essay/critical-code-studies/">Mark C. Marino, "Critical Code Studies"</a> <span class="meta">— the founding essay (Electronic Book Review, 2006).</span></li>
+        <li><a href="https://mitpress.mit.edu/9780262043656/critical-code-studies/">Mark C. Marino, <i>Critical Code Studies</i></a> <span class="meta">— the field's book-length statement (MIT Press, 2020).</span></li>
+        <li><a href="https://stunlaw.blogspot.com/2024/12/reflections-on-method-for-critical-code.html">David M. Berry, "Reflections on Method for Critical Code Studies"</a> <span class="meta">— the method this project follows.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================== INVENTING ELIZA ===================== -->
+    <section class="block">
+      <div class="callout">
+        <span class="kicker">A companion project</span>
+        <p>This study is a companion to <i>Inventing ELIZA: How the First Chatbot Shaped the Future of AI</i> (Sarah Ciston, David M. Berry, Anthony C. Hay, Mark C. Marino, Peter Millican, Jeff Shrager, Arthur I. Schwarz and Peggy Weil, MIT Press, 2026), the team's critical code reading of Joseph Weizenbaum's 1966 conversation program. Two foundational programs of the long 1960s, read side by side: ELIZA teaches the machine to talk, <i>Spacewar!</i> teaches it to play. One opens the question of artificial conversation and the projection of mind onto code; the other opens the question of real-time interaction, simulation, and computational play. Together they let us read the origins of computational culture not through its myths but through its source.</p>
+        <p><a href="https://electronicbookreview.com/essay/reading-eliza-critical-code-studies-in-action/">Read "Reading ELIZA: Critical Code Studies in Action" →</a></p>
+      </div>
+    </section>
+
+    <!-- ===================== HISTORY ===================== -->
+    <section class="block" id="history">
+      <span class="kicker">1961–1962</span>
+      <h2>A short history of Spacewar!</h2>
+      <p><i>Spacewar!</i> was conceived in 1961 by Martin Graetz, Wayne Wiitanen, and Steve Russell, members of the circle around MIT's Tech Model Railroad Club, when the Hingham Institute set itself the problem of writing a program that would show off the new PDP-1. Russell wrote the core over the winter of 1961–62. Two ships, a needle and a wedge, fired torpedoes at one another across a starfield. From there it grew by accretion: Peter Samson replaced the random background with the <i>Expensive Planetarium</i>, the actual night sky; Dan Edwards added a central star whose gravity pulled both ships toward it; Graetz added hyperspace, a panic button that made a ship vanish and reappear elsewhere at random, at the risk of never coming back. By spring 1962 Alan Kotok and Bob Saunders had built dedicated control boxes so players need not hunch over the console switches.</p>
+      <p>Almost as soon as it existed it circulated. The source was copied from PDP-1 to PDP-1, modified, extended, and passed on, an open artefact decades before "open source" had a name. <b>What we intend to do</b> is read that artefact closely: to take the surviving MIDAS source and its assembler listing and work through them line by line, pairing technical explication with cultural interpretation, and asking what this small, much-copied program can tell us about the moment computation became interactive, playable, and shared.</p>
+    </section>
+
+    <div class="rule"><span>007652</span></div>
+
+    <!-- ===================== THE OBJECT ===================== -->
+    <section class="block" id="object">
+      <span class="kicker">What is being read</span>
+      <h2>The object</h2>
+      <p>The primary text is the original MIDAS macro-assembly source, preserved here alongside its assembler listing, its provenance snapshot, and a runnable PDP-1 emulator, so that the reading can move between text and execution.</p>
+      <div class="grid">
+        <article class="card">
+          <p class="obj">spacewar.mac · ~2057 lines</p>
+          <h3>The source</h3>
+          <p>Russell's MIDAS macro-assembly for the 1962 game: the macro definitions, the ship-outline compiler, gravity, hyperspace. The primary close-reading text.</p>
+        </article>
+        <article class="card">
+          <p class="obj">spacewar.lst · 233 KB</p>
+          <h3>The listing</h3>
+          <p>The assembler listing: octal addresses and machine words beside each line. The material memory layout, the program as it sits in core.</p>
+        </article>
+        <article class="card">
+          <p class="obj">originsources.zip</p>
+          <h3>The provenance</h3>
+          <p>A dated upstream snapshot tracing the source back through the Silverman / Gerasimov PDP-1 emulator to the recovered 3.1 listing. The chain of custody.</p>
+        </article>
+        <article class="card">
+          <p class="obj">spacewar.js · emulator</p>
+          <h3>The running artefact</h3>
+          <p>A PDP-1 emulator in the browser. The 1962 code, executing. <a href="play.html">Play it →</a></p>
+        </article>
+      </div>
+
+      <pre class="listing"><span class="com">/macro spacewar! — pdp-1 midas source, 1962</span>
+
+  <span class="kw">define</span> senseswitch A
+  repeat 3, A=A+A
+  szs A
+  <span class="kw">term</span>
+
+  <span class="kw">define</span> hyperspace        <span class="com">; the panic button: vanish, return at random</span>
+  ...
+<span class="addr">007652</span>  640500    szm=sza sma-szf</pre>
+    </section>
+
+    <div class="rule"><span>the machine</span></div>
+
+    <!-- ===================== FACTS / HARDWARE ===================== -->
+    <section class="block" id="machine">
+      <span class="kicker">Context · hardware · artefact</span>
+      <h2>The machine and its world</h2>
+
+      <div class="stat-strip">
+        <div class="stat"><div class="n">1962</div><div class="l">first played</div></div>
+        <div class="stat"><div class="n">18-bit</div><div class="l">word length</div></div>
+        <div class="stat"><div class="n">4096</div><div class="l">words of core</div></div>
+        <div class="stat"><div class="n">1024²</div><div class="l">CRT points</div></div>
+        <div class="stat"><div class="n">~$120k</div><div class="l">PDP-1 price</div></div>
+      </div>
+
+      <div class="hardware">
+        <div>
+          <p>The DEC PDP-1 was, for its day, an intimate machine. Where contemporary mainframes cost millions and were tended by operators behind glass, the PDP-1 sold for around $120,000, sat in a single room, and let one person work at it directly, watching results appear in real time on a round, radar-derived screen. That immediacy is the condition of possibility for <i>Spacewar!</i></p>
+          <p>The display was the DEC Type&nbsp;30, a sixteen-inch CRT addressing a grid of 1024&nbsp;×&nbsp;1024 points, coated in long-persistence P7 phosphor that flashed blue-white and faded to amber-green. Programs were loaded from punched paper tape through a Flexowriter. The custom control boxes, with two levers and a fire button, were among the first dedicated game controllers ever built.</p>
+        </div>
+        <svg viewBox="0 0 240 180" role="img" aria-label="The DEC Type 30 display and a Spacewar control box">
+          <!-- Type 30 console: hexagonal housing, round screen -->
+          <polygon points="20,40 120,30 120,150 20,160 8,100" fill="#1a2730" stroke="#5f93a8" stroke-width="1.5"/>
+          <polygon points="20,40 120,30 120,150 20,160 8,100" fill="none" stroke="#8fc3d6" stroke-width="0.6" opacity="0.5"/>
+          <circle cx="66" cy="96" r="44" fill="#050a14" stroke="#3f5a66" stroke-width="1.5"/>
+          <!-- starfield + two ships on the round screen -->
+          <g fill="#bfe4ff">
+            <circle cx="50" cy="78" r="0.8"/><circle cx="84" cy="70" r="0.8"/><circle cx="44" cy="104" r="0.8"/>
+            <circle cx="90" cy="110" r="0.8"/><circle cx="70" cy="120" r="0.8"/><circle cx="58" cy="64" r="0.8"/>
+            <circle cx="96" cy="92" r="0.8"/><circle cx="40" cy="90" r="0.8"/>
+          </g>
+          <circle cx="66" cy="96" r="1.6" fill="#ffce7a"/>
+          <path d="M54 86 L58 96 L54 93 L50 96 Z" fill="none" stroke="#6cf2ff" stroke-width="1"/>
+          <path d="M80 104 L82 96 L80 99 L78 96 Z" fill="none" stroke="#6cf2ff" stroke-width="1"/>
+          <!-- control box -->
+          <polygon points="150,120 220,110 232,140 162,152" fill="#243038" stroke="#9fb4bd" stroke-width="1.2"/>
+          <polygon points="150,120 220,110 232,140 162,152" fill="none" stroke="#8fc3d6" stroke-width="0.5" opacity="0.5"/>
+          <circle cx="178" cy="130" r="4" fill="#c0392b" stroke="#e07a6a" stroke-width="0.8"/>
+          <rect x="198" y="118" width="3" height="12" rx="1.5" fill="#9fb4bd"/>
+          <rect x="208" y="120" width="3" height="12" rx="1.5" fill="#9fb4bd"/>
+          <text x="150" y="170" fill="#5f93a8" font-family="monospace" font-size="7">TYPE 30 · CONTROL BOX</text>
+        </svg>
+      </div>
+
+      <div class="grid">
+        <article class="card fact">
+          <p class="obj">Context</p>
+          <h3>A hack at the model railroad club</h3>
+          <p><i>Spacewar!</i> came out of MIT's Tech Model Railroad Club and its hacker ethic, with a debt to E. E. "Doc" Smith's pulp space opera. The PDP-1's own lineage runs back through the TX-0 to Lincoln Lab and the Cold-War SAGE air-defence project.</p>
+        </article>
+        <article class="card fact">
+          <p class="obj">Hardware</p>
+          <h3>The first gamepad</h3>
+          <p>Toggling console switches gave players sore elbows, so in March 1962 Alan Kotok and Bob Saunders built wooden control boxes with levers for rotation and thrust and a button to fire, arguably the first purpose-built game controllers.</p>
+        </article>
+        <article class="card fact">
+          <p class="obj">Software artefact</p>
+          <h3>A real sky and a real pull</h3>
+          <p>Peter Samson's <i>Expensive Planetarium</i> plotted the actual stars of the night sky as the background; Dan Edwards added a central sun whose gravity well drew careless pilots to their doom. Hyperspace let you escape, sometimes fatally.</p>
+        </article>
+        <article class="card fact">
+          <p class="obj">Approach</p>
+          <h3>Reading, and re-running</h3>
+          <p>We read the MIDAS source closely across the registers of CCS, and treat programming as scholarship: running the emulator, making small modifications and ports, and comparing transcriptions, so interpretation is tested against the artefact itself.</p>
+        </article>
+      </div>
+    </section>
+
+    <div class="rule"><span>read · spiral outward</span></div>
+
+    <!-- ===================== THE READING ===================== -->
+    <section class="block" id="reading">
+      <span class="kicker">Method</span>
+      <h2>The reading</h2>
+      <p>The study works across the registers of Critical Code Studies, pairing close technical explication of a code fragment with the cultural constellation that spirals out from it. Each fragment is read at three levels and traced through three movements.</p>
+      <ol class="method">
+        <li data-n="1"><b>The machine that owns itself.</b> Ontology: a self-contained program with the whole PDP-1 to itself, addressing core in octal. The lineage from SAGE and Lincoln Lab; what it takes to make the code run, then and now.</li>
+        <li data-n="2"><b>A language for ships.</b> The MIDAS macros and the outline-compiler as a small language Russell built to write the game in: a theory of computational expression embedded in the assembler. Code that writes code, at the origin.</li>
+        <li data-n="3"><b>The expensive planetarium.</b> Peter Samson's real star catalogue rendered as background; Dan Edwards's gravity. The politics and aesthetics of computational verisimilitude: what gets modelled, what gets abstracted away.</li>
+        <li data-n="4"><b>Hyperspace, or the random jump.</b> Contingency, risk, and play designed into a deterministic machine. The register trick, the randomness source, the panic button as game-feel.</li>
+        <li data-n="5"><b>The demo and the gift.</b> Collective authorship and the free circulation of the source to every PDP-1 site: a gift economy running inside a Cold-War defence budget. The emancipatory register held in tension with its genealogy.</li>
+        <li data-n="6"><b>The founding myth.</b> A hermeneutics of suspicion turned on the origin story of hacker culture itself, and on what it occludes.</li>
+      </ol>
+    </section>
+
+    <div class="rule"><span>▶</span></div>
+
+    <!-- ===================== PLAY CTA ===================== -->
+    <section class="block">
+      <div class="cta">
+        <span class="kicker">The artefact, running</span>
+        <h2>Play the 1962 original</h2>
+        <p>The unmodified Spacewar! source, executing on a PDP-1 emulator in your browser. Two ships, one star, gravity that will pull you in.</p>
+        <a class="btn" href="play.html">▶ Enter the playfield</a>
+      </div>
+    </section>
+
+    <div class="rule"><span>further reading</span></div>
+
+    <!-- ===================== FURTHER READING ===================== -->
+    <section class="block reading">
+      <span class="kicker">Background</span>
+      <h2>Further reading</h2>
+      <p>The reading sits within the Critical Code Studies programme and a wider literature on the history and culture of early computing.</p>
+
+      <h3>Method</h3>
+      <ul>
+        <li>David M. Berry, <i>The Philosophy of Software: Code and Mediation in the Digital Age</i> (Palgrave Macmillan, 2011).</li>
+        <li>Mark C. Marino, <i>Critical Code Studies</i> (MIT Press, 2020).</li>
+        <li>Nick Montfort et&nbsp;al., <i>10 PRINT CHR$(205.5+RND(1)); : GOTO 10</i> (MIT Press, 2013).</li>
+        <li>David M. Berry &amp; Mark C. Marino, <a href="https://electronicbookreview.com/essay/reading-eliza-critical-code-studies-in-action/">Reading ELIZA: Critical Code Studies in Action</a> (Electronic Book Review, 2024).</li>
+      </ul>
+
+      <h3>Spacewar! and the PDP-1</h3>
+      <ul>
+        <li>J. M. Graetz, <a href="https://www.masswerk.at/spacewar/SpacewarOrigin.html">"The Origin of Spacewar"</a>, <i>Creative Computing</i> (1981).</li>
+        <li>Stewart Brand, <a href="https://wheels.org/spacewar/stone/rolling_stone.html">"Spacewar: Fanatic Life and Symbolic Death Among the Computer Bums"</a>, <i>Rolling Stone</i> (1972).</li>
+        <li>Steven Levy, <i>Hackers: Heroes of the Computer Revolution</i> (1984).</li>
+      </ul>
+      <p class="micro" style="margin-top:1rem;">See the <a href="bibliography.html">full Critical Code Studies bibliography →</a>. References to be verified against Zotero before publication.</p>
+    </section>
+
+    <div class="rule"><span>contact</span></div>
+
+    <!-- ===================== CONTACTS ===================== -->
+    <section class="block" id="contact">
+      <span class="kicker">The project</span>
+      <h2>Contacts</h2>
+      <p>The Spacewar! reading is a collaboration between two critical code studies scholars.</p>
+      <div class="contacts">
+        <div class="contact">
+          <div class="role">Project lead</div>
+          <p class="name">Professor David M. Berry</p>
+          <p class="aff">University of Sussex</p>
+          <p><a href="mailto:d.m.berry@sussex.ac.uk">d.m.berry@sussex.ac.uk</a></p>
+        </div>
+        <div class="contact">
+          <div class="role">Project lead</div>
+          <p class="name">Professor Mark C. Marino</p>
+          <p class="aff">University of Southern California</p>
+          <p><a href="mailto:mcmarino@usc.edu">mcmarino@usc.edu</a></p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino.</p>
+      <p class="micro">Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · Emulator after Silverman &amp; Gerasimov.</p>
+    </div>
+  </footer>
+
+  <script src="assets/starfield.js"></script>
+</body>
 </html>
