@@ -66,6 +66,10 @@ Galloway, A. R. (2012) *The Interface Effect*. Polity.
 
 Glazier, L. P. (2002) *Digital Poetics: The Making of E-Poetries*. University of Alabama Press.
 
+Graetz, J. M. (1962) 'SPACEWAR! Real-Time Capability of the PDP-1', *DECUS Proceedings 1962*. Maynard, MA: Digital Equipment Computer Users Society. Available at: https://www.masswerk.at/spacewar/decus1962/.
+
+Graetz, J. M. (1981) 'The Origin of Spacewar', *Creative Computing* 7(8): 56-67. Available at: https://www.masswerk.at/spacewar/SpacewarOrigin.html.
+
 Habermas, J. (1972) *Knowledge and Human Interests*. Trans. Shapiro, J. Heinemann.
 
 Hayles, N. K. (2005) *My Mother Was a Computer: Digital Subjects and Literary Texts*. University of Chicago Press.
