@@ -85,7 +85,7 @@
     var W = canvas.width, H = canvas.height;
     var cx = W / 2, cy = H / 2;
     var scale = Math.min(W, H) / 2 * 0.74;
-    var raf = 0;
+    var raf = 0, driftY = 0;
 
     // three circle oscillators: {x,y} on a circle of radius |x,y|, epsilon e
     // sets the angular velocity, th/dth is the slow precession of each circle
@@ -100,7 +100,10 @@
     }
     function pos(o) {
       var c = Math.cos(o.th), s = Math.sin(o.th);
-      return [cx + (o.x * c - o.y * s) * scale, cy + (o.x * s + o.y * c) * scale];
+      var X = cx + (o.x * c - o.y * s) * scale;
+      var Y = cy + (o.x * s + o.y * c) * scale + driftY;
+      Y = ((Y % H) + H) % H;                                // walk down the screen, wrapping
+      return [X, Y];
     }
     function plot(dim) {
       ctx.fillStyle = dim ? 'rgba(96,224,255,0.5)' : 'rgba(175,250,255,0.98)';
@@ -117,6 +120,7 @@
       ctx.fillStyle = 'rgba(0,0,0,0.03)';                  // long persistence builds the figure
       ctx.fillRect(0, 0, W, H);
       for (var i = 0; i < 3; i++) osc[i].th += osc[i].dth;  // slow precession per frame
+      driftY = (driftY + 0.35) % H;                         // descend the display
       for (var j = 0; j < 9; j++) { step(); plot(true); }   // trace the circles
       plot(false);                                          // bright beam heads
       raf = requestAnimationFrame(frame);
