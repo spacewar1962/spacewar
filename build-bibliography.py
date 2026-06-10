@@ -64,7 +64,7 @@ page = f'''<!DOCTYPE html>
         </span>
       </a>
       <nav class="site-nav">
-        <a href="why.html">Why now</a>
+        <a href="why.html">Why?</a>
         <a href="./#ccs">CCS</a>
         <a href="./#history">History</a>
         <a href="./#object">Object</a>
