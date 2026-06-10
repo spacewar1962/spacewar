@@ -2,6 +2,12 @@
 
 All notable changes to the _Spacewar!_ Critical Code Studies website. Versions follow the GitHub releases.
 
+## v1.4.0 — 2026-06-10
+
+- The Minskytron easter egg now runs an animated display on the page: a dense, evolving rosette that morphs between a circle and a figure-of-eight and descends the screen, in CRT cyan, with the full name (Marvin Minsky's _Tri-Pos: Three-Position Display_) and links to the original emulation and the annotated source.
+- Acknowledgement of Norbert Landsteiner's _Spacewar!_ and Minskytron reconstructions (masswerk.at), on the front page and in the README.
+- Bibliography additions and culls; alternate front pages synced.
+
 ## v1.3.0 — 2026-06-10
 
 - New "Why?" page (`why.html`): seven reasons the project matters today (the scholarship gap with a verified literature survey, the retro turn as method, hardware specificity, Cold-War imaginaries with the funding trail and a surveillance lineage, gender and the writing of game history after Nooney, the first playable model and the road to AI, the gift before open source), plus a digression on games and software as research objects across digital humanities, game studies, platform and software studies, and a works-cited list verified against Zotero.

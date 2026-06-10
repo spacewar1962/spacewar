@@ -82,4 +82,4 @@ _Spacewar!_ was created in 1961–62 by Steve Russell, Martin Graetz, Wayne Wiit
 
 ## Acknowledgements
 
-This reading builds on the Critical Code Studies tradition developed by Mark C. Marino and David M. Berry, and on the work of the historians and preservationists who recovered and ran this code.
+This reading builds on the Critical Code Studies tradition developed by Mark C. Marino and David M. Berry, and on the work of the historians and preservationists who recovered and ran this code. We are especially indebted to the remarkable work of **Norbert Landsteiner**, whose emulations, reconstructions, source listings, and software-archaeological analyses of _Spacewar!_ and the Minskytron at [masswerk.at/spacewar](https://www.masswerk.at/spacewar/) this project draws on throughout.

@@ -38,9 +38,10 @@
       '</div>' +
       '<canvas width="284" height="170" style="width:100%;height:auto;display:block;background:#02040a;border:1px solid rgba(108,242,255,0.18);border-radius:2px"></canvas>' +
       '<p style="font-size:.72rem;line-height:1.45;color:#7fa6c4;margin:11px 0 0">' +
-        'Marvin Minsky’s PDP-1 display hack (1962), the precessing curve that became <i>Spacewar!</i>’s hyperspace. ' +
+        'Marvin Minsky’s <i>Tri-Pos: Three-Position Display</i> (early 1960s), the PDP-1 display hack that became <i>Spacewar!</i>’s hyperspace. ' +
         'Run the <a href="https://www.masswerk.at/minskytron/" target="_blank" rel="noopener noreferrer" style="color:#6cf2ff;text-decoration:none;border-bottom:1px solid rgba(108,242,255,.4)">original &rsaquo;</a> ' +
-        'or read the <a href="https://www.masswerk.at/minskytron/minskytron-annotated.txt" target="_blank" rel="noopener noreferrer" style="color:#6cf2ff;text-decoration:none;border-bottom:1px solid rgba(108,242,255,.4)">annotated source &rsaquo;</a>' +
+        'or read the <a href="https://www.masswerk.at/minskytron/minskytron-annotated.txt" target="_blank" rel="noopener noreferrer" style="color:#6cf2ff;text-decoration:none;border-bottom:1px solid rgba(108,242,255,.4)">annotated source &rsaquo;</a>, ' +
+        'after Norbert Landsteiner’s reconstruction.' +
       '</p>';
 
     document.body.appendChild(box);
@@ -62,41 +63,60 @@
     setTimeout(function () { if (open) close(); }, 22000);
   }
 
-  /* The display itself: a Lissajous figure whose phase and frequency ratio
-     drift slowly, redrawn over a fading field so the phosphor trails the way
-     a real long-persistence CRT would. Returns a stop() function. */
+  /* The actual Minskytron, ported from the PDP-1 source (dpys5.mac) via
+     Norbert Landsteiner's annotation and HAKMEM item 149. Three coupled
+     oscillators run Minsky's circle algorithm in 18-bit integer arithmetic
+     The figure is a Lissajous, the family the Minskytron's coupled
+     oscillators sweep through. A morph parameter m (0..1) carries it
+     between a circle (m=0) and a figure-of-eight (m=2): ratio 1->2 with the
+     phase swinging pi/2 -> 0 so both endpoints are clean closed figures.
+     Drawn as a crisp glowing outline that tumbles and walks down the
+     display, redrawn each frame so nothing smears. */
   function runMinskytron(canvas) {
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
-    var cx = W / 2, cy = H / 2, r = Math.min(W, H) * 0.40;
-    var phase = 0, ratio = 2.0, t = 0, raf = 0;
+    var cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 * 0.40;
+    var th = 0, driftY = 0, T = 0, raf = 0;
 
-    function drawFigure() {
-      ctx.strokeStyle = 'rgba(108,242,255,0.9)';
-      ctx.lineWidth = 1;
-      ctx.shadowColor = 'rgba(108,242,255,0.9)';
-      ctx.shadowBlur = 6;
+    // One continuous polyline traced over many periods, with each successive
+    // sample rotated a little, so the loops precess into the full overlapping
+    // rosette in a single crisp frame. No persistence, so nothing smears.
+    function drawCurve(off) {
+      var m = 0.5 * (1 + Math.sin(T * 0.010));     // 0..1: circle <-> figure-eight
+      var ratio = 1 + m, phase = (1 - m) * Math.PI / 2;
+      var amp = 0.82, N = 1500, dp = 0.085, dpr = 0.011;
       ctx.beginPath();
-      for (var i = 0; i <= 260; i++) {
-        var a = i / 260 * Math.PI * 2;
-        var x = cx + r * Math.sin(3 * a + phase);
-        var y = cy + r * Math.sin(ratio * a);
-        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      for (var i = 0; i <= N; i++) {
+        var pp = i * dp;
+        var rot = th + i * dpr;                    // precession baked into the trace
+        var x = amp * Math.sin(pp);
+        var y = amp * Math.sin(ratio * pp + phase);
+        var c = Math.cos(rot), s = Math.sin(rot);
+        var X = cx + (x * c - y * s) * R;
+        var Y = cy + (x * s + y * c) * R + off;
+        if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
       }
       ctx.stroke();
     }
+    function render() {
+      ctx.strokeStyle = 'rgba(108,240,255,0.45)';
+      ctx.lineWidth = 1;
+      ctx.shadowColor = 'rgba(108,242,255,0.7)';
+      ctx.shadowBlur = 4;
+      drawCurve(driftY);
+      drawCurve(driftY - H);                       // seamless wrap as it descends
+      ctx.shadowBlur = 0;
+    }
 
-    if (reduce) { ctx.fillStyle = '#02040a'; ctx.fillRect(0, 0, W, H); drawFigure(); return function () {}; }
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    if (reduce) { render(); return function () {}; }
 
     function frame() {
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = 'rgba(2,4,10,0.14)';   // fade for phosphor persistence
-      ctx.fillRect(0, 0, W, H);
-      drawFigure();
-      phase += 0.018;
-      ratio += 0.0009;                        // the figure slowly precesses and morphs
-      if (ratio > 5) ratio = 2.0;
-      t++;
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);   // clean redraw, no smear
+      T++;
+      th += 0.0016;
+      driftY = (driftY + 0.30) % H;                       // descend the display
+      render();
       raf = requestAnimationFrame(frame);
     }
     raf = requestAnimationFrame(frame);
