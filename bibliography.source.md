@@ -44,7 +44,7 @@ Ceruzzi, P. E. (2003) *A History of Modern Computing*. 2nd ed. MIT Press.
 
 Chun, W. H. K. (2011) *Programmed Visions: Software and Memory*. MIT Press.
 
-Ciston, Sarah, David M. Berry, Anthony C. Hay, Mark C. Marino, Peter Millican, Jeff Shrager, Arthur I. Schwarz and Peggy Weil (2026) *Inventing ELIZA: How the First Chatbot Shaped the Future of AI*. Cambridge, MA: MIT Press.
+Ciston, Sarah, David M. Berry, Anthony C. Hay, Mark C. Marino, Peter Millican, Arthur I. Schwarz, Jeff Shrager and Peggy Weil (2026) *Inventing ELIZA: How the First Chatbot Shaped the Future of AI*. Cambridge, MA: MIT Press.
 
 Crawford, K. (2021) *Atlas of AI*. Yale University Press.
 
