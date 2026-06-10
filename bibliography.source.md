@@ -52,6 +52,8 @@ D'Ignazio, C. & Klein, L. F. (2020) *Data Feminism*. MIT Press.
 
 Ensmenger, N. (2010) *The Computer Boys Take Over*. MIT Press.
 
+Evans, C. L. (2018) *Broad Band: The Untold Story of the Women Who Made the Internet*. New York: Penguin Random House.
+
 Friedman, B. & Nissenbaum, H. (1996) 'Bias in Computer Systems', *ACM Transactions on Information Systems* 14(3): 330-347.
 
 Fuller, M. (ed.) (2008) *Software Studies: A Lexicon*. MIT Press.
@@ -79,6 +81,8 @@ Karpathy, A. (2025) 'Vibe coding' [X/Twitter post]. 2 February. https://x.com/ka
 Kirschenbaum, M. (2008) *Mechanisms: New Media and the Forensic Imagination*. MIT Press.
 
 Kittler, F. (1999) *Gramophone, Film, Typewriter*. Trans. Winthrop-Young, G. & Wutz, M. Stanford University Press.
+
+Landsteiner, N. (2019) 'Inside Spacewar! A Software Archeological Approach to the First Video Game', *masswerk.at*. Available at: https://www.masswerk.at/spacewar/inside/.
 
 Latour, B. (1987) *Science in Action*. Harvard University Press.
 
@@ -157,5 +161,7 @@ Electronic Book Review: https://electronicbookreview.com/
 Platform Studies: https://platformstudies.com/
 
 Software Studies Initiative: http://lab.softwarestudies.com/
+
+Spacewar! (masswerk.at, Norbert Landsteiner) — emulation, source listings, and the *Inside Spacewar!* code analysis: https://www.masswerk.at/spacewar/
 
 Stunlaw: https://stunlaw.blogspot.com/
