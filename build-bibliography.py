@@ -80,7 +80,7 @@ page = f'''<!DOCTYPE html>
     <section class="block">
       <span class="kicker">Reference</span>
       <h2>Bibliography</h2>
-      <p>The working bibliography for the Critical Code Studies programme, shared with the <a href="https://github.com/dmberry/CCS-WB">CCS Workbench</a>. References enter project drafts only after verification against Zotero.</p>
+      <p>This is our working bibliography for the Critical Code Studies programme for our Spacewar! project.</p>
     </section>
 
     <div class="rule"><span>works cited</span></div>
