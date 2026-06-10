@@ -38,7 +38,7 @@
       '</div>' +
       '<canvas width="284" height="170" style="width:100%;height:auto;display:block;background:#02040a;border:1px solid rgba(108,242,255,0.18);border-radius:2px"></canvas>' +
       '<p style="font-size:.72rem;line-height:1.45;color:#7fa6c4;margin:11px 0 0">' +
-        'Marvin Minsky’s <i>Tri-Pos: Three-Position Display</i> (early 1960s), the PDP-1 display hack that became <i>Spacewar!</i>’s hyperspace. ' +
+        'Marvin Minsky’s <i>Tri-Pos: Three-Position Display</i> (early 1960s), the PDP-1 display hack that inspired <i>Spacewar!</i> ' +
         'Run the <a href="https://www.masswerk.at/minskytron/" target="_blank" rel="noopener noreferrer" style="color:#6cf2ff;text-decoration:none;border-bottom:1px solid rgba(108,242,255,.4)">original &rsaquo;</a> ' +
         'or read the <a href="https://www.masswerk.at/minskytron/minskytron-annotated.txt" target="_blank" rel="noopener noreferrer" style="color:#6cf2ff;text-decoration:none;border-bottom:1px solid rgba(108,242,255,.4)">annotated source &rsaquo;</a>, ' +
         'after Norbert Landsteiner’s reconstruction.' +
@@ -96,7 +96,11 @@
     ];
 
     function step() {
-      for (var i = 0; i < 3; i++) { var o = osc[i]; o.x -= o.e * o.y; o.y += o.e * o.x; }
+      for (var i = 0; i < 3; i++) {
+        var o = osc[i];
+        o.x -= o.e * o.y; o.y += o.e * o.x;   // Minsky circle
+        o.th += 0.22 * o.e;                    // precess while tracing -> the loops spiral into a rosette
+      }
     }
     function pos(o) {
       var c = Math.cos(o.th), s = Math.sin(o.th);
@@ -117,11 +121,10 @@
     if (reduce) { for (var i = 0; i < 1400; i++) { step(); plot(true); } plot(false); return function () {}; }
 
     function frame() {
-      ctx.fillStyle = 'rgba(0,0,0,0.03)';                  // long persistence builds the figure
+      ctx.fillStyle = 'rgba(0,0,0,0.018)';                 // long persistence builds the spirals
       ctx.fillRect(0, 0, W, H);
-      for (var i = 0; i < 3; i++) osc[i].th += osc[i].dth;  // slow precession per frame
-      driftY = (driftY + 0.35) % H;                         // descend the display
-      for (var j = 0; j < 9; j++) { step(); plot(true); }   // trace the circles
+      driftY = (driftY + 0.3) % H;                          // descend the display
+      for (var j = 0; j < 11; j++) { step(); plot(true); }  // trace the precessing circles
       plot(false);                                          // bright beam heads
       raf = requestAnimationFrame(frame);
     }
