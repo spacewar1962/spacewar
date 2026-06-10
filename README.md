@@ -23,6 +23,7 @@ The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the
 ## Explore
 
 - 🌐 **Project site:** <https://spacewar1962.github.io/spacewar/>
+- ❓ **Why this project matters today:** <https://spacewar1962.github.io/spacewar/why.html>
 - 🕹 **Play the 1962 original:** <https://spacewar1962.github.io/spacewar/play.html>
 - 📚 **Bibliography:** <https://spacewar1962.github.io/spacewar/bibliography.html>
 - 🖥 **Alternate front pages:** [text (1990s)](https://spacewar1962.github.io/spacewar/index-text.html) · [vector display](https://spacewar1962.github.io/spacewar/index-vector.html)
@@ -37,7 +38,7 @@ The primary text is the original MIDAS macro-assembly source, preserved here alo
 | [`spacewar.lst`](spacewar.lst) | The assembler listing: octal addresses and machine words beside each line. The program as it sits in core. |
 | [`originsources.zip`](originsources.zip) | A dated upstream snapshot, tracing the source back through the Silverman / Gerasimov PDP-1 emulator. |
 | `spacewar.js`, `spacewar.bin.js` | The PDP-1 emulator that runs the 1962 binary in the browser. |
-| `index.html`, `play.html`, `bibliography.html` | The project website (served via GitHub Pages). |
+| `index.html`, `why.html`, `play.html`, `bibliography.html` | The project website (served via GitHub Pages). |
 | `index-text.html`, `index-vector.html` | Alternate front pages: a 1990s text-only version and a vector-display version. |
 | `assets/`, `*.css` | Site styling and brand assets. |
 | `bibliography.source.md`, `build-bibliography.py` | The bibliography and the generator that renders it. |

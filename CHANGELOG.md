@@ -2,6 +2,12 @@
 
 All notable changes to the _Spacewar!_ Critical Code Studies website. Versions follow the GitHub releases.
 
+## v1.3.0 — 2026-06-10
+
+- New "Why?" page (`why.html`): seven reasons the project matters today (the scholarship gap with a verified literature survey, the retro turn as method, hardware specificity, Cold-War imaginaries with the funding trail and a surveillance lineage, gender and the writing of game history after Nooney, the first playable model and the road to AI, the gift before open source), plus a digression on games and software as research objects across digital humanities, game studies, platform and software studies, and a works-cited list verified against Zotero.
+- Copy edits across the front page (Wikipedia links in new tabs, reworded lede and contacts, "read as a cultural text").
+- Software Heritage linked from the shared-heritage discussion.
+
 ## v1.2.0 — 2026-06-10
 
 - Rewrote the repository README into a full project front page (banner, badges, the object, the reading, provenance) and expanded the project description with plans, including the monograph that grows from the reading and the code-and-image visual analysis.
