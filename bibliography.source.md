@@ -18,11 +18,7 @@ Berry, D. M. (ed.) (2012) *Understanding Digital Humanities*. Houndmills, Basing
 
 Berry, D. M. (2014) *Critical Theory and the Digital*. London: Bloomsbury.
 
-Berry, D. M. (2016) 'The Postdigital Constellation', in Berry, D. M. & Dieter, M. (eds) *Postdigital Aesthetics: Art, Computation and Design*, pp. 44-57. Basingstoke: Palgrave Macmillan.
-
 Berry, D. M. (2023a) 'Critical Digital Humanities', in O'Sullivan, J. (ed.) *The Bloomsbury Handbook to the Digital Humanities*, pp. 125-135. London: Bloomsbury.
-
-Berry, D. M. (2023d) 'Tracing Toxicity Through Code: Towards a Method of Explainability and Interpretability in Software', *Digital Humanities Quarterly* 17(2).
 
 Berry, D. M. (2024) 'Reflections on Method for Critical Code Studies', *Stunlaw: Philosophy and Critique for a Digital Age*. Available at: https://stunlaw.blogspot.com/2024/12/reflections-on-method-for-critical-code.html.
 
