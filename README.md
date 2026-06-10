@@ -27,7 +27,7 @@ The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the
 - 🕹 **Play the 1962 original:** <https://spacewar1962.github.io/spacewar/play.html>
 - 📚 **Bibliography:** <https://spacewar1962.github.io/spacewar/bibliography.html>
 - 🖥 **Alternate front pages:** [text (1990s)](https://spacewar1962.github.io/spacewar/index-text.html) · [vector display](https://spacewar1962.github.io/spacewar/index-vector.html)
-- ↯ **Easter egg:** type `minsky` on the front page to summon the [Minskytron](https://www.masswerk.at/minskytron/), the PDP-1 display hack that came before _Spacewar!_ (and gave it the hyperspace effect).
+- ↯ **Easter egg:** type `minsky` on the front page to summon the Minskytron, the PDP-1 display hack that came before _Spacewar!_ (and gave it the hyperspace effect). It draws live on the page, with a link to the [original emulation](https://www.masswerk.at/minskytron/).
 
 ## The object
 
