@@ -69,6 +69,7 @@ page = f'''<!DOCTYPE html>
         <a href="./#history">History</a>
         <a href="./#object">Object</a>
         <a href="./#reading">Reading</a>
+        <a href="bibliography.html">Biblio</a>
         <a href="play.html">Play</a>
         <a href="./#contact">Contact</a>
       </nav>
