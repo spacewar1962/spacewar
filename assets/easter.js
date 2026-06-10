@@ -75,56 +75,50 @@
      The full daisy-chained scheme is unstable in floating point (it relied
      on the PDP-1's integer wraparound), so here we run three independent
      oscillators in the stable core form of Minsky's circle algorithm
-       x -= e*y ;  y += e*x     (the just-updated x, as Minsky describes)
-     each tracing a clean circle, at different radii and angular velocities
-     (their epsilons), and slowly precessing, so they overlap into the
-     turning rosette the original drew. The dots accumulate on a long-
-     persistence field, P7-style: bright cyan beam, the trace lingering. */
+       x -= e*y ;  y += e*x
+     a point circulating the origin. Letting its radius grow as it turns,
+     and resetting at the rim, turns each into a spiral arm. Three arms set
+     a third of a turn apart make a symmetric pinwheel that slowly rotates,
+     the dots accumulating on a long-persistence field, P7-style. */
   function runMinskytron(canvas) {
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
     var cx = W / 2, cy = H / 2;
-    var scale = Math.min(W, H) / 2 * 0.74;
-    var raf = 0, driftY = 0;
+    var scale = Math.min(W, H) / 2 * 0.86;
+    var raf = 0, spin = 0;
 
-    // three circle oscillators: {x,y} on a circle of radius |x,y|, epsilon e
-    // sets the angular velocity, th/dth is the slow precession of each circle
-    var osc = [
-      { x: 0.98, y: 0,    e: 0.040, th: 0,    dth: 0.0016 },
-      { x: 0,    y: 0.68, e: 0.058, th: 1.9,  dth: -0.0021 },
-      { x: 1.16, y: 0,    e: 0.029, th: 3.6,  dth: 0.0027 }
-    ];
+    var RMIN = 0.04, RMAX = 1.04, OMEGA = 0.085, DR = 0.0042;
+    // three spiral arms, a third of a turn apart
+    var arm = [ { a: 0, r: RMIN }, { a: 2.0944, r: RMIN }, { a: 4.1888, r: RMIN } ];
 
     function step() {
       for (var i = 0; i < 3; i++) {
-        var o = osc[i];
-        o.x -= o.e * o.y; o.y += o.e * o.x;   // Minsky circle
-        o.th += 0.22 * o.e;                    // precess while tracing -> the loops spiral into a rosette
+        var o = arm[i];
+        o.a += OMEGA;                          // circulate (Minsky's rotation)
+        o.r += DR;                             // ... while the radius grows: a spiral
+        if (o.r > RMAX) o.r = RMIN;            // reset at the rim -> a fresh arm
       }
     }
     function pos(o) {
-      var c = Math.cos(o.th), s = Math.sin(o.th);
-      var X = cx + (o.x * c - o.y * s) * scale;
-      var Y = cy + (o.x * s + o.y * c) * scale + driftY;
-      Y = ((Y % H) + H) % H;                                // walk down the screen, wrapping
-      return [X, Y];
+      var a = o.a + spin;
+      return [cx + o.r * Math.cos(a) * scale, cy + o.r * Math.sin(a) * scale];
     }
     function plot(dim) {
       ctx.fillStyle = dim ? 'rgba(96,224,255,0.5)' : 'rgba(175,250,255,0.98)';
       if (!dim) { ctx.shadowColor = 'rgba(120,242,255,0.95)'; ctx.shadowBlur = 5; }
       var sz = dim ? 1.3 : 2.4;
-      for (var i = 0; i < 3; i++) { var p = pos(osc[i]); ctx.fillRect(p[0] - sz / 2, p[1] - sz / 2, sz, sz); }
+      for (var i = 0; i < 3; i++) { var p = pos(arm[i]); ctx.fillRect(p[0] - sz / 2, p[1] - sz / 2, sz, sz); }
       if (!dim) ctx.shadowBlur = 0;
     }
 
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    if (reduce) { for (var i = 0; i < 1400; i++) { step(); plot(true); } plot(false); return function () {}; }
+    if (reduce) { for (var i = 0; i < 1600; i++) { step(); plot(true); } plot(false); return function () {}; }
 
     function frame() {
-      ctx.fillStyle = 'rgba(0,0,0,0.018)';                 // long persistence builds the spirals
+      ctx.fillStyle = 'rgba(0,0,0,0.014)';                  // long persistence builds the spiral
       ctx.fillRect(0, 0, W, H);
-      driftY = (driftY + 0.3) % H;                          // descend the display
-      for (var j = 0; j < 11; j++) { step(); plot(true); }  // trace the precessing circles
+      spin += 0.004;                                        // the whole pinwheel turns slowly
+      for (var j = 0; j < 9; j++) { step(); plot(true); }   // trace the arms
       plot(false);                                          // bright beam heads
       raf = requestAnimationFrame(frame);
     }
