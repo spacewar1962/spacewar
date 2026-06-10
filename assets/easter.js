@@ -63,60 +63,69 @@
     setTimeout(function () { if (open) close(); }, 22000);
   }
 
-  /* The actual Minskytron, ported from the PDP-1 source (dpys5.mac) via
-     Norbert Landsteiner's annotation and HAKMEM item 149. Three coupled
-     oscillators run Minsky's circle algorithm in 18-bit integer arithmetic
-     The figure is a Lissajous, the family the Minskytron's coupled
-     oscillators sweep through. A morph parameter m (0..1) carries it
-     between a circle (m=0) and a figure-of-eight (m=2): ratio 1->2 with the
-     phase swinging pi/2 -> 0 so both endpoints are clean closed figures.
-     Drawn as a crisp glowing outline that tumbles and walks down the
-     display, redrawn each frame so nothing smears. */
+  /* The actual Minskytron, after the PDP-1 source (dpys5.mac), Norbert
+     Landsteiner's annotation, and HAKMEM item 149. Three oscillators run
+     Minsky's circle algorithm, daisy-chained, each coordinate modified by
+     the difference to the next oscillator and scaled by a right shift:
+
+       ya += (xa + xb) >> sh0 ;  xa -= (ya - yb) >> sh1   (plot xa,ya)
+       yb += (xb - xc) >> sh2 ;  xb -= (yb - yc) >> sh3   (plot xb,yb)
+       yc += (xc - xa) >> sh4 ;  xc -= (yc - ya) >> sh5   (plot xc,yc)
+
+     The six shifts come from a Test Word (three bits each, +1). Different
+     Test Words give different figures, so we cycle a few for variety, and
+     the dots accumulate on a long-persistence field to draw the curve. */
   function runMinskytron(canvas) {
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
-    var cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 * 0.40;
-    var th = 0, driftY = 0, T = 0, raf = 0;
+    var cx = W / 2, cy = H / 2;
+    var scale = (Math.min(W, H) / 2) * 0.9 / 512;   // display uses the top 10 bits
+    var MAX = 1 << 17;                              // 18-bit signed range
 
-    // One continuous polyline traced over many periods, with each successive
-    // sample rotated a little, so the loops precess into the full overlapping
-    // rosette in a single crisp frame. No persistence, so nothing smears.
-    function drawCurve(off) {
-      var m = 0.5 * (1 + Math.sin(T * 0.010));     // 0..1: circle <-> figure-eight
-      var ratio = 1 + m, phase = (1 - m) * Math.PI / 2;
-      var amp = 0.82, N = 1500, dp = 0.085, dpr = 0.011;
-      ctx.beginPath();
-      for (var i = 0; i <= N; i++) {
-        var pp = i * dp;
-        var rot = th + i * dpr;                    // precession baked into the trace
-        var x = amp * Math.sin(pp);
-        var y = amp * Math.sin(ratio * pp + phase);
-        var c = Math.cos(rot), s = Math.sin(rot);
-        var X = cx + (x * c - y * s) * R;
-        var Y = cy + (x * s + y * c) * R + off;
-        if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
-      }
-      ctx.stroke();
+    function wrap(v) { v = (v + MAX) % (2 * MAX); if (v < 0) v += 2 * MAX; return v - MAX; }
+    function sar(v, k) { return Math.floor(v / (1 << k)); }   // arithmetic right shift
+
+    // a few Test Words (shift sextets) that keep the daisy-chain smooth and
+    // bounded; per-oscillator variation gives overlapping circles of
+    // different size and speed, and each word draws a different figure
+    var WORDS = [
+      [7, 7, 8, 8, 9, 9], [8, 8, 8, 8, 8, 8], [7, 8, 8, 9, 7, 9],
+      [9, 8, 7, 8, 9, 7], [8, 9, 8, 7, 9, 8], [7, 9, 8, 7, 9, 8]
+    ];
+    var xa, ya, xb, yb, xc, yc, sh, wi = 0, raf = 0, frames = 0;
+
+    function seed() {
+      xa = -8192; ya = 0; xb = 0; yb = 16384; xc = 8192; yc = 0;
+      sh = WORDS[wi % WORDS.length]; wi++;
     }
-    function render() {
-      ctx.strokeStyle = 'rgba(108,240,255,0.45)';
-      ctx.lineWidth = 1;
-      ctx.shadowColor = 'rgba(108,242,255,0.7)';
-      ctx.shadowBlur = 4;
-      drawCurve(driftY);
-      drawCurve(driftY - H);                       // seamless wrap as it descends
-      ctx.shadowBlur = 0;
+    function step() {
+      ya = wrap(ya + sar(xa + xb, sh[0]));  xa = wrap(xa - sar(ya - yb, sh[1]));
+      yb = wrap(yb + sar(xb - xc, sh[2]));  xb = wrap(xb - sar(yb - yc, sh[3]));
+      yc = wrap(yc + sar(xc - xa, sh[4]));  xc = wrap(xc - sar(yc - ya, sh[5]));
+    }
+    function px(v) { return cx + sar(v, 8) * scale; }
+    function py(v) { return cy + sar(v, 8) * scale; }
+    function plot(dim) {
+      ctx.fillStyle = dim ? 'rgba(96,224,255,0.5)' : 'rgba(170,250,255,0.95)';
+      if (!dim) { ctx.shadowColor = 'rgba(120,242,255,0.9)'; ctx.shadowBlur = 4; }
+      var s = dim ? 1.2 : 2;
+      ctx.fillRect(px(xa) - s / 2, py(ya) - s / 2, s, s);
+      ctx.fillRect(px(xb) - s / 2, py(yb) - s / 2, s, s);
+      ctx.fillRect(px(xc) - s / 2, py(yc) - s / 2, s, s);
+      if (!dim) ctx.shadowBlur = 0;
     }
 
+    seed();
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    if (reduce) { render(); return function () {}; }
+    if (reduce) { for (var i = 0; i < 1200; i++) { step(); plot(true); } plot(false); return function () {}; }
 
     function frame() {
-      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);   // clean redraw, no smear
-      T++;
-      th += 0.0016;
-      driftY = (driftY + 0.30) % H;                       // descend the display
-      render();
+      frames++;
+      if (frames % 480 === 0) { seed(); }                 // new Test Word ~ every 8s
+      ctx.fillStyle = 'rgba(0,0,0,0.025)';                // long persistence builds the figure
+      ctx.fillRect(0, 0, W, H);
+      for (var i = 0; i < 10; i++) { step(); plot(true); } // cyan trail of dots
+      plot(false);                                        // the bright beam heads
       raf = requestAnimationFrame(frame);
     }
     raf = requestAnimationFrame(frame);
