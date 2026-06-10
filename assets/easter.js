@@ -72,54 +72,51 @@
        yb += (xb - xc) >> sh2 ;  xb -= (yb - yc) >> sh3   (plot xb,yb)
        yc += (xc - xa) >> sh4 ;  xc -= (yc - ya) >> sh5   (plot xc,yc)
 
-     The full daisy-chained scheme is unstable in floating point (it relied
-     on the PDP-1's integer wraparound), so here we run three independent
-     oscillators in the stable core form of Minsky's circle algorithm
-       x -= e*y ;  y += e*x
-     a point circulating the origin. Letting its radius grow as it turns,
-     and resetting at the rim, turns each into a spiral arm. Three arms set
-     a third of a turn apart make a symmetric pinwheel that slowly rotates,
-     the dots accumulating on a long-persistence field, P7-style. */
+     Here, kept simple: three pens trace circles of different radii. A morph
+     value eases each circle into a spiral (the radius ramps with the angle)
+     and back, and the whole thing drifts slowly down the display. */
   function runMinskytron(canvas) {
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
     var cx = W / 2, cy = H / 2;
-    var scale = Math.min(W, H) / 2 * 0.86;
-    var raf = 0, spin = 0;
+    var scale = Math.min(W, H) / 2 * 0.92;
+    var raf = 0, t = 0, T = 0, driftY = 0;
 
-    var RMIN = 0.04, RMAX = 1.04, OMEGA = 0.085, DR = 0.0042;
-    // three spiral arms, a third of a turn apart
-    var arm = [ { a: 0, r: RMIN }, { a: 2.0944, r: RMIN }, { a: 4.1888, r: RMIN } ];
+    // three pens: base radius R, angular velocity w, starting phase ph
+    var pen = [
+      { R: 0.40, w: 0.100, ph: 0 },
+      { R: 0.66, w: 0.072, ph: 2.1 },
+      { R: 0.92, w: 0.052, ph: 4.2 }
+    ];
 
-    function step() {
-      for (var i = 0; i < 3; i++) {
-        var o = arm[i];
-        o.a += OMEGA;                          // circulate (Minsky's rotation)
-        o.r += DR;                             // ... while the radius grows: a spiral
-        if (o.r > RMAX) o.r = RMIN;            // reset at the rim -> a fresh arm
-      }
-    }
-    function pos(o) {
-      var a = o.a + spin;
-      return [cx + o.r * Math.cos(a) * scale, cy + o.r * Math.sin(a) * scale];
+    function pos(p) {
+      var ang = t * p.w + p.ph;
+      var m = 0.5 * (1 + Math.sin(T * 0.010));         // 0 = circle, 1 = spiral
+      var sweep = (ang / (2 * Math.PI * 2.5)) % 1;      // 0..1 ramp over 2.5 turns
+      var rad = p.R * ((1 - m) + m * (0.15 + 0.85 * sweep));
+      var X = cx + rad * Math.cos(ang) * scale;
+      var Y = cy + rad * Math.sin(ang) * scale + driftY;
+      Y = ((Y % H) + H) % H;                            // drift down, wrapping
+      return [X, Y];
     }
     function plot(dim) {
       ctx.fillStyle = dim ? 'rgba(96,224,255,0.5)' : 'rgba(175,250,255,0.98)';
       if (!dim) { ctx.shadowColor = 'rgba(120,242,255,0.95)'; ctx.shadowBlur = 5; }
       var sz = dim ? 1.3 : 2.4;
-      for (var i = 0; i < 3; i++) { var p = pos(arm[i]); ctx.fillRect(p[0] - sz / 2, p[1] - sz / 2, sz, sz); }
+      for (var i = 0; i < 3; i++) { var q = pos(pen[i]); ctx.fillRect(q[0] - sz / 2, q[1] - sz / 2, sz, sz); }
       if (!dim) ctx.shadowBlur = 0;
     }
 
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    if (reduce) { for (var i = 0; i < 1600; i++) { step(); plot(true); } plot(false); return function () {}; }
+    if (reduce) { for (var i = 0; i < 1600; i++) { t++; plot(true); } plot(false); return function () {}; }
 
     function frame() {
-      ctx.fillStyle = 'rgba(0,0,0,0.014)';                  // long persistence builds the spiral
+      ctx.fillStyle = 'rgba(0,0,0,0.05)';               // moderate trail: a clean comet, not a smear
       ctx.fillRect(0, 0, W, H);
-      spin += 0.004;                                        // the whole pinwheel turns slowly
-      for (var j = 0; j < 9; j++) { step(); plot(true); }   // trace the arms
-      plot(false);                                          // bright beam heads
+      T++;
+      driftY = (driftY + 0.16) % H;                     // slow descent
+      for (var j = 0; j < 6; j++) { t++; plot(true); }   // trace
+      plot(false);                                      // bright heads
       raf = requestAnimationFrame(frame);
     }
     raf = requestAnimationFrame(frame);
