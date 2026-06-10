@@ -72,60 +72,53 @@
        yb += (xb - xc) >> sh2 ;  xb -= (yb - yc) >> sh3   (plot xb,yb)
        yc += (xc - xa) >> sh4 ;  xc -= (yc - ya) >> sh5   (plot xc,yc)
 
-     The six shifts come from a Test Word (three bits each, +1). Different
-     Test Words give different figures, so we cycle a few for variety, and
-     the dots accumulate on a long-persistence field to draw the curve. */
+     The full daisy-chained scheme is unstable in floating point (it relied
+     on the PDP-1's integer wraparound), so here we run three independent
+     oscillators in the stable core form of Minsky's circle algorithm
+       x -= e*y ;  y += e*x     (the just-updated x, as Minsky describes)
+     each tracing a clean circle, at different radii and angular velocities
+     (their epsilons), and slowly precessing, so they overlap into the
+     turning rosette the original drew. The dots accumulate on a long-
+     persistence field, P7-style: bright cyan beam, the trace lingering. */
   function runMinskytron(canvas) {
     var ctx = canvas.getContext('2d');
     var W = canvas.width, H = canvas.height;
     var cx = W / 2, cy = H / 2;
-    var scale = (Math.min(W, H) / 2) * 0.9 / 512;   // display uses the top 10 bits
-    var MAX = 1 << 17;                              // 18-bit signed range
+    var scale = Math.min(W, H) / 2 * 0.74;
+    var raf = 0;
 
-    function wrap(v) { v = (v + MAX) % (2 * MAX); if (v < 0) v += 2 * MAX; return v - MAX; }
-    function sar(v, k) { return Math.floor(v / (1 << k)); }   // arithmetic right shift
-
-    // a few Test Words (shift sextets) that keep the daisy-chain smooth and
-    // bounded; per-oscillator variation gives overlapping circles of
-    // different size and speed, and each word draws a different figure
-    var WORDS = [
-      [7, 7, 8, 8, 9, 9], [8, 8, 8, 8, 8, 8], [7, 8, 8, 9, 7, 9],
-      [9, 8, 7, 8, 9, 7], [8, 9, 8, 7, 9, 8], [7, 9, 8, 7, 9, 8]
+    // three circle oscillators: {x,y} on a circle of radius |x,y|, epsilon e
+    // sets the angular velocity, th/dth is the slow precession of each circle
+    var osc = [
+      { x: 0.98, y: 0,    e: 0.040, th: 0,    dth: 0.0016 },
+      { x: 0,    y: 0.68, e: 0.058, th: 1.9,  dth: -0.0021 },
+      { x: 1.16, y: 0,    e: 0.029, th: 3.6,  dth: 0.0027 }
     ];
-    var xa, ya, xb, yb, xc, yc, sh, wi = 0, raf = 0, frames = 0;
 
-    function seed() {
-      xa = -8192; ya = 0; xb = 0; yb = 16384; xc = 8192; yc = 0;
-      sh = WORDS[wi % WORDS.length]; wi++;
-    }
     function step() {
-      ya = wrap(ya + sar(xa + xb, sh[0]));  xa = wrap(xa - sar(ya - yb, sh[1]));
-      yb = wrap(yb + sar(xb - xc, sh[2]));  xb = wrap(xb - sar(yb - yc, sh[3]));
-      yc = wrap(yc + sar(xc - xa, sh[4]));  xc = wrap(xc - sar(yc - ya, sh[5]));
+      for (var i = 0; i < 3; i++) { var o = osc[i]; o.x -= o.e * o.y; o.y += o.e * o.x; }
     }
-    function px(v) { return cx + sar(v, 8) * scale; }
-    function py(v) { return cy + sar(v, 8) * scale; }
+    function pos(o) {
+      var c = Math.cos(o.th), s = Math.sin(o.th);
+      return [cx + (o.x * c - o.y * s) * scale, cy + (o.x * s + o.y * c) * scale];
+    }
     function plot(dim) {
-      ctx.fillStyle = dim ? 'rgba(96,224,255,0.5)' : 'rgba(170,250,255,0.95)';
-      if (!dim) { ctx.shadowColor = 'rgba(120,242,255,0.9)'; ctx.shadowBlur = 4; }
-      var s = dim ? 1.2 : 2;
-      ctx.fillRect(px(xa) - s / 2, py(ya) - s / 2, s, s);
-      ctx.fillRect(px(xb) - s / 2, py(yb) - s / 2, s, s);
-      ctx.fillRect(px(xc) - s / 2, py(yc) - s / 2, s, s);
+      ctx.fillStyle = dim ? 'rgba(96,224,255,0.5)' : 'rgba(175,250,255,0.98)';
+      if (!dim) { ctx.shadowColor = 'rgba(120,242,255,0.95)'; ctx.shadowBlur = 5; }
+      var sz = dim ? 1.3 : 2.4;
+      for (var i = 0; i < 3; i++) { var p = pos(osc[i]); ctx.fillRect(p[0] - sz / 2, p[1] - sz / 2, sz, sz); }
       if (!dim) ctx.shadowBlur = 0;
     }
 
-    seed();
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    if (reduce) { for (var i = 0; i < 1200; i++) { step(); plot(true); } plot(false); return function () {}; }
+    if (reduce) { for (var i = 0; i < 1400; i++) { step(); plot(true); } plot(false); return function () {}; }
 
     function frame() {
-      frames++;
-      if (frames % 480 === 0) { seed(); }                 // new Test Word ~ every 8s
-      ctx.fillStyle = 'rgba(0,0,0,0.025)';                // long persistence builds the figure
+      ctx.fillStyle = 'rgba(0,0,0,0.03)';                  // long persistence builds the figure
       ctx.fillRect(0, 0, W, H);
-      for (var i = 0; i < 10; i++) { step(); plot(true); } // cyan trail of dots
-      plot(false);                                        // the bright beam heads
+      for (var i = 0; i < 3; i++) osc[i].th += osc[i].dth;  // slow precession per frame
+      for (var j = 0; j < 9; j++) { step(); plot(true); }   // trace the circles
+      plot(false);                                          // bright beam heads
       raf = requestAnimationFrame(frame);
     }
     raf = requestAnimationFrame(frame);

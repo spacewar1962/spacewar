@@ -201,8 +201,8 @@ h3 { font-family: var(--mono); font-weight: 700; font-size: 1.05rem; color: var(
 .reading h3 { margin-top: 2rem; color: var(--beam); }
 
 /* ---------- footer ---------- */
-.site-footer { border-top: 1px solid var(--line-soft); padding: 2.5rem 0; margin-top: 4rem; font-family: var(--mono); font-size: 0.78rem; color: var(--phosphor-dim); letter-spacing: 0.5px; }
-.site-footer .wrap { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.site-footer { border-top: 1px solid var(--line-soft); padding: 1.4rem 0; margin-top: 2.5rem; font-family: var(--mono); font-size: 0.78rem; color: var(--phosphor-dim); letter-spacing: 0.5px; }
+.site-footer .wrap { display: flex; flex-direction: column; gap: 0.35rem; }
 .site-footer a { color: var(--phosphor-dim); border: 0; }
 .site-footer a:hover { color: var(--beam); }
 
