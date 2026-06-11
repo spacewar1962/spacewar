@@ -16,7 +16,8 @@
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
-  <link rel="stylesheet" href="assets/css/site.css?v=2">
+  <link rel="stylesheet" href="assets/css/site.css?v=3">
+  <script src="assets/nav.js" defer></script>
   <script src="spacewar.js"></script>
   <script src="spacewar.bin.js"></script>
   <script>
@@ -34,12 +35,14 @@
           <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
         </span>
       </a>
-      <nav class="site-nav">
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
         <a href="why.html">Why?</a>
         <a href="./#ccs">CCS</a>
         <a href="./#history">History</a>
         <a href="./#object">Object</a>
         <a href="code.html">Code</a>
+        <a href="people.html">People</a>
         <a href="bibliography.html">Biblio</a>
         <a href="play.html">Play</a>
         <a href="./#contact">Contact</a>

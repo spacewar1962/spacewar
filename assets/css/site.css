@@ -99,7 +99,7 @@ a:hover { color: var(--bright); text-shadow: var(--glow); }
 }
 .site-header .wrap {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 0; gap: 1rem;
+  padding: 12px 0; gap: 1rem; position: relative;
 }
 .brand { display: flex; align-items: center; gap: 0.7rem; border: 0 !important; }
 .brand svg { width: 30px; height: 30px; filter: drop-shadow(var(--glow)); }
@@ -109,9 +109,25 @@ a:hover { color: var(--bright); text-shadow: var(--glow); }
   color: var(--bright); text-shadow: var(--glow-soft); font-size: 1rem;
 }
 .brand-tagline { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 1px; color: var(--phosphor-dim); text-transform: uppercase; }
-.site-nav { display: flex; align-items: center; gap: 1.05rem; font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.8px; text-transform: uppercase; }
-.site-nav a { color: var(--phosphor-dim); border: 0; }
-.site-nav a:hover { color: var(--beam); text-shadow: var(--glow); }
+.nav-toggle {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: none; border: 1px solid var(--line); color: var(--beam);
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase;
+  padding: 7px 13px; border-radius: 3px; cursor: pointer;
+}
+.nav-toggle:hover { border-color: var(--beam); color: var(--bright); text-shadow: var(--glow); }
+.nav-toggle .bars { font-size: 0.95rem; line-height: 1; }
+.site-nav {
+  position: absolute; top: calc(100% + 7px); right: 0;
+  display: none; flex-direction: column;
+  min-width: 200px; max-width: min(280px, 86vw); padding: 0.4rem 0;
+  background: rgba(5,9,15,0.98); border: 1px solid var(--line); border-radius: 4px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.8px; text-transform: uppercase;
+}
+.site-nav.open { display: flex; }
+.site-nav a { color: var(--phosphor-dim); border: 0; padding: 0.6rem 1.2rem; }
+.site-nav a:hover { color: var(--beam); text-shadow: var(--glow); background: rgba(108,242,255,0.06); }
 
 /* ---------- hero ---------- */
 .hero { position: relative; min-height: 78vh; display: flex; align-items: center; overflow: hidden; border-bottom: 1px solid var(--line-soft); }
@@ -284,7 +300,6 @@ canvas#swcanvas { display: block; width: 100%; height: 100%; background: #000; b
 .micro a:hover { color: var(--beam); }
 
 @media (max-width: 620px) {
-  .site-nav { gap: 0.9rem; font-size: 0.7rem; }
   .brand-tagline { display: none; }
   .content { padding: 3rem 0; }
 }
