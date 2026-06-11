@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Code: Versions of Spacewar!</title>
+  <meta name="description" content="A summary of the principal versions of the Spacewar! code, 1962-1963 and after: 1, 2B, 3.1, the 4.x generation, and later reconstructions.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="The Code: Versions of Spacewar!">
+  <meta property="og:description" content="A summary of the principal versions of the Spacewar! code.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/code.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <nav class="site-nav">
+        <a href="why.html">Why?</a>
+        <a href="./#ccs">CCS</a>
+        <a href="./#history">History</a>
+        <a href="./#object">Object</a>
+        <a href="code.html">Code</a>
+        <a href="bibliography.html">Biblio</a>
+        <a href="play.html">Play</a>
+        <a href="./#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">The code</span>
+      <h2>Versions of Spacewar!</h2>
+      <p><i>Spacewar!</i> is not one program but a family of them. Across 1962 and 1963 it was written, patched, and re-patched by a shifting cast of authors, and later reconstructed and extended by preservationists. For a critical code reading this matters: there is no single canonical text, only a variorum, and the differences between versions are themselves evidence of how the game, the machine, and the culture around them changed.</p>
+      <p>This page summarises the principal versions. Every one of them can be played, in faithful emulation, at Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">masswerk.at/spacewar</a>, on whose detailed documentation this summary draws throughout. The version this project forks and reads is 3.1.</p>
+    </section>
+
+    <div class="rule"><span>1962</span></div>
+
+    <section class="block">
+      <span class="kicker">The first year</span>
+
+      <h3>Spacewar! 1 (early 1962)</h3>
+      <p>The first playable version, running by February 1962: two ships, torpedoes, and a simple star background, but no gravity and no hyperspace. The original is lost and survives only through reconstruction.</p>
+
+      <h3 style="margin-top:2rem;">Spacewar! 2B (2 April 1962)</h3>
+      <p>The first complete version, and the one shown to the public at MIT's Parents' Weekend that month, arguably the first public showing of a digital video game. It carries Peter Samson's <i>Expensive Planetarium</i> (the real star background, devised for this version) and Martin Graetz's hyperspace, whose warp animation borrows the look of Minsky's display hack, the "Minskytron signature." Explosions are blocky, torpedoes single-shot, hyperspace limited to three risky jumps. This is the version closest to the game's public birth.</p>
+
+      <h3 style="margin-top:2rem;">Spacewar! 3.1 (24 September 1962)</h3>
+      <p>The standard version. Returning briefly to MIT, Steve Russell consolidated the scattered patches into one coherent program. It is the version most often preserved and emulated, and the one this project forks, runs, and reads.</p>
+    </section>
+
+    <div class="rule"><span>1963</span></div>
+
+    <section class="block">
+      <span class="kicker">The 4.x generation</span>
+      <h3>Spacewar! 4.1 to 4.8 (1963)</h3>
+      <p>A new line that required the PDP-1's hardware multiply/divide option. Monty Preonas rewrote the gravity routine using floating-point conversions; the line added a working single-shot torpedo mode and, over time, an on-screen score display.</p>
+      <ul class="links" style="margin-top:1.2rem;">
+        <li><b>4.1 / 4.2</b> <span class="meta">(signed "dfw", February 1963), representative of the early 4.x line.</span></li>
+        <li><b>4.1f</b> <span class="meta">the version restored and shown at the Computer History Museum, with the score display patched in and star intensities remapped to the museum's machine.</span></li>
+        <li><b>4.3</b> <span class="meta">(Monty Preonas, May 1963), notable for its Twin Star mode, a subjective view rendered from the Needle's perspective: an early experiment in point-of-view rendering.</span></li>
+        <li><b>4.8</b> <span class="meta">(24 July 1963), apparently the last MIT version, with Peter Samson's score display. Versions 4.5 to 4.7 are lost.</span></li>
+      </ul>
+    </section>
+
+    <div class="rule"><span>reconstructions</span></div>
+
+    <section class="block">
+      <span class="kicker">Later and reconstructed</span>
+      <h3>Variants, hacks, and kin</h3>
+      <p>Landsteiner's emulator also carries reconstructions and extensions worth noting for the reading. A <b>Holloman Air Force Base</b> variant restores altered starting positions recorded by a player in 1966. <b>Spacewar! 2015</b> is Landsteiner's own new PDP-1 program, reviving the Minskytron hyperspace signature and a working subjective view. Parameter hacks such as <b>"Winds of Space"</b> warp the torpedoes' trajectories by tuning a single constant in memory. And the same emulator runs other early PDP-1 graphics programs, including the <b>Minskytron</b> itself and <b>Snowflake</b>.</p>
+    </section>
+
+    <div class="rule"><span>a hackable game</span></div>
+
+    <section class="block">
+      <span class="kicker">Why so many</span>
+      <h3>Built to be changed</h3>
+      <p>The proliferation of versions is itself a finding. Every version but the earliest opens with a block of "interesting and often changed constants," arguably the first cheats in gaming, meant to be retuned at the console or in the debugger. The spaceship outlines are likewise defined as hackable strings of octal directives, compiled at run time by Dan Edwards's outline compiler, plausibly the earliest just-in-time compiler. The code was made to be modified, which is part of why the family is so large, and part of what the reading will pursue.</p>
+      <p class="micro" style="margin-top:1.4rem;">Version histories, dates, and technical detail summarised here are drawn from Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">masswerk.at/spacewar</a>, where each version can be played and is documented far more fully than this overview allows.</p>
+    </section>
+
+    <div class="rule"><span>▶</span></div>
+
+    <section class="block">
+      <div class="cta">
+        <span class="kicker">The artefact</span>
+        <h2>Play version 3.1</h2>
+        <p>This site runs the standard 1962 version, the one read here, in a PDP-1 emulator in your browser.</p>
+        <a class="btn" href="play.html">▶ Play</a>
+        <a class="btn ghost" href="./#object">The object</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · <a href="https://github.com/spacewar1962/spacewar/releases">v1.4</a></p>
+      <p class="micro">Version detail and emulations after Norbert Landsteiner, <a href="https://www.masswerk.at/spacewar/">masswerk.at/spacewar</a>.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
