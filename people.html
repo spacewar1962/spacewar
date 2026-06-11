@@ -18,6 +18,25 @@
   <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
   <link rel="stylesheet" href="assets/css/site.css?v=3">
   <script src="assets/nav.js" defer></script>
+  <style>
+    .person { display: flex; gap: 1.15rem; align-items: flex-start; }
+    .person + .person { margin-top: 1.9rem; }
+    .portrait { flex: 0 0 auto; }
+    .avatar {
+      width: 66px; height: 66px; border-radius: 50%;
+      border: 1px solid var(--line); background: rgba(108,242,255,0.05);
+      display: flex; align-items: center; justify-content: center; overflow: hidden;
+      font-family: var(--mono); font-size: 1.05rem; letter-spacing: 1px;
+      color: var(--beam); text-shadow: var(--glow-soft);
+    }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.25) contrast(1.03) brightness(1.02); }
+    .avatar.unknown { color: var(--beam-warm); border-style: dashed; font-size: 1.5rem; }
+    .avatar svg { width: 34px; height: 34px; }
+    .person-body { flex: 1 1 auto; min-width: 0; }
+    .person-body h3 { margin-top: 0; }
+    .portrait-credit { font-family: var(--mono); font-size: 0.5rem; color: var(--phosphor-dim); text-align: center; margin-top: 0.3rem; max-width: 66px; line-height: 1.3; }
+    @media (max-width: 480px) { .avatar { width: 54px; height: 54px; font-size: 0.9rem; } }
+  </style>
 </head>
 <body>
 
@@ -62,14 +81,29 @@
     <section class="block">
       <span class="kicker">Conceived</span>
 
-      <h3>Steve Russell <span class="status partial">"SLUG"</span></h3>
-      <p>Wrote the first working version of <i>Spacewar!</i>. As John McCarthy's assistant he had already done something just as consequential: in 1958 to 1959 he hand-coded McCarthy's theoretical <code>eval</code> function into IBM 704 machine code, producing the first <a target="_blank" rel="noopener noreferrer" href="https://www.paulgraham.com/icad.html">Lisp interpreter</a>. McCarthy had meant <code>eval</code> only as theory, "intended for reading, not for computing," and told Russell he was "confusing theory with practice"; Russell, by McCarthy's own later account, "went ahead and did it," and in a matter of weeks Lisp had become a running, and more powerful, language than its author intended. Russell returned briefly to MIT in 1962 to consolidate the scattered patches into version 3.1.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">SR</div></div>
+        <div class="person-body">
+          <h3>Steve Russell <span class="status partial">"SLUG"</span></h3>
+          <p>Wrote the first working version of <i>Spacewar!</i>. As John McCarthy's assistant he had already done something just as consequential: in 1958 to 1959 he hand-coded McCarthy's theoretical <code>eval</code> function into IBM 704 machine code, producing the first <a target="_blank" rel="noopener noreferrer" href="https://www.paulgraham.com/icad.html">Lisp interpreter</a>. McCarthy had meant <code>eval</code> only as theory, "intended for reading, not for computing," and told Russell he was "confusing theory with practice"; Russell, by McCarthy's own later account, "went ahead and did it," and in a matter of weeks Lisp had become a running, and more powerful, language than its author intended. Russell returned briefly to MIT in 1962 to consolidate the scattered patches into version 3.1.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Martin Graetz <span class="status partial">"SHAG"</span></h3>
-      <p>Co-conceived the game and wrote its hyperspace routine, the panic button that flings a ship out of danger and back at random. His later memoir, "The Origin of Spacewar" (<i>Creative Computing</i>, 1981), is the principal first-hand account of how the game came to be.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">MG</div></div>
+        <div class="person-body">
+          <h3>Martin Graetz <span class="status partial">"SHAG"</span></h3>
+          <p>Co-conceived the game and wrote its hyperspace routine, the panic button that flings a ship out of danger and back at random. His later memoir, "The Origin of Spacewar" (<i>Creative Computing</i>, 1981), is the principal first-hand account of how the game came to be.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Wayne Wiitanen</h3>
-      <p>Co-conceived <i>Spacewar!</i> with Russell and Graetz in 1961, the three of them styling themselves the Hingham Institute Study Group on Space Warfare. He set the terms of the idea before a line of it was written.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">WW</div></div>
+        <div class="person-body">
+          <h3>Wayne Wiitanen</h3>
+          <p>Co-conceived <i>Spacewar!</i> with Russell and Graetz in 1961, the three of them styling themselves the Hingham Institute Study Group on Space Warfare. He set the terms of the idea before a line of it was written.</p>
+        </div>
+      </div>
     </section>
 
     <div class="rule"><span>1962</span></div>
@@ -77,20 +111,45 @@
     <section class="block">
       <span class="kicker">First realised on the PDP-1</span>
 
-      <h3>Peter Samson <span class="status partial">"PRS"</span></h3>
-      <p>Wrote the Expensive Planetarium, the accurate scrolling star map drawn from a real catalogue down to the faintest stars the eye can see, and the PDP-1 music compiler besides. Years later he gave the on-screen score display of version 4.8 its final form. A central figure of the Tech Model Railroad Club.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">PS</div></div>
+        <div class="person-body">
+          <h3>Peter Samson <span class="status partial">"PRS"</span></h3>
+          <p>Wrote the Expensive Planetarium, the accurate scrolling star map drawn from a real catalogue down to the faintest stars the eye can see, and the PDP-1 music compiler besides. Years later he gave the on-screen score display of version 4.8 its final form. A central figure of the Tech Model Railroad Club.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Dan Edwards</h3>
-      <p>Wrote the central star and its gravity, the physics that turned a shooting match into a contest of orbits, and the outline compiler that drew the two ships efficiently enough to leave the machine time for everything else. He also wrote the garbage collector for Lisp 1.5 and is a named author of the <a target="_blank" rel="noopener noreferrer" href="https://softwarepreservation.computerhistory.org/LISP/book/LISP%201.5%20Programmers%20Manual.pdf"><i>Lisp 1.5 Programmer's Manual</i></a> (1962), a second deep tie between <i>Spacewar!</i> and the birth of AI at MIT.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">DE</div></div>
+        <div class="person-body">
+          <h3>Dan Edwards</h3>
+          <p>Wrote the central star and its gravity, the physics that turned a shooting match into a contest of orbits, and the outline compiler that drew the two ships efficiently enough to leave the machine time for everything else. He also wrote the garbage collector for Lisp 1.5 and is a named author of the <a target="_blank" rel="noopener noreferrer" href="https://softwarepreservation.computerhistory.org/LISP/book/LISP%201.5%20Programmers%20Manual.pdf"><i>Lisp 1.5 Programmer's Manual</i></a> (1962), a second deep tie between <i>Spacewar!</i> and the birth of AI at MIT.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Alan Kotok</h3>
-      <p>With Saunders, built the hand control boxes, arguably the first gamepads, so that players could fight without hunching over the console switches. He also fetched the sine and cosine routines from DEC that removed the last obstacle to the gravity calculation. A TMRC hacker, later a noted DEC engineer.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">AK</div></div>
+        <div class="person-body">
+          <h3>Alan Kotok</h3>
+          <p>With Saunders, built the hand control boxes, arguably the first gamepads, so that players could fight without hunching over the console switches. He also fetched the sine and cosine routines from DEC that removed the last obstacle to the gravity calculation. A TMRC hacker, later a noted DEC engineer.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Bob Saunders</h3>
-      <p>Robert A. Saunders. With Kotok, designed and wired the control boxes for two-handed play, an early piece of game-controller design. A member of the Tech Model Railroad Club circle around the machine.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">BS</div></div>
+        <div class="person-body">
+          <h3>Bob Saunders</h3>
+          <p>Robert A. Saunders. With Kotok, designed and wired the control boxes for two-handed play, an early piece of game-controller design. A member of the Tech Model Railroad Club circle around the machine.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Steve Piner</h3>
-      <p>Named in the game's canonical credit. A TMRC hacker who, on the same PDP-1, wrote the Expensive Typewriter, one of the first text editors, the program with which Graetz's later account and much else was typed.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">SP</div></div>
+        <div class="person-body">
+          <h3>Steve Piner</h3>
+          <p>Named in the game's canonical credit. A TMRC hacker who, on the same PDP-1, wrote the Expensive Typewriter, one of the first text editors, the program with which Graetz's later account and much else was typed.</p>
+        </div>
+      </div>
     </section>
 
     <div class="rule"><span>1963</span></div>
@@ -98,14 +157,29 @@
     <section class="block">
       <span class="kicker">The 4.x generation</span>
 
-      <h3>Monty Preonas <span class="status partial">"DDP"</span></h3>
-      <p>Drove the 4.x line. He rewrote the gravity for the PDP-1's new hardware multiply and divide option (version 4.0), wrote the first on-screen score display, and built the subjective dual-console view of versions 4.3 and 4.4, giving each player a cockpit view of their own ship, an experiment in first-person perspective roughly a decade before the form is usually dated.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">MP</div></div>
+        <div class="person-body">
+          <h3>Monty Preonas <span class="status partial">"DDP"</span></h3>
+          <p>Drove the 4.x line. He rewrote the gravity for the PDP-1's new hardware multiply and divide option (version 4.0), wrote the first on-screen score display, and built the subjective dual-console view of versions 4.3 and 4.4, giving each player a cockpit view of their own ship, an experiment in first-person perspective roughly a decade before the form is usually dated.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Joe Morris</h3>
-      <p>Worked on the 4.x line alongside Preonas and appears to have edited version 4.4. In 2005 his surviving paper listings and his recollections, posted to a PDP-1 discussion list, became key evidence for dating and attributing the 4.x versions, including the limits of what memory could supply.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">JM</div></div>
+        <div class="person-body">
+          <h3>Joe Morris</h3>
+          <p>Worked on the 4.x line alongside Preonas and appears to have edited version 4.4. In 2005 his surviving paper listings and his recollections, posted to a PDP-1 discussion list, became key evidence for dating and attributing the 4.x versions, including the limits of what memory could supply.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">"dfw" <span class="status lost">UNIDENTIFIED</span></h3>
-      <p>The initials "dfw" sign versions 4.1 and 4.8, the last and most polished MIT version, yet they belong to no one anyone can name. Asked in 2005, neither Steve Russell nor Joe Morris could place the initials. A principal author of the founding video game, dropped by the record to three letters. <a href="why.html">Why this gap matters &rsaquo;</a></p>
+      <div class="person">
+        <div class="portrait"><div class="avatar unknown" title="unidentified">?</div></div>
+        <div class="person-body">
+          <h3>"dfw" <span class="status lost">UNIDENTIFIED</span></h3>
+          <p>The initials "dfw" sign versions 4.1 and 4.8, the last and most polished MIT version, yet they belong to no one anyone can name. Asked in 2005, neither Steve Russell nor Joe Morris could place the initials. A principal author of the founding video game, dropped by the record to three letters. <a href="why.html">Why this gap matters &rsaquo;</a></p>
+        </div>
+      </div>
     </section>
 
     <div class="rule"><span>after 1962</span></div>
@@ -113,21 +187,52 @@
     <section class="block">
       <span class="kicker">Preservation and reconstruction</span>
 
-      <h3>Barry Silverman, Brian Silverman, and Vadim Gerasimov</h3>
-      <p>Built, with Steve Russell, the in-browser PDP-1 emulator that this site runs and that underlies most modern <i>Spacewar!</i> emulation. Their work is what lets the reading move between the listing and the running game.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/></svg></div></div>
+        <div class="person-body">
+          <h3>Barry Silverman, Brian Silverman, and Vadim Gerasimov</h3>
+          <p>Built, with Steve Russell, the in-browser PDP-1 emulator that this site runs and that underlies most modern <i>Spacewar!</i> emulation. Their work is what lets the reading move between the listing and the running game.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Norbert Landsteiner</h3>
-      <p>Through <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">masswerk.at</a>, has emulated, reconstructed, and analysed the surviving versions and patches in extraordinary detail. The variorum on this site draws on his work throughout, and tries to extend it from collection toward critical reading.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">NL</div></div>
+        <div class="person-body">
+          <h3>Norbert Landsteiner</h3>
+          <p>Through <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">masswerk.at</a>, has emulated, reconstructed, and analysed the surviving versions and patches in extraordinary detail. The variorum on this site draws on his work throughout, and tries to extend it from collection toward critical reading.</p>
+        </div>
+      </div>
 
-      <h3 style="margin-top:2rem;">Al Kossow</h3>
-      <p>Through <a target="_blank" rel="noopener noreferrer" href="https://bitsavers.org/bits/DEC/pdp1/papertapeImages/">bitsavers.org</a>, scanned and preserved the original PDP-1 paper tapes and source listings, the authentic artefacts behind every reconstruction.</p>
+      <div class="person">
+        <div class="portrait"><div class="avatar">AK</div></div>
+        <div class="person-body">
+          <h3>Al Kossow</h3>
+          <p>Through <a target="_blank" rel="noopener noreferrer" href="https://bitsavers.org/bits/DEC/pdp1/papertapeImages/">bitsavers.org</a>, scanned and preserved the original PDP-1 paper tapes and source listings, the authentic artefacts behind every reconstruction.</p>
+        </div>
+      </div>
     </section>
 
     <div class="rule"><span>the wider circle</span></div>
 
     <section class="block">
       <span class="kicker">Context</span>
-      <p>Two figures stand just outside the credit but inside the story. <b>John McCarthy</b>, who invented Lisp and led MIT's early artificial-intelligence work, employed Russell as his assistant; the line from <i>Spacewar!</i> to symbolic AI runs through him. <b>Marvin Minsky</b>, whose display hack the Minskytron drew hypnotic curves on the same Type 30 tube, gave the hyperspace warp its distinctive look, the "Minskytron signature." The machine room that produced the first video game was also the room in which AI was being imagined.</p>
+      <p>Two figures stand just outside the credit but inside the story. The machine room that produced the first video game was also the room in which artificial intelligence was being imagined.</p>
+
+      <div class="person">
+        <div class="portrait"><div class="avatar">JM</div></div>
+        <div class="person-body">
+          <h3>John McCarthy</h3>
+          <p>Invented Lisp and led MIT's early artificial-intelligence work. He employed Russell as his assistant, and it was his theoretical <code>eval</code> that Russell turned into a running interpreter. The line from <i>Spacewar!</i> to symbolic AI runs through him.</p>
+        </div>
+      </div>
+
+      <div class="person">
+        <div class="portrait"><div class="avatar">MM</div></div>
+        <div class="person-body">
+          <h3>Marvin Minsky</h3>
+          <p>A founder of artificial intelligence at MIT. His display hack, the Minskytron, drew hypnotic curves on the same Type 30 tube and gave the hyperspace warp its distinctive look, the "Minskytron signature."</p>
+        </div>
+      </div>
     </section>
 
     <div class="rule"><span>&#9654;</span></div>
