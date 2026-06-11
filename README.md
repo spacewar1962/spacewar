@@ -32,11 +32,11 @@ The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the
 
 ## The object
 
-The primary text is the original MIDAS macro-assembly source, preserved here alongside its assembler listing, a provenance snapshot, and a working PDP-1 emulator, so that the reading can move between text and execution.
+The original MIDAS macro-assembly source is preserved here alongside its assembler listing, a provenance snapshot, and a working PDP-1 emulator, so that the reading can move between text and execution.
 
 | File | What it is |
 |------|------------|
-| [`spacewar.mac`](spacewar.mac) | The original MIDAS macro-assembly source (~2,000 lines). The primary close-reading text. |
+| [`spacewar.mac`](spacewar.mac) | The original MIDAS macro-assembly source (~2,000 lines), preserved in this fork. |
 | [`spacewar.lst`](spacewar.lst) | The assembler listing: octal addresses and machine words beside each line. The program as it sits in core. |
 | [`originsources.zip`](originsources.zip) | A dated upstream snapshot, tracing the source back through the Silverman / Gerasimov PDP-1 emulator. |
 | `spacewar.js`, `spacewar.bin.js` | The PDP-1 emulator that runs the 1962 binary in the browser. |
