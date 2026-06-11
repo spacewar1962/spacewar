@@ -24,7 +24,7 @@ The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the
 
 - 🌐 **Project site:** <https://spacewar1962.github.io/spacewar/>
 - ❓ **Why this project matters today:** <https://spacewar1962.github.io/spacewar/why.html>
-- 🗂 **The versions:** <https://spacewar1962.github.io/spacewar/code.html> — a variorum of the surviving _Spacewar!_ code, 1962–63, with links to recovered source where it exists.
+- 🗂 **The versions:** <https://spacewar1962.github.io/spacewar/code.html> · a variorum of the surviving _Spacewar!_ code, 1962–63, with links to recovered source where it exists.
 - 🕹 **Play the 1962 original:** <https://spacewar1962.github.io/spacewar/play.html>
 - 📚 **Bibliography:** <https://spacewar1962.github.io/spacewar/bibliography.html>
 - 🖥 **Alternate front pages:** [text (1990s)](https://spacewar1962.github.io/spacewar/index-text.html) · [vector display](https://spacewar1962.github.io/spacewar/index-vector.html)
