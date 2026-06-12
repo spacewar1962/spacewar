@@ -37,10 +37,10 @@ page = f'''<!DOCTYPE html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bibliography — Spacewar! Critical Code Studies</title>
+  <title>Bibliography: Spacewar! Critical Code Studies</title>
   <meta name="description" content="Critical Code Studies bibliography for the Spacewar! reading.">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <meta property="og:title" content="Bibliography — Spacewar! Critical Code Studies">
+  <meta property="og:title" content="Bibliography: Spacewar! Critical Code Studies">
   <meta property="og:description" content="Critical Code Studies bibliography for the Spacewar! reading.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://spacewar1962.github.io/spacewar/bibliography.html">

@@ -108,6 +108,8 @@ Marino, M. C. & Douglass, J. (2023) 'Introduction: Situating Critical Code Studi
 
 Marino, M. C., Leong, D. & Pressman, J. (2022) 'Entanglements', *The Digital Review* 2. Available at: https://thedigitalreview.com/issue02/marino_entanglements/index.html.
 
+Markoff, J. (2002) 'A Long Time Ago, in a Lab Far Away', *The New York Times*, 28 February. Available at: https://www.nytimes.com/2002/02/28/technology/a-long-time-ago-in-a-lab-far-away.html.
+
 McPherson, T. (2012) 'Why Are the Digital Humanities So White? or Thinking the Histories of Race and Computation', in Gold, M. K. (ed.) *Debates in the Digital Humanities*. University of Minnesota Press.
 
 Montfort, N. (2003) *Twisty Little Passages: An Approach to Interactive Fiction*. MIT Press.
@@ -162,6 +164,6 @@ Platform Studies: https://platformstudies.com/
 
 Software Studies Initiative: http://lab.softwarestudies.com/
 
-Spacewar! (masswerk.at, Norbert Landsteiner) — emulation, source listings, and the *Inside Spacewar!* code analysis: https://www.masswerk.at/spacewar/
+Spacewar! (masswerk.at, Norbert Landsteiner), with emulation, source listings, and the *Inside Spacewar!* code analysis: https://www.masswerk.at/spacewar/
 
 Stunlaw: https://stunlaw.blogspot.com/
