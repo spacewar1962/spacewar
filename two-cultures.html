@@ -30,7 +30,8 @@
     .buildings-fig { margin: 1.6rem 0 0; }
     .buildings-fig img { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 4px; }
     .buildings-fig figcaption { font-family: var(--mono); font-size: 0.62rem; line-height: 1.55; color: var(--phosphor-dim); margin-top: 0.55rem; }
-    .buildings-fig.portrait-fig { max-width: 360px; margin-left: auto; margin-right: auto; }
+    .buildings-fig.portrait-fig { max-width: 300px; float: right; margin: 0.2rem 0 1rem 1.6rem; }
+    @media (max-width: 560px) { .buildings-fig.portrait-fig { float: none; max-width: 360px; margin: 1.6rem auto 0; } }
     .pullquote { font-size: 0.95rem; line-height: 1.6; border-left: 2px solid var(--beam); padding-left: 1rem; margin: 1.4rem 0; color: var(--bright); }
   </style>
 </head>
@@ -74,35 +75,36 @@
 
     <section class="block">
       <span class="kicker">Where it forks</span>
-      <p>The two cultures begin in the same place. In 1963 MIT founded <a target="_blank" rel="noopener noreferrer" href="https://www.britannica.com/topic/Project-Mac">Project MAC</a>, an ARPA-funded laboratory under <b>Robert Fano</b> that gathered into one institution the artificial-intelligence group of <b>John McCarthy</b> and <b>Marvin Minsky</b>, the time-sharing work of <b>Jack Dennis</b>, and the Tech Model Railroad Club hacker culture that had just written <i>Spacewar!</i> on the PDP-1. It was on Project MAC's time-sharing system, CTSS, that Joseph Weizenbaum would shortly write <i>ELIZA</i>. The fork this page describes runs through a single building.</p>
       <figure class="buildings-fig portrait-fig">
         <img src="assets/images/Fano-Minsky-1961-PDP1-GCP-00008025.jpg" alt="Robert Fano and Marvin Minsky at the PDP-1 console, MIT, 1961.">
         <figcaption>Robert Fano and Marvin Minsky at the PDP-1, 1961, two years before Fano founded Project MAC, the laboratory in which both cultures took shape. Source: <a target="_blank" rel="noopener noreferrer" href="https://mitmuseum.mit.edu/collections/object/GCP-00008025">MIT Museum</a>.</figcaption>
       </figure>
+      <p>The two cultures begin in the same place. In 1963 MIT founded <a target="_blank" rel="noopener noreferrer" href="https://www.britannica.com/topic/Project-Mac">Project MAC</a>, an ARPA-funded laboratory under <b>Robert Fano</b> that gathered into one institution the artificial-intelligence group of <b>John McCarthy</b> and <b>Marvin Minsky</b>, the time-sharing work of <b>Jack Dennis</b>, and the Tech Model Railroad Club hacker culture that had just written <i>Spacewar!</i> on the PDP-1. It was on Project MAC's time-sharing system, CTSS, that Joseph Weizenbaum would shortly write <i>ELIZA</i>.</p>
+      <div style="clear:both"></div>
     </section>
 
     <div class="rule"><span>the machine as medium</span></div>
 
     <section class="block">
       <span class="kicker">The hackers</span>
-      <p>The first culture is the one this site reads. For the hackers of the Tech Model Railroad Club, the computer was a medium before it was a tool, a place to be rather than a means to an end. <i>Spacewar!</i> is its emblem: a program written for the pleasure and difficulty of writing it, given away rather than sold, improved by whoever had a better idea, and judged by how elegantly it used the machine. Around it grew what Steven Levy later called the Hacker Ethic, a loose creed of hands-on access, mistrust of bureaucracy, and the conviction that "information wants to be free." The lineage runs from Russell, Kotok, and Samson through the next generation, Richard Greenblatt and Bill Gosper, who treated programming as a craft and a way of life.</p>
-      <p>It is a culture of expression and play. Its public herald was Stewart Brand, whose 1972 <i>Rolling Stone</i> report from the <i>Spacewar!</i> scene announced that "ready or not, computers are coming to the people." The machine, in this reading, is something you make things with and inhabit, and the program is an object to be read and admired in its own right.</p>
+      <p>For the hackers of the Tech Model Railroad Club, the computer was a medium before it was a tool, a place to be rather than a means to an end. <i>Spacewar!</i> is its emblem: a program written for the pleasure and difficulty of writing it, given away rather than sold, improved by whoever had a better idea, and judged by how elegantly it used the machine. Around it grew what Steven Levy later called the Hacker Ethic, a loose creed of hands-on access, mistrust of bureaucracy, and the conviction that "information wants to be free." The lineage runs from Russell, Kotok, and Samson through the next generation, Richard Greenblatt and Bill Gosper, who treated programming as a craft and a way of life.</p>
+      <p>It is a culture of expression and play. Its public voice was Stewart Brand, whose 1972 <i>Rolling Stone</i> report from the <i>Spacewar!</i> scene announced that "ready or not, computers are coming to the people." The machine, in this reading, is something you make things with and experience, and the program is an object to be read in its own right.</p>
     </section>
 
     <div class="rule"><span>the machine as mind</span></div>
 
     <section class="block">
       <span class="kicker">Artificial intelligence and its critic</span>
-      <p>The second culture asked a different question: not what you could make with the machine, but whether the machine could think. McCarthy and Minsky's wager was that intelligence could be formalised and run, and its language was Lisp, McCarthy's invention. The tie to <i>Spacewar!</i> is intimate, since it was Steve Russell, before he wrote the game, who hand-compiled McCarthy's theoretical <code>eval</code> into the first working Lisp interpreter. The same hands served both cultures.</p>
-      <p>It is in this lineage that <i>ELIZA</i> sits, though awkwardly. Written by <b>Joseph Weizenbaum</b> between 1964 and 1966, it imitated a psychotherapist by turning a user's words back as questions. Weizenbaum meant it as a demonstration of how shallow such imitation was. To his alarm, people confided in it, asked to be left alone with it, and credited it with understanding. The program that was supposed to expose the illusion instead produced it.</p>
+      <p>The second culture asked a different question: not what you could make with the machine, but whether the machine could think. McCarthy and Minsky's thought was that intelligence could be formalised and run, and its language was Lisp, McCarthy's invention. The tie to <i>Spacewar!</i> is intimate, since it was Steve Russell, before he wrote the game, who hand-compiled McCarthy's theoretical <code>eval</code> into the first working Lisp interpreter. We might say the same hands served both cultures.</p>
+      <p>It is in this lineage that <i>ELIZA</i> sits, though awkwardly. Written by <b>Joseph Weizenbaum</b> between 1964 and 1966, it imitated a psychotherapist by turning a user's words back as questions. Weizenbaum meant it as a demonstration of how shallow such imitation was. To his alarm, people confided in it, asked to be left alone with it, and credited it with understanding. The program that was supposed to reveal the con instead produced it.</p>
     </section>
 
     <div class="rule"><span>the collision</span></div>
 
     <section class="block">
       <span class="kicker">Weizenbaum turns</span>
-      <p>The two cultures meet, head on, in one man's change of mind. In <i>Computer Power and Human Reason</i> (1976) Weizenbaum, writing from inside the same laboratory, described a figure he called the compulsive programmer, the "computer bum," bright young men lost to the machine, unwashed and sleepless at the console, mistaking mastery of code for judgement about the world. The MIT hackers read it as a portrait of themselves, and several took it personally; Minsky and others defended them. The first serious humanist critique of computing came not from outside the field but from a programmer who had built one of its most famous programs.</p>
-      <p>This is why the split is not Snow's split. It is not science against the humanities, technical people against literary ones. It is two readings of the same machine by people who both knew it intimately, one finding in it a medium for human play, the other a mirror that flattered and endangered its users. Weizenbaum belongs to both: the maker of <i>ELIZA</i> and the conscience that recoiled from what it revealed.</p>
+      <p>The two cultures meet, head on, in Weizenbaum's change of mind. In <i>Computer Power and Human Reason</i> (1976) Weizenbaum, writing from inside the same laboratory, described a figure he called the compulsive programmer, the "computer bum," bright young men lost to the machine, unwashed and sleepless at the console, mistaking mastery of code for judgement about the world. The MIT hackers read it as a portrait of themselves, and several took it personally; Minsky and others defended them. The first serious humanist critique of computing came not from outside the field but from a programmer who had built one of its most famous programs.</p>
+      <p>Although sharing some of the same dynamics, the split is not exactly Snow's split. Although we might note that Weizenbaum explicitly attempted to use humanities approaches to understand and critique technoscientific modes of thought. It is not science against the humanities, technical people against literary ones. It is two readings of the same machine by people who both knew it intimately, one finding in it a medium for human play, the other a mirror that flattered and endangered its users. Weizenbaum belongs to both: the maker of <i>ELIZA</i> and a humanities conscience that became increasingly troubled by what he was seeing.</p>
 
       <div class="cultures">
         <div class="culture">
