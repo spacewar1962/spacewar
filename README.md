@@ -18,13 +18,15 @@ This repository holds the original source, a runnable PDP-1 emulator, and the pr
 
 The project develops along several lines. Its principal output is a **monograph** that grows from the close reading, working through the source movement by movement and setting each fragment in its cultural constellation. Around the writing we treat programming as scholarship, using the emulator to run, modify, and port the program so that interpretation is tested against the artefact, and we read the visual register of the Type 30 display in conjunction with the code that produces it, binding critical code studies to a visual and media-archaeological analysis. A variorum across the surviving versions, with links to recovered source where it exists, is compiled as the project's [Code page](https://spacewar1962.github.io/spacewar/code.html); because there is no single canonical _Spacewar!_, the differences between versions, gravity added in one, the on-screen score in another, the subjective view in another still, are themselves evidence the reading works from. Further threads include a fuller account of the paratexts and the political economy of the gift economy that circulated the source inside a Cold-War research budget.
 
-The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the Future of AI_ (MIT Press, 2026). They are two foundational programs of the long 1960s, read side by side: ELIZA teaches the machine to talk, _Spacewar!_ teaches it to play.
+The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the Future of AI_ (MIT Press, 2026). They are two foundational programs of the long 1960s, read side by side: ELIZA teaches the machine to talk, _Spacewar!_ teaches it to play. The site's [Two Cultures](https://spacewar1962.github.io/spacewar/two-cultures.html) page reads them as a fork in MIT's early computer culture, the machine as a medium and the machine as a mind, and the line that runs from there to today's debates over artificial intelligence.
 
 ## Explore
 
 - 🌐 **Project site:** <https://spacewar1962.github.io/spacewar/>
 - ❓ **Why this project matters today:** <https://spacewar1962.github.io/spacewar/why.html>
 - 🗂 **The versions:** <https://spacewar1962.github.io/spacewar/code.html> · a variorum of the surviving _Spacewar!_ code, 1962–63, with links to recovered source where it exists.
+- 👥 **The people:** <https://spacewar1962.github.io/spacewar/people.html> · who conceived, wrote, extended, and preserved _Spacewar!_, and who the record leaves out.
+- 🔀 **Two Cultures:** <https://spacewar1962.github.io/spacewar/two-cultures.html> · the fork in MIT's early computer culture, the machine as a medium (_Spacewar!_) and the machine as a mind (_ELIZA_).
 - 🕹 **Play the 1962 original:** <https://spacewar1962.github.io/spacewar/play.html>
 - 📚 **Bibliography:** <https://spacewar1962.github.io/spacewar/bibliography.html>
 - 🖥 **Alternate front pages:** [text (1990s)](https://spacewar1962.github.io/spacewar/index-text.html) · [vector display](https://spacewar1962.github.io/spacewar/index-vector.html)
@@ -40,7 +42,7 @@ The original MIDAS macro-assembly source is preserved here alongside its assembl
 | [`spacewar.lst`](spacewar.lst) | The assembler listing: octal addresses and machine words beside each line. The program as it sits in core. |
 | [`originsources.zip`](originsources.zip) | A dated upstream snapshot, tracing the source back through the Silverman / Gerasimov PDP-1 emulator. |
 | `spacewar.js`, `spacewar.bin.js` | The PDP-1 emulator that runs the 1962 binary in the browser. |
-| `index.html`, `why.html`, `play.html`, `bibliography.html` | The project website (served via GitHub Pages). |
+| `index.html`, `why.html`, `people.html`, `two-cultures.html`, `play.html`, `bibliography.html` | The project website (served via GitHub Pages). |
 | [`code.html`](code.html) | The versions: a variorum of the surviving _Spacewar!_ source, 1962–63, with per-version links to recovered code. |
 | `index-text.html`, `index-vector.html` | Alternate front pages: a 1990s text-only version and a vector-display version. |
 | `assets/`, `*.css` | Site styling and brand assets. |
