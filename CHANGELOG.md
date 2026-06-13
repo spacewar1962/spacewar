@@ -2,6 +2,14 @@
 
 All notable changes to the _Spacewar!_ Critical Code Studies website. Versions follow the GitHub releases.
 
+## v1.5.0 — 2026-06-13
+
+- New **People page** (`people.html`): the people who conceived, wrote, extended, and preserved _Spacewar!_, with portraits and life dates; the geography of the room (the kluge room and Building 26, the Karl Taylor Compton Laboratories, and a keyed map of the wartime Rad Lab buildings); the Tech Model Railroad Club; the unidentified "dfw"; and a "who is not here" section on the women written out of the record, after Nooney.
+- New **Two Cultures, One Campus** page (`two-cultures.html`): the campus quarrel about what a computer was for, read as one enthusiasm for computation in two faces (the hackers and the AI academics) set against a humanist critique of it (Dreyfus, Weizenbaum, Winograd), with ELIZA as the pivot and the 1967 MacHack versus Dreyfus chess match in a footnote.
+- Navigation extended across the site to carry the new People and Two Cultures pages.
+- Bibliography: added Markoff, "A Long Time Ago, in a Lab Far Away" (_New York Times_, 2002).
+- Corrections and a site-wide copy pass: ELIZA placed on the time-shared IBM 7094 rather than the PDP-1, Building 26 named as the Karl Taylor Compton Laboratories, and all remaining em dashes removed across the site.
+
 ## v1.4.0 — 2026-06-10
 
 - The Minskytron easter egg now runs an animated display on the page: a dense, evolving rosette that morphs between a circle and a figure-of-eight and descends the screen, in CRT cyan, with the full name (Marvin Minsky's _Tri-Pos: Three-Position Display_) and links to the original emulation and the annotated source.
