@@ -13,6 +13,12 @@ reconstructions, preserved by Norbert Landsteiner (masswerk.at) and bitsavers.or
 for loading into an emulator); `.pdf` files are scans of the original printed
 source listings (the material artifact behind the transcription).
 
+Files marked **`(Morris)`** were extracted by David M. Berry from the single
+156-page Joe Morris scan (`spacewar-4.x-morris-listing.pdf`); the unmarked
+reconstructions come from masswerk/bitsavers. Where both exist for a version (4.3,
+4.4), the masswerk `.txt` is a community reassembly and the `(Morris)` files are
+the original "ddp" listing as scanned.
+
 ## The version lineage
 
 | Version | Date | File | Origin |
@@ -22,12 +28,12 @@ source listings (the material artifact behind the transcription).
 | 2B | 2 Apr 1962 | `spacewar-2b-2apr1962.txt` | masswerk; reconstructed from disassembly (Landsteiner 2014) |
 | — (Expensive Planetarium) | 13 Mar 1962 | `spacewar-2b-stars-prs-13mar1962.txt` | masswerk; Samson's ("prs") star-field data for 2B |
 | 3.1 | 24 Sep 1962 | `spacewar-3.1-24sep1962.txt` | masswerk; the standard, most-emulated version |
-| 4.0 | 2 Feb 1963 | `spacewar-4.0-2feb1963.pdf` | "spacewar 4.0 2/2/63 ddp"; Preonas's listing, extracted from the Morris scan. The only surviving source for 4.0 |
-| 4.2 | 11 May 1963 | `spacewar-4.2-11may1963.pdf` | "spacewar 4.2 5/11/63 ddp"; the only surviving source for Preonas's 4.2 |
+| 4.0 | 2 Feb 1963 | `spacewar-4.0-2feb1963-(Morris).pdf` | "spacewar 4.0 2/2/63 ddp"; Preonas's listing, extracted from the Morris scan. The only surviving source for 4.0 |
+| 4.2 | 11 May 1963 | `spacewar-4.2-11may1963-(Morris).pdf` | "spacewar 4.2 5/11/63 ddp"; extracted from the Morris scan. The only surviving source for Preonas's 4.2 |
 | 4.1 (CHM, rev. d) | base 20 Feb 1963; mod. Jun 2005 | `spacewar-4.1-chm-2005d.txt` / `.rim` | bitsavers; Samson's Computer History Museum port, June 2005 checkpoint |
 | 4.1 (CHM, rev. f) | base 20 Feb 1963; mod. Nov 2005, Aug 2008 | `spacewar-4.1-chm-2008f.txt` / `.rim` | bitsavers (`from_peter_samson/sw41f`); the final CHM revision the restored PDP-1 runs |
-| 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` (reconstruction) + `.pdf` (original ddp listing) | masswerk reassembly + the original "spacewar 4.3 5/17/63 ddp" scan extracted from the Morris listing |
-| 4.4 | 21 May 1963 | `spacewar-4.4-21may1963.txt` (reconstruction) + `.pdf` (original ddp listing) | masswerk reassembly + the original "spacewar 4.4 5/17/63 ddp" scan (pt 1 dated 5/17, pt 2 5/21); dual-console subjective view |
+| 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` (masswerk) + `spacewar-4.3-17may1963-(Morris).pdf` | masswerk reassembly (what we had) + the original "spacewar 4.3 5/17/63 ddp" listing extracted from the Morris scan |
+| 4.4 | 21 May 1963 | `spacewar-4.4-21may1963.txt` (masswerk) + `spacewar-4.4-21may1963-(Morris).pdf` | masswerk reassembly (what we had) + the original "spacewar 4.4 5/17/63 ddp" listing from the Morris scan (pt 1 dated 5/17, pt 2 5/21); dual-console subjective view |
 | 4.4 (variant f) | 21 May 1963 | `spacewar-4.4f-21may1963.txt` | masswerk; alternate reassembly of 4.4 |
 | 4.8 part 1 | 24 Jul 1963 | `spacewar-4.8-pt1-24jul1963.txt` (+ `.pdf` scan) | bitsavers; the last MIT version, "dfw" |
 | 4.8 part 2 | 24 Jul 1963 | `spacewar-4.8-pt2-24jul1963.txt` (+ `.pdf` scan) | bitsavers; second half of the 4.8 listing |
