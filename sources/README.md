@@ -26,14 +26,16 @@ the original "ddp" listing as scanned.
 | 1 | early 1962 | `spacewar-1-1962-reconstructed.txt` | masswerk reconstruction (Landsteiner 2016/2021); not an authentic program |
 | 2B (pre-release) | 25 Mar 1962 | `spacewar-2b-25mar1962.txt` | masswerk; earliest dated pre-2B build |
 | 2B | 2 Apr 1962 | `spacewar-2b-2apr1962.txt` | masswerk; reconstructed from disassembly (Landsteiner 2014) |
-| — (Expensive Planetarium) | 13 Mar 1962 | `spacewar-2b-stars-prs-13mar1962.txt` | masswerk; Samson's ("prs") star-field data for 2B |
+| - (Expensive Planetarium) | 13 Mar 1962 | `spacewar-2b-stars-prs-13mar1962.txt` | masswerk; Samson's ("prs") star-field data for 2B |
 | 3.1 | 24 Sep 1962 | `spacewar-3.1-24sep1962.txt` | masswerk; the standard, most-emulated version |
 | 4.0 | 2 Feb 1963 | `spacewar-4.0-2feb1963-(Morris).pdf` + `.txt` (normalised) | "spacewar 4.0 2/2/63 ddp"; Preonas's listing, extracted from the Morris scan. The only surviving source for 4.0. The `.txt` is a page-by-page verified transcription |
+| 4.0TS | 4 May 1963 | `spacewar-4.0ts-4may1963.pdf` + `.txt` | "spacewar 4.0ts 5/4/63 ddp"; a Twin Star variant of 4.0 (simplified starfield, random hyperspace spin), recovered by the CCS team. Verified transcription |
 | 4.2 | 11 May 1963 | `spacewar-4.2-11may1963-(Morris).pdf` + `.txt` (normalised) | "spacewar 4.2 5/11/63 ddp"; extracted from the Morris scan. The only surviving source for Preonas's 4.2, the first with an on-screen score display. The `.txt` is a verified transcription (the score-display routine is on low-contrast pages, marked where uncertain) |
+| 4.1 / 4.2a (original dfw) | 20 / 22 Feb 1963 | `spacewar-4.1-20feb1963-dfw-(Russell).txt`; `SteveRussell_box1/` | **The clean original 1963 dfw source**, located by the CCS team in Steve Russell's tape box (bitsavers papertapeImages). pt 1 = 4.1 (2/20/63 dfw), pt 2 = 4.2a (2/22/63 dfw); no CHM modifications |
 | 4.1 (CHM, rev. d) | base 20 Feb 1963; mod. Jun 2005 | `spacewar-4.1-chm-2005d.txt` / `.rim` | bitsavers; Samson's Computer History Museum port, June 2005 checkpoint |
 | 4.1 (CHM, rev. f) | base 20 Feb 1963; mod. Nov 2005, Aug 2008 | `spacewar-4.1-chm-2008f.txt` / `.rim` | bitsavers (`from_peter_samson/sw41f`); the final CHM revision the restored PDP-1 runs |
-| 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` (masswerk) + `spacewar-4.3-17may1963-(Morris).pdf` | masswerk reassembly (what we had) + the original "spacewar 4.3 5/17/63 ddp" listing extracted from the Morris scan |
-| 4.4 | 21 May 1963 | `spacewar-4.4-21may1963.txt` (masswerk) + `spacewar-4.4-21may1963-(Morris).pdf` | masswerk reassembly (what we had) + the original "spacewar 4.4 5/17/63 ddp" listing from the Morris scan (pt 1 dated 5/17, pt 2 5/21); dual-console subjective view |
+| 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` (masswerk) + `spacewar-4.3-17may1963-(Morris).pdf` | masswerk reassembly (what we had) + the original "spacewar 4.3 5/17/63 ddp" listing from the Morris scan, with `-(Morris).txt` the verified transcription. The masswerk reassembly is a later modified variant; the scan keeps the period code |
+| 4.4 | 21 May 1963 | `spacewar-4.4-21may1963.txt` (masswerk) + `spacewar-4.4-21may1963-(Morris).pdf` + `.txt` | masswerk reassembly (what we had) + the original "spacewar 4.4 5/17/63 ddp" listing from the Morris scan (pt 1 dated 5/17, pt 2 5/21), with `-(Morris).txt` the verified transcription; dual-console subjective view |
 | 4.4 (variant f) | 21 May 1963 | `spacewar-4.4f-21may1963.txt` | masswerk; alternate reassembly of 4.4 |
 | 4.8 part 1 | 24 Jul 1963 | `spacewar-4.8-pt1-24jul1963.txt` (+ `.pdf` scan) | bitsavers; the last MIT version, "dfw" |
 | 4.8 part 2 | 24 Jul 1963 | `spacewar-4.8-pt2-24jul1963.txt` (+ `.pdf` scan) | bitsavers; second half of the 4.8 listing |
@@ -45,13 +47,26 @@ The full as-scanned compilation `spacewar-4.x-morris-listing.pdf` (bitsavers
 2B star table and the 4.0 / 4.2 / 4.3 / 4.4 "ddp" listings, from which the
 per-version PDFs above were extracted.
 
+## Other machines and authentic tapes
+
+- `spacewar-pdp8-EVAN-SUITS-11Jan1971.txt` - the **PDP-8** port (Evan Suits's LAB-8
+  version, 1971), a different machine entirely. See the "long journey" ports table
+  on the code page for the wider census of Spacewar! beyond the PDP-1.
+- `SteveRussell_box1/` - authentic PDP-1 paper tapes from Steve Russell's box
+  (bitsavers, 2003): the original dfw 4.1/4.2a, 3.1, sw4.2, and the star data. See
+  its README.
+- `bin-files/` - loose tape images: the authentic 4.2a tape, 2B, and a relabelled
+  3.1. See its README.
+
 ## What does not survive
 
-No source exists for **2A** (March 1962 integration stage), **4.1 in its clean
-pre-museum form**, **4.2a**, or the lost **4.5 / 4.6 / 4.7**. The genuine February
-1963 "spacewar 4.1 2/20/63 dfw" survives only as the base layer braided inside
-Samson's CHM reconstruction (which also folds in the 4.2 dfw material and the 4.8
-score display); there is no independent 1963 tape to set beside it.
+No source exists for **2A** (the March 1962 integration stage) or the lost
+**4.5 / 4.6 / 4.7** (between the 4.4 experiment and 4.8).
+
+The original **4.1** and **4.2a** (20 and 22 February 1963, dfw) were once thought
+lost in clean form, surviving only inside Samson's CHM reconstruction. They were
+subsequently located by the CCS team in Steve Russell's tape box (see above), so
+the 1963 originals can now be set beside the museum reconstruction.
 
 The `d` and `f` suffixes on the CHM files are Samson's own revision letters for that
 single 2005–2008 reconstruction, not historical release numbers: `d` is the June
@@ -67,6 +82,6 @@ folder's own README.
 
 ## Upstream sources
 
-- masswerk.at/spacewar/sources/ — Norbert Landsteiner's reconstructions and the emulator they drive
-- bitsavers.org/pdf/mit/rle_pdp1/spacewar/ — scanned MIT/RLE listings
-- bitsavers.org/bits/DEC/pdp1/from_peter_samson/ — Peter Samson's CHM files
+- masswerk.at/spacewar/sources/ - Norbert Landsteiner's reconstructions and the emulator they drive
+- bitsavers.org/pdf/mit/rle_pdp1/spacewar/ - scanned MIT/RLE listings
+- bitsavers.org/bits/DEC/pdp1/from_peter_samson/ - Peter Samson's CHM files
