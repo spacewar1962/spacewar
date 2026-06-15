@@ -46,6 +46,13 @@ single 2005–2008 reconstruction, not historical release numbers: `d` is the Ju
 2005 checkpoint, `f` adds further work to November 2005 plus a score-display-delay
 fix dated 22 August 2008.
 
+## Related PDP-1 programs
+
+`pdp1-programs/` holds other programs from the same machine and milieu (Samson's
+display hacks including Munching Squares, his Harmony Compiler and PDP-1 Music, and
+a PDP-1 Game of Life). These are Spacewar!'s kin, not versions of it; see that
+folder's own README.
+
 ## Upstream sources
 
 - masswerk.at/spacewar/sources/ — Norbert Landsteiner's reconstructions and the emulator they drive
