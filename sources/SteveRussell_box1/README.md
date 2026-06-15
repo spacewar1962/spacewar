@@ -19,6 +19,9 @@ original be read directly against Samson's 2005–08 CHM reconstruction (`4.1f`)
 | `spacewar3.1_24-sep-62.bin`, `spacewar3.1pt1/2/3_29sep62.bin` (+ `_text/`) | Spacewar! 3.1 |
 | `stars.bin` (+ `_text/`) | Samson's Expensive Planetarium star data |
 
-Upstream: bitsavers.org/bits/DEC/pdp1/papertapeImages/ (SteveRussell box).
-A clean-named copy of the 4.1 transcription is hosted one level up as
-`spacewar-4.1-20feb1963-dfw-(Russell).txt`.
+Upstream: Steve Russell's tapes at bitsavers.org/bits/DEC/pdp1/papertapeImages/ ;
+the authentic 4.2a object tape (`spacewar4.2a_sa4.bin`, in `../bin-files/`) is from
+https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20040106/russell2/ .
+
+A clean-named copy of the 4.1 (+ 4.2a) transcription is hosted one level up as
+`spacewar-4.1-4.2a-feb1963-dfw-(Russell).txt`.
