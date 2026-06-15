@@ -10,7 +10,8 @@ reconstructions, preserved by Norbert Landsteiner (masswerk.at) and bitsavers.or
 
 `.txt` files are the human-readable PDP-1 MACRO source (tab-aligned columns,
 `/`-delimited comments); `.rim` files are RIM-format paper-tape images (binary,
-for loading into an emulator).
+for loading into an emulator); `.pdf` files are scans of the original printed
+source listings (the material artifact behind the transcription).
 
 ## The version lineage
 
@@ -27,9 +28,9 @@ for loading into an emulator).
 | 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` | masswerk; Preonas's Twin Star subjective view, reassembled |
 | 4.4 | 21 May 1963 | `spacewar-4.4-21may1963.txt` | masswerk; dual-console subjective view |
 | 4.4 (variant f) | 21 May 1963 | `spacewar-4.4f-21may1963.txt` | masswerk; alternate reassembly of 4.4 |
-| 4.8 part 1 | 24 Jul 1963 | `spacewar-4.8-pt1-24jul1963.txt` | bitsavers; the last MIT version, "dfw" |
-| 4.8 part 2 | 24 Jul 1963 | `spacewar-4.8-pt2-24jul1963.txt` | bitsavers; second half of the 4.8 listing |
-| 4.8 scorer | 24 Jul 1963 | `spacewar-4.8-scorer-24jul1963.txt` | bitsavers; the score-display routine (Preonas's, reworked by Samson) |
+| 4.8 part 1 | 24 Jul 1963 | `spacewar-4.8-pt1-24jul1963.txt` (+ `.pdf` scan) | bitsavers; the last MIT version, "dfw" |
+| 4.8 part 2 | 24 Jul 1963 | `spacewar-4.8-pt2-24jul1963.txt` (+ `.pdf` scan) | bitsavers; second half of the 4.8 listing |
+| 4.8 scorer | 24 Jul 1963 | `spacewar-4.8-scorer-24jul1963.txt` (+ `.pdf` scan) | bitsavers; the score-display routine (Preonas's, reworked by Samson) |
 | 2015 | 2015 | `spacewar-2015-landsteiner.txt` / `.rim` | masswerk; Landsteiner's new PDP-1 program reviving the Minskytron hyperspace and subjective view |
 
 ## What does not survive
