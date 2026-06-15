@@ -29,7 +29,7 @@ the original "ddp" listing as scanned.
 | — (Expensive Planetarium) | 13 Mar 1962 | `spacewar-2b-stars-prs-13mar1962.txt` | masswerk; Samson's ("prs") star-field data for 2B |
 | 3.1 | 24 Sep 1962 | `spacewar-3.1-24sep1962.txt` | masswerk; the standard, most-emulated version |
 | 4.0 | 2 Feb 1963 | `spacewar-4.0-2feb1963-(Morris).pdf` + `.txt` (normalised) | "spacewar 4.0 2/2/63 ddp"; Preonas's listing, extracted from the Morris scan. The only surviving source for 4.0. The `.txt` is a page-by-page verified transcription |
-| 4.2 | 11 May 1963 | `spacewar-4.2-11may1963-(Morris).pdf` | "spacewar 4.2 5/11/63 ddp"; extracted from the Morris scan. The only surviving source for Preonas's 4.2 |
+| 4.2 | 11 May 1963 | `spacewar-4.2-11may1963-(Morris).pdf` + `.txt` (normalised) | "spacewar 4.2 5/11/63 ddp"; extracted from the Morris scan. The only surviving source for Preonas's 4.2, the first with an on-screen score display. The `.txt` is a verified transcription (the score-display routine is on low-contrast pages, marked where uncertain) |
 | 4.1 (CHM, rev. d) | base 20 Feb 1963; mod. Jun 2005 | `spacewar-4.1-chm-2005d.txt` / `.rim` | bitsavers; Samson's Computer History Museum port, June 2005 checkpoint |
 | 4.1 (CHM, rev. f) | base 20 Feb 1963; mod. Nov 2005, Aug 2008 | `spacewar-4.1-chm-2008f.txt` / `.rim` | bitsavers (`from_peter_samson/sw41f`); the final CHM revision the restored PDP-1 runs |
 | 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` (masswerk) + `spacewar-4.3-17may1963-(Morris).pdf` | masswerk reassembly (what we had) + the original "spacewar 4.3 5/17/63 ddp" listing extracted from the Morris scan |
