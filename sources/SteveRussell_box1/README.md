@@ -5,7 +5,7 @@ digitised for bitsavers (papertapeImages, 2003). `.bin` files are RIM-format tap
 images; the `_text/` folder holds transcriptions made from them.
 
 **The headline find:** `_text/spacewar4.1pt1and2.txt` is the **clean original 1963
-dfw source** — its pt 1 is "spacewar 4.1 2/20/63 dfw" and its pt 2 is "spacewar 4.2
+dfw source** - its pt 1 is "spacewar 4.1 2/20/63 dfw" and its pt 2 is "spacewar 4.2
 2/22/63 dfw" (i.e. 4.2a), with **no** Computer History Museum modifications. This is
 the genuine pre-museum 4.1 that the project had earlier believed did not survive
 independently; it was located here by the CCS team (Berry & Marino). It lets the
