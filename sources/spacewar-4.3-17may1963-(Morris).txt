@@ -1,24 +1,51 @@
-/ Spacewar! 4.0 - normalised source transcription
+/ Spacewar! 4.3 - normalised source transcription
 / ----------------------------------------------------------------------
-/ Transcribed from the scanned listing "spacewar 4.0  2/2/63  ddp"
-/ (spacewar-4.0-2feb1963-(Morris).pdf), the Monty Preonas ("ddp") listing
-/ extracted by David M. Berry from the Joe Morris scan.
+/ Transcribed from the scanned listing "spacewar 4.3  5/17/63  ddp"
+/ (spacewar-4.3-17may1963-(Morris).pdf), Monty Preonas's ("ddp") version,
+/ the "Twin Star" subjective-view ("ego view") version. Extracted by
+/ David M. Berry from the Joe Morris scan.
 /
-/ Method: verified page by page against the scan images; OCR was used only
-/ as a first pass and every numeral and mnemonic was checked by eye.
-/ Conventions follow the bitsavers Samson files: "~" marks a variable shown
-/ overlined in the original (kept in the auto-index / variables page); tabs
-/ separate the label, instruction and "/" comment columns. The symbol table
-/ that closes the scanned listing (assembler-generated, pp. 29-34) is not
-/ reproduced here.
+/ Method: read and verified page by page (pp. 1-30) against the scan
+/ images. OCR was used only as a first pass; every numeral and mnemonic was
+/ checked by eye (the systematic typewriter confusions are 4<->H, 1<->l/4,
+/ 0<->O<->Q, g<->B). Ambiguous readings were cross-checked against the
+/ masswerk reconstruction of this same version (spacewar-4.3-17may1963.txt),
+/ but the scan is followed wherever it genuinely differs: this listing is
+/ the ORIGINAL 1963 4.3, NOT the masswerk reconstruction's 2015-modified
+/ ("N.L. 2015") variant. Where the reconstruction commented routines out and
+/ substituted 4.0-style code (the background loop, the 8a digit encoder, the
+/ dislis brightness parameter), the scan retains the original code, and that
+/ is what appears below.
 /
-/ One spot is genuinely illegible: a faint handwritten annotation at the
-/ "st3," label on p.26. The program structure shows st3 returns to the main
-/ loop; the handwritten content cannot be read with confidence and is marked
-/ [illegible] below.
+/ Conventions follow the bitsavers Samson files and the sibling 4.0 / 4.2
+/ transcriptions: "~" marks a variable shown overlined in the original
+/ (e.g. ~ssn, ~t1, ~mdx); tabs separate the label / instruction / "/"
+/ comment columns.
+/
+/ This version's distinctive "subjective view" machinery is present and
+/ active: the kcb relocate-for-centre-display routine; the "szs 20 / jda
+/ kcb" guards in dispt, dislis (fyn), mex, mth/bsg and the spaceship
+/ display; the "szs 20 / sub nx1|ny1" ego-view position offsets in the
+/ spaceship calc; and the bpt star-translation block. The on-screen score
+/ display (the 8a digit encoder and the fi/fs/fx display-score routine) is
+/ also present and active, as in 4.2.
+/
+/ Provenance: the assembler pass-log that closes the scan (p.31) records
+/   spacewar 4.3  5/17/63 ddp  pt 1   (pass 1 and 2)
+/   spacewar 4.3  5/17/63 ddp  pt 2   (pass 1 and 2)
+/   stars by prs  for s/w 2b          (pass 1 and 2)
+/   spacewar 4.3 syms  5/23/63  jcm   (Joe C. Morris assembled the symbols)
+/ The star field ("stars by prs for s/w 2b", the 1j-4q "mark" tables) is a
+/ SEPARATE assembly loaded at 6077 and is NOT part of pt 1 / pt 2 in this
+/ listing; it is not reproduced here. The assembler symbol table itself
+/ (pp. 32-37) is likewise not reproduced.
+/
+/ Confidence note: the listing is generally clear. No line was wholly
+/ illegible; nothing is marked [?]. The faint outline-word digits on p.26
+/ (ot1 / ot2) were confirmed against the identical octal in 4.0 / 4.2.
 / ----------------------------------------------------------------------
 
-	spacewar 4.0  2/2/63  ddp · pt. 1
+	spacewar 4.3  5/17/63  ddp · pt 1
 
 3/	jmp sbf		/ ignore seq. break
 	jmp a40
@@ -89,6 +116,8 @@ dispatch
 dispt A,Y,B
 	repeat 6, B=B+B
 	lio Y
+	szs 20
+	jda kcb
 	dpy-A+B
 	term
 	define
@@ -269,7 +298,7 @@ sq1,	0
 sq2,	0
 /outline compiler
 /ac=where to compile to, call   jda oc
-/ot=addres of outline table
+/ot=address of outline table
 	define
 plinst A
 	lac A
@@ -367,7 +396,7 @@ oc9,	clf 6
 	plinst (lac ~ssa
 	lac (lio ~ssi
 	jmp ocd
-/display a star
+/display gravitational star
 	define
 starp
 	add ~bx
@@ -382,13 +411,13 @@ blp,	dap blx		/star
 	jmp blx
 	random
 	rar 9s
-	and (add 340
+	and (400700
 	spa
 	xor (377777
 	dac ~bx
 	lac ran
 	ral 4s
-	and (add 340
+	and (400700
 	spa
 	xor (377777
 	dac ~by
@@ -398,16 +427,21 @@ blx,	jmp .
 bpt,	dap bpx
 	random
 	sar 9s
-	sar 5s
+	sar 6s
 	spa
 	cma
 	sal 3s
 	add (bds
 	dap bjm
 	cla cli clf 6-opr-opr
+	szf i 20
+	jmp bjm-1
+	sub ny1
+	swap
+	sub nx1
 	dpy-4000
 bjm,	jmp .
-bds,	repeat 20, starp
+bds,	repeat 10, starp
 	szf 6
 bpx,	jmp .
 	stf 6
@@ -418,8 +452,8 @@ bpx,	jmp .
 	jmp bjm
 /background display · 3/13/62, prs.
 	define
-dislis J, Q, B
-	repeat 6, B=B+B
+dislis J, Q
+	dap fx+R
 	clf 5
 	lac flo+R
 	dap fpo+R
@@ -429,14 +463,16 @@ fs,	dap fin+R
 fin,	lac		/lac X
 	sub fpr		/right margin
 	sma
-	jmp fgr+R
+	sub (20000
 	add (2000
 frr,	spq
 fou,	jmp fuu+R
 fie,	sub (1000
 	sal 8s
 fyn,	lio		/lio Y
-	dpy-i+B
+	szs 20
+	jda kcb
+	dpy-1
 	stf 5
 fid,	idx fyn+R
 	sad (lio Q+2
@@ -446,10 +482,8 @@ fid,	idx fyn+R
 	dap fin+R
 	idx fyn+R
 	jmp fin+R
-fgr,	add (-20000+2000
-	jmp frr+R
 fuu,	szf 5
-fx,	jmp flo+R+1	/return
+fx,	jmp		/return
 	idx flo+R
 	idx flo+R
 	sas (Q+2
@@ -474,24 +508,31 @@ background
 bck,	dap bcx
 	szs 40
 	jmp bcx
-	isp bcc
-bcx,	jmp .
-	law i 2
-	dac bcc
-	dislis 1j,1q,3
-	dislis 2j,2q,2
-	dislis 3j,3q,1
-	dislis 4j,4q,0
-	isp bkc
-	jmp bcx
-	law i 20
+	jsp 1m
+	jsp 2m
+	idx bcc
+	and (1
+	sza
+	jsp 3m
+bc1,	law 3
+	and bcc
+	sza i
+	jsp 4m
+bc3,	isp bkc
+	jmp bcy
+	law i 10
 	dac bkc
 	law i 1
 	add fpr
 	spa
 	add (20000
 	dac fpr
-	jmp bcx
+bcy,	jsp 1m
+bcx,	jmp
+1m,	dislis 1j, 1q
+2m,	dislis 2j, 2q
+3m,	dislis 3j, 3q
+4m,	dislis 4j, 4q
 bcc,	0
 bkc,	0
 fpr,	10000
@@ -499,10 +540,10 @@ mul=mus
 div=dis
 	start
 
-	spacewar 4.0  ddp  2/2/63  pt.2
+	spacewar 4.3  5/17/63  ddp · pt 2
 /main control routine for spaceships
 nob=30				/total number of colliding objects
-ml0,	load ~mtc, -4000	/delay for loop
+ml0,	setup ~mtc, 5000	/delay for loop
 	init ml1, mtb		/loc of calc routines
 	add (nob
 	dap mx1		/ x
@@ -581,13 +622,13 @@ mdn,	count ~ntd,ml1
 	sza
 	clf 1
 	sza i
-	idx ~1sc
+	idx 1sc
 	law ss2
 	xor mtb 1
 	sza
 	clf 2
 	sza i
-	idx ~2sc
+	idx 2sc
 	clf 2
 	jmp a
 a1,	law mg2		/ test word control
@@ -596,12 +637,16 @@ a1,	law mg2		/ test word control
 a40,	law cwr		/ here from start at 4
 	dac ~cwg
 	jmp a6
-a,	lac ~gct
+1sc,	0		/scores
+2sc,	0
+a,	dzm 8j1
+	dzm 8j2
+	lac ~gct
 	sma
 	jmp a5
 	count ~gct, a5
-	lac ~1sc
-	sas ~2sc
+	lac 1sc
+	sas 2sc
 	jmp a4
 	law i 1
 	dac ~gct
@@ -609,15 +654,13 @@ a5,	lat
 	and (40
 	sza i
 	jmp a2
-a4,	lac ~1sc
-	lio ~2sc
-	hlt
+a4,	jmp fi1
 	lat
 	and (40
 	sza
 	jmp a2
-	dzm ~1sc
-	dzm ~2sc
+	dzm 1sc
+	dzm 2sc
 a6,	lat
 	rar 6s
 	and (37
@@ -645,8 +688,10 @@ a2,	clear mtb, nnn-1	/ clear out all tables
 	jda oc		/ compile outline
 	ot1
 a3,	dac not 1
+	dap fi1
 	jda oc
 	ot2
+	dap fi2
 	xct tno
 	dac ntr
 	dac ntr 1
@@ -662,22 +707,112 @@ a3,	dac not 1
 	jmp ml0
 / control word get routines
 mg1,	dap mg3
-	cli
 	iot 11
+	jsp 8a
+8j1,	0
+	dac ~t1
+	iot 111
+	jsp 8a
+8j2,	0
+	lio ~t1
+	ril 4s
+	rcr 4s
 mg3,	jmp .
 mg2,	dap mg4
 	lat
 	swap
 mg4,	jmp .
+idl,	idx mth
+	idx ~mfu
+	idx ~mtr
+	idx mco
+	idx mot
+	idx mom
+	idx ~mh1
+	idx ~mh2
+	idx ~mh3
+	idx ~mh4
+ids,	idx mx1
+	idx my1
+	idx ma1
+	idx mb1
+	idx ~mdy
+	idx ~mdx
 ml1,	lac .		/ 1st control word
 	sza i		/ zero if not active
 	jmp mq1		/ not active
-	swap
-	idx ~moc
+	dap . 1
+	jmp .
+mb1,	lac .		/ alter count of number of instructions
+	add ~mtc
+	dac ~mtc
+mq1,	idx ml1
+	sad (lac mtb 1
+	jmp idl
+	sas (lac mtb nob
+	jmp ids
+	background
+	jsp blp		/ display massive star
+	count ~mtc, .	/ use up rest of time of main loop
+	jmp ml0		/ repeat whole works
+/ the score-display digit encoder
+8a,	dap 8ay
+	dap 8ax
+	idx 8ax
+	clf 7
 	spi
-	jmp mq4
+	stf 5
+	szf i 5
+	stf 6
+	ril 1
+	spi
+	jmp 8ao
+8ay,	lac
+	rir 8s
+	spi
+	cla
+	rir 1s
+	spi
+	law 2
+	dac i 8ay
+8ad,	rir 8s
+	spi
+	jmp 8aq
+	rir 5s
+	spi
+	ior (14
+	rir 1s
+	spi
+	ior (1
+	jmp 8aa
+8ao,	cla
+	rir 9s
+	spi
+	law 2
+	jmp 8ad
+8aq,	rir 5s
+	spi
+	ior (1
+	rir 1s
+	spi
+	ior (14
+8aa,	rir 1s
+	spi 5
+	ior (4
+	spi 6
+	ior (10
+	rir 1s
+	spi 5
+	ior (10
+	spi 6
+	ior (4
+8ax,	jmp
+/ collision detection (subroutine)
+col,	dap cox
 	law 1
 	add ml1
+	sad (lac mtb nob
+	jmp cox-1
 	dap ml2
 	law 1
 	add mx1
@@ -691,8 +826,6 @@ ml1,	lac .		/ 1st control word
 	law 1
 	add mb1
 	dap mb2
-mot,	lac .
-	dap sp5
 ml2,	lac .		/ 2nd control word
 	spq		/ can it collide?
 	jmp mq2		/ no
@@ -713,9 +846,20 @@ my2,	sub .
 	jmp mq2		/ no
 	add ~mt1
 	sub me2
-	sma
-	jmp mq2
-	lac (mex 400000	/ yes, EXPLODE
+	spa
+	jmp cox
+mq2,	idx mx2		/ end of comparison loop
+	idx my2
+	idx ma2
+	idx mb2
+	index ml2, (lac mtb nob, ml2
+	idx cox
+cox,	jmp .
+/routine to set explosion
+	law 20
+	dac i mb1
+	dac i mb2
+sex,	lac (mex 400000	/EXPLODE
 	dac i ml1	/ replace calc routine with explosion
 	dac i ml2
 	lac i mb1	/ duration of explosion
@@ -725,51 +869,9 @@ mb2,	add .
 	add (1
 ma1,	dac .
 ma2,	dac .
-mq2,	idx mx2		/ end of comparison loop
-	idx my2
-	idx ma2
-	idx mb2
-	index ml2, (lac mtb nob, ml2
-mq4,	lac i ml1	/ routine for calculating spaceship
-	dap . 1		/ or other object and displaying it
-	jsp .
-mb1,	lac .		/ alter count of number of instructions
-	add ~mtc
-	dac ~mtc
-mq1,	idx mx1		/ end of comparison and display loop
-	idx my1
-	idx ma1
-	idx mb1
-	idx ~mdx
-	idx ~mdy
-	idx mom
-	idx mth
-	idx ~mas
-	idx ~mfu
-	idx ~mtr
-	idx mot
-	idx mco
-	idx ~mh1
-	idx ~mh2
-	idx ~mh3
-	idx ~mh4
-	index ml1, (lac mtb nob-1, ml1
-	lac i ml1	/ display and compute last point
-	sza i		/ if active
-	jmp mq3
-	dap . 1
-	jsp .
-	lac i mb1
-	add ~mtc
-	dac ~mtc
-mq3,	background	/ display stars of the heavens
-	jsp blp		/ display massive star
-	count ~mtc, .	/ use up rest of time of main loop
-	jmp ml0		/ repeat whole works
 / misc calculation routines
-/ explosion
-mex,	dap mxr
-	lac i ~mdx
+	/ explosion
+mex,	lac i ~mdx
 	sar 3s
 	add i mx1
 	dac i mx1
@@ -783,10 +885,10 @@ mex,	dap mxr
 	cma cli-opr
 	sar 3s
 	dac ~mxc
-ms1,	sub (140
+	sub (140
 	sma
 	idx msh
-mz1,	random
+mz1,	lac ran
 	and (777
 	ior (scl
 	dac mi1
@@ -798,21 +900,26 @@ mi1,	hlt
 	add i my1
 	swap
 	add i mx1
+	szs 20
+	jda kcb
 	dpy-i 300
 	count ~mxc, mz1
-	count i ma1, mxr
+	count i ma1, mb1
 	dzm i ml1
-mxr,	jmp .
+	jmp mb1
 mst,	scr 1s
 	scr 3s
 / torpedo calc routine
-tcr,	dap trc
+tcr,	jsp col
+	jmp sex-3
 	count i ma1, tc1
 	lac (mex 400000
 	dac i ml1
 	law i 2
 	dac i ma1
-	jmp trc
+	law 20
+	dac i mb1
+	jmp mb1
 tc1,	lac i mx1
 	sar 9s
 	xct the
@@ -828,13 +935,12 @@ tc1,	lac i mx1
 	sar 3s
 	add i mx1
 	dac i mx1
-	dispt 1, i my1, 1
-trc,	jmp .
+	dispt i, i my1, 1
+	jmp mb1
 / hyperspace routines
 / this routine handles a non-colliding ship invisibly
 / in hyperspace
-hp1,	dap hp2
-	count i ma1, hp2
+hp1,	count i ma1, mb1
 	law hp3		/ next step
 	dac i ml1
 	law 7
@@ -848,13 +954,38 @@ hp1,	dap hp2
 	swap
 	add i my1
 	dac i my1
+	dzm i ~mdx
+	dzm i ~mdy
+	xct hd2
+	dac i ma1
+	jmp mb1
+/ this routine handles a ship breaking out of
+/ hyperspace.
+hp3,	jsp col
+	jmp sex
+	count i ma1,hp6
+	law 2000
+	dac i mb1
+	lac i ~mh4
+	add hur
+	dac i ~mh4
 	random
+	ior (400000
+	add i ~mh4
+	sma
+	jmp po1
+	lac i ~mh1
+	dac i ml1
+	lac ran
 	scr 9s
 	sir 9s
 	xct hr2
 	dac i mdy
 	dio i mdx
 	setup ~hpt,3
+	lac ran
+	sar 6s
+	dac i mom
 	lac ran
 	dac i mth
 hp4,	lac i mth
@@ -864,49 +995,33 @@ hp4,	lac i mth
 	add (311040
 	dac i mth
 	count ~hpt,hp4
-	xct hd2
-	dac i ma1
-hp2,	jmp .
-/ this routine handles a ship breaking out of
-/ hyperspace.
-hp3,	dap hp5
-	count i ma1,hp6
-	lac i ~mh1
-	dac i ml1
-	law 2000
-	dac i mb1
 	count i ~mh2,hp7
 	dzm i ~mh2
 hp7,	xct hd3
 	dac i ~mh3
-	lac i ~mh4
-	add hur
-	dac i ~mh4
-	random
-	ior (400000
-	add i ~mh4
-	spa
-	jmp hp5
-	lac (mex 400000
-	dac i ml1
-	law i 10
-	dac i ma1
-	law 2000
-	dac i mb1
 hp6,	lac i mx1
 	dispt i, i my1, 2
-hp5,	jmp .
+	jmp mb1
+kcb,	0		/relocate for center display
+	dap kc1
+	swap
+	sub ny1
+	swap
+	lac kcb
+	sub nx1
+kc1,	jmp .
 / spaceship calc
-ss1,	dap srt		/ first spaceship
-	jsp i ~cwg
+ss1,	jsp i ~cwg
 	dio ~scw
 	jmp sr0
-ss2,	dap srt		/ second spaceship
-	jsp i ~cwg
+ss2,	jsp i cwg
 	rir 4s
 	dio ~scw
 sr0,
-sc1,	lio ~scw	/control word
+sc1,	clf 6
+	jsp col
+	jmp sex
+	lio ~scw
 	clf 6 cla-opr	/update angle
 	spi
 	add maa
@@ -916,10 +1031,10 @@ sc1,	lio ~scw	/control word
 mom,	add .
 	dac i mom
 	szs 10
-	jmp sr8
+	jmp . 3
 	dzm i mom
 	ral 7s
-sr8,	ril 1s
+	ril 1s
 	spi
 	stf 6
 	lio i ~mfu
@@ -968,19 +1083,14 @@ mth,	add .
 	mul ~t1
 	undosft
 	scr 9s
-	scr 6s
-	szs i 20		/ switch 2 for light star
-	scr 2s
+	scr 8s
 	sza
 	jmp bsg
 	scr 1s
 	dio ~t1
 	integrate mx1, ~bx
 	integrate my1, ~by
-bsg,	cla
-	sad i ~mfu
-	clf 6
-	lac i mth
+bsg,	lac i mth
 	jda cos
 	dac ~cs
 	sar 9s
@@ -997,44 +1107,49 @@ bsg,	cla
 	cla
 	add ~bx
 	diff ~mdx, mx1, (sar 3s
-sp1,	scale ~sn, 5s, ~ssn
-sp2,	scale ~cs, 5s, ~scn
+	scale ~sn, 5s, ~ssn
+	scale ~cs, 5s, ~scn
 	lac i mx1
+	szs 20
+	sub nx1
 	sub ~ssn
 	dac ~sx1
 	sub ~ssn
 	dac ~stx
 	lac i my1
+	szs 20
+	sub ny1
 	add ~scn
 	dac ~sy1
 	add ~scn
 	dac ~sty
 	scale ~sn, 9s, ssn
 	scale ~cs, 9s, scn
-	lac ssn
-	dac ssm
-	add scn
-	dac ssc
-	dac ssd
-	lac ssn
-	sub scn
-	dac csn
+	dac ~scm
+	lac ~ssn
+	dac ~ssm
+	add ~scn
+	dac ~ssc
+	dac ~ssd
+	lac ~ssn
+	sub ~scn
+	dac ~csn
 	cma
-	dac csm
-	lac scn
-	dac scm
+	dac ~csm
 	cla cli-opr
+	szs 20
+	jda kcb
 	dpy-4000
-sp5,	jmp .
+mot,sp5,	jmp i .
 sq6,	ioh
-	ranct sar 9s, sar 4s, ~src
 	lio ~scw
 	ril 2s
 	spi i		/ not blasting
 	jmp sq9		/ no tail
-sq7,	scale ~sn, 8s, ~ssn
+	ranct sar 9s, sar 4s, ~src
+	scale ~sn, 8s, ~ssn
 	scale ~cs, 8s, ~scn
-	count i ~mfu, st2
+sq7,	count i ~mfu, st2
 	dzm i ~mfu
 	jmp sq9
 st2,	yincr ~sx1, ~sy1, sub
@@ -1053,13 +1168,17 @@ mco,	lac .		/ previous control word
 	count i ~mtr, st1	/ check if torpedos exhausted
 	dzm i ~mtr	/ prevent count around
 	jmp sr5
-st1,	init sr1, mtb	/ search for unused object
+st1,	init sr1, mtb nob-1	/search for unused object
 sr1,	lac .
 	sza i		/ 0 if unused
 	jmp sr2
-	index sr1, (lac mtb nob, sr1
+	law i 1
+	add sr1
+	dap sr1
+	sas (lac mtb-1
+	jmp sr1
 	hlt		/ no space for new objects
-	jmp .-1
+	jmp sr5
 sr2,	lac (tcr		/ set up torpedo calc
 	dac i sr1
 	law nob
@@ -1090,31 +1209,33 @@ sr3,	dac .
 sr4,	dac .
 	xct rlt
 	dac i ma1	/ permit torp tubes to cool
-trf,	xct tlf		/ life of torpedo
+	xct tlf		/ life of torpedo
 sr6,	dac .
-	law 20
+	lac (lac mtb nob-1
+	sub sr1
+	sal 3s
+	add (30
 sr7,	dap .		/ length of torp calc.
-sr5,	count i ~mh3, st3	/ hyperbutton active?
+sr5,	lac ~scw
+	dac i mco
+	count i ~mh3, mb1
 	dzm i ~mh3
 	lac i ~mh2
 	sza i
-	jmp st3
+	jmp mb1
 	lac ~scw
-	cma
-	ior i mco
 	and (600000
+	xor (600000
 	sza
-	jmp st3
+	jmp mb1
 	lac i ml1
 	dac i ~mh1
 	lac (hp1 400000
 	dac i ml1
 	xct hd1
 	dac i ma1
-	law 3
+	law 2
 	dac i mb1
-st3,			/ faint handwritten on the 4.0 scan (p.26); the 4.0TS listing shows st3 falls through to:
-srt,	jmp .
 / here to handle spaceships dragged into star
 / spaceship in star
 pof,	dzm i ~mdx
@@ -1127,12 +1248,12 @@ pof,	dzm i ~mdx
 	lac i mb1
 	dac ~ssn
 	count ~ssn, .
-	jmp sr1
+	jmp mb1
 po1,	lac (mex 400000	/ now go bang
 	dac i ml1
 	law i 10
 	dac i ma1
-	jmp sr1
+	jmp mb1
 / outlines of spaceships
 ot1,	111131
 	111111
@@ -1152,56 +1273,145 @@ ot2,	013113
 	365114
 	700000
 . 5/
-	constants
 	variables
-p,	. 200/		/ space for patches
+	constants
+.-64/
+p,	. 100/		/ space for patches
+/display score routine
+fss,	0		/set size of spaceship
+	dap fs1
+	lac fss
+	dac ~scm
+	dac ~ssc
+	dac ~ssd
+	dac ~scn
+	dac ~csm
+	cma
+	dac ~csn
+	dzm ~ssn
+	dzm ~ssm
+fs1,	jmp .
+fi1,	law .		/set return of compiled outline
+	sub c21
+	dac t6
+fi2,	law .
+	sub c21
+	dac t7
+fis,	lac c23
+	dac t4
+	szf 3
+	lio 2sc		/get score
+	szf i 3
+	lio 1sc
+	scl 1s
+	cla
+	div c12
+	hlt
+	sza
+	jmp fx1
+fkr,	dio t3
+	law 400
+	jda fss
+	law fys
+	dap frt
+flt,	idx t3
+	cma
+	dac t3
+	law fus
+	dap i t6
+	dap i t7
+fus,	lac c20
+	szf 3
+	cma
+	dac sy1
+	lac t4
+	add c30
+	dac t4
+	dac sx1
+fds,	szf 3		/display spaceship
+	law not
+	szf i 3
+	law not 1
+	dap fug
+	idx t5
+	ral 9s
+	cli
+	dpy-4000+700
+	isp t3
+fug,	jmp i .
+frt,	jmp .
+fys,	law 4000
+	jda fss
+	law fub
+	dap i t6
+	dap i t7
+	lac c26
+	dac sx1
+	lac c20
+	szf i 3
+	cma
+	add c30
+	dac sy1
+	law i 2
+	dac t3
+	jmp fds
+fub,	szf 3
+	jmp . 3
+	stf 3
+	jmp . 2
+	clf 3
+	iot 11
+	dio ~t1
+	iot 111
+	dio t2
+	law 1
+	and ~t1
+	and ~t2
+	sza
+	jmp fik
+	law 2
+	and ~t1
+	and ~t2
+	sza i
+	jmp fis
+	law a4+1
+	dap fiu
+	jmp fwt
+fik,	law 4
+	dap fiu
+fwt,	add .
+	dac ~t1
+	isp ~t1
+	jmp .-1
+fiu,	jmp .
+fx1,	dio ~t1
+	dac t3
+	law fx2
+	dap frt
+	law 1100
+	jda fss
+	jmp flt
+fx2,	lio ~t1
+	jmp fkr
+c12,	12
+c20,	200000
+c21,	21
+c23,	-200000-30000
+c26,	-260000
+c30,	30000
+t3,	0
+t4,	0
+t5,	0
+t6,	0
+t7,	0
 mtb,			/ table of objects and their properties
 	start 4
 
-	spacewar game saver patch
-mg1=1510
-ran=31
-/+ tw > punch
-/- tw > read
-40/
-cwr,	dap cwx
-	lat
-cw2,	cks
-	ril 1s
-	spi+spa i-skp
-	jmp cw1
-	rrb
-	rpa-i
-cw3,	rir 4s
-cwx,	jmp .
-cw1,	ril 3s
-	spi+sma i-skp
-	jmp cw2
-	jsp mg1
-	ril 4s
-	ppa-i
-	jmp cw3
-6000/				/new starting address
-go,	lat
-	sma
-	jmp pu
-	rpb
-	dio ran
-	rpa-i
-	jmp 4
-pu,	law i 200
-	dac ~pc
-	cli
-	ppa
-	isp ~pc
-	jmp .-2
-	lio ran
-	ppb	ril 6s
-	ppb	ril 6s
-	ppb-1
-	jmp 4
-	variables
-	start go
-
-/ (the scan continues with the assembler-generated symbol table,
-/ pp. 30-34, which is not reproduced here.)
+/ (The scan continues with the assembler pass-log (p.31) and the
+/ symbol table (pp. 32-37), which are not reproduced here. The pass-log
+/ records four assemblies: spacewar 4.3 5/17/63 ddp pt 1, pt 2,
+/ "stars by prs for s/w 2b", and "spacewar 4.3 syms 5/23/63 jcm"
+/ (the symbols assembled by Joe C. Morris on 5/23/63), with a
+/ constants area inclusive from 2763 to 3111. The star field is the
+/ separate "stars by prs for s/w 2b" assembly loaded at 6077 and is not
+/ part of pt 1 / pt 2 of this listing.)

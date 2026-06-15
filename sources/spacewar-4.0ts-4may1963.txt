@@ -1,24 +1,56 @@
-/ Spacewar! 4.0 - normalised source transcription
+/ Spacewar! 4.0TS - normalised source transcription
 / ----------------------------------------------------------------------
-/ Transcribed from the scanned listing "spacewar 4.0  2/2/63  ddp"
-/ (spacewar-4.0-2feb1963-(Morris).pdf), the Monty Preonas ("ddp") listing
-/ extracted by David M. Berry from the Joe Morris scan.
+/ Transcribed from the scanned listing "spacewar 4.0ts  5/4/63  ddp"
+/ (spacewar-4.0ts-4may1963.pdf, 33 pp.), Monty Preonas's ("ddp") "Twin
+/ Star" variant of Spacewar! 4.0. Extracted by David M. Berry.
 /
-/ Method: verified page by page against the scan images; OCR was used only
-/ as a first pass and every numeral and mnemonic was checked by eye.
-/ Conventions follow the bitsavers Samson files: "~" marks a variable shown
-/ overlined in the original (kept in the auto-index / variables page); tabs
-/ separate the label, instruction and "/" comment columns. The symbol table
-/ that closes the scanned listing (assembler-generated, pp. 29-34) is not
-/ reproduced here.
+/ Per the masswerk genealogy, 4.0TS is version 4.0 with a simplified
+/ starfield (4th-magnitude stars removed) and minor hyperspace
+/ modifications. The two divergences from 4.0 are confirmed by the scan:
+/   (1) the background routine (pt.1, "background" define) makes only
+/       THREE dislis calls -- dislis 1j,1q,3 / 2j,2q,2 / 3j,3q,1 -- the
+/       "dislis 4j,4q,0" call present in 4.0 is removed; and
+/   (2) the starfield data table appended here ("stars by prs for s/w 2b",
+/       pp.31-33) likewise omits the 4th-magnitude star group: it carries
+/       only 1j/1q, 2j/2q and 3j/3q, not a 4j/4q block.
+/   The "minor hyperspace modifications" are visible in the hp1 routine
+/   (pt.2, "this routine handles a non-colliding ship invisibly in
+/   hyperspace"): after setting the new angle (lac ran / dac i mth),
+/   4.0TS does "random / sar 6s / dac i mom", giving the ship a random
+/   angular velocity on hyperspace re-entry. The 4.0 listing instead has
+/   "setup ~hpt,3" before "lac ran / dac i mth" and closes the hp4 loop
+/   with "count ~hpt,hp4" (a fixed spin of the angle), with no random
+/   "dac i mom". 4.0TS thus drops the hpt spin loop and randomises mom
+/   instead. Otherwise hp1/hp3 are structurally as in 4.0.
 /
-/ One spot is genuinely illegible: a faint handwritten annotation at the
-/ "st3," label on p.26. The program structure shows st3 returns to the main
-/ loop; the handwritten content cannot be read with confidence and is marked
-/ [illegible] below.
+/ Method: read page by page against the scan images; OCR was used only as
+/ a first pass and every numeral and mnemonic was checked by eye. The 4.0
+/ listing (spacewar-4.0-2feb1963-(Morris).txt) was used to resolve
+/ ambiguous readings of the shared routines, but this is a different
+/ version and what the 4.0TS scan actually shows is transcribed.
+/ Conventions follow the bitsavers Samson files: "~" marks a variable
+/ shown overlined in the original; tabs separate the label, instruction
+/ and "/" comment columns.
+/
+/ Confidence notes:
+/   - pt.1 header reads "spacewar 4.0ts  5/4/63  ddp · pt 1".
+/   - p.1 carries a definition line, "ioh=xct (nop", that is not present
+/     in the 4.0 listing (in 4.0 "ioh" is defined elsewhere); transcribed
+/     as it appears, with its "/delay for dpy's" comment.
+/   - p.16: "lio ddd / spi i" -- the skip is read as "spi i" (matching the
+/     valid PDP-1 form and the 4.0 listing); the scan glyph is ambiguous
+/     between "i" and "1".
+/   - p.27: 4.0TS prints both labels "st3," and "srt," explicitly, with
+/     "srt,  jmp .". This resolves the spot that was illegible at the
+/     analogous "st3," label in the 4.0 scan: here st3 is simply a label
+/     point that falls through to "srt, jmp .". No content is illegible.
+/   - No assembler symbol table or pass-log appears in this scan. Unlike
+/     4.0, this listing does NOT carry the game-saver / paper-tape loader
+/     patch; instead pp.31-33 hold the separate starfield source ("stars
+/     by prs for s/w 2b"), assembled at 6077/ with its own "start 4".
 / ----------------------------------------------------------------------
 
-	spacewar 4.0  2/2/63  ddp · pt. 1
+	spacewar 4.0ts  5/4/63  ddp · pt 1
 
 3/	jmp sbf		/ ignore seq. break
 	jmp a40
@@ -55,6 +87,7 @@ grv, 32,	sar 6s		/ gravitational constant
 40/
 cwr,	jmp mg1		/ normally iot 11 control
 . 20/	/ space
+ioh=xct (nop		/delay for dpy's
 / routine to flush sequence breakes, if they occur.
 sbf,	tyi
 	lio 2
@@ -269,7 +302,7 @@ sq1,	0
 sq2,	0
 /outline compiler
 /ac=where to compile to, call   jda oc
-/ot=addres of outline table
+/ot=address of outline table
 	define
 plinst A
 	lac A
@@ -481,7 +514,6 @@ bcx,	jmp .
 	dislis 1j,1q,3
 	dislis 2j,2q,2
 	dislis 3j,3q,1
-	dislis 4j,4q,0
 	isp bkc
 	jmp bcx
 	law i 20
@@ -499,7 +531,7 @@ mul=mus
 div=dis
 	start
 
-	spacewar 4.0  ddp  2/2/63  pt.2
+	spacewar 4.0ts  5/4/63  ddp · pt 2
 /main control routine for spaceships
 nob=30				/total number of colliding objects
 ml0,	load ~mtc, -4000	/delay for loop
@@ -744,7 +776,6 @@ mq1,	idx mx1		/ end of comparison and display loop
 	idx ~mdy
 	idx mom
 	idx mth
-	idx ~mas
 	idx ~mfu
 	idx ~mtr
 	idx mot
@@ -854,16 +885,17 @@ hp1,	dap hp2
 	xct hr2
 	dac i mdy
 	dio i mdx
-	setup ~hpt,3
 	lac ran
 	dac i mth
+	random
+	sar 6s
+	dac i mom
 hp4,	lac i mth
 	sma
 	sub (311040
 	spa
 	add (311040
 	dac i mth
-	count ~hpt,hp4
 	xct hd2
 	dac i ma1
 hp2,	jmp .
@@ -1113,7 +1145,7 @@ sr5,	count i ~mh3, st3	/ hyperbutton active?
 	dac i ma1
 	law 3
 	dac i mb1
-st3,			/ faint handwritten on the 4.0 scan (p.26); the 4.0TS listing shows st3 falls through to:
+st3,
 srt,	jmp .
 / here to handle spaceships dragged into star
 / spaceship in star
@@ -1127,12 +1159,12 @@ pof,	dzm i ~mdx
 	lac i mb1
 	dac ~ssn
 	count ~ssn, .
-	jmp sr1
+	jmp srt
 po1,	lac (mex 400000	/ now go bang
 	dac i ml1
 	law i 10
 	dac i ma1
-	jmp sr1
+	jmp srt
 / outlines of spaceships
 ot1,	111131
 	111111
@@ -1158,50 +1190,130 @@ p,	. 200/		/ space for patches
 mtb,			/ table of objects and their properties
 	start 4
 
-	spacewar game saver patch
-mg1=1510
-ran=31
-/+ tw > punch
-/- tw > read
-40/
-cwr,	dap cwx
-	lat
-cw2,	cks
-	ril 1s
-	spi+spa i-skp
-	jmp cw1
-	rrb
-	rpa-i
-cw3,	rir 4s
-cwx,	jmp .
-cw1,	ril 3s
-	spi+sma i-skp
-	jmp cw2
-	jsp mg1
-	ril 4s
-	ppa-i
-	jmp cw3
-6000/				/new starting address
-go,	lat
-	sma
-	jmp pu
-	rpb
-	dio ran
-	rpa-i
-	jmp 4
-pu,	law i 200
-	dac ~pc
-	cli
-	ppa
-	isp ~pc
-	jmp .-2
-	lio ran
-	ppb	ril 6s
-	ppb	ril 6s
-	ppb-1
-	jmp 4
-	variables
-	start go
+/ ----------------------------------------------------------------------
+/ Starfield source, appended in this scan (pp.31-33). Assembled
+/ separately at 6077/ with its own "start 4". This is the SIMPLIFIED
+/ starfield of the Twin Star variant: only three magnitude groups
+/ (1j/1q, 2j/2q, 3j/3q); the 4th-magnitude group present in the full 4.0
+/ starfield is removed. Loaded by the three "dislis" calls in the
+/ background routine above.
+/ ----------------------------------------------------------------------
 
-/ (the scan continues with the assembler-generated symbol table,
-/ pp. 30-34, which is not reproduced here.)
+stars by prs  for s/w 2b
+6077/
+
+/stars 1 · 3/13/62, prs.
+	decimal
+	define
+mark X, Y
+	repeat 8, Y=Y+Y
+	8192-X	Y
+	terminate
+1j,	mark 1537, 371		/87 Taur, Aldebaran
+	mark 1762, -189		/19 Orio, Rigel
+	mark 1990, 168		/58 Orio, Betelgeuze
+	mark 2280, -377		/ 9 CMaj, Sirius
+	mark 2583, 125		/10 CMin, Procyon
+	mark 3431, 283		/32 Leon, Regulus
+	mark 4551, -242		/67 Virg, Spica
+	mark 4842, 448		/16 Boot, Arcturus
+1q,	mark 6747, 196		/53 Aqil, Altair
+2j,	mark 1819, 143		/24 Orio, Bellatrix
+	mark 1884, -29		/46 Orio
+	mark 1910, -46		/50 Orio
+	mark 1951, -221		/53 Orio
+	mark 2152, -407		/ 2 CMaj
+	mark 2230, 375		/24 Gemi
+	mark 3201, -187		/30 Hyda, Alphard
+	mark 4005, 344		/94 Leon, Denebola
+2q,	mark 5975, 288		/55 Ophi
+3j,	mark   46, 333		/88 Pegs, Algenib
+	mark  362, -244		/31 Ceti
+	mark  490, 338		/99 Pisc
+	mark  566, -375		/52 Ceti
+	mark  621, 462		/ 6 Arie
+	mark  764, -78		/68 Ceti, Mira
+	mark  900, 64		/86 Ceti
+	mark 1007, 84		/92 Ceti
+	mark 1243, -230		/23 Erid
+	mark 1328, -314		/34 Erid
+	mark 1495, 432		/74 Taur
+	mark 1496, 356		/78 Taur
+	mark 1618, 154		/ 1 Orio
+	mark 1644, 52		/ 8 Orio
+	mark 1723, -119		/67 Erid
+	mark 1755, -371		/ 5 Leps
+	mark 1779, -158		/20 Orio
+	mark 1817, -57		/28 Orio
+	mark 1843, -474		/ 9 Leps
+	mark 1860, -8		/34 Orio
+	mark 1868, -407		/11 Leps
+	mark 1875, 225		/39 Orio
+	mark 1880, -136		/44 Orio
+	mark 1887, 480		/123 Taur
+	mark 1948, -338		/14 Leps
+	mark 2274, 296		/31 Gemi
+	mark 2460, 380		/54 Gemi
+	mark 2470, 504		/55 Gemi
+	mark 2513, 193		/ 3 CMin
+	mark 2967, 154		/11 Hyda
+	mark 3016, 144		/16 Hyda
+	mark 3424, 393		/30 Leon
+	mark 3496, 463		/41 Leon, Algieba
+	mark 3668, -357		/nu Hyda
+	mark 3805, 479		/68 Leon
+	mark 3806, 364		/10 Leon
+	mark 4124, -502		/ 2 Corv
+	mark 4157, -387		/ 4 Corv
+	mark 4236, -363		/ 7 Corv
+	mark 4304, -21		/29 Virg
+	mark 4384, 90		/43 Virg
+	mark 4421, 262		/47 Virg
+	mark 4606, -2		/79 Virg
+	mark 4721, 430		/ 8 Boot
+	mark 5037, -356		/ 9 Libr
+	mark 5186, -205		/27 Libr
+	mark 5344, 153		/24 Serp
+	mark 5357, 358		/28 Serp
+	mark 5373, -71		/32 Serp
+	mark 5430, -508		/ 7 Scor
+	mark 5459, -445		/ 8 Scor
+	mark 5513, -78		/ 1 Ophi
+	mark 5536, -101		/ 2 Ophi
+	mark 5609, 494		/27 Herc
+	mark 5641, -236		/13 Ophi
+	mark 5828, -355		/35 Ophi
+	mark 5860, 330		/64 Herc
+	mark 5984, -349		/55 Serp
+	mark 6047, 63		/62 Ophi
+	mark 6107, -222		/64 Ophi
+	mark 6159, 217		/72 Ophi
+	mark 6236, -66		/58 Serp
+	mark 6439, -483		/37 Sgtr
+	mark 6490, 312		/17 Aqil
+	mark 6491, -115		/16 Aqil
+	mark 6507, -482		/41 Sgtr
+	mark 6602, 66		/30 Aqil
+	mark 6721, 236		/50 Aqil
+	mark 6794, 437		/12 Sgte
+	mark 6862, -25		/65 Aqil
+	mark 6914, -344		/ 9 Capr
+	mark 7014, 324		/ 6 Dlph
+	mark 7318, -137		/22 Aqar
+	mark 7391, 214		/ 8 Pegs
+	mark 7404, -377		/49 Capr
+	mark 7513, -18		/34 Aqar
+	mark 7539, 130		/26 Pegs
+	mark 7644, -12		/55 Aqar
+	mark 7717, 235		/42 Pegs
+	mark 7790, -372		/76 Aqar
+3q,	mark 7849, 334		/54 Pegs, Markab
+	start 4
+
+/ ----------------------------------------------------------------------
+/ End of listing. The scan contains no assembler-generated symbol table
+/ and no pass-log. Page-break header glyphs read "spw - 1" ... "spw - 33"
+/ (handwritten). pt.1 ends with "start" (p.12); the main pt.2 program
+/ ends with "start 4" (p.30); the appended starfield ends with its own
+/ "start 4" (p.33).
+/ ----------------------------------------------------------------------
