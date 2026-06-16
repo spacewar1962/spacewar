@@ -4,3 +4,6 @@
 sources/minnesota_spacewar-2014-Landsteiner.js
 sources/SPCWR3-Wrege-1974.txt
 .DS_Store
+
+# GT40 Spacewar local copy (linked from github.com/pdp11/mit-gt40-spacewar instead)
+sources/sw/
