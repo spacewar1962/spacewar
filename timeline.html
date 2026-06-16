@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timeline: Spacewar! 1961–1980</title>
+  <meta name="description" content="An interactive timeline of Spacewar!, from its conception at MIT in 1961 to the arcade era of 1980: the MIT versions, the long journey of ports and clones, the culture, and the legacy. Click through to the sources, photographs, and stories.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="Timeline: Spacewar! 1961–1980">
+  <meta property="og:description" content="An interactive timeline of Spacewar!, from MIT 1961 to the arcade era of 1980, with click-throughs to sources, photographs, and stories.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/timeline.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=3">
+  <script src="assets/nav.js" defer></script>
+  <style>
+    /* ---- Timeline component (scoped to .tl) ---- */
+    .tl { --c-mit:#6cf2ff; --c-port:#ffce7a; --c-culture:#ff9ecf; --c-hw:#8fe6a0; --c-legacy:#c4a8ff; position:relative; }
+    .tl-controls { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin:0 0 0.4rem; }
+    .tl-chip {
+      font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase;
+      padding:0.3rem 0.65rem; border:1px solid var(--line); border-radius:999px; background:transparent;
+      color:var(--phosphor-dim); cursor:pointer; transition:all .15s ease; white-space:nowrap;
+    }
+    .tl-chip .dot { display:inline-block; width:0.5rem; height:0.5rem; border-radius:50%; margin-right:0.35rem; vertical-align:middle; background:currentColor; box-shadow:0 0 6px currentColor; }
+    .tl-chip[aria-pressed="true"] { color:var(--bright); border-color:var(--phosphor-dim); background:rgba(120,200,255,0.06); }
+    .tl-chip[data-cat="mit"]{ --hue:var(--c-mit); } .tl-chip[data-cat="port"]{ --hue:var(--c-port); }
+    .tl-chip[data-cat="culture"]{ --hue:var(--c-culture); } .tl-chip[data-cat="hw"]{ --hue:var(--c-hw); } .tl-chip[data-cat="legacy"]{ --hue:var(--c-legacy); }
+    .tl-chip[data-cat] .dot { color:var(--hue); }
+    .tl-hint { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.06em; color:var(--phosphor-dim); text-transform:uppercase; margin:0 0 0.9rem; }
+
+    .tl-stars { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; border-radius:6px;
+      background-image:
+        radial-gradient(1px 1px at 12% 30%, rgba(191,228,255,0.9), transparent),
+        radial-gradient(1px 1px at 28% 70%, rgba(191,228,255,0.6), transparent),
+        radial-gradient(1px 1px at 47% 18%, rgba(255,206,122,0.7), transparent),
+        radial-gradient(1px 1px at 63% 55%, rgba(191,228,255,0.7), transparent),
+        radial-gradient(1px 1px at 81% 25%, rgba(191,228,255,0.5), transparent),
+        radial-gradient(1px 1px at 90% 78%, rgba(255,158,207,0.6), transparent),
+        radial-gradient(1px 1px at 38% 88%, rgba(191,228,255,0.6), transparent),
+        radial-gradient(1px 1px at 72% 92%, rgba(191,228,255,0.5), transparent);
+      animation:tl-twinkle 6s ease-in-out infinite alternate; }
+    @keyframes tl-twinkle { from{opacity:.45} to{opacity:.9} }
+
+    .tl-scroll { position:relative; z-index:1; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x proximity;
+      -webkit-overflow-scrolling:touch; padding:0.5rem 0 1.2rem; scrollbar-width:thin; }
+    .tl-track { position:relative; display:flex; align-items:stretch; gap:0; min-height:560px; padding:0 1rem; width:max-content; }
+    .tl-track::before { content:""; position:absolute; left:0; right:0; top:50%; height:2px;
+      background:linear-gradient(90deg, transparent, var(--line) 4%, var(--line) 96%, transparent); }
+    .tl-track::after { content:""; position:absolute; left:0; top:50%; width:34%; height:2px; transform:translateY(-1px);
+      background:linear-gradient(90deg, transparent, rgba(108,242,255,0.65), transparent); filter:blur(0.5px);
+      animation:tl-scan 7s linear infinite; }
+    @keyframes tl-scan { from{left:-34%} to{left:100%} }
+
+    .tl-event { position:relative; flex:0 0 300px; scroll-snap-align:center; }
+    .tl-node { position:absolute; left:50%; top:50%; width:14px; height:14px; margin:-7px 0 0 -7px; border-radius:50%;
+      background:var(--bg); border:2px solid var(--hue,#6cf2ff); box-shadow:0 0 8px var(--hue,#6cf2ff); z-index:3; transition:transform .15s ease; }
+    .tl-year { position:absolute; left:50%; top:50%; transform:translate(-50%, 1.2rem); font-family:var(--mono); font-weight:700;
+      font-size:0.74rem; letter-spacing:0.05em; color:var(--hue,#6cf2ff); text-shadow:0 0 8px rgba(0,0,0,0.8); white-space:nowrap; }
+    .tl-event.down .tl-year { transform:translate(-50%, -2rem); }
+    .tl-stem { position:absolute; left:50%; width:2px; background:var(--hue,#6cf2ff); opacity:0.5; }
+    .tl-event.up .tl-stem { bottom:50%; height:30px; }
+    .tl-event.down .tl-stem { top:50%; height:30px; }
+
+    .tl-card { position:absolute; left:50%; transform:translateX(-50%); width:248px; box-sizing:border-box;
+      background:linear-gradient(180deg, rgba(7,11,20,0.96), rgba(7,11,20,0.92)); border:1px solid var(--line);
+      border-top:2px solid var(--hue,#6cf2ff); border-radius:5px; padding:0.7rem 0.8rem; z-index:2;
+      transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
+    .tl-event.up .tl-card { bottom:calc(50% + 30px); }
+    .tl-event.down .tl-card { top:calc(50% + 30px); }
+    .tl-card:hover, .tl-card:focus-within { border-color:var(--hue,#6cf2ff); box-shadow:0 0 0 1px var(--hue,#6cf2ff), 0 6px 22px rgba(0,0,0,0.5); }
+    .tl-event:hover .tl-node { transform:scale(1.35); }
+    .tl-date { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--hue,#6cf2ff); margin:0 0 0.25rem; }
+    .tl-title { font-family:var(--mono); font-weight:700; font-size:0.82rem; line-height:1.25; color:var(--bright); margin:0 0 0.35rem; }
+    .tl-blurb { font-size:0.72rem; line-height:1.45; color:var(--phosphor-dim); margin:0 0 0.5rem; }
+    .tl-thumb { width:100%; height:84px; object-fit:cover; border:1px solid var(--line); border-radius:3px; margin:0 0 0.5rem; display:block; background:#0b0f0c; }
+    .tl-links { display:flex; flex-wrap:wrap; gap:0.3rem; }
+    .tl-links a { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.04em; text-transform:uppercase; text-decoration:none;
+      padding:0.2rem 0.45rem; border:1px solid var(--line); border-radius:3px; color:var(--phosphor); transition:all .12s ease; }
+    .tl-links a:hover { border-color:var(--hue,#6cf2ff); color:var(--bright); background:rgba(120,200,255,0.06); }
+    .tl-event.dim { opacity:0.16; filter:grayscale(0.6); }
+
+    @media (max-width:760px) {
+      .tl-scroll { overflow:visible; scroll-snap-type:none; padding-left:0.3rem; }
+      .tl-track { flex-direction:column; width:auto; min-height:0; gap:0; padding:0; }
+      .tl-track::before { left:7px; right:auto; top:0; bottom:0; width:2px; height:auto;
+        background:linear-gradient(180deg, transparent, var(--line) 2%, var(--line) 98%, transparent); }
+      .tl-track::after { display:none; }
+      .tl-event { flex:none; width:100%; padding:0 0 1.6rem 0; min-height:0; }
+      .tl-node { left:7px; top:8px; margin:0; transform:translate(-50%,0); }
+      .tl-event:hover .tl-node { transform:translate(-50%,0) scale(1.3); }
+      .tl-stem, .tl-year { display:none; }
+      .tl-card, .tl-event.up .tl-card, .tl-event.down .tl-card { position:static; transform:none; width:auto; margin-left:1.6rem; }
+      .tl-card::before { content:attr(data-year); display:inline-block; font-family:var(--mono); font-weight:700; font-size:0.7rem;
+        color:var(--hue,#6cf2ff); margin:0 0 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <a href="why.html">Why?</a>
+        <a href="./#ccs">CCS</a>
+        <a href="./#history">History</a>
+        <a href="timeline.html" aria-current="page">Timeline</a>
+        <a href="./#object">Object</a>
+        <a href="code.html">Code</a>
+        <a href="people.html">People</a>
+        <a href="two-cultures.html">Two Cultures</a>
+        <a href="bibliography.html">Biblio</a>
+        <a href="play.html">Play</a>
+        <a href="./#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">1961 to 1980</span>
+      <h2>The Spacewar! timeline</h2>
+      <p>From a hack on a new minicomputer in a Cambridge, Massachusetts laboratory to the founding myth of the video game, <i>Spacewar!</i> spent two decades being written, patched, carried from machine to machine, cloned, renamed, written about, and played. This timeline gathers the principal release dates, the ports and clones of its "long journey", the cultural moments, and the legacy that followed, each with a way through to the code, the photographs, and the stories on this site.</p>
+    </section>
+
+    <section class="block tl" aria-label="Spacewar timeline">
+      <div class="tl-controls" role="group" aria-label="Filter by category">
+        <button class="tl-chip" data-cat="all" aria-pressed="true">All</button>
+        <button class="tl-chip" data-cat="mit" aria-pressed="true"><span class="dot"></span>MIT versions</button>
+        <button class="tl-chip" data-cat="port" aria-pressed="true"><span class="dot"></span>Ports &amp; clones</button>
+        <button class="tl-chip" data-cat="culture" aria-pressed="true"><span class="dot"></span>Culture &amp; events</button>
+        <button class="tl-chip" data-cat="hw" aria-pressed="true"><span class="dot"></span>Hardware</button>
+        <button class="tl-chip" data-cat="legacy" aria-pressed="true"><span class="dot"></span>Legacy</button>
+      </div>
+      <p class="tl-hint">Scroll sideways &middot; use &larr; &rarr; keys &middot; click a card's links to dig in &middot; on a phone it runs top to bottom</p>
+      <div class="tl-stars" aria-hidden="true"></div>
+      <div class="tl-scroll" id="tlScroll" tabindex="0" aria-label="Timeline, scroll horizontally">
+        <div class="tl-track" id="tlTrack"></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <p style="margin-top:0.4rem;"><a class="btn ghost" href="code.html">Browse the full version table →</a></p>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · <a href="https://github.com/spacewar1962/spacewar/releases">v1.5</a></p>
+    </div>
+  </footer>
+
+  <script>
+  (function () {
+    var CAT = { mit:'--c-mit', port:'--c-port', culture:'--c-culture', hw:'--c-hw', legacy:'--c-legacy' };
+    var I = function (src) { return src; };
+    var EVENTS = [
+      { y:'1961', date:'1961', cat:'mit', t:'Conception', b:'Steve Russell and the Hingham Institute group (Wiitanen, Graetz) sketch a game for MIT’s new PDP-1.',
+        links:[{l:'The people',h:'people.html'}] },
+      { y:'1962', date:'Early 1962', cat:'mit', t:'Version 1', b:'The first playable build: two ships and torpedoes, no gravity or hyperspace yet.',
+        links:[{l:'Text',h:'sources/spacewar-1-1962-reconstructed.txt',x:1},{l:'Versions',h:'code.html'}] },
+      { y:'1962', date:'2 Apr 1962', cat:'mit', t:'Version 2B', b:'First complete version, shown at MIT Parents’ Weekend: Expensive Planetarium starfield, Minskytron hyperspace.', img:'assets/images/thetech-1962-spacewar.jpg',
+        links:[{l:'Text',h:'sources/spacewar-2b-2apr1962.txt',x:1},{l:'The Tech, 1962',h:'http://tech.mit.edu/V82/PDF/V82-N11.pdf',x:1}] },
+      { y:'1962', date:'1962', cat:'hw', t:'The gamepads', b:'Kotok and Saunders build wooden control boxes, levers and a fire button, among the earliest purpose-built game controllers.',
+        links:[{l:'The people',h:'people.html#kotok'}] },
+      { y:'1962', date:'24 Sep 1962', cat:'mit', t:'Version 3.1', b:'The standard version, patches consolidated; the most widely preserved and emulated.',
+        links:[{l:'Text',h:'sources/spacewar-3.1-24sep1962.txt',x:1},{l:'Versions',h:'code.html'}] },
+      { y:'1963', date:'Feb 1963', cat:'mit', t:'The 4.x generation', b:'Two strains fork at MIT: Preonas’s ddp 4.0 and the dfw 4.1, with hardware multiply and floating-point gravity.',
+        links:[{l:'Versions',h:'code.html'}] },
+      { y:'1963', date:'May–Jul 1963', cat:'mit', t:'4.2 → 4.8', b:'Score displays, twin-star views, a dual-console build, and finally 4.8, the last classic MIT version.',
+        links:[{l:'Versions',h:'code.html'}] },
+      { y:'1963', date:'1963', cat:'port', t:'First port: PDP-4', b:'Spacewar leaves the PDP-1 for the first time, rebuilt at the University of Michigan.',
+        links:[{l:'The long journey',h:'code.html#long-journey'}] },
+      { y:'1964', date:'1964', cat:'port', t:'Stanford, PDP-6', b:'Steve Russell carries the game west to Stanford, where it will find a long second home.',
+        links:[{l:'The Stanford story',h:'stanford.html'}] },
+      { y:'1965', date:'1965', cat:'port', t:'IBM 360 &amp; PDP-7', b:'Ported to the IBM System/360 at the MIT Computation Center (Edson Hendricks) and to a PDP-7 at Pittsburgh.',
+        links:[{l:'The long journey',h:'code.html#long-journey'}] },
+      { y:'1967', date:'1966–69', cat:'port', t:'Minnesota: invisibility', b:'On a CDC 3100, Albert Kuhfeld replaces hyperspace with invisibility, turning luck into skill.',
+        links:[{l:'The Minnesota story',h:'minnesota.html'}] },
+      { y:'1967', date:'1967', cat:'port', t:'Stanford SAIL, PDP-10', b:'Ralph Gorin’s multi-player version, up to five ships and runtime-editable rules, the one played at the Olympics.', img:'assets/images/Stanford-spacewar-Bruce-Baumgart.png',
+        links:[{l:'The Stanford story',h:'stanford.html'},{l:'SAIL source',h:'sources/ports/spacewar-pdp10-sail-gorin-1971.txt',x:1}] },
+      { y:'1968', date:'Jun 1968', cat:'port', t:'Cambridge: Duel', b:'Peterson and Viner clone the game as Duel on the Cambridge PDP-7, inventing "viscous space".', img:'assets/images/Spacewar-cambridge-decus7-40-June1968.png',
+        links:[{l:'The Cambridge story',h:'cambridge.html'}] },
+      { y:'1968', date:'1968', cat:'culture', t:'Cybernetic Serendipity', b:'A few streets from the Cambridge lab, Margaret Masterman’s Computerized Haiku shows at the first big computer-art exhibition.',
+        links:[{l:'Masterman &amp; the CLRU',h:'cambridge.html'}] },
+      { y:'1968', date:'Aug 1968', cat:'port', t:'SPCWAR on the LINC-8', b:'E. Duffin’s version (DECUS L-39, in LAP6) is the earliest port with a firm date.', img:'assets/images/SPCWAR-DECUS-L-39.png',
+        links:[{l:'The long journey',h:'code.html#long-journey'}] },
+      { y:'1969', date:'1969', cat:'port', t:'PLATO: networked play', b:'Richard Blomme builds an inter-terminal Spacewar on the PLATO system at Illinois, an early networked game.',
+        links:[{l:'The long journey',h:'code.html#long-journey'}] },
+      { y:'1971', date:'1971', cat:'culture', t:'Spacewar in Analog', b:'Kuhfeld writes the game up for Analog magazine, carrying it to a mass science-fiction readership.',
+        links:[{l:'The Minnesota story',h:'minnesota.html'}] },
+      { y:'1971', date:'1971', cat:'legacy', t:'Computer Space', b:'Bushnell and Dabney turn Spacewar into the first commercial arcade video game.',
+        links:[{l:'Wikipedia',h:'https://en.wikipedia.org/wiki/Computer_Space',x:1}] },
+      { y:'1972', date:'19 Oct 1972', cat:'culture', t:'The Spacewar Olympics', b:'Stewart Brand runs the first video-game tournament at the Stanford AI Lab and reports it for Rolling Stone.', img:'assets/images/spacewar-olympians-and-pam-hart-1972.png',
+        links:[{l:'The Stanford story',h:'stanford.html'},{l:'Brand’s article',h:'https://wheels.org/spacewar/stone/rolling_stone.html',x:1}] },
+      { y:'1972', date:'Nov 1972', cat:'legacy', t:'Pong', b:'Atari’s Pong arrives some six weeks after the Olympics and begins the arcade boom.',
+        links:[{l:'Wikipedia',h:'https://en.wikipedia.org/wiki/Pong',x:1}] },
+      { y:'1974', date:'1974', cat:'culture', t:'On the ARPANET', b:'The ARPANET Directory lists Masterman’s CLRU; meanwhile SPCWAR v3 continues at Georgia Tech.', img:'assets/images/ARPAnet1974-directory-masterman.png',
+        links:[{l:'The Cambridge story',h:'cambridge.html'}] },
+      { y:'1976', date:'c.1976', cat:'port', t:'GT40 &amp; SPCWAR', b:'A vector-display GT40 version (Waters and Billmers) appears, while MIT-AI keeps SPCWAR alive on ITS.',
+        links:[{l:'The SPCWAR story',h:'mit-ai.html'},{l:'SPCWAR source',h:'sources/ports/spacewar-pdp6-10-mit-its-spcwar.txt',x:1}] },
+      { y:'1977', date:'1977', cat:'legacy', t:'The personal computer', b:'The Apple II and its kind arrive, the cheap, legible machine Kay and Brand had foreseen at Stanford.', img:'assets/images/AlanKay-1972.png',
+        links:[{l:'Build your own Spacewar',h:'stanford.html'}] },
+      { y:'1979', date:'1979', cat:'legacy', t:'Asteroids', b:'Atari’s vector-display Asteroids carries the Spacewar lineage into the arcade’s golden age.',
+        links:[{l:'Wikipedia',h:'https://en.wikipedia.org/wiki/Asteroids_(video_game)',x:1}] },
+      { y:'1980', date:'1980', cat:'legacy', t:'Spacewar’s world', b:'Two decades on, the game’s DNA, real-time graphics, twin controls, ships in a gravity well, is everywhere.',
+        links:[{l:'Why it matters',h:'why.html'}] }
+    ];
+
+    var track = document.getElementById('tlTrack');
+    var scroll = document.getElementById('tlScroll');
+
+    EVENTS.forEach(function (e, i) {
+      var dir = (i % 2 === 0) ? 'up' : 'down';
+      var ev = document.createElement('div');
+      ev.className = 'tl-event ' + dir;
+      ev.setAttribute('data-cat', e.cat);
+      ev.style.setProperty('--hue', 'var(' + CAT[e.cat] + ')');
+      var linksHtml = (e.links || []).map(function (k) {
+        var attr = k.x ? ' target="_blank" rel="noopener noreferrer"' : '';
+        return '<a href="' + k.h + '"' + attr + '>' + k.l + '</a>';
+      }).join('');
+      var thumb = e.img ? '<img class="tl-thumb" src="' + e.img + '" alt="" loading="lazy">' : '';
+      ev.innerHTML =
+        '<span class="tl-node"></span>' +
+        '<span class="tl-stem"></span>' +
+        '<span class="tl-year">' + e.y + '</span>' +
+        '<div class="tl-card" data-year="' + e.date + '">' +
+          '<p class="tl-date">' + e.date + '</p>' +
+          '<h3 class="tl-title">' + e.t + '</h3>' +
+          thumb +
+          '<p class="tl-blurb">' + e.b + '</p>' +
+          '<div class="tl-links">' + linksHtml + '</div>' +
+        '</div>';
+      track.appendChild(ev);
+    });
+
+    // Category filters
+    var chips = Array.prototype.slice.call(document.querySelectorAll('.tl-chip'));
+    function active() {
+      return chips.filter(function (c) { return c.dataset.cat !== 'all' && c.getAttribute('aria-pressed') === 'true'; })
+                  .map(function (c) { return c.dataset.cat; });
+    }
+    function apply() {
+      var on = active();
+      Array.prototype.forEach.call(track.children, function (ev) {
+        ev.classList.toggle('dim', on.indexOf(ev.getAttribute('data-cat')) === -1);
+      });
+      var allOn = on.length === Object.keys(CAT).length;
+      var allBtn = chips.filter(function (c) { return c.dataset.cat === 'all'; })[0];
+      allBtn.setAttribute('aria-pressed', allOn ? 'true' : 'false');
+    }
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        if (c.dataset.cat === 'all') {
+          chips.forEach(function (k) { k.setAttribute('aria-pressed', 'true'); });
+        } else {
+          c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+        }
+        apply();
+      });
+    });
+
+    // Keyboard horizontal scroll
+    scroll.addEventListener('keydown', function (ev) {
+      if (ev.key === 'ArrowRight') { scroll.scrollBy({ left: 320, behavior: 'smooth' }); ev.preventDefault(); }
+      if (ev.key === 'ArrowLeft')  { scroll.scrollBy({ left: -320, behavior: 'smooth' }); ev.preventDefault(); }
+    });
+  })();
+  </script>
+
+</body>
+</html>
