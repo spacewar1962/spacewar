@@ -1,0 +1,123 @@
+; Spacewar, in Alan Kay's hand, as printed in Stewart Brand,
+; "SPACEWAR: Fanatic Life and Symbolic Death Among the Computer Bums",
+; Rolling Stone, 7 December 1972, in the sidebar "Your Own Spacewar".
+;
+; A LOGO / turtle-graphics-style sketch (penup / pendown / forward / right),
+; close in spirit to the language ideas Kay was then developing toward Smalltalk
+; and the Dynabook. Transcribed from the magazine scan; spacing and a few
+; characters are approximate to the 1972 original.
+
+to ship :size
+  penup, left 180, forward 2 * :size, right 90
+  forward 1 * :size, right 90
+  pendown, forward 4 * :size, right 30, forward 2 * :size
+  right 120, forward 2 * :size
+  right 30, forward 4 * :size
+  right 30, forward 2 * :size
+  right 120, forward 2 * :size
+  left 150, forward :size * 2 * sqrt 3
+  left 330, forward :size * 2
+  right 60, forward :size * 2
+  left 330, forward :size * 2 * sqrt 3
+  penup, left 90, forward :size, right 90
+  forward 2 * :size
+end to
+
+to flame :size
+  penup, left 180, forward 2 + sqrt 3, pendown
+  triangle :size, forward .5 * :size
+  triangle 1.5 * :size, forward .5 * :size
+  triangle 2 * :size, forward .5 * :size
+  triangle 1 * :size, forward :size
+  etc.
+end to
+
+to flash
+  etc.
+end to
+
+to retro
+  etc.
+end to
+
+to torp
+  etc.
+end to
+
+to spaceship :pilot :thrust :steer :trigger
+  use :numtorps :location (:x :y) :speed :direction
+  repeat
+    moveship
+    if :trigger and :numtorps < 3
+      then create torpedo :speed :direction :location
+    ?crash :self
+    display ship
+    pause until clock = :time + :movelag
+end to
+
+to moveship
+  make :speed be :speed + (:spscale * :thrust)
+  make :direction be :direction + (:dirscale * :steer) rem 360
+  make :location:x be :location:x + (:lscale * :speed * cos :direction) rem 1024
+  make :location:y be :location:y + (:lscale * :speed * sin :direction) rem 1024
+end to
+
+to display :obj
+  penup, moveto :location, turn :direction
+  create :obj :size
+  if :thrust > 0 then create flame :size
+  if :thrust < 0 then create retro flame :size
+  pause until clock = :time + :framelag
+end to
+
+to ?crash :object
+  find all (create spaceship :s)
+    if :object = :s
+      and /:object:location:x - :s:location:x/ < close
+      and /:object:location:y - :s:location:y/ < close
+      then explode :s, explode :obj
+end to
+
+to explode :object
+  penup, moveto :object:location
+  flash
+  finish :object
+end to
+
+to torpedo :speed :direction :location
+  use :thrust 0
+  bump :numtorps
+  moveship
+  if not (0 < :location:x < 1024 and 0 < :location:y < 1024)
+    then debump :numtorps, finish :self
+  ?crash :self
+  display :torp
+end to
+
+to start
+  repeat ask "how many will be playing?" times
+    create spaceship ask "pilot's name?"
+    stick.(make :sn be ask "stick number?").y
+    stick :sn:x
+    stick :sn:but
+  end repeat
+  repeat
+    if (make :char be ask) = "s" then done
+    find all (create spaceship :x)
+    start :x
+end to
+
+
+; A sample run, as printed (user input marked with *):
+
+*start
+  how many will be playing?
+*2
+  pilot's name?
+*Jimmy
+  stick number?
+*2
+  pilot's name?
+*Bill
+  stick number?
+*3
