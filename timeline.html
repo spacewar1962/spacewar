@@ -21,7 +21,8 @@
   <style>
     /* ---- Timeline component (scoped to .tl) ---- */
     .tl { --c-mit:#6cf2ff; --c-port:#ffce7a; --c-culture:#ff9ecf; --c-hw:#8fe6a0; --c-legacy:#c4a8ff; position:relative; }
-    .tl-controls { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin:0 0 0.4rem; }
+    .tl-controls { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; margin:1.1rem 0 0.5rem; }
+    .tl-intro { font-size:0.8rem; line-height:1.6; color:var(--phosphor-dim); margin:0.4rem 0 0; }
     .tl-chip {
       font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase;
       padding:0.3rem 0.65rem; border:1px solid var(--line); border-radius:999px; background:transparent;
@@ -49,10 +50,10 @@
 
     .tl-scroll { position:relative; z-index:1; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x proximity;
       -webkit-overflow-scrolling:touch; padding:0.5rem 0 1.2rem; scrollbar-width:thin; }
-    .tl-track { position:relative; display:flex; align-items:stretch; gap:0; min-height:560px; padding:0 1rem; width:max-content; }
-    .tl-track::before { content:""; position:absolute; left:0; right:0; top:50%; height:2px; transform:translateY(-1px);
-      background:linear-gradient(90deg, transparent, rgba(108,242,255,0.55) 1.5%, rgba(108,242,255,0.55) 98.5%, transparent);
-      box-shadow:0 0 10px rgba(108,242,255,0.30); }
+    .tl-track { position:relative; display:flex; align-items:stretch; gap:0; min-height:560px; padding:0 1rem; width:max-content;
+      background:
+        linear-gradient(to bottom, transparent calc(50% - 4px), rgba(108,242,255,0.12) calc(50% - 4px), rgba(108,242,255,0.12) calc(50% + 4px), transparent calc(50% + 4px)),
+        linear-gradient(to bottom, transparent calc(50% - 1px), rgba(108,242,255,0.65) calc(50% - 1px), rgba(108,242,255,0.65) calc(50% + 1px), transparent calc(50% + 1px)); }
     .tl-track::after { content:""; position:absolute; left:0; top:50%; width:34%; height:2px; transform:translateY(-1px);
       background:linear-gradient(90deg, transparent, rgba(108,242,255,0.65), transparent); filter:blur(0.5px);
       animation:tl-scan 7s linear infinite; }
@@ -99,9 +100,8 @@
 
     @media (max-width:760px) {
       .tl-scroll { overflow:visible; scroll-snap-type:none; padding-left:0.3rem; }
-      .tl-track { flex-direction:column; width:auto; min-height:0; gap:0; padding:0; }
-      .tl-track::before { left:7px; right:auto; top:0; bottom:0; width:2px; height:auto;
-        background:linear-gradient(180deg, transparent, var(--line) 2%, var(--line) 98%, transparent); }
+      .tl-track { flex-direction:column; width:auto; min-height:0; gap:0; padding:0;
+        background:linear-gradient(to right, transparent 6px, rgba(108,242,255,0.5) 6px, rgba(108,242,255,0.5) 8px, transparent 8px); }
       .tl-track::after { display:none; }
       .tl-event { flex:none; width:100%; padding:0 0 1.6rem 0; min-height:0; }
       .tl-node { left:7px; top:8px; margin:0; transform:translate(-50%,0); }
@@ -146,19 +146,9 @@
     <section class="block lede">
       <span class="kicker">1961 to 1980</span>
       <h2>The Spacewar! timeline</h2>
-      <p>From a hack on a new minicomputer in a Cambridge, Massachusetts laboratory to the founding myth of the video game, <i>Spacewar!</i> spent two decades being written, patched, carried from machine to machine, cloned, renamed, written about, and played. This timeline gathers the principal release dates, the ports and clones of its "long journey", the cultural moments, and the legacy that followed, each with a way through to the code, the photographs, and the stories on this site.</p>
     </section>
 
     <section class="block tl" aria-label="Spacewar timeline">
-      <div class="tl-controls" role="group" aria-label="Filter by category">
-        <button class="tl-chip" data-cat="all" aria-pressed="true">All</button>
-        <button class="tl-chip" data-cat="mit" aria-pressed="true"><span class="dot"></span>MIT versions</button>
-        <button class="tl-chip" data-cat="port" aria-pressed="true"><span class="dot"></span>Ports &amp; clones</button>
-        <button class="tl-chip" data-cat="culture" aria-pressed="true"><span class="dot"></span>Culture &amp; events</button>
-        <button class="tl-chip" data-cat="hw" aria-pressed="true"><span class="dot"></span>Hardware</button>
-        <button class="tl-chip" data-cat="legacy" aria-pressed="true"><span class="dot"></span>Legacy</button>
-      </div>
-      <p class="tl-hint">Scroll sideways &middot; use &larr; &rarr; keys &middot; click a card's links to dig in &middot; on a phone it runs top to bottom</p>
       <div class="tl-stage">
         <div class="tl-stars" aria-hidden="true"></div>
         <button class="tl-arrow tl-prev" id="tlPrev" type="button" aria-label="Scroll left">&lsaquo;</button>
@@ -167,6 +157,16 @@
         </div>
         <button class="tl-arrow tl-next" id="tlNext" type="button" aria-label="Scroll right">&rsaquo;</button>
       </div>
+      <div class="tl-controls" role="group" aria-label="Filter by category">
+        <button class="tl-chip" data-cat="all" aria-pressed="true">All</button>
+        <button class="tl-chip" data-cat="mit" aria-pressed="true"><span class="dot"></span>MIT versions</button>
+        <button class="tl-chip" data-cat="port" aria-pressed="true"><span class="dot"></span>Ports &amp; clones</button>
+        <button class="tl-chip" data-cat="culture" aria-pressed="true"><span class="dot"></span>Culture &amp; events</button>
+        <button class="tl-chip" data-cat="hw" aria-pressed="true"><span class="dot"></span>Hardware</button>
+        <button class="tl-chip" data-cat="legacy" aria-pressed="true"><span class="dot"></span>Legacy</button>
+      </div>
+      <p class="tl-hint">Scroll sideways &middot; use &larr; &rarr; keys or the arrows &middot; click a card's links to dig in &middot; on a phone it runs top to bottom</p>
+      <p class="tl-intro">From a hack on a new minicomputer in a Cambridge, Massachusetts laboratory to the founding myth of the video game, <i>Spacewar!</i> spent two decades being written, patched, carried from machine to machine, cloned, renamed, written about, and played. This timeline gathers the principal release dates, the ports and clones of its "long journey", the cultural moments, and the legacy that followed, each with a way through to the code, the photographs, and the stories on this site.</p>
     </section>
 
     <section class="block">
