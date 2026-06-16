@@ -50,12 +50,24 @@
     .tl-scroll { position:relative; z-index:1; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x proximity;
       -webkit-overflow-scrolling:touch; padding:0.5rem 0 1.2rem; scrollbar-width:thin; }
     .tl-track { position:relative; display:flex; align-items:stretch; gap:0; min-height:560px; padding:0 1rem; width:max-content; }
-    .tl-track::before { content:""; position:absolute; left:0; right:0; top:50%; height:2px;
-      background:linear-gradient(90deg, transparent, var(--line) 4%, var(--line) 96%, transparent); }
+    .tl-track::before { content:""; position:absolute; left:0; right:0; top:50%; height:2px; transform:translateY(-1px);
+      background:linear-gradient(90deg, transparent, rgba(108,242,255,0.55) 1.5%, rgba(108,242,255,0.55) 98.5%, transparent);
+      box-shadow:0 0 10px rgba(108,242,255,0.30); }
     .tl-track::after { content:""; position:absolute; left:0; top:50%; width:34%; height:2px; transform:translateY(-1px);
       background:linear-gradient(90deg, transparent, rgba(108,242,255,0.65), transparent); filter:blur(0.5px);
       animation:tl-scan 7s linear infinite; }
     @keyframes tl-scan { from{left:-34%} to{left:100%} }
+
+    .tl-stage { position:relative; }
+    .tl-arrow { position:absolute; top:50%; transform:translateY(-50%); z-index:6;
+      width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+      background:rgba(7,11,20,0.82); color:var(--phosphor); font-size:1.6rem; line-height:0; font-family:var(--mono);
+      cursor:pointer; display:flex; align-items:center; justify-content:center; padding:0 0 0.15rem;
+      transition:border-color .15s ease, color .15s ease, box-shadow .15s ease, background .15s ease; }
+    .tl-arrow:hover, .tl-arrow:focus-visible { border-color:#6cf2ff; color:var(--bright); background:rgba(7,11,20,0.95); box-shadow:0 0 14px rgba(108,242,255,0.4); outline:none; }
+    .tl-prev { left:0.3rem; }
+    .tl-next { right:0.3rem; }
+    @media (max-width:760px) { .tl-arrow { display:none; } }
 
     .tl-event { position:relative; flex:0 0 300px; scroll-snap-align:center; }
     .tl-node { position:absolute; left:50%; top:50%; width:14px; height:14px; margin:-7px 0 0 -7px; border-radius:50%;
@@ -78,7 +90,7 @@
     .tl-date { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--hue,#6cf2ff); margin:0 0 0.25rem; }
     .tl-title { font-family:var(--mono); font-weight:700; font-size:0.82rem; line-height:1.25; color:var(--bright); margin:0 0 0.35rem; }
     .tl-blurb { font-size:0.72rem; line-height:1.45; color:var(--phosphor-dim); margin:0 0 0.5rem; }
-    .tl-thumb { width:100%; height:84px; object-fit:cover; border:1px solid var(--line); border-radius:3px; margin:0 0 0.5rem; display:block; background:#0b0f0c; }
+    .tl-thumb { width:100%; height:110px; object-fit:contain; object-position:center; border:1px solid var(--line); border-radius:3px; margin:0 0 0.5rem; display:block; background:#05080e; padding:3px; box-sizing:border-box; }
     .tl-links { display:flex; flex-wrap:wrap; gap:0.3rem; }
     .tl-links a { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.04em; text-transform:uppercase; text-decoration:none;
       padding:0.2rem 0.45rem; border:1px solid var(--line); border-radius:3px; color:var(--phosphor); transition:all .12s ease; }
@@ -147,9 +159,13 @@
         <button class="tl-chip" data-cat="legacy" aria-pressed="true"><span class="dot"></span>Legacy</button>
       </div>
       <p class="tl-hint">Scroll sideways &middot; use &larr; &rarr; keys &middot; click a card's links to dig in &middot; on a phone it runs top to bottom</p>
-      <div class="tl-stars" aria-hidden="true"></div>
-      <div class="tl-scroll" id="tlScroll" tabindex="0" aria-label="Timeline, scroll horizontally">
-        <div class="tl-track" id="tlTrack"></div>
+      <div class="tl-stage">
+        <div class="tl-stars" aria-hidden="true"></div>
+        <button class="tl-arrow tl-prev" id="tlPrev" type="button" aria-label="Scroll left">&lsaquo;</button>
+        <div class="tl-scroll" id="tlScroll" tabindex="0" aria-label="Timeline, scroll horizontally">
+          <div class="tl-track" id="tlTrack"></div>
+        </div>
+        <button class="tl-arrow tl-next" id="tlNext" type="button" aria-label="Scroll right">&rsaquo;</button>
       </div>
     </section>
 
@@ -276,11 +292,15 @@
       });
     });
 
-    // Keyboard horizontal scroll
+    // Scroll controls (keyboard + on-screen arrows)
+    function nudge(dir) { scroll.scrollBy({ left: dir * 340, behavior: 'smooth' }); }
     scroll.addEventListener('keydown', function (ev) {
-      if (ev.key === 'ArrowRight') { scroll.scrollBy({ left: 320, behavior: 'smooth' }); ev.preventDefault(); }
-      if (ev.key === 'ArrowLeft')  { scroll.scrollBy({ left: -320, behavior: 'smooth' }); ev.preventDefault(); }
+      if (ev.key === 'ArrowRight') { nudge(1); ev.preventDefault(); }
+      if (ev.key === 'ArrowLeft')  { nudge(-1); ev.preventDefault(); }
     });
+    var prev = document.getElementById('tlPrev'), next = document.getElementById('tlNext');
+    if (prev) prev.addEventListener('click', function () { nudge(-1); });
+    if (next) next.addEventListener('click', function () { nudge(1); });
   })();
   </script>
 
