@@ -206,6 +206,38 @@
       <p class="micro" style="margin-top:1.4rem;">Version histories, dates, and technical detail summarised here are drawn from Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">masswerk.at/spacewar</a>, where each version can be played and is documented far more fully than this overview.</p>
     </section>
 
+    <div class="rule"><span>cheats and hacks</span></div>
+
+    <section class="block">
+      <span class="kicker">Modifying the game</span>
+      <h3>Cheats and hacks</h3>
+      <p>If the family is large because the code was built to be changed, the changes themselves are worth cataloguing. Some are <b>cheats</b> in the original sense, parameters the program exposes so a player or programmer can retune the rules. Others are <b>hacks</b>, features bolted on by whoever had a better idea. Together they record how the game, the machine, and the people around it actually worked.</p>
+
+      <h3 style="margin-top:2rem;">The changeable constants</h3>
+      <p>Every version from <a target="_blank" rel="noopener noreferrer" href="sources/spacewar-4.0-2feb1963-(Morris).txt">4.0</a> onward opens with a block headed "interesting and often changed constants": torpedo count and velocity, reload time and torpedo life, fuel supply, the gravitational constant, the ration of hyperspace jumps, and more. The listing notes that "all instructions are executed, and may be replaced by jda or jsp", so the block is not inert data but live code, meant to be retuned at the console test word or patched in the DDT debugger. These are, arguably, the first cheats in gaming: the rules made adjustable by design, in the lineage that runs from <a href="people.html#russell">Steve Russell</a>'s original.</p>
+
+      <h3 style="margin-top:2rem;">Hyperspace, the panic button</h3>
+      <p>Written by <a href="people.html#graetz">Martin Graetz</a> for version 2B, hyperspace flings a cornered ship to a random point and back. Technically it is the game's random-number routine driving a scaled displacement, with the constants <code>hr1</code> and <code>hr2</code> setting how far you jump and how hard you arrive, a strict ration of jumps (<code>mhs</code>), and a rising chance of materialising inside an explosion as the "hyperfield generator" recharges (<code>hd1</code>, <code>hd2</code>, <code>hd3</code>). The warp is drawn with the "Minskytron signature", the smear pattern of <a href="people.html#minsky">Marvin Minsky</a>'s display hack, a hardware quirk reused as an effect. Escape is never free.</p>
+
+      <h3 style="margin-top:2rem;">Photon torpedoes: a cheat made of a hardware limit</h3>
+      <p>When <a href="people.html#edwards">Dan Edwards</a> added the central star's gravity, there were no PDP-1 cycles left to make gravity act on the torpedoes as well. Rather than slow the game, the team simply declared them photon torpedoes, immune to gravity by fiat. The gravity routine runs on ships only; the limit became a rule of the fiction. It is the cleanest case on the page of a hardware constraint folded straight into the design.</p>
+
+      <h3 style="margin-top:2rem;">Reading the boxes</h3>
+      <p>The hand controllers built by <a href="people.html#saunders">Bob Saunders</a> and <a href="people.html#kotok">Alan Kotok</a> in 1962 were themselves a hack of the software: by Saunders's account the boxes were wired and then a single instruction was changed so the program read them, over the <code>iot</code> lines, instead of the console sense switches. The control-word routine still carries both paths, a normal "<code>iot 11</code>" read and a fallback that takes control from the front-panel test word.</p>
+
+      <h3 style="margin-top:2rem;">Sense switches and the test word</h3>
+      <p>The PDP-1's console sense switches are wired straight into the logic as runtime toggles. The code branches on them with the <code>szs</code> (skip on sense switch) instruction: switch 2 selects a lighter central star, others turn the background stars on or off or, in the ddp line, switch on the subjective view. The front-panel test word, meanwhile, can be read directly for control or for tuning. On this machine the switches are part of the game's interface.</p>
+
+      <h3 style="margin-top:2rem;">The subjective view</h3>
+      <p>The boldest rendering hack is <a href="people.html#preonas">Monty Preonas</a>'s Twin Star, first in <a target="_blank" rel="noopener noreferrer" href="sources/spacewar-4.0ts-4may1963.txt">4.0TS</a> and developed through <a target="_blank" rel="noopener noreferrer" href="sources/spacewar-4.3-17may1963-(Morris).txt">4.3</a> and <a target="_blank" rel="noopener noreferrer" href="sources/spacewar-4.4-21may1963-(Morris).txt">4.4</a>. Technically the display is recentred on a chosen ship: a relocate routine subtracts that ship's coordinates from everything drawn, so the Needle holds the centre while the universe moves around it. In 4.4, alternate frames are sent to a second oscilloscope, giving each pilot their own cockpit view, point-of-view rendering roughly a decade before the form is usually dated.</p>
+
+      <h3 style="margin-top:2rem;">Keeping score</h3>
+      <p><a href="people.html#preonas">Preonas</a> added the first on-screen score display in <a target="_blank" rel="noopener noreferrer" href="sources/spacewar-4.2-11may1963-(Morris).txt">4.2</a>, drawn by compiling small digit outlines through a routine over two pages long, with a pulsing separator line. <a href="people.html#samson">Peter Samson</a> reworked it into its final form for 4.8. The scorer reads the controllers a second time to encode the digits, a neat reuse of the input path.</p>
+
+      <h3 style="margin-top:2rem;">Later hacks</h3>
+      <p>The game kept being retuned long after MIT. A. W. Kuhfeld's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/minnesota/">Minnesota</a> CDC-3100 version replaced hyperspace with invisibility: the panic button suppresses your ship's display without moving it, so you vanish, but so does your own view, and your exhaust and torpedoes still give you away, skill in place of luck. Parameter hacks such as "Winds of Space" warp the torpedoes by tuning a single constant in memory; the Holloman Air Force Base variant preserves a player's altered starting positions from 1966. And the PDP-10 versions went furthest: Ralph Gorin's <a target="_blank" rel="noopener noreferrer" href="sources/ports/spacewar-pdp10-sail-gorin-1971.txt">Stanford SAIL Space War</a> carries a routine (<code>GETNAM</code>) to change named parameters at runtime, the constants block grown into a live console for editing the rules.</p>
+    </section>
+
     <div class="rule"><span>▶</span></div>
 
     <section class="block">

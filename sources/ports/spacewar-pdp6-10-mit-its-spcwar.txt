@@ -19,7 +19,7 @@ IF2,{PRINTC "This is version " ? .TYO6 .FNAM2 ? PRINTC "
 ;The consoles were designed and constructed by Kevin Hunter (KH).  Ken
 ;Harrenstein (KLH) and Lee Parks (LSP) spent ten hours wiring the new consoles
 ;into the PDP-6 alternate data switches bank.
-
+
 	SUBTTL	Record of Modifications
 
 ;Modified:	04/10/76-	GMP
@@ -84,7 +84,7 @@ IF2,{PRINTC "This is version " ? .TYO6 .FNAM2 ? PRINTC "
 ;Version 163:	11/05/76:	GMP
 ;	1. Fixed the bug which caused display to flicker when a ship crossed an X
 ;	   boundary on the screen (X=0 or X=1024.).
-
+
 
 	SUBTTL	Acumulator Defintions
 
@@ -113,7 +113,7 @@ S=15
 
 DL=16					; Pointer to current display linked list (wired)
 DP=17					; Pointer to display list being output (wired)
-
+
 	SUBTTL	Assembly Parameter Defintions
 
 ; Macro to set a flag according to user's request
@@ -184,7 +184,7 @@ PRINTC "Reply with <RETURN> to use default value.
 PRINTC "
 "
 ]
-
+
 	SUBTTL	Miscellaneous Definitions
 
 OBJCTS==50.				;NUMBER OF OBJECT IN GAME
@@ -354,11 +354,11 @@ TERMIN
 IFN $ITS,[
 DEFINE DSTART				;ITS version
 	.DSTART DISLST
-	 .VALUE [ASCIZ /: 340 DISPLAY IS NOT AVAILABLE 
+	 .VALUE [ASCIZ /: 340 DISPLAY IS NOT AVAILABLE 
 /]
 TERMIN
 ]
-
+
 
 	SUBTTL	Define Bit Names
 
@@ -384,7 +384,7 @@ DISBIT==1_<7-DISCHN>
 
 IFN $10INT,	ITPBIT==1_<7-ITPCHN>
 IFE $10INT,	ITPBIT==0
-
+
 	SUBTTL	Bit Definitions - PDP-6 Interrupt System
 
 ; ------ PDP-6 APR condition flags
@@ -445,7 +445,7 @@ IFE $10INT,	ITPBIT==0
 ;---------- Interprocessor interupt flags
 ;CONO
 	I%CENB==BIT1.4			;reset and enable interrupts
-
+
 	SUBTTL	Bit Definitions - 340 Display Commands
 
 ; The flags below are for a display command in the right half of a word.
@@ -502,7 +502,7 @@ IFE $10INT,	ITPBIT==0
 	CH%LF== 33			;line feed (any case)
 	CH%CR== 34			;carriage-return (any case)
 	CH%SP== 40			;space (any case)
-
+
 	SUBTTL	APR Interrupt Processing
 
 IFE $ITS,[
@@ -614,7 +614,7 @@ TSINT:	0
 	.SUSET [.SAMASK,,[%PIRLT]]	;TURN OFF FUTURE INTS
 	.DISMIS TSINT+1
 ]
-
+
 	SUBTTL	Display Interrupt Processing
 
 IFE $ITS,[
@@ -666,7 +666,7 @@ BKPT0:	-1,,BKVEC'-1			;HOLDS INITIALIZER FOR STARS
 BKPT1:	0				;HOLDS PTR AT STARS
 BKPTR:	0
 BKPTRA:	-<BKEND-BKBEG>,,<BKBEG-1>	;HOLDS PTR TO ALL STARS
-
+
 	SUBTTL  Interprocessor Interrupt handling
 
 	; Hack to process interrupts from 10 and do stuff
@@ -678,7 +678,7 @@ ITPBRK:	0
 	CONO ITPDEV,10+ITPCHN	; Reset interprocessor device
 	JRST 12,@ITPBRK		; and reset channel
 ]]
-
+
 	SUBTTL	Move Backround Star Field
 
 BKINIT:	PUSH P,A
@@ -740,7 +740,7 @@ IFN $ITS,[
 	POPJ P,
 
 BKSTP:	.BP (777777),BKBEG		;byte ptr to beginning of star field.
-
+
 	SUBTTL	The VECTOR Of MYSTERIES
 
 VERSIO:	.FNAM2	;the version of Space-War
@@ -820,7 +820,7 @@ BMPLN:	90.	;time he can fire beam
 BMRLD:	90.	;beam reload time
 NOHYPR:	1	;0 = allow hyperspace, 1 = do not
 ;********************************
-
+
 	SUBTTL	One Time Initialization and Patch Area
 
 PAT:
@@ -878,7 +878,7 @@ IFN $ITS,[
 IFE $ITS,[	CONO PI,P%CLR\P%CENB\P%ON\APRBIT\FLGBIT\DISBIT\ITPBIT
 					;clear PI system and enable ints for channels
 ]
-
+
 	SUBTTL	Per-Game Initialization
 
 	;come here to clear scores before beginning series of games
@@ -957,7 +957,7 @@ SETTBL:	SETSHP				;STAR-SHIPS
 	SUNSET				;SUNS (I kept the name for KLH)
 	SETTRP				;TORPEODS
 	0				;end of list
-
+
 	SUBTTL	Per-Game Star-Ship Initialization
 
 SETSHP:	MOVE B,NEGSHP			;loop control
@@ -1106,7 +1106,7 @@ STSHP6:	MOVE MP2,SHPDSN(A)		;get design index to obtain information
 	POPJ P,				;that's all
 
 SHPIRD:	350.0				;initial ship radius from center
-
+
 	SUBTTL	Sun and Torpedo Per-Game Initialization
 
 	;Procedure to initialize suns for a game
@@ -1220,7 +1220,7 @@ SETTRP:	LDB A,[.BP 7,TORBRI]		;create command to set brightness of torps
 	MOVE A,TDISPT			;fetch BLKO pointer
 	MOVEM A,TDPTR			;place into DISLST: torps now displayed
 	POPJ P,
-
+
 	SUBTTL	Main Processing Loop of Space-War
 
 ML0:	PUSH Q,[0]			;ENSURE IN PARAM MODE AT END
@@ -1373,7 +1373,7 @@ MQ1:	CAIGE MP1,OBJCTS-2			;next to last object
 	MOVEM TT,BKTIME
 	PUSHJ P,BKMOVE			;UPDATE DISPLAY COMMANDS
 	JRST ML0			;start main loop again
-
+
 	SUBTTL	Collision Processing
 
 	;collision routine table, indexed by smaller of 2 types involved.
@@ -1475,7 +1475,7 @@ MMNTUM:	MOVE C,OBJMAS(MP1)			;compute combined mass
 	TERMIN
 	MOVEM C,OBJMAS(MP1)		;update the mass
 	POPJ P,
-
+
 	SUBTTL	End Of Game Processing
 
 GAMEND:	SKIPN SERCNT			;keeping score?
@@ -1610,7 +1610,7 @@ MDNN1:	IDIVI T,10.
 	POPJ P,
 
 
-
+
 	SUBTTL	Star-Ship Update Routine
 
 	;Update position, create new display, perform other functions
@@ -1729,7 +1729,7 @@ FELL:	PUSHJ P,SSDIS			;make the display list
 	MOVE T,TXTM
 	MOVEM T,MB1(D)			;set length of explosion for torpedo
 SNOTRP:	POPJ P,				;return
-
+
 	SUBTTL	Beam Location and Star-Ship Explode
 
 	;compute starting position for phaser beam
@@ -1770,7 +1770,7 @@ SEXP:	MOVE T,[SETZ FLARE]
 	HLLZM SDPTRS(MP1)		;zero list - remove from display
 	SOS SSING			;decrement # ships in game.
 	POPJ P,0			;return from sss or caller
-
+
 	SUBTTL	Gravity Computation Procedure
 
 SUNGRV:	SETZB XFLAG,R			;one stores X vel, other Y.
@@ -1802,7 +1802,7 @@ CGRAV:	MOVE T,OBJX(MP1)			;compute distance to sun
 	MOVN C,T1
 	FDVR C,T			;put x component into c
 	POPJ P,
-
+
 	SUBTTL	Display a Ship
 
 ;PUSHJ P,SSDIS
@@ -1890,7 +1890,7 @@ XCOS45:		0
 XSIN45:		0
 SXCOS45:	0
 SXSIN45:	0
-
+
 	SUBTTL	Enter Hyper-Space and Update Routines for Hyper-Space
 
 	;routine to enter hyperspace
@@ -1965,7 +1965,7 @@ HYPO1:	MOVN B,HYPBO			;decrement chance of coming out
 	SETZM OBJAVL(MP1)			;stop any spinning
 	JRST SSS
 
-
+
 	SUBTTL	Torpedo Update Routines
 
 ;initial torp routine. this no-op is necessary because torps
@@ -2012,7 +2012,7 @@ TEXP:
 	MOVE T,TXTM
 	MOVEM T,MA1(MP1)		;save length of explosion
 CPOPJ:	POPJ P,
-
+
 	SUBTTL	Homeing Torpedo Guidance Control
 
 GMSLSW:	0				;-1 -> XY guidance; 1 -> trigonemetric guidance
@@ -2164,7 +2164,7 @@ GMSC50:	MOVE A,OBJYVL(MP1)
 	MOVEM C,OBJYVL(MP1)
 	MOVEM D,OBJXVL(MP1)
 	POPJ P,
-
+
 	SUBTTL	Flare Creation Routines
 
 ;routine to create a flare after a star ship blows up and before 
@@ -2217,7 +2217,7 @@ FLARE4:	MOVEI A,MEX
 	SUB A,FLARET(MP1)
 	MOVEM A,MA1(MP1)
 	POPJ P,				; that's all
-
+
 	SUBTTL	Explosion Update Routine
 
 MEX:	SOSGE MA1(MP1)			;is explosion over yet?
@@ -2274,7 +2274,7 @@ MEX2:	IRPS CORD,,D C
 MEXNO:	SETZM OBJFLG(MP1)			;flush object
 	POPJ P,
 
-
+
 	SUBTTL	Input Routines And Movie Code
 
 ;input routines for each star ship
@@ -2435,7 +2435,7 @@ TRIGGR:	SKIPE CHAMBR(MP1)		;is chamber clear?
 	POPJ P,0
 JAMMED:	TLZ C,400000			;turn off fire bit
 	POPJ P,0
-
+
 	SUBTTL	Random Number Generators
 
 	;Routine to set up random # table
@@ -2492,7 +2492,7 @@ RANONE:
 IFE $ITS,[	FADR A,[0.0]
 ]
 	POPJ P,
-
+
 	SUBTTL	Sun Update
 
 TWINKL:	MOVEI S,-$MXSHP(MP1)		;adjust to comfortable index.
@@ -2567,7 +2567,7 @@ TWINC3:
 	MOVEM A,(Q)
 	PUSH Q,MDBFBR			;REENTER PT MODE
 	POPJ P,
-
+
 	SUBTTL	Phasar Per Loop Processing
 
 ; routine to handle phaser beams, called once on each main loop pass
@@ -2859,7 +2859,7 @@ DORAY:	LSH A,-2			;get proper iterate (div by 4 to get increment)
 	AOBJN A,.-7			;loop to form another
 	HRRI Q,-1(A)			;UPDATE PDL PTR
 	POPJ P,
-
+
 	SUBTTL	ForceField Generator and Test For HyperSpace
 
 LTEST:	SETZM RAY(MP1)
@@ -2956,7 +2956,7 @@ CLOOP:	FADR C,XFLAG			;increment argument
 	MOVEM T,CIRTAB(R)		;store in table
 	AOBJN R,CLOOP
 	POPJ P,
-
+
 	SUBTTL	Phasar Tables and Flare Masks
 
 SUNSIZ:	303607,,303607			;twink2 uses this to mask for vector
@@ -3018,7 +3018,7 @@ CWENB:	BLOCK $MXSHP			;cw turn
 CCWENB:	BLOCK $MXSHP			;ccw turn   
 DISTM:	BLOCK $MXSHP			;time he is still disabled
 CIRTAB:	BLOCK FFCPTS			;table for circle coords (used in ff)
-
+
 	SUBTTL	Sqaure Root Procedure
 
 	; This is AGB's super fast SQRT routine, probably impossible to
@@ -3046,7 +3046,7 @@ SQRT3:	MOVE C,B
 	FDVR C,A
 	FAD A,C ? FSC A,-1		; MORE EXACT THAN FADR
 	POPJ P,
-
+
 	SUBTTL	SIN and COS Procedures
 
 ;FLOATING POINT SINE AND COSINE.  REENTERABLE.
@@ -3093,7 +3093,7 @@ SC3:	-0.64596371106
 SC5:	0.07968967928
 SC7:	-0.00467376557
 SC9:	0.00015148419
-
+
 	SUBTTL ATAN Procedure
 
 ;FLOATING POINT SINGLE PRECISION ARCTANGENT FUNCTION
@@ -3163,7 +3163,7 @@ C3:	0
 D1:	0
 PIOT:	201622077325		;PI/2
 ATANB:	0
-
+
 	SUBTTL Ship Design Macro
 
 DEFINE INST IN,CO,ADR			;generates display generating instruction
@@ -3293,7 +3293,7 @@ LOC %CRLOC
 
 %DSNNO==%DSNNO+1
 TERMIN
-
+
 	SUBTTL	 Ship Designs and Design Tables
 
 ;These tables contain information on the above designs
@@ -3334,7 +3334,7 @@ DESIGN FATSHIP,22.0,[D,D,DR,D,D,DR	D,D,DR,D,D,D
 SDISTB:		BLOCK %MAXLN*$MXSHP	;area for display lists
 SDADRS:		REPEAT $MXSHP,[	SDISTB+%MAXLN*.RPCNT
 ]
-
+
 	SUBTTL	Ship Tables
 
 ;Specify the designs for each ship
@@ -3364,7 +3364,7 @@ SHPSL:		BLOCK $MXSHP		;half-length of each ship
 SHPSL1:		BLOCK $MXSHP		;adjusted for the gun
 SHPLN2:		BLOCK $MXSHP		;length of one side of display list; used to
 					;increment list address
-
+
 	SUBTTL	Object Definition And Property Tables
 
 	;Definition of Object Types
@@ -3415,7 +3415,7 @@ ISUNLX:	BLOCK $MXSUN
 FSUNLY:	BLOCK $MXSUN
 FSUNLX:	BLOCK $MXSUN
 SUNINV:	BLOCK $MXSUN			;if non-zero, sun is not displayed-- black hole
-
+
 	SUBTTL	Display List Area
 
 TORDIS:	0				;torpedo brightness
@@ -3436,7 +3436,7 @@ MDBUF2:	BLOCK MDBUFL
 
 CONSTANTS
 VARIABLES
-
+
 	SUBTTL	Star Field Definition
 
 ;STAR RA,DEC,MAG
@@ -3463,7 +3463,7 @@ TERMIN
 
 
 %%X==8192.				;initialize X counter for following field
-
+
 ; This is the backround star field for Space-War.  It was copied from the
 ;field defined in the PDP-1X space war.  The field was generated from an
 ;actual star map.   This field in all probability was copied for CIPG's
@@ -3988,4 +3988,3 @@ BKEND:
 	RADIX 8.
 
 	END GO
-
