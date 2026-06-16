@@ -1,2 +1,6 @@
-
+# Copyright-restricted reference files kept locally for research, NOT for publication:
+#  - Landsteiner's Minnesota Spacewar JS reconstruction ("All rights reserved", masswerk.at)
+#  - D. E. Wrege's SPCWAR v3 source ("Copyright (C) 1974 D.E. Wrege & Assoc.")
+sources/minnesota_spacewar-2014-Landsteiner.js
+sources/SPCWR3-Wrege-1974.txt
 .DS_Store
