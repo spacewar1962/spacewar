@@ -7,3 +7,6 @@ sources/SPCWR3-Wrege-1974.txt
 
 # GT40 Spacewar local copy (linked from github.com/pdp11/mit-gt40-spacewar instead)
 sources/sw/
+
+# messy-named original downloads (normalised copies are in sources/ports/)
+sources/*GORIN*
