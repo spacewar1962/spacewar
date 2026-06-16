@@ -142,6 +142,8 @@ Strachey, C. (1954) 'The "Thinking" Machine', *Encounter* 3(4): 25-31.
 
 Wardrip-Fruin, N. (2009) *Expressive Processing: Digital Fictions, Computer Games, and Software Studies*. MIT Press.
 
+Weaver, C. (interviewer) (2017-2018) *Spacewar! oral histories: Stephen Russell, Peter Samson, Robert Saunders, Steve Piner, Martin Graetz, Wayne Wiitanen, and Daniel Edwards*. Smithsonian National Museum of American History, Archives Center, collection AC1498 (Lemelson Center for the Study of Invention and Innovation). Available at: https://www.si.edu/media/NMAH/.
+
 Weizenbaum, J. (1966) 'ELIZA: A Computer Program For the Study of Natural Language Communication Between Man And Machine', *Communications of the ACM* 9(1): 36-45.
 
 Weizenbaum, J. (1976) *Computer Power and Human Reason: From Judgment to Calculation*. San Francisco: W. H. Freeman.
