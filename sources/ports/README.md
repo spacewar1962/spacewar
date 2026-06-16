@@ -15,8 +15,8 @@ of rights; please honour the originators' wishes and cite the upstream.
 
 | File | What it is |
 |------|-----------|
-| `spacewar-pdp10-sail-gorin-1971.txt` | "SW - SPACE WAR PROGRAM FOR STANFORD A.I. PROJECT." Ralph E. Gorin (5 Sept 1971), with R. Taylor (Feb 1972). MACRO-10, with separate "PDP-10 Space War module" and "PDP-6 Space War module." This is **Gorin's version**, the one run up to 5 ships at the 1972 *Rolling Stone* Spacewar Olympics. From the SAILDART archive (`[SW,BGB]`); the file retains its SAILDART page-dump record markers. |
-| `spacewar-pdp10-sail-gorin-1971-ships.txt` | `SHIPS.SAI`, the ship-shape definitions module (SAIL language), same provenance. |
+| `spacewar-pdp10-sail-gorin-1971.txt` | "SW - SPACE WAR PROGRAM FOR STANFORD A.I. PROJECT." Ralph E. Gorin (5 Sept 1971), with R. Taylor (Feb 1972). MACRO-10, with separate "PDP-10 Space War module" and "PDP-6 Space War module." This is **Gorin's version**, the one run up to 5 ships at the 1972 *Rolling Stone* Spacewar Olympics. Extracted and cleaned from the SAILDART page-dump (`[SW,BGB]`): the per-line record markers were stripped to leave the source as listed. |
+| `spacewar-pdp10-sail-gorin-1971-ships.txt` | `SHIPS.SAI`, the ship-shape definitions module (SAIL language), same provenance and cleaning. (A few non-ASCII SAIL operator glyphs were dropped in the byte-cleaning; the structure is intact.) |
 
 Upstream: saildart.org ; also github.com/PDP-10/Spacewar (`MIT/.../SW.MAC`).
 
