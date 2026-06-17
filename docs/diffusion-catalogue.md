@@ -120,18 +120,37 @@ essentially North American.
 
 ### 4c. Not substantiated / negative findings
 
-- **USSR / Eastern bloc** [FOREIGN: USSR] — **no documented Soviet Spacewar found.**
-  No Soviet PDP-1 clone existed (Soviet PDP cloning was the PDP-11 ISA, 1801 series,
-  early 1980s, plus a PDP-8-based system), so a faithful original-hardware port is ruled
-  out; but a *re-implementation* on a Soviet PDP-11 clone is not, and the SM EVM line
-  (1975-onward) shows no game in its English-language documentation. Standard English
-  histories of Soviet computing name only Tetris (1984), outside the window and
-  unrelated. **Honest status: not found in English-language sources, not "did not
-  exist"** — Russian-language archives were not exhaustively searched and would be
-  needed to close it. Confidence: medium.
-  - https://en.wikipedia.org/wiki/SM_EVM
-  - https://en.wikipedia.org/wiki/History_of_computing_in_the_Soviet_Union
-  - https://www.new-east-archive.org/articles/show/3395/Russian-video-games-history
+- **USSR / Eastern bloc** [FOREIGN: USSR] — **no documented Soviet Spacewar found,
+  now confirmed across Russian-language sources** (third pass, task wtx4g0pym,
+  2026-06-17; the run's "refuted" labels are an artifact of the verification step
+  dying on a session limit — the underlying search findings are genuine and mutually
+  consistent). Five independent Russian-language game/computing histories were read,
+  and none names any Soviet space-combat game (космическая война / звёздные войны /
+  two-ship gravity-well duel) in 1961-1980:
+  - The Russian Virtual Computer Museum and a Russian history of computer games both
+    attribute Spacewar! solely to MIT (1961/62) and name no Soviet version; their
+    earliest Russian-origin title is Tetris (1984).
+    https://www.computer-museum.ru/games/genesis.htm ·
+    https://gamesisart.ru/istoriya_komputernyh_igr.html
+  - A Habr history of Spacewar! is entirely Western; its *only* USSR reference is a
+    **chess** program — the 1966-67 Kotok-McCarthy vs Kronrod telegraph match, Kronrod's
+    program running on the Soviet M-2 at ITEP Moscow — not a space game.
+    https://habr.com/ru/companies/ruvds/articles/943942/
+  - A Russian games-industry history names Tetris (1984) as the earliest Soviet game;
+    the "В СССР игр нет" retro piece dates Soviet first contact with games to 1971
+    arcade cabinets at the *Аттракцион-71* Moscow exhibition, and its earliest Soviet
+    titles (Охота, Вираж, Морской бой, Викторина) are arcade-type copies, none a
+    Spacewar-style duel. https://stopgame.ru/blogs/topic/81568/istoriya_igrovoy_industrii_rossii_chast_1 ·
+    https://dtf.ru/retro/124825-v-sssr-igr-net
+  - Background still holds: no Soviet PDP-1 clone (so no faithful port); SM EVM
+    (1975-onward) and BESM show no game. https://en.wikipedia.org/wiki/SM_EVM
+  - **Honest status: a well-grounded negative.** Multiple independent Russian-language
+    histories agree there was no Soviet Spacewar in the window. The one niche these
+    *game* histories would not cover is an informal, unpublished 1970s
+    university-mainframe re-implementation (e.g. a student program on a СМ ЭВМ), which by
+    nature leaves little trace; absent a specific machine/site/source, treat any such as
+    rumour. Confidence: medium-high for "none documented," and the burden is now firmly
+    on anyone asserting a Soviet case to produce one.
 - **Germany** [FOREIGN: Germany] — a claimed German distribution/cloning of Cinematronics
   *Space Wars* **could not be substantiated**. Treat as rumoured.
   - http://www.andysarcade.de/spacewars_d.html (German Space Wars page; not corroborated as a German release)
@@ -174,6 +193,27 @@ sources yet," not "no foreign version existed." The near-exclusively-US document
 record is itself a finding, but it is an absence-of-evidence claim and is especially
 weak for the non-English archives (Russian, Japanese, German), which the current pass
 can only partly reach.
+
+## Interpretive note (candidate argument for the book)
+
+The shape of the diffusion is itself an argument. Spacewar!'s documented spread runs
+along a specific cultural channel — the MIT/DEC minicomputer hacker milieu and its US
+institutional descendants (Stanford, DECUS, Georgia Tech), then out into the American
+commercial arcade (Computer Space, Space Wars) and only from there abroad, to Japan in
+1978. It did *not* propagate as a free-floating idea into every computing culture with
+capable hardware.
+
+The USSR is the sharp test case. Soviet institutions had machines that could in
+principle have hosted a re-implementation, yet the early Soviet computer-game-adjacent
+record that surfaces is **chess**, not space combat (Kronrod's program on the M-2 at
+ITEP Moscow, the 1966-67 Kotok-McCarthy correspondence match), and the earliest
+documented Soviet game is Tetris (1984). Different computing culture, different game.
+This supports reading Spacewar! not as a universal "first game" that would arise
+anywhere computers and displays met, but as a culturally specific artifact of a
+particular institutional and subcultural formation — exactly the kind of claim a
+Critical Code Studies reading is positioned to make. The near-absence of foreign
+diffusion of the *original* (as against the later commercial lineage) is evidence for,
+not against, that reading.
 
 ## Sources and method
 
