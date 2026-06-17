@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The PDP-1: the machine Spacewar! was written for</title>
+  <meta name="description" content="A deep dive into the DEC PDP-1, the 18-bit transistorised computer Spacewar! was written for in 1962: its design, the Type 30 CRT display, paper-tape I/O, and the MIT machine DEC donated in 1961.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="The PDP-1: the machine Spacewar! was written for">
+  <meta property="og:description" content="The DEC PDP-1 in detail: an 18-bit transistorised computer with a point-plotting Type 30 CRT, the machine Spacewar! was built on at MIT in 1962.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/pdp1.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=3">
+  <script src="assets/nav.js" defer></script>
+  <style>
+    .imodal { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(2,4,8,0.93); padding:4vh 4vw; cursor:zoom-out; }
+    .imodal.open { display:flex; }
+    .imodal img { max-width:92vw; max-height:90vh; width:auto; height:auto; border:1px solid var(--line); box-shadow:0 0 50px rgba(0,0,0,0.85); cursor:default; }
+    .imodal-close { position:fixed; top:1.1rem; right:1.3rem; z-index:201; width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+      background:rgba(7,11,20,0.9); color:var(--phosphor); font-family:var(--mono); font-size:1.5rem; line-height:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .imodal-close:hover { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 12px rgba(108,242,255,0.4); }
+    .spectable { width:100%; border-collapse:collapse; margin:0.4rem 0 0.2rem; font-size:0.8rem; }
+    .spectable th, .spectable td { text-align:left; vertical-align:top; padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); }
+    .spectable th { color:var(--bright); font-family:var(--mono); font-weight:normal; white-space:nowrap; width:34%; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <a href="why.html">Why?</a>
+        <a href="./#ccs">CCS</a>
+        <a href="./#history">History</a>
+        <a href="timeline.html">Timeline</a>
+        <a href="./#object">Object</a>
+        <a href="code.html">Code</a>
+        <a href="restoration.html">Restorations</a>
+        <a href="people.html">People</a>
+        <a href="two-cultures.html">Two Cultures</a>
+        <a href="bibliography.html">Biblio</a>
+        <a href="play.html">Play</a>
+        <a href="./#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">The machine</span>
+      <h2>The PDP-1: the machine Spacewar! was written for</h2>
+      <p>You cannot read <i>Spacewar!</i> without reading the <b>PDP-1</b>. The game was not written for computers in general; it was written for one specific machine, with one specific screen, one specific set of switches, and one specific way of getting code in and out. Almost every distinctive feature of the game, the point-plotted ships, the persistent star field, the toggle-switch controls, the reliance on a real-time display loop, follows from the hardware DEC shipped in 1960 and donated to MIT in 1961. This page is a deep dive into that machine.</p>
+    </section>
+
+    <div class="rule"><span>what it was</span></div>
+
+    <section class="block">
+      <span class="kicker">DEC's first computer, 1959–60</span>
+      <h3>A new kind of machine</h3>
+      <p>The <b>PDP-1</b> (Programmed Data Processor-1) was the first computer built by the <b>Digital Equipment Corporation</b>, first produced in 1959 and shipped from 1960. Its lead engineer was <b>Benjamin Gurley</b>, and its design descended directly from the <b>TX-0</b> and <b>TX-2</b> machines at MIT's Lincoln Laboratory, the transistorised, interactive computers on which much of MIT's hacker culture had already formed. Where the dominant machines of the 1950s were batch-processing mainframes run by operators behind glass, the PDP-1 was comparatively small, fully transistorised, and meant to be sat at and used directly. At roughly <b>US$120,000</b> it was a fraction of a mainframe's price, though, as Kuhfeld's <i>Analog</i> readers were reminded, still "about a quarter of a mega-buck". Only <b>53</b> were ever built, production ending in 1969.</p>
+      <table class="spectable">
+        <tr><th>First produced</th><td>1959 (shipped from 1960)</td></tr>
+        <tr><th>Maker</th><td>Digital Equipment Corporation (DEC)</td></tr>
+        <tr><th>Lead engineer</th><td>Benjamin Gurley</td></tr>
+        <tr><th>Word length</th><td>18 bits</td></tr>
+        <tr><th>Memory</th><td>4,096 words standard, upgradable to 65,536</td></tr>
+        <tr><th>Memory cycle</th><td>5.35 microseconds (≈187 kHz)</td></tr>
+        <tr><th>Instruction speed</th><td>most instructions 10.7 µs (≈93,000/sec)</td></tr>
+        <tr><th>Logic</th><td>2,700 transistors, 3,000 diodes</td></tr>
+        <tr><th>Weight</th><td>about 730 kg (1,600 lb)</td></tr>
+        <tr><th>Price</th><td>about US$120,000</td></tr>
+        <tr><th>Units built</th><td>53 (to 1969)</td></tr>
+      </table>
+    </section>
+
+    <div class="rule"><span>the screen</span></div>
+
+    <section class="block">
+      <span class="kicker">Type 30 Precision CRT</span>
+      <h3>The display that made the game possible</h3>
+      <p>The single most important component for <i>Spacewar!</i> was the optional <b>Type 30</b> Precision CRT display. It was a <b>point-plotting</b> screen: the program named an X and a Y coordinate and the hardware lit a single dot at that location. It could address a grid of <b>1024 by 1024</b> points (the visible image roughly 512 by 512) at about <b>20,000 points per second</b>, on a 16-inch tube coated in <b>P7 phosphor</b>. P7 is a long-persistence phosphor with two layers: a bright blue flash as the beam strikes, fading to a slow green afterglow. This is why the game looks the way it does. There are no lines on the screen, only dots, redrawn fast enough to read as ships and torpedoes, and the slow green decay is what leaves the faint trails behind moving objects and gives the star field its glow. The "heavy star" at the centre of the game is literally a single bright point, jittered and redrawn many times a frame, smeared into a sun by the phosphor itself.</p>
+      <p>To draw anything at all, the program had to do it continuously, plotting every object on every pass through a tight display loop, because nothing on the screen persisted for long. <i>Spacewar!</i> is, at bottom, that loop: compute positions, plot points, repeat. The display is not an output device the game writes to occasionally; it is the heartbeat of the program.</p>
+    </section>
+
+    <div class="rule"><span>getting code in and out</span></div>
+
+    <section class="block">
+      <span class="kicker">Paper tape, switches and a typewriter</span>
+      <h3>The console</h3>
+      <p>Programs lived on <b>fanfold punched paper tape</b>, read in through a photoelectric tape reader and punched back out the same way; a single roll of tape was the distribution medium, the backup, and the archive all at once. This is why so much of the game's history is a history of <i>tapes</i>, copied, carried, lost and occasionally rediscovered. The operator's console carried a bank of <b>sense switches</b> and toggles and an adapted <b>IBM Model B electric typewriter</b> for printed output; offline, programs and listings were prepared on <b>Friden Flexowriters</b> using DEC's <b>FIO-DEC</b> character code.</p>
+      <p>The earliest <i>Spacewar!</i> was played from those console toggle switches, which were awkward and exposed players' hands to the warmth of the machine, until Alan Kotok and Bob Saunders built the famous detached <b>control boxes</b> so the players could sit back from the console. The shape of the game's controls, rotate left, rotate right, thrust, fire, hyperspace, is a direct negotiation with what switches the PDP-1 actually offered.</p>
+    </section>
+
+    <div class="rule"><span>the MIT machine</span></div>
+
+    <section class="block">
+      <span class="kicker">Donated September 1961</span>
+      <h3>How it reached the hackers</h3>
+      <p><figure style="float:right;width:46%;max-width:320px;margin:0.2rem 0 0.9rem 1.4rem;">
+        <a href="assets/images/women-at-dec-production-line-1960.jpg" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/women-at-dec-production-line-1960.jpg" alt="Women assembling equipment on the DEC production line, around 1960" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
+        <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">The DEC production line, around 1960. The machines that ran <i>Spacewar!</i> were built largely by women on the factory floor. <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
+      </figure>
+      In <b>September 1961</b> DEC donated a PDP-1 to <b>MIT</b>, where it was installed in the Research Laboratory of Electronics. It landed among exactly the people primed to exploit it: the students and hangers-on of the Tech Model Railroad Club who had already taught themselves interactive programming on the TX-0. Within months Steve Russell, Martin Graetz, Wayne Wiitanen and the rest had begun writing <i>Spacewar!</i>, and the game became the standard demonstration of what the new machine could do. The donation was good business as well as good will: a PDP-1 that could plot moving spaceships was a far easier machine to sell than one described in a specification sheet.</p>
+      <p>It is worth remembering who actually built these machines. DEC's computers, including the PDP-1, were assembled in large part by <b>women on the production line</b> in Maynard, Massachusetts, a workforce mostly written out of the heroic accounts of the period. The same erasure runs through the Spacewar story itself, which is why this project keeps a record of the <a href="people.html#stephenson">women at Digital</a> alongside the named hackers.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>The hardware is part of the text</h3>
+      <p>For a Critical Code Studies reading, the PDP-1 is not background colour; it is part of the text. The 18-bit word sets the precision of the orbital arithmetic. The point-plotting display dictates that the game be a redraw loop and gives the ships their flicker and the sun its smear. The paper-tape workflow explains both how the game spread and how easily it was lost. The toggle-switch console shapes the controls. To read <i>Spacewar!</i>'s code closely is repeatedly to find the machine showing through it. That is also why the <a href="restoration.html">restorations</a> matter: to run the code as written, you need this machine, or a faithful enough rebuilding of it, screen and all.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="code.html">← The code and versions</a> &nbsp; <a class="btn ghost" href="restoration.html">Restorations →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Specifications after the standard PDP-1 references, including the <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/PDP-1">PDP-1</a> summary and DEC's own handbooks.</li>
+        <li>Computer History Museum, <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/pdp-1/">PDP-1 Restoration Project</a>, for the machine, the Type 30 display and the MIT context.</li>
+        <li>Norbert Landsteiner, <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">Inside Spacewar!</a>, masswerk.at, on the Type 30, the display loop and the "heavy star".</li>
+        <li>Steven Levy, <i>Hackers: Heroes of the Computer Revolution</i>, for the TX-0, the MIT donation and the control boxes.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · <a href="https://github.com/spacewar1962/spacewar/releases">v1.5</a></p>
+    </div>
+  </footer>
+
+  <div class="imodal" id="imodal" aria-hidden="true">
+    <button class="imodal-close" id="imodalClose" type="button" aria-label="Close">&times;</button>
+    <img id="imodalImg" src="" alt="">
+  </div>
+  <script>
+  (function () {
+    var m = document.getElementById('imodal'), mi = document.getElementById('imodalImg'), mc = document.getElementById('imodalClose');
+    function openM(src) { mi.src = src; m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); }
+    function closeM() { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); mi.src = ''; }
+    var links = document.querySelectorAll('figure a[href$=".png"], figure a[href$=".jpg"], figure a[href$=".jpeg"]');
+    Array.prototype.forEach.call(links, function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); openM(a.getAttribute('href')); });
+    });
+    if (mc) mc.addEventListener('click', closeM);
+    m.addEventListener('click', function (e) { if (e.target === m) closeM(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeM(); });
+  })();
+  </script>
+
+</body>
+</html>

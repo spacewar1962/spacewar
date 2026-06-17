@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Restorations: keeping Spacewar! runnable</title>
+  <meta name="description" content="Hardware restorations, FPGA recreations and faithful emulations that keep Spacewar! runnable: the Computer History Museum's PDP-1, Mattis Lind's PDP-11, the MiSTer FPGA core, and Norbert Landsteiner's emulator.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="Restorations: keeping Spacewar! runnable">
+  <meta property="og:description" content="The projects that keep Spacewar! runnable on real or recreated hardware: CHM's restored PDP-1, Mattis Lind's PDP-11, the MiSTer FPGA core, and faithful emulation.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/restoration.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=3">
+  <script src="assets/nav.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <a href="why.html">Why?</a>
+        <a href="./#ccs">CCS</a>
+        <a href="./#history">History</a>
+        <a href="timeline.html">Timeline</a>
+        <a href="./#object">Object</a>
+        <a href="code.html">Code</a>
+        <a href="restoration.html">Restorations</a>
+        <a href="people.html">People</a>
+        <a href="two-cultures.html">Two Cultures</a>
+        <a href="bibliography.html">Biblio</a>
+        <a href="play.html">Play</a>
+        <a href="./#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">Restorations</span>
+      <h2>Keeping Spacewar! runnable</h2>
+      <p>The <a href="code.html">ports and clones</a> trace how <i>Spacewar!</i> travelled across machines while it was still living software. <b>Restoration</b> is a different kind of work and belongs to a later moment: the effort to keep the game <i>runnable</i> once its original hardware had become rare or extinct. That means repairing actual PDP-1s, recovering lost source from paper, rebuilding the machine in programmable logic, and emulating the original down to the glow of its screen. Where a port asks "what is this game on a new machine?", a restoration asks "what does it take to run the old thing at all?" Both are acts of interpretation, and both leave marks on the object we read.</p>
+    </section>
+
+    <div class="rule"><span>the hardware</span></div>
+
+    <section class="block">
+      <span class="kicker">Computer History Museum · 2005</span>
+      <h3>A working PDP-1</h3>
+      <p>The most ambitious restoration is also the most literal. The <b>Computer History Museum</b> in Mountain View returned one of its original <b>PDP-1</b> machines to working order, with the restoration completed in <b>October 2005</b>. The team, <b>Lyle Bickley</b>, <b>Joe Fredrick</b>, <b>Bob Lash</b>, <b>Rafael Skodlar</b> and <b>R. Tim Coslet</b>, debugged the hardware bit by bit, sourced spare parts, and brought the paper-tape reader, console and Type 30 display back to life. <i>Spacewar!</i> is once again played on this machine in regular public demonstrations, sometimes with original authors and players present: Steve Russell, Alan Kotok and Martin "Shag" Graetz have all played it again on the restored hardware, and Peter Samson and Dan Edwards have been photographed at the Type 30 display. It is as close as exists to playing the 1962 game as it was meant to be played.</p>
+      <p>The museum also recovered and documented the game's source. Its 4.1 listing, reconstructed during the restoration, is among the cleanest surviving texts of the late MIT game, and several of the source files used elsewhere on this site descend from that work. The museum's full account is published at <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/pdp-1/">computerhistory.org/pdp-1</a>.</p>
+    </section>
+
+    <section class="block">
+      <span class="kicker">Mattis Lind · 2021</span>
+      <h3>A PDP-11 brought back from a printout</h3>
+      <p>The 1974 <b>PDP-11</b> port by Larry Bryant and Bill Seiler had been lost when DECUS discarded its source materials. <b>Mattis Lind</b> recovered it from a printout Seiler had kept, transcribing the listing by OCR and hand, reassembling it with the period PAL-11S assembler, and adapting the I/O to a single-board <b>AR11</b> converter so it would drive an X-Y oscilloscope with hand-built joysticks. This is restoration as textual scholarship as much as electronics: a forty-year-old listing collated byte-for-byte and made to run again.</p>
+      <p>We give this version its own page, because it sits across the line between a port and a restoration: <a href="pdp11.html">Spacewar on the PDP-11: Bryant, Seiler and the GT40 &rsaquo;</a></p>
+    </section>
+
+    <div class="rule"><span>the rebuilds</span></div>
+
+    <section class="block">
+      <span class="kicker">MiSTer FPGA · 2018</span>
+      <h3>The PDP-1 in programmable logic</h3>
+      <p>Where the museum repairs the original, the <b>MiSTer</b> project rebuilds it. The <b>PDP1_MiSTer</b> core implements a complete PDP-1, instruction set and 4&nbsp;kB of core memory, in an FPGA on a Terasic DE10-Nano board. It runs the canonical software directly: <i>Spacewar!</i> (versions 2B and 4.1), the Minskytron, the Snowflake demo, the Expensive Desk Calculator and DDT. The hardest part is the screen: the original <b>Type 30</b> CRT, with its 1024&times;1024 addressing and its slow, persistent phosphor, is recreated with shift registers, row buffers and a blur circuit so that the decay and afterglow look right on a modern display. The author credits <b>Norbert Landsteiner</b> for guidance, and notes that Ben Gurley "designed PDP-1 in 3 months". <i>Hackaday</i> covered it in <a target="_blank" rel="noopener noreferrer" href="https://hackaday.com/2018/12/21/fpga-emulates-a-pdp-1-breathes-new-life-into-classic-video-game/">December 2018</a>; the core is on <a target="_blank" rel="noopener noreferrer" href="https://github.com/MiSTer-devel/PDP1_MiSTer">GitHub</a>.</p>
+    </section>
+
+    <section class="block">
+      <span class="kicker">Norbert Landsteiner · masswerk.at</span>
+      <h3>Emulation as restoration</h3>
+      <p>The most widely played restoration runs in a web browser. <b>Norbert Landsteiner</b>'s <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">masswerk.at/spacewar</a> is a virtual PDP-1 emulated in HTML5/JavaScript, running the original code with "special attention ... on accurate timing and on a recreation of the appearance and the unique experience of the original CRT display", down to the Type 30's dual-layer phosphor. It loads authentic paper-tape images, including a 3.1 binary dated "24 sep 62" from Steve Russell's archives, and is accompanied by an extensive body of documentation, <i>Inside Spacewar!: A Software Archaeological Approach to the First Video Game</i>, source listings, disassemblies and reconstructions. It is the emulator behind the <a href="play.html">Play</a> page here, and a major scholarly resource in its own right.</p>
+    </section>
+
+    <div class="rule"><span>more</span></div>
+
+    <section class="block">
+      <span class="kicker">The wider scene</span>
+      <h3>Replicas, lasers and write-ups</h3>
+      <p><i>Spacewar!</i> restoration shades off into a wider culture of recreation and homage. <i>Hackaday</i>'s <a target="_blank" rel="noopener noreferrer" href="https://hackaday.com/tag/spacewar/">Spacewar tag</a> collects projects from across this scene, including a galvanometer-driven <b>laser vector display</b> built from recycled 3D-printer parts (2016) and an overview of the PDP-1 as "the machine that started hacker culture" (2017), alongside the FPGA and PDP-11 work above. These are not scholarly editions, but they are part of the same impulse: to make the first video game move again on something you can stand in front of.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>Restoration as interpretation</h3>
+      <p>For a Critical Code Studies project, restoration is not merely background. Every one of these efforts is a reading of the code, and each leaves a trace. The museum's repair decides which machine counts as "the" PDP-1; Lind's transcription resolves ambiguities in a scanned listing; the FPGA core makes explicit, in logic, assumptions the original left implicit; the emulator chooses how the phosphor should fade. The runnable artefact we examine in 2026 is always the product of such choices. Reading the code means reading the restorations too.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="code.html">← The versions and the ports table</a> &nbsp; <a class="btn ghost" href="timeline.html">Timeline →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Computer History Museum, <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/pdp-1/">PDP-1 Restoration Project</a> (restoration completed October 2005; team and Spacewar! demonstrations).</li>
+        <li>Mattis Lind, <a target="_blank" rel="noopener noreferrer" href="https://github.com/MattisLind/SPACEWAR">SPACEWAR</a> (PDP-11 recovery, 2021), and <a target="_blank" rel="noopener noreferrer" href="https://hackaday.com/2021/05/14/spacewar-on-pdp-11-restoration/">Hackaday's write-up</a>. See also <a href="pdp11.html">our PDP-11 page</a>.</li>
+        <li><a target="_blank" rel="noopener noreferrer" href="https://github.com/MiSTer-devel/PDP1_MiSTer">PDP1_MiSTer</a> FPGA core, and <a target="_blank" rel="noopener noreferrer" href="https://hackaday.com/2018/12/21/fpga-emulates-a-pdp-1-breathes-new-life-into-classic-video-game/">Hackaday, December 2018</a>.</li>
+        <li>Norbert Landsteiner, <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">Spacewar! emulation and documentation</a>, masswerk.at.</li>
+        <li><i>Hackaday</i>, <a target="_blank" rel="noopener noreferrer" href="https://hackaday.com/tag/spacewar/">Spacewar tag</a>, for the wider recreation scene.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · <a href="https://github.com/spacewar1962/spacewar/releases">v1.5</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

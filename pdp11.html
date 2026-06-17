@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spacewar on the PDP-11: Bryant, Seiler and the GT40</title>
+  <meta name="description" content="The 1974 PDP-11 port of Spacewar! written by Larry Bryant and Bill Seiler for the GT40 graphics terminal, submitted to DECUS as 11-192, lost, and recovered from Seiler's printout by Mattis Lind in 2021.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="Spacewar on the PDP-11: Bryant, Seiler and the GT40">
+  <meta property="og:description" content="Larry Bryant and Bill Seiler's 1974 PDP-11 GT40 Spacewar (DECUS 11-192), lost by DECUS and recovered from a saved printout by Mattis Lind in 2021.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/pdp11.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=3">
+  <script src="assets/nav.js" defer></script>
+  <style>
+    .imodal { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(2,4,8,0.93); padding:4vh 4vw; cursor:zoom-out; }
+    .imodal.open { display:flex; }
+    .imodal img { max-width:92vw; max-height:90vh; width:auto; height:auto; border:1px solid var(--line); box-shadow:0 0 50px rgba(0,0,0,0.85); cursor:default; }
+    .imodal-close { position:fixed; top:1.1rem; right:1.3rem; z-index:201; width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+      background:rgba(7,11,20,0.9); color:var(--phosphor); font-family:var(--mono); font-size:1.5rem; line-height:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .imodal-close:hover { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 12px rgba(108,242,255,0.4); }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <a href="why.html">Why?</a>
+        <a href="./#ccs">CCS</a>
+        <a href="./#history">History</a>
+        <a href="timeline.html">Timeline</a>
+        <a href="./#object">Object</a>
+        <a href="code.html">Code</a>
+        <a href="restoration.html">Restorations</a>
+        <a href="people.html">People</a>
+        <a href="two-cultures.html">Two Cultures</a>
+        <a href="bibliography.html">Biblio</a>
+        <a href="play.html">Play</a>
+        <a href="./#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">Digging deeper into the PDP-11 port</span>
+      <h2>Spacewar on the PDP-11: Bryant, Seiler and the GT40</h2>
+      <p>By the early 1970s <i>Spacewar!</i> had jumped off the PDP-1 and onto the next generation of DEC hardware. In <b>1974</b> two programmers, <b>Larry Bryant</b> and <b>Bill Seiler</b>, wrote a PDP-11 version for the <b>GT40</b> graphics terminal and submitted it to the DEC users' group, <b>DECUS</b>, as program <b>11-192</b>. It is a port in the fullest sense: a fresh implementation in PDP-11 assembler, driving DEC's own vector display, carrying the 1962 game forward onto the machine that would define minicomputing for the rest of the decade.</p>
+    </section>
+
+    <div class="rule"><span>the machine and the display</span></div>
+
+    <section class="block">
+      <span class="kicker">PDP-11 + GT40, 1974</span>
+      <h3>A new machine for an old game</h3>
+      <p><figure style="float:right;width:44%;max-width:300px;margin:0.2rem 0 0.9rem 1.4rem;">
+        <a href="assets/images/1974-DECUS-PDP-11-Bill-Seiler-Larry-Bryant-in-197411-192.png" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/1974-DECUS-PDP-11-Bill-Seiler-Larry-Bryant-in-197411-192.png" alt="DECUS catalogue entry 11-192 crediting Bill Seiler and Larry Bryant with the PDP-11 Spacewar" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
+        <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">The DECUS listing for 11-192, crediting Bill Seiler and Larry Bryant. <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
+      </figure>
+      The <b>GT40</b> was DEC's intelligent graphics terminal: a PDP-11/05 paired with a <b>VT11</b> vector display processor that could draw lines and points directly from a display list in core, complete with a light pen. For a game built out of moving points and vectors it was an almost exact match to the PDP-1's Type 30 a dozen years earlier, only faster and far more widely sold. Bryant and Seiler's <i>Spacewar!</i> uses the VT11 to draw the two ships, their torpedoes and the star field, and adds touches of its own, including mines and what the recovered source calls a "wild variable". Like the Stanford GT40 version by Botond Eross from the same period, it shows the game settling onto the PDP-11/GT40 combination as its natural early-1970s home.</p>
+    </section>
+
+    <div class="rule"><span>lost and found</span></div>
+
+    <section class="block">
+      <span class="kicker">DECUS discards it; Seiler keeps a printout</span>
+      <h3>A near miss with oblivion</h3>
+      <p><figure style="float:left;width:46%;max-width:320px;margin:0.2rem 1.4rem 0.9rem 0;">
+        <a href="assets/images/1974-bryant-seiler-pdp-11.png" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/1974-bryant-seiler-pdp-11.png" alt="A page of the Bryant/Seiler PDP-11 Spacewar assembly listing" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
+        <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">A page of the original PDP-11 assembly listing, saved by Bill Seiler and later scanned. <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
+      </figure>
+      For decades the version was effectively gone. DECUS, the channel through which it had been distributed, eventually discarded its source materials, and with them the only public copy of 11-192. The game survived only because one of its authors had kept his own paper. <b>Bill Seiler</b> had held on to a printout of the assembly listing, and it was from a scan of that printout that the version was eventually brought back. The story is a sharp illustration of how thin the survival of early software can be: not a repository or an archive, but a single listing in a single person's possession.</p>
+      <p>The recovered source is preserved here as a <a target="_blank" rel="noopener noreferrer" href="sources/SPCWAR-1974-bryant-seiler-pdp-11.pdf">scanned PDF of the original listing</a>. The contemporary tooling it depends on, the PDP-11 paper-tape assembler and utilities, is documented in DEC's <a target="_blank" rel="noopener noreferrer" href="sources/DEC-11-XPTSA-PDP-11-Paper-Tape-Software-Handbook.pdf">PDP-11 Paper Tape Software Handbook</a> (DEC-11-XPTSA-B-D), which describes the PAL-11S assembler and LINK-11S linker used to build programs of exactly this kind.</p>
+    </section>
+
+    <div class="rule"><span>the recovery</span></div>
+
+    <section class="block">
+      <span class="kicker">Mattis Lind, 2021</span>
+      <h3>From scanned listing to running code</h3>
+      <p>The version was returned to working order by <b>Mattis Lind</b> in 2021. Working from Seiler's scans, he used a combination of <b>OCR and manual transcription</b> to turn the printout back into source text, then fed it through the period <b>PAL-11S</b> assembler under emulation. The transcription was unforgiving: as he records, "numerous errors were detected already when trying to get the files pass the syntax check", and every listing had to be compared byte-for-byte against the original scans. Linking exposed further undefined symbols that had to be resolved against the <b>FPMP-11</b> floating-point package.</p>
+      <p>Lind also had to adapt the program to the hardware he actually owned. The original drove DEC's analog subsystems (the AD01 / AA11), so for his own machine he reworked the I/O for the single-board <b>AR11</b>: shifting its 10-bit converters to stand in for the original 12-bit ones, repurposing the display's ERASE bit for Z-axis (brightness) control because the AR11 lacks a third DAC, and running it in unipolar mode so that ordinary joystick potentiometers would work. He built the controllers themselves "from a handful of items found on AliExpress". The result runs <i>Spacewar!</i> on an X-Y oscilloscope with the authentic phosphor afterglow of a vector screen.</p>
+      <blockquote style="clear:both;border-left:2px solid var(--line);margin:1.4rem 0;padding:0.2rem 0 0.2rem 1.1rem;font-style:italic;color:var(--phosphor-dim);">
+        "The original Spacewar! game ... was ported to PDP-11 architecture by Bill Seiler and Larry Bryant in 1974 ... After decades, DECUS discarded the source materials. Fortunately, Seiler retained copies and provided them to the repository maintainer as scanned documents."
+        <span style="display:block;margin-top:0.5rem;font-style:normal;font-size:0.7rem;color:var(--phosphor-dim);">From Mattis Lind's <a target="_blank" rel="noopener noreferrer" href="https://github.com/MattisLind/SPACEWAR">SPACEWAR repository</a>.</span>
+      </blockquote>
+      <p>The transcribed source, build instructions and supporting tools are published in Mattis Lind's <a target="_blank" rel="noopener noreferrer" href="https://github.com/MattisLind/SPACEWAR">SPACEWAR</a> repository, with the AR11 test tools in a <a target="_blank" rel="noopener noreferrer" href="https://github.com/MattisLind/pdp11-ar11-tester">companion repository</a>. The work was written up by <a target="_blank" rel="noopener noreferrer" href="https://hackaday.com/2021/05/14/spacewar-on-pdp-11-restoration/">Hackaday in May 2021</a>.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>The fragility of the source</h3>
+      <p>The PDP-11 version sits at the meeting point of the two halves of this project. As a <a href="code.html">port</a>, it shows <i>Spacewar!</i> moving forward in time, off the PDP-1 and onto the hardware of the 1970s, gaining mines and a "wild variable" along the way. As a <a href="restoration.html">restoration</a>, it shows what it now takes to read that code at all: an OCR pass, a byte-for-byte collation against a forty-year-old printout, a period assembler run under emulation, and a hand-built controller. The text we study is not simply "the 1974 source"; it is a 2021 reconstruction of a 1974 source that very nearly did not survive. For a critical reading of code, that gap between the artefact and its recovery is part of the object.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="code.html">← Back to the versions and the ports table</a> &nbsp; <a class="btn ghost" href="restoration.html">Restorations →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Larry Bryant and Bill Seiler, PDP-11 <i>Spacewar!</i> (DECUS 11-192, 1974). Scanned listing: <a target="_blank" rel="noopener noreferrer" href="sources/SPCWAR-1974-bryant-seiler-pdp-11.pdf">SPCWAR-1974-bryant-seiler-pdp-11.pdf</a>.</li>
+        <li>Mattis Lind, <a target="_blank" rel="noopener noreferrer" href="https://github.com/MattisLind/SPACEWAR">SPACEWAR</a> (transcription, build and AR11 adaptation, 2021); <a target="_blank" rel="noopener noreferrer" href="https://github.com/MattisLind/pdp11-ar11-tester">pdp11-ar11-tester</a>.</li>
+        <li>"Spacewar! On PDP-11 Restoration", <a target="_blank" rel="noopener noreferrer" href="https://hackaday.com/2021/05/14/spacewar-on-pdp-11-restoration/"><i>Hackaday</i></a>, 14 May 2021.</li>
+        <li>DEC, <a target="_blank" rel="noopener noreferrer" href="sources/DEC-11-XPTSA-PDP-11-Paper-Tape-Software-Handbook.pdf"><i>PDP-11 Paper Tape Software Handbook</i></a> (DEC-11-XPTSA-B-D), for the PAL-11S assembler and LINK-11S linker.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · <a href="https://github.com/spacewar1962/spacewar/releases">v1.5</a></p>
+    </div>
+  </footer>
+
+  <div class="imodal" id="imodal" aria-hidden="true">
+    <button class="imodal-close" id="imodalClose" type="button" aria-label="Close">&times;</button>
+    <img id="imodalImg" src="" alt="">
+  </div>
+  <script>
+  (function () {
+    var m = document.getElementById('imodal'), mi = document.getElementById('imodalImg'), mc = document.getElementById('imodalClose');
+    function openM(src) { mi.src = src; m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); }
+    function closeM() { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); mi.src = ''; }
+    var links = document.querySelectorAll('figure a[href$=".png"], figure a[href$=".jpg"], figure a[href$=".jpeg"]');
+    Array.prototype.forEach.call(links, function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); openM(a.getAttribute('href')); });
+    });
+    if (mc) mc.addEventListener('click', closeM);
+    m.addEventListener('click', function (e) { if (e.target === m) closeM(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeM(); });
+  })();
+  </script>
+
+</body>
+</html>
