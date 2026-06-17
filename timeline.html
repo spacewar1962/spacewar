@@ -68,14 +68,12 @@
       background:rgba(108,242,255,0.7); box-shadow:0 0 9px rgba(108,242,255,0.5), 0 0 2px rgba(108,242,255,0.95); }
 
     /* the central sun: a vector sunburst the timeline scrolls past, like the game's gravity well */
-    .tl-sun { position:absolute; left:50%; top:50%; width:320px; height:320px; transform:translate(-50%,-50%); z-index:0; pointer-events:none; border-radius:50%;
-      background:
-        radial-gradient(circle, rgba(255,206,122,0.55) 0%, rgba(255,206,122,0.16) 11%, transparent 26%),
-        repeating-conic-gradient(from 0deg, rgba(255,206,122,0.24) 0deg 1deg, transparent 1deg 15deg);
-      -webkit-mask:radial-gradient(circle, #000 0%, #000 26%, transparent 60%);
-      mask:radial-gradient(circle, #000 0%, #000 26%, transparent 60%);
-      animation:tl-sun-pulse 4.5s ease-in-out infinite alternate; }
-    @keyframes tl-sun-pulse { from{opacity:0.42; transform:translate(-50%,-50%) scale(0.95) rotate(0deg)} to{opacity:0.8; transform:translate(-50%,-50%) scale(1.05) rotate(7deg)} }
+    .tl-sun { position:absolute; left:50%; top:50%; width:62px; height:62px; transform:translate(-50%,-50%); z-index:0; pointer-events:none;
+      animation:tl-sun-pulse 2.6s ease-in-out infinite alternate; }
+    .tl-sun svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 7px rgba(191,228,255,0.55)); }
+    .tl-sun line { stroke:#e6f3ff; stroke-width:1.4; vector-effect:non-scaling-stroke; }
+    .tl-sun .core { fill:#f2f9ff; }
+    @keyframes tl-sun-pulse { from{opacity:0.78; transform:translate(-50%,-50%) scale(0.9) rotate(0deg)} to{opacity:1; transform:translate(-50%,-50%) scale(1.08) rotate(9deg)} }
     @media (max-width:760px) { .tl-sun { display:none; } }
 
     .tl-stage { position:relative; }
@@ -220,7 +218,7 @@
     <section class="block tl" aria-label="Spacewar timeline">
       <div class="tl-stage">
         <div class="tl-stars" aria-hidden="true"></div>
-        <div class="tl-sun" aria-hidden="true"></div>
+        <div class="tl-sun" id="tlSun" aria-hidden="true"></div>
         <button class="tl-arrow tl-prev" id="tlPrev" type="button" aria-label="Scroll left">&lsaquo;</button>
         <div class="tl-scroll" id="tlScroll" tabindex="0" aria-label="Timeline, scroll horizontally">
           <div class="tl-track" id="tlTrack"></div>
@@ -505,6 +503,17 @@
       evEl.classList.add('burning');
       setTimeout(function () { evEl.classList.remove('burning'); evEl._burning = false; }, 1900);
     });
+
+    // ---- The sun: a small spiky vector star, like the game's heavy star ----
+    var sunEl = document.getElementById('tlSun');
+    if (sunEl) {
+      var lens = [25,13,21,12,26,15,22,13,24,16,20,12,25,14,23,13,26,15,19,22], N = lens.length, spikes = '';
+      for (var s = 0; s < N; s++) {
+        var ang = (s / N) * Math.PI * 2, L = lens[s];
+        spikes += '<line x1="0" y1="0" x2="' + (Math.cos(ang) * L).toFixed(1) + '" y2="' + (Math.sin(ang) * L).toFixed(1) + '"/>';
+      }
+      sunEl.innerHTML = '<svg viewBox="-30 -30 60 60" aria-hidden="true">' + spikes + '<circle class="core" cx="0" cy="0" r="2.4"/></svg>';
+    }
 
     // ---- The journey map: arcs from MIT to each site, classic "nuclear curve" style ----
     var mapEl = document.getElementById('tlMap');

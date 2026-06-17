@@ -18,6 +18,14 @@
   <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
   <link rel="stylesheet" href="assets/css/site.css?v=3">
   <script src="assets/nav.js" defer></script>
+  <style>
+    .imodal { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(2,4,8,0.93); padding:4vh 4vw; cursor:zoom-out; }
+    .imodal.open { display:flex; }
+    .imodal img { max-width:92vw; max-height:90vh; width:auto; height:auto; border:1px solid var(--line); box-shadow:0 0 50px rgba(0,0,0,0.85); cursor:default; }
+    .imodal-close { position:fixed; top:1.1rem; right:1.3rem; z-index:201; width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+      background:rgba(7,11,20,0.9); color:var(--phosphor); font-family:var(--mono); font-size:1.5rem; line-height:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .imodal-close:hover { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 12px rgba(108,242,255,0.4); }
+  </style>
 </head>
 <body>
 
@@ -90,6 +98,15 @@
         <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">SPACEWAR FLOWCHART: Here the program flow is broken up into its elements, represented by the small boxes. The box labeled "Generate Picture, SHIPA" has been similarly broken into its smaller elements as a representative sample. Each box in the program could be similarly broken down, and it would be quite possible to break down the boxes in the detailed example into their smaller elements (Kuhfeld 1971: 70). <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
       </figure>
       Kuhfeld did what almost none of the other porters did: he wrote it up for a wide public. His article "Spacewar" appeared in <b><i>Analog Science Fiction / Science Fact</i>, July 1971</b> (vol. LXXXVII, no. 5), the leading American science-fiction magazine, complete with photographs of the screen and an explanation of the rules. For many readers in 1971 this was their first contact with the idea that a computer could be played. The article also caught the mechanism of the game's spread in a single line: "It is in the nature of MIT graduates to wind up at installations with computers; and with a new computer, the fun can start all over again." The diffusion of <i>Spacewar!</i> was a by-product of where its players were posted.</p>
+      <blockquote style="border-left:2px solid var(--line);margin:1.4rem 0;padding:0.2rem 0 0.2rem 1.1rem;font-style:italic;color:var(--phosphor-dim);">
+        "For nearly a dozen years I've been trying to get an article on the remarkable educational game invented at MIT. It's a great game, involving genuine skill in solving velocity and angular relation problems, but I'm afraid it will never be widely popular. The playing 'board' costs about a quarter of a mega-buck!"
+        <span style="display:block;margin-top:0.6rem;font-style:normal;font-size:0.7rem;color:var(--phosphor-dim);">The article's standfirst, by Albert W. Kuhfeld, <i>Analog</i>, July 1971.</span>
+      </blockquote>
+      <p><figure style="float:right;width:40%;max-width:240px;margin:0.2rem 0 0.9rem 1.4rem;">
+        <a href="assets/images/1971-kuhfeld-p72-analogmagazine-3v.png" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/1971-kuhfeld-p72-analogmagazine-3v.png" alt="Diagram of the three variations on the standard trajectory, with the gyro control moved Left, Center, or Right" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
+        <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">The three variations on the standard trajectory. "Left," "Center" and "Right" refer to the direction the gyro control is moved in each maneuver, producing, respectively, counterclockwise, no, and clockwise rotation. (Timing between plots, 1 second.) <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
+      </figure>
+      The article even opens as fiction: a tense Spacewar duel between two players, Fletcher and Tatge, narrated torpedo by torpedo, "the glowing blips approached each other in the battle display", before Kuhfeld pulls back to explain the quarter-million-dollar machine behind the game. The full piece is reproduced at <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/kuhfeld/">masswerk.at/spacewar/kuhfeld</a> and archived at <a target="_blank" rel="noopener noreferrer" href="https://www.luminist.org/archives/SF/AN.htm">luminist.org</a>.</p>
     </section>
 
     <div class="rule"><span>why this belongs here</span></div>
@@ -124,6 +141,25 @@
       <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a> · <a href="https://github.com/spacewar1962/spacewar/releases">v1.5</a></p>
     </div>
   </footer>
+
+  <div class="imodal" id="imodal" aria-hidden="true">
+    <button class="imodal-close" id="imodalClose" type="button" aria-label="Close">&times;</button>
+    <img id="imodalImg" src="" alt="">
+  </div>
+  <script>
+  (function () {
+    var m = document.getElementById('imodal'), mi = document.getElementById('imodalImg'), mc = document.getElementById('imodalClose');
+    function openM(src) { mi.src = src; m.classList.add('open'); m.setAttribute('aria-hidden', 'false'); }
+    function closeM() { m.classList.remove('open'); m.setAttribute('aria-hidden', 'true'); mi.src = ''; }
+    var links = document.querySelectorAll('figure a[href$=".png"], figure a[href$=".jpg"], figure a[href$=".jpeg"]');
+    Array.prototype.forEach.call(links, function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); openM(a.getAttribute('href')); });
+    });
+    if (mc) mc.addEventListener('click', closeM);
+    m.addEventListener('click', function (e) { if (e.target === m) closeM(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeM(); });
+  })();
+  </script>
 
 </body>
 </html>
