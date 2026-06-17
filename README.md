@@ -12,7 +12,7 @@
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
 </p>
 
-A critical code reading of **_Spacewar!_**, the space-combat game written for the DEC PDP-1 at MIT in 1961–62. We read the original MIDAS assembly source as a cultural text, in the tradition of Critical Code Studies: at once literature, mechanism, spatial form, and a repository of the social formation that produced it.
+A critical code reading of **_Spacewar!_**, the space-combat game written for the DEC PDP-1 at MIT in 1961–62. We read the original Macro assembly source as a cultural text, in the tradition of Critical Code Studies: at once literature, mechanism, spatial form, and a repository of the social formation that produced it.
 
 This repository holds the original source, a runnable PDP-1 emulator, and the project website, so the reading can move between the text and its execution. _Spacewar!_ sits at an origin point of computational culture: real-time interactive graphics, the hacker ethic, the demo, and the free circulation of code all condense in roughly two thousand words of macro-assembly. Reading about the origins of computing is not the same as reading the origin's code, and the aim here is the latter, to sit with the listing, the macros, the octal addresses, and the running artefact, and to ask what this code knows, what it assumes, and what its founding myth leaves out.
 
@@ -26,6 +26,11 @@ The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the
 - ❓ **Why this project matters today:** <https://spacewar1962.github.io/spacewar/why.html>
 - 🗂 **The versions:** <https://spacewar1962.github.io/spacewar/code.html> · a variorum of the surviving _Spacewar!_ code, 1962–63, with links to recovered source where it exists.
 - 👥 **The people:** <https://spacewar1962.github.io/spacewar/people.html> · who conceived, wrote, extended, and preserved _Spacewar!_, and who the record leaves out.
+- 🕰 **Timeline:** <https://spacewar1962.github.io/spacewar/timeline.html> · an interactive timeline of _Spacewar!_ from 1961 to now.
+- 🚀 **Ports and the long journey:** <https://spacewar1962.github.io/spacewar/ports.html> · the census of ports and clones across machines and labs, with deep dives into [Cambridge](https://spacewar1962.github.io/spacewar/cambridge.html), [Minnesota](https://spacewar1962.github.io/spacewar/minnesota.html), [Stanford](https://spacewar1962.github.io/spacewar/stanford.html), [MIT-AI](https://spacewar1962.github.io/spacewar/mit-ai.html), and the [PDP-11](https://spacewar1962.github.io/spacewar/pdp11.html), plus a tentative survey of commercial descendants.
+- 🛠 **Restorations:** <https://spacewar1962.github.io/spacewar/restoration.html> · hardware restorations, FPGA rebuilds, and faithful emulation that keep the game runnable.
+- 🖥 **The PDP-1:** <https://spacewar1962.github.io/spacewar/pdp1.html> · a deep dive into the machine the game was written for.
+- ✶ **The Minskytron:** <https://spacewar1962.github.io/spacewar/minskytron.html> · Minsky's display hack and the circle algorithm behind the hyperspace effect.
 - 🔀 **Two Cultures:** <https://spacewar1962.github.io/spacewar/two-cultures.html> · the fork in MIT's early computer culture, the machine as a medium (_Spacewar!_) and the machine as a mind (_ELIZA_).
 - 🕹 **Play the 1962 original:** <https://spacewar1962.github.io/spacewar/play.html>
 - 📚 **Bibliography:** <https://spacewar1962.github.io/spacewar/bibliography.html>
@@ -34,25 +39,25 @@ The reading is a companion to _Inventing ELIZA: How the First Chatbot Shaped the
 
 ## The object
 
-The original MIDAS macro-assembly source is preserved here alongside its assembler listing, a provenance snapshot, and a working PDP-1 emulator, so that the reading can move between text and execution.
+The original Macro assembly source is preserved here alongside its assembler listing, a provenance snapshot, and a working PDP-1 emulator, so that the reading can move between text and execution. (The 1962 source is written in Macro, the PDP-1 assembler descended from the one built for the TX-0; MIDAS, often cited in later accounts, is a later assembler built on it.)
 
 | File | What it is |
 |------|------------|
-| [`spacewar.mac`](spacewar.mac) | The original MIDAS macro-assembly source (~2,000 lines), preserved in this fork. |
+| [`spacewar.mac`](spacewar.mac) | The original Macro assembly source (~2,000 lines), preserved in this fork. |
 | [`spacewar.lst`](spacewar.lst) | The assembler listing: octal addresses and machine words beside each line. The program as it sits in core. |
 | [`originsources.zip`](originsources.zip) | A dated upstream snapshot, tracing the source back through the Silverman / Gerasimov PDP-1 emulator. |
 | `spacewar.js`, `spacewar.bin.js` | The PDP-1 emulator that runs the 1962 binary in the browser. |
-| `index.html`, `why.html`, `people.html`, `two-cultures.html`, `play.html`, `bibliography.html` | The project website (served via GitHub Pages). |
+| `index.html` + the section pages (`why`, `people`, `timeline`, `ports`, `restoration`, `pdp1`, `pdp11`, `minskytron`, `two-cultures`, `play`, `bibliography`, and the port deep-dives `cambridge` / `minnesota` / `stanford` / `mit-ai`) | The project website (served via GitHub Pages), with a grouped dropdown menu. |
 | [`code.html`](code.html) | The versions: a variorum of the surviving _Spacewar!_ source, 1962–63, with per-version links to recovered code. |
 | `index-text.html`, `index-vector.html` | Alternate front pages: a 1990s text-only version and a vector-display version. |
 | `assets/`, `*.css` | Site styling and brand assets. |
 | `bibliography.source.md`, `build-bibliography.py` | The bibliography and the generator that renders it. |
-| [`docs/`](docs/) | Public reading notes: the reading log and close-reading memos. |
+| [`docs/`](docs/) | Public reading notes: the reading log, close-reading memos, and the working diffusion catalogue (versions, ports, and commercial descendants). |
 | [`code/`](code/) | Working space for programming as scholarship (modifications, variations, ports). For future use. |
 
 ## The reading
 
-The study works across the registers of Critical Code Studies, pairing close technical explication of a code fragment with the cultural constellation that spirals out from it. Six movements: the machine that owns itself; the MIDAS macros as a small language for writing the game; the Expensive Planetarium and its real sky; gravity and the central star; hyperspace as designed contingency; and the demo as gift.
+The study works across the registers of Critical Code Studies, pairing close technical explication of a code fragment with the cultural constellation that spirals out from it. Six movements: the machine that owns itself; the Macro assembler's macros as a small language for writing the game; the Expensive Planetarium and its real sky; gravity and the central star; hyperspace as designed contingency; and the demo as gift.
 
 Alongside close reading, we treat programming as scholarship, using the emulator to run, modify, and port the program, so interpretation is tested against the artefact rather than asserted about it. _Spacewar!_ is also, immediately, an image, a vector drawing on the Type 30 display, so we read the visual register in conjunction with the code that produces it, binding critical code studies to a visual and media-archaeological analysis of the display itself.
 
