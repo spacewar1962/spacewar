@@ -35,7 +35,7 @@
   <h1>SPACEWAR! (1962)</h1>
   <p class="byline">A Critical Code Studies Reading</p>
 
-  <div class="nav">[ <a href="why.html">Why?</a> | <a href="play.html">Play</a> | <a href="bibliography.html">Bibliography</a> | <a href="https://github.com/spacewar1962/spacewar">Code</a> ]</div>
+  <div class="nav">[ <a href="why.html">Why?</a> | <a href="timeline.html">Timeline</a> | <a href="code.html">Code</a> | <a href="restoration.html">Restorations</a> | <a href="people.html">People</a> | <a href="play.html">Play</a> | <a href="bibliography.html">Bibliography</a> ]</div>
   <div class="nav small">View this page as: Default (<a href="index.html">graphical</a>) | Text (this page) | <a href="index-vector.html">Vector display</a></div>
 
   <hr>
@@ -59,6 +59,7 @@
   <p><i>Spacewar!</i> was conceived in 1961 by Martin Graetz, Wayne Wiitanen, and Steve Russell, members of the circle around MIT's Tech Model Railroad Club. Russell wrote the core over the winter of 1961-62. Peter Samson replaced the random background with the <i>Expensive Planetarium</i>, the actual night sky; Dan Edwards added a central star whose gravity pulled both ships toward it; Graetz added hyperspace, a panic button. By spring 1962 Alan Kotok and Bob Saunders had built dedicated control boxes. Almost as soon as it existed it circulated, copied from PDP-1 to PDP-1, an open artefact decades before "open source" had a name.</p>
 
   <h2>The object</h2>
+  <p>There is no single canonical <i>Spacewar!</i>. What survives is a family of versions: the early MIT releases (1, 2B, 3.1), the forked 4.x generation of 1963, later reconstructions such as the Computer History Museum's 4.1f, and the many <a href="code.html">ports and clones</a> of its long journey, each in its own dialect of assembly. The <a href="code.html">Versions</a> page and the <a href="timeline.html">Timeline</a> lay out the whole variorum. The primary close-reading texts are the MIDAS macro-assembly sources:</p>
   <ul>
     <li><b>spacewar.mac</b> - the original MIDAS macro-assembly source (~2,057 lines). The primary close-reading text.</li>
     <li><b>spacewar.lst</b> - the assembler listing: octal addresses and machine words beside each line.</li>
@@ -66,14 +67,24 @@
     <li><b>spacewar.js</b> - the PDP-1 emulator. <a href="play.html">Play it</a>.</li>
   </ul>
 
-  <pre>/macro spacewar! - pdp-1 midas source, 1962
+  <pre>/ spacewar 2b - 2 apr 1962 - pdp-1 midas macro-assembly
+/ one of many surviving versions (reconstructed by Norbert Landsteiner)
 
-  define senseswitch A
-  repeat 3, A=A+A
-  szs A
+  define index A,B,C
+    idx A
+    sas B
+    jmp C
   term
 
-007652  640500    szm=sza sma-szf</pre>
+  define swap
+    rcl 9s
+    rcl 9s
+  term
+
+  define count A,B
+    isp A
+    jmp B
+  term</pre>
 
   <h2>The machine, in numbers</h2>
   <ul>
