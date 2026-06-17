@@ -108,7 +108,7 @@
         <tr><th>Maker</th><td>Digital Equipment Corporation (DEC)</td></tr>
         <tr><th>Lead engineer</th><td>Benjamin Gurley</td></tr>
         <tr><th>Word length</th><td>18 bits</td></tr>
-        <tr><th>Memory</th><td>4,096 words standard, upgradable to 65,536</td></tr>
+        <tr><th>Memory</th><td>4,096 18-bit words standard, upgradable to 65,536 (about 9 KB, or roughly 144 KB fully expanded, a fraction of a single modern megabyte)</td></tr>
         <tr><th>Memory cycle</th><td>5.35 microseconds (≈187 kHz)</td></tr>
         <tr><th>Instruction speed</th><td>most instructions 10.7 µs (≈93,000/sec)</td></tr>
         <tr><th>Logic</th><td>2,700 transistors, 3,000 diodes</td></tr>
@@ -147,6 +147,15 @@
       </figure>
       In <b>September 1961</b> DEC donated a PDP-1 to <b>MIT</b>, where it was installed in the Research Laboratory of Electronics. It landed among exactly the people primed to exploit it: the students and hangers-on of the Tech Model Railroad Club who had already taught themselves interactive programming on the TX-0. Within months Steve Russell, Martin Graetz, Wayne Wiitanen and the rest had begun writing <i>Spacewar!</i>, and the game became the standard demonstration of what the new machine could do. The donation was good business as well as good will: a PDP-1 that could plot moving spaceships was a far easier machine to sell than one described in a specification sheet.</p>
       <p>It is worth remembering who actually built these machines. DEC's computers, including the PDP-1, were assembled in large part by <b>women on the production line</b> in Maynard, Massachusetts, a workforce mostly written out of the heroic accounts of the period. The same erasure runs through the Spacewar story itself, which is why this project keeps a record of the <a href="people.html#stephenson">women at Digital</a> alongside the named hackers.</p>
+    </section>
+
+    <div class="rule"><span>the first PDP-1, and time-sharing</span></div>
+
+    <section class="block">
+      <span class="kicker">BBN, Ed Fredkin, and the swapping drum</span>
+      <h3>From one machine to many users</h3>
+      <p>MIT's PDP-1 was a donation, but the very first PDP-1 DEC built was bought by <b>Bolt Beranek and Newman</b>, where <b>Ed Fredkin</b> specified much of how the machine met its users: its character set, its character codes, and its input/output system. Fredkin then solved the problem that turned the single-user PDP-1 into a shared one. <a href="people.html#mccarthy">John McCarthy</a>'s idea of time-sharing wanted every user resident in fast memory, which was ruinously expensive, so Fredkin designed a <b>zero-latency swapping drum</b>: a drum holding 4,096 words, exactly one core image, synchronised to the PDP-1's memory cycle so that on each cycle one word could be read from core while another was written back from the drum. One user could be swapped out and the next swapped in within about <b>20 milliseconds</b>, with no rotational wait. It was built (the engineering was Gordon Bell's) and ran in both the BBN and MIT PDP-1 time-sharing systems. Fredkin also wrote the machine's assembler, <b>FRAP</b> ("Free of Rules Assembler Program"), squeezed into 1,024 words with variable-length symbols and a single backward pass over the paper tape to resolve forward references.</p>
+      <p class="micro" style="margin-top:0.6rem;">Source: Computer History Museum, <i>Oral History of Ed Fredkin</i>, interviewed by Gardner Hendrie, 5 July 2006 (CHM ref. X3641.2007).</p>
     </section>
 
     <div class="rule"><span>why this belongs here</span></div>
