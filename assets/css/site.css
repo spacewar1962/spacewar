@@ -1,7 +1,7 @@
 /* ============================================================
-   Spacewar! — front door
+   Spacewar! · front door
    Aesthetic: DEC PDP-1 Type 30 CRT (P7 phosphor, blue-white),
-   vector graphics, teletype/MIDAS listing. Monochrome phosphor
+   vector graphics, teletype/Macro listing. Monochrome phosphor
    on black, with bloom, scanlines and a faint flicker.
    ============================================================ */
 
@@ -275,7 +275,7 @@ canvas#swcanvas { display: block; width: 100%; height: 100%; background: #000; b
 .callout p { margin: 0; }
 .callout p + p { margin-top: 0.8rem; }
 
-/* stat strip — the machine in numbers */
+/* stat strip · the machine in numbers */
 .stat-strip { display: flex; flex-wrap: wrap; gap: 0; margin-top: 1.6rem; border: 1px solid var(--line-soft); border-radius: 3px; overflow: hidden; }
 .stat { flex: 1 1 140px; padding: 1.1rem 1.2rem; border-right: 1px solid var(--line-soft); background: rgba(95,147,168,0.03); }
 .stat:last-child { border-right: 0; }
