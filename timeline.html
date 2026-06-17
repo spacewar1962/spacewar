@@ -531,9 +531,9 @@
       // frame, leaving a slight green phosphor trail behind a bright blue core
       var sunHist = [];
       function drawSun() {
-        var lines = [], k = 2 + Math.floor(Math.random() * 3);
-        for (var i = 0; i < k; i++) {
-          var ang = Math.random() * Math.PI * 2, r1 = Math.random() * 1.5, r2 = r1 + 4 + Math.random() * 9;
+        var lines = [];
+        for (var i = 0; i < 2; i++) {
+          var ang = Math.random() * Math.PI * 2, r1 = Math.random() * 1.2, r2 = r1 + 3 + Math.random() * 5.5;
           lines.push([Math.cos(ang) * r1, Math.sin(ang) * r1, Math.cos(ang) * r2, Math.sin(ang) * r2]);
         }
         sunHist.unshift(lines);
