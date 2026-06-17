@@ -155,6 +155,18 @@
       cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .tl-modal-close:hover { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 12px rgba(108,242,255,0.4); }
 
+    /* the journey map */
+    .tl-map { position:relative; width:100%; margin:0.6rem 0 0; border:1px solid var(--line); border-radius:6px;
+      background:radial-gradient(120% 140% at 30% 20%, rgba(7,12,22,0.5), rgba(4,6,11,0.85)); overflow:hidden; }
+    .tl-map svg { display:block; width:100%; height:auto; }
+    .tl-map .coast { fill:rgba(108,242,255,0.035); stroke:rgba(108,242,255,0.28); stroke-width:1; stroke-linejoin:round; }
+    .tl-map .grid { stroke:rgba(120,200,255,0.07); stroke-width:0.6; }
+    .tl-map .arc { fill:none; stroke:rgba(255,206,122,0.6); stroke-width:1.4; filter:drop-shadow(0 0 3px rgba(255,206,122,0.45)); }
+    .tl-map .city { fill:#6cf2ff; }
+    .tl-map .city-o { fill:#ffce7a; }
+    .tl-map .label { fill:var(--phosphor-dim); font-family:var(--mono); font-size:11px; letter-spacing:0.3px; }
+    .tl-map .label-o { fill:var(--bright); }
+
     @media (max-width:760px) {
       .tl-scroll { overflow:visible; scroll-snap-type:none; padding-left:0.3rem; }
       .tl-track { flex-direction:column; width:auto; min-height:0; gap:0; padding:0; }
@@ -229,6 +241,15 @@
       </div>
       <p class="tl-hint">Scroll sideways &middot; use &larr; &rarr; keys or the arrows &middot; click a card's links to dig in &middot; on a phone it runs top to bottom</p>
       <p class="tl-intro">From a hack on a new minicomputer in a Cambridge, Massachusetts laboratory to the founding myth of the video game, <i>Spacewar!</i> has been written, patched, carried from machine to machine, cloned, renamed, written about, played, and, much later, recovered, emulated, and read. This timeline runs from its conception in 1961 to the present, gathering the principal release dates, the ports and clones of its "long journey", the cultural moments, and the legacy and afterlife that followed.</p>
+    </section>
+
+    <div class="rule"><span>the long journey, mapped</span></div>
+
+    <section class="block">
+      <span class="kicker">Where the code travelled</span>
+      <h3>The long journey</h3>
+      <p>Through the 1960s and 70s <i>Spacewar!</i> spread from MIT to computer labs across the United States, and, once, across the Atlantic to Cambridge. Each arc traces the game leaving Cambridge, Massachusetts for another machine. The documented spread is almost entirely North American: the only confirmed overseas installation is the Cambridge <i>Duel</i>.</p>
+      <div class="tl-map" id="tlMap" aria-label="Map of where Spacewar! travelled"></div>
     </section>
 
     <section class="block">
@@ -484,6 +505,66 @@
       evEl.classList.add('burning');
       setTimeout(function () { evEl.classList.remove('burning'); evEl._burning = false; }, 1900);
     });
+
+    // ---- The journey map: arcs from MIT to each site, classic "nuclear curve" style ----
+    var mapEl = document.getElementById('tlMap');
+    if (mapEl) {
+      var MB = { lonMin: -128, lonMax: 8, latMin: 28, latMax: 56, W: 1000, H: 440 };
+      function pj(lat, lon) {
+        return [ (lon - MB.lonMin) / (MB.lonMax - MB.lonMin) * MB.W,
+                 (MB.latMax - lat) / (MB.latMax - MB.latMin) * MB.H ];
+      }
+      var CITIES = [
+        { n:'MIT', lat:42.36, lon:-71.09, o:1, la:'start', ld:-8 },
+        { n:'Michigan', lat:42.28, lon:-83.74, la:'end', ld:-8 },
+        { n:'Minnesota', lat:44.97, lon:-93.23, la:'end', ld:-6 },
+        { n:'Illinois', lat:40.11, lon:-88.23, la:'end', ld:15 },
+        { n:'Pittsburgh', lat:40.44, lon:-79.96, la:'start', ld:15 },
+        { n:'Penn', lat:39.95, lon:-75.19, la:'start', ld:5 },
+        { n:'Stanford', lat:37.43, lon:-122.17, la:'start', ld:4 },
+        { n:'Georgia Tech', lat:33.78, lon:-84.39, la:'start', ld:15 },
+        { n:'Cambridge, UK', lat:52.20, lon:0.12, la:'end', ld:-8 }
+      ];
+      var NA = [[49,-125],[40,-124],[34,-120.5],[32.5,-117],[31.5,-111],[31,-106],[29.5,-101],[29.7,-94.5],[30.3,-89],[29.5,-84],[28,-82.5],[28,-80.5],[32,-80],[35,-76],[39,-74],[41,-71],[43.5,-70],[45,-67],[47,-64.5],[49,-67],[49,-95],[49,-125]];
+      var UK = [[50,-5.5],[50,-3],[50.7,-1],[51.4,1.4],[52.8,1.7],[53.5,0.3],[54.5,-0.5],[55.8,-2],[57.5,-2],[58.6,-3.5],[57.5,-5.8],[56,-5.5],[55,-5],[54,-3.5],[53.4,-3],[52.5,-4.2],[51.6,-5.2],[50,-5.5]];
+      function poly(pts) { return pts.map(function (p, i) { var xy = pj(p[0], p[1]); return (i ? 'L' : 'M') + xy[0].toFixed(1) + ' ' + xy[1].toFixed(1); }).join(' ') + ' Z'; }
+      var svg = '<svg viewBox="0 0 ' + MB.W + ' ' + MB.H + '" preserveAspectRatio="xMidYMid meet">';
+      for (var la = 30; la <= 55; la += 10) { var gy = pj(la, 0)[1]; svg += '<line class="grid" x1="0" y1="' + gy.toFixed(1) + '" x2="' + MB.W + '" y2="' + gy.toFixed(1) + '"/>'; }
+      for (var lo = -120; lo <= 0; lo += 20) { var gx = pj(0, lo)[0]; svg += '<line class="grid" x1="' + gx.toFixed(1) + '" y1="0" x2="' + gx.toFixed(1) + '" y2="' + MB.H + '"/>'; }
+      svg += '<path class="coast" d="' + poly(NA) + '"/><path class="coast" d="' + poly(UK) + '"/>';
+      var p1 = pj(CITIES[0].lat, CITIES[0].lon);
+      CITIES.forEach(function (c) {
+        if (c.o) return;
+        var p2 = pj(c.lat, c.lon);
+        var mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2;
+        var dx = p2[0] - p1[0], dy = p2[1] - p1[1], dist = Math.sqrt(dx * dx + dy * dy);
+        var lift = Math.max(30, dist * 0.3);
+        svg += '<path class="arc" d="M' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + ' Q ' + mx.toFixed(1) + ' ' + (my - lift).toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1) + '"/>';
+      });
+      CITIES.forEach(function (c) {
+        var xy = pj(c.lat, c.lon);
+        var anchor = c.la || 'start';
+        var dxl = (anchor === 'end') ? -8 : 8;
+        var ly = xy[1] + (c.ld != null ? c.ld : 4);
+        svg += '<circle class="' + (c.o ? 'city-o' : 'city') + '" cx="' + xy[0].toFixed(1) + '" cy="' + xy[1].toFixed(1) + '" r="' + (c.o ? 5 : 3.5) + '"/>';
+        svg += '<text class="label' + (c.o ? ' label-o' : '') + '" x="' + (xy[0] + dxl).toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '">' + c.n + '</text>';
+      });
+      svg += '</svg>';
+      mapEl.innerHTML = svg;
+      var arcEls = mapEl.querySelectorAll('.arc');
+      Array.prototype.forEach.call(arcEls, function (p, i) {
+        var len = p.getTotalLength();
+        p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+        p.style.transition = 'stroke-dashoffset 1.2s ease ' + (i * 0.18).toFixed(2) + 's';
+      });
+      function drawArcs() { Array.prototype.forEach.call(arcEls, function (p) { p.style.strokeDashoffset = '0'; }); }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) { if (en.isIntersecting) { drawArcs(); io.disconnect(); } });
+        }, { threshold: 0.2 });
+        io.observe(mapEl);
+      } else { setTimeout(drawArcs, 500); }
+    }
   })();
   </script>
 
