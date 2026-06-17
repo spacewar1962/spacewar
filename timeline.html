@@ -79,9 +79,24 @@
     .tl-event.up .tl-stem { bottom:50%; height:30px; }
     .tl-event.down .tl-stem { top:50%; height:30px; }
 
+    /* the ddp / dfw strain split: ships sit on parallel branch lines */
+    .tl-event.strand-top .tl-ship { top:calc(50% - 64px); }
+    .tl-event.strand-bottom .tl-ship { top:calc(50% + 64px); transform:translate(-50%,-50%) rotate(180deg); }
+    .tl-event.strand-top:hover .tl-ship { transform:translate(-50%,-50%) scale(1.28); }
+    .tl-event.strand-bottom:hover .tl-ship { transform:translate(-50%,-50%) rotate(180deg) scale(1.28); }
+    .tl-event.strand-top .tl-stem { bottom:calc(50% + 64px); height:30px; }
+    .tl-event.strand-bottom .tl-stem { top:calc(50% + 64px); height:30px; }
+    .tl-event.strand-top .tl-card { bottom:calc(50% + 94px); top:auto; }
+    .tl-event.strand-bottom .tl-card { top:calc(50% + 94px); bottom:auto; }
+    .tl-event.strand-top .tl-year { top:calc(50% - 64px); transform:translate(-50%, -1.9rem); }
+    .tl-event.strand-bottom .tl-year { top:calc(50% + 64px); transform:translate(-50%, 1.1rem); }
+    .tl-fork { position:absolute; z-index:0; overflow:visible; }
+    .tl-fork path { fill:none; stroke:rgba(108,242,255,0.7); stroke-width:2; filter:drop-shadow(0 0 5px rgba(108,242,255,0.5)); }
+
     .tl-card { position:absolute; left:50%; transform:translateX(-50%); width:248px; box-sizing:border-box;
-      background:linear-gradient(180deg, rgba(7,11,20,0.96), rgba(7,11,20,0.92)); border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(17,28,48,0.98), rgba(11,19,34,0.98)); border:1px solid rgba(120,200,255,0.4);
       border-top:2px solid var(--hue,#6cf2ff); border-radius:5px; padding:0.7rem 0.8rem; z-index:2;
+      box-shadow:0 6px 20px rgba(0,0,0,0.6), inset 0 0 18px rgba(108,242,255,0.04);
       transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease; }
     .tl-event.up .tl-card { bottom:calc(50% + 30px); }
     .tl-event.down .tl-card { top:calc(50% + 30px); }
@@ -196,10 +211,14 @@
         links:[{l:'The people',h:'people.html#kotok'}] },
       { y:'1962', date:'24 Sep 1962', cat:'mit', t:'Version 3.1', b:'The standard version, patches consolidated; the most widely preserved and emulated.',
         links:[{l:'Text',h:'sources/spacewar-3.1-24sep1962.txt',x:1},{l:'Versions',h:'code.html'}] },
-      { y:'1963', date:'Feb 1963', cat:'mit', t:'The 4.x generation', b:'Two strains fork at MIT: Preonas’s ddp 4.0 and the dfw 4.1, with hardware multiply and floating-point gravity.',
-        links:[{l:'Versions',h:'code.html'}] },
-      { y:'1963', date:'May–Jul 1963', cat:'mit', t:'4.2 → 4.8', b:'Score displays, twin-star views, a dual-console build, and finally 4.8, the last classic MIT version.',
-        links:[{l:'Versions',h:'code.html'}] },
+      { y:'1963', date:'2 Feb 1963', cat:'mit', strand:'ddp', t:'4.0 · the ddp strain', b:'Preonas’s base of the whole 4.x family: hardware multiply/divide and floating-point gravity.',
+        links:[{l:'Text',h:'sources/spacewar-4.0-2feb1963-(Morris).txt',x:1},{l:'Versions',h:'code.html'}] },
+      { y:'1963', date:'20 Feb 1963', cat:'mit', strand:'dfw', t:'4.1 · the dfw strain', b:'The dfw strain forks from 4.0: a dotted central sun and a major code reorganisation. Whose work "dfw" was is still unknown.',
+        links:[{l:'Text',h:'sources/spacewar-4.1-4.2a-feb1963-dfw-(Russell).txt',x:1},{l:'Versions',h:'code.html'}] },
+      { y:'1963', date:'May 1963', cat:'mit', strand:'ddp', t:'4.2 – 4.4 (ddp)', b:'Preonas adds the on-screen score, a twin-star subjective view, and a dual-console build.',
+        links:[{l:'Text',h:'sources/spacewar-4.2-11may1963-(Morris).txt',x:1},{l:'Versions',h:'code.html'}] },
+      { y:'1963', date:'24 Jul 1963', cat:'mit', strand:'dfw', t:'4.8 (dfw)', b:'The last classic MIT version, the score display reworked by Samson; the two strains end here.',
+        links:[{l:'Text',h:'sources/spacewar-4.8-pt1-24jul1963.txt',x:1},{l:'Versions',h:'code.html'}] },
       { y:'1963', date:'1963', cat:'port', t:'First port: PDP-4', b:'Spacewar leaves the PDP-1 for the first time, rebuilt at the University of Michigan.',
         links:[{l:'The long journey',h:'code.html#long-journey'}] },
       { y:'1964', date:'1964', cat:'port', t:'Stanford, PDP-6', b:'Steve Russell carries the game west to Stanford, where it will find a long second home.',
@@ -242,9 +261,13 @@
     var scroll = document.getElementById('tlScroll');
 
     EVENTS.forEach(function (e, i) {
-      var dir = (i % 2 === 0) ? 'up' : 'down';
       var ev = document.createElement('div');
-      ev.className = 'tl-event ' + dir;
+      if (e.strand) {
+        ev.className = 'tl-event strand-' + (e.strand === 'ddp' ? 'top' : 'bottom');
+        ev.setAttribute('data-strand', e.strand);
+      } else {
+        ev.className = 'tl-event ' + ((i % 2 === 0) ? 'up' : 'down');
+      }
       ev.setAttribute('data-cat', e.cat);
       ev.style.setProperty('--hue', 'var(' + CAT[e.cat] + ')');
       ev.style.setProperty('--d', (0.45 + i * 0.03).toFixed(2) + 's');
@@ -267,30 +290,64 @@
       track.appendChild(ev);
     });
 
-    // Draw the spine first, then land the ships on it
+    // ---- Spine: draw it first, fork at the ddp/dfw split, then land the ships ----
+    var SVGNS = 'http://www.w3.org/2000/svg';
     var section = document.querySelector('.tl');
-    var line = document.createElement('div');
-    line.className = 'tl-line';
-    track.insertBefore(line, track.firstChild);
-    function placeLine(animate) {
-      if (window.innerWidth > 760) {
-        line.style.left = '0'; line.style.top = '50%'; line.style.height = '2px'; line.style.marginTop = '-1px';
-        var full = track.scrollWidth + 'px';
-        if (animate) {
-          line.style.transition = 'none'; line.style.width = '0px';
-          void line.offsetWidth;
-          line.style.transition = 'width .9s cubic-bezier(.2,.7,.2,1)';
-          line.style.width = full;
-        } else {
-          line.style.transition = 'none'; line.style.width = full;
-        }
-      } else {
-        line.style.transition = 'none'; line.style.left = '7px'; line.style.top = '0';
-        line.style.height = '100%'; line.style.width = '2px'; line.style.marginTop = '0';
-      }
+    var COLW = 300, PADL = 16, DY = 64;
+    var spineEls = [];
+    function seg(x, w, y, vertical) {
+      var d = document.createElement('div');
+      d.className = 'tl-line';
+      d.style.left = x + 'px'; d.style.top = y + 'px';
+      if (vertical) { d.style.width = '2px'; d.style.height = '100%'; d.style.marginTop = '0'; d._w = null; }
+      else { d.style.width = w + 'px'; d.style.height = '2px'; d.style.marginTop = '-1px'; d._w = w; }
+      track.appendChild(d); spineEls.push(d); return d;
     }
-    placeLine(true);
-    window.addEventListener('resize', function () { placeLine(false); });
+    function buildSpine() {
+      spineEls.forEach(function (el) { el.remove(); }); spineEls = [];
+      if (window.innerWidth <= 760) { seg(7, 0, 0, true); return; }
+      var totalW = track.scrollWidth, H = track.offsetHeight, cy = H / 2;
+      var strains = [];
+      Array.prototype.forEach.call(track.querySelectorAll('.tl-event'), function (ev, i) {
+        if (ev.getAttribute('data-strand')) strains.push(i);
+      });
+      if (!strains.length) { seg(0, totalW, cy); return; }
+      var fi = strains[0], li = strains[strains.length - 1];
+      var forkX = PADL + fi * COLW, mergeX = PADL + (li + 1) * COLW, W = mergeX - forkX;
+      seg(0, forkX, cy);
+      seg(mergeX, totalW - mergeX, cy);
+      var svg = document.createElementNS(SVGNS, 'svg');
+      svg.setAttribute('class', 'tl-fork');
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.style.left = forkX + 'px'; svg.style.top = '0'; svg.style.width = W + 'px'; svg.style.height = H + 'px';
+      [-1, 1].forEach(function (sign) {
+        var y = cy + sign * DY;
+        var p = document.createElementNS(SVGNS, 'path');
+        p.setAttribute('d', 'M0 ' + cy + ' C36 ' + cy + ' 20 ' + y + ' 64 ' + y + ' H ' + (W - 64) + ' C ' + (W - 20) + ' ' + y + ' ' + (W - 36) + ' ' + cy + ' ' + W + ' ' + cy);
+        svg.appendChild(p);
+      });
+      track.appendChild(svg); spineEls.push(svg);
+    }
+    function drawSpine() {
+      spineEls.forEach(function (el) {
+        if (el.tagName.toLowerCase() === 'svg') {
+          Array.prototype.forEach.call(el.querySelectorAll('path'), function (p) {
+            var len = p.getTotalLength();
+            p.style.transition = 'none'; p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+            void p.getBoundingClientRect();
+            p.style.transition = 'stroke-dashoffset 1s ease .3s'; p.style.strokeDashoffset = '0';
+          });
+        } else if (el._w != null) {
+          var w = el._w;
+          el.style.transition = 'none'; el.style.width = '0px';
+          void el.offsetWidth;
+          el.style.transition = 'width .9s cubic-bezier(.2,.7,.2,1)'; el.style.width = w + 'px';
+        }
+      });
+    }
+    try { buildSpine(); drawSpine(); } catch (err) { try { buildSpine(); } catch (e2) {} }
+    var rt;
+    window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(buildSpine, 200); });
     requestAnimationFrame(function () { requestAnimationFrame(function () { if (section) section.classList.add('drawn'); }); });
     setTimeout(function () { if (section) section.classList.add('drawn'); }, 1400);
 
