@@ -68,12 +68,12 @@
       background:rgba(108,242,255,0.7); box-shadow:0 0 9px rgba(108,242,255,0.5), 0 0 2px rgba(108,242,255,0.95); }
 
     /* the central sun: a vector sunburst the timeline scrolls past, like the game's gravity well */
-    .tl-sun { position:absolute; left:50%; top:50%; width:62px; height:62px; transform:translate(-50%,-50%); z-index:0; pointer-events:none;
-      animation:tl-sun-pulse 2.6s ease-in-out infinite alternate; }
-    .tl-sun svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 8px rgba(108,242,255,0.7)); }
-    .tl-sun line { stroke:#6cf2ff; stroke-width:1.4; vector-effect:non-scaling-stroke; }
-    .tl-sun .core { fill:#eaf6ff; }
-    @keyframes tl-sun-pulse { from{opacity:0.78; transform:translate(-50%,-50%) scale(0.9) rotate(0deg)} to{opacity:1; transform:translate(-50%,-50%) scale(1.08) rotate(9deg)} }
+    .tl-sun { position:absolute; left:50%; top:10%; width:56px; height:56px; transform:translate(-50%,-50%); z-index:0; pointer-events:none;
+      animation:tl-sun-pulse 3s ease-in-out infinite alternate; }
+    .tl-sun svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 5px rgba(108,242,255,0.4)); }
+    .tl-sun line { stroke:#6cf2ff; stroke-width:1.3; vector-effect:non-scaling-stroke; }
+    .tl-sun .core { fill:#cfe8ff; }
+    @keyframes tl-sun-pulse { from{opacity:0.26; transform:translate(-50%,-50%) scale(0.92) rotate(0deg)} to{opacity:0.5; transform:translate(-50%,-50%) scale(1.06) rotate(8deg)} }
     @media (max-width:760px) { .tl-sun { display:none; } }
 
     .tl-stage { position:relative; }
@@ -164,6 +164,24 @@
     .tl-map .city-o { fill:#ffce7a; }
     .tl-map .label { fill:var(--phosphor-dim); font-family:var(--mono); font-size:11px; letter-spacing:0.3px; }
     .tl-map .label-o { fill:var(--bright); }
+    .tl-map .arc.ret { stroke:rgba(108,242,255,0.6); }
+    .tl-map .arc.sel { stroke:#ffce7a; stroke-width:2.8; filter:drop-shadow(0 0 6px rgba(255,206,122,0.9)); }
+    .tl-map .arcg .arc.ret.sel { stroke:#6cf2ff; filter:drop-shadow(0 0 6px rgba(108,242,255,0.9)); }
+    .tl-map .hit { fill:none; stroke:transparent; stroke-width:16; pointer-events:stroke; cursor:pointer; }
+    .tl-map .fship { fill:#bfe4ff; }
+    .tl-map .ytag { fill:#cfe8ff; font-family:var(--mono); font-size:9px; }
+    .tl-map-replay { position:absolute; top:0.5rem; right:0.5rem; z-index:5; font-family:var(--mono); font-size:0.58rem; letter-spacing:0.08em;
+      text-transform:uppercase; padding:0.3rem 0.6rem; border:1px solid var(--line); border-radius:4px; background:rgba(7,11,20,0.82); color:var(--phosphor); cursor:pointer; transition:border-color .15s ease, color .15s ease; }
+    .tl-map-replay:hover { border-color:#6cf2ff; color:var(--bright); }
+    .tl-map-card { position:absolute; left:0.6rem; bottom:0.6rem; max-width:280px; z-index:6; display:none;
+      background:linear-gradient(180deg, rgba(17,28,48,0.97), rgba(11,19,34,0.97)); border:1px solid rgba(120,200,255,0.42); border-radius:5px;
+      padding:0.6rem 0.7rem; box-shadow:0 6px 20px rgba(0,0,0,0.6); }
+    .tl-map-card.show { display:block; }
+    .tl-map-card-h { font-family:var(--mono); font-weight:700; font-size:0.74rem; color:var(--bright); margin:0 0 0.3rem; }
+    .tl-map-card-h span { color:#ffce7a; }
+    .tl-map-card-b { font-size:0.72rem; line-height:1.45; color:var(--phosphor-dim); margin:0 0 0.4rem; }
+    .tl-map-card a { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.04em; text-transform:uppercase; color:#6cf2ff; text-decoration:none; }
+    .tl-map-card a:hover { color:var(--bright); }
 
     @media (max-width:760px) {
       .tl-scroll { overflow:visible; scroll-snap-type:none; padding-left:0.3rem; }
@@ -515,64 +533,92 @@
       sunEl.innerHTML = '<svg viewBox="-30 -30 60 60" aria-hidden="true">' + spikes + '<circle class="core" cx="0" cy="0" r="2.4"/></svg>';
     }
 
-    // ---- The journey map: arcs from MIT to each site, classic "nuclear curve" style ----
+    // ---- The journey map: arcs launch one by one with a flyer + year tag; clickable; replayable ----
     var mapEl = document.getElementById('tlMap');
     if (mapEl) {
       var MB = { lonMin: -128, lonMax: 8, latMin: 28, latMax: 56, W: 1000, H: 440 };
-      function pj(lat, lon) {
-        return [ (lon - MB.lonMin) / (MB.lonMax - MB.lonMin) * MB.W,
-                 (MB.latMax - lat) / (MB.latMax - MB.latMin) * MB.H ];
-      }
-      var CITIES = [
-        { n:'MIT', lat:42.36, lon:-71.09, o:1, la:'start', ld:-8 },
-        { n:'Michigan', lat:42.28, lon:-83.74, la:'end', ld:-8 },
-        { n:'Minnesota', lat:44.97, lon:-93.23, la:'end', ld:-6 },
-        { n:'Illinois', lat:40.11, lon:-88.23, la:'end', ld:15 },
-        { n:'Pittsburgh', lat:40.44, lon:-79.96, la:'start', ld:15 },
-        { n:'Penn', lat:39.95, lon:-75.19, la:'start', ld:5 },
-        { n:'Stanford', lat:37.43, lon:-122.17, la:'start', ld:4 },
-        { n:'Georgia Tech', lat:33.78, lon:-84.39, la:'start', ld:15 },
-        { n:'Cambridge, UK', lat:52.20, lon:0.12, la:'end', ld:-8 }
+      function pj(lat, lon) { return [ (lon - MB.lonMin) / (MB.lonMax - MB.lonMin) * MB.W, (MB.latMax - lat) / (MB.latMax - MB.latMin) * MB.H ]; }
+      var MIT = { n:'MIT', lat:42.36, lon:-71.09, la:'start', ld:-8 };
+      var DEST = [
+        { n:'Michigan', lat:42.28, lon:-83.74, year:'1963', la:'end', ld:-8, desc:'Rebuilt on a PDP-4, and later a DDP-224, at the University of Michigan.', link:'code.html' },
+        { n:'Stanford', lat:37.43, lon:-122.17, year:'1964', la:'start', ld:4, desc:'Steve Russell carried it west; Ralph Gorin later built the multi-player PDP-10 version.', link:'stanford.html' },
+        { n:'Pittsburgh', lat:40.44, lon:-79.96, year:'1965', la:'start', ld:15, desc:'Ported to a PDP-7 at the University of Pittsburgh by Russell Randshaw.', link:'code.html' },
+        { n:'Minnesota', lat:44.97, lon:-93.23, year:'1967', la:'end', ld:-6, desc:'Albert Kuhfeld rebuilt it on a CDC 3100, swapping hyperspace for invisibility.', link:'minnesota.html' },
+        { n:'Penn', lat:39.95, lon:-75.19, year:'1968', la:'start', ld:5, desc:'Duffin’s SPCWAR on a LINC-8 (DECUS L-39), the earliest firmly dated port.', link:'code.html' },
+        { n:'Cambridge, UK', lat:52.20, lon:0.12, year:'1968', la:'end', ld:-8, desc:'Peterson and Viner cloned it as Duel on the Cambridge PDP-7, the only documented overseas site.', link:'cambridge.html' },
+        { n:'Illinois', lat:40.11, lon:-88.23, year:'1969', la:'end', ld:15, desc:'Richard Blomme built a networked Spacewar on the PLATO system.', link:'code.html' },
+        { n:'Georgia Tech', lat:33.78, lon:-84.39, year:'1974', la:'start', ld:15, desc:'D. E. Wrege continued the SPCWAR line as v3 on a PDP-12.', link:'code.html' }
       ];
       var NA = [[49,-125],[40,-124],[34,-120.5],[32.5,-117],[31.5,-111],[31,-106],[29.5,-101],[29.7,-94.5],[30.3,-89],[29.5,-84],[28,-82.5],[28,-80.5],[32,-80],[35,-76],[39,-74],[41,-71],[43.5,-70],[45,-67],[47,-64.5],[49,-67],[49,-95],[49,-125]];
       var UK = [[50,-5.5],[50,-3],[50.7,-1],[51.4,1.4],[52.8,1.7],[53.5,0.3],[54.5,-0.5],[55.8,-2],[57.5,-2],[58.6,-3.5],[57.5,-5.8],[56,-5.5],[55,-5],[54,-3.5],[53.4,-3],[52.5,-4.2],[51.6,-5.2],[50,-5.5]];
       function poly(pts) { return pts.map(function (p, i) { var xy = pj(p[0], p[1]); return (i ? 'L' : 'M') + xy[0].toFixed(1) + ' ' + xy[1].toFixed(1); }).join(' ') + ' Z'; }
+      var pM = pj(MIT.lat, MIT.lon);
+      var ARCS = [];
+      DEST.forEach(function (c) {
+        var p2 = pj(c.lat, c.lon), mx = (pM[0] + p2[0]) / 2, my = (pM[1] + p2[1]) / 2, dx = p2[0] - pM[0], dy = p2[1] - pM[1], lift = Math.max(30, Math.sqrt(dx * dx + dy * dy) * 0.3);
+        ARCS.push({ d:'M' + pM[0].toFixed(1) + ' ' + pM[1].toFixed(1) + ' Q ' + mx.toFixed(1) + ' ' + (my - lift).toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1), year:c.year, desc:c.desc, link:c.link, label:'MIT → ' + c.n });
+      });
+      (function () { var s = pj(37.43, -122.17), mx = (s[0] + pM[0]) / 2, my = (s[1] + pM[1]) / 2, dx = pM[0] - s[0], dy = pM[1] - s[1], lift = Math.max(30, Math.sqrt(dx * dx + dy * dy) * 0.3);
+        ARCS.push({ ret:1, d:'M' + s[0].toFixed(1) + ' ' + s[1].toFixed(1) + ' Q ' + mx.toFixed(1) + ' ' + (my + lift).toFixed(1) + ' ' + pM[0].toFixed(1) + ' ' + pM[1].toFixed(1), year:'1976', label:'Stanford → MIT', desc:'The idea returned to MIT: the GT40 vector-display version (Waters & Billmers, c.1976) was inspired by Gorin’s Stanford Spacewar.', link:'mit-ai.html' }); })();
       var svg = '<svg viewBox="0 0 ' + MB.W + ' ' + MB.H + '" preserveAspectRatio="xMidYMid meet">';
       for (var la = 30; la <= 55; la += 10) { var gy = pj(la, 0)[1]; svg += '<line class="grid" x1="0" y1="' + gy.toFixed(1) + '" x2="' + MB.W + '" y2="' + gy.toFixed(1) + '"/>'; }
       for (var lo = -120; lo <= 0; lo += 20) { var gx = pj(0, lo)[0]; svg += '<line class="grid" x1="' + gx.toFixed(1) + '" y1="0" x2="' + gx.toFixed(1) + '" y2="' + MB.H + '"/>'; }
       svg += '<path class="coast" d="' + poly(NA) + '"/><path class="coast" d="' + poly(UK) + '"/>';
-      var p1 = pj(CITIES[0].lat, CITIES[0].lon);
-      CITIES.forEach(function (c) {
-        if (c.o) return;
-        var p2 = pj(c.lat, c.lon);
-        var mx = (p1[0] + p2[0]) / 2, my = (p1[1] + p2[1]) / 2;
-        var dx = p2[0] - p1[0], dy = p2[1] - p1[1], dist = Math.sqrt(dx * dx + dy * dy);
-        var lift = Math.max(30, dist * 0.3);
-        svg += '<path class="arc" d="M' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + ' Q ' + mx.toFixed(1) + ' ' + (my - lift).toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1) + '"/>';
+      ARCS.forEach(function (a, i) {
+        svg += '<g class="arcg" data-i="' + i + '"><path class="arc' + (a.ret ? ' ret' : '') + '" d="' + a.d + '"/><path class="hit" d="' + a.d + '"/>'
+          + '<g class="flyer" style="display:none"><g class="fship"><path d="M0 -5 L3 5 L0 2.6 L-3 5 Z"/></g><text class="ytag" x="7" y="3.5">' + a.year + '</text></g></g>';
       });
-      CITIES.forEach(function (c) {
-        var xy = pj(c.lat, c.lon);
-        var anchor = c.la || 'start';
-        var dxl = (anchor === 'end') ? -8 : 8;
-        var ly = xy[1] + (c.ld != null ? c.ld : 4);
-        svg += '<circle class="' + (c.o ? 'city-o' : 'city') + '" cx="' + xy[0].toFixed(1) + '" cy="' + xy[1].toFixed(1) + '" r="' + (c.o ? 5 : 3.5) + '"/>';
-        svg += '<text class="label' + (c.o ? ' label-o' : '') + '" x="' + (xy[0] + dxl).toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '">' + c.n + '</text>';
+      [MIT].concat(DEST).forEach(function (c) {
+        var xy = pj(c.lat, c.lon), o = (c.n === 'MIT'), anchor = c.la || 'start', dxl = (anchor === 'end') ? -8 : 8, ly = xy[1] + (c.ld != null ? c.ld : 4);
+        svg += '<circle class="' + (o ? 'city-o' : 'city') + '" cx="' + xy[0].toFixed(1) + '" cy="' + xy[1].toFixed(1) + '" r="' + (o ? 5 : 3.5) + '"/>';
+        svg += '<text class="label' + (o ? ' label-o' : '') + '" x="' + (xy[0] + dxl).toFixed(1) + '" y="' + ly.toFixed(1) + '" text-anchor="' + anchor + '">' + c.n + '</text>';
       });
       svg += '</svg>';
-      mapEl.innerHTML = svg;
-      var arcEls = mapEl.querySelectorAll('.arc');
-      Array.prototype.forEach.call(arcEls, function (p, i) {
-        var len = p.getTotalLength();
-        p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
-        p.style.transition = 'stroke-dashoffset 1.2s ease ' + (i * 0.18).toFixed(2) + 's';
+      mapEl.innerHTML = '<div class="tl-map-svg">' + svg + '</div>'
+        + '<button class="tl-map-replay" id="tlMapReplay" type="button">↻ replay</button>'
+        + '<div class="tl-map-card" id="tlMapCard"></div>';
+      var svgEl = mapEl.querySelector('svg'), groups = svgEl.querySelectorAll('.arcg'), cardEl = document.getElementById('tlMapCard');
+      var items = [];
+      Array.prototype.forEach.call(groups, function (g) {
+        var path = g.querySelector('.arc'), len = path.getTotalLength();
+        path.style.strokeDasharray = len; path.style.strokeDashoffset = len;
+        items.push({ path:path, flyer:g.querySelector('.flyer'), fship:g.querySelector('.fship'), len:len });
       });
-      function drawArcs() { Array.prototype.forEach.call(arcEls, function (p) { p.style.strokeDashoffset = '0'; }); }
+      var gen = 0;
+      function resetMap() { items.forEach(function (it) { it.path.style.strokeDashoffset = it.len; it.flyer.style.display = 'none'; }); }
+      function animItem(it, myGen, done) {
+        it.flyer.style.display = ''; var start = null, dur = 1700;
+        function frame(ts) {
+          if (myGen !== gen) { it.flyer.style.display = 'none'; return; }
+          if (start === null) start = ts;
+          var p = Math.min(1, (ts - start) / dur), at = p * it.len;
+          it.path.style.strokeDashoffset = it.len * (1 - p);
+          var pt = it.path.getPointAtLength(at), pt2 = it.path.getPointAtLength(Math.min(it.len, at + 1.2));
+          var ang = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * 180 / Math.PI;
+          it.flyer.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ',' + pt.y.toFixed(1) + ')');
+          it.fship.setAttribute('transform', 'rotate(' + (ang + 90).toFixed(1) + ')');
+          if (p < 1) requestAnimationFrame(frame); else { it.flyer.style.display = 'none'; done(); }
+        }
+        requestAnimationFrame(frame);
+      }
+      function runSeq() {
+        gen++; var myGen = gen, qi = 0; resetMap();
+        function next() { if (myGen !== gen || qi >= items.length) return; animItem(items[qi], myGen, function () { qi++; setTimeout(next, 300); }); }
+        next();
+      }
+      function clearSel() { Array.prototype.forEach.call(svgEl.querySelectorAll('.arc'), function (p) { p.classList.remove('sel'); }); cardEl.classList.remove('show'); }
+      function selectArc(i) {
+        clearSel(); var a = ARCS[i]; items[i].path.classList.add('sel');
+        cardEl.innerHTML = '<p class="tl-map-card-h">' + a.label + ' <span>' + a.year + '</span></p><p class="tl-map-card-b">' + a.desc + '</p>' + (a.link ? '<a href="' + a.link + '">read more ›</a>' : '');
+        cardEl.classList.add('show');
+      }
+      Array.prototype.forEach.call(groups, function (g) { g.addEventListener('click', function () { selectArc(+g.getAttribute('data-i')); }); });
+      svgEl.addEventListener('click', function (ev) { if (!(ev.target.closest && ev.target.closest('.arcg'))) clearSel(); });
+      document.getElementById('tlMapReplay').addEventListener('click', runSeq);
       if ('IntersectionObserver' in window) {
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (en) { if (en.isIntersecting) { drawArcs(); io.disconnect(); } });
-        }, { threshold: 0.2 });
+        var io = new IntersectionObserver(function (entries) { entries.forEach(function (en) { if (en.isIntersecting) { runSeq(); io.disconnect(); } }); }, { threshold: 0.2 });
         io.observe(mapEl);
-      } else { setTimeout(drawArcs, 500); }
+      } else { setTimeout(runSeq, 500); }
     }
   })();
   </script>
