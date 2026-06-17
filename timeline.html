@@ -70,9 +70,9 @@
     /* the central sun: a vector sunburst the timeline scrolls past, like the game's gravity well */
     .tl-sun { position:absolute; left:50%; top:50%; width:62px; height:62px; transform:translate(-50%,-50%); z-index:0; pointer-events:none;
       animation:tl-sun-pulse 2.6s ease-in-out infinite alternate; }
-    .tl-sun svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 7px rgba(191,228,255,0.55)); }
-    .tl-sun line { stroke:#e6f3ff; stroke-width:1.4; vector-effect:non-scaling-stroke; }
-    .tl-sun .core { fill:#f2f9ff; }
+    .tl-sun svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 8px rgba(108,242,255,0.7)); }
+    .tl-sun line { stroke:#6cf2ff; stroke-width:1.4; vector-effect:non-scaling-stroke; }
+    .tl-sun .core { fill:#eaf6ff; }
     @keyframes tl-sun-pulse { from{opacity:0.78; transform:translate(-50%,-50%) scale(0.9) rotate(0deg)} to{opacity:1; transform:translate(-50%,-50%) scale(1.08) rotate(9deg)} }
     @media (max-width:760px) { .tl-sun { display:none; } }
 
@@ -98,7 +98,7 @@
       color:var(--hue,#6cf2ff); filter:drop-shadow(0 0 4px var(--hue,#6cf2ff)); transition:transform .18s ease; }
     .tl-ship { width:30px; height:30px; }
     .tl-ship path.tl-body { fill:var(--bg); stroke:currentColor; stroke-width:0.9; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
-    .tl-flame { fill:#ffce7a; stroke:none; opacity:0; transform-box:fill-box; transform-origin:top center; filter:drop-shadow(0 0 3px #ffce7a); }
+    .tl-flame { fill:currentColor; stroke:none; opacity:0; transform-box:fill-box; transform-origin:top center; filter:drop-shadow(0 0 3px currentColor); }
     .tl-event.burning .tl-flame { animation:tl-burn 0.1s steps(2, end) infinite; }
     @keyframes tl-burn { 0%{opacity:0.95; transform:scaleY(0.55) scaleX(0.9)} 50%{opacity:0.5; transform:scaleY(1.3) scaleX(1.05)} 100%{opacity:0.9; transform:scaleY(0.8)} }
     .tl-event.down .tl-ship { transform:translate(-50%,-50%) rotate(180deg); }
