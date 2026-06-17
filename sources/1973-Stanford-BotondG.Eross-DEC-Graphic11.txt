@@ -1,0 +1,2436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><link rel="stylesheet" href="/css/u8.css" /><meta charset="utf-8" />
+<title>SW.P11[11,BO] - www.SailDart.org</title>
+</head>
+<body id="u8body">
+<div id="tagline">perm filename SW.P11[11,BO]  blob <a href="SW.P11[11,BO]_blob">sn#154423</a> filedate 1975-04-11 generic text, type C, neo UTF8</div>
+<pre id="u8lump">COMMENT ⊗   VALID 00051 PAGES
+C REC  PAGE   DESCRIPTION
+C00001 00001
+C00005 00002	.TITLE SPCWAR	GT40 SPACEWAR PROGRAM
+C00007 00003	OPERATING INSTRUCTIONS AND RULES OF THE GAME
+C00014 00004	PROGRAM ORIGIN, ACCUMULATOR DEFINITIONS, BASIC PARAMETERS
+C00017 00005	DESCRIPTION OF THE UNIVERSE
+C00020 00006	FURTHER DESCRIPTION OF THE UNIVERSE
+C00025 00007	HANDY DANDY MACROS
+C00027 00008	PROGRAM ORGANIZATION
+C00032 00009	RESTART INITIALIZATION
+C00034 00010		New hand - set the stars in the sky.
+C00036 00011		Set up ships
+C00039 00012		Lay mines
+C00043 00013		Initialize torp list, and count down.
+C00045 00014	MAIN PROGRAM (LEVEL 0)
+C00047 00015	CLOCK LEVEL AND LEVEL-SHIFTING
+C00049 00016	MOTION ROUTINE (LEVEL 3)
+C00051 00017		DEAD SHIP MOTION
+C00053 00018		Dead mine
+C00054 00019		TORPEDO MOTION
+C00056 00020		LIVE SHIP MOTION
+C00058 00021			TORPEDO LAUNCHING
+C00062 00022		GRAVITY CALCULATION FOR SHIPS AND MINES
+C00065 00023		POSITION CALCULATIONS... SHIPS, MINES, TORPS.
+C00067 00024		SHIP ROTATION ROUTINE
+C00071 00025			ROTATION CONTINUED
+C00074 00026		COMPUTE SQUARE OF DISTANCE FROM SUN
+C00075 00027	PROXIMITY CHECK (LEVEL 2)
+C00078 00028		Collision test 1 - take care of non-ships.
+C00081 00029		Collision test 2 - ship involved.
+C00084 00030			Ship's detailed collision outline
+C00086 00031			Distance calculation
+C00088 00032	MARK AN OBJECT FOR EXPLOSION
+C00090 00033	MAKE AN EXPLOSION (LEVEL 2)
+C00092 00034		SHIP EXPLODING
+C00094 00035		Mine exploding
+C00095 00036	SUBROUTINES:	two-at-a-time multiplier
+C00098 00037			Single multiplier
+C00102 00038			El Cheapo binary-to-ASCII converter.
+C00103 00039			Divide routine (BLECH!)
+C00104 00040			Square-root routine
+C00108 00041			Pseudo-random number generator
+C00109 00042	COUNT-DOWN HACK FOR STARTUP.
+C00111 00043	THE DISPLAY LIST
+C00113 00044	SHIP DESCRIPTION TABLES
+C00117 00045	SHIP #2 AND TORPEDO DESCRIPTIONS.
+C00119 00046	EXPLOSION DRAWINGS
+C00121 00047	DATA AREA - MISCELLANEOUS STUFF
+C00123 00048	POINT TABLE FOR MAKING THE SHIP DRAWINGS
+C00127 00049	ONE-TIME ONLY INITIALIZATION - ROTATE VECTORS
+C00130 00050		Rotate the points in the ship drawings.
+C00132 00051		VECTOR ROTATE ROUTINE (FOR SETTING UP TABLES)
+C00134 ENDMK
+C⊗;
+.TITLE SPCWAR	GT40 SPACEWAR PROGRAM
+
+COMMENT⊗
+		COPYRIGHT 1973
+		by Botond G. Eross
+		Artificial Intelligence Project
+		Computer Science Department
+		Stanford University
+		Stanford, California 94305
+
+		(I've been reading too many DEC listings.)
+
+
+	This is yet another adaptation of the infamous traditional
+PDP-1 Spacewar game, this time for the DEC Graphic 11.  The inspiration
+for this version came from Ralph Gorin's Stanford A. I. Project PDP-10
+Spacewar.  However, the opinions expressed in this program are the
+author's alone and do not necessarily represent those of the Intergalactic
+Olympic Committee, the Spacewar League of America, or the management.
+
+	A warning to the export user of this program: the language in
+which it is written is not standard PAL-11, but a modified version which
+I kludged up from an obsolete assembler.  This source file needs to be
+assembled together with my own file of PDP-11 definitions.
+
+
+					Bo Eross
+					Stanford A. I. Project
+					August-September 1973
+⊗
+;OPERATING INSTRUCTIONS AND RULES OF THE GAME
+
+COMMENT⊗
+
+Program starting address is 1000.  Halting the program and restarting
+it at this location will reset the scores to zero.
+
+The game uses the display screen as the playing field.  The screen
+represents a finite two-dimensional universe with a sun at the center
+and a (purely decorative) background of stars.  The sun exerts a
+gravitational pull which varies by the inverse-square law that we all
+know and love.  The universe is toroidal, so that when an object moves
+off one side of the screen it appears on the opposite side.
+
+The two players have spaceships which they may maneuver around on the
+screen.  Each ship can fire deadly torpedoes out of a launching tube
+in its nose.  The object of the game is to shoot your opponent down
+and prevent him from doing the same to you.
+
+A "hand" of spacewar starts with the screen empty except for a five-
+second countdown that shows in the center of the screen.  When the
+countdown reaches zero, the universe appears with the ships in their
+starting positions: player 1 at the bottom left and player 2 at top
+right.  The "hand" is over when at least one ship has been blown up
+and the other (if he's still around) is clearly a survivor.  At the
+beginning of a hand, each player has 50 torpedoes in his ship's stores;
+if he runs out, that's all.  A count of the number of torps remaining
+appears near each player's starting position.  The player's score
+shows in the same area.  The score is tallied at the end of each hand
+and accumulates throughout the game, which ends when both players
+agree that they've had enough.
+
+The controls for the ships are the front-panel data switches on the
+PDP-11.  Pushing a switch up starts an operation, down stops it.
+However, it takes time to reload a torpedo tube, so there is a
+noticeable delay after firing before you can fire again.  A bright
+spot appears in the nose of each ship when its torp tube is loaded.
+The switches are assigned according to this table:
+
+	 Player		Switch
+	1	2	Function
+
+Switch	15	3	Rotate counterclockwise (turn left)
+Number:	14	2	Rotate clockwise (turn right)
+	12	1	Fire the engine (accelerate forward)
+	11	0	Shoot a torpedo.
+
+The ships' motions are subject to the laws of Newtonian mechanics:
+you keep going the way you were headed until something happens to
+change your speed or direction.  The things that change your velocity
+are the sun's gravity and firing your thruster.  Rotation is at a
+constant angular velocity.  The "left" and "right" switches cancel
+each other if they are both on.
+
+The torps are really Photon Torpedoes, which have no mass.  They are
+therefore immune to gravitation (go in a straight line) and they can
+pass through the sun.  A torp does not necessarily travel in the
+direction you aimed it, however.  Its velocity depends on which way
+the ship's nose was pointed and which way it was travelling at
+launch time.  Thus, if you fire a torp straight back along your path
+and you're travelling at the right speed, the torp will stand still.
+Each torpedo has a fixed lifetime.  If it hasn't hit anything when
+its time has run out, it will explode harmlessly.
+
+Just to add a little spice to the game, there are four "space mines".
+The mines appear at the beginning of each hand, in randomly-determined
+positions and approximately circular orbits about the sun.  If anything
+hits a mine, it will be destroyed.  You can destroy mines by hitting
+them with torpedoes.  You can also shoot torpedoes down if your aim
+is good.  The sun is another hazard:  it destroys anything that
+approaches it too closely, except torpedoes.  The final hazard is the
+other ship.  If the two collide, both explode.  This gives you a last
+resort if you've used up all of your torps:  you can try to take your
+opponent down with you.
+
+Scoring is as follows: one point for shooting your opponent, one point
+for surviving to the end of the hand, and minus one point if you
+manage to shoot yourself.  The hand ends two seconds after the first
+ship is destroyed unless some of that ship's torpedoes are still around.
+If they are, the hand continues until the last torp of the last-exploded
+ship has expired.  So beware!  It is not enough to finish your opponent
+off.  You must continue to defend yourself against the cruel universe.
+⊗
+;PROGRAM ORIGIN, ACCUMULATOR DEFINITIONS, BASIC PARAMETERS
+
+;ACCUMULATORS
+
+AC0	←%0	;Register names used generally
+MQ0	←%1
+AC1	←%2
+MQ1	←%3
+T0	←%4
+T1	←%5
+
+X	←AC0	;More obvious mnemonic names for position crunching.
+Y	←AC1
+ANG	←MQ0
+SHIP	←MQ1	;Nearly always points to a ship.
+MODL	←T0	;Location of the drawing teemplate.
+QUAD	←T1	;Quadrant of an angle.
+
+TYP	←MQ0	;Type of collision
+OBJ1	←SHIP	;Objects involved
+OBJ2	←T0
+DL	←T1	;Display list pointer for collision scanner.
+
+COS	←T0	;Used only in the one-time initialization.
+SIN	←T1
+
+;Parameters
+
+DEFSHP	←2	;Default number of ships
+MXSHIP	←2	;Max number of ships,
+DEFMIN	←4
+MXMINE	←4	;	mines,
+TRPLIM	←62	;Limit 50 torps per ship
+ATLIM	←"50	;Torp limit in ASCII.
+
+NSBRT	←6	;# of star brightness levels
+NSTARS	←10	;# of stars of each brightness.
+MXSBRT	←D.PNT+.INT7
+MNSBRT	←D.PNT+.INT2
+
+DBLDSP←1	;Use double-precision position, velocity, acceleration.
+
+XOFF	←.GXUL+1⊗&lt;-1>	;Screen position of center of sun.
+YOFF	←.GYUL+1⊗&lt;-1>
+
+MOTLVL	←3	;Priority level for MOTION
+PRXLVL	←2	;		for PROX
+EXPLVL	←2	;		for EXPLODE
+
+;DESCRIPTIONS OF OBJECTS (leagues, scaled to be furlongs,
+;				see the description of the universe)
+
+SHIPL←40⊗5		;Half-length of a ship
+SHIPW←10⊗5		;Half-width of a ship
+OVALR←&lt;SHIPW/2+SHIPL>*2	;"Radius" of a ship's colision oval.
+
+MINER←10⊗5		;Radius of a mine
+TORPR←5⊗5		;Radius of a torp for torp-torp collisions
+
+COMMENT⊗	For collision purposes, a ship is defined to be an ellipse
+of width 2*SHIPW with foci at SHIPL from its center.
+⊗
+
+.←1000
+PDL:		;THIS SHOULD BE ENOUGH ROOM FOR THE STACK.
+START:	JMP @(PC)+
+STRTAD:	.WORD CRANKUP	;Gets changed after the one-time setup.
+;DESCRIPTION OF THE UNIVERSE
+
+COMMENT⊗	DEFINITIONS OF PHYSICAL UNITS
+
+LENGTH:	The Astrological Unit (AU) is the fundamental unit of distance,
+	defined as the width of the displayable portion of the GT40 screen.
+
+	The Furlong (FL) is 2↑-15 AU.  This is the shortest useful distance
+	in our universe, though in order to avoid roundoff errors some things
+	are kept in fractional furlongs.
+
+	The League (L) is 2↑-10 AU.  This is the spacing of resolvable
+	points in the Display Processor's world.
+
+TIME:	The fundamental unit is the Tick, 1/60 second, which is the frequency
+	of the KW-11L clock.
+
+	The Fortnight is an integer multiple of ticks, chosen to be as small
+	as possible while still guaranteeing that the motion calculations
+	can run to completion in this time.
+
+ANGLE:	The Semiwheel (SW), defined as 1/2 of a full revolution, is the
+	fundamental unit.
+
+	The Hemi-demi-semiwheel (HW) is 2↑-15 SW.  This is the smallest
+	conceivable increment of revolution in our quantized universe.
+	In fact, the quantum of rotation is 2↑9 HW or 2↑-6 SW:  That is
+	the spacing of the entries in the sin-cos table, and should be
+	fine enough for all practical purposes.
+
+
+		FUNDAMENTAL PHYSICAL CONSTANTS
+
+G	The Sun's gravitational constant, picked out of a hat to make
+	reasonable-looking orbits.  Units are AU↑3/FN↑2.
+
+A	The acceleration of a ship at full thrust, arbitrarily chosen to
+	maximize the aesthetic appeal of the dynamics of the game.  Units
+	are AU/FN↑2.
+
+R	The rotation rate of a ship being steered left or right, chosen in
+	a manner similar to A.  Units are SW/FN.
+
+T	The launch speed of a torpedo relative to the launching ship.
+	Units are AU/FN.
+
+S	The radius of the sun; the minimum radius of an orbit.  Picked
+	with an eye toward maintaining as much precision as possible in
+	the fixed-point calculations that determine the acceleration
+	due to gravity.
+⊗
+;FURTHER DESCRIPTION OF THE UNIVERSE
+COMMENT⊗
+
+		IMPORTANT NOTATIONAL NOTE
+
+The reason behind the above choice of units is to simplify, as much as
+possible, the calculations.  One may consider a position measurement to be
+either in integral furlongs or in fractional astrological units (with the
+radix point just right of the sign bit); the binary representation is the
+same in either case.  Similarly, angles can be thought of as fractional
+semiwheels or integral hemi-demi-semiwheels.  The reason for the choice
+of semiwheels instead of degrees or radians is that angular computations
+automatically wrap around the full circle from 2↑15-1 to -2↑15 hemi-demi-
+semiwheels (i.e., from π-ε to -π).
+
+	Because this machine lacks even multiply and divide hardware,
+not to mention floating point arithmetic, we have to make do with scaled
+integer operations.  The multiply routines assume that the operands are
+signed fractions with 15 bits of precision, and they return a 30-bit
+fraction with the implied radix point right after the sign.  To make life
+easier, there is a semi-automatic scaling system.  For each variable that
+is subject to some scaling operation, there is defined a symbol which is
+the scaling of that variable.  The SCALE macro can be invoked using these
+symbols to get the results of an operation in the right position.  Certain
+important parameters, such as the gravitational constant, can be patched
+in core to alter the physics of the game, but if the desired change requires
+a change in scaling the program must be recompiled.  The literal meaning
+of the scale of a variable is the position of the binary point to the right
+of bit 15: that is, a scale of 0 means the point is between bits 15 and 14;
+a scale of 1 means between 14 and 13.
+⊗
+;DEFINITION OF PHYSICAL CONSTANTS
+
+.MACR FPCON XSYM,SYM,XVAL,VAL	;Define a pseudo-floating constant.
+	  .EXP←XVAL
+	  .FRA←VAL
+	  NORM .EXP,.FRA
+XSYM	←.EXP
+SYM:	.WORD .FRA
+.ENDM
+
+.MACR NORM EXP,FRA		;Sub-macro to normalize.
+	    .IFNZ FRA∧100000
+	      EXP←EXP+1
+	      FRA←&lt;FRA+1>⊗&lt;-1>
+	    .ELSF Z FRA∧40000
+	      EXP←EXP-1
+	      FRA←FRA⊗1
+	      NORM EXP,FRA
+	    .ENDC
+.ENDM
+
+XTPFN←2
+TPFN←3			;3 ticks per fortnight
+
+TRPLIF	←1130/TPFN	;Torps live 10 seconds
+TRELOD	←132/TPFN	;It takes 1.5 seconds to reload.
+SHPTRP	←TRPLIF+TRELOD-1/TRELOD+1	;Max torps/ship
+MXTORP	←SHPTRP*MXSHIP	;Overall maximum no. of torps.
+
+;G = 1.5*2↑-23 au↑3/tick↑2
+	FPCON XG,G,-30+17,3*TPFN*TPFN
+
+;A = 1.5*2↑-20 au/tick↑2
+	FPCON XA,A,-25+17,3*TPFN*TPFN
+
+XR←-10			;R = 1.5*2↑-8 sw/tick
+R:140000⊗XR*TPFN	;scaled to add directly to heading.
+
+;T = 1.25*2↑-10 au/tick
+	FPCON XT,T,-14+17,5*TPFN
+
+XS←-6			;S = 2↑-6 au
+S: .WORD 100000⊗XS	;Scaled to add directly to distances.
+SQ: .WORD 100000⊗&lt;2*XS>	;S↑2 (for minimum orbit distance test)
+
+XD←0			;Scaling of distances
+XID←-XS			;Scaling of inverse distance
+
+XGD←XG+XID		;Scaling of G/D for mine velocity calculation,
+.IFNZ XGD∧1		;has to be even for the square root.
+  XGD←XGD+1
+.ENDC
+;HANDY DANDY MACROS
+
+;SCALE &lt;CURRENT SCALING>,&lt;DESIRED SCALING>
+;SCALE operates on (AC0,MQ0).  SCALE1 does (AC1,MQ1).
+
+.MACR SCALE CUR,DES
+	  .SC←&lt;CUR>-&lt;DES>
+	  .IFNZ .SC
+	    .IFG .SC
+	      .REPT .SC
+		ASL MQ0
+		ROL AC0
+	      .ENDR
+	    .ELSE
+	      .SC←0-.SC
+	      .REPT .SC
+		ASR AC0
+		ROR MQ0
+	      .ENDR
+	    .ENDC
+	  .ENDC
+.ENDM
+
+.MACR SCALE1 CUR,DES
+	  .SC←&lt;CUR>-&lt;DES>
+	  .IFNZ .SC
+	    .IFG .SC
+	      .REPT .SC
+		ASL MQ1
+		ROL AC1
+	      .ENDR
+	    .ELSE
+	      .SC←0-.SC
+	      .REPT .SC
+		ASR AC1
+		ROR MQ1
+	      .ENDR
+	    .ENDC
+	  .ENDC
+.ENDM
+
+.MACR RNDAC AC
+	  ASL AC+1
+	  ADC AC
+.ENDM
+;PROGRAM ORGANIZATION
+COMMENT⊗
+
+The basic assumptions behind the way I chose to write this program
+are (1) it is extremely important to maintain a fine time resolution
+in order to do a decent simulation of orbits, and (2) it is not quite
+so important to do all of the calculations for collisions in real time
+since the time window during which objects may pass through each other
+is fairly broad.  Accordingly, the program is broken up into sections
+that operate at different levels of priority, using the PDP-11 interrupt
+structure as a framework.
+
+The core of this priority framework is the procedure SETPRI, which
+takes a priority level and a procedure address as arguments.  If the
+priority saved on the stack is lower than the given one, SETPRI changes
+the program's priority level and jumps to the procedure; otherwise it
+merely returns.  Thus an interrupt-level procedure can effectively
+generate a lower-level interrupt to get another procedure going if it
+is not already in progress.
+
+The highest priority is the short routine CLKSER which takes the clock
+interrupts.  This routine merely counts ticks until a fortnight has
+passed (only two, according to plan, but this quantity can easily be
+changed if it turns out to be necessary).  At the proper time, this
+routine activates MOTION.
+
+MOTION runs at priority 3 and does the real-time calculations for all
+orbits.  If it finds something coming too close to the sun, MOTION
+will mark the object as dead - otherwise, MOTION does not concern itself
+with collisions.  When this section has finished one fortnight's
+calculations, it starts PROX if that program is not already running.
+
+PROX runs at priority 2 to perform the tests for collisions.  It does
+an exhaustive check on every pair of objects, and allows objects that
+have been dead for less that 1/10 second to participate.  This procedure
+is not strictly necessary and may in fact be changed later to save
+some compute cycles, but it's a nice way to take care of the pornographic
+case where more than two things reach the same place at the same time.
+
+When an object (other than a torpedo) is found to be dead, the subroutine
+KILLIT marks it and enables the display halt interrupt.  The next time
+the display stops, EXPLODE scans the display list for just-killed objects.
+These things it re-draws as a starburst.  There are four stages in the
+death of an object: just killed, when KILLIT has marked it dead; exploding,
+when EXPLODE has made the burst pattern; the post-explosion fade (ships
+only), which gives a time delay after the next-to-last ship has exploded
+before starting a new game; and fully dead, when all traces of the object
+have been removed from the display list.  EXPLODE runs at priority 2,
+but takes precedence over PROX because the interrupt comes at BR4.
+⊗
+;RESTART INITIALIZATION
+
+PWROFF:
+RESTRT:	RESET		;Start here for a whole new game.
+	MOV #PDL,SP		;Set up stack and
+	MOV #PWROFF,PWR.V	;power-fail trap.
+	MOV (PC)+,@(PC)+
+	  PSWD 7
+	  PWR.V+2
+	CLR .PSW		;Priority 0.
+
+;Brand new game... set scores to 0.
+
+	MOV #DEFMIN,NMINES
+	MOV #DEFSHP,T1		;Default number of ships
+	MOV T1,NSHIPS
+	MOV #DLIST,AC0
+	MOV #DPYSCR,MQ0
+
+CLRSCR:	MOV #D.JMP,(AC0)+	;Display list jumps to score.
+	MOV MQ0,(AC0)+
+	ADD #DSCORE-DPYSCR-6,MQ0
+	MOV #"  ,(MQ0)+		;Display score ← 0
+	MOV #"  ,(MQ0)+
+	MOV #" 0,(MQ0)+
+	ADD #DSCEND-DSCORE,MQ0
+	MOV AC0,(MQ0)		;End of score - jump back to dpy list.
+	ADD #SCORE-DSCEND,MQ0
+	CLR (MQ0)		;Clear the real score.
+	ADD #SHPEND-SHPTAB+DPYSCR-SCORE,MQ0	;Move to next ship.
+	DEC T1
+	BGT CLRSCR
+
+	MOV AC0,DSHPNT		;Save pointer → first ship in dpy list.
+
+;Fall through.
+	;New hand - set the stars in the sky.
+
+NEWHND:	MOV #MXSBRT,AC1		;Begin with max brightness.
+	MOV #DSTARS,MQ1
+
+SETSTR:	MOV AC1,(MQ1)+		;Set point mode and brightness.
+	MOV #NSTARS,T1		;This many at each intensity.
+
+SETST1:	PUSHJ RANDOM		;Get a coordinate.
+	ASR MQ0			;Normalize to screen dimensions.
+	MOV MQ0,AC0
+	ASR AC0
+	ASR AC0
+	SUB AC0,MQ0
+  .REPT 5			;Convert to display units.
+	ASR MQ0
+  .ENDR
+	ADD #XOFF,MQ0
+	BIC #176000,MQ0
+	BIS #40000,MQ0		;Turn on the brightness bit,
+	MOV MQ0,(MQ1)+		;save as X location.
+
+	PUSHJ RANDOM		;Do the Y in a similar way.
+	ASR MQ0
+	MOV MQ0,AC0
+	ASR AC0
+	ASR AC0
+	SUB AC0,MQ0
+  .REPT 5
+	ASR MQ0
+  .ENDR
+	ADD #YOFF,MQ0
+	BIC #176000,MQ0
+	MOV MQ0,(MQ1)+
+
+	DEC T1			;Test for enough at this intensity.
+	BGT SETST1
+
+	SUB #.INT1-.INT0,AC1	;Go to next intensity.
+	CMP AC1,#MNSBRT
+	BGE SETSTR
+
+;Fall through.
+	;Set up ships
+
+	MOV DSHPNT,AC0		;→ dpy list.
+	CLR SWITCH
+	MOV NSHIPS,T1
+	MOV #TRPLFT,SHIP
+
+NXTSHP:	MOV #ATLIM,DTLFT-TRPLFT-2(SHIP)	;Display torp limit
+	MOV #TRPLIM,(SHIP)+		;and real torp limit.
+	CLR (SHIP)			;Reload timer
+	MOV INANG-RELTIM(SHIP),HEADING-RELTIM(SHIP)	;Heading
+	ADD #VELOCX-RELTIM,SHIP		;Skip over torp velocity,
+	MOV #&lt;POSITX-VELOCX>/2,T0	;nose, and thrust.
+
+CLRVEL:	CLR (SHIP)+		;Clear ship's velocity
+	DEC T0
+	BGT CLRVEL
+
+	MOV SHIP,AC1
+	ADD #INPOS-POSITX,AC1
+	MOV #&lt;TYPE-POSITX>/2,T0
+
+SETPOS:	MOV (AC1)+,(SHIP)+	;Set initial position.
+	DEC T0
+	BGT SETPOS
+
+	CLR (SHIP)+		;Clear status.
+	MOV AC0,(SHIP)+		;Set pointer back to dpy list.
+	MOV #D.JMP,(AC0)+	;Make dpy list jump to ship's
+	MOV SHIP,(AC0)+		;base address.
+
+	MOV SHIP,AC1		;Leave the base address alone.
+	MOV #D.PNT,(AC1)+	;Point mode instruction,
+	CLR (AC1)+		;X and
+	CLR (AC1)+		;Y coordinates for dpy.
+	MOV #D.SVEC+.INT6,(AC1)+;Start drawing - short vector
+	CLR (AC1)+		;torp tube,
+	CLR (AC1)+		;move to tail
+	MOV #D.SVEC+.INT6+.BLINK,(AC1)+	;Blinker for flame
+	CLR (AC1)+		;flame.
+	MOV #D.SVEC+.INT4+.NOBLINK,(AC1)+;Display back to normal.
+	MOV SHIP,MQ0
+	ADD #MODEL+3-BASE,MQ0	;Get address of model.
+
+DRWSHP:	MOV #40000,(AC1)+	;Set intensity bits for the model.
+	TSTB (MQ0)+
+	BEQ DRWEND		;A zero ends the drawing,
+	BPL DRWSHP		;positive means visible,
+	CLR -2(AC1)		;negative is invisible.
+	BR DRWSHP
+
+DRWEND:	MOV #D.JMP,-2(AC1)	;Finish up with a DJMP back to
+	MOV AC0,(AC1)		;the dpy list.
+	PUSH AC0
+	PUSH T1
+	MOV HEADING-BASE(SHIP),AC0	;Get the heading,
+	PUSHJ SHIPROT		;Go draw the ship.
+	POP T1
+	POP AC0
+	ADD #SHPEND-SHPTAB+TRPLFT-BASE,SHIP ;move to next ship.
+	DEC T1
+	BGT NXTSHP
+
+;Fall through.
+	;Lay mines
+
+	MOV AC0,DMIPNT		;Save pointers to mines in dpy list.
+	MOV #FREEST,SHIP
+	MOV NMINES,T1
+	BGT LAYMI0
+	JMP MINEND
+
+LAYMI0:	PUSH AC0		;Save display list pointer.
+LAYMIN:	MOV #2+&lt;2*DBLDSP>,T0
+LAYMI1:	CLR (SHIP)+		;Clear mine's velocity.
+	DEC T0
+	BGT LAYMI1
+
+	MOV #2,AC1
+LAYMI2:	PUSHJ RANDOM		;Make a random position.
+	ASR MQ0
+	MOV MQ0,(SHIP)+
+  .IFNZ DBLDSP
+	CLR (SHIP)+
+  .ENDC
+	DEC AC1
+	BGT LAYMI2
+	PUSHJ RANDOM		;Random direction for later.
+
+	MOV #2,(SHIP)+		;Status and identifier for mine.
+	POP AC0
+	MOV AC0,(SHIP)+		;Pointer to display list.
+	MOV #D.JMP,(AC0)+	;Set the dpy list to jump to the mine.
+	MOV SHIP,(AC0)+
+	PUSH AC0
+	PUSH T1
+	PUSH SHIP
+
+	MOV #D.PNT,(SHIP)+	;Mine drawing...
+	CLR (SHIP)+		;location on screen,
+	CLR (SHIP)+
+	MOV #D.SVEC,(SHIP)+	;a short vector to offset
+	MOV (PC)+,(SHIP)+	;to the start of a character,
+	  SVEC -.CXOFF,-.CYOFF,.INVIS
+	MOV #D.CHR+.INT4,(SHIP)+;Character mode,
+	MOV #'*,(SHIP)+		;display an asterisk,
+	MOV #D.JMP,(SHIP)+	;and jump back to the display list.
+	MOV AC0,(SHIP)+
+
+	MOV (SP),SHIP
+	PUSHJ DSQ		;Square of distance from sun...
+	BGT LAYM2A
+	POP SHIP		;Too close.  The mine will explode
+	BR LAYMI4		;immediately.
+
+LAYM2A:	PUSHJ SQRT		;Distance from sun,
+	MOV MQ0,T0
+	MOV #100000⊗&lt;-XID>,AC0
+	CLR MQ0
+	PUSHJ UDIV		;inverse of distance.
+	CLC
+	ROR MQ0
+	ADC MQ0
+	PUSH MQ0
+	MOV G,T0
+	PUSHJ SMUL		;G/D
+	SCALE XG+XID,XGD
+	PUSHJ SQRT		;sqrt(G/D)
+	MOV MQ0,AC0
+	POP MQ0
+	PUSH AC0
+
+	MOV 2(SP),SHIP
+	MOV POSITY-BASE(SHIP),T0
+	NEG T0
+	MOV POSITX-BASE(SHIP),T1
+	PUSHJ TWOMUL		;(-Y,X)/D
+	SCALE XD+XID,1
+	SCALE1 XD+XID,1
+	RNDAC AC0
+	RNDAC AC1
+	MOV AC0,T0
+	MOV AC1,T1
+	POP MQ0
+	PUSHJ TWOMUL		;(-Y,X)/D * sqrt(G/D)...
+	SCALE XGD/2+1,XD	;is the initial velocity for
+	SCALE1 XGD/2+1,XD	;a circular orbit.
+  .IFZ DBLDSP
+	RNDAC AC0
+	RNDAC AC1
+  .ENDC
+	TST RANDNO
+	BPL LAYMI3
+	NEG AC0			;Randomly reverse direction.
+	NEG AC1
+  .IFNZ DBLDSP
+	NEG MQ0
+	SBC AC0
+	NEG MQ1
+	SBC MQ1
+  .ENDC
+LAYMI3:
+  .IFNZ DBLDSP			;Give the mine its velocity.
+	POP T0
+	MOV MQ0,VELOCX+2-BASE(T0)
+	MOV MQ1,VELOCY+2-BASE(T0)
+	MOV T0,SHIP
+  .ELSE
+	POP SHIP
+  .ENDC
+	MOV AC0,VELOCX-BASE(SHIP)
+	MOV AC1,VELOCY-BASE(SHIP)
+
+LAYMI4:	ADD #14+&lt;2*MBRSTL>,SHIP	;Advance to next mine.
+	POP T1
+	DEC T1
+	BLE LAYMI5
+	JMP LAYMIN
+
+LAYMI5:	POP AC0
+MINEND:
+;Fall through.
+	;Initialize torp list, and count down.
+
+	MOV AC0,DTRPNT
+	MOV SHIP,TRPNT
+	MOV #MXTORP,T1
+
+CLRTRP:	MOV #D.JMP,(AC0)+	;Set each torp slot in the dpy list
+	TST (AC0)+		;to a DJMP .+1
+	MOV AC0,-2(AC0)
+	DEC T1
+	BGT CLRTRP
+
+	MOV #D.NOP,(AC0)+	;end the list with a DNOP
+	MOV #D.JMP,(AC0)+	;and a DJMP back to the beginning.
+	MOV #DPRO,(AC0)
+
+;Now for the big count down, and let the games commence.
+
+	MOV #CTDWN,LFK.V	;Set up clock vector
+	MOV (PC)+,@(PC)+
+	  PSWD LFK.P
+	  .WORD LFK.V+2
+
+	MOV #DOFINT,DHLT.V	;and display stop vector.
+	MOV (PC)+,@(PC)+
+	  PSWD EXPLVL
+	  .WORD DHLT.V+2
+
+	MOV #74,TICCNT		;Exactly one second at a time,
+	MOVB #'5,DWNCNT		;Count down from five.
+	MOV #D.SETS+.STPDIS+.NOITAL+.SYNCH,DCTDWN
+	MOV #DCTDWN,D.PC
+	MOV #LFK.EN,LFK.K
+
+CRANK:	WAIT			;Wait for the count to finish.
+	TST DCTDWN
+	BNE CRANK
+
+	MOV #1,TICCNT
+	MOV #CLKSER,LFK.V	;Interrupt vectors for main program.
+	MOV #EXPLODE,DHLT.V
+
+;Fall through.
+;MAIN PROGRAM (LEVEL 0)
+
+	MOV #D.SETS+.STPDIS+.LPDIM+.NOITAL+.SYNCH,DPRO
+
+	MOV NSHIPS,NACTS
+	CLR NEXPS
+	MOV #DPRO,D.PC		;Start up the display,
+	MOV #LFK.EN,LFK.K	;enable the clock.
+
+MAIN:	WAIT			;Wait until...
+	CMP NACTS,#1		;at most one ship remains
+	BGT MAIN
+	BLT MAIN1
+	CMP NSHIPS,#1		;(unless it's a one-man game)
+	BEQ MAIN
+MAIN1:	TST NEXPS		;and there are no phantoms left.
+	BGT MAIN
+
+	MOV #DOFINT,DHLT.V	;All conditions met...
+	CLR LFK.K		;Disable the clock
+	COM DCTDWN		;stop the display
+	MOV #D.SETS+.STOP+.STPEN,DPRO
+ENDIT:	WAIT			;Wait until it's run down.
+	TST DCTDWN
+	BNE ENDIT
+
+	TST NACTS		;Is there a survivor?
+	BLE NXTHND
+	MOV DSHPNT,AC0
+
+FNDSCR:	TST (AC0)+		;There is.  Search the display list
+	MOV (AC0)+,SHIP
+	CMP AC0,SHIP		;until you find him.
+	BEQ FNDSCR
+
+	INC SCORE-BASE(SHIP)	;Add one to his score.
+	MOV SCORE-BASE(SHIP),MQ0
+	MOV #DSCORE-BASE,AC1
+	ADD SHIP,AC1
+	MOV #6,T1
+	PUSHJ BINASC		;Display the score.
+
+NXTHND:	JMP NEWHND		;Start the next game.
+;CLOCK LEVEL AND LEVEL-SHIFTING
+
+CLKSER:	MOV .CSW,SWITCH		;Read the console switches.
+	DEC TICCNT		;Count the time,
+	BGT CLKRET		;test for a fortnight gone by.
+
+	JSR R5,SETPRI		;Yup.  Attempt to start MOTION.
+	PSWD MOTLVL
+	.WORD MOTION
+
+	.BEEP		;HORRORS!  It's already going!  That means
+			;it overran its allotted time.  Show audible
+			;displeasure at this state of affairs.
+
+CLKRET:	RTI
+
+;THE LEVEL-SHIFTER
+
+SETPRI:	TVAR
+	MOV 6(SP),(SP)		;Get the preceding priority off the stack.
+	BIC #177437,(SP)
+	CMP (SP)+,(R5)+		;Compare with the desired level.
+	BGE CNTSET
+
+	MOV -2(R5),.PSW		;It's lower.  Set the required level,
+	MOV (R5),R5		;get the procedure address,
+	RTS R5			;and cleverly leave the registers
+				;and stack as they were.
+
+CNTSET:	TST (R5)+		;It's too high.  Bypass the procedure
+	RTS R5			;address and return.
+;MOTION ROUTINE (LEVEL 3)
+
+MOTION:	MOV #TPFN,TICCNT	;Reset his clock.
+	PUSHACS
+
+	MOV DSHPNT,AC1
+NXTOBJ:	CMP (AC1)+,#D.JMP	;Each display list entry is a DJMP.
+	BNE OBJDON
+
+	MOV (AC1)+,SHIP		;Get data address.
+	CMP SHIP,AC1		;Null entry (DJMP to next location)?
+	BEQ NXTOBJ
+
+	PUSH AC1		;Nope.  Save the index
+	MOVB TYPE-BASE(SHIP),AC1
+	TSTB STAT-BASE(SHIP)	;Test whether living or dead.
+	BEQ LIVOBJ
+	ADD #DEDTAB-LIVTAB,AC1
+LIVOBJ:	PUSHJ @LIVTAB(AC1)	;Dispatch to proper calculations.
+	POP AC1
+	BR NXTOBJ		;Repeat for each object.
+
+LIVTAB:	.WORD LVSHIP
+	.WORD LVMINE
+	.WORD LVTORP
+
+DEDTAB:	.WORD DDSHIP
+	.WORD DDMINE
+	.WORD DDTORP
+
+OBJDON:	POPACS			;All done.  Get ready to return.
+	JSR R5,SETPRI		;Crank up PROX if it isn't running.
+	PSWD PRXLVL
+	.WORD PROX
+	RTI
+	;DEAD SHIP MOTION
+
+DDSHIP:	CMPB STAT-BASE(SHIP),#1	;Exploded yet?
+	BEQ FLASHX
+	CMPB STAT-BASE(SHIP),#-100
+	BEQ FLASHX
+	INCB STAT-BASE(SHIP)	;Yes.  How long ago?
+	BMI DDSHPX		;It's a phantom.
+	BEQ HIDES2		;It's an expired phantom.
+	CMPB STAT-BASE(SHIP),#100	;Flash is finished...
+	BEQ HIDES		;erase it from the screen.
+	MOV #IBURST,T0
+	MOV #IBRSTL,AC0
+
+INCEXP:	BITB #1,STAT-BASE(SHIP)
+	BNE FLASHX		;Increment burst every other time.
+
+	MOV #DRAWING-BASE,T1
+	ADD SHIP,T1
+
+DDSHP1:	ADD (T0)+,(T1)+		;Add the burst increment to
+	TST (T1)+		;the burst.
+	DEC AC0
+	BGT DDSHP1
+
+FLASH:	BITB #6,STAT-BASE(SHIP)	;Gradually decrease the brightness.
+	BNE FLASHX
+	SUB #.INT1-.INT0,DRAWING-2-BASE(SHIP)
+FLASHX:	JMP GRAV		;The shrapnel is still subject to gravity.
+
+HIDES:	JSR R5,KILLIT		;The explosion just finished...
+	.BYTE -100,0		;erase it and set delay timer.
+	BR DDSHPX
+
+HIDES2:	TSTB NTACT-BASE(SHIP)	;Expired phantom...
+	BEQ BURYS		;Any torps still alive?
+	DECB STAT-BASE(SHIP)	;Yes.  Let the phantom live
+	BR DDSHPX		;for a while.
+
+BURYS:	DEC NEXPS
+BURY:	MOV DPYITM-BASE(SHIP),T0	;The explosion is over...
+	ADD #4,T0		;make the display list entry null.
+	MOV T0,-2(T0)
+DDSHPX:	POPJ
+	;Dead mine
+
+DDMINE:	CMPB STAT-BASE(SHIP),#1
+	BEQ FLASHX
+	INCB STAT-BASE(SHIP)
+	CMPB STAT-BASE(SHIP),#100
+	BEQ BURY
+
+	MOV #IMBRST,T0
+	MOV #IMBRSL,AC0
+	BR INCEXP
+	;TORPEDO MOTION
+
+LVTORP:	DEC TRPAGE-BASE(SHIP)	;Live torp.  Check its age.
+	BGT LVTRP2
+
+LVTRP1:	INCB STAT-BASE(SHIP)	;Too old.  Kill it.
+	MOV #D.PNT+.INT7,(SHIP)	;Show a small flash.
+LVTRP2:	JMP POSCAL		;Update the position.
+
+DDTORP:	INCB STAT-BASE(SHIP)	;Dead torp -
+	CMPB STAT-BASE(SHIP),#40;is it dead enough?
+	BGT BURYT		;Yes.  Get rid of it.
+	BITB #3,STAT-BASE(SHIP)
+	BNE DDTRP1		;Otherwise, gradually diminish
+	SUB #.INT1-.INT0,(SHIP)	;its brightness.
+DDTRP1:	JMP POSCAL		;Keep it moving.
+
+BURYT:	MOV TRPOWN-BASE(SHIP),T0;Torp completely dead...
+	DECB NTACT-BASE(T0)	;Count down the owner's
+	BR BURY			;active torp counter.
+	;LIVE SHIP MOTION
+
+LVSHIP:	DEC RELTIM-BASE(SHIP)	;Torp reload delay over?
+	BGT LVSHP0
+	CLR RELTIM-BASE(SHIP)	;Yes...
+	TSTB TRPLFT-BASE(SHIP)	;Do you have torps left?
+	BEQ LVSHP0
+	BIS #40000,TRPTUB-BASE(SHIP)	;turn the indicator on.
+LVSHP0:	PUSH BUTBIT-BASE(SHIP)	;Get the switch-test bit.
+	CLR AC0
+	BIT (SP),SWITCH
+	BEQ LVSHP1		;Turning left?
+	ADD R,AC0		;Yes.
+
+LVSHP1:	CLC
+	ROR (SP)
+	BIT (SP),SWITCH
+	BEQ LVSHP2		;Turning right?
+	SUB R,AC0		;Yes.  Left and right cancel each other.
+
+LVSHP2:	TST AC0
+	BEQ LVSHP3		;Turning?
+
+	ADD HEADING-BASE(SHIP),AC0	;Yes.  Update heading,
+	MOV AC0,HEADING-BASE(SHIP)
+	PUSHJ SHIPROT		;rotate.
+
+LVSHP3:	ASR (SP)
+	BIT (SP),SWITCH
+	BEQ LVSHP4		;Thrusting?
+
+.IFNZ DBLDSP			;Yes.  Add thrust increment to velocity.
+	ADD THRSTX+2-BASE(SHIP),VELOCX+2-BASE(SHIP)
+	ADC VELOCX-BASE(SHIP)
+	ADD THRSTY+2-BASE(SHIP),VELOCY+2-BASE(SHIP)
+	ADC VELOCY-BASE(SHIP)
+.ENDC
+	ADD THRSTX-BASE(SHIP),VELOCX-BASE(SHIP)
+	ADD THRSTY-BASE(SHIP),VELOCY-BASE(SHIP)
+
+	BIS #40000,FLAME+2-BASE(SHIP)	;Turn flame on.
+	BR LVSHP5
+
+LVSHP4:	BIC #40000,FLAME+2-BASE(SHIP)	;Not thrusting.  Turn flame off.
+
+LVSHP5:
+
+;Fall through to next page.
+		;TORPEDO LAUNCHING
+
+	ASR (SP)
+	BIT (SP),SWITCH		;Do you want to fire?
+	BEQ ENDLNCH
+	BIT #40000,TRPTUB-BASE(SHIP)	;You do, but is your gun loaded?
+	BEQ ENDLNCH		;Not yet.  You lose.
+	CMPB NTACT-BASE(SHIP),#SHPTRP	;How many torps do you have out?
+	BGE ENDLNCH		;Too many.  Your gun is jammed.
+
+	MOV DTRPNT,T0		;Scan the display list for a
+LNCH1:	CMP (T0)+,#D.JMP	;slot for a torpedo.
+	BNE ENDLNCH		;If there isn't one, you lose.
+	MOV (T0)+,T1
+	CMP T1,T0
+	BNE LNCH1
+
+	BIC #40000,TRPTUB-BASE(SHIP)	;Turn off the loaded indicator
+	MOV #TRELOD,RELTIM-BASE(SHIP)	;and set the reload timer.
+	INCB NTACT-BASE(SHIP)	;Increment the active torp count.
+
+	PUSH SHIP
+	SUB #4,T0		;T0 points to display list entry.
+	MOV T0,T1
+	SUB DTRPNT,T1		;Make a pointer to the corresponding
+  .REPT 4			;free storage block
+	ASL T1
+  .ENDR
+	ADD TRPNT,T1		;in T1.
+
+	MOV SHIP,(T1)+		;Name of torp's owner.
+	MOV #TRPLIF,(T1)+	;Lifetime of torp.
+
+	MOV SHIP,AC0		;Torp velocity ← ship velocity plus
+	ADD #TVELX-BASE,AC0	;launch speed vector, and
+	ADD #VELOCX-BASE,SHIP	;Torp position ← ship position plus
+	MOV #4,MQ0		;nose offset vector.
+
+LNCH2:	MOV (SHIP)+,(T1)	;Move high part of data vel. or pos.,
+	ADD (AC0)+,(T1)+	;add offset,
+  .IFNZ DBLDSP			;move low part.
+	MOV (SHIP)+,(T1)+
+  .ENDC
+	DEC MQ0
+	BGT LNCH2
+
+	MOV #4,(T1)+		;Set type and status,
+	MOV T0,(T1)+		;and pointer to dpy list.
+	MOV T1,AC0		;Save torp's base address.
+	MOV #D.PNT+.INT4,(T1)+	;Point mode,
+	MOV #40000+XOFF,(T1)+	;location in DPY coordinates.
+	MOV #YOFF,(T1)+
+	MOV #D.JMP,(T1)+	;End the torp with a jump
+	MOV T0,(T1)		;back to the display list, and
+	ADD #4,(T1)		;change the display list entry
+	MOV AC0,2(T0)		;to jump to the torp.
+
+	POP SHIP		;Now resume the ship's calculations.
+	DECB TRPLFT-BASE(SHIP)	;Update the remaining torps counter.
+	MOVB TRPLFT-BASE(SHIP),MQ0
+	MOV SHIP,AC1
+	ADD #DTLFT-BASE,AC1
+	MOV #2,T1
+	PUSHJ BINASC		;and display it.
+ENDLNCH:
+	ZAP			;We're done with the button bit.
+
+;Fall through to gravity calculation.
+	;GRAVITY CALCULATION FOR SHIPS AND MINES
+
+LVMINE:
+GRAV:	PUSHJ DSQ
+	BGT GRAV1		;Below minimum orbit...
+
+	TSTB STAT-BASE(SHIP)	;If it is alive,
+	BNE POSCAL
+	JSR R5,KILLIT		;it won't be for long.
+	.WORD 1
+	BR POSCAL
+
+GRAV1:	PUSH SHIP
+	PUSHJ SQRT		;D ≤ .707 au scaled XD.
+
+	MOV MQ0,T0
+	MOV #100000⊗&lt;-XID>,AC0
+	CLR MQ0
+	PUSHJ UDIV		;1/D, scaled XID.
+	CLC
+	ROR MQ0
+	ADC MQ0			;and rounded.
+
+	PUSH MQ0
+	MOV POSITX-BASE(SHIP),T0
+	MOV POSITY-BASE(SHIP),T1
+	PUSHJ TWOMUL		;(X,Y)/D scaled XD+XID
+	SCALE XD+XID,1		;-1 ≤ (X/D) ≤ 1
+	SCALE1 XD+XID,1
+	RNDAC AC0
+	RNDAC AC1
+	POP T0
+	PUSH AC1
+	PUSH AC0
+	MOV G,MQ0
+	NEG MQ0
+	PUSHJ SMUL		;-G/D scaled XG+XID
+	RNDAC AC0
+	MOV AC0,MQ0
+
+	MOV T0,AC0
+	POP T0
+	POP T1
+	PUSH AC0
+	PUSHJ TWOMUL		;-G*(X,Y)/D↑2 scaled XG+XID+1
+	RNDAC AC0
+	RNDAC AC1
+	MOV AC0,T0
+	MOV AC1,T1
+	POP MQ0
+	PUSHJ TWOMUL		;Accel. ← -G*(X,Y)/D↑3
+	SCALE XG+&lt;2*XID>+1,XD	;Rescale the same as distance.
+	SCALE1 XG+&lt;2*XID>+1,XD
+.IFNZ DBLDSP			;Double-precision distances?
+	POP T0
+	ADD MQ0,VELOCX+2-BASE(T0)	;Yes.  Add low part of acceleration
+	ADC VELOCX-BASE(T0)		;to velocity.
+	ADD MQ1,VELOCY+2-BASE(T0)
+	ADC VELOCY-BASE(T0)
+	MOV T0,SHIP
+.ELSE
+	RNDAC AC0		;Otherwise, round acceleration.
+	RNDAC AC1
+	POP SHIP
+.ENDC
+	ADD AC0,VELOCX-BASE(SHIP)	;Add high part.
+	ADD AC1,VELOCY-BASE(SHIP)
+
+;Fall through to next page.
+	;POSITION CALCULATIONS... SHIPS, MINES, TORPS.
+
+POSCAL:
+.IFNZ DBLDSP			;Add velocity vector to position
+	ADD VELOCX+2-BASE(SHIP),POSITX+2-BASE(SHIP)
+	ADC POSITX-BASE(SHIP)
+	ADD VELOCY+2-BASE(SHIP),POSITY+2-BASE(SHIP)
+	ADC POSITY-BASE(SHIP)
+.ENDC
+	MOV VELOCX-BASE(SHIP),AC0	;Add X velocity to position,
+	ADD POSITX-BASE(SHIP),AC0
+	ROL AC0			;Mod 1 au by setting sign of result
+	ASR AC0			;equal to next bit.
+	MOV AC0,POSITX-BASE(SHIP)
+	NEG AC0
+	ASR AC0
+	ASR AC0
+	ADD POSITX-BASE(SHIP),AC0
+	ADD #XOFF⊗5,AC0		;Add screen center offset
+.REPT 5				;Shift to screen coordinates
+	ASR AC0
+.ENDR
+	ADC AC0			;and round off.
+	BIC #176000,AC0		;Make sure it's on the screen.
+	BIC #1777,XPOS-BASE(SHIP)
+	BIS AC0,XPOS-BASE(SHIP)
+
+	MOV VELOCY-BASE(SHIP),AC0	;Same thing exactly for the Y position.
+	ADD POSITY-BASE(SHIP),AC0
+	ROL AC0
+	ASR AC0
+	MOV AC0,POSITY-BASE(SHIP)
+	NEG AC0
+	ASR AC0
+	ASR AC0
+	ADD POSITY-BASE(SHIP),AC0
+	ADD #YOFF⊗5,AC0
+.REPT 5
+	ASR AC0
+.ENDR
+	ADC AC0
+	BIC #176000,AC0
+	MOV AC0,YPOS-BASE(SHIP)
+
+	POPJ
+	;SHIP ROTATION ROUTINE
+
+;Enter with heading angle in AC0, pointer to ship in SHIP.
+;Clobbers everything but SHIP.
+
+SHIPROT:
+	ADD #400,AC0		;Round angle to 7 bits.
+	MOV AC0,ANG
+	SWAB ANG
+	BIC #177701,ANG		;Get first-quadrant part
+	ASL ANG			;Set for two-word table entries.
+	ROL AC0
+	ROL AC0
+	ROL AC0
+	ROL AC0
+	MOV AC0,QUAD		;and quadrant index.
+	BIC #177771,QUAD
+
+;Rotate the thrust and nose vectors
+
+	BIT #2,QUAD
+	BNE TROT1
+
+;1st or third quadrant - get x and y components in table order
+
+.IFNZ DBLDSP
+	MOV THRTB1(ANG),THRSTX+2-BASE(SHIP)
+	MOV THRTB1+2(ANG),THRSTY+2-BASE(SHIP)
+.ENDC
+	MOV THRTAB(ANG),THRSTX-BASE(SHIP)
+	MOV THRTAB+2(ANG),THRSTY-BASE(SHIP)
+	MOV NOSTAB(ANG),NOSEX-BASE(SHIP)
+	MOV NOSTAB+2(ANG),NOSEY-BASE(SHIP)
+	MOV TVTAB(ANG),TVELX-BASE(SHIP)
+	MOV TVTAB+2(ANG),TVELY-BASE(SHIP)
+	BIT #4,QUAD
+	BEQ TROT3
+
+;3rd quadrant - negate x and y.
+
+.IFNZ DBLDSP
+	NEG THRSTX-BASE(SHIP)
+	NEG THRSTX+2-BASE(SHIP)
+	SBC THRSTX-BASE(SHIP)
+.ELSE
+	NEG THRSTX-BASE(SHIP)
+.ENDC
+	NEG NOSEX-BASE(SHIP)
+	NEG TVELX-BASE(SHIP)
+	BR TROT2
+
+;2nd or 4th quadrant - get x,y in reverse order
+
+TROT1:
+.IFNZ DBLDSP
+	MOV THRTB1(ANG),THRSTY+2-BASE(SHIP)
+	MOV THRTB1+2(ANG),THRSTX+2-BASE(SHIP)
+.ENDC
+	MOV THRTAB(ANG),THRSTY-BASE(SHIP)
+	MOV THRTAB+2(ANG),THRSTX-BASE(SHIP)
+	MOV NOSTAB(ANG),NOSEY-BASE(SHIP)
+	MOV NOSTAB+2(ANG),NOSEX-BASE(SHIP)
+	MOV TVTAB(ANG),TVELY-BASE(SHIP)
+	MOV TVTAB+2(ANG),TVELX-BASE(SHIP)
+	BIT #4,QUAD
+	BNE TROT2
+
+;2nd quadrant - negate x.
+
+.IFNZ DBLDSP
+	NEG THRSTX-BASE(SHIP)
+	NEG THRSTX+2-BASE(SHIP)
+	SBC THRSTX-BASE(SHIP)
+.ELSE
+	NEG THRSTX-BASE(SHIP)
+.ENDC
+	NEG NOSEX-BASE(SHIP)
+	NEG TVELX-BASE(SHIP)
+	BR TROT3
+
+;3rd or 4th quadrant - negate y.
+
+TROT2:
+.IFNZ DBLDSP
+	NEG THRSTY-BASE(SHIP)
+	NEG THRSTY+2-BASE(SHIP)
+	SBC THRSTY-BASE(SHIP)
+.ELSE
+	NEG THRSTY-BASE(SHIP)
+.ENDC
+	NEG NOSEY-BASE(SHIP)
+	NEG TVELY-BASE(SHIP)
+
+TROT3:
+
+;Fall through to next page.
+		;ROTATION CONTINUED
+
+	MOV ROTDIS(QUAD),QUAD	;Address of quadrant fixer for drawing.
+	ASL ANG
+	ASL ANG
+	ASL ANG
+	ADD #POINTS,ANG		;Go to the correct angle table.
+	PUSH SHIP
+	MOV SHIP,MODL
+	ADD #MODEL-BASE,MODL	;Address of model
+	ADD #DRAWING-BASE,SHIP	;and where to put the results.
+	TVAR			;2 temp cells needed for converting
+	TVAR			;(X,Y) pairs to deltas.
+
+SROT1:	PUSH SHIP		;We need a register.
+	MOVB (MODL)+,SHIP	;Get a point number from the model.
+	BEQ SROT6		;Zero means end.
+	BPL SROT2
+	NEG SHIP		;Get absolute value
+SROT2:	ADD SHIP,ANG		;Address of that point in angle table.
+	JMP (QUAD)		;Do the quadrant transform.
+
+SRQ0:	MOVB (ANG),X		;1st quadrant.
+	MOVB 1(ANG),Y
+	BR SROT3
+
+SRQ1:	MOVB (ANG),Y		;2nd quadrant
+	MOVB 1(ANG),X
+	NEG X
+	BR SROT3
+
+SRQ2:	MOVB (ANG),X		;3rd quadrant
+	MOVB 1(ANG),Y
+	NEG X
+	BR SRQ3A
+
+SRQ3:	MOVB (ANG),Y		;4th quadrant
+	MOVB 1(ANG),X
+SRQ3A:	NEG Y
+
+SROT3:	SUB SHIP,ANG		;Restore the base address
+	POP SHIP		;Bring back the "where to" address.
+	SUB (SP),X		;Convert the X and Y to
+	ADD X,(SP)		;deltas, saving them for next time.
+	SUB 2(SP),Y
+	ADD Y,2(SP)
+
+	TST Y		;Make a short relative vector word...
+	BGE RELV1
+	NEG Y		;Convert Y to sign-magnitude format.
+	BIS #100,Y
+
+RELV1:	TST X
+	BGE RELV2
+	NEG X		;Same for X.
+	BIS #100,X
+
+RELV2:	SWAB X		;Shift X left 7
+	ASR X
+	BIS X,Y		;Merge into one word.
+
+SROT4:	TST (SHIP)+	;Don't mess with display control words.
+	BMI SROT4
+
+	MOV -(SHIP),X	;Get the brightness bit from the drawing,
+	BIC #137777,X
+	BIS X,Y		;Put it into the new vector.
+	MOV Y,(SHIP)+
+
+	BR SROT1		;Get next point.
+
+SROT6:	ZAPS 3			;All done.  Get rid of the temp cells,
+	POP SHIP		;bring back the ship index.
+	POPJ
+
+ROTDIS:	.WORD SRQ0		;Quadrant dispatch table.
+	.WORD SRQ1
+	.WORD SRQ2
+	.WORD SRQ3
+	;COMPUTE SQUARE OF DISTANCE FROM SUN
+
+DSQ:	MOV POSITX-BASE(SHIP),MQ0
+	MOV MQ0,T0
+	PUSHJ SMUL		;X↑2 ≤ 1/4 au.
+	PUSH AC0
+	PUSH MQ0		;Save it on stack.
+
+	MOV POSITY-BASE(SHIP),MQ0
+	MOV MQ0,T0
+	PUSHJ SMUL		;Y↑2 ≤ 1/4 au.
+
+	ADD (SP)+,MQ0		;Double-precision add:
+	ADC AC0
+	ADD (SP)+,AC0		;D↑2 = X↑2 + Y↑2 ≤1/2 au.
+
+	CMP AC0,SQ		;Compare D↑2 with square of minimum
+	POPJ			;orbit, return the condition code.
+;PROXIMITY CHECK (LEVEL 2)
+
+COMMENT⊗
+Check for pairs of things that are colliding.  This routine makes
+a yes-no-maybe check, killing things that are definitely colliding
+and passing the maybes on to COLIDE.  Objects are eligible for
+collisions up until 1/10 second after they have exploded (If you
+get too close to a blast, the blast gets you).
+⊗
+
+PROX:	PUSHACS
+	MOV DSHPNT,DL		;Scan from beginning of dpy list.
+
+PROX1:	CMP (DL)+,#D.JMP
+	BEQ PROX2		;End of list?
+	POPACS			;Yes.  Return.
+	RTI			;The call on COLIDE will be here.
+
+PROX2:	MOV (DL)+,OBJ1
+	CMP OBJ1,DL		;Check for a null entry.
+	BEQ PROX1
+
+	PUSH DL			;Not null.  Assume a live thing
+	MOVB TYPE-BASE(OBJ1),-(SP)	;for the time being.
+	TSTB STAT-BASE(OBJ1)		;Is it really alive?
+	BEQ PROX4
+	CMPB TYPE-BASE(OBJ1),#4		;It isn't.  Is it a torp?
+	BEQ PROX2A
+	CMPB STAT-BASE(OBJ1),#6/TPFN	;No.  How long has it been dead?
+	BLOS PROX3
+PROX2A:	ZAPS 2			;Too long.  Keep scanning.
+	BR PROX1
+
+PROX3:	COMB 1(SP)		;Not too long.  Just flag it.
+
+PROX4:	CMP (DL)+,#D.JMP	;Scan some more for things that
+	BEQ PROX5		;may be colliding with this one.
+PROX4A:	ZAP			;There aren't any more.  Look for
+	POP DL			;another first object to check.
+	BR PROX1
+
+PROX5:	MOV (DL)+,OBJ2		;Looking for a second object...
+	CMP OBJ2,DL
+	BEQ PROX4		;Again skip null entries.
+
+	TSTB STAT-BASE(OBJ2)	;Found one.  Is it dead?
+	BEQ PROX6
+	CMPB STAT-BASE(OBJ2),#6/TPFN	;Yes.  Too dead?
+	BHI PROX4		;Too too.  Scan on.
+	TST (SP)		;Not too.  Is object 1 dead?
+	BMI PROX4		;It is.  Scan some more.
+
+;Fall through to beginning of collision test.
+	;Collision test 1 - take care of non-ships.
+
+PROX6:	MOV POSITX-BASE(OBJ1),X	;Compute deltas X and Y.
+	SUB POSITX-BASE(OBJ2),X
+	MOV POSITY-BASE(OBJ1),Y
+	SUB POSITY-BASE(OBJ2),Y
+	PUSHJ DIST		;Get the distance.
+
+	MOVB TYPE-BASE(OBJ2),TYP
+	TSTB (SP)		;Is object 1 a ship?
+	BEQ SPROX		;Yes.  More crunching involved.
+
+	ADD (SP),TYP		;No.  Combined collision code is
+	BIC #177700,TYP		;4 for mine-mine, 6 for mine-torp,
+	CMP X,PRXTB1(TYP)	;8 for torp-torp.
+	BGT PROX4		;Compare distance with appropriate radius.
+
+PRXKIL:	TST (SP)		;Less than the radius...
+	BMI PROX7		;If object 1 is alive,
+	JSR R5,KILLIT		;do it in.
+	.WORD 1
+
+PROX7:	TSTB STAT-BASE(OBJ2)	;Likewise object 2.
+	BNE PROX8
+
+	MOV OBJ1,Y
+	MOV OBJ2,OBJ1
+	JSR R5,KILLIT
+	.WORD 1
+	MOV Y,OBJ1
+
+;An added fillip for torp-to-torp collisions...
+
+	TST (SP)		;If both objects were alive...
+	BMI PROX4
+	COMB 1(SP)
+	CMP TYP,#10		;and both were torps, then...
+	BNE PROX4
+
+	MOV #VELOCX-BASE,X
+	MOV X,Y
+	ADD OBJ1,X
+	ADD OBJ2,Y
+
+	ADD (X),(Y)		;set their velocities equal to
+	ASR (Y)			;the mean of their individual
+	MOV (Y)+,(X)+		;velocities.
+  .IFNZ DBLDSP
+	CMP (Y)+,(X)+		;Don't bother with the low-order parts.
+  .ENDC
+	ADD (X),(Y)
+	ASR (Y)
+	MOV (Y)+,(X)+
+
+	BR PROX4A		;Scan for more.
+
+PROX8:	MOVB #-1,1(SP)
+	BR PROX4
+
+PRXTB1	←.-4			;Collision threshold values.
+	.WORD 2*MINER
+	.WORD MINER+TORPR
+	.WORD 2*TORPR
+	;Collision test 2 - ship involved.
+
+SPROX:	CMP X,PRXTB3(TYP)	;Within maximum kill radius?
+	BGT PROX4		;No.  Ignore.
+	CMP X,PRXTB2(TYP)	;Within minimum radius for a
+	BGT MAYBE		;definite kill?
+
+SHPKIL:	CMP TYP,#4		;Yes.  Ship-torp collision?
+	BNE PRXKIL		;No.  Just kill them.
+	TST (SP)		;Ship already dead?
+	BLT PRXKIL		;If so, don't score.
+
+	PUSHACS			;Yes.
+	MOV TRPOWN-BASE(OBJ2),AC1	;Get the torp's owner.
+	CMP AC1,OBJ1		;Same as the ship?
+	BNE STCOL1
+	DEC SCORE-BASE(AC1)	;Yup.  You goofed.  You lose one
+	BR STCOL2		;gold star.
+STCOL1:	INC SCORE-BASE(AC1)	;Nope.  Score a big point for a kill.
+STCOL2:	MOV SCORE-BASE(AC1),MQ0
+	ADD #DSCORE-BASE,AC1
+	MOV #6,T1
+	PUSHJ BINASC		;Display the updated score,
+	POPACS
+	BR PRXKIL		;and now kill the objects.
+
+MAYBE:	PUSHJ OVALT		;Fine collision checker...
+	CMP X,PRXTB4(TYP)	;Is object 2 within the ship's
+	BLE SHPKIL		;collision ellipse?
+
+	TST TYP			;No.  If object 2 isn't a ship,
+	BEQ MAYBE1
+	JMP PROX4		;there's no collision.
+
+MAYBE1:	MOV OBJ2,X		;They're both ships...
+	MOV OBJ1,OBJ2		;interchange their pointers
+	MOV X,OBJ1
+	PUSHJ OVALT		;and check again.
+	MOV OBJ2,Y		;Put the pointers back.
+	MOV OBJ1,OBJ2
+	MOV Y,OBJ1
+	CMP X,PRXTB4
+	BLE PRXKIL		;Ship 1 too close to ship 2!
+	JMP PROX4		;No collision.
+
+PRXTB2:	.WORD 2*SHIPW		;Table of max radii for a definite
+	.WORD SHIPW+MINER	;ship collision.
+	.WORD SHIPW
+
+PRXTB3:	.WORD 2*SHIPL		;Table of min radii for a definite no.
+	.WORD SHIPL+MINER
+	.WORD SHIPL
+
+PRXTB4:	.WORD OVALR+SHIPW	;Table of oval "radii" for the hairy
+	.WORD OVALR+MINER	;collision test.
+	.WORD OVALR
+		;Ship's detailed collision outline
+
+COMMENT⊗
+	Enter with a pointer to a ship in  OBJ1, to another thing
+in OBJ2.  Returns the sum of distances from OBJ2's center to the
+two foci of the ship's elliptical outline, in X.  Clobbers Y.
+⊗
+
+OVALT:	TVAR
+	MOV POSITX-BASE(OBJ1),X	;Get delta X from nose to OBJ2,
+	ADD NOSEX-BASE(OBJ1),X
+	SUB POSITX-BASE(OBJ2),X
+	PUSH X			;Save it.
+	MOV POSITY-BASE(OBJ1),Y	;Delta Y from nose.
+	ADD NOSEY-BASE(OBJ1),Y
+	SUB POSITY-BASE(OBJ2),Y
+	PUSH Y
+	PUSHJ DIST		;Nose distance,
+	MOV X,4(SP)		;saved for later.
+	MOV NOSEY-BASE(OBJ1),Y	;Convert nose delta Y to
+	NEG Y			;tail by subtracting the
+	ASL Y			;length of the ship.
+	ADD (SP)+,Y
+	MOV NOSEX-BASE(OBJ1),X	;Same for delta X.
+	NEG X
+	ASL X
+	ADD (SP)+,X
+	PUSHJ DIST		;Tail distance.
+	ADD (SP)+,X		;Sum of distances.
+	POPJ
+		;Distance calculation
+
+COMMENT⊗
+	This procedure calculates the distance between two points
+as D = max(delta X, delta Y) + 1/2 min(delta X, delta Y).  This
+metric gives "circles" of equal distance the shape of octagons,
+a fair approximation to a circle.
+
+Enter with delta X and delta Y (may be negative) in X and Y.
+Returns distance in X.  Clobbers Y, transparent to all other registers.
+Reduces the deltas modulo 1 au to take care of screen wraparaund.
+⊗
+
+DIST:	ASL X		;Mod 1 au by making the sign the same as
+	ASR X		;the most significant bit.
+	BPL DIST1	;Abs(delta X)
+	NEG X
+
+DIST1:	ASL Y
+	ASR Y
+	BPL DIST2	;Abs(delta Y)
+	NEG Y
+
+DIST2:	CMP X,Y
+	BLE DIST3	;Which is smaller?
+
+	ASR Y		;Delta Y.  Cut it in half.
+	BR DIST4
+
+DIST3:	ASR X		;Delta X.
+
+DIST4:	ADD Y,X		;And that's the distance.
+	POPJ
+;MARK AN OBJECT FOR EXPLOSION
+
+COMMENT⊗	Enter with SHIP pointing at the thing that should
+be blown up.  This routine just marks the object as dead (status=1)
+and enables the DP to interrupt when it stops.  When the DP interrupts,
+EXPLODE runs at level 2 to create the drawing of the explosion.  Thus
+we avoid timing interference with the DP.  The global variable KILCTR
+is incremented for each object that needs to be exploded and decremented
+each time one has been redrawn.
+⊗
+
+KILLIT:	CMPB TYPE-BASE(SHIP),#4	;Torps get special handling.
+	BEQ KILTRP
+
+	PUSH .PSW		;Avoid possible race conditions
+	MOV (PC)+,@(PC)+	;by setting the priority to 7.
+	  PSWD 7
+	  .WORD .PSW
+
+	MOVB (R5)+,STAT-BASE(SHIP)	;Mark it as dead.
+	INC R5
+	INC KILCTR
+	MOV (PC)+,@(PC)+	;Enable the DP interrupt.
+	  DSETS .STPEN+.STOP
+	  .WORD DPRO
+
+	POP .PSW		;Restore the old priority.
+	RTS R5
+
+KILTRP:	MOV #D.PNT+.INT7,(SHIP)	;Torp dying - make it bright.
+	MOVB (R5)+,STAT-BASE(SHIP)	;Flag it as dead.
+	INC R5
+	RTS R5
+;MAKE AN EXPLOSION (LEVEL 2)
+
+EXPLODE:
+	PUSHACS
+
+EXPL1:	MOV DSHPNT,T0		;Scan down the display list...
+
+EXPL2:	CMP T0,DTRPNT		;If we're into the torps, we're done...
+	BGE EXPDON		;(torp explosions happen in PROX).
+	CMP #D.JMP,(T0)+	;End of list?
+	BNE EXPDON
+	MOV (T0)+,SHIP		;No.
+	CMP SHIP,T0		;Object already dead?
+	BEQ EXPL2		;Yes.  Go on by.
+	CMPB #1,STAT-BASE(SHIP)	;Marked for explosion?
+	BEQ EXPL3
+
+	CMPB #-100,STAT-BASE(SHIP)	;No.  Post-explosion disappearance?
+	BNE EXPL2
+
+	MOV SHIP,T1		;Yes.  Wipe out the drawing
+				;without removing it from the
+	BR XSHIP2		;display list.
+
+EXPL3:	MOVB TYPE-BASE(SHIP),T1
+	JMP @EXPDIS(T1)		;Go to the right type of explosion.
+EXPDIS:	.WORD XSHIP
+	.WORD XMINE
+
+EXPDON:	MOV (PC)+,@(PC)+	;End of the list.
+	  PSWD 7		;Lock out interrupts to avoid races.
+	  .WORD .PSW
+	TST KILCTR		;Has every marked object been exploded?
+	BGT EXPMOR
+
+EXPD1:	MOV (PC)+,@(PC)+	;It has.  Disable the DP halt
+	  DSETS .STPDIS+.LPDIM+.NOITAL+.SYNCH
+	  .WORD DPRO
+	MOV #DPRO,D.PC		;and start the display running again.
+	POPACS
+	RTI
+
+EXPMOR:	MOV (PC)+,@(PC)+	;Something else got marked while we were
+	  PSWD EXPLVL		;scanning the list, so set the priority
+	  .WORD .PSW		;back and scan the list again.
+	BR EXPL1
+	;SHIP EXPLODING
+
+XSHIP:	DEC NACTS		;One less ship alive,
+	INC NEXPS		;one more dying.
+	MOV #BURST,AC0		;Burst prototype address
+	MOV #BURSTL,AC1		;and length.
+
+BLOW:	MOV SHIP,T1
+	ADD #DRAWING-2-BASE,T1	;Base address of drawing.
+	MOV #D.SVEC+.INT7,(T1)+	;Bright vector mode.
+
+XSHIP0:	.BEEP			;Explosions make a noise, don't they?
+
+XSHIP1:	MOV (AC0)+,(T1)+	;Move the burst into the ship's
+	DEC AC1			;drawing area.
+	BGT XSHIP1
+
+XSHIP2:	MOV #D.JMP,(T1)+	;End with a DJMP
+	MOV DPYITM-BASE(SHIP),(T1)	;back to the display list.
+	ADD #4,(T1)
+
+XDONE:	MOV (PC)+,@(PC)+	;Finished this explosion...
+	  PSWD 7		;lock out interrupts.
+	  .WORD .PSW
+	INCB STAT-BASE(SHIP)	;Set status to exploded.
+	DEC KILCTR		;Synchronize with the explosion count.
+	BLE EXPD1		;All done.  Return.
+
+	MOV (PC)+,@(PC)+	;There's more to come...
+	  PSWD EXPLVL		;get back to the right priority
+	  .WORD .PSW
+	BR EXPL2		;and resume scanning.
+	;Mine exploding
+
+XMINE:	MOV #MBURST,AC0
+	MOV #MBRSTL,AC1
+	BR BLOW
+;SUBROUTINES:	two-at-a-time multiplier
+COMMENT⊗
+This routine multiplies the numbers in T0 and T1 by the number in MQ0.
+The result of the first multiply is in AC0 and MQ0; the second in AC1
+and MQ1.  All numbers are treated as fractions with the radix point
+just right of the sign.  The reason for this double-duty routine is to
+cut down the overhead of the commonly used operation
+	(x,y)←(r cos t, r sin t).
+Combining the two multiplications saves a little less than 1/2 of the
+time the second multiplication would take by itself.
+
+The comments describing this routine may be deduced from those for
+SMUL, on the next page.
+⊗
+
+TWOMUL:	PUSH MQ0
+	PUSH #20	;Loop count goes on the stack because we're
+	CLR AC0		;out of registers.
+	CLR AC1
+	CLR MQ1
+	ROR MQ0
+
+TM1:	BCS TM2
+	ROR AC1
+	ROR MQ1
+	BR TM3
+TM2:	ADD T1,AC1
+	ROR AC1
+	ROR MQ1
+	ADD T0,AC0
+TM3:	ROR AC0
+	ROR MQ0
+	DEC (SP)
+	BNE TM1
+
+	TST (SP)+	;Get rid of the used counter.
+	TST (SP)
+	BPL TM4
+	PUSH T0
+	BIC #100000,(SP)
+	SUB (SP)+,AC0
+	PUSH T1
+	BIC #100000,(SP)
+	SUB (SP)+,AC1
+
+TM4:	BIC #100000,(SP)
+	TST T0
+	BPL TM5
+	SUB (SP),AC0
+
+TM5:	TST T1
+	BPL TM6
+	SUB (SP),AC1
+
+TM6:	TST (SP)+	;Finish cleaning up the stack.
+	ASL MQ0
+	ROL AC0
+	ASL MQ1
+	ROL AC1
+	POPJ
+		;Single multiplier
+
+COMMENT⊗	Revised 11 Apr 75 by Bo.
+The previous version used the more elaborate algorithm of adding or
+subtracting on changes between strings of 0's and 1's.  The drawback
+to that scheme is that you need an arithmetic right shift that looks
+at overflow and complements the sign if ov is on.  That takes some
+messing around and costs cycles.  This version does a 16 by 16 unsigned
+multiply with a sign correction at the end, saving considerable time
+in the loop.
+
+Call with the multiplier in MQ0 and the multiplicand in T0.  Returns
+the double-length signed product (fractional scaling) in (AC0,MQ0).
+Transparent to the other registers.
+⊗
+	
+SMUL:	PUSH T1		;Make a register for the loop count.
+	PUSH MQ0	;Save multiplier for the sign correction.
+	MOV #20,T1	;Initial loop count.
+	CLR AC0		;Product starts out zero.
+	ROR MQ0		;Look at first bit of multiplier.
+
+SM1:	BCC SM2		;If multiplier bit is a one,
+	ADD T0,AC0	;do the addition.
+SM2:	ROR AC0		;Shift the whole thing right, putting the
+	ROR MQ0		;next multiplier bit into C.
+	DEC T1		;Count iterations.
+	BNE SM1
+
+	TST T0		;Now for the correction.  If the multplicand
+	BPL SM3		;is negative,
+	MOV (SP),T1
+	BIC #100000,T1	;subtract all but the sign bit of the multiplier.
+	SUB T1,AC0
+
+SM3:	TST (SP)+	;If the multiplier is negative,
+	BPL SM4
+	MOV T0,T1
+	BIC #100000,T1	;subtract all but the sign of the multiplicand.
+	SUB T1,AC0
+
+SM4:	ASL MQ0		;Finally, put the product into fractional scaling.
+	ROL AC0
+	POP T1		;Restore the clobbered temp register.
+	POPJ
+		;El Cheapo binary-to-ASCII converter.
+
+;Enter with number to be converted in MQ0, number of digits in T1,
+;address plus one of low-order byte of ASCII string in AC1.
+;This routine doesn't check whether the number will fit.  It does
+;provide leading spaces and minus sign.  It clobbers everything
+;but SHIP.
+
+BINASC:	MOV #12,T0
+	PUSH MQ0
+	BPL BINA1
+	NEG MQ0
+
+BINA1:	CLR AC0
+	PUSHJ UDIV
+	ASR AC0
+	ADD #'0,AC0
+	MOVB AC0,-(AC1)
+	DEC T1
+	TST MQ0
+	BNE BINA1
+	TST (SP)+
+	BPL BINA2
+	MOVB #'-,-(AC1)
+	DEC T1
+
+BINA2:	DEC T1
+	BMI BINA3
+	MOVB #' ,-(AC1)
+	BR BINA2
+
+BINA3:	POPJ
+		;Divide routine (BLECH!)
+
+;This is a very dirty UNSIGNED divide.  Divisor in T0,
+;dividend in (AC0,MQ0).  Quotient in MQ0, remainder in AC0.
+;Caution: the dividend had better be positive and less than
+;the divisor, or garbage WILL result.
+
+UDIV:	PUSH #21
+	NEG T0
+UDIV1:	ADD T0,AC0
+	BCS UDIV2
+	SUB T0,AC0
+	CLC
+UDIV2:	ROL MQ0
+	ROL AC0
+	DEC (SP)
+	BGT UDIV1
+	NEG T0
+	ZAP
+	POPJ
+
+;This gives a 16-bit unsigned result, which if shifted right 1
+;(rounded?) is scaled as a fraction.
+		;Square-root routine
+
+COMMENT⊗
+	This routine uses the desk-calculator algorithm, based on
+the theorem that the sum of the first n odd integers is n↑2.
+Enter with a double-precision fraction in (AC0,MQ0).  Returns the
+15-bit fractional result in MQ0.  Clobbers AC0, T0, and T1.
+NOTE:  If you really want to, you can even use an unsigned number
+≥ 1 as the input.  This routine will return the correct unsigned
+result.  Since the error in the result is always negative, you might
+just want to use this feature to give that extra bit for rounding.
+
+	The time required for this type of square root is about the
+same as for a multiply or a divide, so it is much more efficient than
+Newton's method on a machine without hardware multiply/divide.
+
+	I first wrote this routine in 1963 as a programming exercise
+for a 1401.  I've written it again for each new machine that I've
+run into, as an exercise.  Now, 10 years later, I finally get a chance
+to use it!
+⊗
+
+SQRT:	CLC		;Move the radix point to an even position,
+	ROR AC0		;preserving the 30 bits of the fraction.
+	ROR MQ0
+	MOV #100000,T0	;This holds successive odd numbers for subtracting.
+	MOV #40000,T1	;This keeps track of bit positions in the subtractor.
+
+SQRT1:	ADD T1,T0	;Make that odd number in the next position over.
+	ADD T0,AC0	;Subtract it.
+	BCS SQRT2	;Did it go?
+
+	SUB T0,AC0	;No.  Add it back
+	ASL MQ0		;and shift a zero into the result.
+	ROL AC0		;That last one in the subtractor becomes a zero
+	BR SQRT3	;because it will no longer be the last significant bit.
+
+SQRT2:	ROL MQ0		;Yes.  Shift a one into the result.
+	ROL AC0
+	SUB T1,T0	;The subtractor becomes the next higher even number.
+
+SQRT3:	ASR T1		;Now extend the subtractor right.
+	BNE SQRT1	;Did we run out of bits?
+	BCC SQRT4	;Yes.  But there's a special hack to get the sixteenth
+			;bit of the result anyway...
+	TST MQ0		;If there would be a carry into bit 0 of AC0,
+	BPL SQRT1
+	INC T0		;we take care of it here.
+	BR SQRT1	;Warning...that hack makes the remainder unusable
+			;without some more hacking.
+SQRT4:	POPJ
+		;Pseudo-random number generator
+
+COMMENT⊗
+	Uses the linear congruential method as recommended by Knuth,
+Vol 2, Sec 3.6.
+⊗
+
+RANDOM:	MOV RANDNO,MQ0
+	MOV #26435,T0
+	PUSHJ SMUL
+	ASR AC0
+	ROR MQ0
+	ADD #33031,MQ0
+	MOV MQ0,RANDNO
+	POPJ
+;COUNT-DOWN HACK FOR STARTUP.
+
+CTDWN:	DEC TICCNT		;Count ticks...
+	BGT IGNINT
+	DECB DWNCNT		;One second gone by.  Show it on dpy.
+	CMPB DWNCNT,#'0		;Count reached zero?
+	BEQ STOPCT
+	MOV #74,TICCNT		;Nope.  Wait another second.
+IGNINT:	RTI
+
+STOPCT:	CLR LFK.K		;Countdown done.  Disable the clock,
+	MOV #D.SETS+.STOP+.STPEN,DCTDWN	;enable the display halt.
+	RTI
+
+DOFINT:	CLR DCTDWN		;Display halted.  Set flag for main.
+	RTI
+
+;Display routine for countdown
+
+DCTDWN:	D.SETS			;Set brightness and synchronize.
+	DLOC XOFF-.CXOFF,YOFF-.CYOFF	;Display one char at center.
+	D.CHR+.INT7
+DWNCNT:	0			;This will be the digit displayed.
+	D.JMP			;Go do it again.
+	DCTDWN
+;THE DISPLAY LIST
+
+DPRO:	DSETS .STPDIS+.LPDIM+.NOITAL+.SYNCH
+	DLOC 200,0
+	DLVEC .INT1+.SOLID	;Draw a box at the edges of
+	LVEC 0,1377		;the universe.
+	LVEC 1377,0
+	LVEC 0,-1377
+	LVEC -1377,0
+
+	DLOC XOFF,YOFF		;Go to center of universe
+	DRPNT .INT3+.BLINK+.LPDIS
+	RPNT 10,0		;The sun is a short-term variable star.
+	RPNT -1,3		;Here is its varying component
+	RPNT -1,3
+	RPNT -3,1
+	RPNT -3,1
+	RPNT -3,-1
+	RPNT -3,-1
+	RPNT -1,-3
+	RPNT -1,-3
+	RPNT 1,-3
+	RPNT 1,-3
+	RPNT 3,-1
+	RPNT 3,-1
+	RPNT 3,1
+	RPNT 3,1
+	RPNT 1,3
+	DRPNT .INT4+.NOBLINK	;and its steady component.
+	RPNT 1,3
+	RPNT -1,3
+	RPNT -1,3
+	RPNT -3,1
+	RPNT -3,1
+	RPNT -3,-1
+	RPNT -3,-1
+	RPNT -1,-3
+	RPNT -1,-3
+	RPNT 1,-3
+	RPNT 1,-3
+	RPNT 3,-1
+	RPNT 3,-1
+	RPNT 3,1
+	RPNT 3,1
+	RPNT 1,3
+
+DSTARS:	.←.+&lt;NSBRT*&lt;4*NSTARS+2>>	;Room for all the stars
+
+DLIST:				;The list itself...
+	.←.+&lt;10*MXSHIP>		;Room for scores and ships.
+
+	.←.+&lt;4*MXMINE>		;Space for the mines
+
+	.←.+&lt;4*MXTORP>		;Leave room for all of the torps.
+
+	DNOP			;Flag end of display list
+	DJMP DPRO
+;SHIP DESCRIPTION TABLES
+
+DBL←2*DBLDSP+2		;Single or double precision.
+
+;Description of ship #1.  These labels are only used to create
+;symbolic displacements relative to SHPTAB or to BASE.
+
+SHPTAB:
+BUTBIT:	.WORD 10	;Button-test bit
+INANG:	.WORD 0		;Initial orientation angle
+INPOS:			;Initial position
+.IFNZ DBLDSP
+	.WORD 20000,0
+	.WORD 20000,0
+.ELSE
+	.WORD 20000,20000
+.ENDC
+
+DPYSCR:	DLOC .GXUL-&lt;10*.CXSPC>,.GYUL	;The display list jumps here
+	D.CHR+.INT4			;to display the player's score.
+	.ASCII "012345"
+DSCORE:	EVEN
+	DLOC .GXUL-&lt;10*.CXSPC>,.GYUL-&lt;2*.CYSPC>
+	D.CHR
+	.ASCII "01"
+DTLFT:	.ASCII " TORPS"
+	EVEN
+	D.JMP
+DSCEND:	.WORD 0
+
+;The following bytes are indices into the POINTS table for generating
+;the ship drawing.
+
+MODEL:	.BYTE -40,-2,-4,-6,10,12,14,16,20,22,6
+	.BYTE 26,30,10,-20,32,34,22,0
+	EVEN
+
+SCORE:	.←.+2
+TRPLFT:	.←.+1		;# of torps remaining
+NTACT:	.←.+1		;# of torps active
+RELTIM:	.←.+2		;Torp tube reload timer
+TVELX:	.←.+2		;Torp launch velocity
+TVELY:	.←.+2
+NOSEX:	.←.+2		;Relative location of nose
+NOSEY:	.←.+2
+HEADING:.←.+2
+THRSTX:	.←.+DBL		;Thrust components
+THRSTY:	.←.+DBL
+VELOCX:	.←.+DBL		;Velocity components
+VELOCY:	.←.+DBL
+POSITX:	.←.+DBL		;Position coordinates
+POSITY:	.←.+DBL
+TYPE:	.←.+1		;0 ⊃ ship, 2 ⊃ mine, 4 ⊃ torp
+STAT:	.←.+1		;Status	= 0 means alive and well
+			;	= 1 means just killed
+			;between 2 and 31, exploding
+			;negative, post-explosion fade.
+DPYITM:	.←.+2		;Pointer back to display list entry
+
+BASE:	.←.+2		;Put the DP in absolute point mode.
+XPOS:	.←.+2		;Display coordinates of center of ship
+YPOS:	.←.+2
+	.←.+2		;Short vector mode.
+DRAWING: .←.+2		;First piece of the drawing is
+TRPTUB	←DRAWING	;the torpedo tube.
+	.←.+2		;then move to the tail.
+FLAME:	.←.+2		;Short vector mode, blink on.
+	.←.+2		;the flame itself
+	.←.+2		;Turn blink off again
+	.←.+46		;The rest of the drawing, ending with a DJMP
+SHPEND:			;back to the display list.
+;SHIP #2 AND TORPEDO DESCRIPTIONS.
+
+;This block uses the same relative labels as ship #1.
+
+	.WORD 100000		;Button test
+	.WORD 100000		;initial heading
+.IFNZ DBLDSP			;and position.
+	.WORD 160000,0,160000,0
+.ELSE
+	.WORD 160000,160000
+.ENDC
+
+	DLOC 0,2*.CYSPC		;Score display.
+	D.CHR+.INT4
+	.ASCII "012345"
+	EVEN
+	DLOC 0,0
+	D.CHR
+	.ASCII "99 TORPS"
+	EVEN
+	D.JMP
+	0
+
+;Model.  This had better be the same length for all ships, padded with
+;zeros if necessary.
+
+	.BYTE -40,-2,-4,-6,10,12,14,16,20,22,6
+	.BYTE 24,26,10,-20,34,36,22,0
+	EVEN
+
+.IFNZ &lt;.-SHPEND>-&lt;SCORE-SHPTAB>
+  .ERR	YOU FUCKED UP WITH YOUR SHIP DESCRIPTIONS!
+.ENDC
+
+	.←.+SHPEND-SCORE
+
+;Torpedoes are given blocks in free storage.  Referenced relative to BASE,
+;they have the same information for items VELOCX through YPOS except that
+;XPOS has the intensify bit turned on to display the torp as a point.
+;Following YPOS is a DJMP back to the display list.
+
+TRPAGE	←VELOCX-2	;Age counter for the torp's self-destruct mechanism
+TRPOWN	←TRPAGE-2	;Pointer to who launched it (for killer scoring).
+;EXPLOSION DRAWINGS
+
+BURST:	SVEC 0,0,.INVIS		;Ship explosion, initial state.
+	SVEC 1,0,.VIS
+	SVEC 0,1,.INVIS
+	SVEC 1,1,.VIS
+	SVEC -2,-2,.INVIS
+	SVEC 0,1,.VIS
+	SVEC -1,0,.INVIS
+	SVEC -1,1,.VIS
+	SVEC 2,-2,.INVIS
+	SVEC -1,0,.VIS
+	SVEC 0,-1,.INVIS
+	SVEC -1,-1,.VIS
+	SVEC 2,2,.INVIS
+	SVEC 0,-1,.VIS
+	SVEC 1,0,.INVIS
+	SVEC 1,-1,.VIS
+BURSTL←&lt;.-BURST>/2
+
+IBURST:	SVEC 1,0,.INVIS		;Increments for the invisible
+	SVEC 1,2,.INVIS		;vectors in the ship burst.
+	SVEC 2,1,.INVIS
+	SVEC 2,1,.INVIS
+	SVEC 1,2,.INVIS
+	SVEC 1,2,.INVIS
+	SVEC 2,1,.INVIS
+	SVEC 2,1,.INVIS
+IBRSTL←&lt;.-IBURST>/2
+
+MBURST:	SVEC 0,0,.INVIS		;Initial form of an exploding mine.
+	SVEC 1,1,.VIS
+	SVEC -1,-1,.INVIS
+	SVEC -1,1,.VIS
+	SVEC 1,-1,.INVIS
+	SVEC -1,-1,.VIS
+	SVEC 1,1,.INVIS
+	SVEC 1,-1,.VIS
+MBRSTL←&lt;.-MBURST>/2
+
+IMBRST:	SVEC 1,1,.INVIS		;Increment for the mine explosions.
+	SVEC 2,0,.INVIS
+	SVEC 0,2,.INVIS
+	SVEC 2,0,.INVIS
+IMBRSL←&lt;.-IMBRST>/2
+;DATA AREA - MISCELLANEOUS STUFF
+
+;Miscellaneous variables
+
+DSHPNT:	.WORD 0		;Point to ships in dpy list.
+DMIPNT:	.WORD 0		;Point to mines.
+DTRPNT:	.WORD 0		;Point to torps in display list
+TRPNT:	.WORD 0		;and free storage.
+FREPNT:	.WORD 0		;Pointer to free space.
+NSHIPS:	.WORD 0		;Number of ships
+NMINES:	.WORD 0		;Number of mines
+TICCNT:	.WORD 0		;Count clock ticks
+SWITCH:	.WORD 0		;Switch settings
+KILCTR:	.WORD 0		;Count things waiting to explode.
+NACTS:	.WORD 0		;Number of live ships
+NEXPS:	.WORD 0		;Number of exploding ships
+RANDNO:	.WORD 123456	;Random number
+
+;Tables of vectors rotated in all directions at initialize time
+;(32 two-word entries in each table)
+
+THRTAB:	.←.+200		;Thrust vectors
+
+.IFNZ DBLDSP
+THRTB1:	.←.+200		;Low-order parts of thrust vectors
+.ENDC
+
+NOSTAB:	.←.+200		;Relative location of ship's nose.
+
+TVTAB:	.←.+200		;Torpedo launch velocity.
+;POINT TABLE FOR MAKING THE SHIP DRAWINGS
+COMMENT⊗
+	I keep a set of 16 standard points in the array POINTS.
+These represent short displacements from the center of a ship to
+various spots in a ship at heading angle 0.  The initializing
+routine generates 32 rotations of these points covering the
+first quadrant.  These displacements are in integral leagues.
+
+	A ship model consists of an ordered set of pointers to
+these points, interpreted as a "follow-the-dots" sequence of
+drawing instructions.  These pointers are further coded with
+a negative sign meaning to draw an invisible vector.
+
+	Generating a ship drawing in some specified orientation
+consists of (1) setting up the base address of one of the point
+sets, (2) setting up the call to the proper procedure to get the
+points into the proper quadrant, and (3) interpreting the ship's
+model, using the specified point set, to generate the display
+short vector words.
+
+	The visible/invisible flags in the ship models are used
+only at initialization time.  The rest of the time, the intensify
+bits that are already in the display area stay there.  Because of
+this convention, setting the visual indicators for thrust and
+loaded torp tube is made easy - just change the state of a couple
+of bits in the display area.
+
+	One further convention for ship drawings: the first point
+is always the torp tube, and the third is always the tail flame.
+⊗
+
+POINTS	←.-2
+	.BYTE -25,0	;Tailpipe
+	.BYTE -35,0	;Flame
+
+	.BYTE -25,3	;Outline of body
+	.BYTE -10,5
+	.BYTE 12,5
+	.BYTE 33,0
+	.BYTE 12,-5
+	.BYTE -10,-5
+	.BYTE -25,-3
+
+	.BYTE -30,3	;Tailfin points
+	.BYTE -30,12
+	.BYTE -12,12
+	.BYTE -12,-12
+	.BYTE -30,-12
+	.BYTE -30,-3
+
+	.BYTE 3,0	;Torp tube
+	.←.+&lt;37*40>	;Leave room for the rotated points.
+FREEST:
+
+;The torpedo data blocks, at 32 words each, come here.
+;Yes, torps only need 17 words each, but 32 is a much nicer number.
+;ONE-TIME ONLY INITIALIZATION - ROTATE VECTORS
+
+;These routines set up the tables of rotations, then
+;get clobbered by free storage.
+
+CRANKUP:
+	RESET
+	MOV #PDL,SP		;Set up stack and
+	MOV #CRANKUP,PWR.V	;power-fail trap.
+	MOV (PC)+,@(PC)+
+	  PSWD 7
+	  PWR.V+2
+	CLR .PSW		;Priority 0.
+
+	MOV #TRGTAB,R0		;Indexes forward through cosines,
+	MOV #TRGEND+2,R1	;backward through sines.
+.IFNZ DBLDSP
+	PUSH #THRTB1		;Address of low part of thrust.
+.ENDC
+	PUSH #THRTAB		;Ad of high part of thrust
+	PUSH #NOSTAB		;Ad of noses.
+	PUSH #TVTAB		;Torp launch vectors.
+	PUSH #POINTS+42		;First loc for rotate points.
+
+NXTANG:	MOV (R0)+,COS		;Trig function lookup,
+	MOV -(R1),SIN
+	PUSH R0			;save addresses.
+	PUSH R1
+
+	MOV A,MQ0
+	PUSHJ TWOMUL		;Current angle of thrust,
+	PUSH T1			;Scale clobbers this.
+	SCALE XA,XD		;scaled the same as distance.
+	SCALE1 XA,XD
+	POP T1
+.IFNZ DBLDSP
+	PUSH MQ1		;Save low-order parts in THRTB1,
+	MOV 16(SP),MQ1
+	MOV MQ0,(MQ1)+
+	POP MQ0
+	MOV MQ0,(MQ1)+
+	MOV MQ1,14(SP)
+.ELSE
+	RNDAC AC0		;or round if not double precision.
+	RNDAC AC1
+.ENDC
+	MOV 12(SP),MQ1
+	MOV AC0,(MQ1)+		;High parts in THRTAB.
+	MOV AC1,(MQ1)+
+	MOV MQ1,12(SP)
+
+	MOV #SHIPL,MQ0	;Current angle for
+	PUSHJ TWOMUL		;nose offset,
+	RNDAC AC0		;rounded.
+	RNDAC AC1
+	MOV 10(SP),MQ1
+	MOV AC0,(MQ1)+		;Result goes to NOSTAB.
+	MOV AC1,(MQ1)+
+	MOV MQ1,10(SP)
+
+	MOV T,MQ0		;Torpedo launch vectors
+	PUSHJ TWOMUL		;go to TVTAB.
+	PUSH T1
+	SCALE XT,XD
+	SCALE1 XT,XD
+	POP T1
+	RNDAC AC0
+	RNDAC AC1
+	MOV 6(SP),MQ1
+	MOV AC0,(MQ1)+
+	MOV AC1,(MQ1)+
+	MOV MQ1,6(SP)
+
+	TST SIN			;For angle = 0, don't rotate points.
+	BEQ FRSTIM		;(They're already there).
+
+;Fall through to next page.
+	;Rotate the points in the ship drawings.
+
+	PUSH #20		;16 points in table.
+	MOV #POINTS+2,MQ0	;They come from here (at angle = 0)
+	MOV 6(SP),MQ1		;and go there.
+
+NXTPNT:	MOVB (MQ0)+,X		;Get the point.
+	MOVB (MQ0)+,Y
+	PUSH MQ0		;We'll be clobbering these registers.
+	PUSH MQ1
+	PUSHJ VECROT		;Make the rotation,
+	RNDAC AC0		;round off.
+	RNDAC AC1
+	POP MQ1			;Get the addresses back.
+	POP MQ0
+	MOVB X,(MQ1)+		;Store the rotated point.
+	MOVB Y,(MQ1)+
+	DEC (SP)		;Loop count.
+	BGT NXTPNT
+
+	ZAP			;Clean the stack,
+	MOV MQ1,4(SP)		;save address for next angle.
+
+FRSTIM:	POP R1			;Done with an angle,
+	POP R0			;get back trig indices.
+	CMP R0,#TRGEND		;Are we at 31/32 of 90 deg?
+	BEQ ENDNIT
+	JMP NXTANG
+
+ENDNIT:	MOV #RESTRT,STRTAD	;Change the start address.
+	JMP RESTRT
+	;VECTOR ROTATE ROUTINE (FOR SETTING UP TABLES)
+
+COMMENT⊗
+	Enter with X component in X, Y in Y, cos and sin of
+angle in COS and SIN.  Does the vector*matrix multiply, assuming
+fractional arithmetic.  Returns the double-precision X in (AC0,MQ0)
+and Y in (AC1,MQ1).  Leaves COS and SIN unchanged.
+⊗
+
+VECROT:	PUSH AC0	;Save X on stack.
+	MOV Y,MQ0
+	PUSHJ TWOMUL	;do Y*COS and Y*SIN
+	PUSH AC1	;Save results in reverse order.
+	PUSH MQ1
+	PUSH AC0
+	PUSH MQ0
+	MOV 10(SP),MQ0	;Get X back,
+	PUSHJ TWOMUL	;do X*COS and X*SIN.
+	ADD (SP)+,MQ1	;Y'←X*SIN+Y*COS
+	ADC AC1
+	ADD (SP)+,AC1
+	NOP
+	SUB (SP)+,MQ0	;X'←X*COS-Y*SIN
+	SBC AC0
+	SUB (SP)+,AC0
+	ZAP		;Clean up the stack.
+	POPJ
+
+;TABLE OF COSINES FOR 32 EQUALLY-SPACED INCREMENTS FROM 0 TO 90 DEG.
+;These values are 15-bit fractions, generated by a SAIL program.
+
+TRGTAB:
+.WORD	77777,	77731,	77543,	77236,	76613,	76052,	75175,	74205
+.WORD	73102,	71666,	70343,	66713,	65156,	63320,	61362,	57330
+.WORD	55203,	52766,	50464,	46100,	43435,	40717,	36127,	33273
+.WORD	30374,	25440,	22451,	17432,	14371,	11311,	06214,	03110
+TRGEND:	.WORD	00000
+
+.END START
+</pre>
+</body>
+</html>
