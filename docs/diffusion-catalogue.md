@@ -118,6 +118,20 @@ essentially North American.
   - https://www.bitsavers.org/pdf/dec/pdp1/PDP-1_SerialNumbers.pdf
   - https://en.wikipedia.org/wiki/PDP-1
 
+### 4b-bis. United Kingdom — documented (single secondary source)
+
+- **DUEL (Cambridge, UK)** [FOREIGN: UK] — c.1968, a Spacewar! adaptation called
+  *DUEL*, written by two graduate students, **M. S. Peterson and John C. Viner**, on the
+  **PDP-7A** (purchased 1966, with a Type 340 CRT display) at the **University of
+  Cambridge** (the Computer Laboratory / Mathematical Laboratory). Relationship:
+  re-implementation / adaptation. Per the source it "appears to have been simply a
+  demonstration of the PDP-7's graphical capabilities and wasn't taken very seriously:
+  no copies survive at Cambridge." This is the **earliest documented European Spacewar**,
+  and it resolves the `cambridge.html` question (Cambridge UK, not Cambridge MA).
+  Confidence: moderate — single secondary source (the Kinephanos "Long Journey of
+  Spacewar!" survey), specific but uncorroborated; no surviving code.
+  - https://www.kinephanos.ca/2015/space-odyssey-the-long-journey-of-spacewar-from-mit-to-computer-labs-around-the-world/
+
 ### 4c. Not substantiated / negative findings
 
 - **USSR / Eastern bloc** [FOREIGN: USSR] — **no documented Soviet Spacewar found,
