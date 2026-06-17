@@ -28,6 +28,15 @@
     .spectable { width:100%; border-collapse:collapse; margin:0.4rem 0 0.2rem; font-size:0.8rem; }
     .spectable th, .spectable td { text-align:left; vertical-align:top; padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); }
     .spectable th { color:var(--bright); font-family:var(--mono); font-weight:normal; white-space:nowrap; width:34%; }
+    .chargen-box { clear:both; margin:1.8rem 0 0.4rem; }
+    .chargen-field { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin:0 0 0.7rem;
+      font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; color:var(--phosphor-dim); text-transform:uppercase; }
+    .chargen-field input { flex:1 1 auto; min-width:200px; background:#02060a; border:1px solid var(--line); border-radius:3px;
+      color:var(--bright); font-family:var(--mono); font-size:0.95rem; letter-spacing:0.1em; padding:0.5rem 0.7rem; text-transform:none; }
+    .chargen-field input:focus { outline:none; border-color:#6cf2ff; box-shadow:0 0 10px rgba(108,242,255,0.3); }
+    .chargen-stage { width:100%; border:1px solid var(--line); border-radius:6px; background:#02060a;
+      box-shadow:0 0 26px rgba(108,242,255,0.07), inset 0 0 50px rgba(0,0,0,0.6); overflow:hidden; }
+    .chargen-stage canvas { display:block; width:100%; height:auto; }
   </style>
 </head>
 <body>
@@ -154,6 +163,16 @@
         <a href="assets/images/photo-of-pdp1-font.jpeg" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/photo-of-pdp1-font.jpeg" alt="Photograph of characters drawn on a PDP-1 display" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
         <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;text-align:center;">Characters on a PDP-1 display, each one plotted point by point. Computer History Museum (<a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/collections/catalog/102663947">102663947</a>). <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
       </figure>
+
+      <div class="chargen-box">
+        <span class="kicker">Try it: the BBN-37 character generator, live</span>
+        <div class="chargen-field">
+          <label for="chargenInput">Type:</label>
+          <input id="chargenInput" type="text" maxlength="42" value="spacewar 1962" autocomplete="off" spellcheck="false" aria-label="Text to draw on the PDP-1 character generator">
+        </div>
+        <div class="chargen-stage"><canvas id="chargen" width="680" height="120" aria-label="Live PDP-1 character generator output"></canvas></div>
+        <p class="micro" style="margin-top:0.5rem;font-size:0.6rem;line-height:1.6;">Drawn dot by dot from the original <b>BBN-37</b> glyph table, two 18-bit words per character (a 5&times;7 dot pattern), the same data the PDP-1 plotted. Lowercase, digits and a little punctuation only, as on the machine. Routine by Ben Gurley and Welden Clark (DEC/BBN, <a target="_blank" rel="noopener noreferrer" href="https://archive.computerhistory.org/resources/text/DEC/pdp-1/DEC.pdp_1.1961.102650098.pdf">1961</a>); glyph data after <a target="_blank" rel="noopener noreferrer" href="https://masswerk.at/spacewar/chargen/">masswerk.at/spacewar/chargen</a>.</p>
+      </div>
     </section>
 
     <div class="rule"><span>the MIT machine</span></div>
@@ -228,6 +247,77 @@
     if (mc) mc.addEventListener('click', closeM);
     m.addEventListener('click', function (e) { if (e.target === m) closeM(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeM(); });
+  })();
+  </script>
+
+  <script>
+  // Live BBN-37 character generator. Each glyph is two 18-bit octal words; the 35 bits
+  // are a 5x7 dot matrix read column by column (left to right), bottom to top, MSB first.
+  // Data after the 1961 DEC/BBN routine (Gurley & Clark) via masswerk.at/spacewar/chargen.
+  (function () {
+    var G = {
+      ' ':['0','0'],'1':['2057','740000'],'2':['413032','144614'],'3':['206231','545542'],
+      '4':['100602','411376'],'5':['276231','144542'],'6':['372231','144544'],'7':['604421','102406'],
+      '8':['332231','144554'],'9':['32231','144574'],'0':['161050','121070'],'?':['40','154414'],
+      's':['232231','144544'],'t':['4037','700402'],'u':['376010','40176'],'v':['175010','20076'],
+      'w':['775003','20376'],'x':['405043','421202'],'y':['4057','401002'],'z':['606431','142606'],
+      ',':['12','030000'],'j':['202010','137402'],'k':['774202','421202'],'l':['776010','40200'],
+      'm':['774041','401376'],'n':['774141','30376'],'o':['372030','140574'],'p':['774221','104414'],
+      'q':['372032','160774'],'r':['774223','124614'],'-':['201','4000'],')':['2027','600000'],
+      '(':['7','640400'],'a':['760442','111370'],'b':['776231','144554'],'c':['372030','140504'],
+      'd':['776030','121070'],'e':['776231','144602'],'f':['774221','104402'],'g':['372030','150544'],
+      'h':['774201','4376'],'i':['2037','740400'],'.':['10','0']
+    };
+    function cells(ch) {
+      var g = G[ch] || G[' '], w1 = parseInt(g[0], 8), w2 = parseInt(g[1], 8), c = [];
+      for (var col = 0; col < 5; col++) { c[col] = []; for (var r = 0; r < 7; r++) {
+        var i = col * 7 + r; c[col][r] = i < 18 ? (w1 >> (17 - i)) & 1 : (w2 >> (17 - (i - 18))) & 1;
+      } }
+      return c;
+    }
+    var cv = document.getElementById('chargen'), inp = document.getElementById('chargenInput');
+    if (!cv || !inp || !cv.getContext) return;
+    var ctx = cv.getContext('2d');
+    var PITCH = 6, ADV = 7 * PITCH, LH = 9 * PITCH, MX = 12, MY = 16;
+    var dots = [], shown = 0, raf = null;
+
+    function build() {
+      var text = (inp.value || '').toLowerCase(), x = MX, y = MY, maxW = cv.width - MX - PITCH * 5;
+      dots = [];
+      for (var k = 0; k < text.length; k++) {
+        var ch = text[k];
+        if (ch !== ' ' && x > maxW) { x = MX; y += LH; }
+        if (ch !== ' ') {
+          var c = cells(ch);
+          for (var col = 0; col < 5; col++) for (var r = 0; r < 7; r++) {
+            if (c[col][r]) dots.push([x + col * PITCH, y + (6 - r) * PITCH]);
+          }
+        }
+        x += ADV;
+      }
+      cv.height = Math.max(110, y + 7 * PITCH + MY);   // resizing also clears the canvas
+      ctx.fillStyle = '#02060a'; ctx.fillRect(0, 0, cv.width, cv.height);
+      shown = 0;
+      if (raf) clearTimeout(raf);
+      if (document.hidden) {        // hidden/backgrounded tabs throttle timers: draw it all at once
+        for (var d = 0; d < dots.length; d++) plot(dots[d][0], dots[d][1]);
+        shown = dots.length;
+      } else {
+        raf = setTimeout(step, 16); // visible: animate the points dot by dot
+      }
+    }
+    function plot(x, y) {
+      ctx.beginPath(); ctx.fillStyle = 'rgba(150,255,205,0.4)'; ctx.arc(x, y, 2.5, 0, 6.2832); ctx.fill();
+      ctx.beginPath(); ctx.fillStyle = 'rgba(190,246,255,0.95)'; ctx.arc(x, y, 1.35, 0, 6.2832); ctx.fill();
+    }
+    function step() {
+      var n = Math.min(dots.length, shown + 5);
+      for (var i = shown; i < n; i++) plot(dots[i][0], dots[i][1]);
+      shown = n;
+      if (shown < dots.length) raf = setTimeout(step, 16);
+    }
+    inp.addEventListener('input', build);
+    build();
   })();
   </script>
 
