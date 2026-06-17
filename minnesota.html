@@ -81,11 +81,19 @@
       <span class="kicker">The Minnesota Panic Button</span>
       <h3>Invisibility, not hyperspace</h3>
       <p>The MIT game's hyperspace is an escape of last resort: press it and your ship jumps to a random point, at the risk of materialising inside the sun and being destroyed. It is pure luck. Kuhfeld replaced it with something better. The <b>Minnesota Panic Button</b> makes your ship invisible, but, as he put it, "your enemy can't see you, but neither can you yourself". You keep moving and steering blind, and your exhaust flame and any torpedo you fire give your position away. The escape now rewards nerve and dead reckoning rather than chance, "a panic button involving skill rather than luck".</p>
+      <blockquote style="clear:both;border-left:2px solid var(--line);margin:1.4rem 0;padding:0.2rem 0 0.2rem 1.1rem;font-style:italic;color:var(--phosphor-dim);">
+        "While programming Minnesota Spacewar, I opted for a panic button involving skill rather than luck. The Minnesota Panic Button makes your ship invisible. Your enemy can't see you, but neither can you yourself. The advantage lies with the player who is better at mentally predicting trajectories, which is made simpler because the rocket flames are not invisible: any course alterations will immediately pinpoint ship position."
+        <span style="display:block;margin-top:0.5rem;font-style:normal;font-size:0.7rem;color:var(--phosphor-dim);">Kuhfeld, <i>Analog</i>, 1971 (p. 71).</span>
+      </blockquote>
       <p><figure style="float:right;width:38%;max-width:230px;margin:0.2rem 0 0.9rem 1.4rem;">
         <a href="assets/images/1971-kuhfeld-p72-analogmagazine.png" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/1971-kuhfeld-p72-analogmagazine.png" alt="Diagram of toroidal space: the ship Arrow fires across the edge of the universe to hit the Flying Wedge" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
         <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">Rocketship Arrow demonstrates "toroidal space" by firing across the edge of the universe to destroy the villainous opponent Flying Wedge. Arrows have been drawn in to clarify the situation to some extent. (Timing between plots, .75 seconds.) <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
       </figure>
       The rest of his changes tended to focus on tactics in the game. Ammunition is limited to twenty torpedoes a ship rather than the MIT thirty-one; they fire in salvoes of up to four at one-second intervals; fuel runs to about two minutes of thrust; and retro-rockets brake the ship at roughly a quarter of main power. Every one of these is a design judgement about how the game should feel, made by a player who had never seen the original code.</p>
+      <blockquote style="clear:both;border-left:2px solid var(--line);margin:1.4rem 0;padding:0.2rem 0 0.2rem 1.1rem;font-style:italic;color:var(--phosphor-dim);">
+        "When a ship reaches the right edge of the CRT, it reappears at the left edge. When it goes out the top, it comes back in the bottom ... This is easy to program, for it is something digital computers will do automatically because of the way they handle positive and negative numbers. It's quite possible that the original programmers of Spacewar were as surprised by the effect as anybody is upon seeing the game for the first time, but if they were, they realized they had a good thing going and kept it. With the relatively small display terminals usually available, this little trick is the only thing that keeps the game from getting cramped."
+        <span style="display:block;margin-top:0.5rem;font-style:normal;font-size:0.7rem;color:var(--phosphor-dim);">Kuhfeld on "toroidal space", <i>Analog</i>, 1971 (p. 72).</span>
+      </blockquote>
     </section>
 
     <div class="rule"><span>spacewar on the newsstand</span></div>
@@ -93,7 +101,7 @@
     <section class="block">
       <span class="kicker">Analog, July 1971</span>
       <h3>The game in a science-fiction magazine</h3>
-      <p><figure style="float:right;width:44%;max-width:300px;margin:0.2rem 0 0.9rem 1.4rem;">
+      <p><figure style="float:left;width:44%;max-width:300px;margin:0.2rem 1.4rem 0.9rem 0;">
         <a href="assets/images/spacewar-flowchart-1971-kuhfeld-analog.png" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/spacewar-flowchart-1971-kuhfeld-analog.png" alt="Spacewar program flowchart from Kuhfeld's 1971 Analog article, the program flow broken into boxes with the 'Generate Picture, SHIPA' box expanded into its sub-elements" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
         <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">SPACEWAR FLOWCHART: Here the program flow is broken up into its elements, represented by the small boxes. The box labeled "Generate Picture, SHIPA" has been similarly broken into its smaller elements as a representative sample. Each box in the program could be similarly broken down, and it would be quite possible to break down the boxes in the detailed example into their smaller elements (Kuhfeld 1971: 70). <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
       </figure>
@@ -119,6 +127,10 @@
         <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">SPIN-AND-DRIFT with flip getaway. The good ship Flying Wedge begins with a rapid spin to clockwise, while firing its tail rockets. When it is far enough from the sun that flying can be neglected for a moment, it turns to face the enemy ship Arrow (conveniently playing the part of a sitting duck in this enactment) and fires. Flying Wedge then continues its spin and accelerates past the sun, achieving an orbit rather like the "left" variation in the other image. (Timing between plots, 2 seconds.) <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
       </figure>
       Minnesota makes plain something the version table can only gesture to: that to re-implement <i>Spacewar!</i> was to interpret it. Kuhfeld did not merely move the game to a new machine, he argued with it, and his argument, that an escape mechanism should test skill rather than luck, is a piece of design criticism written in code. Each lab that received the game retuned it to its own taste, so that "<i>Spacewar!</i>" by the late 1960s is less a single program than a family of differing readings of one idea.</p>
+      <blockquote style="clear:both;border-left:2px solid var(--line);margin:1.4rem 0;padding:0.2rem 0 0.2rem 1.1rem;font-style:italic;color:var(--phosphor-dim);">
+        "Although it uses a computer to handle orbital mechanics, physicists and mathematicians have no great playing advantage; John Campbell's seventeen-year-old daughter beat her MIT student-instructor on her third try and thereafter, while the most promising player I've seen was a theology student. Good reflexes and an eye for motion seem to be far more important than training in the concepts involved. And most perverse of all, the fun part of the game isn't really playing it, it's writing the program."
+        <span style="display:block;margin-top:0.5rem;font-style:normal;font-size:0.7rem;color:var(--phosphor-dim);">Kuhfeld, <i>Analog</i>, 1971 (p. 78).</span>
+      </blockquote>
       <p style="margin-top:1.4rem;"><a class="btn ghost" href="code.html">← Back to the versions and the ports table</a></p>
     </section>
 
