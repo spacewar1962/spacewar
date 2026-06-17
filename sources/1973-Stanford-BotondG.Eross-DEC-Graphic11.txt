@@ -1,64 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head><link rel="stylesheet" href="/css/u8.css" /><meta charset="utf-8" />
-<title>SW.P11[11,BO] - www.SailDart.org</title>
-</head>
-<body id="u8body">
-<div id="tagline">perm filename SW.P11[11,BO]  blob <a href="SW.P11[11,BO]_blob">sn#154423</a> filedate 1975-04-11 generic text, type C, neo UTF8</div>
-<pre id="u8lump">COMMENT ⊗   VALID 00051 PAGES
-C REC  PAGE   DESCRIPTION
-C00001 00001
-C00005 00002	.TITLE SPCWAR	GT40 SPACEWAR PROGRAM
-C00007 00003	OPERATING INSTRUCTIONS AND RULES OF THE GAME
-C00014 00004	PROGRAM ORIGIN, ACCUMULATOR DEFINITIONS, BASIC PARAMETERS
-C00017 00005	DESCRIPTION OF THE UNIVERSE
-C00020 00006	FURTHER DESCRIPTION OF THE UNIVERSE
-C00025 00007	HANDY DANDY MACROS
-C00027 00008	PROGRAM ORGANIZATION
-C00032 00009	RESTART INITIALIZATION
-C00034 00010		New hand - set the stars in the sky.
-C00036 00011		Set up ships
-C00039 00012		Lay mines
-C00043 00013		Initialize torp list, and count down.
-C00045 00014	MAIN PROGRAM (LEVEL 0)
-C00047 00015	CLOCK LEVEL AND LEVEL-SHIFTING
-C00049 00016	MOTION ROUTINE (LEVEL 3)
-C00051 00017		DEAD SHIP MOTION
-C00053 00018		Dead mine
-C00054 00019		TORPEDO MOTION
-C00056 00020		LIVE SHIP MOTION
-C00058 00021			TORPEDO LAUNCHING
-C00062 00022		GRAVITY CALCULATION FOR SHIPS AND MINES
-C00065 00023		POSITION CALCULATIONS... SHIPS, MINES, TORPS.
-C00067 00024		SHIP ROTATION ROUTINE
-C00071 00025			ROTATION CONTINUED
-C00074 00026		COMPUTE SQUARE OF DISTANCE FROM SUN
-C00075 00027	PROXIMITY CHECK (LEVEL 2)
-C00078 00028		Collision test 1 - take care of non-ships.
-C00081 00029		Collision test 2 - ship involved.
-C00084 00030			Ship's detailed collision outline
-C00086 00031			Distance calculation
-C00088 00032	MARK AN OBJECT FOR EXPLOSION
-C00090 00033	MAKE AN EXPLOSION (LEVEL 2)
-C00092 00034		SHIP EXPLODING
-C00094 00035		Mine exploding
-C00095 00036	SUBROUTINES:	two-at-a-time multiplier
-C00098 00037			Single multiplier
-C00102 00038			El Cheapo binary-to-ASCII converter.
-C00103 00039			Divide routine (BLECH!)
-C00104 00040			Square-root routine
-C00108 00041			Pseudo-random number generator
-C00109 00042	COUNT-DOWN HACK FOR STARTUP.
-C00111 00043	THE DISPLAY LIST
-C00113 00044	SHIP DESCRIPTION TABLES
-C00117 00045	SHIP #2 AND TORPEDO DESCRIPTIONS.
-C00119 00046	EXPLOSION DRAWINGS
-C00121 00047	DATA AREA - MISCELLANEOUS STUFF
-C00123 00048	POINT TABLE FOR MAKING THE SHIP DRAWINGS
-C00127 00049	ONE-TIME ONLY INITIALIZATION - ROTATE VECTORS
-C00130 00050		Rotate the points in the ship drawings.
-C00132 00051		VECTOR ROTATE ROUTINE (FOR SETTING UP TABLES)
-C00134 ENDMK
+; SPCWAR -- GT40 (PDP-11) Spacewar, copyright 1973 by Botond G. Eross,
+; Artificial Intelligence Project, Computer Science Department, Stanford University.
+; Recovered from the Stanford SAILDART archive (SW.P11[11,BO], filedate 1975-04-11);
+; SailDart page directory and HTML wrapper stripped, HTML entities unescaped.
+;
 C⊗;
 .TITLE SPCWAR	GT40 SPACEWAR PROGRAM
 
@@ -215,8 +159,8 @@ MNSBRT	←D.PNT+.INT2
 
 DBLDSP←1	;Use double-precision position, velocity, acceleration.
 
-XOFF	←.GXUL+1⊗&lt;-1>	;Screen position of center of sun.
-YOFF	←.GYUL+1⊗&lt;-1>
+XOFF	←.GXUL+1⊗<-1>	;Screen position of center of sun.
+YOFF	←.GYUL+1⊗<-1>
 
 MOTLVL	←3	;Priority level for MOTION
 PRXLVL	←2	;		for PROX
@@ -227,7 +171,7 @@ EXPLVL	←2	;		for EXPLODE
 
 SHIPL←40⊗5		;Half-length of a ship
 SHIPW←10⊗5		;Half-width of a ship
-OVALR←&lt;SHIPW/2+SHIPL>*2	;"Radius" of a ship's colision oval.
+OVALR←<SHIPW/2+SHIPL>*2	;"Radius" of a ship's colision oval.
 
 MINER←10⊗5		;Radius of a mine
 TORPR←5⊗5		;Radius of a torp for torp-torp collisions
@@ -335,7 +279,7 @@ SYM:	.WORD .FRA
 .MACR NORM EXP,FRA		;Sub-macro to normalize.
 	    .IFNZ FRA∧100000
 	      EXP←EXP+1
-	      FRA←&lt;FRA+1>⊗&lt;-1>
+	      FRA←<FRA+1>⊗<-1>
 	    .ELSF Z FRA∧40000
 	      EXP←EXP-1
 	      FRA←FRA⊗1
@@ -365,7 +309,7 @@ R:140000⊗XR*TPFN	;scaled to add directly to heading.
 
 XS←-6			;S = 2↑-6 au
 S: .WORD 100000⊗XS	;Scaled to add directly to distances.
-SQ: .WORD 100000⊗&lt;2*XS>	;S↑2 (for minimum orbit distance test)
+SQ: .WORD 100000⊗<2*XS>	;S↑2 (for minimum orbit distance test)
 
 XD←0			;Scaling of distances
 XID←-XS			;Scaling of inverse distance
@@ -376,11 +320,11 @@ XGD←XG+XID		;Scaling of G/D for mine velocity calculation,
 .ENDC
 ;HANDY DANDY MACROS
 
-;SCALE &lt;CURRENT SCALING>,&lt;DESIRED SCALING>
+;SCALE <CURRENT SCALING>,<DESIRED SCALING>
 ;SCALE operates on (AC0,MQ0).  SCALE1 does (AC1,MQ1).
 
 .MACR SCALE CUR,DES
-	  .SC←&lt;CUR>-&lt;DES>
+	  .SC←<CUR>-<DES>
 	  .IFNZ .SC
 	    .IFG .SC
 	      .REPT .SC
@@ -398,7 +342,7 @@ XGD←XG+XID		;Scaling of G/D for mine velocity calculation,
 .ENDM
 
 .MACR SCALE1 CUR,DES
-	  .SC←&lt;CUR>-&lt;DES>
+	  .SC←<CUR>-<DES>
 	  .IFNZ .SC
 	    .IFG .SC
 	      .REPT .SC
@@ -560,7 +504,7 @@ NXTSHP:	MOV #ATLIM,DTLFT-TRPLFT-2(SHIP)	;Display torp limit
 	CLR (SHIP)			;Reload timer
 	MOV INANG-RELTIM(SHIP),HEADING-RELTIM(SHIP)	;Heading
 	ADD #VELOCX-RELTIM,SHIP		;Skip over torp velocity,
-	MOV #&lt;POSITX-VELOCX>/2,T0	;nose, and thrust.
+	MOV #<POSITX-VELOCX>/2,T0	;nose, and thrust.
 
 CLRVEL:	CLR (SHIP)+		;Clear ship's velocity
 	DEC T0
@@ -568,7 +512,7 @@ CLRVEL:	CLR (SHIP)+		;Clear ship's velocity
 
 	MOV SHIP,AC1
 	ADD #INPOS-POSITX,AC1
-	MOV #&lt;TYPE-POSITX>/2,T0
+	MOV #<TYPE-POSITX>/2,T0
 
 SETPOS:	MOV (AC1)+,(SHIP)+	;Set initial position.
 	DEC T0
@@ -621,7 +565,7 @@ DRWEND:	MOV #D.JMP,-2(AC1)	;Finish up with a DJMP back to
 	JMP MINEND
 
 LAYMI0:	PUSH AC0		;Save display list pointer.
-LAYMIN:	MOV #2+&lt;2*DBLDSP>,T0
+LAYMIN:	MOV #2+<2*DBLDSP>,T0
 LAYMI1:	CLR (SHIP)+		;Clear mine's velocity.
 	DEC T0
 	BGT LAYMI1
@@ -665,7 +609,7 @@ LAYMI2:	PUSHJ RANDOM		;Make a random position.
 
 LAYM2A:	PUSHJ SQRT		;Distance from sun,
 	MOV MQ0,T0
-	MOV #100000⊗&lt;-XID>,AC0
+	MOV #100000⊗<-XID>,AC0
 	CLR MQ0
 	PUSHJ UDIV		;inverse of distance.
 	CLC
@@ -721,7 +665,7 @@ LAYMI3:
 	MOV AC0,VELOCX-BASE(SHIP)
 	MOV AC1,VELOCY-BASE(SHIP)
 
-LAYMI4:	ADD #14+&lt;2*MBRSTL>,SHIP	;Advance to next mine.
+LAYMI4:	ADD #14+<2*MBRSTL>,SHIP	;Advance to next mine.
 	POP T1
 	DEC T1
 	BLE LAYMI5
@@ -1089,7 +1033,7 @@ GRAV1:	PUSH SHIP
 	PUSHJ SQRT		;D ≤ .707 au scaled XD.
 
 	MOV MQ0,T0
-	MOV #100000⊗&lt;-XID>,AC0
+	MOV #100000⊗<-XID>,AC0
 	CLR MQ0
 	PUSHJ UDIV		;1/D, scaled XID.
 	CLC
@@ -1124,8 +1068,8 @@ GRAV1:	PUSH SHIP
 	MOV AC1,T1
 	POP MQ0
 	PUSHJ TWOMUL		;Accel. ← -G*(X,Y)/D↑3
-	SCALE XG+&lt;2*XID>+1,XD	;Rescale the same as distance.
-	SCALE1 XG+&lt;2*XID>+1,XD
+	SCALE XG+<2*XID>+1,XD	;Rescale the same as distance.
+	SCALE1 XG+<2*XID>+1,XD
 .IFNZ DBLDSP			;Double-precision distances?
 	POP T0
 	ADD MQ0,VELOCX+2-BASE(T0)	;Yes.  Add low part of acceleration
@@ -2028,14 +1972,14 @@ DPRO:	DSETS .STPDIS+.LPDIM+.NOITAL+.SYNCH
 	RPNT 3,1
 	RPNT 1,3
 
-DSTARS:	.←.+&lt;NSBRT*&lt;4*NSTARS+2>>	;Room for all the stars
+DSTARS:	.←.+<NSBRT*<4*NSTARS+2>>	;Room for all the stars
 
 DLIST:				;The list itself...
-	.←.+&lt;10*MXSHIP>		;Room for scores and ships.
+	.←.+<10*MXSHIP>		;Room for scores and ships.
 
-	.←.+&lt;4*MXMINE>		;Space for the mines
+	.←.+<4*MXMINE>		;Space for the mines
 
-	.←.+&lt;4*MXTORP>		;Leave room for all of the torps.
+	.←.+<4*MXTORP>		;Leave room for all of the torps.
 
 	DNOP			;Flag end of display list
 	DJMP DPRO
@@ -2057,11 +2001,11 @@ INPOS:			;Initial position
 	.WORD 20000,20000
 .ENDC
 
-DPYSCR:	DLOC .GXUL-&lt;10*.CXSPC>,.GYUL	;The display list jumps here
+DPYSCR:	DLOC .GXUL-<10*.CXSPC>,.GYUL	;The display list jumps here
 	D.CHR+.INT4			;to display the player's score.
 	.ASCII "012345"
 DSCORE:	EVEN
-	DLOC .GXUL-&lt;10*.CXSPC>,.GYUL-&lt;2*.CYSPC>
+	DLOC .GXUL-<10*.CXSPC>,.GYUL-<2*.CYSPC>
 	D.CHR
 	.ASCII "01"
 DTLFT:	.ASCII " TORPS"
@@ -2140,7 +2084,7 @@ SHPEND:			;back to the display list.
 	.BYTE 24,26,10,-20,34,36,22,0
 	EVEN
 
-.IFNZ &lt;.-SHPEND>-&lt;SCORE-SHPTAB>
+.IFNZ <.-SHPEND>-<SCORE-SHPTAB>
   .ERR	YOU FUCKED UP WITH YOUR SHIP DESCRIPTIONS!
 .ENDC
 
@@ -2171,7 +2115,7 @@ BURST:	SVEC 0,0,.INVIS		;Ship explosion, initial state.
 	SVEC 0,-1,.VIS
 	SVEC 1,0,.INVIS
 	SVEC 1,-1,.VIS
-BURSTL←&lt;.-BURST>/2
+BURSTL←<.-BURST>/2
 
 IBURST:	SVEC 1,0,.INVIS		;Increments for the invisible
 	SVEC 1,2,.INVIS		;vectors in the ship burst.
@@ -2181,7 +2125,7 @@ IBURST:	SVEC 1,0,.INVIS		;Increments for the invisible
 	SVEC 1,2,.INVIS
 	SVEC 2,1,.INVIS
 	SVEC 2,1,.INVIS
-IBRSTL←&lt;.-IBURST>/2
+IBRSTL←<.-IBURST>/2
 
 MBURST:	SVEC 0,0,.INVIS		;Initial form of an exploding mine.
 	SVEC 1,1,.VIS
@@ -2191,13 +2135,13 @@ MBURST:	SVEC 0,0,.INVIS		;Initial form of an exploding mine.
 	SVEC -1,-1,.VIS
 	SVEC 1,1,.INVIS
 	SVEC 1,-1,.VIS
-MBRSTL←&lt;.-MBURST>/2
+MBRSTL←<.-MBURST>/2
 
 IMBRST:	SVEC 1,1,.INVIS		;Increment for the mine explosions.
 	SVEC 2,0,.INVIS
 	SVEC 0,2,.INVIS
 	SVEC 2,0,.INVIS
-IMBRSL←&lt;.-IMBRST>/2
+IMBRSL←<.-IMBRST>/2
 ;DATA AREA - MISCELLANEOUS STUFF
 
 ;Miscellaneous variables
@@ -2279,7 +2223,7 @@ POINTS	←.-2
 	.BYTE -30,-3
 
 	.BYTE 3,0	;Torp tube
-	.←.+&lt;37*40>	;Leave room for the rotated points.
+	.←.+<37*40>	;Leave room for the rotated points.
 FREEST:
 
 ;The torpedo data blocks, at 32 words each, come here.
@@ -2431,6 +2375,3 @@ TRGTAB:
 TRGEND:	.WORD	00000
 
 .END START
-</pre>
-</body>
-</html>
