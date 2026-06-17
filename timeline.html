@@ -525,12 +525,17 @@
     // ---- The sun: a small spiky vector star, like the game's heavy star ----
     var sunEl = document.getElementById('tlSun');
     if (sunEl) {
-      var lens = [25,13,21,12,26,15,22,13,24,16,20,12,25,14,23,13,26,15,19,22], N = lens.length, spikes = '';
-      for (var s = 0; s < N; s++) {
-        var ang = (s / N) * Math.PI * 2, L = lens[s];
-        spikes += '<line x1="0" y1="0" x2="' + (Math.cos(ang) * L).toFixed(1) + '" y2="' + (Math.sin(ang) * L).toFixed(1) + '"/>';
+      // the game's heavy star: irregular short segments, redrawn so it crackles like a Minskytron
+      function drawSun() {
+        var spikes = '', n = 14;
+        for (var s = 0; s < n; s++) {
+          var ang = Math.random() * Math.PI * 2, r1 = 1.5 + Math.random() * 4, r2 = r1 + 5 + Math.random() * 17;
+          spikes += '<line x1="' + (Math.cos(ang) * r1).toFixed(1) + '" y1="' + (Math.sin(ang) * r1).toFixed(1) + '" x2="' + (Math.cos(ang) * r2).toFixed(1) + '" y2="' + (Math.sin(ang) * r2).toFixed(1) + '"/>';
+        }
+        sunEl.innerHTML = '<svg viewBox="-30 -30 60 60" aria-hidden="true">' + spikes + '<circle class="core" cx="0" cy="0" r="1.8"/></svg>';
       }
-      sunEl.innerHTML = '<svg viewBox="-30 -30 60 60" aria-hidden="true">' + spikes + '<circle class="core" cx="0" cy="0" r="2.4"/></svg>';
+      drawSun();
+      setInterval(drawSun, 130);
     }
 
     // ---- The journey map: arcs launch one by one with a flyer + year tag; clickable; replayable ----
