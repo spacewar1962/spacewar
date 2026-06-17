@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Timeline: Spacewar! 1961–1980</title>
-  <meta name="description" content="An interactive timeline of Spacewar!, from its conception at MIT in 1961 to the arcade era of 1980: the MIT versions, the long journey of ports and clones, the culture, and the legacy. Click through to the sources, photographs, and stories.">
+  <title>Timeline: Spacewar! 1961–2026</title>
+  <meta name="description" content="An interactive timeline of Spacewar!, from its conception at MIT in 1961 to its recovery and re-reading today: the MIT versions, the long journey of ports and clones, the culture, and the legacy. Click through to the sources, photographs, and stories.">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <meta property="og:title" content="Timeline: Spacewar! 1961–1980">
-  <meta property="og:description" content="An interactive timeline of Spacewar!, from MIT 1961 to the arcade era of 1980, with click-throughs to sources, photographs, and stories.">
+  <meta property="og:title" content="Timeline: Spacewar! 1961–2026">
+  <meta property="og:description" content="An interactive timeline of Spacewar!, from MIT 1961 to its recovery and re-reading today, with click-throughs to sources, photographs, and stories.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://spacewar1962.github.io/spacewar/timeline.html">
   <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
@@ -50,7 +50,7 @@
 
     .tl-scroll { position:relative; z-index:1; overflow-x:auto; overflow-y:hidden; scroll-snap-type:x proximity;
       -webkit-overflow-scrolling:touch; padding:0.5rem 0 1.2rem; scrollbar-width:thin; }
-    .tl-track { position:relative; display:flex; align-items:stretch; gap:0; min-height:560px; padding:0 1rem; width:max-content; }
+    .tl-track { position:relative; display:flex; align-items:stretch; gap:0; min-height:780px; padding:0 1rem; width:max-content; }
     /* The spine is a real element; its width is set in JS, so Safari never has to resolve an intrinsic width. */
     .tl-line { position:absolute; left:0; top:50%; height:2px; margin-top:-1px; width:0; z-index:0;
       background:rgba(108,242,255,0.7); box-shadow:0 0 9px rgba(108,242,255,0.5), 0 0 2px rgba(108,242,255,0.95); }
@@ -119,6 +119,16 @@
     .tl-links a:hover { border-color:var(--hue,#6cf2ff); color:var(--bright); background:rgba(120,200,255,0.06); }
     .tl.drawn .tl-event.dim { opacity:0.16; filter:grayscale(0.6); }
 
+    /* image modal (e.g. the scan of The Tech) */
+    .tl-modal { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center;
+      background:rgba(2,4,8,0.93); padding:4vh 4vw; cursor:zoom-out; }
+    .tl-modal.open { display:flex; }
+    .tl-modal img { max-width:92vw; max-height:90vh; width:auto; height:auto; border:1px solid var(--line); box-shadow:0 0 50px rgba(0,0,0,0.85); cursor:default; }
+    .tl-modal-close { position:fixed; top:1.1rem; right:1.3rem; z-index:201; width:44px; height:44px; border-radius:50%;
+      border:1px solid var(--line); background:rgba(7,11,20,0.9); color:var(--phosphor); font-family:var(--mono); font-size:1.5rem; line-height:0;
+      cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .tl-modal-close:hover { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 12px rgba(108,242,255,0.4); }
+
     @media (max-width:760px) {
       .tl-scroll { overflow:visible; scroll-snap-type:none; padding-left:0.3rem; }
       .tl-track { flex-direction:column; width:auto; min-height:0; gap:0; padding:0; }
@@ -165,7 +175,7 @@
   <main class="wrap content">
 
     <section class="block lede">
-      <span class="kicker">1961 to 1980</span>
+      <span class="kicker">1961 to now</span>
       <h2>The Spacewar! timeline</h2>
     </section>
 
@@ -191,12 +201,17 @@
         <button class="tl-chip" data-cat="legacy" aria-pressed="true"><span class="dot"></span>Legacy</button>
       </div>
       <p class="tl-hint">Scroll sideways &middot; use &larr; &rarr; keys or the arrows &middot; click a card's links to dig in &middot; on a phone it runs top to bottom</p>
-      <p class="tl-intro">From a hack on a new minicomputer in a Cambridge, Massachusetts laboratory to the founding myth of the video game, <i>Spacewar!</i> spent two decades being written, patched, carried from machine to machine, cloned, renamed, written about, and played. This timeline gathers the principal release dates, the ports and clones of its "long journey", the cultural moments, and the legacy that followed, each with a way through to the code, the photographs, and the stories on this site.</p>
+      <p class="tl-intro">From a hack on a new minicomputer in a Cambridge, Massachusetts laboratory to the founding myth of the video game, <i>Spacewar!</i> has been written, patched, carried from machine to machine, cloned, renamed, written about, played, and, much later, recovered, emulated, and read. This timeline runs from its conception in 1961 to the present, gathering the principal release dates, the ports and clones of its "long journey", the cultural moments, and the legacy and afterlife that followed, each with a way through to the code, the photographs, and the stories on this site.</p>
     </section>
 
     <section class="block">
       <p style="margin-top:0.4rem;"><a class="btn ghost" href="code.html">Browse the full version table →</a></p>
     </section>
+
+    <div class="tl-modal" id="tlModal" aria-hidden="true">
+      <button class="tl-modal-close" id="tlModalClose" type="button" aria-label="Close">&times;</button>
+      <img id="tlModalImg" src="" alt="">
+    </div>
 
   </main>
 
@@ -215,8 +230,10 @@
         links:[{l:'The people',h:'people.html'}] },
       { y:'1962', date:'Early 1962', cat:'mit', t:'Version 1', b:'The first playable build: two ships and torpedoes, no gravity or hyperspace yet.',
         links:[{l:'Text',h:'sources/spacewar-1-1962-reconstructed.txt',x:1},{l:'Versions',h:'code.html'}] },
+      { y:'1962', date:'1962', cat:'culture', t:'The Minskytron', b:'Marvin Minsky’s display hack on the PDP-1; its swirling patterns were borrowed for Spacewar!’s hyperspace effect.',
+        links:[{l:'Minsky',h:'people.html#minsky'}] },
       { y:'1962', date:'2 Apr 1962', cat:'mit', t:'Version 2B', b:'First complete version, shown at MIT Parents’ Weekend: Expensive Planetarium starfield, Minskytron hyperspace.', img:'assets/images/thetech-1962-spacewar.jpg',
-        links:[{l:'Text',h:'sources/spacewar-2b-2apr1962.txt',x:1},{l:'The Tech, 1962',h:'http://tech.mit.edu/V82/PDF/V82-N11.pdf',x:1}] },
+        links:[{l:'Text',h:'sources/spacewar-2b-2apr1962.txt',x:1},{l:'The Tech, 1962',modal:'assets/images/thetech-1962-spacewar.jpg'}] },
       { y:'1962', date:'1962', cat:'hw', t:'The gamepads', b:'Kotok and Saunders build wooden control boxes, levers and a fire button, among the earliest purpose-built game controllers.',
         links:[{l:'The people',h:'people.html#kotok'}] },
       { y:'1962', date:'24 Sep 1962', cat:'mit', t:'Version 3.1', b:'The standard version, patches consolidated; the most widely preserved and emulated.',
@@ -264,7 +281,15 @@
       { y:'1979', date:'1979', cat:'legacy', t:'Asteroids', b:'Atari’s vector-display Asteroids carries the Spacewar lineage into the arcade’s golden age.',
         links:[{l:'Wikipedia',h:'https://en.wikipedia.org/wiki/Asteroids_(video_game)',x:1}] },
       { y:'1980', date:'1980', cat:'legacy', t:'Spacewar’s world', b:'Two decades on, the game’s DNA, real-time graphics, twin controls, ships in a gravity well, is everywhere.',
-        links:[{l:'Why it matters',h:'why.html'}] }
+        links:[{l:'Why it matters',h:'why.html'}] },
+      { y:'2008', date:'2005–08', cat:'mit', t:'4.1f · the CHM version', b:'The Computer History Museum restores a working PDP-1 and runs Spacewar! again; dfw 4.1 is reconstructed with the 4.8 score grafted on as 4.1f, the version most emulators now play.',
+        links:[{l:'Text',h:'sources/spacewar-4.1-chm-2008f.txt',x:1},{l:'Versions',h:'code.html'}] },
+      { y:'2010s', date:'2010s', cat:'legacy', t:'Software archaeology', b:'Norbert Landsteiner’s masswerk.at emulations and reconstructions recover the version lineage and make every build playable in a browser.',
+        links:[{l:'masswerk.at',h:'https://www.masswerk.at/spacewar/',x:1}] },
+      { y:'2015', date:'2015', cat:'legacy', t:'The long-journey census', b:'The Kinephanos study maps Spacewar!’s ports to computer labs around the world, the fullest account of its diffusion.',
+        links:[{l:'Kinephanos',h:'https://www.kinephanos.ca/2015/space-odyssey-the-long-journey-of-spacewar-from-mit-to-computer-labs-around-the-world/',x:1}] },
+      { y:'2026', date:'2026', cat:'legacy', t:'Reading the code', b:'This Critical Code Studies project reads Spacewar! as a cultural text and recovers lost versions, including the original dfw 4.1 from Steve Russell’s tape box.',
+        links:[{l:'Why it matters',h:'why.html'},{l:'Home',h:'./'}] }
     ];
 
     var track = document.getElementById('tlTrack');
@@ -282,6 +307,7 @@
       ev.style.setProperty('--hue', 'var(' + CAT[e.cat] + ')');
       ev.style.setProperty('--d', (0.45 + i * 0.03).toFixed(2) + 's');
       var linksHtml = (e.links || []).map(function (k) {
+        if (k.modal) return '<a href="#" data-modal="' + k.modal + '">' + k.l + '</a>';
         var attr = k.x ? ' target="_blank" rel="noopener noreferrer"' : '';
         return '<a href="' + k.h + '"' + attr + '>' + k.l + '</a>';
       }).join('');
@@ -319,7 +345,7 @@
       spineEls.forEach(function (el) { el.remove(); }); spineEls = [];
       if (window.innerWidth <= 760) { seg(7, 0, 0, true); return; }
       var N = track.querySelectorAll('.tl-event').length;
-      var totalW = PADL * 2 + N * COLW, H = 560, cy = H / 2;
+      var totalW = PADL * 2 + N * COLW, H = 780, cy = H / 2;
       var strains = [];
       Array.prototype.forEach.call(track.querySelectorAll('.tl-event'), function (ev, i) {
         if (ev.getAttribute('data-strand')) strains.push(i);
@@ -406,6 +432,20 @@
     var zin = document.getElementById('tlZoomIn'), zout = document.getElementById('tlZoomOut');
     if (zin) zin.addEventListener('click', function () { zoom = Math.min(2, +(zoom * 1.2).toFixed(3)); applyZoom(); });
     if (zout) zout.addEventListener('click', function () { zoom = Math.max(0.5, +(zoom / 1.2).toFixed(3)); applyZoom(); });
+
+    // Image modal (e.g. the scan of The Tech)
+    var modal = document.getElementById('tlModal'),
+        modalImg = document.getElementById('tlModalImg'),
+        modalClose = document.getElementById('tlModalClose');
+    function openModal(src) { modalImg.src = src; modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); }
+    function closeModal() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); modalImg.src = ''; }
+    track.addEventListener('click', function (ev) {
+      var a = ev.target.closest ? ev.target.closest('[data-modal]') : null;
+      if (a) { ev.preventDefault(); openModal(a.getAttribute('data-modal')); }
+    });
+    if (modalClose) modalClose.addEventListener('click', closeModal);
+    if (modal) modal.addEventListener('click', function (ev) { if (ev.target === modal) closeModal(); });
+    document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeModal(); });
   })();
   </script>
 
