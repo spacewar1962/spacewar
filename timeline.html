@@ -295,7 +295,7 @@
       { y:'1962', date:'Early 1962', cat:'mit', t:'Version 1', b:'The first playable build: two ships and torpedoes, no gravity or hyperspace yet.',
         links:[{l:'Text',h:'sources/spacewar-1-1962-reconstructed.txt',x:1},{l:'Versions',h:'code.html'}] },
       { y:'1962', date:'1962', cat:'culture', t:'The Minskytron', b:'Marvin Minsky’s display hack on the PDP-1; its swirling patterns were borrowed for Spacewar!’s hyperspace effect.',
-        links:[{l:'Minsky',h:'people.html#minsky'}] },
+        links:[{l:'▶ Play the Minskytron',h:'https://www.masswerk.at/minskytron/',x:1},{l:'Minsky',h:'people.html#minsky'}] },
       { y:'1962', date:'2 Apr 1962', cat:'mit', t:'Version 2B', b:'First complete version, shown at MIT Parents’ Weekend: Expensive Planetarium starfield, Minskytron hyperspace.', img:'assets/images/thetech-1962-spacewar.jpg',
         links:[{l:'Text',h:'sources/spacewar-2b-2apr1962.txt',x:1},{l:'The Tech, 1962',modal:'assets/images/thetech-1962-spacewar.jpg'}] },
       { y:'1962', date:'1962', cat:'hw', t:'The gamepads', b:'Kotok and Saunders build wooden control boxes, levers and a fire button, among the earliest purpose-built game controllers.',
@@ -619,7 +619,7 @@
       }
       Array.prototype.forEach.call(groups, function (g) { g.addEventListener('click', function () { selectArc(+g.getAttribute('data-i')); }); });
       svgEl.addEventListener('click', function (ev) { if (!(ev.target.closest && ev.target.closest('.arcg'))) clearSel(); });
-      document.getElementById('tlMapReplay').addEventListener('click', runSeq);
+      document.getElementById('tlMapReplay').addEventListener('click', function () { clearSel(); runSeq(); });
       if ('IntersectionObserver' in window) {
         var io = new IntersectionObserver(function (entries) { entries.forEach(function (en) { if (en.isIntersecting) { runSeq(); io.disconnect(); } }); }, { threshold: 0.2 });
         io.observe(mapEl);
