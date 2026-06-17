@@ -70,8 +70,11 @@
     /* the central sun: a vector sunburst the timeline scrolls past, like the game's gravity well */
     .tl-sun { position:absolute; left:50%; top:10%; width:56px; height:56px; transform:translate(-50%,-50%); z-index:0; pointer-events:none;
       animation:tl-sun-pulse 3s ease-in-out infinite alternate; }
-    .tl-sun svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 5px rgba(108,242,255,0.6)); }
-    .tl-sun circle { fill:#6cf2ff; }
+    .tl-sun svg { width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 5px rgba(108,242,255,0.55)); }
+    .tl-sun line { vector-effect:non-scaling-stroke; stroke-linecap:round; }
+    .tl-sun .fresh { stroke:#6cf2ff; stroke-width:1.6; }
+    .tl-sun .trail { stroke:#8fe6a0; stroke-width:1.1; }
+    .tl-sun .core { fill:#9fdcff; }
     @keyframes tl-sun-pulse { from{opacity:0.26; transform:translate(-50%,-50%) scale(0.92) rotate(0deg)} to{opacity:0.5; transform:translate(-50%,-50%) scale(1.06) rotate(8deg)} }
     @media (max-width:760px) { .tl-sun { display:none; } }
 
@@ -339,7 +342,7 @@
         links:[{l:'The Cambridge story',h:'cambridge.html'}] },
       { y:'1976', date:'c.1976', cat:'port', t:'GT40 &amp; SPCWAR', b:'A vector-display GT40 version (Waters and Billmers) appears, while MIT-AI keeps SPCWAR alive on ITS.',
         links:[{l:'The SPCWAR story',h:'mit-ai.html'},{l:'SPCWAR source',h:'sources/ports/spacewar-pdp6-10-mit-its-spcwar.txt',x:1}] },
-      { y:'1977', date:'1977', cat:'legacy', t:'The personal computer', b:'The Apple II and its kind arrive, the cheap, legible machine Kay and Brand had foreseen at Stanford.', img:'assets/images/AlanKay-1972.png',
+      { y:'1977', date:'1977', cat:'legacy', t:'The personal computer', b:'The Apple II and its kind arrive, the cheap, legible machine Kay and Brand had foreseen at Stanford.', img:'assets/images/apple-ii-1977.jpg',
         links:[{l:'Build your own Spacewar',h:'stanford.html'}] },
       { y:'1979', date:'1979', cat:'legacy', t:'Asteroids', b:'Atari’s vector-display Asteroids carries the Spacewar lineage into the arcade’s golden age.',
         links:[{l:'Wikipedia',h:'https://en.wikipedia.org/wiki/Asteroids_(video_game)',x:1}] },
@@ -524,18 +527,27 @@
     // ---- The sun: a small spiky vector star, like the game's heavy star ----
     var sunEl = document.getElementById('tlSun');
     if (sunEl) {
-      // the game's heavy star (blp/bpt in the 3.1 source): a bright point that jitters and
-      // flickers each frame; we keep a short fading trail to stand in for phosphor persistence
+      // the game's heavy star: a couple of short lines drawn at random from the centre each
+      // frame, leaving a slight green phosphor trail behind a bright blue core
       var sunHist = [];
       function drawSun() {
-        sunHist.unshift({ x:(Math.random() - 0.5) * 9, y:(Math.random() - 0.5) * 9, r:1.1 + Math.random() * 1.6 });
-        if (sunHist.length > 6) sunHist.pop();
-        var dots = '';
-        sunHist.forEach(function (h, i) { dots += '<circle cx="' + h.x.toFixed(1) + '" cy="' + h.y.toFixed(1) + '" r="' + h.r.toFixed(2) + '" opacity="' + (1 - i * 0.15).toFixed(2) + '"/>'; });
-        sunEl.innerHTML = '<svg viewBox="-14 -14 28 28" aria-hidden="true">' + dots + '</svg>';
+        var lines = [], k = 2 + Math.floor(Math.random() * 3);
+        for (var i = 0; i < k; i++) {
+          var ang = Math.random() * Math.PI * 2, r1 = Math.random() * 1.5, r2 = r1 + 4 + Math.random() * 9;
+          lines.push([Math.cos(ang) * r1, Math.sin(ang) * r1, Math.cos(ang) * r2, Math.sin(ang) * r2]);
+        }
+        sunHist.unshift(lines);
+        if (sunHist.length > 7) sunHist.pop();
+        var s = '';
+        sunHist.forEach(function (frame, age) {
+          var cls = age === 0 ? 'fresh' : 'trail', op = (1 - age * 0.14).toFixed(2);
+          frame.forEach(function (l) { s += '<line class="' + cls + '" x1="' + l[0].toFixed(1) + '" y1="' + l[1].toFixed(1) + '" x2="' + l[2].toFixed(1) + '" y2="' + l[3].toFixed(1) + '" opacity="' + op + '"/>'; });
+        });
+        s += '<circle class="core" cx="0" cy="0" r="1.6"/>';
+        sunEl.innerHTML = '<svg viewBox="-16 -16 32 32" aria-hidden="true">' + s + '</svg>';
       }
       drawSun();
-      setInterval(drawSun, 90);
+      setInterval(drawSun, 100);
     }
 
     // ---- The journey map: arcs launch one by one with a flyer + year tag; clickable; replayable ----
