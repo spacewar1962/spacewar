@@ -13,10 +13,14 @@ marked **[US]** or **[FOREIGN: country]**, with platform, people, relationship t
 original, and a source.
 
 **Status (2026-06-17):** the firmly-documented record for 1961-1980 is, so far,
-*entirely US*. The foreign instances below are leads, not confirmed cases; a
-verification pass was cut short by a research session limit and is to be resumed. Do
-not assert the foreign cases, or the absence of foreign cases, in the book until the
-verification is complete.
+*entirely US*, but this reflects English-language sources and is not yet a safe basis
+for claiming the absence of foreign versions. A foreign Spacewar need not be a PDP-1
+port; as the US case shows, most versions were re-implementations on local hardware
+(PDP-6/8/10, GT40/PDP-11, CDC 3100), so the live foreign question is re-implementation
+on whatever machines foreign labs had (incl. Soviet PDP-11 clones, British and
+Japanese minicomputers). A foreign-focused verification pass is in progress
+(deep-research task w4ci1btqn). Do not assert either the foreign cases or their absence
+in the book until that completes and non-English archives have been probed.
 
 ---
 
