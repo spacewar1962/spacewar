@@ -152,11 +152,13 @@ a:hover { color: var(--bright); text-shadow: var(--glow); }
   .nav-group { position: relative; display: inline-block; }
   .nav-top { width: auto; justify-content: center; padding: 0.55rem 0.7rem; }
   .nav-menu {
-    position: absolute; top: calc(100% + 4px); left: 0; min-width: 180px;
+    position: absolute; top: 100%; left: 0; margin-top: 0; min-width: 180px;
     background: rgba(5,9,15,0.98); border: 1px solid var(--line); border-radius: 4px;
     box-shadow: 0 12px 32px rgba(0,0,0,0.6); padding: 0.3rem 0; z-index: 9000;
   }
-  .nav-group:hover .nav-menu, .nav-group:focus-within .nav-menu, .nav-menu.open { display: flex; }
+  /* Click to open (handled in nav.js); no hover-open, so the menu does not vanish
+     when the cursor crosses to it. focus-within keeps it open for keyboard users. */
+  .nav-group:focus-within .nav-menu, .nav-menu.open { display: flex; }
   .nav-menu a { padding: 0.5rem 1.1rem; white-space: nowrap; }
   .site-nav > .nav-group:last-of-type .nav-menu { left: auto; right: 0; }
 }
