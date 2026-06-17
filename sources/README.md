@@ -8,6 +8,24 @@ and its upstream origin.
 Spacewar! is in the public domain. These are MIT-era listings and community
 reconstructions, preserved by Norbert Landsteiner (masswerk.at) and bitsavers.org.
 
+## Folder layout
+
+- **top level** — the canonical PDP-1 version lineage (1 / 2B / 3.1 / the 4.x
+  generation / later PDP-1 reconstructions), in the `spacewar-<version>-<date>`
+  scheme. Documented in the version-lineage table below.
+- **`ports/`** — Spacewar! on machines *other than* the PDP-1: the port and clone
+  sources (PDP-6/10, PDP-8, LINC-8/PDP-12, GT40/PDP-11, Knight TV, etc.), named
+  `spacewar-<machine>-<lab/author>-<year>`. See that folder's own README and the
+  "long journey" census on the `code.html` page.
+- **`reference/`** — secondary and contextual documents, *not* Spacewar! source:
+  magazine articles (Kuhfeld's 1971 *Analog*, the 1972 *Rolling Stone* excerpt),
+  hardware manuals (the DEC PDP-11 Paper Tape Software Handbook), pseudocode
+  (Alan Kay's *Rolling Stone* listing), and third-party reconstructions in other
+  languages (Landsteiner's 2014 Minnesota JavaScript).
+- **`SteveRussell_box1/`, `bin-files/`, `pdp1-programs/`, `sw/`** — specialised
+  archives (authentic tapes, loose binaries, kindred PDP-1 programs); each has its
+  own README.
+
 `.txt` files are the human-readable PDP-1 MACRO source (tab-aligned columns,
 `/`-delimited comments); `.rim` files are RIM-format paper-tape images (binary,
 for loading into an emulator); `.pdf` files are scans of the original printed
@@ -49,9 +67,12 @@ per-version PDFs above were extracted.
 
 ## Other machines and authentic tapes
 
-- `spacewar-pdp8-EVAN-SUITS-11Jan1971.txt` - the **PDP-8** port (Evan Suits's LAB-8
-  version, 1971), a different machine entirely. See the "long journey" ports table
-  on the code page for the wider census of Spacewar! beyond the PDP-1.
+- `ports/` - all the ports to **other machines** (PDP-8, PDP-6/10, LINC-8/PDP-12,
+  GT40/PDP-11, Knight TV, etc.). For example `ports/spacewar-pdp8-labx8-suits-1971.txt`
+  is Evan Suits's 1971 LAB-8 (PDP-8) port; `ports/spacewar-gt40-pdp11-bryant-seiler-1974.pdf`
+  and `ports/spacewar-gt40-pdp11-stanford-eross-1973.txt` are the two GT40/PDP-11
+  versions. See the "long journey" ports table on the code page for the wider census
+  of Spacewar! beyond the PDP-1.
 - `SteveRussell_box1/` - authentic PDP-1 paper tapes from Steve Russell's box
   (bitsavers, 2003): the original dfw 4.1/4.2a, 3.1, sw4.2, and the star data. See
   its README.
