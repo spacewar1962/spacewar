@@ -18,9 +18,13 @@ arcade lineage, not the original game**: Taito's licensed *Space Wars* (Japan, J
 1978) and Sega's *Space Ship* (Jun 1978), both descending from the US Cinematronics
 *Space Wars* (1977). The original MIT game on its native PDP-1 stayed essentially North
 American (the only documented non-US PDP-1 was a single Canadian unit, with no evidence
-Spacewar! ran on it). No European, Japanese, or Soviet *original-game* port is
-documented; the Soviet case is "not found in English-language sources," not a proven
-absence (Russian archives unexamined). Caveat throughout: a foreign Spacewar need not be
+Spacewar! ran on it). The one documented European case is a re-implementation on
+*other* DEC hardware: **DUEL**, a Spacewar! adaptation on Cambridge University's PDP-7A,
+c.1968 (no code survives). No Japanese or Soviet original-game port is documented; the
+Soviet case is "not found in English-language sources," not a proven absence (Russian
+archives unexamined). Oxford, by contrast, had no Spacewar — its machines (Ferranti
+Mercury, KDF9, later a PDP-10) were not the display-equipped PDP-1/PDP-7 type the game
+needed. Caveat throughout: a foreign Spacewar need not be
 a PDP-1 port — as the US case shows, most versions were re-implementations on local
 hardware — so the negative findings for the USSR and Europe are absence-of-evidence in
 English-language sources, not closure.
@@ -168,12 +172,19 @@ essentially North American.
 - **Germany** [FOREIGN: Germany] — a claimed German distribution/cloning of Cinematronics
   *Space Wars* **could not be substantiated**. Treat as rumoured.
   - http://www.andysarcade.de/spacewars_d.html (German Space Wars page; not corroborated as a German release)
-- **UK / continental Europe** [FOREIGN] — no university/research-lab Spacewar port
-  surfaced for this period. The Norway/Kjeller (NDRE) lead resolved to Norway building
-  its *own* SAM minicomputers, not importing a PDP-1; the British Elliott 803 line was
-  checked without a confirmed Spacewar. NB: the project site's `cambridge.html` should
-  be checked for whether it is Cambridge UK or Cambridge MA. Status: nothing documented.
-  - https://en.wikipedia.org/wiki/Elliott_803
+- **UK (beyond Cambridge) / continental Europe** [FOREIGN] — apart from the Cambridge
+  *DUEL* case (section 4b-bis), no further UK or European university Spacewar surfaced.
+  The Norway/Kjeller (NDRE) lead resolved to Norway building its *own* SAM minicomputers,
+  not importing a PDP-1; the British Elliott 803 line was checked without a confirmed
+  Spacewar.
+  - **Oxford specifically: NO Spacewar, and the hardware explains why.** Oxford's
+    machines in the window were British, not display-equipped DEC minis: a Ferranti
+    Mercury (1959), then an English Electric KDF9 (1966, "Oxford University's Computer,"
+    used by Strachey). Oxford did later buy a PDP-10, but that is a timesharing mainframe,
+    not a PDP-1/PDP-7 with a point-plot CRT, and it came after the early-diffusion window.
+    Oxford had no native home for Spacewar of the kind Cambridge's PDP-7A provided.
+    Contrast Cambridge, which had exactly the right machine (PDP-7A + Type 340 display)
+    and produced *DUEL*. https://en.wikipedia.org/wiki/Elliott_803
 
 ### 4d. Refuted diffusion myth
 
@@ -216,6 +227,16 @@ institutional descendants (Stanford, DECUS, Georgia Tech), then out into the Ame
 commercial arcade (Computer Space, Space Wars) and only from there abroad, to Japan in
 1978. It did *not* propagate as a free-floating idea into every computing culture with
 capable hardware.
+
+The Oxford/Cambridge contrast makes the channel concrete. Both are elite research
+universities a stone's throw apart, yet only Cambridge produced a Spacewar (*DUEL*,
+1968) — because Cambridge had bought a DEC PDP-7A with a point-plot display, the right
+machine in the right hands, while Oxford ran British iron (Ferranti Mercury, then a
+KDF9) with no comparable display and never acquired a PDP-1/PDP-7. The game travelled
+with a *specific apparatus* (DEC minicomputer + vector/point CRT + a permissive
+hacker-ish lab culture), not with prestige or capability in the abstract. Where the
+apparatus landed, the game could appear; where it did not, the game did not, however
+distinguished the institution.
 
 The USSR is the sharp test case. Soviet institutions had machines that could in
 principle have hosted a re-implementation, yet the early Soviet computer-game-adjacent

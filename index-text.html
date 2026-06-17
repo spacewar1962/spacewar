@@ -40,7 +40,7 @@
 
   <hr>
 
-  <p><i>Spacewar!</i> is where code first becomes play. Written across 1961-62 by Steve Russell and a circle of MIT hackers for the DEC PDP-1, in roughly two thousand words of MIDAS macro-assembly it gave the computer a starfield, two ships, gravity, and a panic button. It is one of the founding objects of computational culture: real-time interactive graphics, the hacker ethic, the demo, and the free circulation of source.</p>
+  <p><i>Spacewar!</i> is where code first becomes play. Written across 1961-62 by Steve Russell and a circle of MIT hackers for the DEC PDP-1, in roughly two thousand words of Macro assembly it gave the computer a starfield, two ships, gravity, and a panic button. It is one of the founding objects of computational culture: real-time interactive graphics, the hacker ethic, the demo, and the free circulation of source.</p>
 
   <p>This project reads that program as a cultural text. Following Critical Code Studies, the source is approached in its multiplicity, as literature, as mechanism, as spatial form, and as a repository of the social formation that produced it. Reading about the origins of computing is not the same as reading the origin's code, and the aim here is the latter.</p>
 
@@ -59,15 +59,15 @@
   <p><i>Spacewar!</i> was conceived in 1961 by Martin Graetz, Wayne Wiitanen, and Steve Russell, members of the circle around MIT's Tech Model Railroad Club. Russell wrote the core over the winter of 1961-62. Peter Samson replaced the random background with the <i>Expensive Planetarium</i>, the actual night sky; Dan Edwards added a central star whose gravity pulled both ships toward it; Graetz added hyperspace, a panic button. By spring 1962 Alan Kotok and Bob Saunders had built dedicated control boxes. Almost as soon as it existed it circulated, copied from PDP-1 to PDP-1, an open artefact decades before "open source" had a name.</p>
 
   <h2>The object</h2>
-  <p>There is no single <i>Spacewar!</i> source code. What survives is a family of versions: the early MIT releases (1, 2B, 3.1), the forked 4.x generation of 1963, later reconstructions such as the Computer History Museum's 4.1f, and the many <a href="code.html">ports and clones</a> of its long journey, each in its own dialect of assembly. The <a href="code.html">Versions</a> page and the <a href="timeline.html">Timeline</a> lay out the whole variorum. The primary close-reading texts are the MIDAS macro-assembly sources:</p>
+  <p>There is no single <i>Spacewar!</i> source code. What survives is a family of versions: the early MIT releases (1, 2B, 3.1), the forked 4.x generation of 1963, later reconstructions such as the Computer History Museum's 4.1f, and the many <a href="code.html">ports and clones</a> of its long journey, each in its own dialect of assembly. The <a href="code.html">Versions</a> page and the <a href="timeline.html">Timeline</a> lay out the whole variorum. The primary close-reading texts are the Macro assembly sources:</p>
   <ul>
-    <li><b>spacewar.mac</b> - the original MIDAS macro-assembly source (~2,057 lines). The primary close-reading text.</li>
+    <li><b>spacewar.mac</b> - the original Macro assembly source (~2,057 lines). The primary close-reading text.</li>
     <li><b>spacewar.lst</b> - the assembler listing: octal addresses and machine words beside each line.</li>
     <li><b>originsources.zip</b> - a dated upstream snapshot tracing the source through the Silverman / Gerasimov emulator.</li>
     <li><b>spacewar.js</b> - the PDP-1 emulator. <a href="play.html">Play it</a>.</li>
   </ul>
 
-  <pre>/ spacewar 2b - 2 apr 1962 - pdp-1 midas macro-assembly
+  <pre>/ spacewar 2b - 2 apr 1962 - pdp-1 macro assembly
 / one of many surviving versions (reconstructed by Norbert Landsteiner)
 
   define index A,B,C
@@ -99,7 +99,7 @@
   <p>The study works across the registers of Critical Code Studies, pairing close technical explication of a code fragment with the cultural constellation that spirals out from it. Six movements:</p>
   <ol>
     <li><b>The machine that owns itself.</b> A self-contained program with the whole PDP-1 to itself.</li>
-    <li><b>A language for ships.</b> The MIDAS macros and the outline compiler as a small language Russell built to write the game in.</li>
+    <li><b>A language for ships.</b> The Macro assembler's macros and the outline compiler as a small language Russell built to write the game in.</li>
     <li><b>The expensive planetarium.</b> Samson's real star catalogue; Edwards's gravity.</li>
     <li><b>Hyperspace, or the random jump.</b> Contingency and risk designed into a deterministic machine.</li>
     <li><b>The demo and the gift.</b> Collective authorship and the free circulation of the source.</li>
