@@ -64,13 +64,19 @@
     .tl-arrow:hover, .tl-arrow:focus-visible { border-color:#6cf2ff; color:var(--bright); background:rgba(7,11,20,0.95); box-shadow:0 0 14px rgba(108,242,255,0.4); outline:none; }
     .tl-prev { left:0.3rem; }
     .tl-next { right:0.3rem; }
-    @media (max-width:760px) { .tl-arrow { display:none; } }
+    .tl-zoom { position:absolute; top:0.5rem; right:0.5rem; z-index:7; display:flex; gap:0.35rem; }
+    .tl-zbtn { width:30px; height:30px; border-radius:6px; border:1px solid var(--line); background:rgba(7,11,20,0.82);
+      color:var(--phosphor); font-family:var(--mono); font-size:1.05rem; line-height:0; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; transition:border-color .15s ease, color .15s ease, box-shadow .15s ease; }
+    .tl-zbtn:hover, .tl-zbtn:focus-visible { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 10px rgba(108,242,255,0.35); outline:none; }
+    @media (max-width:760px) { .tl-arrow, .tl-zoom { display:none; } }
 
     .tl-event { position:relative; flex:0 0 300px; scroll-snap-align:center; opacity:0; transition:opacity .5s ease var(--d, 0s), filter .2s ease; }
     .tl.drawn .tl-event { opacity:1; }
     .tl-ship { position:absolute; left:50%; top:50%; width:26px; height:26px; transform:translate(-50%,-50%); z-index:3;
       color:var(--hue,#6cf2ff); filter:drop-shadow(0 0 4px var(--hue,#6cf2ff)); transition:transform .18s ease; }
-    .tl-ship path { fill:var(--bg); stroke:currentColor; stroke-width:2; stroke-linejoin:round; }
+    .tl-ship { width:30px; height:30px; }
+    .tl-ship path { fill:var(--bg); stroke:currentColor; stroke-width:0.9; stroke-linejoin:round; vector-effect:non-scaling-stroke; }
     .tl-event.down .tl-ship { transform:translate(-50%,-50%) rotate(180deg); }
     .tl-year { position:absolute; left:50%; top:50%; transform:translate(-50%, 1.2rem); font-family:var(--mono); font-weight:700;
       font-size:0.74rem; letter-spacing:0.05em; color:var(--hue,#6cf2ff); text-shadow:0 0 8px rgba(0,0,0,0.8); white-space:nowrap; }
@@ -171,6 +177,10 @@
           <div class="tl-track" id="tlTrack"></div>
         </div>
         <button class="tl-arrow tl-next" id="tlNext" type="button" aria-label="Scroll right">&rsaquo;</button>
+        <div class="tl-zoom" role="group" aria-label="Zoom">
+          <button class="tl-zbtn" id="tlZoomOut" type="button" aria-label="Zoom out">&minus;</button>
+          <button class="tl-zbtn" id="tlZoomIn" type="button" aria-label="Zoom in">+</button>
+        </div>
       </div>
       <div class="tl-controls" role="group" aria-label="Filter by category">
         <button class="tl-chip" data-cat="all" aria-pressed="true">All</button>
@@ -276,8 +286,10 @@
         return '<a href="' + k.h + '"' + attr + '>' + k.l + '</a>';
       }).join('');
       var thumb = e.img ? '<img class="tl-thumb" src="' + e.img + '" alt="" loading="lazy">' : '';
+      var needle = (e.cat === 'mit' || e.cat === 'hw');  // original MIT ship vs the wedge for ports and beyond
+      var shipSvg = '<svg class="tl-ship" viewBox="0 0 24 24" aria-hidden="true"><path d="' + (needle ? 'M12 1 L14.4 21 L12 16.5 L9.6 21 Z' : 'M12 2 L20 22 L12 16 L4 22 Z') + '"/></svg>';
       ev.innerHTML =
-        '<svg class="tl-ship" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 L19 22 L12 17 L5 22 Z"/></svg>' +
+        shipSvg +
         '<span class="tl-stem"></span>' +
         '<span class="tl-year">' + e.y + '</span>' +
         '<div class="tl-card" data-year="' + e.date + '">' +
@@ -306,7 +318,8 @@
     function buildSpine() {
       spineEls.forEach(function (el) { el.remove(); }); spineEls = [];
       if (window.innerWidth <= 760) { seg(7, 0, 0, true); return; }
-      var totalW = track.scrollWidth, H = track.offsetHeight, cy = H / 2;
+      var N = track.querySelectorAll('.tl-event').length;
+      var totalW = PADL * 2 + N * COLW, H = 560, cy = H / 2;
       var strains = [];
       Array.prototype.forEach.call(track.querySelectorAll('.tl-event'), function (ev, i) {
         if (ev.getAttribute('data-strand')) strains.push(i);
@@ -386,6 +399,13 @@
     var prev = document.getElementById('tlPrev'), next = document.getElementById('tlNext');
     if (prev) prev.addEventListener('click', function () { nudge(-1); });
     if (next) next.addEventListener('click', function () { nudge(1); });
+
+    // Zoom (scales the whole track via CSS zoom; buildSpine geometry is constant, so the fork stays aligned)
+    var zoom = 1;
+    function applyZoom() { track.style.zoom = zoom; }
+    var zin = document.getElementById('tlZoomIn'), zout = document.getElementById('tlZoomOut');
+    if (zin) zin.addEventListener('click', function () { zoom = Math.min(2, +(zoom * 1.2).toFixed(3)); applyZoom(); });
+    if (zout) zout.addEventListener('click', function () { zoom = Math.max(0.5, +(zoom / 1.2).toFixed(3)); applyZoom(); });
   })();
   </script>
 
