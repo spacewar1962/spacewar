@@ -35,6 +35,28 @@
     .wordmap .f-op { background:rgba(108,242,255,0.10); }
     .wordmap .f-i { background:rgba(255,206,122,0.12); }
     .wordmap .f-ad { background:rgba(108,242,255,0.04); }
+    .lookup { margin:1.2rem 0 0.4rem; }
+    .lookup-field { display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap; margin:0 0 0.8rem;
+      font-family:var(--mono); font-size:0.62rem; letter-spacing:0.08em; color:var(--phosphor-dim); text-transform:uppercase; }
+    .lookup-field input { flex:1 1 auto; min-width:220px; background:#02060a; border:1px solid var(--line); border-radius:3px;
+      color:var(--bright); font-family:var(--mono); font-size:1rem; letter-spacing:0.08em; padding:0.55rem 0.8rem; text-transform:none; }
+    .lookup-field input:focus { outline:none; border-color:#6cf2ff; box-shadow:0 0 10px rgba(108,242,255,0.3); }
+    .lookup-count { font-family:var(--mono); font-size:0.6rem; color:var(--phosphor-dim); white-space:nowrap; }
+    .instr-card { border:1px solid var(--beam); border-radius:6px; background:rgba(108,242,255,0.05); padding:0.85rem 1.05rem; margin:0 0 1rem;
+      box-shadow:0 0 20px rgba(108,242,255,0.07); }
+    .instr-card .mn { font-family:var(--mono); font-size:1.3rem; color:var(--bright); }
+    .instr-card .oct { font-family:var(--mono); font-size:0.78rem; color:var(--beam-warm); margin-left:0.7rem; }
+    .instr-card .nm { font-family:var(--mono); font-size:0.66rem; color:var(--beam); text-transform:uppercase; letter-spacing:0.09em; margin-top:0.25rem; }
+    .instr-card .ds { margin-top:0.5rem; font-size:0.85rem; line-height:1.6; }
+    .instr-card .ex { margin-top:0.5rem; font-family:var(--mono); font-size:0.78rem; color:var(--phosphor-dim); white-space:pre-wrap; }
+    .instr-table-wrap { max-height:520px; overflow:auto; border:1px solid var(--line); border-radius:6px; }
+    .instr-table { width:100%; border-collapse:collapse; font-size:0.78rem; }
+    .instr-table th, .instr-table td { text-align:left; vertical-align:top; padding:0.45rem 0.7rem; border-bottom:1px solid var(--line); }
+    .instr-table thead th { color:var(--bright); font-family:var(--mono); font-weight:normal; position:sticky; top:0; background:#070b14; z-index:1; }
+    .instr-table td.mn { font-family:var(--mono); color:var(--beam); white-space:nowrap; }
+    .instr-table td.oct { font-family:var(--mono); color:var(--beam-warm); white-space:nowrap; }
+    .instr-table .ds { color:var(--phosphor-dim); font-size:0.72rem; line-height:1.5; margin-top:0.15rem; }
+    .instr-empty { padding:1rem; color:var(--phosphor-dim); font-family:var(--mono); font-size:0.7rem; }
   </style>
 </head>
 <body>
@@ -134,37 +156,23 @@
     <section class="block">
       <span class="kicker">A few dozen verbs</span>
       <h3>What the machine can be told to do</h3>
-      <p>The instruction set is small enough to hold in your head. Memory-reference instructions name a word to act on; the operate and skip groups are micro-coded bit-fields that can be combined in a single word. A representative selection (octal codes after Landsteiner's reference):</p>
+      <p>The instruction set is small enough to hold in your head: memory-reference instructions name a word to act on, while the operate, skip, shift and in-out groups are micro-coded bit-fields that combine in a single word. Type a mnemonic to look one up, the table filters as you go.</p>
 
-      <table class="spectable">
-        <caption>Memory-reference instructions</caption>
-        <tr><th class="mono">lac Y</th><th class="mono">20</th><td>Load AC from location Y</td></tr>
-        <tr><th class="mono">dac Y</th><th class="mono">24</th><td>Deposit (store) AC into Y</td></tr>
-        <tr><th class="mono">add Y</th><th class="mono">40</th><td>Add the word at Y to AC</td></tr>
-        <tr><th class="mono">sub Y</th><th class="mono">42</th><td>Subtract the word at Y from AC</td></tr>
-        <tr><th class="mono">mul Y</th><th class="mono">54</th><td>Multiply (optional hardware, up to ~25&nbsp;&micro;s)</td></tr>
-        <tr><th class="mono">div Y</th><th class="mono">56</th><td>Divide (optional hardware, up to ~40&nbsp;&micro;s)</td></tr>
-        <tr><th class="mono">idx Y</th><th class="mono">44</th><td>Increment Y, leave result in AC</td></tr>
-        <tr><th class="mono">isp Y</th><th class="mono">46</th><td>Increment Y, skip next instruction if result is positive</td></tr>
-        <tr><th class="mono">jmp Y</th><th class="mono">60</th><td>Jump to Y</td></tr>
-        <tr><th class="mono">jsp Y</th><th class="mono">62</th><td>Jump to Y, saving the return address in AC</td></tr>
-        <tr><th class="mono">law N</th><th class="mono">70</th><td>Load AC with the constant N</td></tr>
-      </table>
-
-      <table class="spectable">
-        <caption>Operate, skip and in-out groups (bit-fields, combinable)</caption>
-        <tr><th class="mono">cla</th><th class="mono">760200</th><td>Clear AC</td></tr>
-        <tr><th class="mono">cma</th><th class="mono">761000</th><td>Complement AC</td></tr>
-        <tr><th class="mono">hlt</th><th class="mono">760400</th><td>Halt the processor</td></tr>
-        <tr><th class="mono">sza</th><th class="mono">640100</th><td>Skip if AC is zero</td></tr>
-        <tr><th class="mono">spa</th><th class="mono">640200</th><td>Skip if AC is positive</td></tr>
-        <tr><th class="mono">sma</th><th class="mono">640400</th><td>Skip if AC is negative</td></tr>
-        <tr><th class="mono">szf f</th><th class="mono">6400f</th><td>Skip if program flag f is zero</td></tr>
-        <tr><th class="mono">ral / rar</th><th class="mono">66&hellip;</th><td>Rotate AC left / right by a bit count</td></tr>
-        <tr><th class="mono">iot Y</th><th class="mono">72</th><td>In-out transfer to a device</td></tr>
-        <tr><th class="mono">dpy</th><th class="mono">730007</th><td>Display one point on the Type 30</td></tr>
-      </table>
-      <p class="micro" style="margin-top:0.5rem;font-size:0.6rem;">Octal values follow Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a>; the full set, with every operate-group bit, is given there and in DEC's PDP-1 handbooks.</p>
+      <div class="lookup">
+        <div class="lookup-field">
+          <label for="instrSearch">Look&nbsp;up:</label>
+          <input id="instrSearch" type="text" placeholder="lac, dpy, jmp, szf&hellip;" autocomplete="off" spellcheck="false" aria-label="Search the PDP-1 instruction set">
+          <span class="lookup-count" id="instrCount"></span>
+        </div>
+        <div id="instrCard" aria-live="polite"></div>
+        <div class="instr-table-wrap">
+          <table class="instr-table">
+            <thead><tr><th>Mnemonic</th><th>Octal</th><th>Instruction</th></tr></thead>
+            <tbody id="instrBody"></tbody>
+          </table>
+        </div>
+        <p class="micro" id="instrMeta" style="margin-top:0.5rem;font-size:0.6rem;"></p>
+      </div>
     </section>
 
     <div class="rule"><span>the instruction that draws the game</span></div>
@@ -218,6 +226,44 @@ dispt A,Y,B
       <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
     </div>
   </footer>
+
+  <script>
+  (function(){
+    var BODY=document.getElementById('instrBody'),
+        CARD=document.getElementById('instrCard'),
+        COUNT=document.getElementById('instrCount'),
+        META=document.getElementById('instrMeta'),
+        INPUT=document.getElementById('instrSearch');
+    if(!BODY||!INPUT) return;
+    var DATA=[], TOTAL=0;
+    function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function render(q){
+      q=(q||'').trim().toLowerCase().split(/\s+/)[0]||'';
+      var rows = q ? DATA.filter(function(e){ return e.mn.indexOf(q)===0; }) : DATA;
+      BODY.innerHTML = rows.length ? rows.map(function(e){
+        return '<tr><td class="mn">'+esc(e.mn)+'</td><td class="oct">'+esc(e.octal)+'</td>'+
+               '<td><b>'+esc(e.name)+'</b><div class="ds">'+esc(e.description)+'</div></td></tr>';
+      }).join('') : '<tr><td colspan="3" class="instr-empty">No instruction starts with &ldquo;'+esc(q)+'&rdquo;.</td></tr>';
+      COUNT.textContent = q ? (rows.length+' of '+TOTAL) : (TOTAL+' entries');
+      var card = q ? (DATA.filter(function(e){ return e.mn===q; })[0] || rows[0] || null) : null;
+      CARD.innerHTML = card ? ('<div class="instr-card"><span class="mn">'+esc(card.mn)+'</span>'+
+        (card.octal?'<span class="oct">octal '+esc(card.octal)+'</span>':'')+
+        '<div class="nm">'+esc(card.name)+(card.params?' &middot; '+esc(card.params):'')+'</div>'+
+        '<div class="ds">'+esc(card.description)+'</div>'+
+        (card.example?'<div class="ex">'+esc(card.example)+'</div>':'')+'</div>') : '';
+    }
+    fetch('assets/pdp1-instructions.json').then(function(r){ return r.json(); }).then(function(j){
+      var e=j.entries||{};
+      DATA=Object.keys(e).map(function(k){ var v=e[k]; return {mn:k, name:v.name||'', params:v.params||'', octal:v.octal||'', description:v.description||'', example:v.example||''}; });
+      TOTAL=DATA.length;
+      if(META){ META.innerHTML='Instruction data after '+esc(j.ref||'the DEC PDP-1 Handbook')+'. The filter matches the leading mnemonic.'; }
+      render('');
+      INPUT.addEventListener('input', function(){ render(INPUT.value); });
+    }).catch(function(){
+      BODY.innerHTML='<tr><td colspan="3" class="instr-empty">Could not load the instruction table.</td></tr>';
+    });
+  })();
+  </script>
 
 </body>
 </html>
