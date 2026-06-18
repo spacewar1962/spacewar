@@ -82,6 +82,8 @@ Kirschenbaum, M. (2008) *Mechanisms: New Media and the Forensic Imagination*. MI
 
 Kittler, F. (1999) *Gramophone, Film, Typewriter*. Trans. Winthrop-Young, G. & Wutz, M. Stanford University Press.
 
+Kline, S., Dyer-Witheford, N. & de Peuter, G. (2005) *Digital Play: The Interaction of Technology, Culture, and Marketing*. Montreal: McGill-Queen's University Press.
+
 Landsteiner, N. (2019) 'Inside Spacewar! A Software Archeological Approach to the First Video Game', *masswerk.at*. Available at: https://www.masswerk.at/spacewar/inside/.
 
 Latour, B. (1987) *Science in Action*. Harvard University Press.
