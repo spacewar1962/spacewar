@@ -25,6 +25,9 @@
     .cmp thead th { color:var(--bright); font-family:var(--mono); font-weight:normal; border-bottom:1px solid var(--beam); position:sticky; top:0; background:#070b14; }
     .cmp td.m { font-family:var(--mono); color:var(--beam); white-space:nowrap; }
     .cmp tr.hl td { background:rgba(108,242,255,0.06); }
+    .cmp th.sortable { cursor:pointer; user-select:none; }
+    .cmp th.sortable:hover { color:#6cf2ff; }
+    .cmp th .arr { color:var(--beam); }
   </style>
 </head>
 <body>
@@ -105,7 +108,7 @@
     <section class="block lede">
       <span class="kicker">The wider range</span>
       <h2>The DEC PDP family</h2>
-      <p>The PDP-1 was the first of a long line. <b>PDP</b> stood for <b>Programmed Data Processor</b>, a name Digital Equipment Corporation chose deliberately to avoid the word <i>computer</i>, which in 1959 meant a million-dollar machine in a glass room and frightened the investors and customers DEC needed. Over the next decade and more, DEC built out a whole family of PDPs, cheaper, smaller, interactive machines that put computing within reach of a single laboratory, a single department, even a single user. This page sets the PDP-1 in that family with a comparative table, so the machine <i>Spacewar!</i> was written for can be seen as one member of the line that, more than any other, created the minicomputer and the interactive computing culture that came with it.</p>
+      <p>The PDP-1 was the first of a long line. <b>PDP</b> stood for <b>Programmed Data Processor</b>, a name Digital Equipment Corporation chose deliberately to avoid the word <i>computer</i>, which in 1959 meant a million-dollar machine in a glass room and frightened the investors and customers DEC needed. Over the next decade and more, DEC built out a whole family of PDPs, cheaper, smaller, interactive machines that put computing within reach of a single laboratory, a single department, even a single user. The PDP-1 was in that minicomputer family which created the interactive computing culture that blossomed into <i>Spacewar!</i></p>
     </section>
 
     <div class="rule"><span>the comparative table</span></div>
@@ -113,12 +116,12 @@
     <section class="block">
       <span class="kicker">The line, machine by machine</span>
       <h3>The Programmed Data Processors</h3>
-      <p>The main general-purpose PDPs, with the figures that matter for comparison. Memory is given as the basic word count with an approximate modern equivalent in brackets; word lengths and the software each machine is known for tell the real story of the line.</p>
+      <p>The main general-purpose PDPs, with the figures that matter for comparison. Memory is given as the basic word count with an approximate modern equivalent in brackets, alongside word lengths and the software each machine is known for.</p>
       <div class="cmp-wrap">
         <table class="cmp">
-          <thead><tr><th>Model</th><th>Year</th><th>Word</th><th>Memory (basic, &asymp; modern)</th><th>Price / class</th><th>Known for</th></tr></thead>
+          <thead><tr><th class="sortable" data-type="num">Model<span class="arr"></span></th><th class="sortable" data-type="num">Year<span class="arr"></span></th><th class="sortable" data-type="num">Word<span class="arr"></span></th><th class="sortable" data-type="num">Memory (basic, &asymp; modern)<span class="arr"></span></th><th class="sortable" data-type="num">Price / class<span class="arr"></span></th><th class="sortable" data-type="text">Known for<span class="arr"></span></th></tr></thead>
           <tbody>
-            <tr class="hl"><td class="m">PDP-1</td><td>1959&ndash;60</td><td>18-bit</td><td>4,096 words (&asymp; 9&nbsp;KB)</td><td>~$120,000; ~53 built</td><td><a href="overview.html"><i>Spacewar!</i></a> (1962), the first time-sharing experiments, the MIT hackers</td></tr>
+            <tr class="hl"><td class="m"><a href="pdp1.html">PDP-1</a></td><td>1959&ndash;60</td><td>18-bit</td><td>4,096 words (&asymp; 9&nbsp;KB)</td><td>~$120,000; ~53 built</td><td><a href="overview.html"><i>Spacewar!</i></a> (1962), the first time-sharing experiments, the MIT hackers</td></tr>
             <tr><td class="m">PDP-4</td><td>1962</td><td>18-bit</td><td>4,096 words (&asymp; 9&nbsp;KB)</td><td>~$65,000 (half a PDP-1)</td><td>A cheaper PDP-1; ancestor of the 7 / 9 / 15 line</td></tr>
             <tr><td class="m">PDP-5</td><td>1963</td><td>12-bit</td><td>1,024 words (&asymp; 1.5&nbsp;KB)</td><td>~$27,000</td><td>Often called the first commercial minicomputer; ancestor of the PDP-8</td></tr>
             <tr><td class="m">PDP-6</td><td>1964</td><td>36-bit</td><td>16,384 words (&asymp; 72&nbsp;KB)</td><td>~$300,000 system; ~23 sold</td><td>DEC's first time-sharing machine; <b>ITS</b> began here; ancestor of the PDP-10</td></tr>
@@ -132,7 +135,7 @@
           </tbody>
         </table>
       </div>
-      <p class="micro" style="margin-top:0.6rem;font-size:0.6rem;line-height:1.7;">Notes and honest caveats. Modern-equivalent memory figures are rounded conversions from the word count (an 18-bit word is about 2.25 bytes, a 12-bit word about 1.5, a 36-bit word about 4.5), offered only for a sense of scale. A few figures carry genuine source conflicts: the PDP-7 is variously dated 1964 or 1965, the PDP-15 announced in 1969 and first shipped in 1970, and the PDP-11/20's base price is given as anywhere from about $10,800 to $20,000. Several numbers (PDP-4 / 9 / 12 memory, the PDP-12 price) rest on a single secondary source. Figures are drawn from Wikipedia, the Computer History Wiki (gunkies.org), the Computer History Museum and soemtron.org; for a print-grade table the PDP-1, 8, 10 and 11 rows should be checked against DEC's own handbooks.</p>
+      <p class="micro" style="margin-top:0.6rem;font-size:0.6rem;line-height:1.7;">Notes. Modern-equivalent memory figures are rounded conversions from the word count (an 18-bit word is about 2.25 bytes, a 12-bit word about 1.5, a 36-bit word about 4.5), offered only for a sense of scale. A few figures carry genuine source conflicts: the PDP-7 is variously dated 1964 or 1965, the PDP-15 announced in 1969 and first shipped in 1970, and the PDP-11/20's base price is given as anywhere from about $10,800 to $20,000. Several numbers (PDP-4 / 9 / 12 memory, the PDP-12 price) rest on a single secondary source. Figures are drawn from Wikipedia, the Computer History Wiki (gunkies.org), the Computer History Museum and soemtron.org; the PDP-1, 8, 10 and 11 rows should be checked against DEC's own handbooks.</p>
     </section>
 
     <div class="rule"><span>the gaps in the numbering</span></div>
@@ -171,6 +174,36 @@
       <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
     </div>
   </footer>
+
+  <script>
+  (function(){
+    var table=document.querySelector('table.cmp'); if(!table) return;
+    var tbody=table.tBodies[0], heads=table.querySelectorAll('thead th.sortable');
+    var rows=Array.prototype.slice.call(tbody.rows);
+    var sortCol=-1, dir=1;
+    function numv(s){ var m=String(s).replace(/,/g,'').match(/\d+/); return m?parseInt(m[0],10):-1; }
+    function arrows(){
+      Array.prototype.forEach.call(heads,function(h,i){
+        var s=h.querySelector('.arr');
+        if(s) s.textContent = (i===sortCol) ? (dir>0?' ▲':' ▼') : '';
+      });
+    }
+    Array.prototype.forEach.call(heads,function(h,i){
+      h.addEventListener('click',function(){
+        if(sortCol===i){ dir=-dir; } else { sortCol=i; dir=1; }
+        var type=h.getAttribute('data-type');
+        rows.sort(function(a,b){
+          var av=a.cells[i].textContent, bv=b.cells[i].textContent, r;
+          if(type==='num'){ r=numv(av)-numv(bv); }
+          else { r=av.toLowerCase().localeCompare(bv.toLowerCase()); }
+          return r*dir;
+        });
+        rows.forEach(function(r){ tbody.appendChild(r); });
+        arrows();
+      });
+    });
+  })();
+  </script>
 
 </body>
 </html>
