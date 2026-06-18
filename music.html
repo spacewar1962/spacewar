@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The PDP-1 as a musical instrument: Samson's Harmony Compiler</title>
+  <meta name="description" content="Not only Spacewar!: how Peter Samson made the PDP-1 sing. The Harmony Compiler (1961), four-voice 1-bit polyphony from the machine's program flags, and the arc from toggled light bulbs to the Samson Box at Stanford's CCRMA.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="The PDP-1 as a musical instrument: Samson's Harmony Compiler">
+  <meta property="og:description" content="How Peter Samson made the PDP-1 sing: four-voice 1-bit polyphony from the machine's program flags, the Harmony Compiler, and the arc from light bulbs to the Samson Box.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/music.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=4">
+  <script src="assets/nav.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Main <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="./">Home</a>
+            <a href="why.html">Why?</a>
+            <a href="./#ccs">CCS</a>
+            <a href="./#history">History</a>
+            <a href="two-cultures.html">Two Cultures</a>
+            <a href="bibliography.html">Bibliography</a>
+            <a href="./#contact">Contact</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Code <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="code.html">Versions</a>
+            <a href="./#object">The object</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Ports <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="ports.html">All ports</a>
+            <a href="cambridge.html">Cambridge</a>
+            <a href="minnesota.html">Minnesota</a>
+            <a href="stanford.html">Stanford</a>
+            <a href="mit-ai.html">MIT-AI</a>
+            <a href="pdp11.html">PDP-11</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">PDP-1 <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="pdp1.html">The machine</a>
+            <a href="restoration.html">Restorations</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <a class="nav-top nav-direct" href="people.html">People</a>
+        <a class="nav-top nav-direct" href="timeline.html">Timeline</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">A footnote to the PDP-1 page</span>
+      <h2>Not only Spacewar!: the PDP-1 as a musical instrument</h2>
+      <p>The same machine that ran the first video game was also one of the first computers people sat down and played music on, in real time, by hand. While Steve Russell and the others were building <i>Spacewar!</i> out of plotted points, <a href="people.html#samson"><b>Peter Samson</b></a> was making the PDP-1 sing four-part harmony out of nothing but the flip-flops on its own control panel. The two efforts came out of the same room, the same Tech Model Railroad Club milieu, and the same insight: that a fast, interactive, programmable machine was an instrument, and that what it did was entirely a matter of how you timed its pulses. This page follows that thread, which is why it lives one click off the <a href="pdp1.html">PDP-1 page</a> rather than in the main menu.</p>
+    </section>
+
+    <div class="rule"><span>a computer with no sound hardware</span></div>
+
+    <section class="block">
+      <span class="kicker">Four light bulbs, turned into voices</span>
+      <h3>How the PDP-1 made sound</h3>
+      <p>The PDP-1 shipped with no audio hardware at all. What it had was six <b>program flags</b>: flip-flops wired to six indicator lights on the operator's console, each one settable or clearable by a single CPU instruction. They were meant for status and debugging, a way for a running program to signal the operator. Samson heard them differently. If a program can turn a flag on and off, it can turn it on and off <i>fast</i>, and a flip-flop switched on and off at an audio rate is a square-wave oscillator. He took four of the six flags and drove each one as a one-bit tone generator, toggling it in software at the frequency of the note he wanted.</p>
+      <p>Four flags meant <b>four independent voices</b>. The outputs were brought off the machine through a small passive network, four resistors mixing the signals down to a stereo pair and four capacitors forming low-pass filters to round off the hard edges of the square waves and damp the computer's electrical buzz, and into an amplifier. The result was unmistakably a 1-bit sound, precisely on pitch but with a rough, buzzy undertone, especially on the higher notes. It is the sound of a computer with no business making music doing it anyway, and it is exactly the sound the PDP-1 makes when it plays <a href="pdp1.html">Boards of Canada's <i>Olson</i></a> in the video on the machine page.</p>
+      <p>This is the part a Critical Code Studies reading wants to underline. The music and the game are the same kind of object. <i>Spacewar!</i> is a tight loop that plots points on the Type 30 fast enough to read as motion; the Harmony Compiler is a tight loop that flips a console light fast enough to read as pitch. Both turn the machine's one real talent, doing a simple thing on an exact schedule, into something that looks like magic. The display and the loudspeaker are just two places the same timed pulses come out.</p>
+    </section>
+
+    <div class="rule"><span>the Harmony Compiler</span></div>
+
+    <section class="block">
+      <span class="kicker">Peter Samson, MIT, 1961</span>
+      <h3>Compiling music from notation</h3>
+      <p>Samson did not hand-time every note. He wrote the <b>Harmony Compiler</b>, a program that took music written in a compact <b>text notation</b> and turned it into the timed flag-toggling the hardware needed, synthesising up to four voices. You wrote the score; the compiler played it. It built on an earlier music program Samson had written for MIT's <a href="pdp1.html">TX-0</a> in the late 1950s, the vacuum-tube machine the same hackers learned on before the PDP-1 arrived, so the lineage of computer music at MIT actually runs a step behind the lineage of the game.</p>
+      <p>The compiler was general enough for many kinds of music but was, by Samson's own design, happiest with <b>baroque counterpoint</b>, where four clear contrapuntal lines suit four square-wave voices almost perfectly. Over time several hours of music were encoded for it: <b>Bach</b> fugues, the whole of <b>Mozart</b>'s <i>Eine kleine Nachtmusik</i>, the <i>Ode to Joy</i> from <b>Beethoven</b>'s Ninth, Christmas carols and a run of popular songs. In <b>1962</b> the Harmony Compiler and its player became part of the <b>stock software</b> DEC shipped with new PDP-1 machines, which means that one of the first things a brand-new PDP-1 anywhere could do, out of the box, was play polyphonic music. For a piece of software written by a student to amuse himself and his friends, that is a remarkable distribution.</p>
+    </section>
+
+    <div class="rule"><span>not the first, but a particular kind of first</span></div>
+
+    <section class="block">
+      <span class="kicker">An honest place in the history</span>
+      <h3>What the PDP-1 music was, and was not</h3>
+      <p>It is easy to overclaim here, so it is worth being exact. The PDP-1 did not make the first computer music. Australia's <b>CSIRAC</b> had played popular tunes around <b>1950 to 1951</b>, and the <b>Ferranti Mark 1</b> at Manchester was recorded by the BBC playing <i>God Save the King</i> and other tunes in <b>1951</b>, the earliest known recording of a computer making music. In the same year Samson's compiler was taking shape, <b>1961</b>, Max Mathews and John Kelly at Bell Labs had an <b>IBM 704</b> sing <i>Daisy Bell</i> (<i>A Bicycle Built for Two</i>), the performance Arthur C. Clarke heard and gave to the dying HAL in <i>2001</i>.</p>
+      <p>What the PDP-1 work represents is a different first: music as <b>real-time, interactive, polyphonic software</b> on a general-purpose machine, written inside a hacker culture, played for fun, and handed around as freely as the game beside it. The Bell Labs work was painstaking research output; the Harmony Compiler was something a student wrote on a machine he could touch, and that other students could load and run on a whim. That informality, the computer as an instrument you simply pick up, is the through-line from this room to everything that followed.</p>
+    </section>
+
+    <div class="rule"><span>from one bit to the green fridge</span></div>
+
+    <section class="block">
+      <span class="kicker">Peter Samson, 1961 and 1977</span>
+      <h3>The arc: the light-bulb hacker built a landmark synthesiser</h3>
+      <p>The loveliest part of the thread is where it ends up. The same Peter Samson who in 1961 coaxed four-voice harmony out of four console lights went on, in <b>1977</b>, to design the <b>Systems Concepts Digital Synthesizer</b>, universally known as the <b>Samson Box</b>. A one-off green cabinet costing on the order of $100,000, it was installed at Stanford's <b>Center for Computer Research in Music and Acoustics (CCRMA)</b>, where it served as the principal music-generation system for more than a decade and became one of the defining instruments of early digital synthesis. The arc from the PDP-1's one-bit flags to a purpose-built digital synthesiser running a whole research centre is, in miniature, the arc of computer music itself, from a clever abuse of debugging lights to dedicated hardware, carried by one of the same hands the whole way.</p>
+      <p>So the PDP-1 holds two firsts of computational play in one machine: the game and the instrument. Both were written by the same small group, in the same idiom, on the same hardware, treating the computer not as a calculator but as something to perform with. Reading <i>Spacewar!</i>'s code closely, you keep finding the machine showing through; reading the music, you find the same thing, and the same people, listening as well as watching.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="pdp1.html">← The PDP-1 page</a> &nbsp; <a class="btn ghost" href="people.html#samson">Peter Samson →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Computer History Museum, <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/pdp-1/music/">PDP-1 Restoration Project: Music</a>, and the CHM blog, <a target="_blank" rel="noopener noreferrer" href="https://computerhistory.org/blog/programming-in-harmony/">"Programming in Harmony"</a>, on Samson, the program flags and the four-voice setup.</li>
+        <li><a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Harmony_Compiler">Harmony Compiler</a> and <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Peter_Samson">Peter Samson</a> (Wikipedia), for the text notation, the TX-0 precursor and the 1962 stock-software distribution.</li>
+        <li>Daniel P. B. Smith, <a target="_blank" rel="noopener noreferrer" href="http://www.dpbsmith.com/pdp1music/">PDP-1 Music</a>, on the resistor/capacitor output network and the character of the 1-bit sound.</li>
+        <li>Obsolescence Guaranteed, <a target="_blank" rel="noopener noreferrer" href="https://obsolescence.dev/pdp1-music.html">"the earliest real-time computer music"</a>, and the <a href="pdp1.html">Boards of Canada <i>Olson</i></a> demonstration.</li>
+        <li>Gareth Loy, "Life and Times of the Samson Box," <a target="_blank" rel="noopener noreferrer" href="https://direct.mit.edu/comj/article/37/3/26/94433/Life-and-Times-of-the-Samson-Box"><i>Computer Music Journal</i> 37(3), 2013</a>, on the Systems Concepts Digital Synthesizer at CCRMA.</li>
+        <li>On the wider history: CSIRAC and the Ferranti Mark 1 (Manchester, 1951) as the earliest computer music, and the Bell Labs <i>Daisy Bell</i> on the IBM 704 (1961). Steven Levy, <i>Hackers</i> (1984), for the TMRC framing.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
