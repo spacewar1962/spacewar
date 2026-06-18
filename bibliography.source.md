@@ -80,6 +80,8 @@ Karpathy, A. (2025) 'Vibe coding' [X/Twitter post]. 2 February. https://x.com/ka
 
 Kirschenbaum, M. (2008) *Mechanisms: New Media and the Forensic Imagination*. MIT Press.
 
+Kittler, F. (1997) 'There Is No Software', in Johnston, J. (ed.) *Literature, Media, Information Systems*. Amsterdam: G+B Arts International, pp. 147-155.
+
 Kittler, F. (1999) *Gramophone, Film, Typewriter*. Trans. Winthrop-Young, G. & Wutz, M. Stanford University Press.
 
 Kline, S., Dyer-Witheford, N. & de Peuter, G. (2005) *Digital Play: The Interaction of Technology, Culture, and Marketing*. Montreal: McGill-Queen's University Press.
