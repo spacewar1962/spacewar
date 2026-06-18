@@ -27,6 +27,12 @@
     .cmp th, .cmp td { text-align:left; vertical-align:top; padding:0.45rem 0.6rem; border-bottom:1px solid var(--line); }
     .cmp thead th { color:var(--bright); font-family:var(--mono); font-weight:normal; border-bottom:1px solid var(--beam); }
     .cmp td.t { font-family:var(--mono); color:var(--beam); white-space:nowrap; }
+    .imodal { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(2,4,8,0.93); padding:4vh 4vw; cursor:zoom-out; }
+    .imodal.open { display:flex; }
+    .imodal img { max-width:92vw; max-height:90vh; width:auto; height:auto; border:1px solid var(--line); box-shadow:0 0 50px rgba(0,0,0,0.85); cursor:default; }
+    .imodal-close { position:fixed; top:1.1rem; right:1.3rem; z-index:201; width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+      background:rgba(7,11,20,0.9); color:var(--phosphor); font-family:var(--mono); font-size:1.5rem; line-height:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .imodal-close:hover { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 12px rgba(108,242,255,0.4); }
   </style>
 </head>
 <body>
@@ -107,7 +113,11 @@
     <section class="block lede">
       <span class="kicker">The display</span>
       <h2>The Type 30: the screen that made Spacewar! possible</h2>
-      <p><i>Spacewar!</i> exists because the PDP-1 at MIT had an <b>optional</b> screen attached, DEC's <b>Type 30 Precision CRT Display</b>, installed on <b>29 December 1961</b>, just as Steve Russell began coding. The machine carried the original <b>Type 30</b>, DEC's first display for the PDP-1; the lettered sub-variants the manuals later distinguish (30A, 30E, 30M) are minor revisions, mostly tied to other PDP models, and are set out further down this page. It was not a screen in the modern sense: it drew nothing on its own, held no image, and knew nothing of lines or shapes. It plotted single points, one at a time, wherever the program told it to. Everything distinctive about how <i>Spacewar!</i> looks follows from exactly what this device could and could not do. This page looks closely at the Type 30, sets it beside DEC's other displays of the period, and explains the <b>P7 phosphor</b> and the <b>light pen</b> that went with it. The figures here are taken from DEC's own <a target="_blank" rel="noopener noreferrer" href="https://www.bitsavers.org/pdf/dec/pdp1/F15D_PDP1_Handbook_Oct63.pdf">PDP-1 Handbook</a> and display manuals.</p>
+      <p><figure style="float:right;width:43%;max-width:310px;margin:0.2rem 0 0.9rem 1.4rem;">
+        <a href="assets/images/Type30-pdp1.jpg" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/Type30-pdp1.jpg" alt="The round Type 30 CRT display mounted beside a PDP-1" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
+        <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">The Type 30 Precision CRT Display and its housing, beside a PDP-1. <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
+      </figure>
+      <i>Spacewar!</i> exists because the PDP-1 at MIT had an <b>optional</b> screen attached, DEC's <b>Type 30 Precision CRT Display</b>, installed on <b>29 December 1961</b>, just as Steve Russell began coding. The machine carried the original <b>Type 30</b>, DEC's first display for the PDP-1; the lettered sub-variants the manuals later distinguish (30A, 30E, 30M) are minor revisions, mostly tied to other PDP models, and are set out further down this page. It was not a screen in the modern sense: it drew nothing on its own, held no image, and knew nothing of lines or shapes. It plotted single points, one at a time, wherever the program told it to. Everything distinctive about how <i>Spacewar!</i> looks follows from exactly what this device could and could not do. This page looks closely at the Type 30, sets it beside DEC's other displays of the period, and explains the <b>P7 phosphor</b> and the <b>light pen</b> that went with it. The figures here are taken from DEC's own <a target="_blank" rel="noopener noreferrer" href="https://www.bitsavers.org/pdf/dec/pdp1/F15D_PDP1_Handbook_Oct63.pdf">PDP-1 Handbook</a> and display manuals.</p>
     </section>
 
     <div class="rule"><span>the Type 30 in detail</span></div>
@@ -219,6 +229,22 @@
       <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
     </div>
   </footer>
+
+  <div class="imodal" id="imodal" aria-hidden="true">
+    <button class="imodal-close" aria-label="Close">&times;</button>
+    <img src="" alt="">
+  </div>
+  <script>
+  (function(){
+    var modal=document.getElementById('imodal'); if(!modal) return;
+    var mimg=modal.querySelector('img'), links=document.querySelectorAll('figure a[href$=".png"], figure a[href$=".jpg"], figure a[href$=".jpeg"], figure a[href$=".webp"]');
+    function open(src,alt){ mimg.src=src; mimg.alt=alt||''; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); }
+    function close(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); mimg.src=''; }
+    Array.prototype.forEach.call(links,function(a){ a.addEventListener('click',function(e){ e.preventDefault(); var img=a.querySelector('img'); open(a.getAttribute('href'), img?img.alt:''); }); });
+    modal.addEventListener('click',function(e){ if(e.target!==mimg) close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  })();
+  </script>
 
 </body>
 </html>
