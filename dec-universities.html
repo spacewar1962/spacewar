@@ -25,6 +25,9 @@
     .cmp thead th { color:var(--bright); font-family:var(--mono); font-weight:normal; border-bottom:1px solid var(--beam); }
     .cmp td.s { color:var(--bright); white-space:nowrap; }
     .cmp td.m { font-family:var(--mono); color:var(--beam); white-space:nowrap; }
+    .cmp th.sortable { cursor:pointer; user-select:none; }
+    .cmp th.sortable:hover { color:#6cf2ff; }
+    .cmp th .arr { color:var(--beam); }
   </style>
 </head>
 <body>
@@ -105,7 +108,7 @@
     <section class="block lede">
       <span class="kicker">The machines and the work</span>
       <h2>PDPs at universities</h2>
-      <p>For about fifteen years, the DEC PDP line was the working medium of academic computing. Cheap enough for a single department and interactive enough to sit at, the PDPs became the machines on which an extraordinary amount of foundational software was first written. Time-sharing, Unix, Lisp and artificial intelligence, interactive graphics, the whole hacker culture, all of it has a PDP somewhere near its origin. <i>Spacewar!</i> on MIT's PDP-1 is the first of these, and far from the last. This page is a short map of which machines ran where, and what came off them.</p>
+      <p>For about fifteen years, the DEC PDP line was the working medium of academic computing. Cheap enough for a single department and interactive enough to sit at, the PDPs became the machines on which an extraordinary amount of foundational software was first written. Time-sharing, Unix, Lisp and artificial intelligence, interactive graphics, the whole hacker culture, all of it has a PDP somewhere near its origin. <i>Spacewar!</i> on MIT's PDP-1 is the first of these, and far from the last.</p>
     </section>
 
     <div class="rule"><span>the map</span></div>
@@ -115,7 +118,7 @@
       <h3>Which PDP, and what it produced</h3>
       <div class="cmp-wrap">
         <table class="cmp">
-          <thead><tr><th>Site</th><th>Machine(s)</th><th>From</th><th>What came off it</th></tr></thead>
+          <thead><tr><th class="sortable" data-type="text">Site<span class="arr"></span></th><th class="sortable" data-type="num">Machine(s)<span class="arr"></span></th><th class="sortable" data-type="num">From<span class="arr"></span></th><th class="sortable" data-type="text">What came off it<span class="arr"></span></th></tr></thead>
           <tbody>
             <tr><td class="s">MIT (TMRC, RLE)</td><td class="m">PDP-1</td><td>1961</td><td><a href="overview.html"><i>Spacewar!</i></a> (1962), early time-sharing experiments, and the Tech Model Railroad Club hacker culture</td></tr>
             <tr><td class="s">MIT (Project MAC / AI Lab)</td><td class="m">PDP-6 &rarr; PDP-10</td><td>mid-1960s</td><td><b>ITS</b> (the Incompatible Timesharing System), <b>MacLisp</b> and <b>Macsyma</b>, the origins of <b>Emacs</b>; the AI Lab formed in 1970</td></tr>
@@ -128,7 +131,7 @@
           </tbody>
         </table>
       </div>
-      <p class="micro" style="margin-top:0.6rem;font-size:0.6rem;">Bell Labs is a research laboratory rather than a university, included here because the PDP-7 and PDP-11 work done there is inseparable from this story. The exact DEC model at Utah, and the precise machine behind each CMU speech system, are not pinned down in the sources consulted.</p>
+      <p class="micro" style="margin-top:0.6rem;font-size:0.6rem;">Bell Labs is a research laboratory rather than a university, included here because the PDP-7 and PDP-11 work done there is important in relation to research work. The exact DEC model at Utah, and the precise machine behind each CMU speech system, are not confirmed.</p>
     </section>
 
     <div class="rule"><span>why this belongs here</span></div>
@@ -136,7 +139,7 @@
     <section class="block">
       <span class="kicker">The reading</span>
       <h3>The medium of a generation's computing</h3>
-      <p>It is hard to overstate how much of modern computing was first written on these machines. The PDP line was not a backdrop to this work; it was its <b>medium</b>, the constitutive ground on which time-sharing, Unix, Lisp and interactive graphics became thinkable and then real. <i>Spacewar!</i> belongs to the very start of that story, the moment a roomful of students discovered that an interactive computer was a thing you could <i>do</i> something playful and expressive with. The same discovery, repeated and deepened across the PDP family, is most of what the next two decades of computing consisted of.</p>
+      <p>It is hard to overstate how much of modern computing was first written on these machines. The PDP line was not a backdrop to this work; it was its <b>medium</b>, the constitutive ground on which time-sharing, Unix, Lisp and interactive graphics became thinkable and then real. <i>Spacewar!</i> belongs to the very start of that story, the moment a roomful of students discovered that an interactive computer was a thing you could <i>do</i> something playful and expressive with.</p>
       <p style="margin-top:1.4rem;"><a class="btn ghost" href="dec-family.html">← The PDP family</a> &nbsp; <a class="btn ghost" href="dec-legacy.html">The legacy of the PDP →</a></p>
     </section>
 
@@ -159,6 +162,40 @@
       <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
     </div>
   </footer>
+
+  <script>
+  (function(){
+    var table=document.querySelector('table.cmp'); if(!table) return;
+    var tbody=table.tBodies[0], heads=table.querySelectorAll('thead th.sortable');
+    var rows=Array.prototype.slice.call(tbody.rows);
+    var sortCol=-1, dir=1;
+    function numv(s){ var m=String(s).replace(/,/g,'').match(/\d+/); return m?parseInt(m[0],10):-1; }
+    function arrows(){
+      Array.prototype.forEach.call(heads,function(h,i){
+        var s=h.querySelector('.arr');
+        if(s) s.textContent = (i===sortCol) ? (dir>0?' ▲':' ▼') : '';
+      });
+    }
+    function doSort(i){
+      var type=heads[i].getAttribute('data-type');
+      rows.sort(function(a,b){
+        var av=a.cells[i].textContent, bv=b.cells[i].textContent, r;
+        if(type==='num'){ r=numv(av)-numv(bv); }
+        else { r=av.toLowerCase().localeCompare(bv.toLowerCase()); }
+        return r*dir;
+      });
+      rows.forEach(function(r){ tbody.appendChild(r); });
+      arrows();
+    }
+    Array.prototype.forEach.call(heads,function(h,i){
+      h.addEventListener('click',function(){
+        if(sortCol===i){ dir=-dir; } else { sortCol=i; dir=1; }
+        doSort(i);
+      });
+    });
+    sortCol=0; dir=1; doSort(0);
+  })();
+  </script>
 
 </body>
 </html>
