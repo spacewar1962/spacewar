@@ -191,7 +191,7 @@
         </div>
         <div class="instr-gloss">
           <p><b>Mnemonic</b>, the short name written in assembly (for example <code>lac</code>), standing in for the machine's numeric operation. <b>Octal</b>, that operation as a base-8 number, the way PDP-1 programmers wrote it (three bits per digit): two digits for memory-reference instructions, six for the micro-coded operate, skip, shift and in-out groups. <b>Instruction</b>, what it does, where <code>AC</code> is the accumulator, <code>IO</code> the in-out register, <code>Y</code> a memory location, and <code>&larr;</code> means "is given the value of".</p>
-          <p>Click a column heading to sort (again to reverse, a third time to restore the original order). Instruction data after Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a> and DEC's PDP-1 Handbook.</p>
+          <p>The table loads sorted alphabetically by mnemonic. Click a column heading to sort by it (again to reverse, a third time to restore the original order). Instruction data after Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a> and DEC's PDP-1 Handbook.</p>
         </div>
       </div>
     </section>
@@ -218,7 +218,7 @@ dispt A,Y,B
     <section class="block">
       <span class="kicker">The reading</span>
       <h3>The instruction set is part of the meaning</h3>
-      <p>Reading <i>Spacewar!</i> closely means reading at this level. The 18-bit word fixes the precision of the orbital arithmetic; one's-complement sign handling shows up in the physics; the single accumulator dictates a style of code that constantly loads, operates and stores; and <code>dpy</code> is the reason the game is a redraw loop rather than a picture. The constraints are not background to the program, they are legible <i>in</i> it.</p>
+      <p>Reading <i>Spacewar!</i> closely means reading at this level. The 18-bit word fixes the precision of the orbital arithmetic; one's-complement sign handling shows up in the physics; the single accumulator dictates a style of code that constantly loads, operates and stores; and <code>dpy</code> is the reason the game is a redraw loop rather than a picture.</p>
       <p style="margin-top:1.4rem;"><a class="btn ghost" href="pdp1.html">← The PDP-1</a> &nbsp; <a class="btn ghost" href="code.html">The versions and source →</a></p>
     </section>
 
@@ -232,8 +232,8 @@ dispt A,Y,B
 
     <section class="block">
       <span class="kicker">On this page</span>
-      <h3>Where it comes from</h3>
-      <ul>
+      <h3>References</h3>
+      <ul style="font-size:0.72rem;line-height:1.65;">
         <li>Norbert Landsteiner, <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a> and the <i>Inside Spacewar!</i> series, masswerk.at, for the instruction set and octal codes.</li>
         <li>DEC, <i>PDP-1 handbooks</i> and the <a href="pdp1.html">PDP-1 machine page</a> here, for the word format, registers and cycle times.</li>
         <li><i>Spacewar!</i> 3.1 (24 September 1962), the source of the <code>dispt</code> macro quoted above; held with the other listings on the <a href="code.html">versions and source</a> page.</li>
@@ -256,7 +256,7 @@ dispt A,Y,B
         INPUT=document.getElementById('instrSearch'),
         HEADERS=document.querySelectorAll('.instr-table th.sortable');
     if(!BODY||!INPUT) return;
-    var DATA=[], TOTAL=0, sortKey=null, sortDir=1;
+    var DATA=[], TOTAL=0, sortKey='mn', sortDir=1;
     function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
     function octVal(s){ var m=(s||'').match(/^[0-7]+/); return m?parseInt(m[0],8):-1; }
     function cmp(a,b){
@@ -301,6 +301,7 @@ dispt A,Y,B
       var e=j.entries||{};
       DATA=Object.keys(e).map(function(k,i){ var v=e[k]; return {mn:k, name:v.name||'', params:v.params||'', octal:v.octal||'', description:v.description||'', example:v.example||'', _i:i}; });
       TOTAL=DATA.length;
+      arrows();
       render();
       INPUT.addEventListener('input', render);
     }).catch(function(){

@@ -107,7 +107,7 @@
     <section class="block lede">
       <span class="kicker">The display</span>
       <h2>The Type 30: the screen that made Spacewar! possible</h2>
-      <p>No display, no game. <i>Spacewar!</i> exists because the PDP-1 at MIT had an <b>optional</b> screen attached, DEC's <b>Type 30 Precision CRT Display</b>, installed on <b>29 December 1961</b>, just as Steve Russell began coding. It was not a screen in the modern sense: it drew nothing on its own, held no image, and knew nothing of lines or shapes. It plotted single points, one at a time, wherever the program told it to. Everything distinctive about how <i>Spacewar!</i> looks follows from exactly what this device could and could not do. This page looks closely at the Type 30, sets it beside DEC's other displays of the period, and explains the <b>P7 phosphor</b> and the <b>light pen</b> that went with it. The figures here are taken from DEC's own <a target="_blank" rel="noopener noreferrer" href="https://www.bitsavers.org/pdf/dec/pdp1/F15D_PDP1_Handbook_Oct63.pdf">PDP-1 Handbook</a> and display manuals.</p>
+      <p><i>Spacewar!</i> exists because the PDP-1 at MIT had an <b>optional</b> screen attached, DEC's <b>Type 30 Precision CRT Display</b>, installed on <b>29 December 1961</b>, just as Steve Russell began coding. It was not a screen in the modern sense: it drew nothing on its own, held no image, and knew nothing of lines or shapes. It plotted single points, one at a time, wherever the program told it to. Everything distinctive about how <i>Spacewar!</i> looks follows from exactly what this device could and could not do. This page looks closely at the Type 30, sets it beside DEC's other displays of the period, and explains the <b>P7 phosphor</b> and the <b>light pen</b> that went with it. The figures here are taken from DEC's own <a target="_blank" rel="noopener noreferrer" href="https://www.bitsavers.org/pdf/dec/pdp1/F15D_PDP1_Handbook_Oct63.pdf">PDP-1 Handbook</a> and display manuals.</p>
     </section>
 
     <div class="rule"><span>the Type 30 in detail</span></div>
@@ -127,7 +127,7 @@
         <tr><th class="k">Instruction</th><td><code>dpy</code> (octal 0007): AC bits 0&ndash;9 give the signed X coordinate, IO bits 0&ndash;9 the signed Y; the instruction also clears the light-pen status bit</td></tr>
         <tr><th class="k">Options</th><td>Type 32 light pen; the Type 33 symbol generator for fast text</td></tr>
       </table>
-      <p style="margin-top:0.8rem;">Two figures here are worth keeping straight, because they are often muddled. The tube is <b>16 inches</b> (its diameter); the actual <b>plotting area is 9.25 inches</b> square. And the grid is <b>1024 by 1024 addressable</b> locations, but the eye can only resolve about <b>512 distinct points per axis</b> on the phosphor, so "512" is a limit of what you can <i>see</i>, not a smaller image drawn inside a larger frame. The whole tube face is in play, with the origin at its centre.</p>
+      <p style="margin-top:0.8rem;">The tube is <b>16 inches</b> (its diameter); the actual <b>plotting area is 9.25 inches</b> square. And the grid is <b>1024 by 1024 addressable</b> locations, but the eye can only resolve about <b>512 distinct points per axis</b> on the phosphor, so "512" is a limit of what you can <i>see</i>, not a smaller image drawn inside a larger frame.</p>
     </section>
 
     <div class="rule"><span>DEC's display family</span></div>
@@ -191,8 +191,8 @@
 
     <section class="block">
       <span class="kicker">On this page</span>
-      <h3>Where it comes from</h3>
-      <ul>
+      <h3>References</h3>
+      <ul style="font-size:0.72rem;line-height:1.65;">
         <li>DEC, <a target="_blank" rel="noopener noreferrer" href="https://www.bitsavers.org/pdf/dec/pdp1/F15D_PDP1_Handbook_Oct63.pdf"><i>PDP-1 Handbook</i> (F-15D, 1963)</a>, for the Type 30, Type 31, Type 32 light pen and Type 33 symbol generator (read directly from the bitsavers scan).</li>
         <li>DEC, <i>Type 30E Precision CRT Display</i> manual (F-15(30E), 1963), for the 30A / 30E / 30M variants and the external-oscilloscope outputs.</li>
         <li>DEC, <i>Type 340 Precision Incremental CRT Display</i> manuals (1964), for the vector display, its modes, the Type 342 symbol generator and the Type 370 light pen.</li>
