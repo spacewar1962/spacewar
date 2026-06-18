@@ -26,7 +26,7 @@
     .spectable caption { text-align:left; color:var(--phosphor-dim); font-size:0.6rem; padding:0.3rem 0; }
     .codeblock { background:#02060a; border:1px solid var(--line); border-radius:6px; padding:0.9rem 1.1rem; margin:1rem 0 0.4rem;
       font-family:var(--mono); font-size:0.82rem; line-height:1.55; color:var(--phosphor); overflow-x:auto;
-      box-shadow:inset 0 0 50px rgba(0,0,0,0.6); }
+      white-space:pre; tab-size:4; box-shadow:inset 0 0 50px rgba(0,0,0,0.6); }
     .codeblock .cm { color:var(--phosphor-dim); }
     .codeblock .op { color:var(--beam); }
     .wordmap { width:100%; border-collapse:collapse; margin:0.8rem 0 0.2rem; font-family:var(--mono); font-size:0.7rem; text-align:center; }
@@ -103,7 +103,7 @@
     <section class="block lede">
       <span class="kicker">Inside the machine</span>
       <h2>Programming the PDP-1</h2>
-      <p>To read <i>Spacewar!</i> as code you have to know what kind of code it is. There was no operating system, no high-level language, no library to call. A program for the PDP-1 was a list of <b>18-bit words</b> in the machine's own instruction set, written in octal or in the <b>MACRO</b> assembler's mnemonics, punched to paper tape and loaded into core. The game's physics, its controls and its glowing ships are all built from a few dozen instruction types operating on a single accumulator. This page is a short tour of that instruction set, and of the one instruction, <code>dpy</code>, that made the whole genre possible. The complete reference is Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a>.</p>
+      <p>To read <i>Spacewar!</i> as code you have to know what kind of code it is. There was no operating system, no high-level language, no library to call. A program for the PDP-1 was a list of <b>18-bit words</b> in the machine's own instruction set, written in octal or in the <b>MACRO</b> assembler's mnemonics, punched to paper tape and loaded into core. The game's physics, its controls and its glowing ships are all built from a few dozen instruction types operating on a single accumulator. This page is a short tour of that instruction set, and of the one instruction, <code>dpy</code>, that made the whole genre possible.<sup><a id="fnref1" href="#fn1">1</a></sup></p>
     </section>
 
     <div class="rule"><span>the 18-bit word</span></div>
@@ -126,7 +126,7 @@
         </tr>
       </table>
 
-      <p>Arithmetic is <b>one's complement</b>: a negative number is the bitwise complement of its positive, which means the machine has two representations of zero (all-zeros and all-ones) and that overflow and sign behave a little differently from the two's-complement machines that came later. The programmer works mostly through one <b>accumulator (AC)</b>, with an <b>in-out register (IO)</b> alongside it (the two can be joined for 36-bit shifts), a <b>program counter (PC)</b>, an overflow flag, six <a href="music.html">program flags</a> and a bank of sense switches on the console. A core cycle takes about <b>5.35 microseconds</b>; most instructions take two cycles, roughly <b>10.7 microseconds</b>, so the machine runs on the order of ninety thousand instructions a second. Every moving thing in <i>Spacewar!</i> has to be computed and drawn inside that budget.</p>
+      <p>Arithmetic is <b>one's complement</b>: a negative number is the bitwise complement of its positive, which means the machine has two representations of zero (all-zeros and all-ones) and that overflow and sign behave a little differently from the two's-complement machines that came later. The programmer works mostly through one <b>accumulator (AC)</b>, with an <b>in-out register (IO)</b> alongside it (the two can be joined for 36-bit shifts), a <b>program counter (PC)</b>, an overflow flag, six <a href="music.html">program flags</a> and a bank of sense switches on the console. A core cycle takes about <b>5.35 microseconds</b>; most instructions take two cycles, roughly <b>10.7 microseconds</b>, so the machine runs on the order of ninety thousand instructions a second. Every moving thing in <i>Spacewar!</i> has to be computed and drawn.</p>
     </section>
 
     <div class="rule"><span>the instruction set</span></div>
@@ -189,8 +189,14 @@ dispt A,Y,B
     <section class="block">
       <span class="kicker">The reading</span>
       <h3>The instruction set is part of the meaning</h3>
-      <p>Reading <i>Spacewar!</i> closely means reading at this level. The 18-bit word fixes the precision of the orbital arithmetic; one's-complement sign handling shows up in the physics; the single accumulator dictates a style of code that constantly loads, operates and stores; and <code>dpy</code> is the reason the game is a redraw loop rather than a picture. The constraints are not background to the program, they are legible <i>in</i> it. To study the code is repeatedly to meet the machine through it.</p>
+      <p>Reading <i>Spacewar!</i> closely means reading at this level. The 18-bit word fixes the precision of the orbital arithmetic; one's-complement sign handling shows up in the physics; the single accumulator dictates a style of code that constantly loads, operates and stores; and <code>dpy</code> is the reason the game is a redraw loop rather than a picture. The constraints are not background to the program, they are legible <i>in</i> it.</p>
       <p style="margin-top:1.4rem;"><a class="btn ghost" href="pdp1.html">← The PDP-1</a> &nbsp; <a class="btn ghost" href="code.html">The versions and source →</a></p>
+    </section>
+
+    <div class="rule"><span>notes</span></div>
+
+    <section class="block">
+      <p class="micro" id="fn1" style="font-size:0.65rem;line-height:1.7;"><sup>1</sup>&nbsp;The complete reference is Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a> (masswerk.at). <a href="#fnref1">&#8617;</a></p>
     </section>
 
     <div class="rule"><span>sources</span></div>
