@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The legacy of the PDP: from the PDP-11 to VAX, VMS and Unix</title>
+  <meta name="description" content="The line forward from the DEC PDP family: the PDP-11 to the 32-bit VAX and VMS, Unix's PDP roots and its spread, the PDP-11 architecture's influence on later CPUs, and DEC's later trajectory.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="The legacy of the PDP: VAX, VMS and Unix">
+  <meta property="og:description" content="From the PDP-11 to the VAX and VMS, Unix's PDP roots, the architecture's influence on later CPUs, and DEC's later trajectory.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/dec-legacy.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=4">
+  <script src="assets/nav.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Main <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="./">Home</a>
+            <a href="why.html">Why?</a>
+            <a href="./#ccs">CCS</a>
+            <a href="./#history">History</a>
+            <a href="two-cultures.html">Two Cultures</a>
+            <a href="bibliography.html">Bibliography</a>
+            <a href="./#contact">Contact</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">The Game <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="overview.html">Overview</a>
+            <a href="code.html">Versions</a>
+            <a href="./#object">The object</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Ports <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="ports.html">All ports</a>
+            <a href="cambridge.html">Cambridge (UK)</a>
+            <a href="minnesota.html">Minnesota</a>
+            <a href="stanford.html">Stanford</a>
+            <a href="mit-ai.html">MIT-AI</a>
+            <a href="pdp11.html">PDP-11</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">PDP-1 <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="pdp1.html">PDP-1 Computer</a>
+            <a href="programming.html">Programming</a>
+            <a href="type30.html">Type 30 Display</a>
+            <a href="software.html">Software environment</a>
+            <a href="games.html">As a games machine</a>
+            <a href="music.html">As a media machine</a>
+            <a href="restoration.html">Restorations</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">DEC <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="dec-family.html">DEC PDP family</a>
+            <a href="dec-universities.html">PDPs at universities</a>
+            <a href="dec-legacy.html">The legacy</a>
+          </div>
+        </div>
+        <a class="nav-top nav-direct" href="people.html">People</a>
+        <a class="nav-top nav-direct" href="timeline.html">Timeline</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">The line forward</span>
+      <h2>The legacy of the PDP</h2>
+      <p>The PDP family did not end so much as transform. The interactive, real-time computing the PDP-1 introduced in 1962 ran forward through the line and out the other side, into the machines, operating systems and architectures that carried it to everyone. This page follows that thread, from the PDP-11 to the VAX, through Unix, and into the wider influence DEC's minicomputers had on the computing we use now.</p>
+    </section>
+
+    <div class="rule"><span>from the PDP-11 to the VAX</span></div>
+
+    <section class="block">
+      <span class="kicker">VAX and VMS</span>
+      <h3>The 32-bit successor</h3>
+      <p>The PDP-11 was so successful that its limits eventually mattered: sixteen bits could address only so much memory. DEC's answer, in <b>October 1977</b>, was the <b>VAX-11/780</b>, the first of the <b>VAX</b> family, whose name stood for <b>Virtual Address eXtension</b>, literally a 32-bit extension of the 16-bit PDP-11, complete with a compatibility mode that could still run PDP-11 code. It shipped with the <b>VMS</b> operating system and became the canonical "one-MIPS" machine of its era. Through the 1980s the VAX and VMS dominated the mini and supermini market, the workhorses of engineering, science and research computing, and the direct institutional descendants of the PDP line.</p>
+    </section>
+
+    <div class="rule"><span>Unix and C</span></div>
+
+    <section class="block">
+      <span class="kicker">Born on a PDP, spread by one</span>
+      <h3>The Unix thread</h3>
+      <p>The most consequential software legacy of the PDP line is <b>Unix</b>. It began in 1969 on a cast-off <a href="dec-family.html">PDP-7</a> at Bell Labs, was named and moved to the <b>PDP-11</b> in 1970&ndash;71, and in 1973 was rewritten in <b>C</b>, the language Dennis Ritchie had developed on the PDP-11. That rewrite, an operating system written in a portable high-level language, is one of the hinges of computing history, and it happened on a DEC minicomputer. Unix then spread through the enormous PDP-11 install base and onward to the VAX; Berkeley's <b>BSD</b> line ran first on a PDP-11 and then on the VAX, carrying the tradition into the workstation era and, eventually, into Linux and macOS. The command line you may have open right now is, genealogically, a PDP program.</p>
+    </section>
+
+    <div class="rule"><span>the architecture's afterlife</span></div>
+
+    <section class="block">
+      <span class="kicker">Influence on later machines</span>
+      <h3>How the PDP-11 shaped what came after</h3>
+      <p>The PDP-11's instruction-set architecture, its general-purpose registers, its rich and orthogonal addressing modes, its clean memory model, was widely admired and widely imitated. It is regularly cited as an influence on the microprocessors that defined the personal-computer era, including the Intel x86 and the Motorola 68000, and its operating-system conventions fed forward through CP/M into MS-DOS. The interactive, single-user, real-time machine the PDP-1 had prototyped became, by this route, the ordinary shape of the personal computer.</p>
+      <p class="micro" style="margin-top:0.5rem;font-size:0.6rem;">The architectural influence is well attested in the secondary literature; "influence" rather than direct derivation is the careful word.</p>
+    </section>
+
+    <div class="rule"><span>and DEC itself</span></div>
+
+    <section class="block">
+      <span class="kicker">An endnote</span>
+      <h3>The company's later course</h3>
+      <p>DEC carried on into the RISC era with the 64-bit <b>Alpha</b> architecture in 1992, but the minicomputer model that had been its making was overtaken by the very personal computers its own machines had helped inspire. Digital Equipment Corporation was acquired by <b>Compaq in 1998</b>, at the time the largest merger the computer industry had seen; Compaq merged with <b>Hewlett-Packard in 2002</b>, and the Alpha line was wound down. The company that coined "Programmed Data Processor" to avoid frightening its customers with the word <i>computer</i> had, by then, helped make the computer something anyone could sit down and use.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>From Spacewar! to the machine on your desk</h3>
+      <p>The through-line this project cares about runs straight through here. <i>Spacewar!</i> on the PDP-1's <a href="type30.html">Type 30</a> display was an early, vivid proof that a computer could be interactive, real-time, and personal, something you played with at the console rather than queued jobs for. The PDP line carried that proposition forward, through time-sharing and Unix and the VAX, into the architectures and habits of modern interactive computing. To read the 1962 game closely is to read the first clear statement of a value that the rest of this history spent decades making universal.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="dec-universities.html">← PDPs at universities</a> &nbsp; <a class="btn ghost" href="overview.html">Spacewar! overview →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Wikipedia, <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/VAX-11">VAX-11</a>, <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/VAX">VAX</a>, <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/History_of_Unix">History of Unix</a>, <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/PDP-11">PDP-11</a>, and <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Digital_Equipment_Corporation">Digital Equipment Corporation</a>, cross-checked against the Computer History Wiki (gunkies.org).</li>
+        <li>Computer History Museum, the Revolution exhibit on the <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/revolution/minicomputers/11/366">PDP-11</a> and DEC's minicomputers.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

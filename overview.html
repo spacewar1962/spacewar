@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spacewar!: an overview of the first widely played video game</title>
+  <meta name="description" content="A deep-dive overview of Spacewar! (PDP-1, 1962): the design, the two ships and the gravity star, how it plays and the strategies, the experience on the Type 30 display, and its code, versions and long afterlife.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="Spacewar!: an overview of the first widely played video game">
+  <meta property="og:description" content="The design, play and strategy of Spacewar! (PDP-1, 1962), with its code, versions and afterlife: the deep-dive overview.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/overview.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=4">
+  <script src="assets/nav.js" defer></script>
+  <style>
+    .imodal { position:fixed; inset:0; z-index:200; display:none; align-items:center; justify-content:center; background:rgba(2,4,8,0.93); padding:4vh 4vw; cursor:zoom-out; }
+    .imodal.open { display:flex; }
+    .imodal img { max-width:92vw; max-height:90vh; width:auto; height:auto; border:1px solid var(--line); box-shadow:0 0 50px rgba(0,0,0,0.85); cursor:default; }
+    .imodal-close { position:fixed; top:1.1rem; right:1.3rem; z-index:201; width:44px; height:44px; border-radius:50%; border:1px solid var(--line);
+      background:rgba(7,11,20,0.9); color:var(--phosphor); font-family:var(--mono); font-size:1.5rem; line-height:0; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .imodal-close:hover { border-color:#6cf2ff; color:var(--bright); box-shadow:0 0 12px rgba(108,242,255,0.4); }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Main <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="./">Home</a>
+            <a href="why.html">Why?</a>
+            <a href="./#ccs">CCS</a>
+            <a href="./#history">History</a>
+            <a href="two-cultures.html">Two Cultures</a>
+            <a href="bibliography.html">Bibliography</a>
+            <a href="./#contact">Contact</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">The Game <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="overview.html">Overview</a>
+            <a href="code.html">Versions</a>
+            <a href="./#object">The object</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Ports <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="ports.html">All ports</a>
+            <a href="cambridge.html">Cambridge (UK)</a>
+            <a href="minnesota.html">Minnesota</a>
+            <a href="stanford.html">Stanford</a>
+            <a href="mit-ai.html">MIT-AI</a>
+            <a href="pdp11.html">PDP-11</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">PDP-1 <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="pdp1.html">PDP-1 Computer</a>
+            <a href="programming.html">Programming</a>
+            <a href="type30.html">Type 30 Display</a>
+            <a href="software.html">Software environment</a>
+            <a href="games.html">As a games machine</a>
+            <a href="music.html">As a media machine</a>
+            <a href="restoration.html">Restorations</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">DEC <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="dec-family.html">DEC PDP family</a>
+            <a href="dec-universities.html">PDPs at universities</a>
+            <a href="dec-legacy.html">The legacy</a>
+          </div>
+        </div>
+        <a class="nav-top nav-direct" href="people.html">People</a>
+        <a class="nav-top nav-direct" href="timeline.html">Timeline</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">The game</span>
+      <h2>Spacewar!: an overview</h2>
+      <p><figure style="float:right;width:46%;max-width:320px;margin:0.2rem 0 0.9rem 1.4rem;">
+        <a href="assets/images/barbara-stephenson-dec-1961.jpg" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/barbara-stephenson-dec-1961.jpg" alt="A player at the PDP-1 console playing Spacewar!, 1961" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
+        <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">Barbera Stephenson at the PDP-1 with <i>Spacewar!</i>, around 1961&ndash;62. <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
+      </figure>
+      <i>Spacewar!</i> is a two-player space-combat game written for the DEC <a href="pdp1.html">PDP-1</a> at MIT in <b>1961&ndash;62</b>. Two ships fight a duel around a star whose gravity pulls on them both, firing torpedoes and, when all else fails, flicking into hyperspace to escape. It is widely regarded as the <b>first widely played video game</b>, and it sits at an origin point of computational culture: real-time interactive graphics, the hacker ethic, the demo, and the free circulation of code all condense in roughly two thousand words of macro-assembly. This page is the overview, what the game is, how it plays, and how to read it. The rest of the site follows each thread in depth.</p>
+    </section>
+
+    <div class="rule"><span>the design</span></div>
+
+    <section class="block">
+      <span class="kicker">Two ships and a star</span>
+      <h3>What is on the screen</h3>
+      <p>The screen holds two <b>ships</b>, drawn as outline shapes and nicknamed the <b>needle</b> and the <b>wedge</b> so players could tell them apart, a single bright <b>star</b> at the centre, and a scatter of background stars, Peter Samson's <a href="music.html">Expensive Planetarium</a>, an accurate map of the real night sky. Each ship can <b>rotate</b> left or right, fire its engine for <b>thrust</b>, launch <b>torpedoes</b>, and enter <b>hyperspace</b>. The central star exerts <b>gravity</b> on the ships, curving their paths, so the game is played in a constant gravitational field rather than empty space. Fuel for thrust and the supply of torpedoes are both <b>limited</b>, and torpedoes take time to reload, so the duel is a contest of momentum, position and patience as much as aim.</p>
+      <figure style="clear:both;margin:1.2rem auto 0;max-width:60%;">
+        <a href="assets/images/Stanford-spacewar-Bruce-Baumgart.png" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/Stanford-spacewar-Bruce-Baumgart.png" alt="A Spacewar! screen: two ships, torpedoes and the central star" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
+        <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;text-align:center;">A <i>Spacewar!</i> screen: the two ships, their torpedoes, and the central star. Image via Bruce Baumgart. <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
+      </figure>
+    </section>
+
+    <div class="rule"><span>how it plays</span></div>
+
+    <section class="block">
+      <span class="kicker">Gravity, torpedoes, hyperspace</span>
+      <h3>Strategy</h3>
+      <p>The star is the heart of the game. Because it pulls on both ships, the central skill is the <b>gravity turn</b>: a pilot can swing close to the star and let its pull whip the ship around at speed, a slingshot that costs no fuel, but a misjudged approach ends in a collision with the star and death. Good players orbit, using gravity to line up shots while their opponent struggles with the same pull. In the original the torpedoes fly straight, unaffected by gravity, so leading a moving, curving target is a real skill.</p>
+      <p>Three resources govern the duel. <b>Fuel</b> limits how much you can thrust, so reckless acceleration leaves you adrift; <b>torpedoes</b> are finite and reload slowly, so spraying them is fatal; and <b>hyperspace</b> is the panic button, written by Martin Graetz, that flings your ship to a random new position, escaping an incoming torpedo, but it reappears unpredictably and, in the spirit of the thing, carried a small chance of the ship exploding on re-entry. The good player treats hyperspace as a last resort, not a tactic. Sense switches on the console let players turn options on and off, gravity, the background star field, and the way ships wrap or vanish at the screen edge, so the game had variations even in 1962.</p>
+    </section>
+
+    <div class="rule"><span>the experience</span></div>
+
+    <section class="block">
+      <span class="kicker">Phosphor and control boxes</span>
+      <h3>What it was like</h3>
+      <p>Part of the game is the hardware. On the <a href="type30.html">Type 30</a> display, every object is a pattern of plotted points held briefly by a long-persistence <b>P7 phosphor</b>, so ships and torpedoes glow and trail, and the central star smears into a soft sun. Players first worked the game from the console toggle switches, awkward and uncomfortably close to the warm machine, until Alan Kotok and Bob Saunders built the famous detached <b>control boxes</b>, the shape of whose controls, rotate, thrust, fire, hyperspace, is a direct response to what the PDP-1 offered. To play <i>Spacewar!</i> on a real PDP-1 is to play inside the glow of a specific screen, with a specific feel: something the <a href="play.html">browser emulation</a> can only partly recover.</p>
+    </section>
+
+    <div class="rule"><span>the code, the versions, the afterlife</span></div>
+
+    <section class="block">
+      <span class="kicker">Where to go next</span>
+      <h3>Reading the game in depth</h3>
+      <p>This overview is a doorway. Each part of <i>Spacewar!</i> opens onto its own reading:</p>
+      <ul class="links">
+        <li><b><a href="programming.html">The code</a></b>: how the game is built from the PDP-1's instruction set, the redraw loop, and the <code>dpy</code> display instruction, with a live instruction-set lookup.</li>
+        <li><b><a href="code.html">The versions</a></b>: there is no single <i>Spacewar!</i>. A variorum of the surviving sources from 1962&ndash;63, gravity added in one, the on-screen score in another, each a different reading of the game.</li>
+        <li><b><a href="people.html">The people</a></b>: who conceived, wrote, extended and preserved it, and whom the record leaves out.</li>
+        <li><b><a href="ports.html">The long journey</a></b>: the census of ports and commercial descendants, from Cambridge and Stanford to Computer Space and the arcade.</li>
+        <li><b><a href="play.html">Play it</a></b>: the 1962 original, running in your browser on an emulated PDP-1.</li>
+      </ul>
+      <p>For why any of this matters to a critical reading of code, see <a href="why.html">why this project</a>, and the <a href="./#ccs">Critical Code Studies</a> approach.</p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>J. M. Graetz, "The Origin of Spacewar" (<i>Creative Computing</i>, August 1981), the principal first-hand account of the game's design and play.</li>
+        <li>Norbert Landsteiner, <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">Inside Spacewar!</a>, masswerk.at, on the mechanics, the sense-switch options and the display.</li>
+        <li>Computer History Museum, <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/pdp-1/spacewar/">Spacewar! and the PDP-1 Restoration Project</a>.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
+    </div>
+  </footer>
+
+  <div class="imodal" id="imodal" aria-hidden="true">
+    <button class="imodal-close" aria-label="Close">&times;</button>
+    <img src="" alt="">
+  </div>
+  <script>
+  (function(){
+    var modal=document.getElementById('imodal'); if(!modal) return;
+    var mimg=modal.querySelector('img'), links=document.querySelectorAll('figure a[href$=".png"], figure a[href$=".jpg"], figure a[href$=".jpeg"], figure a[href$=".webp"]');
+    function open(src,alt){ mimg.src=src; mimg.alt=alt||''; modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); }
+    function close(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); mimg.src=''; }
+    Array.prototype.forEach.call(links,function(a){ a.addEventListener('click',function(e){ e.preventDefault(); var img=a.querySelector('img'); open(a.getAttribute('href'), img?img.alt:''); }); });
+    modal.addEventListener('click',function(e){ if(e.target!==mimg) close(); });
+    document.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  })();
+  </script>
+
+</body>
+</html>

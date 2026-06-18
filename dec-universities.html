@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PDPs at universities: the machines behind time-sharing, Unix and AI</title>
+  <meta name="description" content="Which universities and labs ran which DEC PDP machines, and the foundational software that came off them: Spacewar! and time-sharing at MIT, Unix at Bell Labs, Lisp and AI at MIT and Stanford, BSD at Berkeley.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="PDPs at universities: time-sharing, Unix and AI">
+  <meta property="og:description" content="The DEC PDP machines that ran at MIT, Stanford, Cambridge, Bell Labs, Berkeley and CMU, and the foundational software built on them.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/dec-universities.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=4">
+  <script src="assets/nav.js" defer></script>
+  <style>
+    .cmp-wrap { width:100%; overflow-x:auto; margin:0.6rem 0 0.2rem; }
+    .cmp { border-collapse:collapse; font-size:0.74rem; min-width:680px; }
+    .cmp th, .cmp td { text-align:left; vertical-align:top; padding:0.5rem 0.6rem; border-bottom:1px solid var(--line); }
+    .cmp thead th { color:var(--bright); font-family:var(--mono); font-weight:normal; border-bottom:1px solid var(--beam); }
+    .cmp td.s { color:var(--bright); white-space:nowrap; }
+    .cmp td.m { font-family:var(--mono); color:var(--beam); white-space:nowrap; }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Main <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="./">Home</a>
+            <a href="why.html">Why?</a>
+            <a href="./#ccs">CCS</a>
+            <a href="./#history">History</a>
+            <a href="two-cultures.html">Two Cultures</a>
+            <a href="bibliography.html">Bibliography</a>
+            <a href="./#contact">Contact</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">The Game <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="overview.html">Overview</a>
+            <a href="code.html">Versions</a>
+            <a href="./#object">The object</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Ports <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="ports.html">All ports</a>
+            <a href="cambridge.html">Cambridge (UK)</a>
+            <a href="minnesota.html">Minnesota</a>
+            <a href="stanford.html">Stanford</a>
+            <a href="mit-ai.html">MIT-AI</a>
+            <a href="pdp11.html">PDP-11</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">PDP-1 <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="pdp1.html">PDP-1 Computer</a>
+            <a href="programming.html">Programming</a>
+            <a href="type30.html">Type 30 Display</a>
+            <a href="software.html">Software environment</a>
+            <a href="games.html">As a games machine</a>
+            <a href="music.html">As a media machine</a>
+            <a href="restoration.html">Restorations</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">DEC <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="dec-family.html">DEC PDP family</a>
+            <a href="dec-universities.html">PDPs at universities</a>
+            <a href="dec-legacy.html">The legacy</a>
+          </div>
+        </div>
+        <a class="nav-top nav-direct" href="people.html">People</a>
+        <a class="nav-top nav-direct" href="timeline.html">Timeline</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">The machines and the work</span>
+      <h2>PDPs at universities</h2>
+      <p>For about fifteen years, the DEC PDP line was the working medium of academic computing. Cheap enough for a single department and interactive enough to sit at, the PDPs became the machines on which an extraordinary amount of foundational software was first written. Time-sharing, Unix, Lisp and artificial intelligence, interactive graphics, the whole hacker culture, all of it has a PDP somewhere near its origin. <i>Spacewar!</i> on MIT's PDP-1 is the first of these, and far from the last. This page is a short map of which machines ran where, and what came off them.</p>
+    </section>
+
+    <div class="rule"><span>the map</span></div>
+
+    <section class="block">
+      <span class="kicker">Lab by lab</span>
+      <h3>Which PDP, and what it produced</h3>
+      <div class="cmp-wrap">
+        <table class="cmp">
+          <thead><tr><th>Site</th><th>Machine(s)</th><th>From</th><th>What came off it</th></tr></thead>
+          <tbody>
+            <tr><td class="s">MIT (TMRC, RLE)</td><td class="m">PDP-1</td><td>1961</td><td><a href="overview.html"><i>Spacewar!</i></a> (1962), early time-sharing experiments, and the Tech Model Railroad Club hacker culture</td></tr>
+            <tr><td class="s">MIT (Project MAC / AI Lab)</td><td class="m">PDP-6 &rarr; PDP-10</td><td>mid-1960s</td><td><b>ITS</b> (the Incompatible Timesharing System), <b>MacLisp</b> and <b>Macsyma</b>, the origins of <b>Emacs</b>; the AI Lab formed in 1970</td></tr>
+            <tr><td class="s">Stanford (SAIL)</td><td class="m">PDP-1 &rarr; PDP-6/10</td><td>1964</td><td>Raj Reddy's first <a href="music.html">speech recognition</a> under John McCarthy on the PDP-1; the Stanford AI Lab on the PDP-6/10</td></tr>
+            <tr><td class="s">Cambridge (UK)</td><td class="m">PDP-7 + Type 340</td><td>1966</td><td><a href="cambridge.html"><i>Duel</i></a> (c.1968), a two-player <i>Spacewar!</i>-style game on a vector display</td></tr>
+            <tr><td class="s">Bell Labs</td><td class="m">PDP-7 &rarr; PDP-11</td><td>1969</td><td>The <b>birth of UNIX</b> (Ken Thompson, 1969) and then <b>C</b> (Dennis Ritchie, 1971&ndash;73), with Unix rewritten in C on the PDP-11</td></tr>
+            <tr><td class="s">UC Berkeley</td><td class="m">PDP-11/45 &rarr; VAX</td><td>1974</td><td>The <b>BSD</b> line of Unix; <b>3BSD</b> (1979) with virtual memory, on the early VAX</td></tr>
+            <tr><td class="s">University of Utah</td><td class="m">DEC machines</td><td>late 1960s</td><td>The Sutherland and Evans <b>computer-graphics</b> group, foundations of 3D graphics (the exact DEC model is not firmly recorded)</td></tr>
+            <tr><td class="s">Carnegie Mellon</td><td class="m">PDP-10</td><td>1970s</td><td>Raj Reddy's <b>continuous speech recognition</b> (Hearsay, Harpy and the line toward Sphinx) under the DARPA speech programme</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="micro" style="margin-top:0.6rem;font-size:0.6rem;">Bell Labs is a research laboratory rather than a university, included here because the PDP-7 and PDP-11 work done there is inseparable from this story. The exact DEC model at Utah, and the precise machine behind each CMU speech system, are not pinned down in the sources consulted.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>The medium of a generation's computing</h3>
+      <p>It is hard to overstate how much of modern computing was first written on these machines. The PDP line was not a backdrop to this work; it was its <b>medium</b>, the constitutive ground on which time-sharing, Unix, Lisp and interactive graphics became thinkable and then real. <i>Spacewar!</i> belongs to the very start of that story, the moment a roomful of students discovered that an interactive computer was a thing you could <i>do</i> something playful and expressive with. The same discovery, repeated and deepened across the PDP family, is most of what the next two decades of computing consisted of.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="dec-family.html">← The PDP family</a> &nbsp; <a class="btn ghost" href="dec-legacy.html">The legacy of the PDP →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Computer History Wiki (gunkies.org), the <a target="_blank" rel="noopener noreferrer" href="https://gunkies.org/wiki/Incompatible_Timesharing_System">ITS</a> and per-model pages; Wikipedia's <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/History_of_Unix">History of Unix</a> and <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Incompatible_Timesharing_System">ITS</a>.</li>
+        <li>On Cambridge's <i>Duel</i>, the Kinephanos study <a target="_blank" rel="noopener noreferrer" href="https://www.kinephanos.ca/2015/space-odyssey-the-long-journey-of-spacewar-from-mit-to-computer-labs-around-the-world/">"Space Odyssey"</a>; see also our <a href="cambridge.html">Cambridge page</a>.</li>
+        <li>On Reddy, the <a target="_blank" rel="noopener noreferrer" href="https://amturing.acm.org/award_winners/reddy_9634208.cfm">ACM A.M. Turing Award profile</a>; and our <a href="music.html">media-machine page</a>.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -57,6 +57,12 @@
     .instr-table td.oct { font-family:var(--mono); color:var(--beam-warm); white-space:nowrap; }
     .instr-table .ds { color:var(--phosphor-dim); font-size:0.72rem; line-height:1.5; margin-top:0.15rem; }
     .instr-empty { padding:1rem; color:var(--phosphor-dim); font-family:var(--mono); font-size:0.7rem; }
+    .instr-table th.sortable { cursor:pointer; user-select:none; }
+    .instr-table th.sortable:hover { color:#6cf2ff; }
+    .instr-table th .arr { color:var(--beam); font-size:0.78em; }
+    .instr-gloss { margin-top:0.6rem; font-size:0.6rem; line-height:1.75; color:var(--phosphor-dim); }
+    .instr-gloss code { font-size:0.95em; color:var(--beam); }
+    .instr-gloss b { color:var(--phosphor); }
   </style>
 </head>
 <body>
@@ -85,8 +91,9 @@
           </div>
         </div>
         <div class="nav-group">
-          <button class="nav-top" aria-expanded="false">Code <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <button class="nav-top" aria-expanded="false">The Game <span class="caret" aria-hidden="true">&#9662;</span></button>
           <div class="nav-menu">
+            <a href="overview.html">Overview</a>
             <a href="code.html">Versions</a>
             <a href="./#object">The object</a>
             <a href="play.html">Play</a>
@@ -109,9 +116,19 @@
             <a href="pdp1.html">PDP-1 Computer</a>
             <a href="programming.html">Programming</a>
             <a href="type30.html">Type 30 Display</a>
+            <a href="software.html">Software environment</a>
+            <a href="games.html">As a games machine</a>
             <a href="music.html">As a media machine</a>
             <a href="restoration.html">Restorations</a>
             <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">DEC <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="dec-family.html">DEC PDP family</a>
+            <a href="dec-universities.html">PDPs at universities</a>
+            <a href="dec-legacy.html">The legacy</a>
           </div>
         </div>
         <a class="nav-top nav-direct" href="people.html">People</a>
@@ -168,11 +185,14 @@
         <div id="instrCard" aria-live="polite"></div>
         <div class="instr-table-wrap">
           <table class="instr-table">
-            <thead><tr><th>Mnemonic</th><th>Octal</th><th>Instruction</th></tr></thead>
+            <thead><tr><th class="sortable" data-sort="mn">Mnemonic<span class="arr"></span></th><th class="sortable" data-sort="octal">Octal<span class="arr"></span></th><th class="sortable" data-sort="name">Instruction<span class="arr"></span></th></tr></thead>
             <tbody id="instrBody"></tbody>
           </table>
         </div>
-        <p class="micro" id="instrMeta" style="margin-top:0.5rem;font-size:0.6rem;"></p>
+        <div class="instr-gloss">
+          <p><b>Mnemonic</b>, the short name written in assembly (for example <code>lac</code>), standing in for the machine's numeric operation. <b>Octal</b>, that operation as a base-8 number, the way PDP-1 programmers wrote it (three bits per digit): two digits for memory-reference instructions, six for the micro-coded operate, skip, shift and in-out groups. <b>Instruction</b>, what it does, where <code>AC</code> is the accumulator, <code>IO</code> the in-out register, <code>Y</code> a memory location, and <code>&larr;</code> means "is given the value of".</p>
+          <p>Click a column heading to sort (again to reverse, a third time to restore the original order). Instruction data after Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a> and DEC's PDP-1 Handbook.</p>
+        </div>
       </div>
     </section>
 
@@ -233,14 +253,30 @@ dispt A,Y,B
     var BODY=document.getElementById('instrBody'),
         CARD=document.getElementById('instrCard'),
         COUNT=document.getElementById('instrCount'),
-        META=document.getElementById('instrMeta'),
-        INPUT=document.getElementById('instrSearch');
+        INPUT=document.getElementById('instrSearch'),
+        HEADERS=document.querySelectorAll('.instr-table th.sortable');
     if(!BODY||!INPUT) return;
-    var DATA=[], TOTAL=0;
+    var DATA=[], TOTAL=0, sortKey=null, sortDir=1;
     function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-    function render(q){
-      q=(q||'').trim().toLowerCase().split(/\s+/)[0]||'';
-      var rows = q ? DATA.filter(function(e){ return e.mn.indexOf(q)===0; }) : DATA;
+    function octVal(s){ var m=(s||'').match(/^[0-7]+/); return m?parseInt(m[0],8):-1; }
+    function cmp(a,b){
+      var r=0;
+      if(sortKey==='mn') r=a.mn<b.mn?-1:(a.mn>b.mn?1:0);
+      else if(sortKey==='name'){ var an=a.name.toLowerCase(), bn=b.name.toLowerCase(); r=an<bn?-1:(an>bn?1:0); }
+      else if(sortKey==='octal') r=octVal(a.octal)-octVal(b.octal);
+      if(r===0) r=a._i-b._i;
+      return r*sortDir;
+    }
+    function arrows(){
+      Array.prototype.forEach.call(HEADERS,function(h){
+        var s=h.querySelector('.arr');
+        s.textContent = (h.getAttribute('data-sort')===sortKey) ? (sortDir>0?' ▲':' ▼') : '';
+      });
+    }
+    function render(){
+      var q=(INPUT.value||'').trim().toLowerCase().split(/\s+/)[0]||'';
+      var rows = q ? DATA.filter(function(e){ return e.mn.indexOf(q)===0; }) : DATA.slice();
+      rows.sort(sortKey ? cmp : function(a,b){ return a._i-b._i; });
       BODY.innerHTML = rows.length ? rows.map(function(e){
         return '<tr><td class="mn">'+esc(e.mn)+'</td><td class="oct">'+esc(e.octal)+'</td>'+
                '<td><b>'+esc(e.name)+'</b><div class="ds">'+esc(e.description)+'</div></td></tr>';
@@ -253,13 +289,20 @@ dispt A,Y,B
         '<div class="ds">'+esc(card.description)+'</div>'+
         (card.example?'<div class="ex">'+esc(card.example)+'</div>':'')+'</div>') : '';
     }
+    Array.prototype.forEach.call(HEADERS,function(h){
+      h.addEventListener('click',function(){
+        var k=h.getAttribute('data-sort');
+        if(sortKey===k){ if(sortDir>0){ sortDir=-1; } else { sortKey=null; sortDir=1; } }
+        else { sortKey=k; sortDir=1; }
+        arrows(); render();
+      });
+    });
     fetch('assets/pdp1-instructions.json').then(function(r){ return r.json(); }).then(function(j){
       var e=j.entries||{};
-      DATA=Object.keys(e).map(function(k){ var v=e[k]; return {mn:k, name:v.name||'', params:v.params||'', octal:v.octal||'', description:v.description||'', example:v.example||''}; });
+      DATA=Object.keys(e).map(function(k,i){ var v=e[k]; return {mn:k, name:v.name||'', params:v.params||'', octal:v.octal||'', description:v.description||'', example:v.example||'', _i:i}; });
       TOTAL=DATA.length;
-      if(META){ META.innerHTML='Instruction data after '+esc(j.ref||'the DEC PDP-1 Handbook')+'. The filter matches the leading mnemonic.'; }
-      render('');
-      INPUT.addEventListener('input', function(){ render(INPUT.value); });
+      render();
+      INPUT.addEventListener('input', render);
     }).catch(function(){
       BODY.innerHTML='<tr><td colspan="3" class="instr-empty">Could not load the instruction table.</td></tr>';
     });

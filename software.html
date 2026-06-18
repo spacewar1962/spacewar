@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The PDP-1 software environment: no operating system, paper tape and DDT</title>
+  <meta name="description" content="What the PDP-1 actually ran: no operating system, programs on paper tape, the MACRO and FRAP assemblers, the DDT debugger, the Expensive Typewriter and TECO editors, and the BBN time-sharing experiment.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="The PDP-1 software environment: no operating system, paper tape and DDT">
+  <meta property="og:description" content="No operating system, just paper tape and a console: the assemblers, the DDT debugger, the Expensive Typewriter, and the first time-sharing on the PDP-1.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/software.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=4">
+  <script src="assets/nav.js" defer></script>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Main <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="./">Home</a>
+            <a href="why.html">Why?</a>
+            <a href="./#ccs">CCS</a>
+            <a href="./#history">History</a>
+            <a href="two-cultures.html">Two Cultures</a>
+            <a href="bibliography.html">Bibliography</a>
+            <a href="./#contact">Contact</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">The Game <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="overview.html">Overview</a>
+            <a href="code.html">Versions</a>
+            <a href="./#object">The object</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Ports <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="ports.html">All ports</a>
+            <a href="cambridge.html">Cambridge (UK)</a>
+            <a href="minnesota.html">Minnesota</a>
+            <a href="stanford.html">Stanford</a>
+            <a href="mit-ai.html">MIT-AI</a>
+            <a href="pdp11.html">PDP-11</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">PDP-1 <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="pdp1.html">PDP-1 Computer</a>
+            <a href="programming.html">Programming</a>
+            <a href="type30.html">Type 30 Display</a>
+            <a href="software.html">Software environment</a>
+            <a href="games.html">As a games machine</a>
+            <a href="music.html">As a media machine</a>
+            <a href="restoration.html">Restorations</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">DEC <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="dec-family.html">DEC PDP family</a>
+            <a href="dec-universities.html">PDPs at universities</a>
+            <a href="dec-legacy.html">The legacy</a>
+          </div>
+        </div>
+        <a class="nav-top nav-direct" href="people.html">People</a>
+        <a class="nav-top nav-direct" href="timeline.html">Timeline</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">Inside the machine</span>
+      <h2>The PDP-1 software environment</h2>
+      <p>The PDP-1 had <b>no operating system</b>. There was no file system, no command line, no resident supervisor deciding what ran when. When you sat down at the machine you <i>were</i> the operating system: you loaded a program from <b>paper tape</b>, set the console switches, pressed start, and the machine did that one thing until it stopped. Everything we now take for granted, the editor, the assembler, the debugger, even the idea of more than one user, had to be written as ordinary programs and loaded the same way. This page is about that environment, the thin, hand-built software world in which <i>Spacewar!</i> was written, and about how much of modern computing first appears here in miniature.</p>
+    </section>
+
+    <div class="rule"><span>one program at a time</span></div>
+
+    <section class="block">
+      <span class="kicker">Paper tape and the console</span>
+      <h3>How software lived</h3>
+      <p>Programs lived on rolls of <b>fanfold punched paper tape</b>, read in through a photoelectric reader and punched back out the same way. A single tape was at once the distribution medium, the backup and the archive, which is why so much early-software history is a history of <i>tapes</i> being copied, carried, lost and occasionally rediscovered. Text and listings were prepared offline on <b>Friden Flexowriters</b> using DEC's <b>FIO-DEC</b> character code, and the operator's console offered a bank of sense switches and an adapted IBM electric typewriter for printed output. To run anything was a physical act: thread the tape, toggle the switches, press start.</p>
+      <p>Because nothing managed memory or scheduling for you, a program owned the whole machine while it ran. That is the deep reason <i>Spacewar!</i> takes the shape it does: with the entire PDP-1 to itself and nothing to interrupt it, the game could run a tight, uninterrupted real-time loop, computing and redrawing the whole screen on every pass. The absence of an operating system is written into the game.</p>
+    </section>
+
+    <div class="rule"><span>the tools, hand-built</span></div>
+
+    <section class="block">
+      <span class="kicker">Assemblers, editors, a debugger</span>
+      <h3>Writing programs for a machine with nothing on it</h3>
+      <p>Everything needed to write software had itself to be written. The assembler that turned mnemonics and octal into machine words was <b>MACRO</b>, carried over from the earlier <a href="pdp1.html">TX-0</a> and extended with the <code>define</code> facility the <i>Spacewar!</i> authors used to build their own higher-level operations. Ed Fredkin, at BBN, wrote an alternative assembler, <b>FRAP</b> ("Free of Rules Assembler Program"), squeezed into 1,024 words; <b>MIDAS</b>, often miscredited as the assembler of the game, is a later development built in this same line.</p>
+      <p>To edit text there was the <b>Expensive Typewriter</b>, written around 1961&ndash;62 by <b>Steve Piner</b> (one of the <i>Spacewar!</i> circle), one of the earliest programs to treat a computer as a word processor, and later <b>TECO</b>, the Tape Editor and Corrector by <b>Dan Murphy</b>, whose macro language would echo down the decades into Emacs. To find out why a program did not work there was <b>DDT</b>, an interactive debugger descended from the TX-0's <b>FLIT</b>, which let a programmer stop a running program, inspect and patch memory, and continue, in real time, at the console. An interactive debugger in 1962 is a remarkable thing: it assumes the machine is yours to converse with, not a batch service you submit jobs to.</p>
+      <p>The names tell their own story. The TMRC hackers called their programs the <b>Expensive</b> series as a running joke about using a six-figure computer for the work of cheaper machines: the Expensive Typewriter, the <b>Expensive Desk Calculator</b>, and Samson's <b>Expensive Planetarium</b>, the accurate star map that became the background of <i>Spacewar!</i>. The joke encodes an attitude, that the machine is for whatever you can imagine doing with it.</p>
+    </section>
+
+    <div class="rule"><span>from one user to many</span></div>
+
+    <section class="block">
+      <span class="kicker">The first time-sharing</span>
+      <h3>Making the single-user machine shared</h3>
+      <p>If the PDP-1 ran one program at a time, how could it ever be shared? The answer, worked out partly on this very class of machine, was <b>time-sharing</b>. <a href="people.html#mccarthy">John McCarthy</a>'s idea was to let many users appear to use the computer at once by switching rapidly between them; the obstacle was that swapping a user in and out of expensive core memory was slow. <b>Ed Fredkin</b> solved it with a <b>zero-latency swapping drum</b>, synchronised to the memory cycle so a user could be swapped out and the next swapped in within about twenty milliseconds. Built into the BBN and MIT PDP-1 systems, it produced one of the earliest working <b>time-sharing</b> systems, the seed of an idea that would define computing for the next two decades. The full story is on the <a href="pdp1.html">PDP-1 page</a>.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>The hacker ethic in embryo</h3>
+      <p>For a Critical Code Studies reading, the software environment is where the culture becomes visible. A machine with no operating system, programmed hands-on from the console with tools the users built for themselves, is the material condition of the <b>hacker ethic</b>: direct access, total control, tools made and shared freely, the computer treated as an instrument rather than a service. <i>Spacewar!</i> was not an exception to this environment but its natural product. To read the game's code is also to read the world of paper tape, octal and the midnight console that made it possible.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="programming.html">← Programming the PDP-1</a> &nbsp; <a class="btn ghost" href="pdp1.html">The PDP-1 →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Steven Levy, <i>Hackers: Heroes of the Computer Revolution</i> (1984), for the Expensive series, DDT, the TMRC milieu and the hacker ethic.</li>
+        <li>Computer History Museum, <i>Oral History of Ed Fredkin</i> (2006), for FRAP and the swapping-drum time-sharing system; and the <a href="pdp1.html">PDP-1 machine page</a> here.</li>
+        <li>On the editors: the <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Expensive_Typewriter">Expensive Typewriter</a> (Steve Piner) and <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/TECO_(text_editor)">TECO</a> (Dan Murphy).</li>
+        <li>Norbert Landsteiner, <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/">Inside Spacewar!</a>, masswerk.at, on MACRO and the assembler lineage.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>

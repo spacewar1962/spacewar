@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The DEC PDP family: a comparative table of the Programmed Data Processors</title>
+  <meta name="description" content="A comparative table of DEC's PDP line, the Programmed Data Processors, from the PDP-1 (1959) to the PDP-15: word length, memory, price and the software each is known for, with the PDP-1 and Spacewar! in context.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="The DEC PDP family: a comparative table">
+  <meta property="og:description" content="DEC's PDP line from 1959 to the 1970s: word length, memory, price and notable software, with the PDP-1 and Spacewar! in context.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/dec-family.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=4">
+  <script src="assets/nav.js" defer></script>
+  <style>
+    .cmp-wrap { width:100%; overflow-x:auto; margin:0.6rem 0 0.2rem; }
+    .cmp { border-collapse:collapse; font-size:0.72rem; min-width:820px; }
+    .cmp th, .cmp td { text-align:left; vertical-align:top; padding:0.45rem 0.6rem; border-bottom:1px solid var(--line); }
+    .cmp thead th { color:var(--bright); font-family:var(--mono); font-weight:normal; border-bottom:1px solid var(--beam); position:sticky; top:0; background:#070b14; }
+    .cmp td.m { font-family:var(--mono); color:var(--beam); white-space:nowrap; }
+    .cmp tr.hl td { background:rgba(108,242,255,0.06); }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Main <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="./">Home</a>
+            <a href="why.html">Why?</a>
+            <a href="./#ccs">CCS</a>
+            <a href="./#history">History</a>
+            <a href="two-cultures.html">Two Cultures</a>
+            <a href="bibliography.html">Bibliography</a>
+            <a href="./#contact">Contact</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">The Game <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="overview.html">Overview</a>
+            <a href="code.html">Versions</a>
+            <a href="./#object">The object</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Ports <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="ports.html">All ports</a>
+            <a href="cambridge.html">Cambridge (UK)</a>
+            <a href="minnesota.html">Minnesota</a>
+            <a href="stanford.html">Stanford</a>
+            <a href="mit-ai.html">MIT-AI</a>
+            <a href="pdp11.html">PDP-11</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">PDP-1 <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="pdp1.html">PDP-1 Computer</a>
+            <a href="programming.html">Programming</a>
+            <a href="type30.html">Type 30 Display</a>
+            <a href="software.html">Software environment</a>
+            <a href="games.html">As a games machine</a>
+            <a href="music.html">As a media machine</a>
+            <a href="restoration.html">Restorations</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">DEC <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="dec-family.html">DEC PDP family</a>
+            <a href="dec-universities.html">PDPs at universities</a>
+            <a href="dec-legacy.html">The legacy</a>
+          </div>
+        </div>
+        <a class="nav-top nav-direct" href="people.html">People</a>
+        <a class="nav-top nav-direct" href="timeline.html">Timeline</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">The wider range</span>
+      <h2>The DEC PDP family</h2>
+      <p>The PDP-1 was the first of a long line. <b>PDP</b> stood for <b>Programmed Data Processor</b>, a name Digital Equipment Corporation chose deliberately to avoid the word <i>computer</i>, which in 1959 meant a million-dollar machine in a glass room and frightened the investors and customers DEC needed. Over the next decade and more, DEC built out a whole family of PDPs, cheaper, smaller, interactive machines that put computing within reach of a single laboratory, a single department, even a single user. This page sets the PDP-1 in that family with a comparative table, so the machine <i>Spacewar!</i> was written for can be seen as one member of the line that, more than any other, created the minicomputer and the interactive computing culture that came with it.</p>
+    </section>
+
+    <div class="rule"><span>the comparative table</span></div>
+
+    <section class="block">
+      <span class="kicker">The line, machine by machine</span>
+      <h3>The Programmed Data Processors</h3>
+      <p>The main general-purpose PDPs, with the figures that matter for comparison. Memory is given as the basic word count with an approximate modern equivalent in brackets; word lengths and the software each machine is known for tell the real story of the line.</p>
+      <div class="cmp-wrap">
+        <table class="cmp">
+          <thead><tr><th>Model</th><th>Year</th><th>Word</th><th>Memory (basic, &asymp; modern)</th><th>Price / class</th><th>Known for</th></tr></thead>
+          <tbody>
+            <tr class="hl"><td class="m">PDP-1</td><td>1959&ndash;60</td><td>18-bit</td><td>4,096 words (&asymp; 9&nbsp;KB)</td><td>~$120,000; ~53 built</td><td><a href="overview.html"><i>Spacewar!</i></a> (1962), the first time-sharing experiments, the MIT hackers</td></tr>
+            <tr><td class="m">PDP-4</td><td>1962</td><td>18-bit</td><td>4,096 words (&asymp; 9&nbsp;KB)</td><td>~$65,000 (half a PDP-1)</td><td>A cheaper PDP-1; ancestor of the 7 / 9 / 15 line</td></tr>
+            <tr><td class="m">PDP-5</td><td>1963</td><td>12-bit</td><td>1,024 words (&asymp; 1.5&nbsp;KB)</td><td>~$27,000</td><td>Often called the first commercial minicomputer; ancestor of the PDP-8</td></tr>
+            <tr><td class="m">PDP-6</td><td>1964</td><td>36-bit</td><td>16,384 words (&asymp; 72&nbsp;KB)</td><td>~$300,000 system; ~23 sold</td><td>DEC's first time-sharing machine; <b>ITS</b> began here; ancestor of the PDP-10</td></tr>
+            <tr><td class="m">PDP-7</td><td>1964&ndash;65</td><td>18-bit</td><td>4,096 words (&asymp; 9&nbsp;KB)</td><td>~$72,000; ~120 sold</td><td>The <b>birthplace of UNIX</b> (Bell Labs, 1969); Cambridge's <a href="cambridge.html"><i>Duel</i></a> ran on a PDP-7 with a Type 340</td></tr>
+            <tr><td class="m">PDP-8</td><td>1965</td><td>12-bit</td><td>4,096 words (&asymp; 6&nbsp;KB)</td><td>$18,500; 50,000+ (family)</td><td>The <b>first commercially successful minicomputer</b>; everywhere in labs, industry and schools</td></tr>
+            <tr><td class="m">PDP-9</td><td>1966</td><td>18-bit</td><td>8,192 words (&asymp; 18&nbsp;KB)</td><td>~$35,000</td><td>A faster PDP-7; DEC's first micro-programmed machine</td></tr>
+            <tr><td class="m">PDP-10</td><td>1966</td><td>36-bit</td><td>8,192 words and up</td><td>mainframe class (from ~$99,000)</td><td><b>ITS, Project MAC, the MIT AI Lab</b>; MacLisp, Macsyma, the origins of Emacs; Stanford's SAIL</td></tr>
+            <tr><td class="m">PDP-11</td><td>1970</td><td>16-bit</td><td>Unibus architecture; varied</td><td>~$10,800&ndash;20,000; ~600,000 sold</td><td>DEC's huge success; <b>early Unix and C</b>; an architecture that influenced later CPUs</td></tr>
+            <tr><td class="m">PDP-12</td><td>1969</td><td>12-bit</td><td>4,096 words (&asymp; 6&nbsp;KB)</td><td>~$27,900</td><td>A PDP-8 that also ran <b>LINC</b> programs; lab and biomedical work</td></tr>
+            <tr><td class="m">PDP-15</td><td>1969&ndash;70</td><td>18-bit</td><td>4,096 words (&asymp; 9&nbsp;KB)</td><td>$15,600 (basic)</td><td>DEC's <b>last 18-bit</b> machine; the PDP-9 rebuilt in integrated circuits</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="micro" style="margin-top:0.6rem;font-size:0.6rem;line-height:1.7;">Notes and honest caveats. Modern-equivalent memory figures are rounded conversions from the word count (an 18-bit word is about 2.25 bytes, a 12-bit word about 1.5, a 36-bit word about 4.5), offered only for a sense of scale. A few figures carry genuine source conflicts: the PDP-7 is variously dated 1964 or 1965, the PDP-15 announced in 1969 and first shipped in 1970, and the PDP-11/20's base price is given as anywhere from about $10,800 to $20,000. Several numbers (PDP-4 / 9 / 12 memory, the PDP-12 price) rest on a single secondary source. Figures are drawn from Wikipedia, the Computer History Wiki (gunkies.org), the Computer History Museum and soemtron.org; for a print-grade table the PDP-1, 8, 10 and 11 rows should be checked against DEC's own handbooks.</p>
+    </section>
+
+    <div class="rule"><span>the gaps in the numbering</span></div>
+
+    <section class="block">
+      <span class="kicker">The ones that are missing</span>
+      <h3>PDP-2, 3, 13, 14, 16</h3>
+      <p>The numbering is not continuous, and the gaps are part of the story. The <b>PDP-2</b> (a 24-bit design) and <b>PDP-13</b> were numbers DEC never used. The <b>PDP-3</b> was a 36-bit paper design DEC chose not to build; the only one ever made was assembled outside DEC, by the CIA's Scientific Engineering Institute, from DEC modules. The <b>PDP-14</b> and <b>PDP-16</b> were not general-purpose computers at all but industrial control systems, the PDP-14 a programmable logic controller meant to replace banks of relays, the PDP-16 a kit of "Register Transfer Modules" for building custom digital systems. The family, in other words, was less a tidy sequence than a spread of experiments in what a smaller, cheaper, more specialised computer could be.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>The PDP-1 as the first step</h3>
+      <p>Seen in this company, the PDP-1 is not a curiosity but a beginning. Its 18-bit word, its interactive console, its optional <a href="type30.html">display</a> and the culture of hands-on programming it invited are the seed of everything the line went on to do: time-sharing on the 6 and 10, Unix on the 7 and 11, the minicomputer revolution on the 8. <i>Spacewar!</i> is the first flowering of a value, interactive, real-time, personal computing, that the whole PDP family would carry into the mainstream. To read the game is to read the first chapter of that history.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="pdp1.html">← The PDP-1</a> &nbsp; <a class="btn ghost" href="dec-universities.html">PDPs at universities →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Computer History Wiki, <a target="_blank" rel="noopener noreferrer" href="https://gunkies.org/wiki/List_of_Programmed_Data_Processors">List of Programmed Data Processors</a>, and the per-model pages there.</li>
+        <li>Computer History Museum, <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/pdp-1/">PDP-1 Restoration Project</a>, and the Revolution exhibits on the <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/revolution/minicomputers/11/331">PDP-8</a> and <a target="_blank" rel="noopener noreferrer" href="https://www.computerhistory.org/revolution/minicomputers/11/366">PDP-11</a>.</li>
+        <li>Wikipedia's <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Programmed_Data_Processor">Programmed Data Processor</a> and per-model articles, cross-checked against the above; and <a target="_blank" rel="noopener noreferrer" href="https://www.soemtron.org/pdp7.html">soemtron.org</a> for the PDP-7.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
