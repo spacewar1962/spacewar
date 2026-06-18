@@ -48,6 +48,8 @@ D'Ignazio, C. & Klein, L. F. (2020) *Data Feminism*. MIT Press.
 
 Ensmenger, N. (2010) *The Computer Boys Take Over*. MIT Press.
 
+Ernst, W. (2013) *Digital Memory and the Archive*. Ed. Parikka, J. Minneapolis: University of Minnesota Press.
+
 Evans, C. L. (2018) *Broad Band: The Untold Story of the Women Who Made the Internet*. New York: Penguin Random House.
 
 Friedman, B. & Nissenbaum, H. (1996) 'Bias in Computer Systems', *ACM Transactions on Information Systems* 14(3): 330-347.
