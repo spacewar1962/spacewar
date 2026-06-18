@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Programming the PDP-1: 18-bit words, octal and the display instruction</title>
+  <meta name="description" content="How you actually programmed the PDP-1: the 18-bit word, one's-complement arithmetic, the instruction set, MACRO assembly in octal, and the dpy 'display one point' instruction that made Spacewar! possible.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <meta property="og:title" content="Programming the PDP-1: 18-bit words, octal and the display instruction">
+  <meta property="og:description" content="The 18-bit word, one's-complement arithmetic, the PDP-1 instruction set, MACRO assembly, and the dpy 'display one point' instruction at the heart of Spacewar!.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://spacewar1962.github.io/spacewar/programming.html">
+  <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
+  <link rel="stylesheet" href="assets/css/site.css?v=4">
+  <script src="assets/nav.js" defer></script>
+  <style>
+    .spectable { width:100%; border-collapse:collapse; margin:0.6rem 0 0.2rem; font-size:0.78rem; }
+    .spectable th, .spectable td { text-align:left; vertical-align:top; padding:0.45rem 0.7rem; border-bottom:1px solid var(--line); }
+    .spectable th { color:var(--bright); font-family:var(--mono); font-weight:normal; white-space:nowrap; }
+    .spectable td.mono, .spectable th.mono { font-family:var(--mono); color:var(--beam); white-space:nowrap; }
+    .spectable caption { text-align:left; color:var(--phosphor-dim); font-size:0.6rem; padding:0.3rem 0; }
+    .codeblock { background:#02060a; border:1px solid var(--line); border-radius:6px; padding:0.9rem 1.1rem; margin:1rem 0 0.4rem;
+      font-family:var(--mono); font-size:0.82rem; line-height:1.55; color:var(--phosphor); overflow-x:auto;
+      box-shadow:inset 0 0 50px rgba(0,0,0,0.6); }
+    .codeblock .cm { color:var(--phosphor-dim); }
+    .codeblock .op { color:var(--beam); }
+    .wordmap { width:100%; border-collapse:collapse; margin:0.8rem 0 0.2rem; font-family:var(--mono); font-size:0.7rem; text-align:center; }
+    .wordmap td { border:1px solid var(--line); padding:0.5rem 0.3rem; }
+    .wordmap .lbl { color:var(--phosphor-dim); font-size:0.58rem; }
+    .wordmap .f-op { background:rgba(108,242,255,0.10); }
+    .wordmap .f-i { background:rgba(255,206,122,0.12); }
+    .wordmap .f-ad { background:rgba(108,242,255,0.04); }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="./" aria-label="Spacewar! home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4 L23 27 L16 22 L9 27 Z" fill="none" stroke="#6cf2ff" stroke-width="1.6" stroke-linejoin="round"/><circle cx="16" cy="16" r="1.4" fill="#ffce7a"/></svg>
+        <span class="brand-block">
+          <span class="brand-text">SPACEWAR!</span>
+          <span class="brand-tagline">Critical Code Studies · PDP-1 · 1962</span>
+        </span>
+      </a>
+      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false"><span class="bars" aria-hidden="true">&#9776;</span>&nbsp;Menu</button>
+      <nav class="site-nav" id="site-nav">
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Main <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="./">Home</a>
+            <a href="why.html">Why?</a>
+            <a href="./#ccs">CCS</a>
+            <a href="./#history">History</a>
+            <a href="two-cultures.html">Two Cultures</a>
+            <a href="bibliography.html">Bibliography</a>
+            <a href="./#contact">Contact</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Code <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="code.html">Versions</a>
+            <a href="./#object">The object</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">Ports <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="ports.html">All ports</a>
+            <a href="cambridge.html">Cambridge</a>
+            <a href="minnesota.html">Minnesota</a>
+            <a href="stanford.html">Stanford</a>
+            <a href="mit-ai.html">MIT-AI</a>
+            <a href="pdp11.html">PDP-11</a>
+          </div>
+        </div>
+        <div class="nav-group">
+          <button class="nav-top" aria-expanded="false">PDP-1 <span class="caret" aria-hidden="true">&#9662;</span></button>
+          <div class="nav-menu">
+            <a href="pdp1.html">The machine</a>
+            <a href="music.html">As a media machine</a>
+            <a href="restoration.html">Restorations</a>
+            <a href="play.html">Play</a>
+          </div>
+        </div>
+        <a class="nav-top nav-direct" href="people.html">People</a>
+        <a class="nav-top nav-direct" href="timeline.html">Timeline</a>
+      </nav>
+
+    </div>
+  </header>
+
+  <main class="wrap content">
+
+    <section class="block lede">
+      <span class="kicker">Inside the machine</span>
+      <h2>Programming the PDP-1</h2>
+      <p>To read <i>Spacewar!</i> as code you have to know what kind of code it is. There was no operating system, no high-level language, no library to call. A program for the PDP-1 was a list of <b>18-bit words</b> in the machine's own instruction set, written in octal or in the <b>MACRO</b> assembler's mnemonics, punched to paper tape and loaded into core. The game's physics, its controls and its glowing ships are all built from a few dozen instruction types operating on a single accumulator. This page is a short tour of that instruction set, and of the one instruction, <code>dpy</code>, that made the whole genre possible. The complete reference is Norbert Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a>.</p>
+    </section>
+
+    <div class="rule"><span>the 18-bit word</span></div>
+
+    <section class="block">
+      <span class="kicker">One word, one instruction</span>
+      <h3>Eighteen bits, octal, and one's complement</h3>
+      <p>The PDP-1's word is <b>18 bits</b> wide, conventionally written as six octal digits (each digit is three bits, so the largest word is <code>777777</code> octal). A memory-reference instruction divides that word into three fields: a <b>five-bit operation code</b>, a single <b>indirect-address bit</b>, and a <b>twelve-bit address</b>. Twelve bits is why the basic machine reaches exactly <b>4,096</b> words of core (<code>00000</code> to <code>07777</code> octal); larger memories were addressed by switching in an extend mode.</p>
+
+      <table class="wordmap">
+        <tr>
+          <td class="f-op" colspan="5">opcode</td>
+          <td class="f-i">i</td>
+          <td class="f-ad" colspan="12">address</td>
+        </tr>
+        <tr class="lbl">
+          <td colspan="5">bits 0&ndash;4 &middot; 5 bits</td>
+          <td>bit 5</td>
+          <td colspan="12">bits 6&ndash;17 &middot; 12 bits &rarr; 4,096 words</td>
+        </tr>
+      </table>
+
+      <p>Arithmetic is <b>one's complement</b>: a negative number is the bitwise complement of its positive, which means the machine has two representations of zero (all-zeros and all-ones) and that overflow and sign behave a little differently from the two's-complement machines that came later. The programmer works mostly through one <b>accumulator (AC)</b>, with an <b>in-out register (IO)</b> alongside it (the two can be joined for 36-bit shifts), a <b>program counter (PC)</b>, an overflow flag, six <a href="music.html">program flags</a> and a bank of sense switches on the console. A core cycle takes about <b>5.35 microseconds</b>; most instructions take two cycles, roughly <b>10.7 microseconds</b>, so the machine runs on the order of ninety thousand instructions a second. Every moving thing in <i>Spacewar!</i> has to be computed and drawn inside that budget.</p>
+    </section>
+
+    <div class="rule"><span>the instruction set</span></div>
+
+    <section class="block">
+      <span class="kicker">A few dozen verbs</span>
+      <h3>What the machine can be told to do</h3>
+      <p>The instruction set is small enough to hold in your head. Memory-reference instructions name a word to act on; the operate and skip groups are micro-coded bit-fields that can be combined in a single word. A representative selection (octal codes after Landsteiner's reference):</p>
+
+      <table class="spectable">
+        <caption>Memory-reference instructions</caption>
+        <tr><th class="mono">lac Y</th><th class="mono">20</th><td>Load AC from location Y</td></tr>
+        <tr><th class="mono">dac Y</th><th class="mono">24</th><td>Deposit (store) AC into Y</td></tr>
+        <tr><th class="mono">add Y</th><th class="mono">40</th><td>Add the word at Y to AC</td></tr>
+        <tr><th class="mono">sub Y</th><th class="mono">42</th><td>Subtract the word at Y from AC</td></tr>
+        <tr><th class="mono">mul Y</th><th class="mono">54</th><td>Multiply (optional hardware, up to ~25&nbsp;&micro;s)</td></tr>
+        <tr><th class="mono">div Y</th><th class="mono">56</th><td>Divide (optional hardware, up to ~40&nbsp;&micro;s)</td></tr>
+        <tr><th class="mono">idx Y</th><th class="mono">44</th><td>Increment Y, leave result in AC</td></tr>
+        <tr><th class="mono">isp Y</th><th class="mono">46</th><td>Increment Y, skip next instruction if result is positive</td></tr>
+        <tr><th class="mono">jmp Y</th><th class="mono">60</th><td>Jump to Y</td></tr>
+        <tr><th class="mono">jsp Y</th><th class="mono">62</th><td>Jump to Y, saving the return address in AC</td></tr>
+        <tr><th class="mono">law N</th><th class="mono">70</th><td>Load AC with the constant N</td></tr>
+      </table>
+
+      <table class="spectable">
+        <caption>Operate, skip and in-out groups (bit-fields, combinable)</caption>
+        <tr><th class="mono">cla</th><th class="mono">760200</th><td>Clear AC</td></tr>
+        <tr><th class="mono">cma</th><th class="mono">761000</th><td>Complement AC</td></tr>
+        <tr><th class="mono">hlt</th><th class="mono">760400</th><td>Halt the processor</td></tr>
+        <tr><th class="mono">sza</th><th class="mono">640100</th><td>Skip if AC is zero</td></tr>
+        <tr><th class="mono">spa</th><th class="mono">640200</th><td>Skip if AC is positive</td></tr>
+        <tr><th class="mono">sma</th><th class="mono">640400</th><td>Skip if AC is negative</td></tr>
+        <tr><th class="mono">szf f</th><th class="mono">6400f</th><td>Skip if program flag f is zero</td></tr>
+        <tr><th class="mono">ral / rar</th><th class="mono">66&hellip;</th><td>Rotate AC left / right by a bit count</td></tr>
+        <tr><th class="mono">iot Y</th><th class="mono">72</th><td>In-out transfer to a device</td></tr>
+        <tr><th class="mono">dpy</th><th class="mono">730007</th><td>Display one point on the Type 30</td></tr>
+      </table>
+      <p class="micro" style="margin-top:0.5rem;font-size:0.6rem;">Octal values follow Landsteiner's <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a>; the full set, with every operate-group bit, is given there and in DEC's PDP-1 handbooks.</p>
+    </section>
+
+    <div class="rule"><span>the instruction that draws the game</span></div>
+
+    <section class="block">
+      <span class="kicker">dpy: display one point</span>
+      <h3>The whole game is points, plotted in a loop</h3>
+      <p>One instruction matters more than all the others for this project. <code>dpy</code>, <b>"display one point,"</b> takes the value in the <b>accumulator</b> as the point's <b>X</b> coordinate and the value in the <b>IO register</b> as its <b>Y</b> coordinate, and lights a single dot at that position on the <a href="pdp1.html">Type 30</a> screen (a few bits select brightness). There is no line-drawing, no shape primitive, no frame buffer. A ship, a torpedo, a star, the heavy sun, every one of them is a set of points pushed through <code>dpy</code>, and they stay visible only because the program plots them again on the next pass and the phosphor holds the glow for a moment. <i>Spacewar!</i> at bottom is a loop: compute positions, load X into AC and Y into IO, <code>dpy</code>, repeat, fast enough that the eye reads motion.</p>
+      <p>Here is that idea in the game's own source. This is the <code>dispt</code> ("display point") macro from the <b>3.1</b> listing of September 1962, a definition in DEC's <b>MACRO</b> assembler:</p>
+      <div class="codeblock"><span class="cm">define</span>
+dispt A,Y,B
+    <span class="op">repeat</span> 6, B=B+B   <span class="cm">/ shift brightness B up into the display field</span>
+    <span class="op">lio</span> Y           <span class="cm">/ load the Y coordinate into the IO register</span>
+    <span class="op">dpy</span>-A+B        <span class="cm">/ display one point (X already in the accumulator)</span>
+    <span class="op">term</span></div>
+      <p class="micro" style="margin-top:0.4rem;font-size:0.6rem;">Quoted from <i>Spacewar!</i> 3.1 (24 September 1962), held in <a href="code.html">our source archive</a>. <code>repeat 6, B=B+B</code> doubles the brightness value six times, that is, shifts it left six bits, to seat it in the instruction's brightness field; <code>lio</code> loads the IO register; <code>dpy</code> then plots the point whose X coordinate the caller has already left in the accumulator.</p>
+      <p>It is worth pausing on the fact that this is a <b>macro</b>. DEC's MACRO assembler let the MIT programmers define their own higher-level operations, <code>dispt</code>, <code>scale</code>, <code>diff</code>, and build the game out of them, which is part of how a program this ambitious fitted in a few thousand words and stayed readable enough to be modified by a dozen hands. The assembler is itself part of the <a href="pdp1.html">PDP-1 software</a> the hackers wrote for themselves.</p>
+    </section>
+
+    <div class="rule"><span>why this belongs here</span></div>
+
+    <section class="block">
+      <span class="kicker">The reading</span>
+      <h3>The instruction set is part of the meaning</h3>
+      <p>Reading <i>Spacewar!</i> closely means reading at this level. The 18-bit word fixes the precision of the orbital arithmetic; one's-complement sign handling shows up in the physics; the single accumulator dictates a style of code that constantly loads, operates and stores; and <code>dpy</code> is the reason the game is a redraw loop rather than a picture. The constraints are not background to the program, they are legible <i>in</i> it. To study the code is repeatedly to meet the machine through it.</p>
+      <p style="margin-top:1.4rem;"><a class="btn ghost" href="pdp1.html">← The PDP-1</a> &nbsp; <a class="btn ghost" href="code.html">The versions and source →</a></p>
+    </section>
+
+    <div class="rule"><span>sources</span></div>
+
+    <section class="block">
+      <span class="kicker">On this page</span>
+      <h3>Where it comes from</h3>
+      <ul>
+        <li>Norbert Landsteiner, <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/spacewar/inside/pdp1-instructions.html">PDP-1 instruction list</a> and the <i>Inside Spacewar!</i> series, masswerk.at, for the instruction set and octal codes.</li>
+        <li>DEC, <i>PDP-1 handbooks</i> and the <a href="pdp1.html">PDP-1 machine page</a> here, for the word format, registers and cycle times.</li>
+        <li><i>Spacewar!</i> 3.1 (24 September 1962), the source of the <code>dispt</code> macro quoted above; held with the other listings on the <a href="code.html">versions and source</a> page.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p class="micro">A Critical Code Studies project initiated by David M. Berry and Mark C. Marino. · Source: <a href="https://github.com/spacewar1962/spacewar">github.com/spacewar1962</a></p>
+    </div>
+  </footer>
+
+</body>
+</html>
