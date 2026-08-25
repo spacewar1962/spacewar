@@ -39,6 +39,8 @@
     .member .meta .role { font-family:var(--mono); font-size:0.6rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--beam); }
     .member .meta .sep { color:var(--line); margin:0 0.55rem; }
     .member .meta a { color:var(--beam); }
+    .member .bio { font-size:0.9rem; color:var(--phosphor); margin:0.5rem 0 0; line-height:1.65; max-width:60ch; }
+    .member .bio em { color:var(--phosphor); }
     @media (max-width:480px) { .member .portrait { width:68px; height:68px; } .member .meta .sep { margin:0 0.35rem; } }
   </style>
 </head>
@@ -155,7 +157,8 @@
           </div>
           <figcaption class="body">
             <h3>Anthony Hay</h3>
-            <p class="meta"><span class="role">Team Member</span></p>
+            <p class="meta"><span class="role">Team Member</span><span class="sep">·</span>Programmer (formerly Digital Research, Novell); BSc, Imperial College London</p>
+            <p class="bio">Wrote a near-perfect clone of the original MAD-SLIP ELIZA in C++, first from Weizenbaum&rsquo;s 1966 paper, later corrected against the recovered MIT source. Untangled the &ldquo;certain counting mechanism&rdquo; behind ELIZA&rsquo;s memory.</p>
           </figcaption>
         </figure>
 
@@ -166,7 +169,8 @@
           </div>
           <figcaption class="body">
             <h3>Sarah Ciston</h3>
-            <p class="meta"><span class="role">Team Member</span></p>
+            <p class="meta"><span class="role">Team Member</span><span class="sep">·</span>Professor of Computational Thinking and Aesthetic Doing, Academy of Media Arts Cologne</p>
+            <p class="bio">Builds critical-creative tools to bring intersectional approaches to machine learning. Winner of the 2025 Ars Electronica STARTS Grand Prize. Author of <em>A Critical Field Guide to Working with Machine Learning Datasets</em> and founder of Code Collective.</p>
           </figcaption>
         </figure>
 
@@ -177,7 +181,8 @@
           </div>
           <figcaption class="body">
             <h3>Art Schwarz</h3>
-            <p class="meta"><span class="role">Team Member</span></p>
+            <p class="meta"><span class="role">Team Member</span><span class="sep">·</span>Software developer and technical lead (aerospace, automotive); BS Physics, MS Computer Science</p>
+            <p class="bio">Developed gSlip, a public-domain implementation of SLIP, the list-processing library underpinning ELIZA. Interests include hashing algorithms and anomaly detection.</p>
           </figcaption>
         </figure>
 
@@ -189,6 +194,17 @@
           <figcaption class="body">
             <h3>Claire Carroll</h3>
             <p class="meta"><span class="role">Team Member</span></p>
+          </figcaption>
+        </figure>
+
+        <figure class="member">
+          <div class="portrait">
+            <span class="initials" aria-hidden="true">NL</span>
+          </div>
+          <figcaption class="body">
+            <h3>Norbert Landsteiner</h3>
+            <p class="meta"><span class="role">Team Member</span><span class="sep">·</span>Independent researcher and developer, <a target="_blank" rel="noopener noreferrer" href="https://www.masswerk.at/">masswerk.at</a></p>
+            <p class="bio">Software archaeologist whose browser-based reconstructions of historic systems include the definitive emulation of <i>Spacewar!</i> running on the PDP-1. His restorations and technical notes on the original code inform this project throughout.</p>
           </figcaption>
         </figure>
 
