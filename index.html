@@ -163,6 +163,7 @@
       <h2>A short history of Spacewar!</h2>
       <p><i>Spacewar!</i> was conceived in 1961 by <a href="people.html#graetz">Martin Graetz</a>, <a href="people.html#wiitanen">Wayne Wiitanen</a>, and <a href="people.html#russell">Steve Russell</a>, members of the circle around MIT's Tech Model Railroad Club, when the Hingham Institute set itself the problem of writing a program that would show off the new PDP-1. Russell wrote the core over the winter of 1961–62. Two ships, a needle and a wedge, fired torpedoes at one another across a starfield. From there it grew by accretion: <a href="people.html#samson">Peter Samson</a> replaced the random background with the <i>Expensive Planetarium</i>, the actual night sky; <a href="people.html#edwards">Dan Edwards</a> added a central star whose gravity pulled both ships toward it; Graetz added hyperspace, a panic button that made a ship vanish and reappear elsewhere at random, at the risk of never coming back. By spring 1962 <a href="people.html#kotok">Alan Kotok</a> and <a href="people.html#saunders">Bob Saunders</a> had built dedicated control boxes so players need not hunch over the console switches.</p>
       <p>Almost as soon as it existed it circulated. The source was copied from PDP-1 to PDP-1, modified, extended, and passed on, an open artefact decades before "open source" had a name. <b>What we intend to do</b> is read that artefact closely: to take the surviving Macro source and its assembler listing and work through them line by line, pairing technical explication with cultural interpretation, and asking what this small, much-copied program can tell us about the moment computation became interactive, playable, and shared.</p>
+      <p class="micro" style="margin-top:0.8rem;font-size:0.72rem;line-height:1.6;color:var(--phosphor-dim);">None of the authors worked for DEC. They were MIT students and staff in the orbit of the Tech Model Railroad Club, writing on a PDP-1 that DEC had supplied to the university, a machine whose own lineage ran back through Lincoln Laboratory, where DEC's founder Ken Olsen had worked on the TX-0. The company's part came afterwards: DEC took up <i>Spacewar!</i> as a demonstration and diagnostic program and shipped it out with new PDP-1s, carrying the hackers' code to every installation.</p>
     </section>
 
     <div class="rule"><span>007652</span></div>
@@ -171,23 +172,23 @@
     <section class="block" id="object">
       <span class="kicker">What is being read</span>
       <h2>The object</h2>
-      <p>There is no single <i>Spacewar!</i> source code. What survives is a family of versions: the early MIT releases (1, 2B, 3.1), the forked 4.x generation of 1963, later reconstructions such as the Computer History Museum's 4.1f, and the many ports and clones of its <a href="code.html">long journey</a>, each in its own dialect of assembly. The primary texts here are the Macro assembly sources, preserved alongside assembler listings, provenance notes, and a runnable PDP-1 emulator, so the reading can move between text, version, and execution. The <a href="code.html">Versions</a> page and the <a href="timeline.html">Timeline</a> lay out the whole variorum.</p>
-      <p class="micro" style="margin-top:0.8rem;font-size:0.6rem;line-height:1.6;color:var(--phosphor-dim);">A note on the assembler: the 1962 source is written in <b>Macro</b>, the PDP-1 assembler descended from the one built for the TX-0, the porting effort that first won the TMRC hackers their access to the machines. <i>MIDAS</i>, often named in later accounts, is one of several later and broadly compatible assemblers built on Macro (alongside <i>Certainly</i> and <i>Possible</i>); the <i>Spacewar!</i> listings are Macro, not MIDAS.</p>
+      <p>There is no single <i>Spacewar!</i> source code. What survives is a family of versions: the early MIT releases (1, 2B, 3.1), the forked 4.x generation of 1963, later reconstructions such as the Computer History Museum's 4.1f, and the many ports and clones of its long journey, each in its own dialect of assembly language. The primary texts here are the Macro assembly sources, preserved alongside assembler listings, provenance notes, and a runnable PDP-1 emulator, so the reading can move between text, version, and execution. The <a href="code.html">Versions</a> page and the <a href="timeline.html">Timeline</a> lay out the whole variorum.</p>
+      <p class="micro" style="margin-top:0.8rem;font-size:0.72rem;line-height:1.6;color:var(--phosphor-dim);">A note on the assembler: the 1962 source is written in <b>Macro</b>, the PDP-1 assembler descended from the one built for the TX-0, the porting effort that first won the TMRC hackers their access to the machines. <i>MIDAS</i>, often named in later accounts, is one of several later and broadly compatible assemblers built on Macro (alongside <i>Certainly</i> and <i>Possible</i>); the <i>Spacewar!</i> listings are Macro, not MIDAS.</p>
       <div class="grid">
         <article class="card">
           <p class="obj">spacewar.mac · ~2057 lines</p>
           <h3>The source</h3>
-          <p>Russell's Macro assembly for the 1962 game: the macro definitions, the ship-outline compiler, gravity, hyperspace. The primary close-reading text.</p>
+          <p>Russell's Macro assembly for the 1962 game: the macro definitions, the ship-outline compiler, gravity, hyperspace. The primary close-reading text. <a href="spacewar.mac" target="_blank" rel="noopener noreferrer">Read it →</a></p>
         </article>
         <article class="card">
           <p class="obj">spacewar.lst · 233 KB</p>
           <h3>The listing</h3>
-          <p>The assembler listing: octal addresses and machine words beside each line. The material memory layout, the program as it sits in core.</p>
+          <p>The assembler listing: octal addresses and machine words beside each line. The material memory layout, the program as it sits in core. <a href="spacewar.lst" target="_blank" rel="noopener noreferrer">Read it →</a></p>
         </article>
         <article class="card">
           <p class="obj">originsources.zip</p>
           <h3>The provenance</h3>
-          <p>A dated upstream snapshot tracing the source back through the Silverman / Gerasimov PDP-1 emulator to the recovered 3.1 listing.</p>
+          <p>A dated upstream snapshot tracing the source back through the Silverman / Gerasimov PDP-1 emulator to the recovered 3.1 listing. <a href="originsources.zip">Download →</a></p>
         </article>
         <article class="card">
           <p class="obj">spacewar.js · emulator</p>
@@ -195,6 +196,8 @@
           <p>A PDP-1 emulator in the browser. The 1962 code, executing. <a href="play.html">Play it →</a></p>
         </article>
       </div>
+
+      <p style="margin-top:1.4rem;">The macros themselves. Three short definitions from the 2B source: each names a pattern the Macro assembler expands inline wherever it is called, the same mechanism Russell used to build the ship-outline compiler at the heart of the game.</p>
 
       <pre class="listing"><span class="com">/ spacewar 2b · 2 apr 1962 · pdp-1 macro assembly</span>
 <span class="com">/ one of many surviving versions (reconstructed by Norbert Landsteiner)</span>
@@ -233,7 +236,7 @@
 
       <div class="hardware">
         <div>
-          <p>The DEC PDP-1 was, for its day, an intimate machine. Where contemporary mainframes cost millions and were tended by operators behind glass, the PDP-1 sold for around $120,000, sat in a single room, and let one person work at it directly, watching results appear in real time on a round, radar-derived screen. That immediacy is the condition of possibility for <i>Spacewar!</i></p>
+          <p>The DEC PDP-1 was, for its day, an intimate machine. Where contemporary mainframes cost millions and were tended by operators behind glass, the PDP-1 sold for around $120,000, sat in a single room, and let one person work at it directly, watching results appear in real time on a round, oscilloscope-style screen. That immediacy is the condition of possibility for <i>Spacewar!</i></p>
           <p>The display was the DEC Type&nbsp;30, a sixteen-inch CRT addressing a grid of 1024&nbsp;×&nbsp;1024 points, coated in long-persistence P7 phosphor that flashed blue-white and faded to amber-green. Programs were loaded from punched paper tape through a Flexowriter. The custom control boxes, with two levers and a fire button, were among the first dedicated game controllers ever built.</p>
         </div>
         <svg viewBox="0 0 240 180" role="img" aria-label="The DEC Type 30 display and a Spacewar control box">
@@ -284,7 +287,7 @@
         <article class="card fact">
           <p class="obj">Approach</p>
           <h3>Reading, and re-running</h3>
-          <p>We read the Macro source closely across the registers of CCS, and treat programming as scholarship: running the emulator, making small modifications and ports, and comparing transcriptions, so interpretation is tested against the artefact itself.</p>
+          <p>We read the Macro source closely across the registers of CCS, and treat programming itself as a method: running the code in emulation, altering small parts of it to see what each does, and checking the surviving transcriptions of the source against one another, so that every interpretation is tested against the running program.</p>
         </article>
       </div>
     </section>
@@ -295,9 +298,9 @@
     <section class="block" id="reading">
       <span class="kicker">Method</span>
       <h2>The reading</h2>
-      <p>The study works across the registers of Critical Code Studies, pairing close technical explication of a code fragment with the cultural constellation that spirals out from it. Each fragment is read at three levels and traced through three movements.</p>
+      <p>The study works across the registers of Critical Code Studies, pairing close technical explication of a code fragment with the cultural constellation that spirals out from it. It proceeds through six readings, each starting from the code and spiralling outward, moving from the machine itself to the founding myth of hacker culture.</p>
       <ol class="method">
-        <li data-n="1"><b>The machine that owns itself.</b> Ontology: a self-contained program with the whole PDP-1 to itself, addressing core in octal. The lineage from SAGE and Lincoln Lab; what it takes to make the code run, then and now.</li>
+        <li data-n="1"><b>The machine that owns itself.</b> Ontology: a self-contained program with the whole PDP-1 to itself, its core addresses written in octal. The lineage from SAGE and Lincoln Lab; what it takes to make the code run, then and now.</li>
         <li data-n="2"><b>A language for ships.</b> The Macro assembler's macros and the outline-compiler as a small language Russell built to write the game in: a theory of computational expression embedded in the assembler. Code that writes code, at the origin.</li>
         <li data-n="3"><b>The expensive planetarium.</b> Peter Samson's real star catalogue rendered as background; Dan Edwards's gravity. The politics and aesthetics of computational verisimilitude: what gets modelled, what gets abstracted away.</li>
         <li data-n="4"><b>Hyperspace, or the random jump.</b> Contingency, risk, and play designed into a deterministic machine. The register trick, the randomness source, the panic button as game-feel.</li>
