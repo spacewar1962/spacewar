@@ -93,6 +93,29 @@
     return cache[vid];
   };
 
+  // Every note in the group, every draft, and every build log, all versions.
+  N.listAll = function () {
+    var V = root.SWVersions;
+    var logs = [];
+    V.VERSIONS.forEach(function (v) {
+      (v.buildNotes || []).forEach(function (bn, i) {
+        logs.push({ id: 'log-' + v.id + '-' + i, vid: v.id, kind: 'version', anchor: null, text: bn.text, by: bn.by,
+                    name: bn.who, date: bn.date, parent: null, tags: ['build log'], source: 'buildlog' });
+      });
+    });
+    var local = drafts();
+    function page(offset, acc) {
+      return hx('GET', '/search?limit=200&sort=created&order=asc&offset=' + offset + '&group=' + encodeURIComponent(cfg().group))
+        .then(function (r) {
+          var rows = (r.rows || []).map(fromH).filter(function (n) { return n.vid; });
+          acc = acc.concat(rows);
+          return (r.rows || []).length === 200 && offset < 5000 ? page(offset + 200, acc) : acc;
+        });
+    }
+    var remote = N.configured() ? page(0, []).catch(function (e) { SW.toast(e.message, 5000); return []; }) : Promise.resolve([]);
+    return remote.then(function (rows) { return logs.concat(rows, local); });
+  };
+
   N.invalidate = function (vid) { delete cache[vid]; SW.emit('notes', vid); };
 
   // note: {vid, kind, anchor, quote, text, tags, parent}

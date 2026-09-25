@@ -119,7 +119,7 @@
     dialect = dialect || v.dialect;
     var key = id + '|' + dialect;
     if (buildCache[key]) return buildCache[key];
-    buildCache[key] = V.load(v, SW.fetchText, A.splitLines).then(function (L) {
+    buildCache[key] = V.load(v, SW.fetchText, A.splitLines, SW.fetchBytes).then(function (L) {
       var t0 = performance.now();
       var asm = v.build ? A.assemble(L.files, V.DIALECTS[dialect].options) : null;
       var b = { v: v, dialect: dialect, parts: L.parts, asm: asm, ms: 0 };
@@ -181,6 +181,13 @@
     var q = [];
     for (var k in params) if (params[k] != null && params[k] !== '') q.push(k + '=' + encodeURIComponent(params[k]));
     return SW.BASE_URI + (q.length ? '?' + q.join('&') : '');
+  };
+  // A file in sources/, opened in a new tab on GitHub (tape images are binary,
+  // so the browser cannot show them itself; GitHub shows size, history, raw).
+  SW.REPO = 'https://github.com/spacewar1962/spacewar/blob/main/sources/';
+  SW.sourceURL = function (path) { return SW.REPO + path.split('/').map(encodeURIComponent).join('/'); };
+  SW.sourceLink = function (path, text) {
+    return '<a href="' + SW.esc(SW.sourceURL(path)) + '" target="_blank" rel="noopener" title="Open ' + SW.esc(path) + ' in a new tab">' + SW.esc(text || path) + ' ↗</a>';
   };
   SW.versionURI = function (id) { return SW.BASE_URI + '?v=' + encodeURIComponent(id); };
 

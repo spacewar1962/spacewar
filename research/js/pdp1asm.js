@@ -20,7 +20,9 @@
  *  - an overlined (variable) name never resolves to a macro or pseudo-op
  *    by macro1's three-letter abbreviation rule (2B's \ran vs ranct);
  *  - a macro definition may be written on one line with tab-separated
- *    parts, as the MACRO manual (F-36) permits.
+ *    parts, as the MACRO manual (F-36) permits;
+ *  - options.defVars and options.wholeMacroLines give the 1962-63 MACRO
+ *    behaviour where macro1 differs (see versions.js, DIALECTS).
  */
 (function (root) {
   'use strict';
@@ -305,7 +307,9 @@
           mc = curmacro.ptr < body.length ? body.charAt(curmacro.ptr) : '\0';
           curmacro.ptr++;
           if (mc !== '\0') s += mc;
-        } while (!ISEND(mc));
+          // macro1 ends a body line at a tab; MACRO (1962-63) read the whole
+          // line, so "repeat 6<tab>B=B+B" repeats as the tapes show
+        } while (!(options.wholeMacroLines ? (mc === '\0' || mc === '\n') : ISEND(mc)));
         line = s;
         maxcc = line.length;
         return;

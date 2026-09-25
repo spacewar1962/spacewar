@@ -33,6 +33,10 @@
 
   var MACROS = { src: 'spacewar-4.3-17may1963.txt', end: 61,
                  role: 'macro fio-dec system (June 1963), from the masswerk 4.3 build' };
+  // The dfw tapes of February 1963 were assembled with "ioh" as 760000 (opr):
+  // with that one change the dfw source rebuilds both authentic dfw tapes.
+  var MACROS_FEB63 = { src: 'spacewar-4.3-17may1963.txt', end: 61, patch: [['ioh=iot i', 'ioh=760000']],
+                       role: 'macro fio-dec system (June 1963, masswerk 4.3 build) with ioh=760000, as the February 1963 dfw tapes require' };
   var STARS = { src: 'spacewar-2b-stars-prs-13mar1962.txt',
                 role: 'Expensive Planetarium star table (prs, 13 Mar 1962)' };
 
@@ -74,6 +78,15 @@
       summary: 'The standard version, patches consolidated; the most widely preserved and emulated. The first in which fuel is really burned.',
       build: [{ src: 'spacewar-3.1-24sep1962.txt' }],
       witnesses: ['SteveRussell_box1/spacewar3.1_24-sep-62.bin', 'bin-files/newSpacewar_4-30-60.bin'] },
+    { id: '3.1t', label: 'Spacewar! 3.1 (source tapes)', date: '24 Sep 1962; tapes 29 Sep 1962', sort: 19620929,
+      authors: 'Russell', fork: 'early', status: 'recovered', medium: 'Source tape (FIO-DEC)',
+      buildNotes: ["Read from SteveRussell_box1/spacewar3.1pt1_29sep62.bin, pt2 and pt3 (the star table), decoded from FIO-DEC: every frame passes the odd-parity check. The tapes carry the title 'spacewar 3.1 24 sep 62' though filed as 29 Sep 62.", "One character is mis-punched on the pt 1 tape, in a comment: 'calling s?quence' has code 035 where 'e' (065) belongs, one hole short; parity is still odd, so the fault is in the punching, not the reading.", "The macro definitions are not on these tapes; the 'macro fio-dec system' lines of the masswerk 3.1 file are supplied in front.", "Assembled in the 1962-63 dialect, the tapes rebuild bin-files/newSpacewar_4-30-60.bin exactly (2,514 words). The source tape's dispt macro reads 'repeat 6<tab>B=B+B' where the masswerk text has 'repeat 6, B=B+B'; the 1962-63 dialect reads both alike. Against spacewar3.1_24-sep-62.bin the result differs only in the star table (27 words, 4 fewer on that tape), as for the masswerk text."],
+      summary: 'Spacewar! 3.1 read directly from Steve Russell\'s own punched source tapes (pt. 1, pt. 2, and the star table as pt. 3), decoded from FIO-DEC with no transcription in between.',
+      build: [{ src: 'spacewar-3.1-24sep1962.txt', end: 64, role: 'macro fio-dec system, from the masswerk 3.1 build' },
+              { tape: 'SteveRussell_box1/spacewar3.1pt1_29sep62.bin', titleMatch: true },
+              { tape: 'SteveRussell_box1/spacewar3.1pt2_29sep62.bin', titleMatch: true },
+              { tape: 'SteveRussell_box1/spacewar3.1pt3_29sep62.bin' }],
+      witnesses: ['SteveRussell_box1/spacewar3.1_24-sep-62.bin', 'bin-files/newSpacewar_4-30-60.bin'] },
     { id: '4.0', label: 'Spacewar! 4.0', date: '2 Feb 1963', sort: 19630202,
       authors: 'Monty Preonas ("ddp")', fork: 'ddp', status: 'recovered', medium: 'Source listing',
       buildNotes: ["The ddp listing calls macros (setup, count, init, swap...) from a separate macro tape and the star table from Samson's tape. Neither is in the Morris scan; the June 1963 macro tape (from the masswerk 4.3 build) and the 13 March 1962 star table are supplied. With them the listing assembles without error (2,478 words).", "The explanatory header of the transcription is skipped: assembly starts at the tape title 'spacewar 4.0 2/2/63 ddp'."],
@@ -82,13 +95,20 @@
       scans: ['spacewar-4.0-2feb1963-(Morris).pdf'] },
     { id: '4.1', label: 'Spacewar! 4.1 / 4.2a (dfw)', date: '20 / 22 Feb 1963', sort: 19630220,
       authors: '"dfw"', fork: 'dfw', status: 'recovered', medium: 'Listing + tape',
-      buildNotes: ["Normalised for assembly: the transcription marks overlined (variable) names with a leading '.' (e.g. '.sx1', '.1sc'); these are read as '~'. Whitespace-only lines (page breaks) are read as blank, so the pt 2 title line is recognised.", "Assembles without error to 2,364 words, the same length as the three authentic dfw tapes. It differs from spacewar4.1_2-20-63_dfw.bin and spacewar4.2a_sa4.bin in 13 words and from sw4.2.bin in 14. Ten of the 13 are 'ioh' (the June 1963 macro tape gives 730000, the tapes have 760000), which points to a different macro tape in February 1963; two are the iot codes in 'dispt i, i my1, 1/2' (720011/720013 against 720107/720207).", "SteveRussell_box1/spacewar4.1pt1and2.bin is not an object tape: it is the source itself punched in FIO-DEC, from which the _text transcription was made."],
+      buildNotes: ["Normalised for assembly: the transcription marks overlined (variable) names with a leading '.' (e.g. '.sx1', '.1sc'); these are read as '~'. Whitespace-only lines (page breaks) are read as blank, so the pt 2 title line is recognised.", "With the June 1963 macro tape as found, the build differs from the authentic dfw tapes in 13 words: ten are 'ioh' (730000 against 760000 on the tapes) and two are the display iot codes in 'dispt i, i my1, 1/2'. The second pair is an assembler matter: the 1963 source writes 'repeat 6<tab>B=B+B' in the dispt macro, which macro1 cuts at the tab; the 1962-63 dialect here reads the whole line, as the tapes show MACRO did.", "With 'ioh' defined as 760000 (opr) in the supplied macro tape, the build is identical to both spacewar4.1_2-20-63_dfw.bin and spacewar4.2a_sa4.bin (2,364 words, no differences). The February 1963 macro system therefore defined ioh differently from the June 1963 tape we hold. SteveRussell_box1/sw4.2.bin differs in one word only (isp 3043 against 3042 at 2333, 'count \\\\src,sq7'): a different build, one variable apart.", "The transcription agrees with Russell's punched source tape (see '4.1 / 4.2a (dfw, source tape)') in 1,135 of 1,138 lines; the differences are the scan label '>>32<< 1', a stray '_' at the end, and the tape's overstruck '\u203e+' (\u00b1) in a comment, transcribed as '.+'."],
       summary: 'The dfw fork, built on Preonas\'s 4.0: dotted central sun, major code reorganisation. The clean original from Steve Russell\'s tape box: pt 1 is 4.1 (2/20/63), pt 2 is 4.2a (2/22/63).',
-      build: [MACROS, { src: 'spacewar-4.1-4.2a-feb1963-dfw-(Russell).txt', titleMatch: true }, STARS],
+      build: [MACROS_FEB63, { src: 'spacewar-4.1-4.2a-feb1963-dfw-(Russell).txt', titleMatch: true }, STARS],
       transforms: ['dotOverbar', 'blankWhitespace'],
       sourceTapes: ['SteveRussell_box1/spacewar4.1pt1and2.bin'],
       witnesses: ['SteveRussell_box1/spacewar4.1_2-20-63_dfw.bin',
                   'bin-files/spacewar4.2a_sa4.bin', 'SteveRussell_box1/sw4.2.bin'] },
+    { id: '4.1t', label: 'Spacewar! 4.1 / 4.2a (dfw, source tape)', date: '20 / 22 Feb 1963', sort: 19630221,
+      authors: '"dfw"', fork: 'dfw', status: 'recovered', medium: 'Source tape (FIO-DEC)',
+      buildNotes: ["Read from SteveRussell_box1/spacewar4.1pt1and2.bin, the dfw source punched in FIO-DEC: 15,389 frames, every one passing the odd-parity check, 26 stop codes (page breaks).", "Assembled with the June 1963 macro tape patched to 'ioh=760000', the tape rebuilds spacewar4.1_2-20-63_dfw.bin and spacewar4.2a_sa4.bin exactly: an authentic source reproducing authentic binaries. sw4.2.bin differs by one variable address.", "Overlined variables are punched with the non-spacing overbar (lower-case 056), read as '\\\\'; the one overstrike, '\u203e+' (\u00b1), is in a comment."],
+      summary: 'The dfw 4.1 (pt 1) and 4.2a (pt 2) read directly from Steve Russell\'s punched source tape, decoded from FIO-DEC with no transcription in between.',
+      build: [MACROS_FEB63, { tape: 'SteveRussell_box1/spacewar4.1pt1and2.bin', titleMatch: true }, STARS],
+      transforms: ['blankWhitespace'],
+      witnesses: ['SteveRussell_box1/spacewar4.1_2-20-63_dfw.bin', 'bin-files/spacewar4.2a_sa4.bin', 'SteveRussell_box1/sw4.2.bin'] },
     { id: '4.0ts', label: 'Spacewar! 4.0TS', date: '4 May 1963', sort: 19630504,
       authors: 'Monty Preonas ("ddp")', fork: 'ddp', status: 'recovered', medium: 'Source listing',
       buildNotes: ["Assembled as two tape segments from the one transcription: the program (title at line 53, to 'start 4' at line 1191) and the simplified Twin Star star tape (title at line 1202). Macro tape supplied as for 4.0. Assembles without error."],
@@ -169,7 +189,7 @@
   // and 3.1 tapes); 'macro1' is the 2003 cross-assembler used for the
   // modern CHM and 2015 builds.
   var DIALECTS = {
-    macro1963: { label: 'MACRO (1962-63 behaviour)', options: { defVars: true } },
+    macro1963: { label: 'MACRO (1962-63 behaviour)', options: { defVars: true, wholeMacroLines: true } },
     macro1: { label: 'macro1 (simh, 2003)', options: {} }
   };
 
@@ -204,16 +224,21 @@
    * fetchText(path) -> Promise<string>. Returns a Promise of
    * { version, parts: [{src, role, text, title, end}], files: [...for assembler] }.
    */
-  function load(v, fetchText, splitLines) {
+  function load(v, fetchText, splitLines, fetchBytes) {
     if (!v.build) return Promise.resolve({ version: v, parts: [], files: [] });
-    return Promise.all(v.build.map(function (b) { return fetchText(b.src); })).then(function (texts) {
+    var F = root.SWFiodec || (typeof require === 'function' ? require('./fiodec.js') : null);
+    return Promise.all(v.build.map(function (b) {
+      if (!b.tape) return fetchText(b.src);
+      return fetchBytes(b.tape).then(function (bytes) { return F.decode(bytes).text; });
+    })).then(function (texts) {
       var parts = v.build.map(function (b, i) {
         var raw = texts[i];
         var norm = raw;
         (v.transforms || []).forEach(function (k) { norm = TRANSFORMS[k].fn(norm); });
+        (b.patch || []).forEach(function (pp) { norm = norm.split(pp[0]).join(pp[1]); });
         var title = b.title;
         if (!title && b.titleMatch) title = findTitle(splitLines(raw));
-        return { src: b.src, role: b.role || 'program', raw: raw, text: norm,
+        return { src: b.src || b.tape, tape: !!b.tape, role: b.role || 'program', raw: raw, text: norm, patch: b.patch || null,
                  title: title || 1, end: b.end || null };
       });
       var files = parts.map(function (p) {

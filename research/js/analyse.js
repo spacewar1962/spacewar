@@ -21,7 +21,8 @@
     [9, 'Instructions', 'Instruction frequency, as written and as executed'],
     [10, 'Memory map', 'Code, constants, variables and tables across the 4096 words'],
     [11, 'Macros', 'The macros and how often each is expanded'],
-    [12, 'The sky', 'The Expensive Planetarium’s star table drawn as a chart']
+    [12, 'The sky', 'The Expensive Planetarium’s star table drawn as a chart'],
+    [13, 'The ships', 'The Needle and the Wedge, drawn from their outline codes']
   ];
 
   function progLines(b) {
@@ -232,6 +233,33 @@
     });
     var rows = Object.keys(edges).map(function (k) { var e = edges[k]; return [e.from, e.to, e.via, e.n]; }).sort(function (a, b) { return a[1] < b[1] ? -1 : 1; });
     var callees = {}; rows.forEach(function (r) { callees[r[1]] = (callees[r[1]] || 0) + r[3]; });
+    // Arc diagram: routines along a line in address order, calls as arcs.
+    var nodes = {}, W = 1100, H = 330, base = 250;
+    rows.forEach(function (r) { nodes[r[0]] = 1; nodes[r[1]] = 1; });
+    var addrOf = function (n) { var s = b.sym[n]; return s ? s.val : 0; };
+    var order = Object.keys(nodes).sort(function (x, y) { return addrOf(x) - addrOf(y); });
+    var pos = {}; order.forEach(function (n, i) { pos[n] = 30 + i * (W - 60) / Math.max(1, order.length - 1); });
+    var arcSVG = function () {
+      var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><rect width="' + W + '" height="' + H + '" fill="var(--surface)"/>'];
+      o.push('<line x1="20" y1="' + base + '" x2="' + (W - 20) + '" y2="' + base + '" stroke="var(--line)"/>');
+      rows.forEach(function (r) {
+        var x1 = pos[r[0]], x2 = pos[r[1]];
+        if (x1 == null || x2 == null || x1 === x2) return;
+        var h = Math.min(base - 12, Math.abs(x2 - x1) * 0.55), mx = (x1 + x2) / 2;
+        o.push('<path d="M' + x1.toFixed(1) + ' ' + base + ' Q' + mx.toFixed(1) + ' ' + (base - 2 * h).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + base + '" fill="none" stroke="' + (x2 > x1 ? 'var(--beam)' : 'var(--amber)') + '" stroke-opacity="0.55" stroke-width="' + Math.min(4, 0.8 + r[3] * 0.4).toFixed(1) + '"><title>' + SW.esc(r[0] + ' → ' + r[1] + ' (' + r[2] + ', ' + r[3] + ' site' + (r[3] > 1 ? 's' : '') + ')') + '</title></path>');
+      });
+      order.forEach(function (n) {
+        var x = pos[n], called = callees[n] || 0;
+        o.push('<circle cx="' + x.toFixed(1) + '" cy="' + base + '" r="' + (2.5 + Math.min(6, called)).toFixed(1) + '" fill="var(--text)"><title>' + SW.esc(n + ' at ' + SW.oct(addrOf(n), 4) + (called ? ', called from ' + called + ' site(s)' : '')) + '</title></circle>');
+        o.push('<text transform="translate(' + (x + 3).toFixed(1) + ' ' + (base + 12) + ') rotate(60)" font-size="9" fill="var(--text-dim)">' + SW.esc(n) + '</text>');
+      });
+      return o.concat(['</svg>']).join('');
+    };
+    var c0 = card('The call structure', 'Routines along the line in memory order; each arc a call (blue: to a routine later in memory, amber: to one earlier), thicker for more call sites. Hover for names.');
+    c0.appendChild(SW.el('div', { class: 'svgbox' }, SW.resolveVars(arcSVG())));
+    c0.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download('spacewar-' + b.v.id + '-calls.svg', SW.resolveVars(arcSVG()), 'image/svg+xml'); } }, '▣ SVG'));
+    c0.style.gridColumn = '1 / -1';
+    el.appendChild(c0);
     var c1 = card('Most called', 'Subroutines by the number of call sites (jsp and jda).');
     c1.insertAdjacentHTML('beforeend', '<div class="scroll">' + bars(Object.keys(callees).map(function (k) { return [k, callees[k]]; }).sort(function (x, y) { return y[1] - x[1]; }).slice(0, 30)) + '</div>');
     var c2 = card('Call sites', 'From routine to called routine. Routines are regions beginning at a label.');
@@ -336,7 +364,72 @@
     return function () { return [SW.tableBlock('Star table', ['Label', 'X', 'Y', 'Identification', 'Line'], stars.map(function (s) { return [s.label, String(s.x), String(s.y), s.name, String(s.L.n)]; }))]; };
   }
 
-  var FNS = { 1: comments, 2: hands, 3: lexicon, 4: adjustable, 5: machine, 6: timeGoes, 7: absence, 8: calls, 9: instructions, 10: memmap, 11: macros, 12: sky };
+  // ---------- 13 the ships ----------
+  // Decode an outline table as the outline compiler (oc) does: each octal
+  // digit read from the top of the word is a step, plotted after moving.
+  // At angle zero (x right, y up): 1 (0,-1), 2 (1,0), 3 (1,-1), 4 (-1,0),
+  // 5 (-1,-1); 6 saves then restores the position; 7 ends the side, and the
+  // compiled code runs again with the sideways terms negated (the mirror).
+  var STEP = { 1: [0, -1], 2: [1, 0], 3: [1, -1], 4: [-1, 0], 5: [-1, -1] };
+  function outline(b, name) {
+    var s = b.sym[name];
+    if (!s || !s.defined || !b.asm) return null;
+    var digits = [], a = s.val;
+    for (var n = 0; n < 40; n++, a++) {
+      var w = b.asm.memory[a];
+      if (!w) break;
+      var v = w.val, end = false;
+      for (var k = 5; k >= 0; k--) { var d = (v >> (3 * k)) & 7; digits.push(d); if (d === 7) { end = true; break; } }
+      if (end) break;
+    }
+    var pts = [];
+    [1, -1].forEach(function (side) {
+      var x = 0, y = 0, saved = null;
+      digits.forEach(function (d) {
+        if (d === 6) { if (saved) { x = saved[0]; y = saved[1]; saved = null; } else saved = [x, y]; return; }
+        var st = STEP[d];
+        if (!st) return;
+        x += st[0] * side; y += st[1];
+        pts.push([x, y, side]);
+      });
+    });
+    return { name: name, addr: s.val, digits: digits, pts: pts,
+             words: digits.join('').match(/.{1,6}/g) };
+  }
+  function outlineSVG(o, cell, title) {
+    cell = cell || 7;
+    var xs = o.pts.map(function (p) { return p[0]; }), ys = o.pts.map(function (p) { return p[1]; });
+    var minx = Math.min.apply(null, xs.concat([0])), maxx = Math.max.apply(null, xs.concat([0]));
+    var miny = Math.min.apply(null, ys.concat([0])), maxy = Math.max.apply(null, ys.concat([0]));
+    var w = (maxx - minx + 3) * cell, h = (maxy - miny + 3) * cell + (title ? 18 : 0);
+    var o2 = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '"><rect width="' + w + '" height="' + h + '" fill="#02040a"/>'];
+    var X = function (x) { return (x - minx + 1.5) * cell; }, Y = function (y) { return (maxy - y + 1.5) * cell; };
+    o2.push('<circle cx="' + X(0) + '" cy="' + Y(0) + '" r="' + (cell * 0.22) + '" fill="#ffce7a"><title>start</title></circle>');
+    o.pts.forEach(function (p, i) {
+      o2.push('<circle cx="' + X(p[0]).toFixed(1) + '" cy="' + Y(p[1]).toFixed(1) + '" r="' + (cell * 0.32).toFixed(1) + '" fill="' + (p[2] > 0 ? '#e6f4ff' : '#8fc3d6') + '"><title>' + (i + 1) + '</title></circle>');
+    });
+    if (title) o2.push('<text x="4" y="' + (h - 5) + '" font-size="11" fill="#7fa6c4">' + SW.esc(title) + '</text>');
+    return o2.concat(['</svg>']).join('');
+  }
+  function ships(b, el) {
+    var os = ['ot1', 'ot2'].map(function (n) { return outline(b, n); }).filter(Boolean);
+    if (!os.length) { el.appendChild(card('No outline tables', 'This build has no ot1/ot2 outline tables.')); return null; }
+    os.forEach(function (o) {
+      var label = o.name === 'ot1' ? 'ot1, the Needle' : 'ot2, the Wedge';
+      var c = card(label, 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. Pale points are the first side, blue the mirrored pass; the amber point is the start (the nose). ' + o.pts.length + ' points, each plotted every frame.');
+      var svg = outlineSVG(o, 9);
+      c.appendChild(SW.el('div', { class: 'svgbox', style: 'text-align:center' }, svg));
+      c.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download('spacewar-' + b.v.id + '-' + o.name + '.svg', outlineSVG(o, 12, b.v.label + ' ' + label), 'image/svg+xml'); } }, '▣ SVG'));
+      el.appendChild(c);
+    });
+    var c2 = card('How to read the codes', 'From the outline compiler in the source: 1 continue along the axis; 2 step outward; 3 outward and along; 4 step inward; 5 inward and along; 6 remember this point, and at the next 6 return to it; 7 end, then draw the other side as its mirror. The compiler turns these into display instructions when the game starts: Dan Edwards’s outline compiler, compiling data into code at run time.');
+    el.appendChild(c2);
+    return function () {
+      return [SW.tableBlock('Outline tables', ['Table', 'Address', 'Codes', 'Points'], os.map(function (o) { return [o.name, SW.oct(o.addr, 4), o.words.join(' '), String(o.pts.length)]; }))];
+    };
+  }
+
+  var FNS = { 1: comments, 2: hands, 3: lexicon, 4: adjustable, 5: machine, 6: timeGoes, 7: absence, 8: calls, 9: instructions, 10: memmap, 11: macros, 12: sky, 13: ships };
 
   // =================== across the variorum ===================
   var V = root.SWVersions;
@@ -684,6 +777,31 @@
     onlyToggle(c, rerender);
     el.appendChild(c);
     return function () { return [SW.tableBlock('Stars by version', ['Version', 'Stars'], sum), SW.tableBlock('Star positions by version', ['Star'].concat(vs.map(short)), m)]; };
+  };
+
+  XFNS[13] = function (vs, bs, el) {
+    ['ot1', 'ot2'].forEach(function (n) {
+      var c = card(n === 'ot1' ? 'The Needle (ot1) through the versions' : 'The Wedge (ot2) through the versions', 'Each version\'s outline table drawn from its codes. A change in the codes is a change in the ship.');
+      var row = SW.el('div', { style: 'display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end' });
+      var prev = null;
+      vs.forEach(function (v, i) {
+        var o = outline(bs[i], n);
+        var key = o ? o.words.join(' ') : '';
+        var box = SW.el('div', { style: 'text-align:center;font-size:11px' });
+        box.innerHTML = (o ? outlineSVG(o, 5) : '<div class="faint" style="padding:20px">none</div>') + '<div class="mono' + (i && key !== prev ? '' : ' faint') + '"' + (i && key !== prev ? ' style="color:var(--amber)"' : '') + '>' + SW.esc(short(v)) + (i && key !== prev ? ' (changed)' : '') + '</div>';
+        prev = key;
+        row.appendChild(box);
+      });
+      c.appendChild(row);
+      c.style.gridColumn = '1 / -1';
+      el.appendChild(c);
+    });
+    var rows = vs.map(function (v, i) {
+      var a = outline(bs[i], 'ot1'), b = outline(bs[i], 'ot2');
+      return [short(v), a ? a.words.join(' ') : '', b ? b.words.join(' ') : ''];
+    });
+    el.appendChild(matrixCard('The codes', '', ['Version', 'ot1 (Needle)', 'ot2 (Wedge)'], rows, ['mono', 'mono', 'mono']));
+    return function () { return [SW.tableBlock('Outline codes by version', ['Version', 'ot1 (Needle)', 'ot2 (Wedge)'], rows)]; };
   };
 
   function renderAcross(cards, head, L) {
