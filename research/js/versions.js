@@ -76,7 +76,12 @@
       authors: 'Russell', fork: 'early', status: 'recovered', medium: 'Paper tape',
       buildNotes: ["Assembled with the 1962-63 MACRO variable rule, the source rebuilds bin-files/newSpacewar_4-30-60.bin exactly (2,514 words). With macro1's own rule it differs in 62 words, all addresses of overlined variables: \\\\ssn and \\\\scn are allotted first on the tapes because they occur in the bodies of the xincr/yincr macros defined at the head of the program.", "Against Steve Russell's tape spacewar3.1_24-sep-62.bin the source differs in 27 words, all in the star table, and the tape is 4 words shorter. From 7712 the tables diverge: the tape's second word for '91 Aqar' differs (652375 against 622377), '6 Pisc' (mark 7919, 62) is absent so that the following stars sit two words lower, and the table ends before '2 Ceti' (4q). The program code itself is identical.", "Confirmed: Landsteiner's spacewar3.1_complete.txt is a modern composite of four tapes (June 1963 macros, Russell's 1962 program in two parts, and Samson's star table), used because it's the only surviving macro tape and it still rebuilds the original 3.1 binary exactly."],
       summary: 'The standard version, patches consolidated; the most widely preserved and emulated. The first in which fuel is really burned.',
-      build: [{ src: 'spacewar-3.1-24sep1962.txt' }],
+      // Landsteiner's file joins four tapes; read as such, so the June 1963
+      // macro tape shows as supplied rather than as part of the 1962 program.
+      build: [{ src: 'spacewar-3.1-24sep1962.txt', end: 64, role: 'macro fio-dec system, the June 1963 macro tape joined in front of the program in Landsteiner’s composite file' },
+              { src: 'spacewar-3.1-24sep1962.txt', title: 65, end: 658 },
+              { src: 'spacewar-3.1-24sep1962.txt', title: 659, end: 1370 },
+              { src: 'spacewar-3.1-24sep1962.txt', title: 1371 }],
       witnesses: ['SteveRussell_box1/spacewar3.1_24-sep-62.bin', 'bin-files/newSpacewar_4-30-60.bin'] },
     { id: '3.1t', label: 'Spacewar! 3.1 (source tapes)', date: '24 Sep 1962; tapes 29 Sep 1962', sort: 19620929,
       authors: 'Russell', fork: 'early', status: 'recovered', medium: 'Source tape (FIO-DEC)',

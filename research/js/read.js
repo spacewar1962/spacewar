@@ -25,7 +25,11 @@
       var supplied = part.role !== 'program', star = isStars(b, pi);
       var label = star ? 'Star table' : supplied ? (/macro/i.test(part.role) ? 'Macro definitions' : part.role.charAt(0).toUpperCase() + part.role.slice(1))
         : progs > 1 ? 'Program, part ' + (++k) : 'Program';
-      return { pi: pi, supplied: supplied, star: star, title: tapeTitle(b, pi).trim(), label: label + (supplied ? ' (supplied)' : '') };
+      // A supplied tape's own date, from its title ("… june 1963"), so a later tape is seen as later.
+      var d = /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+(19\d\d)\b/i.exec(tapeTitle(b, pi));
+      var when = d ? ', ' + ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][
+        ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].indexOf(d[1].toLowerCase())] + ' ' + d[2] : '';
+      return { pi: pi, supplied: supplied, star: star, title: tapeTitle(b, pi).trim(), label: label + (supplied ? ' (supplied' + when + ')' : '') };
     });
   }
   function showsTape(pi) { return opts.tapes === 'all' || +opts.tapes === pi; }
