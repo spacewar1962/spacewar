@@ -327,6 +327,53 @@
     });
   };
 
+  // The bin, drawn into a holder: this version's deleted notes by default, or
+  // every version's with the box ticked. Restoring or emptying redraws it.
+  // opts: {vid, all}; the choice is kept on the holder for redraws.
+  N.showBin = function (holder, opts) {
+    opts = opts || {};
+    if (opts.vid) holder.dataset.vid = opts.vid;
+    if (opts.all != null) holder.dataset.all = opts.all ? '1' : '';
+    var vid = holder.dataset.vid, all = !vid || holder.dataset.all === '1';
+    holder.classList.add('bin');
+    holder.innerHTML = '<p class="hint">Opening the bin…</p>';
+    N.binList().then(function (every) {
+      var list = all ? every : every.filter(function (n) { return n.vid === vid; });
+      var V = root.SWVersions, cur = vid && V.byId(vid);
+      var h = (vid ? '<label class="check bin-scope"><input type="checkbox"' + (all ? ' checked' : '') + '> all versions' +
+               (all ? '' : ' <span class="faint">(showing ' + SW.esc(cur ? cur.label.replace(/^Spacewar! /, '') : vid) + ' only; ' + every.length + ' in all)</span>') + '</label>' : '');
+      if (!list.length) { holder.innerHTML = h + '<p class="hint">Nothing in the bin' + (all ? '' : ' for this version') + '.</p>'; wireScope(); return; }
+      holder.innerHTML = h + list.map(function (n, i) {
+        var v = V.byId(n.vid);
+        return '<div class="note binned" data-i="' + i + '"><div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
+          (all ? ' · ' + SW.esc(v ? v.label.replace(/^Spacewar! /, '') : n.vid) : '') + (n.anchor ? ' · l. ' + n.anchor.n0 : ' · version note') +
+          (n.parent ? ' · reply' : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + ' · deleted ' + SW.esc(SW.fmtDate(n.binnedAt)) + '</div>' +
+          '<div class="body">' + SW.esc(n.text) + '</div>' +
+          '<div class="acts"><button data-r="restore">Restore</button></div></div>';
+      }).join('') +
+        '<p style="margin-top:10px"><button class="btn" data-r="empty">' + (all ? 'Empty the bin' : 'Delete these for good') + ' (' + list.length + ')</button></p>';
+      wireScope();
+      holder.onclick = function (e) {
+        var btn = e.target.closest('[data-r]');
+        if (!btn) return;
+        e.stopPropagation();
+        btn.disabled = true;
+        if (btn.dataset.r === 'restore') {
+          N.restore(list[+btn.closest('.note').dataset.i]).then(function () { SW.toast('Restored.'); N.showBin(holder); },
+            function (err) { btn.disabled = false; SW.toast(err.message, 5000); });
+        } else if (btn.dataset.r === 'empty') {
+          if (!window.confirm('Delete ' + (list.length > 1 ? 'these ' + list.length + ' notes' : 'this note') + ' for good?\n\nThis cannot be undone.')) { btn.disabled = false; return; }
+          N.emptyBin(list).then(function () { SW.toast('Deleted for good.'); N.showBin(holder); },
+            function (err) { SW.toast(err.message, 5000); N.showBin(holder); });
+        }
+      };
+    });
+    function wireScope() {
+      var box = holder.querySelector('.bin-scope input');
+      if (box) box.onchange = function () { N.showBin(holder, { all: box.checked }); };
+    }
+  };
+
   // Edit a note of one's own: its text, and for a note (not a reply) its tags.
   N.update = function (note, text, tags) {
     var now = new Date().toISOString();
@@ -484,7 +531,7 @@
       var btn = e.target.closest('button[data-act]');
       var anc = e.target.closest('.anchor');
       if (anc) { SW.emit('goto', { p: +anc.dataset.p, n: +anc.dataset.n, tab: 'read' }); return; }
-      if (!btn) return;
+      if (!btn || !btn.closest('.note')) return;   // panel buttons (add, bin) handle themselves
       var id = btn.closest('.note').dataset.id;
       var note = all.filter(function (x) { return x.id === id; })[0];
       if (!note) return;

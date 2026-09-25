@@ -62,11 +62,11 @@
     tools.appendChild(SW.el('span', { class: 'sep' }));
     tools.appendChild(SW.exportButtons(function () { return doc(b); }, 'spacewar-' + v.id + '-notes'));
     var binBox = SW.el('div', { style: 'margin-top:26px' });
-    binBox.innerHTML = '<h3>Deleted notes</h3><p class="hint">Notes you delete go to this bin, from every version. Restore them one at a time, or empty the bin to delete them for good.</p>';
-    var bb = SW.el('button', { class: 'btn' }, 'Show the bin');
+    binBox.innerHTML = '<h3>Deleted notes</h3><p class="hint">Notes you delete go to the bin. It shows this version’s by default; tick “all versions” for the rest. Restore them one at a time, or delete them for good.</p>';
+    var bb = SW.el('button', { class: 'btn' }, '🗑 Show the bin');
     binBox.appendChild(bb);
     pad.appendChild(binBox);
-    bb.onclick = function () { bb.remove(); showBin(binBox); };
+    bb.onclick = function () { bb.remove(); N.showBin(binBox.appendChild(SW.el('div')), { vid: v.id }); };
     var logBox = SW.el('div', { style: 'margin-top:26px' });
     logBox.innerHTML = '<h3>All notes, every version</h3><p class="hint">The whole discussion in one place: the group’s notes, your drafts and the build logs for every version, newest first. Search by word, initials or version.</p>';
     var lb = SW.el('button', { class: 'btn' }, 'Show the log');
@@ -126,35 +126,6 @@
     });
   }
 
-  function showBin(box) {
-    var holder = box.querySelector('.bin') || box.appendChild(SW.el('div', { class: 'bin' }));
-    holder.innerHTML = '<p class="hint">Opening the bin…</p>';
-    N.binList().then(function (list) {
-      if (!list.length) { holder.innerHTML = '<p class="hint">The bin is empty.</p>'; return; }
-      holder.innerHTML = list.map(function (n, i) {
-        var v = V.byId(n.vid);
-        return '<div class="note binned" data-i="' + i + '"><div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) + ' · ' +
-          SW.esc(v ? v.label.replace(/^Spacewar! /, '') : n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 : '') + (n.parent ? ' · reply' : '') +
-          (n.source === 'draft' ? ' · <i>draft</i>' : '') + ' · deleted ' + SW.esc(SW.fmtDate(n.binnedAt)) + '</div>' +
-          '<div class="body">' + SW.esc(n.text) + '</div>' +
-          '<div class="acts"><button data-r="restore">Restore</button></div></div>';
-      }).join('') +
-        '<p style="margin-top:10px"><button class="btn" data-r="empty">Empty the bin (' + list.length + ')</button></p>';
-      holder.onclick = function (e) {
-        var btn = e.target.closest('[data-r]');
-        if (!btn) return;
-        btn.disabled = true;
-        if (btn.dataset.r === 'restore') {
-          var n = list[+btn.closest('.note').dataset.i];
-          N.restore(n).then(function () { SW.toast('Restored.'); showBin(box); }, function (err) { btn.disabled = false; SW.toast(err.message, 5000); });
-        } else if (btn.dataset.r === 'empty') {
-          if (!window.confirm('Delete these ' + list.length + ' note' + (list.length > 1 ? 's' : '') + ' for good?\n\nThis cannot be undone.')) { btn.disabled = false; return; }
-          N.emptyBin(list).then(function () { SW.toast('Bin emptied.'); showBin(box); }, function (err) { SW.toast(err.message, 5000); showBin(box); });
-        }
-      };
-    });
-  }
-
   function notes(b) {
     N.list(b.v.id).then(function (all) {
       if (build !== b) return;
@@ -181,6 +152,6 @@
   SW.on('notes', function (vid) {
     if (build && build.v.id === vid && SW.state.tab === 'about') notes(build);
     var open = SW.$('.bin', view);
-    if (open && SW.state.tab === 'about') showBin(open.parentNode);
+    if (open && SW.state.tab === 'about') N.showBin(open);
   });
 })(this);

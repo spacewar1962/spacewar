@@ -387,7 +387,7 @@
     });
   }
 
-  var openNotesKey = null;
+  var openNotesKey = null, binInPanel = false;
   function showNotesFor(k, quiet) {
     var parts = k.split(':'), p = +parts[0], n = +parts[1];
     var ts = N.threads(notes).filter(function (t) { return t.note.anchor && t.note.anchor.p === p && t.note.anchor.n0 === n; });
@@ -395,12 +395,25 @@
     // No citation here: the version and file are in the page title and part
     // header, and every thread in this panel is on the line just clicked.
     void n1;
-    var html = '<p style="margin-top:0"><button class="btn" data-act="new">✎ Add a note on this line</button></p>' +
-      (ts.map(function (t) { return N.renderThread(t, null); }).join('') || '<p class="hint">No notes yet.</p>');
+    var html = '<p style="margin-top:0"><button class="btn" data-act="new">✎ Add a note on this line</button> ' +
+      '<button class="btn" data-act="bin" title="Deleted notes on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
+      (ts.map(function (t) { return N.renderThread(t, null); }).join('') || '<p class="hint">No notes yet.</p>') +
+      '<div class="panel-bin"' + (binInPanel ? '' : ' hidden') + '><h4>Deleted notes</h4><div></div></div>';
     var body = SW.drawer('Notes', html);
     body.dataset.notes = k;
     openNotesKey = k;
     N.wire(body, build.v.id, notes);
+    var pb = body.querySelector('.panel-bin'), binBtn = body.querySelector('[data-act="bin"]');
+    function openBin() { N.showBin(pb.lastChild, { vid: build.v.id }); }
+    if (binInPanel) openBin();
+    binBtn.classList.toggle('on', binInPanel);
+    binBtn.onclick = function (e) {
+      e.stopPropagation();
+      binInPanel = pb.hidden;
+      pb.hidden = !binInPanel;
+      binBtn.classList.toggle('on', binInPanel);
+      if (binInPanel) { openBin(); pb.scrollIntoView({ block: 'nearest' }); }
+    };
     body.querySelector('[data-act="new"]').onclick = function () {
       var L = build.lines[p][n - 1];
       N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: p, n0: n, n1: n, src: build.parts[p].src }, quote: L ? L.raw : '',
