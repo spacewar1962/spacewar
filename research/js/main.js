@@ -5,7 +5,7 @@
   'use strict';
   var SW = root.SW, V = root.SWVersions;
 
-  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'about'];
+  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'about', 'findings'];
 
   function fillPicker() {
     var sel = SW.$('#pick-a');
@@ -45,7 +45,7 @@
         SW.$('#view-' + tab).innerHTML = '<div class="pad hint">This view is being built and will arrive in the next update.</div>';
         return;
       }
-      if (shown[tab] !== b || tab === 'about' || tab === 'run') { shown[tab] = b; view.show(b); }
+      if (shown[tab] !== b || tab === 'about' || tab === 'run' || (tab === 'tape' && SW.state.tapeGo)) { shown[tab] = b; view.show(b); }
     }).catch(function (e) {
       SW.$('#view-' + tab).innerHTML = '<div class="pad"><p class="badge err">Could not load</p> ' + SW.esc(e.message) + '</div>';
     });
@@ -117,6 +117,13 @@
     document.documentElement.setAttribute('data-theme', t);
     SW.store.set('theme', t);
     SW.emit('theme', t);
+    // Figures and tapes are coloured for the theme when drawn, so draw them again.
+    if (SW.state.v) {
+      ['analyse', 'compare', 'genealogy', 'tape', 'findings'].forEach(function (k) { delete shown[k]; });
+      if (SW.views.findings && SW.views.findings.reset) SW.views.findings.reset();
+      if (['analyse', 'compare', 'genealogy', 'tape', 'findings'].indexOf(SW.state.tab) >= 0) showCurrent();
+      if (SW.tape) SW.build(SW.state.v).then(function (b) { SW.tape.strip(b); }).catch(function () {});
+    }
   }
 
   function init() {

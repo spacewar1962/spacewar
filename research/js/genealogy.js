@@ -778,10 +778,11 @@
   }
 
   // Unit y-positions within a column: stacked, height proportional to lines.
-  function layoutColumn(us, y0, scale, gap) {
+  function layoutColumn(us, y0, scale, gap, full) {
     var y = y0, pos = [];
     us.forEach(function (u) {
-      var h = u.lines * scale;
+      // full: every line of the unit (blank and comment lines too), so its code fits the box
+      var h = (full ? u.end - u.start + 1 : u.lines) * scale;
       pos.push({ y: y, h: h });
       y += h + gap;
     });
@@ -791,7 +792,8 @@
   /*
    * svgAlluvial(texts, flows, opts) -> SVG string.
    * opts: {height=560, colWidth=110, boxWidth=14, labels:[...], maxBoxes=400,
-   *        title}
+   *        title, perLine (pixels per source line, overrides height),
+   *        names (write each unit's name in its box), code (write its lines)}
    */
   function svgAlluvial(texts, fl, opts) {
     opts = opts || {};
@@ -805,9 +807,9 @@
       maxTotal = Math.max(maxTotal, t + us.length * gap * 0);
     });
     var maxUnits = Math.max.apply(null, fl.units.map(function (us) { return us.length; }).concat([1]));
-    var scale = Math.max(0.05, (H - gap * maxUnits) / maxTotal);
+    var scale = opts.perLine || Math.max(0.05, (H - gap * maxUnits) / maxTotal);
     var labels = opts.labels || texts.map(function (t) { return t.label; });
-    var cols = fl.units.map(function (us, i) { return layoutColumn(us, top, scale, gap); });
+    var cols = fl.units.map(function (us, i) { return layoutColumn(us, top, scale, gap, !!opts.code); });
     var totalH = Math.max.apply(null, cols.map(function (c) { return c.bottom; })) + 34;
     var s = svgOpen(W, totalH, 'g-alluvial', opts.title || ('Genealogy flow (' + fl.granularity + ')'));
     // ribbons
@@ -854,7 +856,7 @@
       s += '<rect x="' + f1(x) + '" y="' + top + '" width="' + bw + '" height="' + f1(Math.max(1, c.bottom - top - gap)) +
         '" fill="' + COLORS.box + '" stroke="' + COLORS.stroke + '" stroke-width="0.5"><title>' +
         esc(texts[i].label + ': ' + us.length + ' units, ' + t + ' lines') + '</title></rect>';
-      if (us.length <= maxBoxes) {
+      if (us.length <= maxBoxes || opts.names || opts.code) {
         us.forEach(function (u, k) {
           var p = c.pos[k];
           s += '<rect x="' + f1(x) + '" y="' + f1(p.y) + '" width="' + bw + '" height="' + f1(Math.max(p.h, 0.5)) +
@@ -862,6 +864,26 @@
             esc(texts[i].label + ' · ' + u.name + ' (' + u.file + ' ' + u.n0 + '–' + u.n1 + ', ' + u.lines + ' lines)') +
             '</title></rect>';
         });
+        // Zoomed in: the unit's name, then (further in) its code, clipped to the box.
+        if (opts.names || opts.code) {
+          var fs = opts.code ? Math.min(12, Math.max(6, scale - 1.5)) : 10, cpx = fs * 0.6, maxCh = Math.floor((bw - 8) / cpx);
+          s += '<clipPath id="gclip' + i + '"><rect x="' + f1(x) + '" y="' + top + '" width="' + bw + '" height="' + f1(c.bottom - top) + '"/></clipPath>' +
+            '<g clip-path="url(#gclip' + i + ')" pointer-events="none" font-size="' + f1(fs) + '" fill="' + COLORS.text + '">';
+          us.forEach(function (u, k) {
+            var p = c.pos[k];
+            if (opts.code && texts[i].lines) {
+              for (var j = u.start; j <= u.end; j++) {
+                var L = texts[i].lines[j];
+                if (!L) continue;
+                var ty = p.y + (j - u.start + 0.8) * scale;
+                s += '<text x="' + f1(x + 4) + '" y="' + f1(ty) + '" xml:space="preserve">' + esc(trunc(String(L.raw).replace(/\t/g, '  '), maxCh)) + '</text>';
+              }
+            } else if (p.h >= 11) {
+              s += '<text x="' + f1(x + 4) + '" y="' + f1(p.y + Math.min(p.h / 2 + 3.5, 12)) + '">' + esc(trunc(u.name, maxCh)) + '</text>';
+            }
+          });
+          s += '</g>';
+        }
       }
       var lx = x + bw / 2, ly = top - 8;
       s += '<text x="' + f1(lx) + '" y="' + f1(ly) + '" font-size="11" fill="' + COLORS.text +

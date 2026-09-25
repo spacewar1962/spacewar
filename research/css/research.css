@@ -352,16 +352,21 @@ svg text { font-family: var(--mono); }
 .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-dim); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 .svgbox { overflow: auto; border: 1px solid #1a2638; border-radius: 6px; background: #0b1018; padding: 8px; }
-/* Figures sit on a dark plate in both themes; their legends take the plate's colours. */
-:root[data-theme="paper"] .legend {
-  --beam: #6cf2ff; --amber: #ffce7a; --violet: #c7a6ff; --green: #7be3a0; --red: #ff8a8a; --line-soft: #1a2638;
-  --g-retained: #6cf2ff; --g-moved: #c7a6ff; --g-edited: #ffce7a; --g-added: #7be3a0; --g-removed: #ff8a8a;
-}
-:root[data-theme="paper"] .legend i { box-shadow: 0 0 0 1px #0b1018; }
+/* On listing paper, figures are drawn in dark ink on white. */
+:root[data-theme="paper"] .svgbox { background: #ffffff; border-color: var(--line); }
+:root[data-theme="paper"] .svgbox.flow [data-col]:hover, :root[data-theme="paper"] .svgbox.flow .picked { stroke: #1d2327; }
+:root[data-theme="paper"] .legend i { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); }
+/* Tape on listing paper is white, with an edge, so it stands off the page. */
+:root[data-theme="paper"] .tape-roll canvas, :root[data-theme="paper"] .tape-strip canvas,
+:root[data-theme="paper"] .tape-title-img svg { box-shadow: 0 0 0 1px var(--line); }
 
 /* ---------- tape ---------- */
 .tape-view canvas { display: block; margin: 0 auto; }
 .tape-roll { overflow-x: auto; padding: 10px 0; }
+.tape-titles h3 { margin: 14px 0 4px; }
+.tape-title { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 8px 0; }
+.tape-title-img { overflow-x: auto; max-width: 100%; border-radius: 4px; }
+.tape-title-img svg { display: block; }
 
 /* ---------- about ---------- */
 .meta { display: grid; grid-template-columns: 11em 1fr; gap: 4px 14px; font-size: 14px; }
@@ -485,3 +490,18 @@ body.drawer-open .notes-tab { display: none; }
 .dl-pick[hidden] { display: none; }
 .dl-pick button { border: 1px solid var(--line) !important; border-radius: 4px; padding: 0 6px !important; }
 .edit-box .edit-tags { width: 100%; margin-top: 4px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; font-size: 13px; }
+
+/* ---------- Read: notes filter ---------- */
+.listing .ln.nf-hide, .listing .part.nf-empty { display: none; }
+.listing .ln.nf-jump { border-top: 1px dashed var(--line); margin-top: 6px; padding-top: 2px; }
+#rd-nf:empty { display: none; }
+
+/* ---------- findings ---------- */
+.findings .fd-list { list-style: none; padding: 0; margin: 12px 0 20px; max-width: 980px; }
+.findings .fd { border: 1px solid var(--line-soft); border-radius: 6px; padding: 10px 12px; margin: 0 0 10px; }
+.findings .fd p { margin: 6px 0; line-height: 1.5; }
+.findings .fd-no { color: var(--text-dim); margin-right: 4px; }
+.findings .fd-ev { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; font-size: 12px; }
+.findings .fd-ev .btn { font-size: 12px; padding: 2px 8px; }
+.findings .fd-gh a { text-decoration: none; }
+.findings h3 { margin-top: 22px; }

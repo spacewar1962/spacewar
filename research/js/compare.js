@@ -387,7 +387,7 @@
   // ======================= Genealogy =======================
   var gview = SW.$('#view-genealogy');
   var DEFAULT_SET = ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'];
-  var gst = { set: SW.store.get('gen.set', DEFAULT_SET), gran: 'routine', supplied: true, show: 'alluvial' };
+  var gst = { set: SW.store.get('gen.set', DEFAULT_SET), gran: 'routine', supplied: true, show: 'alluvial', zoom: +SW.store.get('gen.zoom', 0) || 0 };
 
   function texts(ids) {
     var vs = buildable().filter(function (v) { return ids.indexOf(v.id) >= 0; });
@@ -443,11 +443,53 @@
   function showAlluvial(body, exp, ts) {
     if (gst.gran === 'line') { body.innerHTML = '<p class="hint">Line granularity is too fine for the flow view; choose routine or section, or use Compare → Routines for a pair.</p>'; return; }
     var fl = G.flows(ts, { granularity: gst.gran });
-    var svg = function () { return G.svgAlluvial(ts, fl, { granularity: gst.gran }); };
+    // Zoom, in pixels per source line (0 = fit to the window). Further in, each
+    // box shows its routine's name, then its code.
+    var NAMES_AT = 2.5, CODE_AT_G = 8;
+    var maxLines = Math.max.apply(null, ts.map(function (t) { return t.lines.length; }).concat([1]));
+    var fitZ = 560 / maxLines;
+    function z() { return gst.zoom || fitZ; }
+    function flowOpts() {
+      var k = z(), code = k >= CODE_AT_G, names = !code && k >= NAMES_AT;
+      return { granularity: gst.gran, perLine: gst.zoom ? k : null, names: names, code: code,
+               boxWidth: code ? 330 : names ? 130 : 14, colWidth: code ? 450 : names ? 240 : 110 };
+    }
+    var svg = function () { return G.svgAlluvial(ts, fl, flowOpts()); };
     body.innerHTML = '<p class="hint fine">Each column is a version in date order; each box a ' + gst.gran + ', stacked in source order with height by length. Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped. Hover for names.</p>' +
       '<div class="legend">' + ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('') + '</div>';
-    var box = SW.el('div', { class: 'svgbox flow', style: 'margin-top:10px' }, SW.displaySVG(svg()));
+    var zbar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0;margin-top:8px' });
+    var box = SW.el('div', { class: 'svgbox flow', style: 'margin-top:4px;max-height:80vh' });
+    var slider = SW.el('input', { type: 'range', min: '0', max: '100', title: 'Zoom' });
+    var readout = SW.el('span', { class: 'hint' });
+    slider.style.width = '160px';
+    function drawFlow() {
+      box.innerHTML = SW.displaySVG(svg());
+      var k = z();
+      slider.value = String(Math.round(100 * Math.log(k / 0.1) / Math.log(16 / 0.1)));
+      readout.textContent = (gst.zoom ? k.toFixed(1) + ' px per line' : 'fitted') +
+        (k >= CODE_AT_G ? ' · code shown' : k >= NAMES_AT ? ' · names shown; zoom in further for the code' : ' · zoom in for names, then code');
+    }
+    function zoomTo(k, keep) {
+      var fy = box.scrollHeight ? (box.scrollTop + box.clientHeight / 2) / box.scrollHeight : 0;
+      var fx = box.scrollWidth ? (box.scrollLeft + box.clientWidth / 2) / box.scrollWidth : 0;
+      gst.zoom = k ? Math.max(0.1, Math.min(16, k)) : 0;
+      SW.store.set('gen.zoom', gst.zoom);
+      drawFlow();
+      if (keep) { box.scrollTop = fy * box.scrollHeight - box.clientHeight / 2; box.scrollLeft = fx * box.scrollWidth - box.clientWidth / 2; }
+    }
+    [['−', 'Zoom out', function () { zoomTo(z() / 1.5, true); }],
+     ['+', 'Zoom in: routine names appear, then the code', function () { zoomTo(z() * 1.5, true); }],
+     ['Fit', 'Fit every version in the window', function () { zoomTo(0, false); }],
+     ['Names', 'Zoom in far enough to read the names of the ' + gst.gran + 's', function () { zoomTo(Math.max(NAMES_AT, 3), true); }],
+     ['Code', 'Zoom in far enough to read the code', function () { zoomTo(Math.max(CODE_AT_G, 11), true); }]].forEach(function (b) {
+      zbar.appendChild(SW.el('button', { class: 'btn', title: b[1], onclick: b[2] }, b[0]));
+    });
+    slider.oninput = function () { zoomTo(0.1 * Math.pow(16 / 0.1, +slider.value / 100), true); };
+    zbar.appendChild(slider);
+    zbar.appendChild(readout);
+    body.appendChild(zbar);
     body.appendChild(box);
+    drawFlow();
     body.querySelector('.hint').insertAdjacentHTML('beforeend', ' <b>Click a box or a ribbon</b> to read the code it stands for, coloured by what happened to it.');
     box.addEventListener('click', function (e) {
       var t = e.target.closest('[data-col],[data-step]');

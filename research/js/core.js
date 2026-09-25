@@ -443,8 +443,9 @@
     if (theme) { if (was == null) de.removeAttribute('data-theme'); else de.setAttribute('data-theme', was); }
     return out;
   };
-  // Figures on screen always sit on a dark plate, in both themes.
-  SW.displaySVG = function (svg) { return SW.resolveVars(svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, ''), 'phosphor'); };
+  // Figures on screen follow the theme: a dark plate in phosphor, white with dark ink on listing paper.
+  SW.lightTheme = function () { return document.documentElement.getAttribute('data-theme') === 'paper'; };
+  SW.displaySVG = function (svg) { return SW.resolveVars(svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, ''), SW.lightTheme() ? 'paper' : 'phosphor'); };
   // Palettes for figures that draw their own ground (sky, ships).
   SW.PLATE = { bg: '#02040a', ink: '#e6f4ff', ink2: '#8fc3d6', dim: '#7fa6c4', accent: '#ffce7a', dark: true };
   SW.exportPalette = function () {
