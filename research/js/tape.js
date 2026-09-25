@@ -88,7 +88,7 @@
       tb.innerHTML = '<label class="check">From frame <input type="number" id="tp-from" min="0" value="' + f.start + '" style="width:7em"></label>' +
         '<label class="check">Frames <input type="number" id="tp-n" min="10" value="600" style="width:6em"></label>';
       tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
-        var from = +SW.$('#tp-from').value, n = +SW.$('#tp-n').value;
+        var from = +SW.$('#tp-from', tb).value, n = +SW.$('#tp-n', tb).value;
         var svg = T.svg(f.bytes, from, Math.min(n, total - from), 10, 100);
         root.SWExport.download('spacewar-' + b.v.id + '-tape.svg', svg, 'image/svg+xml');
       } }, '▣ Save as SVG'));
@@ -101,7 +101,7 @@
       function draw() {
         roll.innerHTML = '';
         var c = document.createElement('canvas');
-        T.draw(c, f.bytes, { from: +SW.$('#tp-from').value, max: +SW.$('#tp-n').value, pitch: 9, height: 90 });
+        T.draw(c, f.bytes, { from: +SW.$('#tp-from', tb).value, max: +SW.$('#tp-n', tb).value, pitch: 9, height: 90 });
         roll.appendChild(c);
       }
       tb.addEventListener('change', draw);
@@ -112,7 +112,7 @@
         w.innerHTML = '<h3>Witness tapes</h3><p class="hint">Surviving object tapes for this version, compared word by word with what the source assembles to.</p><div id="tp-wit" class="hint">Reading tapes…</div>';
         pad.appendChild(w);
         SW.tape.witnesses(b).then(function (rows) {
-          var el = SW.$('#tp-wit');
+          var el = SW.$('#tp-wit', pad);
           el.innerHTML = '';
           el.appendChild(SW.table(['Tape', 'Words on tape', 'Differ', 'Only in source', 'Only on tape'], rows.map(function (r) {
             return [r.tape, r.words, r.differ, r.missing, r.extra];
