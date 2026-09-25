@@ -7,7 +7,42 @@
   var view = SW.$('#view-read');
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
-  var opts = { words: SW.store.get('read.words', true), norm: false, supplied: false, heat: false };
+  // tapes: which of the version's tapes to show: 'all', or a single tape's index.
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false };
+
+  // ---------- the tapes a version is read from ----------
+  // A version is assembled from its tapes read one after another as one
+  // program: the program (sometimes in parts), a star table, and "supplied"
+  // tapes taken from another build so that it assembles. Plain labels for each.
+  function tapeTitle(b, pi) { return ((b.asm && b.asm.titles.filter(function (t) { return t.file === pi; })[0]) || {}).text || ''; }
+  function isStars(b, pi) {
+    var part = b.parts[pi];
+    return /star/i.test(part.role) || /\bstars\b/i.test(tapeTitle(b, pi)) || /stars/i.test(part.src.split('/').pop());
+  }
+  function tapeInfo(b) {
+    var progs = b.parts.filter(function (p, i) { return p.role === 'program' && !isStars(b, i); }).length, k = 0;
+    return b.parts.map(function (part, pi) {
+      var supplied = part.role !== 'program', star = isStars(b, pi);
+      var label = star ? 'Star table' : supplied ? (/macro/i.test(part.role) ? 'Macro definitions' : part.role.charAt(0).toUpperCase() + part.role.slice(1))
+        : progs > 1 ? 'Program, part ' + (++k) : 'Program';
+      return { pi: pi, supplied: supplied, star: star, title: tapeTitle(b, pi).trim(), label: label + (supplied ? ' (supplied)' : '') };
+    });
+  }
+  function showsTape(pi) { return opts.tapes === 'all' || +opts.tapes === pi; }
+  function tapeOptions(b, info) {
+    var o = [['all', 'All ' + info.length + ' tapes']].concat(info.map(function (t) { return [String(t.pi), (t.pi + 1) + '. ' + t.label]; }));
+    return o.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === String(opts.tapes) ? ' selected' : '') + '>' + SW.esc(x[1]) + '</option>'; }).join('');
+  }
+  // The hover explanation on the Tape menu: why one version has several files.
+  function tapeHelp(info) {
+    var progParts = info.filter(function (t) { return !t.supplied && !t.star; }).length;
+    var h = 'Why ' + info.length + ' files? The PDP-1 assembler read paper tapes one after another as a single program, so a version can come in pieces. ' +
+      'These are parts of one version, not copies or different versions:\n' + info.map(function (t) { return '  ' + (t.pi + 1) + '. ' + t.label; }).join('\n');
+    if (progParts > 1) h += '\nThe program itself comes in ' + progParts + ' parts.';
+    if (info.some(function (t) { return t.star; })) h += '\nThe star table, Peter Samson’s catalogue of the night sky, is read in with it.';
+    if (info.some(function (t) { return t.supplied; })) h += '\n“Supplied” tapes are not in this version’s surviving source; they come from another build so that it assembles.';
+    return h + '\nChoose All to read them in order, or one tape on its own.';
+  }
 
   var PSEUDO = { define: 1, term: 1, terminate: 1, repeat: 1, constants: 1, variables: 1, start: 1,
                  text: 1, decimal: 1, octal: 1, flexo: 1, 'char': 1, character: 1, noinput: 1, expunge: 1 };
@@ -96,7 +131,6 @@
       '<details class="menu"><summary class="btn" title="What the listing shows">View ▾</summary><div class="menu-body">' +
       '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
       '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
-      '<label class="check" title="Show the tapes supplied to make this version assemble (the macro definitions and the star table), which are not part of the version&#39;s own source; they are collapsed by default"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
       '</div></details>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
@@ -111,6 +145,11 @@
         '<div><span class="faint"><i>italic grey</i></span> not assembled (a transcription header, or outside this tape segment)</div>' +
         '<div class="faint flow" style="margin-top:6px">Text: <span class="lab">labels</span>, <b>instructions</b>, <span class="mac">macros</span>, <span class="ps">pseudo-instructions</span>, <span class="num">numbers</span>, <span class="cm">comments</span>.</div></div>');
     } }, 'Key'));
+    if (b.v.build && b.parts.length > 1) {
+      var ti = tapeInfo(b);
+      tb.appendChild(SW.el('label', { class: 'check tape-pick', title: tapeHelp(ti) },
+        'Tape <select id="rd-tape">' + tapeOptions(b, ti) + '</select> <span class="help-dot">?</span>'));
+    }
     // Only assembly errors are flagged here; the word count and start address
     // are on the Version & notes page.
     if (b.asm && b.asm.errorCount) {
@@ -127,40 +166,38 @@
       view.appendChild(lost);
       return;
     }
+    view.appendChild(SW.el('div', { class: 'selbar', id: 'rd-selbar' }));
+    renderListing();
+    wireTb(tb);
+  }
+
+  // The listing alone, so choosing a tape keeps the toolbar (and a search) as it is.
+  function renderListing() {
+    var b = build, info = tapeInfo(b), bar = SW.$('#rd-selbar', view);
+    SW.$$('.listing', view).forEach(function (x) { x.remove(); });
     var box = SW.el('div', { class: 'listing' + (opts.words ? '' : ' hide-words') });
     b.parts.forEach(function (part, pi) {
-      var supplied = part.role !== 'program';
-      var sec = SW.el('div', { class: 'part' + (supplied && !opts.supplied ? ' collapsed' : '') });
+      if (!showsTape(pi)) return;
+      var t = info[pi], sec = SW.el('div', { class: 'part' });
       var errs = b.asm.errors.filter(function (e) { return e.file === pi; }).length;
-      // Heading: what the part is (a program tape's own title, or what was
-      // supplied); underneath, where it comes from and which lines are used.
-      var title = (b.asm.titles.filter(function (t) { return t.file === pi; })[0] || {}).text;
-      var heading = supplied ? part.role.charAt(0).toUpperCase() + part.role.slice(1)
-                             : (title && title.trim()) || part.src.split('/').pop();
       var span = part.end ? 'lines ' + part.title + '–' + part.end : part.title > 1 ? 'from line ' + part.title : 'whole file';
-      var closed = supplied && !opts.supplied;
-      sec.innerHTML = '<div class="part-head" data-p="' + pi + '" title="Click to ' + (closed ? 'show' : 'hide') + ' this part">' +
-        '<div class="ph-main"><span class="kind ' + (supplied ? 'k-sup' : 'k-prog') + '">' + (supplied ? 'Supplied' : 'Program') + '</span>' +
-        '<span class="ph-title">' + SW.esc(heading) + '</span>' +
-        (errs ? '<span class="badge err">' + errs + ' error' + (errs > 1 ? 's' : '') + '</span>' : '') +
-        '<span class="ph-toggle">' + (closed ? 'show ▸' : 'hide ▾') + '</span></div>' +
-        '<div class="ph-sub">Part ' + (pi + 1) + ' of ' + b.parts.length + ' · ' + SW.sourceLink(part.src, part.src.split('/').pop()) +
+      sec.innerHTML = '<div class="part-head" data-p="' + pi + '">' +
+        '<div class="ph-main">' + (b.parts.length > 1 ? '<span class="ph-num">Tape ' + (pi + 1) + ' of ' + b.parts.length + '</span>' : '') +
+        '<span class="ph-title">' + SW.esc(t.label) + '</span>' +
+        (errs ? '<span class="badge err">' + errs + ' error' + (errs > 1 ? 's' : '') + '</span>' : '') + '</div>' +
+        '<div class="ph-sub">' + SW.sourceLink(part.src, part.src.split('/').pop()) +
         ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
-        (supplied ? ' · not part of this version’s own source; added so it assembles' : '') + '</div>' +
+        (t.title ? ' · tape title “' + SW.esc(t.title) + '”' : '') + '</div>' +
         '<div class="lncols"><span class="n" title="The line’s number in the source file">Line</span>' +
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
         '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word</span>' +
         '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)">Source</span>' +
         '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Notes</span></div></div>';
-      var html = [];
-      if (!supplied || opts.supplied) b.lines[pi].forEach(function (L) { html.push(rowHTML(b, L)); });
-      sec.insertAdjacentHTML('beforeend', html.join(''));
+      sec.insertAdjacentHTML('beforeend', b.lines[pi].map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
     });
-    view.appendChild(box);
-    var bar = SW.el('div', { class: 'selbar', id: 'rd-selbar' });
-    view.appendChild(bar);
-    wire(box, tb);
+    view.insertBefore(box, bar);
+    wireBox(box);
     paintSel();
   }
 
@@ -271,20 +308,9 @@
   R.listingDoc = listingDoc;
 
   // ---------- events ----------
-  function wire(box, tb) {
+  function wireBox(box) {
     box.addEventListener('click', function (e) {
-      var head = e.target.closest('.part-head');
-      if (head && e.target.closest('a, .lncols')) return;   // the source link opens GitHub; column titles only explain
-      if (head) {
-        var sec = head.parentNode;
-        if (sec.classList.contains('collapsed') && !sec.querySelector('.ln')) { opts.supplied = true; render(); }
-        else {
-          var c = sec.classList.toggle('collapsed');
-          head.querySelector('.ph-toggle').textContent = c ? 'show ▸' : 'hide ▾';
-          head.title = 'Click to ' + (c ? 'show' : 'hide') + ' this part';
-        }
-        return;
-      }
+      if (e.target.closest('.part-head')) return;   // tape headers only label (their source link opens GitHub)
       var dot = e.target.closest('.note-dot');
       if (dot) { showNotesFor(dot.dataset.k); return; }
       var sym = e.target.closest('.sym');
@@ -304,9 +330,17 @@
       var k = p + ':' + n;
       if (counts[k]) showNotesFor(k);
     });
-    SW.$('#rd-words', tb).onchange = function (e) { opts.words = e.target.checked; SW.store.set('read.words', opts.words); box.classList.toggle('hide-words', !opts.words); };
+  }
+
+  function wireTb(tb) {
+    SW.$('#rd-words', tb).onchange = function (e) {
+      opts.words = e.target.checked; SW.store.set('read.words', opts.words);
+      var box = SW.$('.listing', view);
+      if (box) box.classList.toggle('hide-words', !opts.words);
+    };
     SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
-    SW.$('#rd-sup', tb).onchange = function (e) { opts.supplied = e.target.checked; render(); };
+    var tapeSel = SW.$('#rd-tape', tb);
+    if (tapeSel) tapeSel.onchange = function () { opts.tapes = tapeSel.value; renderListing(); view.scrollTop = 0; };
     SW.$('#rd-heat', tb).onchange = function (e) {
       opts.heat = e.target.checked;
       if (opts.heat && !(SW.profile && SW.profile.build === build)) SW.toast('Run the program in the Run view to collect a profile.');
@@ -423,8 +457,13 @@
   }
 
   R.goto = function (p, n, flash) {
-    var part = build.parts[p];
-    if (part && part.role !== 'program' && !opts.supplied) { opts.supplied = true; render(); }
+    // A line on a tape not shown (a search hit, a note, a link): show every tape.
+    if (build.parts[p] && !showsTape(p)) {
+      opts.tapes = 'all';
+      var ts = SW.$('#rd-tape', view);
+      if (ts) ts.value = 'all';
+      renderListing();
+    }
     var el = SW.$('#L' + p + '-' + n, view);
     if (!el) return;
     el.scrollIntoView({ block: 'center' });
@@ -454,6 +493,7 @@
   }
 
   R.show = function (b) {
+    if (build !== b) opts.tapes = 'all';
     build = b;
     R.build = b;
     SW.loadGlosses();

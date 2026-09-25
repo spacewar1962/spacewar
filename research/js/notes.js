@@ -716,4 +716,56 @@
                replies: flat };
     });
   };
+
+  // ---------- the Notes tab and the version's notes panel ----------
+  // A tab at the foot of the window, there whenever the side panel is closed:
+  // it reopens the notes last open, or else every note on this version.
+  var binInVersionPanel = false;
+  N.openPanel = function (vid) {
+    return Promise.all([N.list(vid), SW.build(vid)]).then(function (r) {
+      var all = r[0], b = r[1];
+      var ts = N.threads(all).filter(function (t) { return t.note.source !== 'buildlog'; });
+      function where(a) {
+        return a ? '<div class="anchor" data-p="' + a.p + '" data-n="' + a.n0 + '">' + (b.parts.length > 1 ? 'tape ' + (a.p + 1) + ', ' : '') +
+          (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + '</div>' : '<div class="anchor-none">version note</div>';
+      }
+      var html = '<p class="hint" style="margin-top:0">Every note on ' + SW.esc(b.v.label) + '. Click a line reference to go to it.</p>' +
+        '<p><button class="btn" data-act="vnote">✎ Add a version note</button> ' +
+        '<button class="btn' + (binInVersionPanel ? ' on' : '') + '" data-act="bin" title="Deleted notes on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
+        (ts.map(function (t) { return where(t.note.anchor) + N.renderThread(t, null); }).join('') || '<p class="hint">No notes on this version yet.</p>') +
+        '<div class="panel-bin"' + (binInVersionPanel ? '' : ' hidden') + '><h4>Deleted notes</h4><div></div></div>';
+      var body = SW.drawer('Notes', html);
+      body.dataset.panel = 'version';
+      body.dataset.vid = vid;
+      N.wire(body, vid, all);
+      var pb = body.querySelector('.panel-bin'), binBtn = body.querySelector('[data-act="bin"]');
+      if (binInVersionPanel) N.showBin(pb.lastChild, { vid: vid });
+      binBtn.onclick = function (e) {
+        e.stopPropagation();
+        binInVersionPanel = pb.hidden;
+        pb.hidden = !binInVersionPanel;
+        binBtn.classList.toggle('on', binInVersionPanel);
+        if (binInVersionPanel) { N.showBin(pb.lastChild, { vid: vid }); pb.scrollIntoView({ block: 'nearest' }); }
+      };
+      body.querySelector('[data-act="vnote"]').onclick = function (e) {
+        e.stopPropagation();
+        N.dialog({ vid: vid, kind: 'version', anchor: null, heading: 'Note on ' + b.v.label, anchorText: 'A note on the version as a whole.' });
+      };
+    });
+  };
+  // Keep the version panel current as notes change.
+  SW.on('notes', function (vid) {
+    var body = SW.$('#drawer-body');
+    if (body && body.dataset.panel === 'version' && body.dataset.vid === vid && document.body.classList.contains('drawer-open')) N.openPanel(vid);
+  });
+
+  var tab = SW.el('button', { id: 'notes-tab', class: 'notes-tab', title: 'Notes on this version' }, '▴ Notes');
+  document.body.appendChild(tab);
+  tab.onclick = function () {
+    var body = SW.$('#drawer-body');
+    var lastWasNotes = SW.$('#drawer-title').textContent === 'Notes' && body && body.innerHTML &&
+      (body.dataset.notes || (body.dataset.panel === 'version' && body.dataset.vid === SW.state.v));
+    if (lastWasNotes) document.body.classList.add('drawer-open');
+    else if (SW.state.v) N.openPanel(SW.state.v);
+  };
 })(this);

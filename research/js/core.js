@@ -230,6 +230,7 @@
   SW.drawer = function (title, html) {
     document.body.classList.remove('drawer-wide');
     delete SW.$('#drawer-body').dataset.notes;
+    delete SW.$('#drawer-body').dataset.panel;
     SW.$('#drawer-title').textContent = title;
     var body = SW.$('#drawer-body');
     if (typeof html === 'string') body.innerHTML = html; else { body.innerHTML = ''; body.appendChild(html); }
@@ -241,6 +242,8 @@
   SW.closeDrawer = function () {
     var wide = document.body.classList.contains('drawer-wide');
     document.body.classList.remove('drawer-open', 'drawer-wide');
+    // A notes panel is reopened from the Notes tab (notes.js), which is always there.
+    if (SW.$('#drawer-title').textContent === 'Notes') { var d0 = SW.$('#drawer-dock'); if (d0) d0.classList.remove('on'); return; }
     var dock = SW.$('#drawer-dock');
     if (!dock) {
       dock = SW.el('button', { id: 'drawer-dock', class: 'drawer-dock', title: 'Show the side panel again' });
