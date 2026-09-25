@@ -448,32 +448,53 @@
     gview.innerHTML = '';
     var tb = SW.el('div', { class: 'toolbar' });
     tb.innerHTML = ['alluvial', 'matrix', 'lineage'].map(function (m) {
-      return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '">' + { alluvial: 'Flow through versions', matrix: 'Similarity & family tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '')) }[m] + '</button>';
+      return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '" title="' + { alluvial: 'Flow through versions: every version side by side, routines joined to their ancestors', matrix: 'Similarity matrix and family tree of the chosen versions', lineage: 'The line of descent of the version open now' }[m] + '">' + { alluvial: 'Flow', matrix: 'Similarity &amp; tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '')) }[m] + '</button>';
     }).join('') + '<span class="sep"></span>' +
       '<label class="check" title="The size of the pieces traced from version to version: section (large blocks under a header or tape title), routine (from one label after a break to the next), or line">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
-      '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied tapes</label><span class="sep"></span><span id="gn-pal"></span><span class="sep"></span><span id="gn-exp"></span>';
+      '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied</label><span id="gn-pal"></span>' +
+      '<span class="help-dot" id="gn-help" tabindex="0">?</span><span class="tb-right" id="gn-exp"></span>';
+    // The versions: a menu, not a wall of checkboxes. Changes apply when it closes.
+    var all = buildable().filter(function (v) { return v.id !== 'stars'; });
+    var vm = SW.el('details', { class: 'menu' });
+    vm.innerHTML = '<summary class="btn" title="Which versions to trace, in date order">Versions ' + gst.set.filter(function (id) { return all.some(function (v) { return v.id === id; }); }).length + ' of ' + all.length + ' ▾</summary>' +
+      '<div class="menu-body gen-versions"><div class="row-btns"><button class="btn ghost" data-vs="all">All</button><button class="btn ghost" data-vs="none">None</button><button class="btn ghost" data-vs="default">Default</button></div>' +
+      all.map(function (v) {
+        return '<label class="check" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + ' <span class="faint">' + SW.esc(v.date) + '</span></label>';
+      }).join('') + '<div class="hint">Applied when this menu closes.</div></div>';
+    tb.insertBefore(vm, tb.querySelector('.sep').nextSibling);
     gview.appendChild(tb);
     SW.$('#gn-pal', tb).appendChild(SW.paletteSelect(function () { renderGen(cur); }));
-    var picks = SW.el('div', { class: 'pad gen-extra', style: 'padding-bottom:0;max-width:none' });
+    SW.$('#gn-help', tb).title = gst.show === 'alluvial' ? '' : 'Choose versions, granularity and colours here; the figure and its exports are below.';
     gview.classList.toggle('gen-big', gst.show === 'alluvial' && !!SW.store.get('gen.big', false));
-    picks.innerHTML = '<div class="hint">Versions (chronological): ' + buildable().filter(function (v) { return v.id !== 'stars'; }).map(function (v) {
-      return '<label class="check" style="margin-right:10px" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</label>';
-    }).join('') + '</div>';
-    gview.appendChild(picks);
-    var body = SW.el('div', { class: 'pad', style: 'max-width:none' });
-    gview.appendChild(body);
-    tb.addEventListener('click', function (e) { var s = e.target.closest('[data-s]'); if (s) { gst.show = s.dataset.s; renderGen(cur); } });
-    tb.addEventListener('change', function (e) {
-      if (e.target.id === 'gn-gran') gst.gran = e.target.value;
-      if (e.target.id === 'gn-sup') gst.supplied = e.target.checked;
-      renderGen(cur);
-    });
-    picks.addEventListener('change', function (e) {
+    var dirty = false;
+    vm.addEventListener('change', function (e) {
       var id = e.target.dataset.id;
       if (!id) return;
       gst.set = gst.set.filter(function (x) { return x !== id; });
       if (e.target.checked) gst.set.push(id);
+      dirty = true;
+    });
+    vm.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-vs]');
+      if (!b) return;
+      e.preventDefault();
+      var k = b.dataset.vs;
+      gst.set = k === 'all' ? all.map(function (v) { return v.id; }) : k === 'none' ? [] : DEFAULT_SET.slice();
+      SW.$$('input[data-id]', vm).forEach(function (c) { c.checked = gst.set.indexOf(c.dataset.id) >= 0; });
+      dirty = true;
+    });
+    vm.addEventListener('toggle', function () {
+      if (vm.open || !dirty) return;
       SW.store.set('gen.set', gst.set);
+      renderGen(cur);
+    });
+    var body = SW.el('div', { class: 'pad', style: 'max-width:none' });
+    gview.appendChild(body);
+    tb.addEventListener('click', function (e) { var s = e.target.closest('[data-s]'); if (s) { gst.show = s.dataset.s; renderGen(cur); } });
+    tb.addEventListener('change', function (e) {
+      if (e.target.dataset.id) return;   // a version box: applied when the menu closes
+      if (e.target.id === 'gn-gran') gst.gran = e.target.value;
+      if (e.target.id === 'gn-sup') gst.supplied = e.target.checked;
       renderGen(cur);
     });
     body.innerHTML = '<p class="hint">Assembling and matching ' + gst.set.length + ' versions…</p>';
@@ -544,9 +565,13 @@
       return o;
     };
     var svg = function () { return G.svgAlluvial(ts, fl, flowOpts()); };
-    body.innerHTML = '<div class="gen-extra"><p class="hint fine">Each column is a version in date order; each box a ' + gst.gran + ', stacked in source order with height by length. Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped. Hover for names.</p>' +
-      '<div class="legend">' + ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('') + '</div></div>';
-    var zbar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0;margin-top:8px' });
+    var help = SW.$('#gn-help');
+    if (help) help.title = 'Each column is a version in date order; each box a ' + gst.gran + ', stacked in source order with height by length. ' +
+      'Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped.\n\n' +
+      'Hover a box or ribbon for names. Click one to read the code it stands for, coloured by what happened to it; a clicked box also lights the same ' + gst.gran + ' in every version before and after it (click it again, or empty space, to clear).\n\n' +
+      'Zoom in for names, then code. Chart only hides the tables below; drag the bar under the chart to resize it.';
+    body.innerHTML = '';
+    var zbar = SW.el('div', { class: 'toolbar flow-bar', style: 'position:static;padding-left:0' });
     var box = SW.el('div', { class: 'svgbox flow', style: 'margin-top:4px;max-height:80vh' });
     var slider = SW.el('input', { type: 'range', min: '0', max: '100', title: 'Zoom' });
     var readout = SW.el('span', { class: 'hint' });
@@ -557,8 +582,8 @@
       if (ov) ov.refresh();
       var k = z();
       slider.value = String(Math.round(100 * Math.log(k / 0.1) / Math.log(16 / 0.1)));
-      readout.textContent = (gst.zoom ? k.toFixed(1) + ' px per line' : 'fitted') +
-        (k >= CODE_AT_G ? ' · code shown' : k >= NAMES_AT ? ' · names shown; zoom in further for the code' : ' · zoom in for names, then code');
+      readout.textContent = (gst.zoom ? k.toFixed(1) + ' px/line' : 'fitted');
+      readout.title = k >= CODE_AT_G ? 'Code shown' : k >= NAMES_AT ? 'Names shown; zoom in further for the code' : 'Zoom in for names, then code';
     }
     function zoomTo(k, keep) {
       var fy = box.scrollHeight ? (box.scrollTop + box.clientHeight / 2) / box.scrollHeight : 0;
@@ -600,6 +625,8 @@
     zbar.appendChild(SW.el('button', { class: 'btn', title: 'Fill the whole screen with the chart and its zoom controls (Esc to leave)', onclick: function () {
       if (document.fullscreenElement) document.exitFullscreen(); else if (stage.requestFullscreen) stage.requestFullscreen();
     } }, '⛶ Full screen'));
+    zbar.appendChild(SW.el('span', { class: 'legend tb-right', title: 'Ribbon colours: what happened to each ' + gst.gran + ' between one version and the next' },
+      ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('')));
     body.appendChild(stage);
     stage.appendChild(zbar);
     stage.appendChild(ov.el);
@@ -624,7 +651,6 @@
     });
     grip.addEventListener('dblclick', function () { SW.store.set('gen.h', 0); setH(0); });
     drawFlow();
-    body.querySelector('.hint').insertAdjacentHTML('beforeend', ' <b>Click a box or a ribbon</b> to read the code it stands for, coloured by what happened to it; a clicked box also lights the same ' + gst.gran + ' in every version before and after it (click it again, or empty space, to clear).');
     // Click: the unit's line of descent, back and forward, lightly lit, with the ribbons between.
     var back = fl.units.map(function () { return {}; }), fwd = fl.units.map(function () { return {}; });
     fl.steps.forEach(function (st, si) {

@@ -445,6 +445,7 @@
   // A select for choosing a scheme; onChange re-renders the caller's figure.
   SW.paletteSelect = function (onChange) {
     var l = SW.el('label', { class: 'check', title: 'Colours for retained, moved, edited, added and removed, on screen and in exported figures' }, 'Colours ');
+    l.classList.add('pal-pick');
     var sel = SW.el('select', {}, SW.PALETTES.map(function (p) { return '<option value="' + p[0] + '"' + (p[0] === SW.palette() ? ' selected' : '') + '>' + SW.esc(p[1]) + '</option>'; }).join(''));
     sel.onchange = function (e) { e.stopPropagation(); SW.applyPalette(sel.value); if (onChange) onChange(); };
     l.appendChild(sel);

@@ -537,3 +537,14 @@ body.drawer-open .notes-tab { display: none; }
   linear-gradient(var(--line), var(--line)) center / 48px 2px no-repeat, var(--surface); border: 1px solid var(--line-soft); }
 .flow-grip:hover { background-color: var(--bg-2); }
 .flow-stage:fullscreen .flow-grip { display: none; }
+
+/* Genealogy: compact controls */
+.toolbar .tb-right { margin-left: auto; }
+.toolbar .help-dot { display: inline-block; width: 18px; height: 18px; line-height: 17px; text-align: center; border-radius: 50%;
+  border: 1px solid var(--line); font-size: 11px; color: var(--text-dim); cursor: help; }
+.gen-versions { max-height: 60vh; overflow: auto; min-width: 300px; gap: 4px !important; }
+.gen-versions .row-btns { display: flex; gap: 6px; margin-bottom: 4px; }
+.gen-versions .check { white-space: nowrap; }
+.flow-bar { padding-top: 6px; padding-bottom: 4px; }
+.flow-bar .legend { font-size: 11px; gap: 8px; }
+.pal-pick select { max-width: 11.5em; }
