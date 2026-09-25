@@ -555,3 +555,9 @@ dialog.wire-dlg { width: min(720px, 94vw); }
 .wire-dlg .wire-from select { margin-left: 6px; max-width: 58vw; }
 .wire-dlg .wire-preview { margin: 4px 0 0; font-size: 12px; color: var(--beam); }
 .wire-dlg .wire-preview.bad { color: var(--red); }
+
+/* Genealogy flow: click a pinned version name to hide that version; chips bring it back. */
+.svgbox.flow .flow-head text.g-pin { cursor: pointer; }
+.svgbox.flow .flow-head text.g-pin:hover { text-decoration: line-through; fill: var(--amber); }
+.gen-hidden { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 2px 0 6px; font-size: 12px; }
+.gen-hidden .chip { padding: 1px 8px; font-size: 12px; }

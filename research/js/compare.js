@@ -441,6 +441,9 @@
   // A line of descent of your own: a parent for any version, then the version to
   // follow back from. Kept in this browser; the bench's own reading is untouched.
   gst.custom = SW.store.get('gen.custom', null);
+  // Versions hidden from the flow by clicking their name: the flow closes up
+  // around them, comparing their neighbours directly.
+  gst.hidden = SW.store.get('gen.hidden', []);
   function wiredChain(parents, tip) {
     var chain = [], cur = tip, seen = {}, loop = null;
     while (cur) { if (seen[cur]) { loop = cur; break; } seen[cur] = 1; chain.unshift(cur); cur = parents[cur]; }
@@ -578,12 +581,17 @@
       var anc = V.ancestry(cur.v.id);
       ids = anc.length > 1 ? anc : (gst.set.indexOf(cur.v.id) < 0 ? gst.set.concat([cur.v.id]) : gst.set);
     }
+    var hiddenHere = [];
+    if (gst.show === 'alluvial') {
+      var kept = ids.filter(function (id) { return gst.hidden.indexOf(id) < 0; });
+      if (kept.length >= 2) { hiddenHere = ids.filter(function (id) { return gst.hidden.indexOf(id) >= 0; }); ids = kept; }
+    }
     body.innerHTML = '<p class="hint">Assembling and matching ' + ids.length + ' versions…</p>';
     setTimeout(function () {
       texts(ids).then(function (ts) {
         body.innerHTML = '';
         var exp = SW.$('#gn-exp', tb);
-        if (gst.show === 'alluvial') showAlluvial(body, exp, ts);
+        if (gst.show === 'alluvial') showAlluvial(body, exp, ts, { hidden: hiddenHere, rerender: function () { renderGen(cur); } });
         else if (gst.show === 'matrix') showMatrix(body, exp, ts);
         else showLineage(body, exp, ts, cur);
       }).catch(function (e) { body.innerHTML = '<p>' + SW.esc(e.message) + '</p>'; });
@@ -593,7 +601,7 @@
   // The version names pinned above the flow: the chart's label band is copied into
   // a strip that sticks to the top of the scrolling box and moves sideways with the
   // columns; the chart itself is pulled up under it. Exports keep the labels in place.
-  function pinLabels(box) {
+  function pinLabels(box, vids) {
     var main = box.querySelector('svg'), labs = main ? Array.prototype.slice.call(main.querySelectorAll('.g-collabel')) : [];
     if (!labs.length) return;
     // The chart leaves a tall band for its angled labels; the pinned strip is a
@@ -614,7 +622,8 @@
       n.setAttribute('x', xs[i]); n.setAttribute('y', 14); n.setAttribute('text-anchor', 'middle');
       n.setAttribute('font-size', '11'); n.setAttribute('fill', t.getAttribute('fill'));
       n.textContent = full.length > max ? full.slice(0, max - 1) + '…' : full;
-      var tt = document.createElementNS(NS, 'title'); tt.textContent = full; n.appendChild(tt);
+      if (vids && vids[i]) { n.setAttribute('data-vid', vids[i]); n.setAttribute('class', 'g-pin'); }
+      var tt = document.createElementNS(NS, 'title'); tt.textContent = full + (vids ? ': click to hide this version' : ''); n.appendChild(tt);
       head.appendChild(n);
       t.setAttribute('visibility', 'hidden');
     });
@@ -626,7 +635,9 @@
     main.style.marginTop = -band + 'px';
   }
 
-  function showAlluvial(body, exp, ts) {
+  function showAlluvial(body, exp, ts, o) {
+    o = o || { hidden: [], rerender: function () {} };
+    function setHidden(list) { gst.hidden = list; SW.store.set('gen.hidden', list); o.rerender(); }
     gst.boxes = SW.store.get('gen.boxes', gst.boxes);
     if (gst.gran === 'line') { body.innerHTML = '<p class="hint">Line granularity is too fine for the flow view; choose routine or section, or use Compare → Routines for a pair.</p>'; return; }
     var fl = G.flows(ts, { granularity: gst.gran });
@@ -675,7 +686,7 @@
     slider.style.width = '160px';
     function drawFlow() {
       box.innerHTML = SW.displaySVG(svg());
-      pinLabels(box);
+      pinLabels(box, ts.map(function (t) { return t.id; }));
       if (ov) ov.refresh();
       var k = z();
       slider.value = String(Math.round(100 * Math.log(k / 0.1) / Math.log(16 / 0.1)));
@@ -726,6 +737,19 @@
       G.STATUSES.map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('')));
     body.appendChild(stage);
     stage.appendChild(zbar);
+    // The versions hidden from the flow, each a chip that brings it back.
+    if (o.hidden.length) {
+      var chips = SW.el('div', { class: 'gen-hidden' });
+      chips.innerHTML = '<span class="hint">Hidden:</span> ' + o.hidden.map(function (id) {
+        return '<button class="btn chip" data-unhide="' + SW.esc(id) + '" title="Show this version again">' + SW.esc(shortName(id)) + ' ×</button>';
+      }).join(' ') + (o.hidden.length > 1 ? ' <button class="btn ghost chip" data-unhide="*">Show all</button>' : '');
+      chips.onclick = function (e) {
+        var b = e.target.closest('[data-unhide]');
+        if (!b) return;
+        setHidden(b.dataset.unhide === '*' ? [] : gst.hidden.filter(function (x) { return x !== b.dataset.unhide; }));
+      };
+      stage.appendChild(chips);
+    }
     stage.appendChild(ov.el);
     // A grip under the chart: drag to make it taller or shorter; double-click to reset.
     var grip = SW.el('div', { class: 'flow-grip', title: 'Drag to resize the chart; double-click to reset' });
@@ -775,6 +799,13 @@
       });
     }
     box.addEventListener('click', function (e) {
+      // a version's pinned name: hide it (the flow closes up around it)
+      var hv = e.target.closest('[data-vid]');
+      if (hv) {
+        if (ts.length <= 2) { SW.toast('Keep at least two versions in the flow.'); return; }
+        setHidden(gst.hidden.filter(function (x) { return x !== hv.dataset.vid; }).concat([hv.dataset.vid]));
+        return;
+      }
       var t = e.target.closest('[data-col],[data-step]');
       if (!t) { unlight(); return; }
       // the same box again: cancel the lighting
