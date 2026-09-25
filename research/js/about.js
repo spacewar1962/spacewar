@@ -28,6 +28,10 @@
       ['Witness tapes', (v.witnesses || []).map(SW.esc).join('<br>') || 'none'],
       ['Source tapes', (v.sourceTapes || []).map(SW.esc).join('<br>') || 'none'],
       ['Normalisations', (v.transforms || []).map(function (k) { return SW.esc(V.TRANSFORMS[k].label); }).join('<br>') || 'none'],
+      ['Patches to supplied tapes', b.parts.filter(function (p) { return p.patch; }).map(function (p) {
+        return SW.esc(p.src) + ': ' + p.patch.map(function (x) { return '<span class="mono">' + SW.esc(x[0]) + '</span> → <span class="mono">' + SW.esc(x[1]) + '</span>'; }).join(', ');
+      }).join('<br>') || 'none'],
+      ['Read from source tape', b.parts.filter(function (p) { return p.tape; }).map(function (p) { return SW.esc(p.src) + ' (FIO-DEC, decoded in the browser)'; }).join('<br>') || 'no'],
       ['Assembler', SW.esc(V.DIALECTS[b.dialect].label)],
       ['Machine', v.runnable ? (v.mdv ? 'PDP-1 with automatic multiply/divide (mul, div)' : 'PDP-1 without multiply/divide (mus, dis steps)') : 'not runnable'],
       ['Assembly', a ? a.words.length + ' words; ' + (a.errorCount ? a.errorCount + ' errors' : 'no errors') + '; start ' + SW.oct(a.start, 4) +
@@ -57,7 +61,63 @@
     tools.appendChild(SW.el('button', { class: 'btn', onclick: function () { N.publishDrafts(); } }, '⇪ Publish drafts to the group'));
     tools.appendChild(SW.el('span', { class: 'sep' }));
     tools.appendChild(SW.exportButtons(function () { return doc(b); }, 'spacewar-' + v.id + '-notes'));
+    var logBox = SW.el('div', { style: 'margin-top:26px' });
+    logBox.innerHTML = '<h3>All notes, every version</h3><p class="hint">The whole discussion in one place: the group’s notes, your drafts and the build logs for every version, newest first. Search by word, initials or version.</p>';
+    var lb = SW.el('button', { class: 'btn' }, 'Show the log');
+    logBox.appendChild(lb);
+    pad.appendChild(logBox);
+    lb.onclick = function () { lb.remove(); allLog(logBox); };
     notes(b);
+  }
+
+  function allLog(box) {
+    var wait = SW.el('p', { class: 'hint' }, 'Gathering notes…');
+    box.appendChild(wait);
+    N.listAll().then(function (all) {
+      wait.remove();
+      var tb = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+      var q = SW.el('input', { type: 'search', placeholder: 'Search notes, initials, versions…' });
+      tb.appendChild(q);
+      var src = SW.el('select', { class: 'btn' }, '<option value="">all sources</option><option value="hypothesis">group notes</option><option value="draft">my drafts</option><option value="buildlog">build logs</option>');
+      tb.appendChild(src);
+      var holder = SW.el('div');
+      var rowsNow = [];
+      function run() {
+        var t = q.value.trim().toLowerCase(), sv = src.value;
+        var list = all.filter(function (n) {
+          if (sv && n.source !== sv) return false;
+          if (!t) return true;
+          return (n.text + ' ' + n.by + ' ' + n.vid + ' ' + (n.tags || []).join(' ')).toLowerCase().indexOf(t) >= 0;
+        }).sort(function (a, b2) { return String(b2.date) < String(a.date) ? -1 : 1; });
+        var noteOf = new Map();
+        rowsNow = list.map(function (n) {
+          var v = V.byId(n.vid);
+          var row = [{ html: SW.esc(SW.fmtDate(n.date)), sort: String(n.date), text: SW.fmtDate(n.date) }, n.by, v ? v.label.replace(/^Spacewar! /, '') : n.vid,
+                  n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : (n.source === 'buildlog' ? 'build log' : 'version'),
+                  n.parent ? '↳ reply' : '', n.text];
+          noteOf.set(row, n);
+          return row;
+        });
+        holder.innerHTML = '<p class="hint">' + list.length + ' notes</p>';
+        holder.appendChild(SW.table(['Date', 'By', 'Version', 'Where', '', 'Note'], rowsNow, { cls: ['mono', 'mono', 'mono', 'mono', '', ''], onRow: function (r) {
+          var n = noteOf.get(r);
+          if (!n) return;
+          if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
+          if (n.vid !== SW.state.v) SW.select(n.vid);
+          SW.setTab(n.anchor ? 'read' : 'about');
+        } }));
+      }
+      tb.appendChild(SW.el('span', { class: 'sep' }));
+      tb.appendChild(SW.exportButtons(function () {
+        return { title: 'Spacewar! research notes, all versions', subtitle: 'Notes, drafts and build logs' + (q.value ? ' matching “' + q.value + '”' : ''),
+                 blocks: [SW.tableBlock('Notes', ['Date', 'By', 'Version', 'Where', '', 'Note'], rowsNow)] };
+      }, 'spacewar-notes-log'));
+      q.addEventListener('input', run);
+      src.addEventListener('change', run);
+      box.appendChild(tb);
+      box.appendChild(holder);
+      run();
+    });
   }
 
   function notes(b) {

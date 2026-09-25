@@ -119,7 +119,7 @@
     dialect = dialect || v.dialect;
     var key = id + '|' + dialect;
     if (buildCache[key]) return buildCache[key];
-    buildCache[key] = V.load(v, SW.fetchText, A.splitLines).then(function (L) {
+    buildCache[key] = V.load(v, SW.fetchText, A.splitLines, SW.fetchBytes).then(function (L) {
       var t0 = performance.now();
       var asm = v.build ? A.assemble(L.files, V.DIALECTS[dialect].options) : null;
       var b = { v: v, dialect: dialect, parts: L.parts, asm: asm, ms: 0 };

@@ -39,13 +39,20 @@
   T.strip = function (b) {
     var el = SW.$('#tape-strip');
     el.innerHTML = '';
-    if (!b.asm) return;
-    var c = document.createElement('canvas');
-    // skip the leader and show the start of the program proper
-    var bytes = b.asm.tape, s = 0;
-    while (s < bytes.length && bytes[s] === 0) s++;
-    T.draw(c, bytes, { from: s, max: 400, pitch: 4, height: 30 });
-    el.appendChild(c);
+    if (!b.asm) { el.title = 'No tape'; return; }
+    var reals = T.realTapes ? T.realTapes(b) : [];
+    function put(bytes, title) {
+      var c = document.createElement('canvas'), s = 0;
+      while (s < bytes.length && bytes[s] === 0) s++;
+      T.draw(c, bytes, { from: s, max: 400, pitch: 4, height: 30 });
+      el.innerHTML = '';
+      el.appendChild(c);
+      el.title = title;
+    }
+    if (reals.length) {
+      SW.fetchBytes(reals[0].path).then(function (bytes) { put(bytes, 'Real tape: ' + reals[0].path); })
+        .catch(function () { put(b.asm.tape, 'Reconstruction: the tape the assembler punches today'); });
+    } else put(b.asm.tape, 'Reconstruction: the tape the assembler punches today (no real tape survives for this version)');
   };
 
   T.svg = function (bytes, from, n, pitch, h) {
@@ -73,39 +80,81 @@
     return { bytes: bytes, start: s };
   }
 
+  // Real tapes held for a version: digitised images of the physical tapes.
+  T.realTapes = function (b) {
+    var out = [], seen = {};
+    function add(path, kind) { if (!seen[path]) { seen[path] = 1; out.push({ path: path, kind: kind }); } }
+    b.parts.forEach(function (p) { if (p.tape) add(p.src, 'source tape (FIO-DEC)'); });
+    (b.v.sourceTapes || []).forEach(function (t) { add(t, 'source tape (FIO-DEC)'); });
+    (b.v.witnesses || []).forEach(function (t) { add(t, /\.rim$/.test(t) ? 'object tape (modern macro1 build)' : 'object tape'); });
+    return out;
+  };
+
   SW.views.tape = {
     show: function (b) {
       view.innerHTML = '';
       if (!b.asm) { view.innerHTML = '<div class="pad hint">No tape: no source survives for this version.</div>'; return; }
-      var f = frames(b), total = f.bytes.length;
+      var reals = T.realTapes(b);
       var pad = SW.el('div', { class: 'pad' });
-      pad.innerHTML = '<h2>' + SW.esc(b.v.label) + ': the object tape</h2>' +
-        '<p class="prose">The tape the assembler punches for this build: ' + total.toLocaleString('en-GB') + ' frames, ' +
-        (total / 10 / 12).toFixed(1) + ' feet at ten frames to the inch. It begins with blank leader, then the read-in loader ' +
-        '(RIM mode, pairs of <code>dio</code> and data), then the program in checksummed blocks, and ends with a <code>jmp</code> to the start address. ' +
-        'Each column is one frame: eight data channels, with the smaller sprocket hole between the third and fourth.</p>';
+      pad.innerHTML = '<h2>' + SW.esc(b.v.label) + ': tapes</h2>' +
+        '<p class="prose">Two kinds of tape are shown here, and they should not be confused. <b>Real tapes</b> are the digitised images of the surviving paper tapes (for the 1962–63 versions, mostly from Steve Russell’s box, read for bitsavers in 2003–04): every frame as the tape reader saw it. <b>The reconstruction</b> is the tape the assembler here would punch from the source today, in macro1’s loader and block format, not the format MIT’s MACRO punched.</p>' +
+        '<p class="prose">A <b>frame</b> is one column of holes across the tape: one character on a source tape, one six-bit part of a word on an object tape, at ten frames to the inch. Eight data channels run along the tape, with the small sprocket hole between the third and fourth. Choose where to start (counted from the very beginning of the tape image, leader included) and how many frames to draw.</p>' +
+        (reals.length ? '' : '<p class="prose"><b>No real tape survives for this version</b> in the project’s sources; only the reconstruction can be shown.</p>');
       var tb = SW.el('div', { class: 'toolbar' });
-      tb.innerHTML = '<label class="check">From frame <input type="number" id="tp-from" min="0" value="' + f.start + '" style="width:7em"></label>' +
-        '<label class="check">Frames <input type="number" id="tp-n" min="10" value="600" style="width:6em"></label>';
-      tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
-        var from = +SW.$('#tp-from', tb).value, n = +SW.$('#tp-n', tb).value;
-        var svg = T.svg(f.bytes, from, Math.min(n, total - from), 10, 100);
-        root.SWExport.download('spacewar-' + b.v.id + '-tape.svg', svg, 'image/svg+xml');
-      } }, '▣ Save as SVG'));
-      tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
-        root.SWExport.download('spacewar-' + b.v.id + '.bin', new Uint8Array(f.bytes), 'application/octet-stream');
-      } }, '⤓ Tape image (.bin)'));
-      pad.appendChild(tb);
+      tb.innerHTML = '<label class="check">Tape <select id="tp-which">' +
+        reals.map(function (r, i) { return '<option value="r' + i + '">Real: ' + SW.esc(r.path) + ' (' + SW.esc(r.kind) + ')</option>'; }).join('') +
+        '<option value="asm">Reconstruction: assembled today (macro1 format)</option></select></label>' +
+        '<label class="check" title="A frame is one column of holes across the tape: one character or byte. Frames are counted from the very start of the tape image, leader included.">Start at frame <input type="number" id="tp-from" min="0" value="0" style="width:7em"></label>' +
+        '<label class="check" title="How many frames to draw (ten frames to the inch of real tape)">Number of frames <input type="number" id="tp-n" min="10" value="600" style="width:6em"></label>';
+      var info = SW.el('div', { class: 'hint', style: 'margin:6px 0' });
       var roll = SW.el('div', { class: 'tape-roll' });
-      pad.appendChild(roll);
+      var decoded = SW.el('pre', { class: 'mono', style: 'display:none;max-height:260px;overflow:auto;font-size:12px;background:var(--surface);padding:8px;border-radius:6px' });
+      var cur = { bytes: [], name: '' };
+      function start(bytes) { var s = 0; while (s < bytes.length && bytes[s] === 0) s++; return s; }
       function draw() {
         roll.innerHTML = '';
         var c = document.createElement('canvas');
-        T.draw(c, f.bytes, { from: +SW.$('#tp-from', tb).value, max: +SW.$('#tp-n', tb).value, pitch: 9, height: 90 });
+        T.draw(c, cur.bytes, { from: +SW.$('#tp-from', tb).value, max: +SW.$('#tp-n', tb).value, pitch: 9, height: 90 });
         roll.appendChild(c);
       }
-      tb.addEventListener('change', draw);
-      draw();
+      function select() {
+        var w = SW.$('#tp-which', tb).value;
+        decoded.style.display = 'none';
+        if (w === 'asm') {
+          cur = { bytes: b.asm.tape, name: 'spacewar-' + b.v.id + '-reconstruction' };
+          info.innerHTML = '<b>Reconstruction.</b> ' + cur.bytes.length.toLocaleString('en-GB') + ' frames (' + (cur.bytes.length / 120).toFixed(1) + ' ft): blank leader, macro1’s RIM read-in loader, the program in checksummed blocks, a closing <code>jmp</code> to the start address.';
+          SW.$('#tp-from', tb).value = start(cur.bytes);
+          draw();
+          return;
+        }
+        var r = reals[+w.slice(1)];
+        info.textContent = 'Reading ' + r.path + '…';
+        SW.fetchBytes(r.path).then(function (bytes) {
+          cur = { bytes: bytes, name: r.path.split('/').pop().replace(/\.[a-z]+$/, '') };
+          var d = root.SWFiodec ? root.SWFiodec.decode(bytes) : null;
+          var kind = d && d.isSource ? 'a <b>source tape</b>: FIO-DEC text, every frame passing the odd-parity check (' + d.stops + ' stop codes)' :
+            'an <b>object tape</b>: binary words for the loader' + (d ? ' (' + Math.round(100 * d.parityErrors / Math.max(1, d.frames)) + '% of frames fail the FIO-DEC parity test, as binary does)' : '');
+          info.innerHTML = '<b>Real tape.</b> <span class="mono">' + SW.esc(r.path) + '</span>: ' + bytes.length.toLocaleString('en-GB') + ' frames (' + (bytes.length / 120).toFixed(1) + ' ft), ' + kind + '.';
+          if (d && d.isSource) { decoded.style.display = 'block'; decoded.textContent = d.text.slice(0, 6000) + (d.text.length > 6000 ? '\n…' : ''); }
+          SW.$('#tp-from', tb).value = start(bytes);
+          draw();
+        }).catch(function (e) { info.textContent = e.message; });
+      }
+      tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
+        var from = +SW.$('#tp-from', tb).value, n = +SW.$('#tp-n', tb).value;
+        root.SWExport.download(cur.name + '.svg', T.svg(cur.bytes, from, Math.min(n, cur.bytes.length - from), 10, 100), 'image/svg+xml');
+      } }, '▣ Save as SVG'));
+      tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
+        root.SWExport.download(cur.name + '.bin', new Uint8Array(cur.bytes), 'application/octet-stream');
+      } }, '⤓ Tape image (.bin)'));
+      pad.appendChild(tb);
+      pad.appendChild(info);
+      pad.appendChild(roll);
+      pad.appendChild(decoded);
+      SW.$('#tp-which', tb).addEventListener('change', select);
+      SW.$('#tp-from', tb).addEventListener('change', draw);
+      SW.$('#tp-n', tb).addEventListener('change', draw);
+      select();
       var wit = b.v.witnesses || [];
       if (wit.length) {
         var w = SW.el('div', { style: 'margin-top:18px' });
@@ -117,11 +166,41 @@
           el.appendChild(SW.table(['Tape', 'Words on tape', 'Differ', 'Only in source', 'Only on tape'], rows.map(function (r) {
             return [r.tape, r.words, r.differ, r.missing, r.extra];
           }), { cls: ['mono', 'num', 'num', 'num', 'num'] }));
+          rows.forEach(function (r) { if (r.mem) el.appendChild(witnessDetail(b, r)); });
         });
       }
       view.appendChild(pad);
     }
   };
+
+  // Every word where source and tape part company, as code.
+  function witnessDetail(b, r) {
+    var C = root.PDP1CPU, rows = [];
+    var addrs = {};
+    r.diffs.forEach(function (a) { addrs[a] = 1; });
+    for (var k in b.asm.memory) if (!(k in r.mem)) addrs[k] = 1;
+    for (var k2 in r.mem) if (!(k2 in b.asm.memory)) addrs[k2] = 1;
+    Object.keys(addrs).map(Number).sort(function (x, y) { return x - y; }).forEach(function (a) {
+      var w = b.asm.memory[a], t = r.mem[a], L = w ? b.lines[w.file][w.line - 1] : null;
+      rows.push([SW.oct(a, 4), b.symAt(a) || '', w ? SW.oct(w.val) : '', w ? C.disasm(w.val, b.symAt) : '', t != null ? SW.oct(t) : '', t != null ? C.disasm(t, b.symAt) : '',
+                 L ? L.n + ': ' + L.raw.trim() : '']);
+    });
+    var d = SW.el('details', { style: 'margin:10px 0' });
+    d.innerHTML = '<summary><b>' + SW.esc(r.tape) + '</b>: ' + (rows.length ? rows.length + ' words differ' : 'identical to the build') + '</summary>';
+    if (!rows.length) return d;
+    var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+    bar.appendChild(SW.exportButtons(function () {
+      return { title: b.v.label + ' against ' + r.tape, subtitle: 'Words where the build and the witness tape differ', meta: SW.docMeta(b),
+               blocks: [SW.tableBlock('Differences', ['Address', 'Symbol', 'Source word', 'As code', 'Tape word', 'As code', 'Source line'], rows)] };
+    }, 'spacewar-' + b.v.id + '-witness-' + r.tape.split('/').pop().replace(/\.[a-z]+$/, '')));
+    d.appendChild(bar);
+    d.appendChild(SW.table(['Address', 'Symbol', 'Source word', 'As code', 'Tape word', 'As code', 'Source line'], rows,
+      { cls: ['mono', 'mono', 'mono', 'mono', 'mono', 'mono', 'mono'], onRow: function (row) {
+        var s = b.srcOf(parseInt(row[0], 8));
+        if (s) SW.emit('goto', { p: s.p, n: s.n, tab: 'read' });
+      } }));
+    return d;
+  }
 
   // Compare a build with its witness tapes.
   T.witnesses = function (b) {
