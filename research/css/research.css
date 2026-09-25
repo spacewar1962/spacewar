@@ -419,7 +419,8 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 /* Kinds of line, in the syntax colours. */
 .ln.kdef { background: color-mix(in srgb, var(--violet) 9%, transparent); }
 .ln.keq { background: color-mix(in srgb, var(--green) 8%, transparent); }
-.ln.kcall .t { background-image: linear-gradient(to right, var(--violet) 0, var(--violet) 2px, transparent 2px); padding-left: 5px; }
+/* Macro calls: a dotted cyan rule, unlike the solid violet of definitions and normalised lines. */
+.ln.kcall .t { background-image: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px); background-size: 2px 100%; background-repeat: no-repeat; padding-left: 5px; }
 .ln.kdef:hover, .ln.keq:hover { background: var(--surface); }
 .keylist div { margin: 3px 0; display: flex; align-items: center; gap: 8px; }
 .keylist .lab { color: var(--beam); } .keylist .mac { color: var(--violet); font-weight: 600; } .keylist .ps { color: var(--green); }
@@ -427,7 +428,7 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 .kx { display: inline-block; width: 22px; height: 14px; border-radius: 2px; flex: none; }
 .kx.kdef { background: color-mix(in srgb, var(--violet) 30%, transparent); }
 .kx.keq { background: color-mix(in srgb, var(--green) 30%, transparent); }
-.kx.kcall { background: linear-gradient(to right, var(--violet) 0, var(--violet) 3px, transparent 3px); border: 1px solid var(--line); }
+.kx.kcall { background: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px) left / 3px 100% no-repeat; border: 1px solid var(--line); }
 .kx.knorm { background: linear-gradient(to left, var(--violet) 0, var(--violet) 3px, transparent 3px); border: 1px solid var(--line); }
 .kx.knoted { background: linear-gradient(to right, var(--amber) 0, var(--amber) 2px, transparent 2px); border: 1px solid var(--line); }
 .keylist .errs { text-decoration: underline wavy var(--red); text-underline-offset: 3px; font-family: var(--code-font); }

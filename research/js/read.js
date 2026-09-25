@@ -55,10 +55,15 @@
     if (L.raw !== L.norm && !L.skipped) cls += ' norm';
     if (b.kind && b.kind[k]) cls += ' k' + b.kind[k];
     if (SW.breakpoints && words && words.some(function (w) { return SW.breakpoints[w.loc]; })) cls += ' bp';
-    var a = '', w = '';
+    var a = '', w = '', wTitle = '';
     if (words && words.length) {
       a = SW.oct(words[0].loc, 4);
       w = SW.oct(words[0].val) + (words.length > 1 ? ' <span class="faint">+' + (words.length - 1) + '</span>' : '');
+      var last = words[words.length - 1].loc;
+      wTitle = words.length === 1 ? '1 word, at ' + a
+        : words.length + ' words, at ' + (last - words[0].loc === words.length - 1 ? a + '–' + SW.oct(last, 4) : words.map(function (x) { return SW.oct(x.loc, 4); }).join(', ')) +
+          (b.kind && b.kind[k] === 'call' ? ' (the macro expanded)' : '');
+      wTitle += words.length === 1 ? '. Click to see it.' : '. Click to see them all.';
     }
     var text = opts.norm ? L.norm : L.raw;
     var mk = N.marginMark(k, counts[k]);
@@ -75,7 +80,8 @@
     else if (L.skipped) title = 'Not assembled (transcription header or outside this tape segment)';
     return '<div class="' + cls + '" id="L' + L.p + '-' + L.n + '" data-p="' + L.p + '" data-n="' + L.n + '"' +
       (title ? ' title="' + SW.esc(title) + '"' : '') + '>' +
-      '<span class="n"' + heat + '>' + L.n + '</span><span class="a">' + a + '</span><span class="w">' + w + '</span>' +
+      '<span class="n"' + heat + '>' + L.n + '</span><span class="a"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + a + '</span>' +
+      '<span class="w"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + w + '</span>' +
       '<span class="t">' + (text ? hl(text, b) : ' ') + '</span><span class="mk">' + mk + '</span></div>';
   }
 
@@ -96,7 +102,7 @@
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
-        '<div><i class="kx kcall"></i>a macro used (the words it made are in the address column)</div>' +
+        '<div><i class="kx kcall"></i>a macro called here (hover the word column for how many words it made; “+5” means five more)</div>' +
         '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
         '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
         '<div><i class="kx knoted"></i>covered by a note (initials at the right; click them)</div>' +
