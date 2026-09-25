@@ -134,7 +134,7 @@
           var d = root.SWFiodec ? root.SWFiodec.decode(bytes) : null;
           var kind = d && d.isSource ? 'a <b>source tape</b>: FIO-DEC text, every frame passing the odd-parity check (' + d.stops + ' stop codes)' :
             'an <b>object tape</b>: binary words for the loader' + (d ? ' (' + Math.round(100 * d.parityErrors / Math.max(1, d.frames)) + '% of frames fail the FIO-DEC parity test, as binary does)' : '');
-          info.innerHTML = '<b>Real tape.</b> <span class="mono">' + SW.esc(r.path) + '</span>: ' + bytes.length.toLocaleString('en-GB') + ' frames (' + (bytes.length / 120).toFixed(1) + ' ft), ' + kind + '.';
+          info.innerHTML = '<b>Real tape.</b> <span class="mono">' + SW.sourceLink(r.path) + '</span>: ' + bytes.length.toLocaleString('en-GB') + ' frames (' + (bytes.length / 120).toFixed(1) + ' ft), ' + kind + '.';
           if (d && d.isSource) { decoded.style.display = 'block'; decoded.textContent = d.text.slice(0, 6000) + (d.text.length > 6000 ? '\n…' : ''); }
           SW.$('#tp-from', tb).value = start(bytes);
           draw();
@@ -164,7 +164,7 @@
           var el = SW.$('#tp-wit', pad);
           el.innerHTML = '';
           el.appendChild(SW.table(['Tape', 'Words on tape', 'Differ', 'Only in source', 'Only on tape'], rows.map(function (r) {
-            return [r.tape, r.words, r.differ, r.missing, r.extra];
+            return [{ html: SW.sourceLink(r.tape), text: r.tape, sort: r.tape }, r.words, r.differ, r.missing, r.extra];
           }), { cls: ['mono', 'num', 'num', 'num', 'num'] }));
           rows.forEach(function (r) { if (r.mem) el.appendChild(witnessDetail(b, r)); });
         });
@@ -186,7 +186,7 @@
                  L ? L.n + ': ' + L.raw.trim() : '']);
     });
     var d = SW.el('details', { style: 'margin:10px 0' });
-    d.innerHTML = '<summary><b>' + SW.esc(r.tape) + '</b>: ' + (rows.length ? rows.length + ' words differ' : 'identical to the build') + '</summary>';
+    d.innerHTML = '<summary><b>' + SW.esc(r.tape) + '</b> (' + SW.sourceLink(r.tape, 'open file') + '): ' + (rows.length ? rows.length + ' words differ' : 'identical to the build') + '</summary>';
     if (!rows.length) return d;
     var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
     bar.appendChild(SW.exportButtons(function () {

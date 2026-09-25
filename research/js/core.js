@@ -182,6 +182,13 @@
     for (var k in params) if (params[k] != null && params[k] !== '') q.push(k + '=' + encodeURIComponent(params[k]));
     return SW.BASE_URI + (q.length ? '?' + q.join('&') : '');
   };
+  // A file in sources/, opened in a new tab on GitHub (tape images are binary,
+  // so the browser cannot show them itself; GitHub shows size, history, raw).
+  SW.REPO = 'https://github.com/spacewar1962/spacewar/blob/main/sources/';
+  SW.sourceURL = function (path) { return SW.REPO + path.split('/').map(encodeURIComponent).join('/'); };
+  SW.sourceLink = function (path, text) {
+    return '<a href="' + SW.esc(SW.sourceURL(path)) + '" target="_blank" rel="noopener" title="Open ' + SW.esc(path) + ' in a new tab">' + SW.esc(text || path) + ' ↗</a>';
+  };
   SW.versionURI = function (id) { return SW.BASE_URI + '?v=' + encodeURIComponent(id); };
 
   // ---------- routing ----------
