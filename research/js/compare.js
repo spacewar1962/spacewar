@@ -435,7 +435,7 @@
   // ======================= Genealogy =======================
   var gview = SW.$('#view-genealogy');
   var DEFAULT_SET = ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'];
-  var gst = { set: SW.store.get('gen.set', DEFAULT_SET), gran: 'routine', supplied: true, show: 'alluvial', zoom: +SW.store.get('gen.zoom', 0) || 0 };
+  var gst = { set: SW.store.get('gen.set', DEFAULT_SET), gran: 'routine', supplied: true, show: 'alluvial', boxes: SW.store.get('gen.boxes', 'change'), zoom: +SW.store.get('gen.zoom', 0) || 0 };
 
   function texts(ids) {
     var vs = buildable().filter(function (v) { return ids.indexOf(v.id) >= 0; });
@@ -454,7 +454,8 @@
       '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied tapes</label><span class="sep"></span><span id="gn-pal"></span><span class="sep"></span><span id="gn-exp"></span>';
     gview.appendChild(tb);
     SW.$('#gn-pal', tb).appendChild(SW.paletteSelect(function () { renderGen(cur); }));
-    var picks = SW.el('div', { class: 'pad', style: 'padding-bottom:0;max-width:none' });
+    var picks = SW.el('div', { class: 'pad gen-extra', style: 'padding-bottom:0;max-width:none' });
+    gview.classList.toggle('gen-big', gst.show === 'alluvial' && !!SW.store.get('gen.big', false));
     picks.innerHTML = '<div class="hint">Versions (chronological): ' + buildable().filter(function (v) { return v.id !== 'stars'; }).map(function (v) {
       return '<label class="check" style="margin-right:10px" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</label>';
     }).join('') + '</div>';
@@ -508,6 +509,7 @@
   }
 
   function showAlluvial(body, exp, ts) {
+    gst.boxes = SW.store.get('gen.boxes', gst.boxes);
     if (gst.gran === 'line') { body.innerHTML = '<p class="hint">Line granularity is too fine for the flow view; choose routine or section, or use Compare → Routines for a pair.</p>'; return; }
     var fl = G.flows(ts, { granularity: gst.gran });
     // Zoom, in pixels per source line (0 = fit to the window). Further in, each
@@ -521,9 +523,29 @@
       return { granularity: gst.gran, perLine: gst.zoom ? k : null, names: names, code: code,
                boxWidth: code ? 330 : names ? 130 : 14, colWidth: code ? 450 : names ? 240 : 110 };
     }
+    // Whose hand: each box signed (initials in its comments), inherited from
+    // its ancestor, or new on a tape whose title is signed.
+    var hands = G.attributeHands(ts, fl, SW.handsIn);
+    function handFill(i, k) {
+      var a = hands[i][k], h = a.hand && SW.handOf(a.hand);
+      return h ? h.colour + (a.how === 'signed' ? '' : a.how === 'inherited' ? 'a0' : '70') : null;
+    }
+    function handTip(i, k) { return '\n' + handText(ts, fl, hands, i, k); }
+    function handLegend() {
+      var seen = {};
+      hands.forEach(function (col) { col.forEach(function (a) { if (a.hand) seen[a.hand] = 1; }); });
+      return SW.HANDS.filter(function (h) { return seen[h.k]; }).map(function (h) { return [h.colour, h.k + ' ' + h.who]; })
+        .concat([['var(--g-box, #263238)', 'no hand in the record'], ['#88888870', 'paler: inherited, or new on a signed tape']]);
+    }
+    var baseOpts = flowOpts;
+    flowOpts = function () {
+      var o = baseOpts();
+      if (gst.boxes === 'hand') { o.boxFill = handFill; o.boxTip = handTip; o.extraLegend = handLegend(); }
+      return o;
+    };
     var svg = function () { return G.svgAlluvial(ts, fl, flowOpts()); };
-    body.innerHTML = '<p class="hint fine">Each column is a version in date order; each box a ' + gst.gran + ', stacked in source order with height by length. Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped. Hover for names.</p>' +
-      '<div class="legend">' + ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('') + '</div>';
+    body.innerHTML = '<div class="gen-extra"><p class="hint fine">Each column is a version in date order; each box a ' + gst.gran + ', stacked in source order with height by length. Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped. Hover for names.</p>' +
+      '<div class="legend">' + ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('') + '</div></div>';
     var zbar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0;margin-top:8px' });
     var box = SW.el('div', { class: 'svgbox flow', style: 'margin-top:4px;max-height:80vh' });
     var slider = SW.el('input', { type: 'range', min: '0', max: '100', title: 'Zoom' });
@@ -562,16 +584,84 @@
     slider.oninput = function () { userZoom(0.1 * Math.pow(16 / 0.1, +slider.value / 100), true); };
     zbar.appendChild(slider);
     zbar.appendChild(readout);
-    body.appendChild(zbar);
-    body.appendChild(ov.el);
+    zbar.appendChild(SW.el('span', { class: 'sep' }));
+    var boxSel = SW.el('label', { class: 'check', title: 'What the boxes show. Whose hand: the initials written in each ' + gst.gran + '’s own comments (solid), carried forward to its descendants (paler), or, for a ' + gst.gran + ' new in a version, the initials in that tape’s title (palest). Ribbons still show what changed.' },
+      'Boxes <select><option value="change"' + (gst.boxes !== 'hand' ? ' selected' : '') + '>plain</option><option value="hand"' + (gst.boxes === 'hand' ? ' selected' : '') + '>whose hand</option></select>');
+    boxSel.querySelector('select').onchange = function (e) { gst.boxes = e.target.value; SW.store.set('gen.boxes', gst.boxes); drawFlow(); handTable(); };
+    zbar.appendChild(boxSel);
+    zbar.appendChild(SW.el('span', { class: 'sep' }));
+    var gv = body.closest('.view') || body;
+    var bigBtn = SW.el('button', { class: 'btn', title: 'Give the chart the whole page: hides the version choices, the explanation and the tables below (click again to bring them back)' });
+    function paintBig() { var on = gv.classList.contains('gen-big'); bigBtn.textContent = on ? '⤡ Show everything' : '⤢ Chart only'; bigBtn.classList.toggle('on', on); }
+    bigBtn.onclick = function () { var on = !gv.classList.contains('gen-big'); gv.classList.toggle('gen-big', on); SW.store.set('gen.big', on); paintBig(); };
+    paintBig();
+    zbar.appendChild(bigBtn);
+    var stage = SW.el('div', { class: 'flow-stage' });
+    zbar.appendChild(SW.el('button', { class: 'btn', title: 'Fill the whole screen with the chart and its zoom controls (Esc to leave)', onclick: function () {
+      if (document.fullscreenElement) document.exitFullscreen(); else if (stage.requestFullscreen) stage.requestFullscreen();
+    } }, '⛶ Full screen'));
+    body.appendChild(stage);
+    stage.appendChild(zbar);
+    stage.appendChild(ov.el);
+    // A grip under the chart: drag to make it taller or shorter; double-click to reset.
+    var grip = SW.el('div', { class: 'flow-grip', title: 'Drag to resize the chart; double-click to reset' });
+    stage.appendChild(grip);
+    function setH(h) {
+      if (h) { box.style.height = h + 'px'; box.style.setProperty('max-height', h + 'px', 'important'); }
+      else { box.style.height = ''; box.style.removeProperty('max-height'); box.style.maxHeight = '80vh'; }
+    }
+    setH(+SW.store.get('gen.h', 0) || 0);
+    grip.addEventListener('pointerdown', function (e) {
+      e.preventDefault();
+      var y0 = e.clientY, h0 = box.getBoundingClientRect().height;
+      grip.setPointerCapture(e.pointerId);
+      function move(ev) { setH(Math.max(200, Math.round(h0 + ev.clientY - y0))); }
+      function up() {
+        grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up);
+        SW.store.set('gen.h', Math.round(box.getBoundingClientRect().height));
+      }
+      grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+    });
+    grip.addEventListener('dblclick', function () { SW.store.set('gen.h', 0); setH(0); });
     drawFlow();
-    body.querySelector('.hint').insertAdjacentHTML('beforeend', ' <b>Click a box or a ribbon</b> to read the code it stands for, coloured by what happened to it.');
+    body.querySelector('.hint').insertAdjacentHTML('beforeend', ' <b>Click a box or a ribbon</b> to read the code it stands for, coloured by what happened to it; a clicked box also lights the same ' + gst.gran + ' in every version before and after it (click it again, or empty space, to clear).');
+    // Click: the unit's line of descent, back and forward, lightly lit, with the ribbons between.
+    var back = fl.units.map(function () { return {}; }), fwd = fl.units.map(function () { return {}; });
+    fl.steps.forEach(function (st, si) {
+      st.pairs.forEach(function (p) { if (p.a != null && p.b != null) { fwd[si][p.a] = p.b; back[si + 1][p.b] = p.a; } });
+    });
+    var lit = [], litKey = '';
+    function unlight() { lit.forEach(function (x) { x.classList.remove('hl'); }); lit = []; litKey = ''; }
+    function light(col, k) {
+      if (litKey === col + ':' + k && (!lit.length || box.contains(lit[0]))) return;
+      unlight();
+      litKey = col + ':' + k;
+      var chain = [[col, k]], c = col, u = k;
+      while (c > 0 && back[c][u] != null) { u = back[c][u]; c--; chain.unshift([c, u]); }
+      c = col; u = k;
+      while (c < fwd.length - 1 && fwd[c][u] != null) { u = fwd[c][u]; c++; chain.push([c, u]); }
+      chain.forEach(function (cu, i) {
+        var r = box.querySelector('rect[data-col="' + cu[0] + '"][data-u="' + cu[1] + '"]');
+        if (r) { r.classList.add('hl'); lit.push(r); }
+        if (i === chain.length - 1) return;
+        var a = cu[1], nb = chain[i + 1][1];
+        SW.$$('path[data-step="' + cu[0] + '"]', box).forEach(function (pth) {
+          var d = pth.dataset;
+          if (d.a0 !== '' && d.b0 !== '' && +d.a0 <= a && a <= +d.a1 && +d.b0 <= nb && nb <= +d.b1) { pth.classList.add('hl'); lit.push(pth); }
+        });
+      });
+    }
     box.addEventListener('click', function (e) {
       var t = e.target.closest('[data-col],[data-step]');
-      if (!t) return;
+      if (!t) { unlight(); return; }
+      // the same box again: cancel the lighting
+      if (t.dataset.col != null && litKey === t.dataset.col + ':' + t.dataset.u && lit.length && box.contains(lit[0])) {
+        unlight(); t.classList.remove('picked'); return;
+      }
+      if (t.dataset.col != null) light(+t.dataset.col, +t.dataset.u); else unlight();
       SW.$$('.picked', box).forEach(function (x) { x.classList.remove('picked'); });
       t.classList.add('picked');
-      if (t.dataset.col != null) showUnit(ts, fl, +t.dataset.col, +t.dataset.u);
+      if (t.dataset.col != null) showUnit(ts, fl, +t.dataset.col, +t.dataset.u, hands);
       else showRibbon(ts, fl, t.dataset);
     });
     exp.appendChild(svgActions(svg, 'spacewar-genealogy-flow-' + gst.gran));
@@ -579,12 +669,33 @@
       var m = s.summary;
       return [s.from, s.to, m.retained, m.moved, m.edited, m.added, m.removed, Math.round(m.similarity * 100)];
     });
-    body.insertAdjacentHTML('beforeend', '<h3 style="margin-top:18px">Step by step</h3>');
-    body.appendChild(SW.table(['From', 'To', 'Retained', 'Moved', 'Edited', 'Added', 'Removed', 'Similarity %'], rows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num', 'num'] }));
+    var extra = SW.el('div', { class: 'gen-extra' });
+    body.appendChild(extra);
+    extra.insertAdjacentHTML('beforeend', '<h3 style="margin-top:18px">Step by step</h3>');
+    extra.appendChild(SW.table(['From', 'To', 'Retained', 'Moved', 'Edited', 'Added', 'Removed', 'Similarity %'], rows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num', 'num'] }));
+    // Lines by hand, version by version (shown with the hand colouring).
+    var hkeys = SW.HANDS.map(function (h) { return h.k; }).filter(function (k) { return hands.some(function (col) { return col.some(function (a) { return a.hand === k; }); }); });
+    var hHead = ['Version'].concat(hkeys, ['no hand']);
+    var hRows = ts.map(function (t, i) {
+      var c = {};
+      fl.units[i].forEach(function (u, k) { var h = hands[i][k].hand || '-'; c[h] = (c[h] || 0) + u.lines; });
+      return [t.label].concat(hkeys.map(function (k) { return c[k] || 0; }), [c['-'] || 0]);
+    });
+    var hBox = SW.el('div');
+    extra.appendChild(hBox);
+    function handTable() {
+      hBox.innerHTML = '';
+      if (gst.boxes !== 'hand') return;
+      hBox.insertAdjacentHTML('beforeend', '<h3 style="margin-top:18px">Lines by hand</h3><p class="hint">Code lines in ' + gst.gran + 's attributed to each hand: signed in the ' + gst.gran + '’s own comments, carried forward from an ancestor, or new on a tape whose title is signed. This follows the written record; it is evidence of a hand, not proof of authorship.</p>');
+      hBox.appendChild(SW.table(hHead, hRows.map(function (r) { return r.slice(); }), { cls: ['mono'].concat(hHead.slice(1).map(function () { return 'num'; })) }));
+    }
+    handTable();
     exp.appendChild(SW.exportButtons(function () {
-      return { title: 'Spacewar! genealogy: ' + gst.gran + ' flow', blocks: [
+      var bl = [
         { type: 'p', text: 'Consecutive versions compared at ' + gst.gran + ' granularity' + (gst.supplied ? ', counting supplied macro and star tapes' : '') + '.' },
-        SW.tableBlock('Step by step', ['From', 'To', 'Retained', 'Moved', 'Edited', 'Added', 'Removed', 'Similarity %'], rows)] };
+        SW.tableBlock('Step by step', ['From', 'To', 'Retained', 'Moved', 'Edited', 'Added', 'Removed', 'Similarity %'], rows)];
+      if (gst.boxes === 'hand') bl.push(SW.tableBlock('Lines by hand (signed, inherited, or new on a signed tape)', hHead, hRows));
+      return { title: 'Spacewar! genealogy: ' + gst.gran + ' flow', blocks: bl };
     }, 'spacewar-genealogy-steps'));
   }
 
@@ -633,11 +744,25 @@
     return el;
   }
   // A box: the unit, its ancestor in the previous column and its heir in the next.
-  function showUnit(ts, fl, col, k) {
+  // How a unit came by its hand, in words.
+  function handText(ts, fl, hands, i, k) {
+    var a = hands[i][k], h = a.hand && SW.handOf(a.hand);
+    if (!h) return 'Hand: none in the record';
+    var who = h.k + ' (' + h.who + ')';
+    if (a.how === 'signed') return 'Hand: ' + who + ', signed in its own comment at line ' + a.line.n + ': ' + a.line.comment.trim();
+    if (a.how === 'tape') return 'Hand: ' + who + ', new in ' + ts[i].label + ', on a tape titled “' + a.line.raw.trim() + '”';
+    var src = a, back = 0;
+    while (src.how === 'inherited' && src.from) { src = src.from; back++; }
+    return 'Hand: ' + who + ', carried forward ' + back + ' version' + (back === 1 ? '' : 's') + ' from where it was ' +
+      (src.how === 'signed' ? 'signed (line ' + src.line.n + ')' : 'first seen on a signed tape') + (a.status ? '; ' + a.status + ' here' : '');
+  }
+
+  function showUnit(ts, fl, col, k, hands) {
     var t = ts[col], u = fl.units[col][k];
     var prev = col > 0 ? fl.steps[col - 1].pairs.filter(function (p) { return p.b === k; })[0] : null;
     var next = col < fl.steps.length ? fl.steps[col].pairs.filter(function (p) { return p.a === k; })[0] : null;
-    var h = '<p class="mono" style="margin-top:0">' + SW.esc(u.file) + ', ll. ' + u.n0 + '–' + u.n1 + ' · ' + u.lines + ' lines</p>';
+    var h = '<p class="mono" style="margin-top:0">' + SW.esc(u.file) + ', ll. ' + u.n0 + '–' + u.n1 + ' · ' + u.lines + ' lines</p>' +
+      (hands ? '<p class="hint">' + SW.esc(handText(ts, fl, hands, col, k)) + '</p>' : '');
     if (prev) {
       var ua = prev.a != null ? fl.units[col - 1][prev.a] : null;
       h += '<h3>From ' + SW.esc(ts[col - 1].label) + ' ' + statusChip(prev.status, prev.similarity) + '</h3>' +

@@ -172,7 +172,8 @@
   }
 
   // Every note in the group, every draft, and every build log, all versions.
-  N.listAll = function () {
+  N.listAll = function (opts) {
+    opts = opts || {};
     var V = root.SWVersions;
     var logs = [];
     V.VERSIONS.forEach(function (v) {
@@ -191,7 +192,78 @@
         });
     }
     var remote = N.configured() ? page(0, []).catch(function (e) { SW.toast(e.message, 5000); return []; }) : Promise.resolve([]);
-    return remote.then(function (rows) { return logs.concat(rows, local).filter(function (n) { return !N.isReaction(n); }); });
+    return remote.then(function (rows) { return logs.concat(rows, local).filter(function (n) { return opts.reactions || !N.isReaction(n); }); });
+  };
+
+  // ---------- what's new: notes, replies and reactions by others since you last looked ----------
+  var newsItems = [], newsAll = [];
+  function newsSince() {
+    var s = SW.store.get('notes.seen', '');
+    return s || new Date(Date.now() - 7 * 864e5).toISOString();   // first visit: the last week
+  }
+  function isMine(n) { var me = SW.me(); return N.mine(n) || (!!me.initials && n.by === me.initials); }
+  N.news = function () {
+    if (!N.configured()) { newsItems = []; paintNews(); return Promise.resolve([]); }
+    var since = newsSince();
+    return N.whoami().catch(function () {}).then(function () { return N.listAll({ reactions: true }); }).then(function (all) {
+      newsAll = all;
+      newsItems = all.filter(function (n) { return n.source === 'hypothesis' && String(n.date) > since && !isMine(n); })
+        .sort(function (a, b) { return String(b.date) < String(a.date) ? -1 : 1; });
+      paintNews();
+      return newsItems;
+    }).catch(function () { return []; });
+  };
+  function paintNews() {
+    var n = SW.$('#news-n'), btn = SW.$('#btn-news');
+    if (!n || !btn) return;
+    n.textContent = newsItems.length ? (newsItems.length > 99 ? '99+' : String(newsItems.length)) : '';
+    btn.classList.toggle('has-news', !!newsItems.length);
+    btn.title = newsItems.length ? newsItems.length + ' new in the group’s notes since ' + SW.fmtDate(newsSince()) : 'What’s new in the group’s notes';
+  }
+  function newsLine(n, byId) {
+    var V = root.SWVersions, v = V.byId(n.vid), par = n.parent && byId[n.parent];
+    var what = N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s note' : 'a note') : n.parent ? 'reply to ' + (par ? par.by : 'a note') : n.anchor ? 'note' : 'version note';
+    var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
+    var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
+    var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + (anchor ? ', l. ' + anchor.n0 + (anchor.n1 !== anchor.n0 ? '–' + anchor.n1 : '') : '');
+    return { n: n, anchor: anchor, html: '<div class="news-item" data-id="' + SW.esc(n.id) + '"><div class="news-meta"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(what) +
+      ' · <span class="mono">' + SW.esc(where) + '</span> · <span class="faint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
+      (N.isReaction(n) ? '' : '<div class="news-text">' + SW.esc(String(n.text).slice(0, 280)) + (String(n.text).length > 280 ? '…' : '') + '</div>') + '</div>' };
+  }
+  N.showNews = function () {
+    var body = SW.drawer('What’s new', '<p class="hint">Looking…</p>');
+    N.news().then(function (items) {
+      if (!N.configured()) { body.innerHTML = '<p class="hint">Set the Hypothesis group and token in ⚙ to see what others have added.</p>'; return; }
+      var byId = {};
+      newsAll.forEach(function (n) { byId[n.id] = n; });
+      var lines = items.map(function (n) { return newsLine(n, byId); });
+      body.innerHTML = '<p class="hint">Notes, replies and reactions by others since ' + SW.esc(SW.fmtDate(newsSince())) + (SW.store.get('notes.seen', '') ? ', when you last marked them read' : ' (the last week; nothing has been marked read yet)') + '.</p>';
+      var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+      bar.appendChild(SW.el('button', { class: 'btn', title: 'Everything up to now counts as read; the count starts again from zero', onclick: function () {
+        SW.store.set('notes.seen', new Date().toISOString());
+        newsItems = []; paintNews();
+        SW.toast('Marked as read');
+        N.showNews();
+      } }, '✓ Mark all as read'));
+      body.appendChild(bar);
+      if (!lines.length) { body.insertAdjacentHTML('beforeend', '<p>Nothing new.</p>'); return; }
+      var list = SW.el('div', { class: 'news-list' }, lines.map(function (l) { return l.html; }).join(''));
+      list.addEventListener('click', function (e) {
+        var it = e.target.closest('.news-item');
+        if (!it) return;
+        var l = lines.filter(function (x) { return x.n.id === it.dataset.id; })[0];
+        if (!l) return;
+        SW.openAt(l.n.vid, l.anchor);
+      });
+      body.appendChild(list);
+    });
+  };
+  N.initNews = function () {
+    var btn = SW.$('#btn-news');
+    if (!btn) return;
+    btn.onclick = N.showNews;
+    setTimeout(N.news, 1500);
+    setInterval(N.news, 5 * 60 * 1000);
   };
 
   N.invalidate = function (vid) { delete cache[vid]; SW.emit('notes', vid); };

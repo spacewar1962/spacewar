@@ -90,8 +90,8 @@
       SW.setTab('tape');
       return;
     }
-    if (ev.v !== SW.state.v) SW.select(ev.v);   // choosing a version clears the selection, so select first
-    if (at) SW.state.sel = { p: at.p, n0: at.n, n1: at.n };
+    if (at && !ev.tab) { SW.openAt(ev.v, { p: at.p, n0: at.n }); return; }
+    if (ev.v !== SW.state.v) SW.select(ev.v);
     SW.setTab(ev.tab || 'read');
   }
 

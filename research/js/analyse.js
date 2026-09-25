@@ -22,7 +22,8 @@
     [10, 'Memory map', 'Code, constants, variables and tables across the 4096 words'],
     [11, 'Macros', 'The macros and how often each is expanded'],
     [12, 'The sky', 'The Expensive Planetarium’s star table drawn as a chart'],
-    [13, 'The ships', 'The Needle and the Wedge, drawn from their outline codes']
+    [13, 'The ships', 'The Needle and the Wedge, drawn from their outline codes'],
+    [14, 'Biographies', 'One name’s life across the versions: when it appears, how its definition changes, who signs it, when it goes']
   ];
 
   function progLines(b) {
@@ -109,18 +110,16 @@
   }
 
   // ---------- 2 hands and dates ----------
-  var HANDS = { ddp: 'D. D. "Monty" Preonas', dfw: 'unidentified', prs: 'Peter R. Samson', jcm: 'Joe Morris', nl: 'Norbert Landsteiner', sr: 'Steve Russell', dje: 'Dan Edwards', jmg: 'J. Martin Graetz', ak: 'Alan Kotok' };
   function hands(b, el) {
     var rows = [];
     allLines(b).forEach(function (L) {
-      var s = L.raw, m, re = /\b(ddp|dfw|prs|jcm|nl|dje|jmg)\b/gi, dates = s.match(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2} (?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]* \d{2,4}\b/gi);
-      var hs = [];
-      while ((m = re.exec(s))) hs.push(m[1].toLowerCase());
+      var s = L.raw, dates = s.match(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2} (?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]* \d{2,4}\b/gi);
+      var hs = SW.handsIn(s);
       if (hs.length || dates) rows.push({ L: L, hands: hs, dates: dates || [], src: b.parts[L.p].src });
     });
     var c = card('Signatures and dates', 'Initials and dates as the programmers and later editors left them. Titles are the first line of each tape; later annotations (reconstruction notes, museum logs) are part of the text’s history too.');
     var t = SW.table(['File', 'Line', 'Hand', 'Date', 'Text'], rows.map(function (r) {
-      return [r.src, r.L.n, r.hands.map(function (h) { return h + (HANDS[h] ? ' (' + HANDS[h] + ')' : ''); }).join(', '), r.dates.join(', '), r.L.raw.trim()];
+      return [r.src, r.L.n, r.hands.map(function (h) { return h + ' (' + SW.handOf(h).who + ')'; }).join(', '), r.dates.join(', '), r.L.raw.trim()];
     }), { cls: ['mono', 'num', '', 'mono', 'mono'], onRow: function (r) { var x = rows.filter(function (y) { return y.L.n === r[1] && y.src === r[0]; })[0]; if (x) goto(x.L); } });
     var s = SW.el('div', { class: 'scroll' }); s.appendChild(t); c.appendChild(s);
     c.style.gridColumn = '1 / -1';
@@ -457,6 +456,181 @@
 
   var FNS = { 1: comments, 2: hands, 3: lexicon, 4: adjustable, 5: machine, 6: timeGoes, 7: absence, 8: calls, 9: instructions, 10: memmap, 11: macros, 12: sky, 13: ships };
 
+  // ---------- 14 biographies ----------
+  // A symbol or macro followed through every version that can be built.
+  var bioName = SW.store.get('an.bio', 'str');
+  function bioVersions() {
+    return V.VERSIONS.filter(function (v) { return v.build && v.id !== 'stars'; }).sort(function (a, b) { return a.sort - b.sort; });
+  }
+  function squash(t) { return String(t || '').replace(/[\\~]/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  function bioEntry(b, name) {
+    var s = b.sym && b.sym[name], m = b.macros && b.macros[name];
+    if (!s && !m) return null;
+    var e = { kind: m ? 'macro' : s.variable ? 'variable' : s.label ? 'label' : 'symbol', uses: 0, L: null, def: '', cm: '', key: '', val: '', supplied: false };
+    if (m) {
+      e.L = b.lines[m.file] && b.lines[m.file][m.line - 1];
+      e.def = m.args.length ? name + ' ' + m.args.join(',') : name;
+      e.key = squash(m.body).replace(/[\s,]+/g, ' ');   // tab or comma between a pseudo-op and its argument is the same to MACRO
+      e.body = m.body;
+      e.uses = facts(b).macros[name] || 0;
+      e.supplied = b.parts[m.file].role !== 'program';
+    } else {
+      var d = s.defs[0];
+      e.L = d ? b.lines[d.file] && b.lines[d.file][d.line - 1] : null;
+      e.uses = s.refs.length;
+      e.val = SW.oct(s.val, s.label || s.variable ? 4 : 6);
+      e.supplied = d ? b.parts[d.file].role !== 'program' : false;
+      if (e.L) {
+        var p = SW.parseLine(e.L.norm || e.L.raw);
+        e.def = ((p.labels.length ? p.labels.join(', ') + ', ' : '') + p.code).replace(/\s+/g, ' ').trim();
+        e.key = squash(e.def);
+      } else e.def = s.variable ? '(variable, allotted by the assembler)' : '';
+    }
+    if (e.L) {
+      e.cm = SW.parseLine(e.L.raw).comment.replace(/^\/\s?/, '').trim();
+      e.hands = SW.handsIn(e.cm);
+    }
+    return e;
+  }
+  function bioRows(name) {
+    var vs = bioVersions();
+    return Promise.all(vs.map(function (v) { return SW.build(v.id).catch(function () { return null; }); })).then(function (bs) {
+      var rows = [], last = null, seen = false;
+      vs.forEach(function (v, i) {
+        var b = bs[i];
+        if (!b || !b.asm) return;
+        var e = bioEntry(b, name), st;
+        if (!e) st = seen ? 'gone' : 'not yet';
+        else if (!seen) st = 'first';
+        else if (!last) st = 'returns';
+        else if (e.key !== last.key) st = e.kind === 'variable' ? 'same' : 'changed';
+        else if (squash(e.cm) !== squash(last.cm)) st = 'comment changed';
+        else st = 'same';
+        if (e) { seen = true; last = e; } else last = null;
+        rows.push({ v: v, b: b, e: e, st: st });
+      });
+      return rows;
+    });
+  }
+  var BIO_COL = { first: 'var(--g-added)', same: 'var(--g-retained)', changed: 'var(--g-edited)', 'comment changed': 'var(--g-moved)',
+                  returns: 'var(--g-added)', gone: 'var(--g-removed)', 'not yet': 'var(--g-muted)' };
+  function bioSVG(name, rows) {
+    var step = 74, left = 40, W = left * 2 + Math.max(1, rows.length - 1) * step + 60, H = 200, y = 96;
+    var out = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" font-family="ui-monospace, Menlo, Consolas, monospace">',
+               '<title>' + SW.esc(name + ' across the versions') + '</title>',
+               '<text x="' + left + '" y="18" font-size="13" fill="var(--g-text)">' + SW.esc(name) + ' across the versions</text>'];
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i].e && rows[i - 1].e) out.push('<line x1="' + (left + (i - 1) * step) + '" y1="' + y + '" x2="' + (left + i * step) + '" y2="' + y + '" stroke="var(--g-line)" stroke-width="2"/>');
+    }
+    rows.forEach(function (r, i) {
+      var x = left + i * step, c = BIO_COL[r.st], present = !!r.e;
+      out.push('<g><title>' + SW.esc(r.v.label + ' (' + r.v.date + '): ' + r.st + (r.e ? '. ' + r.e.def : '')) + '</title>' +
+        '<circle cx="' + x + '" cy="' + y + '" r="' + (present ? 8 : 5) + '" fill="' + (present ? c : 'none') + '" stroke="' + c + '" stroke-width="2"/></g>');
+      out.push('<text x="' + x + '" y="' + (y - 18) + '" font-size="10" fill="var(--g-text)" transform="rotate(-35 ' + x + ' ' + (y - 18) + ')">' + SW.esc(short(r.v)) + '</text>');
+      if (present) {
+        var val = r.e.kind === 'macro' ? 'macro' : r.e.def.replace(/^[^,]*,\s*/, '').slice(0, 11);
+        out.push('<text x="' + x + '" y="' + (y + 26) + '" font-size="10" text-anchor="middle" fill="' + (r.st === 'changed' || r.st === 'first' ? 'var(--g-text)' : 'var(--g-muted)') + '">' + SW.esc(val) + '</text>');
+      }
+    });
+    var lx = left, ly = H - 22;
+    ['first', 'same', 'changed', 'comment changed', 'gone'].forEach(function (k) {
+      out.push('<circle cx="' + (lx + 5) + '" cy="' + (ly - 4) + '" r="5" fill="' + (k === 'gone' ? 'none' : BIO_COL[k]) + '" stroke="' + BIO_COL[k] + '" stroke-width="2"/>' +
+        '<text x="' + (lx + 14) + '" y="' + ly + '" font-size="10" fill="var(--g-text)">' + k + '</text>');
+      lx += 30 + k.length * 6.2;
+    });
+    out.push('</svg>');
+    return out.join('');
+  }
+  function bioSummary(name, rows) {
+    var pres = rows.filter(function (r) { return r.e; });
+    if (!pres.length) return 'No version that can be assembled defines “' + name + '”.';
+    var first = pres[0], lastR = pres[pres.length - 1], k = first.e.kind;
+    var out = '“' + name + '” is a ' + k + (first.e.supplied ? ' on a supplied tape' : '') + '. It first appears in ' + first.v.label.replace(/^Spacewar! /, '') + ' (' + first.v.date + ')';
+    out += first.e.def && k !== 'macro' ? ', as “' + first.e.def + '”' + (first.e.cm ? ' (' + first.e.cm + ')' : '') + '.' : '.';
+    var ch = rows.filter(function (r) { return r.st === 'changed'; });
+    if (ch.length) out += ' Its definition changes in ' + ch.map(function (r) { return r.v.label.replace(/^Spacewar! /, '') + (k !== 'macro' ? ' (to “' + r.e.def + '”)' : ''); }).join(', ') + '.';
+    else out += ' Its definition never changes.';
+    var cc = rows.filter(function (r) { return r.st === 'comment changed'; });
+    if (cc.length) out += ' Its comment is rewritten in ' + cc.map(function (r) { return r.v.label.replace(/^Spacewar! /, ''); }).join(', ') + '.';
+    var gone = rows.filter(function (r) { return r.st === 'gone'; });
+    if (gone.length) out += ' It is absent from ' + gone.map(function (r) { return r.v.label.replace(/^Spacewar! /, ''); }).join(', ') + '.';
+    var hs = {};
+    pres.forEach(function (r) { (r.e.hands || []).forEach(function (h) { hs[h] = 1; }); });
+    if (Object.keys(hs).length) out += ' Initials in its comment: ' + Object.keys(hs).join(', ') + '.';
+    if (lastR !== first) out += ' Last seen in ' + lastR.v.label.replace(/^Spacewar! /, '') + '.';
+    return out;
+  }
+  function biography(b, el) {
+    var c = card('Whose life?', 'Type a label, constant, variable or macro, or pick one. Every version that can be assembled is searched; the definition line, its comment, value and number of uses are compared step by step.');
+    c.style.gridColumn = '1 / -1';
+    var names = {};
+    if (b.sym) Object.keys(b.sym).forEach(function (n) { if (b.sym[n].defs.length) names[n] = 1; });
+    if (b.macros) Object.keys(b.macros).forEach(function (n) { names[n] = 1; });
+    var dl = SW.el('datalist', { id: 'bio-names' }, Object.keys(names).sort().map(function (n) { return '<option value="' + SW.esc(n) + '">'; }).join(''));
+    var inp = SW.el('input', { type: 'search', list: 'bio-names', value: bioName, placeholder: 'e.g. str, maa, ioh, dispt', class: 'btn', style: 'width:14em' });
+    var go = SW.el('button', { class: 'btn' }, 'Follow');
+    var row = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+    row.appendChild(inp); row.appendChild(dl); row.appendChild(go);
+    var consts = Object.keys(facts(b).consts).slice(0, 14);
+    ['ioh', 'dispt', 'mex', 'tcr', 'sqs'].forEach(function (n) { if (names[n] && consts.indexOf(n) < 0) consts.push(n); });
+    consts.forEach(function (n) {
+      row.appendChild(SW.el('button', { class: 'btn ghost mono', title: 'Follow ' + n, onclick: function () { inp.value = n; follow(); } }, n));
+    });
+    c.appendChild(row);
+    el.appendChild(c);
+    var out = SW.el('div', { style: 'grid-column:1 / -1' });
+    el.appendChild(out);
+    var cur = { name: '', rows: [] };
+    function follow() {
+      var name = inp.value.trim().replace(/^[\\~.]/, '');
+      if (!name) return;
+      bioName = name; SW.store.set('an.bio', name);
+      out.innerHTML = '<p class="hint">Following ' + SW.esc(name) + ' through ' + bioVersions().length + ' versions…</p>';
+      bioRows(name).then(function (rows) {
+        cur = { name: name, rows: rows };
+        out.innerHTML = '';
+        var sc = card(name, SW.esc(bioSummary(name, rows)));
+        var fig = SW.el('div', { class: 'svgbox', style: 'margin:8px 0' }, SW.displaySVG(bioSVG(name, rows)));
+        sc.appendChild(fig);
+        sc.appendChild(SW.figureButtons(function () { return bioSVG(name, rows); }, 'spacewar-biography-' + SW.slug(name)));
+        out.appendChild(sc);
+        var t = SW.table(['Version', 'Date', 'Status', 'Kind', 'Definition', 'Comment', 'Value', 'Uses', 'Hand'], tableRows(rows),
+          { cls: ['', 'mono', '', '', 'mono', '', 'mono', 'num', 'mono'], onRow: function (r) {
+            var hit = rows.filter(function (x) { return x.v.label.replace(/^Spacewar! /, '') === r[0]; })[0];
+            if (!hit || !hit.e || !hit.e.L) return;
+            SW.openAt(hit.v.id, { p: hit.e.L.p, n0: hit.e.L.n });
+          } });
+        var tc = card('Step by step', 'Click a row to open the definition in that version.');
+        var sd = SW.el('div', { class: 'scroll' }); sd.appendChild(t); tc.appendChild(sd);
+        out.appendChild(tc);
+        var withBody = rows.filter(function (r) { return r.e && r.e.body; });
+        if (withBody.length) {
+          var mc = card('The macro body, where it changes', '');
+          rows.forEach(function (r) {
+            if (r.st !== 'first' && r.st !== 'changed' && r.st !== 'returns') return;
+            mc.insertAdjacentHTML('beforeend', '<h4>' + SW.esc(short(r.v)) + ' · ' + SW.esc(r.st) + '</h4><pre class="mono" style="font-size:12px;overflow:auto">' + SW.esc(r.e.body) + '</pre>');
+          });
+          out.appendChild(mc);
+        }
+      });
+    }
+    function tableRows(rows) {
+      return rows.map(function (r) {
+        var e = r.e;
+        return [short(r.v), r.v.date, { html: '<span style="color:' + BIO_COL[r.st] + '">●</span> ' + SW.esc(r.st), text: r.st, sort: r.st },
+                e ? e.kind + (e.supplied ? ' (supplied)' : '') : '', e ? e.def : '', e ? e.cm : '', e ? e.val : '', e ? e.uses : '',
+                e && e.hands && e.hands.length ? e.hands.join(', ') : ''];
+      });
+    }
+    go.onclick = follow;
+    inp.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') follow(); });
+    follow();
+    return function () {
+      return [{ type: 'p', text: bioSummary(cur.name, cur.rows) },
+              SW.tableBlock(cur.name + ' across the versions', ['Version', 'Date', 'Status', 'Kind', 'Definition', 'Comment', 'Value', 'Uses', 'Hand'], tableRows(cur.rows))];
+    };
+  }
+
   // =================== across the variorum ===================
   var V = root.SWVersions;
   var DEFAULT_SET = ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'];
@@ -484,8 +658,7 @@
         f.comments[k].n++; f.nComments++;
         if (!p.code.trim() && !p.labels.length) f.own++;
       }
-      var re = /\b(ddp|dfw|prs|jcm|nl|dje|jmg)\b/gi, m;
-      while ((m = re.exec(L.raw))) { var h = m[1].toLowerCase(); f.hands[h] = (f.hands[h] || 0) + 1; }
+      SW.handsIn(L.raw).forEach(function (h) { f.hands[h] = (f.hands[h] || 0) + 1; });
       (L.raw.match(/\b\d{1,2}\/\d{1,2}\/\d{2,4}\b|\b\d{4}-\d{2}-\d{2}\b/g) || []).forEach(function (d) { if (f.dates.indexOf(d) < 0) f.dates.push(d); });
       var cm = /^\s*([a-z0-9]+),\s*([0-7]+),\s*([^\/]*?)\s*(\/.*)?$/i.exec(L.raw);
       if (cm) f.consts[cm[1]] = { val: cm[3].replace(/\s+/g, ' '), cm: (cm[4] || '').replace(/^\/\s*/, ''), loc: cm[2] };
@@ -615,6 +788,10 @@
     var hs = {}; fs.forEach(function (f) { Object.keys(f.hands).forEach(function (h) { hs[h] = 1; }); });
     var m = matrix(Object.keys(hs).sort(), vs, function (h, v, i) { return fs[i].hands[h] || ''; });
     el.appendChild(matrixCard('Which hand appears where', 'Occurrences of each set of initials, version by version.', ['Initials'].concat(vs.map(short)), m, ['mono'].concat(vs.map(function () { return 'num'; }))));
+    var fw = card('Following the hands', 'Initials sit in particular routines. The Genealogy flow can colour every routine by the hand that signed it and carry that hand forward to its descendants, so a signature in 4.0 can be followed into 4.8.');
+    fw.appendChild(SW.el('button', { class: 'btn', onclick: function () { SW.store.set('gen.boxes', 'hand'); SW.forget('genealogy'); SW.setTab('genealogy'); } }, 'Show the hands in the genealogy flow →'));
+    fw.style.gridColumn = '1 / -1';
+    el.appendChild(fw);
     return function () { return [SW.tableBlock('Hands and dates', ['Version', 'Date', 'Attributed to', 'Tape titles', 'Initials', 'Dates'], rows), SW.tableBlock('Initials by version', ['Initials'].concat(vs.map(short)), m)]; };
   };
 
@@ -873,6 +1050,16 @@
     var cards = SW.el('div', { class: 'cards' });
     pad.appendChild(cards);
     view.appendChild(pad);
+    if (lens === 14) {
+      // a biography is always across the versions; there is no single-version mode
+      SW.$$('[data-mode]', head).forEach(function (x) { x.style.display = 'none'; });
+      if (!b.asm) { cards.innerHTML = '<p class="hint">Choose a version with a surviving source; its names are offered for following.</p>'; return; }
+      var bb = biography(b, cards);
+      head.appendChild(SW.exportButtons(function () {
+        return { title: 'Spacewar!: the life of “' + bioName + '”', subtitle: L[2], meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]], blocks: bb() };
+      }, function () { return 'spacewar-biography-' + bioName; }));
+      return;
+    }
     if (mode === 'across') { renderAcross(cards, head, L); return; }
     if (!b.asm && lens !== 7) { cards.innerHTML = '<p class="hint">No source survives for this version.</p>'; return; }
     var blocks = FNS[lens](b, cards);
@@ -882,5 +1069,12 @@
   }
 
   SW.views.analyse = { show: function (b) { build = b; render(); } };
+  // Open a biography from elsewhere (the symbol pop-up in Read).
+  SW.biography = function (name) {
+    bioName = name; SW.store.set('an.bio', name);
+    lens = 14; SW.store.set('an.lens', 14);
+    SW.forget('analyse');
+    SW.setTab('analyse');
+  };
   SW.on('profile', function () { if (build && SW.state.tab === 'analyse' && (lens === 5 || lens === 6 || lens === 9)) render(); });
 })(this);
