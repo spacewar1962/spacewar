@@ -62,9 +62,10 @@
       <label>Initials <input id="set-initials" maxlength="6" placeholder="DMB" autocomplete="off"></label>
       <label>Name <input id="set-name" placeholder="David M. Berry" autocomplete="off"></label>
       <h2>Shared annotations</h2>
-      <p class="hint">Annotations are shared through a private Hypothesis group. Paste the group ID (from the group's invite link, hypothes.is/groups/<b>ID</b>/…) and a personal API token (hypothes.is/account/developer). Without them, notes are kept as drafts in this browser and can be exported or published later.</p>
-      <label>Group ID <input id="set-group" placeholder="e.g. Ab12Cd34" autocomplete="off"></label>
-      <label>API token <input id="set-token" type="password" placeholder="6879-…" autocomplete="off"></label>
+      <p class="hint">Annotations are shared through a private Hypothesis group. Paste the group's link (hypothes.is/groups/<b>ID</b>/…) or just its ID, and a personal API token (hypothes.is/account/developer). Without them, notes are kept as drafts in this browser and can be exported or published later.</p>
+      <label>Group link or ID <input id="set-group" placeholder="https://hypothes.is/groups/Ab12Cd34/name" autocomplete="off"></label>
+      <label for="set-token">API token</label>
+      <div class="token-row"><input id="set-token" type="password" placeholder="6879-…" autocomplete="off" spellcheck="false"><button id="set-token-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
       <p class="hint" id="set-check"></p>
       <div class="row">
         <button value="cancel" class="btn ghost">Cancel</button>

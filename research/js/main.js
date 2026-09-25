@@ -72,14 +72,24 @@
     var dlg = SW.$('#dlg-settings');
     SW.$('#set-initials').value = SW.store.get('initials', '');
     SW.$('#set-name').value = SW.store.get('name', '');
-    SW.$('#set-group').value = SW.store.get('group', '');
-    SW.$('#set-token').value = SW.store.get('token', '');
+    var grp = SW.$('#set-group'), tok = SW.$('#set-token'), show = SW.$('#set-token-show');
+    grp.value = SW.notes.groupId(SW.store.get('group', ''));
+    tok.value = SW.store.get('token', '');
+    tok.type = 'password'; show.textContent = 'Show'; show.setAttribute('aria-pressed', 'false');
     SW.$('#set-check').textContent = '';
     dlg.returnValue = '';
     dlg.showModal();
+    // A pasted group link is reduced to its ID, so what is stored is visible.
+    grp.onchange = function () { grp.value = SW.notes.groupId(grp.value); };
+    show.onclick = function () {
+      var hidden = tok.type === 'password';
+      tok.type = hidden ? 'text' : 'password';
+      show.textContent = hidden ? 'Hide' : 'Show';
+      show.setAttribute('aria-pressed', String(hidden));
+    };
     SW.$('#set-test').onclick = function () {
-      SW.store.set('group', SW.$('#set-group').value.trim());
-      SW.store.set('token', SW.$('#set-token').value.trim());
+      SW.store.set('group', SW.notes.groupId(grp.value));
+      SW.store.set('token', tok.value.trim());
       SW.$('#set-check').textContent = 'Checking…';
       SW.notes.test().then(function (r) {
         SW.$('#set-check').textContent = 'Connected as ' + r.user + (r.group ? '; group “' + r.group + '” found.' : '; but that group was not found for this account.');
@@ -89,8 +99,8 @@
       if (dlg.returnValue !== 'save') return;
       SW.store.set('initials', SW.$('#set-initials').value.trim().toUpperCase());
       SW.store.set('name', SW.$('#set-name').value.trim());
-      SW.store.set('group', SW.$('#set-group').value.trim());
-      SW.store.set('token', SW.$('#set-token').value.trim());
+      SW.store.set('group', SW.notes.groupId(grp.value));
+      SW.store.set('token', tok.value.trim());
       SW.notes.invalidate(SW.state.v);
       SW.toast('Saved');
     };

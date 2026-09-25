@@ -18,8 +18,14 @@
   var N = SW.notes = {};
   var cache = {};
 
+  // Accepts a group's URL (https://hypothes.is/groups/ID/name) or its bare ID.
+  N.groupId = function (s) {
+    s = String(s || '').trim();
+    var m = /\/groups\/([A-Za-z0-9]+)/.exec(s);
+    return m ? m[1] : s;
+  };
   function cfg() {
-    return { group: SW.store.get('group', ''), token: SW.store.get('token', '') };
+    return { group: N.groupId(SW.store.get('group', '')), token: SW.store.get('token', '') };
   }
   N.configured = function () { var c = cfg(); return !!(c.group && c.token); };
 

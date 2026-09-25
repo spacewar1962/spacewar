@@ -329,6 +329,8 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
 .settings input, .settings textarea { background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; color: var(--text); }
 .settings textarea { font-family: var(--serif); font-size: 15px; resize: vertical; }
 .settings .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px; }
+.settings .token-row { display: flex; gap: 6px; margin-top: -5px; }
+.settings .token-row input { flex: 1; min-width: 0; font-family: var(--mono); }
 .toast { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: var(--surface-2); border: 1px solid var(--line); padding: 8px 14px; border-radius: 6px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 60; }
 .toast.on { opacity: 1; }
 
