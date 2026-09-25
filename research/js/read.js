@@ -8,7 +8,7 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '' };
 
   // ---------- the tapes a version is read from ----------
   // A version is assembled from its tapes read one after another as one
@@ -135,8 +135,10 @@
       '<details class="menu"><summary class="btn" title="What the listing shows">View ▾</summary><div class="menu-body">' +
       '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
       '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
+      '<label class="check" title="Hide every line that no note covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
+      '<label class="check" title="Show only notes (and the lines they cover) in which these initials take part, as author or in a reply">Notes by <select id="rd-by"><option value="">anyone</option></select></label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
-      '</div></details>';
+      '</div></details><span class="hint" id="rd-nf"></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
@@ -202,6 +204,7 @@
     });
     view.insertBefore(box, bar);
     wireBox(box);
+    applyFilter();
     paintSel();
   }
 
@@ -269,6 +272,7 @@
   function listingDoc(b, s) {
     var lines = s ? b.lines[s.p].slice(s.n0 - 1, s.n1)
       : [].concat.apply([], b.lines.filter(function (x, pi) { return b.parts[pi].role === 'program'; })).filter(function (L) { return !L.away; });
+    if (!s && filtering()) { var keep = keptLines(); lines = lines.filter(function (L) { return keep[L.p + ':' + L.n]; }); }
     return N.list(b.v.id).then(function (all) {
       var threads = N.threads(all);
       var byLine = {};
@@ -346,6 +350,9 @@
     SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
     var tapeSel = SW.$('#rd-tape', tb);
     if (tapeSel) tapeSel.onchange = function () { opts.tapes = tapeSel.value; renderListing(); view.scrollTop = 0; };
+    SW.$('#rd-noted', tb).onchange = function (e) { opts.onlyNoted = e.target.checked; applyFilter(); view.scrollTop = 0; };
+    SW.$('#rd-by', tb).onchange = function (e) { opts.by = e.target.value; applyFilter(); view.scrollTop = 0; };
+    fillBy();
     SW.$('#rd-heat', tb).onchange = function (e) {
       opts.heat = e.target.checked;
       if (opts.heat && !(SW.profile && SW.profile.build === build)) SW.toast('Run the program in the Run view to collect a profile.');
@@ -360,7 +367,8 @@
       var re;
       try { re = /^\/.*\/$/.test(q) ? new RegExp(q.slice(1, -1), 'i') : new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
       catch (err) { SW.$('#rd-hits', tb).textContent = 'bad pattern'; return; }
-      build.lines.forEach(function (ls, pi) { ls.forEach(function (L) { if (!L.away && re.test(L.raw)) hits.push(L); }); });
+      var keep = filtering() ? keptLines() : null;
+      build.lines.forEach(function (ls, pi) { ls.forEach(function (L) { if (!L.away && re.test(L.raw) && (!keep || keep[L.p + ':' + L.n])) hits.push(L); }); });
       SW.$('#rd-hits', tb).textContent = hits.length + ' match' + (hits.length === 1 ? '' : 'es');
       hi = -1; step(1);
     }
@@ -478,6 +486,49 @@
     }
   };
 
+  // ---------- notes filter ----------
+  // Lines covered by notes, limited to those in which the chosen initials take part.
+  function keptLines() {
+    var keep = {};
+    Object.keys(counts).forEach(function (k) {
+      var c = counts[k];
+      if (opts.by && c.by.indexOf(opts.by) < 0) return;
+      for (var n = c.n0; n <= c.n1; n++) keep[c.p + ':' + n] = true;
+    });
+    return keep;
+  }
+  function filtering() { return opts.onlyNoted || !!opts.by; }
+  function fillBy() {
+    var sel = SW.$('#rd-by', view);
+    if (!sel) return;
+    var who = {};
+    Object.keys(counts).forEach(function (k) { counts[k].by.forEach(function (x) { who[x] = 1; }); });
+    if (opts.by) who[opts.by] = 1;
+    sel.innerHTML = '<option value="">anyone</option>' + Object.keys(who).sort().map(function (x) {
+      return '<option value="' + SW.esc(x) + '"' + (x === opts.by ? ' selected' : '') + '>' + SW.esc(x) + '</option>';
+    }).join('');
+  }
+  function applyFilter() {
+    var on = filtering(), keep = on ? keptLines() : null, shown = 0, gap = false;
+    SW.$$('.listing .ln', view).forEach(function (row) {
+      var k = row.dataset.p + ':' + row.dataset.n, hide = on && !keep[k];
+      row.classList.toggle('nf-hide', hide);
+      row.classList.toggle('nf-jump', on && !hide && gap);
+      if (hide) gap = true; else { gap = false; shown++; }
+    });
+    SW.$$('.listing .part', view).forEach(function (sec) {
+      sec.classList.toggle('nf-empty', on && !SW.$('.ln:not(.nf-hide)', sec));
+    });
+    var out = SW.$('#rd-nf', view);
+    if (out) out.textContent = on ? shown + ' annotated line' + (shown === 1 ? '' : 's') + (opts.by ? ' with ' + opts.by : '') : '';
+    var box = SW.$('.listing', view);
+    if (box) {
+      var none = SW.$('.nf-none', box);
+      if (on && !shown && !none) box.insertBefore(SW.el('p', { class: 'hint nf-none pad' }, opts.by ? 'No notes by ' + opts.by + ' on this version' + (opts.tapes === 'all' ? '' : ' and tape') + '.' : 'No annotated lines on this version' + (opts.tapes === 'all' ? '' : ' and tape') + ' yet.'), box.firstChild);
+      else if ((!on || shown) && none) none.remove();
+    }
+  }
+
   function refreshNotes() {
     if (!build) return;
     N.list(build.v.id).then(function (all) {
@@ -493,6 +544,8 @@
         if (mk) mk.innerHTML = N.marginMark(k, counts[k]);
         row.classList.toggle('noted', !!noted[k]);
       });
+      fillBy();
+      applyFilter();
       if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey) showNotesFor(openNotesKey, true);
     });
   }
