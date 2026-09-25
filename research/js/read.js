@@ -392,9 +392,11 @@
     var parts = k.split(':'), p = +parts[0], n = +parts[1];
     var ts = N.threads(notes).filter(function (t) { return t.note.anchor && t.note.anchor.p === p && t.note.anchor.n0 === n; });
     var c = counts[k], n1 = c ? c.n1 : n;
-    var html = '<p class="mono" style="margin-top:0">' + SW.esc(SW.cite(build, p, n, n1)) + '</p>' +
-      '<p><button class="btn" data-act="new">✎ Add a note on this line</button></p>' +
-      (ts.map(function (t) { return N.renderThread(t, build); }).join('') || '<p class="hint">No notes yet.</p>');
+    // No citation here: the version and file are in the page title and part
+    // header, and every thread in this panel is on the line just clicked.
+    void n1;
+    var html = '<p style="margin-top:0"><button class="btn" data-act="new">✎ Add a note on this line</button></p>' +
+      (ts.map(function (t) { return N.renderThread(t, null); }).join('') || '<p class="hint">No notes yet.</p>');
     var body = SW.drawer('Notes', html);
     body.dataset.notes = k;
     openNotesKey = k;
