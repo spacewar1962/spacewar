@@ -186,6 +186,18 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .part-head .kind { font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; border: 1px solid; white-space: nowrap; }
 .part-head .k-prog { color: var(--beam); border-color: var(--beam); }
 .part-head .k-sup { color: var(--text-dim); border-color: var(--line); border-style: dashed; }
+/* Column titles, on the same grid as .ln (em widths at the code size, so they line up). */
+.lncols {
+  display: grid; grid-template-columns: 4.8em 3.6em 5.2em 1fr minmax(2.2em, max-content); column-gap: 10px;
+  margin: 4px -14px -2px; padding: 3px 14px 0 6px; border-top: 1px solid var(--line-soft);
+  font-size: var(--code-size); color: var(--text-faint); cursor: default;
+}
+.lncols > span { font-size: 0.72em; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+.lncols .n { text-align: right; padding-right: 9px; }
+.lncols .mk { padding-left: 4px; }
+.part.collapsed .lncols { display: none; }
+.hide-words .lncols { grid-template-columns: 4.8em 1fr minmax(2.2em, max-content); }
+.hide-words .lncols .a, .hide-words .lncols .w { display: none; }
 .part.collapsed .ln { display: none; }
 .ln { display: grid; grid-template-columns: 4.8em 3.6em 5.2em 1fr minmax(2.2em, max-content); column-gap: 10px; padding: 0 14px 0 6px; white-space: pre; min-height: 1.5em; }
 .ln:hover { background: var(--surface); }
@@ -381,8 +393,8 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
   .run-left { border-right: 0; }
   body.drawer-open main { margin-right: 0; }
   .drawer { width: 100%; }
-  .ln { grid-template-columns: 3.2em 1fr 2em; }
-  .ln .a, .ln .w { display: none; }
+  .ln, .lncols { grid-template-columns: 3.2em 1fr 2em; }
+  .ln .a, .ln .w, .lncols .a, .lncols .w { display: none; }
   .diff .row { grid-template-columns: 3em 1fr; }
   .diff .row > span:nth-child(3), .diff .row > span:nth-child(4) { display: none; }
   .meta { grid-template-columns: 1fr; }

@@ -146,7 +146,12 @@
         '<span class="ph-toggle">' + (closed ? 'show ▸' : 'hide ▾') + '</span></div>' +
         '<div class="ph-sub">Part ' + (pi + 1) + ' of ' + b.parts.length + ' · ' + SW.sourceLink(part.src, part.src.split('/').pop()) +
         ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
-        (supplied ? ' · not part of this version’s own source; added so it assembles' : '') + '</div></div>';
+        (supplied ? ' · not part of this version’s own source; added so it assembles' : '') + '</div>' +
+        '<div class="lncols"><span class="n" title="The line’s number in the source file">Line</span>' +
+        '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
+        '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word</span>' +
+        '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)">Source</span>' +
+        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Notes</span></div></div>';
       var html = [];
       if (!supplied || opts.supplied) b.lines[pi].forEach(function (L) { html.push(rowHTML(b, L)); });
       sec.insertAdjacentHTML('beforeend', html.join(''));
@@ -269,7 +274,7 @@
   function wire(box, tb) {
     box.addEventListener('click', function (e) {
       var head = e.target.closest('.part-head');
-      if (head && e.target.closest('a')) return;   // the source link opens GitHub
+      if (head && e.target.closest('a, .lncols')) return;   // the source link opens GitHub; column titles only explain
       if (head) {
         var sec = head.parentNode;
         if (sec.classList.contains('collapsed') && !sec.querySelector('.ln')) { opts.supplied = true; render(); }
