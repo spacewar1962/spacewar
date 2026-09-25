@@ -217,20 +217,24 @@
   }
 
   /*
-   * Routine: a labelled line following a blank or comment-only line, a
-   * `define`, a title or a new part starts a routine; its comment header
-   * above (up to the previous code line) belongs to it. Labels inside a
-   * macro body do not start routines.
+   * Routine: a labelled line after a comment-only line, or one the code above
+   * cannot fall into (after a jmp, say), a `define`, a title or a new part
+   * starts a routine; its comment header above (up to the previous code line)
+   * belongs to it. Labels inside a macro body do not start routines.
+   * Blank lines do not count: they are layout, and transcriptions of one
+   * program differ in them (3.1 has a blank line inside sqt that the 4.0
+   * listing lacks, which split the routine in one version and not the other).
    */
   function routineUnits(text, o) {
     var L = text.lines, starts = [], names = [], inDef = false, last = -1;
     for (var i = 0; i < L.length; i++) {
-      var l = L[i], prev = i > 0 ? L[i - 1] : null;
+      var l = L[i], prev = i > 0 ? L[i - 1] : null, pnb = null;
+      for (var q = i - 1; q >= 0 && L[q].part === l.part; q--) if (L[q].kind !== 'blank') { pnb = L[q]; break; }
       var name = null;
       if (l.kind === 'title' || !prev || prev.part !== l.part) name = l.kind === 'title' ? words(l.code, 4) : null;
       if (isDefine(l)) { name = 'define ' + macroName(L, i); inDef = true; }
       else if (!inDef && l.kind === 'code' && l.labels.length && prev &&
-               (prev.kind === 'blank' || prev.kind === 'comment' ||
+               ((pnb && pnb.kind === 'comment') ||
                 (o.flowStarts !== false && noFallThrough(L, i)))) {
         name = l.labels.filter(function (x) { return !/^\d+$/.test(x); })[0] || l.labels[0];
       }
