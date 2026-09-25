@@ -45,7 +45,7 @@
       '<select id="r-speed" class="btn" title="Speed relative to the PDP-1 (5 µs memory cycle)">' +
       [0.01, 0.05, 0.25, 0.5, 1, 2, 4].map(function (s) { return '<option value="' + s + '"' + (s === speed ? ' selected' : '') + '>' + s + '×</option>'; }).join('') +
       '</select>' +
-      '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Figure</button></div>' +
+      '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button></div>' +
       '<div class="keys">Controls: click the scope, then <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
     var right = SW.el('div', { class: 'run-right' });
@@ -65,7 +65,9 @@
     cv.addEventListener('keyup', function (e) { if (KEYS[e.code]) { cpu.control &= ~KEYS[e.code]; e.preventDefault(); } });
     cv.addEventListener('blur', function () { cpu.control = 0; });
 
-    SW.$('#r-run', view).onclick = function () { running ? pause() : go(); };
+    // Hand focus back to the scope, so the game keys work and a later Space or
+    // Enter does not press this button again and resume the game.
+    SW.$('#r-run', view).onclick = function () { if (running) { pause(); cv.focus(); } else go(); };
     SW.$('#r-step', view).onclick = function () { pause(); stepOnce(); };
     SW.$('#r-over', view).onclick = stepOver;
     SW.$('#r-reset', view).onclick = function () { pause(); load(); updateAll(); };
@@ -121,8 +123,10 @@
       '<div style="margin-top:4px">' + SW.esc(C.disasm(md, build.symAt)) + '</div>';
     var ck = SW.$('#r-clock', view);
     if (ck) ck.textContent = (cpu.cycles / CPS).toFixed(3) + ' s machine time · ' + cpu.instructions.toLocaleString('en-GB') + ' instructions';
-    var rb = SW.$('#r-run', view);
-    if (rb) rb.textContent = running ? '❚❚ Pause' : '▶ Run';
+    // Only touch the label when it changes: this runs every frame, and replacing
+    // the text node under the pointer mid-click makes Chrome drop the click.
+    var rb = SW.$('#r-run', view), label = running ? '❚❚ Pause' : '▶ Run';
+    if (rb && rb.textContent !== label) rb.textContent = label;
   }
 
   // ---------- scope ----------
@@ -193,6 +197,7 @@
     running = true;
     lastT = performance.now();
     SW.$('#scope', view).focus();
+    cancelAnimationFrame(raf);
     raf = requestAnimationFrame(frame);
     regs();
   }

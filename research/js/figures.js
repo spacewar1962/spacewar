@@ -169,7 +169,7 @@
       var p = SW.$('#sf-prev'); p.innerHTML = ''; p.appendChild(c);
     }
     var name = 'spacewar-' + b.v.id + '-scope-' + (now / 200000).toFixed(2).replace('.', '_') + 's';
-    dialog('Scope figure', body, [
+    dialog('Scope screenshot', body, [
       ['▣ PNG', function () {
         var c = F.scopeCanvas(pts, now, +SW.$('#sf-size').value, opts());
         c.toBlob(function (bl) { bl.arrayBuffer().then(function (a) { root.SWExport.download(name + '.png', new Uint8Array(a), 'image/png'); }); }, 'image/png');

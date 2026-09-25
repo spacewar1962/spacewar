@@ -230,6 +230,22 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') SW.unpop(); });
   document.addEventListener('mousedown', function (e) { if (popEl && !popEl.contains(e.target)) SW.unpop(); });
 
+  // A click on a modal's backdrop closes it. Both ends of the click must fall
+  // outside the box, so a text selection dragged out of a field does not.
+  function outside(d, e) {
+    var r = d.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  }
+  var downOnBackdrop = null;
+  document.addEventListener('mousedown', function (e) {
+    downOnBackdrop = e.target.tagName === 'DIALOG' && e.target.open && outside(e.target, e) ? e.target : null;
+  });
+  document.addEventListener('click', function (e) {
+    var d = e.target;
+    if (d === downOnBackdrop && d.open && outside(d, e)) d.close();
+    downOnBackdrop = null;
+  });
+
   // Instruction glosses (the project's PDP-1 instruction reference).
   SW.glosses = null;
   SW.loadGlosses = function () {
