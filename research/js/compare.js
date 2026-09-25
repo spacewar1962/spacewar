@@ -437,6 +437,72 @@
     });
   }
 
+  // ---------- your own wiring ----------
+  // A line of descent of your own: a parent for any version, then the version to
+  // follow back from. Kept in this browser; the bench's own reading is untouched.
+  gst.custom = SW.store.get('gen.custom', null);
+  function wiredChain(parents, tip) {
+    var chain = [], cur = tip, seen = {}, loop = null;
+    while (cur) { if (seen[cur]) { loop = cur; break; } seen[cur] = 1; chain.unshift(cur); cur = parents[cur]; }
+    return { ids: chain, loop: loop };
+  }
+  function shortName(id) { var v = V.byId(id); return v ? v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '') : id; }
+  function wireDialog(done) {
+    var vs = buildable().filter(function (v) { return v.id !== 'stars'; }).sort(function (a, b) { return a.sort - b.sort; });
+    var c = gst.custom || { parents: {}, tip: '' };
+    var parents = Object.assign({}, c.parents), tip = c.tip || vs[vs.length - 1].id;
+    var d = SW.el('dialog', { class: 'wire-dlg' });
+    function opts(sel, skip) {
+      return '<option value="">(none: a starting point)</option>' + vs.filter(function (v) { return v.id !== skip; }).map(function (v) {
+        return '<option value="' + SW.esc(v.id) + '"' + (v.id === sel ? ' selected' : '') + '>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</option>';
+      }).join('');
+    }
+    d.innerHTML = '<form method="dialog" class="settings"><h2>Wire up your own line</h2>' +
+      '<p class="hint">Give any version the parent you think it was made from, then choose the version to follow back from. The flow then compares each version with the parent you gave it. Kept in this browser only; the bench’s own reading of the descent is unchanged.</p>' +
+      '<div class="row-btns"><button type="button" class="btn ghost" data-w="bench">Start from the bench’s reading</button> <button type="button" class="btn ghost" data-w="clear">Clear all</button></div>' +
+      '<div class="wire-list">' + vs.map(function (v) {
+        return '<div class="wire-row"><span><span class="mono">' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</span> <span class="faint">' + SW.esc(v.date) + '</span></span>' +
+          '<span class="wire-from">made from <select data-p="' + SW.esc(v.id) + '">' + opts(parents[v.id] || '', v.id) + '</select></span></div>';
+      }).join('') + '</div>' +
+      '<label>Follow the line back from <select id="wr-tip">' + opts(tip, null).replace('<option value="">(none: a starting point)</option>', '') + '</select></label>' +
+      '<p class="wire-preview mono" id="wr-prev"></p>' +
+      '<div class="row"><button value="cancel" class="btn ghost">Cancel</button><button type="button" class="btn" id="wr-save">Show this line</button></div></form>';
+    document.body.appendChild(d);
+    d.addEventListener('close', function () { d.remove(); });
+    var save = SW.$('#wr-save', d), prev = SW.$('#wr-prev', d);
+    function preview() {
+      var w = wiredChain(parents, tip);
+      prev.textContent = w.loop ? 'A loop: ' + shortName(w.loop) + ' is its own ancestor. Change one of its parents.'
+        : w.ids.length < 2 ? 'Only ' + shortName(tip) + ': give it a parent to make a line.'
+        : 'The line: ' + w.ids.map(shortName).join(' → ');
+      prev.classList.toggle('bad', !!w.loop || w.ids.length < 2);
+      save.disabled = !!w.loop || w.ids.length < 2;
+    }
+    d.addEventListener('change', function (e) {
+      if (e.target.dataset.p) { if (e.target.value) parents[e.target.dataset.p] = e.target.value; else delete parents[e.target.dataset.p]; }
+      if (e.target.id === 'wr-tip') tip = e.target.value;
+      preview();
+    });
+    d.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-w]');
+      if (!b) return;
+      parents = {};
+      if (b.dataset.w === 'bench') V.VERSIONS.forEach(function (v) { var p = v.witnessOf ? V.byId(v.witnessOf).parent : v.parent; if (p) parents[v.id] = p; });
+      SW.$$('select[data-p]', d).forEach(function (s) { s.value = parents[s.dataset.p] || ''; });
+      preview();
+    });
+    save.onclick = function () {
+      gst.custom = { parents: parents, tip: tip };
+      SW.store.set('gen.custom', gst.custom);
+      gst.line = 'custom';
+      SW.store.set('gen.line', 'custom');
+      d.close();
+      done();
+    };
+    d.showModal();
+    preview();
+  }
+
   function renderGen(cur) {
     gview.innerHTML = '';
     var tb = SW.el('div', { class: 'toolbar' });
@@ -445,7 +511,9 @@
     }).join('') + '<span class="sep"></span>' +
       '<label class="check" id="gn-line-l" title="Which line of descent to follow. After 4.0 the program forks into ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8); the CHM builds and 2015 descend from dfw 4.1. Each step compares a version with its parent. &#39;Chosen versions&#39; compares the versions you tick in date order, which mixes the forks.">Line <select id="gn-line">' +
       V.LINES.map(function (l) { return '<option value="' + l.id + '"' + (gst.line === l.id ? ' selected' : '') + '>' + SW.esc(l.label) + '</option>'; }).join('') +
-      '<option value="chosen"' + (gst.line === 'chosen' ? ' selected' : '') + '>Chosen versions, by date (mixes the forks)</option></select></label>' +
+      '<option value="chosen"' + (gst.line === 'chosen' ? ' selected' : '') + '>Chosen versions, by date (mixes the forks)</option>' +
+      '<option value="custom"' + (gst.line === 'custom' ? ' selected' : '') + '>' + (gst.custom ? 'Your own line (' + SW.esc(shortName(gst.custom.tip)) + ')' : 'Wire up your own…') + '</option></select></label>' +
+      (gst.line === 'custom' ? '<button class="btn" id="gn-wire" title="Change the parents you have given, or the version followed">✎ Edit wiring</button>' : '') +
       '<label class="check" title="The size of the pieces traced from version to version: section (large blocks under a header or tape title), routine (from one label after a break to the next), or line">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
       '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied</label><span id="gn-pal"></span>' +
       '<span class="help-dot" id="gn-help" tabindex="0">?</span><span class="tb-right" id="gn-exp"></span>';
@@ -486,10 +554,18 @@
     });
     var body = SW.el('div', { class: 'pad', style: 'max-width:none' });
     gview.appendChild(body);
-    tb.addEventListener('click', function (e) { var s = e.target.closest('[data-s]'); if (s) { gst.show = s.dataset.s; renderGen(cur); } });
+    tb.addEventListener('click', function (e) {
+      if (e.target.id === 'gn-wire') { wireDialog(function () { renderGen(cur); }); return; }
+      var s = e.target.closest('[data-s]'); if (s) { gst.show = s.dataset.s; renderGen(cur); }
+    });
     tb.addEventListener('change', function (e) {
       if (e.target.dataset.id) return;   // a version box: applied when the menu closes
       if (e.target.id === 'gn-gran') gst.gran = e.target.value;
+      if (e.target.id === 'gn-line' && e.target.value === 'custom' && !gst.custom) {
+        e.target.value = gst.line;
+        wireDialog(function () { renderGen(cur); });
+        return;
+      }
       if (e.target.id === 'gn-line') { gst.line = e.target.value; SW.store.set('gen.line', gst.line); }
       if (e.target.id === 'gn-sup') gst.supplied = e.target.checked;
       renderGen(cur);
@@ -497,7 +573,7 @@
     // The versions to trace: the chosen line (each a chain of parents), or the ticked
     // versions; the lineage of the open version follows its own ancestors.
     var line = V.LINES.filter(function (l) { return l.id === gst.line; })[0];
-    var ids = line ? line.ids : gst.set;
+    var ids = line ? line.ids : gst.line === 'custom' && gst.custom ? wiredChain(gst.custom.parents, gst.custom.tip).ids : gst.set;
     if (gst.show === 'lineage') {
       var anc = V.ancestry(cur.v.id);
       ids = anc.length > 1 ? anc : (gst.set.indexOf(cur.v.id) < 0 ? gst.set.concat([cur.v.id]) : gst.set);

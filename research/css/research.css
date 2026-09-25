@@ -546,3 +546,12 @@ body.drawer-open .notes-tab { display: none; }
 .flow-bar { padding-top: 6px; padding-bottom: 4px; }
 .flow-bar .legend { font-size: 11px; gap: 8px; }
 .pal-pick select { max-width: 11.5em; }
+
+/* Wire up your own line of descent (compare.js wireDialog). */
+dialog.wire-dlg { width: min(720px, 94vw); }
+.wire-dlg .wire-list { max-height: 48vh; overflow: auto; display: grid; gap: 3px; border: 1px solid var(--line-soft); border-radius: 4px; padding: 6px 8px; }
+.wire-dlg .wire-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 2px 12px; font-size: 13px; padding: 2px 0; border-bottom: 1px solid var(--line-soft); }
+.wire-dlg .wire-from { display: block; color: var(--text-dim); white-space: nowrap; }
+.wire-dlg .wire-from select { margin-left: 6px; max-width: 58vw; }
+.wire-dlg .wire-preview { margin: 4px 0 0; font-size: 12px; color: var(--beam); }
+.wire-dlg .wire-preview.bad { color: var(--red); }
