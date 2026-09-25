@@ -218,6 +218,45 @@
     return null;
   }
 
+  // ---------- descent ----------
+  // After 4.0 the program forks: ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8). 4.8
+  // continues dfw 4.1, with the ddp versions (4.4, the lost 4.5) as influence, not
+  // parent; the code agrees (4.1 to 4.8 is 83% similar by routine, 4.4 to 4.8 71%).
+  // The CHM builds descend from 4.1 with 4.8's score display grafted on, and
+  // Landsteiner's 2015 from 4.1f. (Placements confirmed 26 Sep 2026.)
+  // parent: the version it was made from. witnessOf: another reading of the same
+  // version (from other tapes, or a later reassembly), not a step of its own.
+  // also: a second source it draws on.
+  var PARENT = { '2b-pre': '1', '2b': '1', '3.1': '2b', '4.0': '3.1',
+                 '4.0ts': '4.0', '4.2': '4.0ts', '4.3': '4.2', '4.4': '4.3',
+                 '4.1': '4.0', '4.8': '4.1', '4.1d': '4.1', '4.1f': '4.1d', '2015': '4.1f' };
+  var WITNESS = { '3.1t': '3.1', '4.1t': '4.1', '4.3m': '4.3', '4.4m': '4.4', '4.4f': '4.4' };
+  var ALSO = { '4.1f': ['4.8'] };
+  var INFLUENCE = { '4.8': ['4.4'] };
+  VERSIONS.forEach(function (v) {
+    v.parent = PARENT[v.id] || null;
+    v.witnessOf = WITNESS[v.id] || null;
+    v.also = ALSO[v.id] || [];
+    v.influence = INFLUENCE[v.id] || [];
+  });
+  // The chain from the first version to this one, following parents (a witness
+  // stands in for the version it reads).
+  function ancestry(id) {
+    var v = byId(id), chain = [];
+    if (!v) return chain;
+    var cur = v.witnessOf || v.id;
+    while (cur) { chain.unshift(cur); var p = byId(cur); cur = p && p.parent; }
+    if (v.witnessOf) chain[chain.length - 1] = v.id;
+    return chain;
+  }
+  // The lines of descent, each a straight chain the genealogy can follow.
+  var LINES = [
+    { id: 'ddp', label: 'ddp line (4.0 → 4.0TS → 4.2 → 4.3 → 4.4)', tip: '4.4' },
+    { id: 'dfw', label: 'dfw line (4.0 → 4.1 → 4.8)', tip: '4.8' },
+    { id: 'chm', label: 'CHM line (4.1 → 4.1d → 4.1f → 2015)', tip: '2015' }
+  ];
+  LINES.forEach(function (l) { l.ids = ancestry(l.tip); });
+
   // Find the "spacewar ..." title line of a modern transcription.
   function findTitle(lines) {
     for (var i = 0; i < lines.length; i++) {
@@ -255,7 +294,7 @@
   }
 
   var api = { VERSIONS: VERSIONS, TRANSFORMS: TRANSFORMS, DIALECTS: DIALECTS, byId: byId, load: load,
-              findTitle: findTitle, SRC: SRC };
+              findTitle: findTitle, SRC: SRC, LINES: LINES, ancestry: ancestry };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SWVersions = api;
 })(this);

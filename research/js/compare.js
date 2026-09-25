@@ -426,7 +426,9 @@
   // ======================= Genealogy =======================
   var gview = SW.$('#view-genealogy');
   var DEFAULT_SET = ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'];
-  var gst = { set: SW.store.get('gen.set', DEFAULT_SET), gran: 'routine', supplied: true, show: 'alluvial', boxes: SW.store.get('gen.boxes', 'change'), zoom: +SW.store.get('gen.zoom', 0) || 0 };
+  // line: which line of descent the flow follows (V.LINES), or 'chosen' for the
+  // ticked versions in date order, which mixes the ddp and dfw forks.
+  var gst = { line: SW.store.get('gen.line', 'dfw'), set: SW.store.get('gen.set', DEFAULT_SET), gran: 'routine', supplied: true, show: 'alluvial', boxes: SW.store.get('gen.boxes', 'change'), zoom: +SW.store.get('gen.zoom', 0) || 0 };
 
   function texts(ids) {
     var vs = buildable().filter(function (v) { return ids.indexOf(v.id) >= 0; });
@@ -441,6 +443,9 @@
     tb.innerHTML = ['alluvial', 'matrix', 'lineage'].map(function (m) {
       return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '" title="' + { alluvial: 'Flow through versions: every version side by side, routines joined to their ancestors', matrix: 'Similarity matrix and family tree of the chosen versions', lineage: 'The line of descent of the version open now' }[m] + '">' + { alluvial: 'Flow', matrix: 'Similarity &amp; tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '')) }[m] + '</button>';
     }).join('') + '<span class="sep"></span>' +
+      '<label class="check" id="gn-line-l" title="Which line of descent to follow. After 4.0 the program forks into ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8); the CHM builds and 2015 descend from dfw 4.1. Each step compares a version with its parent. &#39;Chosen versions&#39; compares the versions you tick in date order, which mixes the forks.">Line <select id="gn-line">' +
+      V.LINES.map(function (l) { return '<option value="' + l.id + '"' + (gst.line === l.id ? ' selected' : '') + '>' + SW.esc(l.label) + '</option>'; }).join('') +
+      '<option value="chosen"' + (gst.line === 'chosen' ? ' selected' : '') + '>Chosen versions, by date (mixes the forks)</option></select></label>' +
       '<label class="check" title="The size of the pieces traced from version to version: section (large blocks under a header or tape title), routine (from one label after a break to the next), or line">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
       '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied</label><span id="gn-pal"></span>' +
       '<span class="help-dot" id="gn-help" tabindex="0">?</span><span class="tb-right" id="gn-exp"></span>';
@@ -452,7 +457,7 @@
       all.map(function (v) {
         return '<label class="check" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + ' <span class="faint">' + SW.esc(v.date) + '</span></label>';
       }).join('') + '<div class="hint">Applied when this menu closes.</div></div>';
-    tb.insertBefore(vm, tb.querySelector('.sep').nextSibling);
+    if (gst.line === 'chosen') tb.insertBefore(vm, SW.$('#gn-line-l', tb).nextSibling);
     gview.appendChild(tb);
     SW.$('#gn-pal', tb).appendChild(SW.paletteSelect(function () { renderGen(cur); }));
     SW.$('#gn-help', tb).title = gst.show === 'alluvial' ? '' : 'Choose versions, granularity and colours here; the figure and its exports are below.';
@@ -485,11 +490,19 @@
     tb.addEventListener('change', function (e) {
       if (e.target.dataset.id) return;   // a version box: applied when the menu closes
       if (e.target.id === 'gn-gran') gst.gran = e.target.value;
+      if (e.target.id === 'gn-line') { gst.line = e.target.value; SW.store.set('gen.line', gst.line); }
       if (e.target.id === 'gn-sup') gst.supplied = e.target.checked;
       renderGen(cur);
     });
-    body.innerHTML = '<p class="hint">Assembling and matching ' + gst.set.length + ' versions…</p>';
-    var ids = gst.show === 'lineage' && gst.set.indexOf(cur.v.id) < 0 ? gst.set.concat([cur.v.id]) : gst.set;
+    // The versions to trace: the chosen line (each a chain of parents), or the ticked
+    // versions; the lineage of the open version follows its own ancestors.
+    var line = V.LINES.filter(function (l) { return l.id === gst.line; })[0];
+    var ids = line ? line.ids : gst.set;
+    if (gst.show === 'lineage') {
+      var anc = V.ancestry(cur.v.id);
+      ids = anc.length > 1 ? anc : (gst.set.indexOf(cur.v.id) < 0 ? gst.set.concat([cur.v.id]) : gst.set);
+    }
+    body.innerHTML = '<p class="hint">Assembling and matching ' + ids.length + ' versions…</p>';
     setTimeout(function () {
       texts(ids).then(function (ts) {
         body.innerHTML = '';
@@ -857,7 +870,7 @@
     var byFirst = {};
     lin.rows.forEach(function (r) { var k = r.firstSeen || cur.v.id; byFirst[k] = (byFirst[k] || 0) + r.unit.codeLines; });
     var total = 0; for (var k in byFirst) total += byFirst[k];
-    body.innerHTML = '<p class="hint prose">Each ' + gst.gran + ' of ' + SW.esc(cur.v.label) + ', traced back through the selected versions to where it first appears (exactly or edited). Where a link is missing in the version before, older versions are searched (a bridged link).</p>';
+    body.innerHTML = '<p class="hint prose">Each ' + gst.gran + ' of ' + SW.esc(cur.v.label) + ', traced back through its line of descent to where it first appears (exactly or edited). Where a link is missing in the version before, older versions are searched (a bridged link).</p>';
     var bars = SW.el('div', { class: 'bars card', style: 'max-width:640px;margin:10px 0' });
     bars.innerHTML = '<h3>Code lines by version of first appearance</h3>' + ts.filter(function (t) { return byFirst[t.id]; }).map(function (t) {
       return '<div class="b"><span>' + SW.esc(t.label) + '</span><i style="width:' + (100 * byFirst[t.id] / total).toFixed(1) + '%"></i><em>' + byFirst[t.id] + '</em></div>';

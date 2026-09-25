@@ -14,11 +14,22 @@
     }).join('') + '</div>';
   }
 
+  // Where the version sits in the lines of descent (versions.js).
+  function descent(v) {
+    var name = function (id) { var x = V.byId(id); return x ? SW.esc(x.label.replace(/^Spacewar! /, '')) : SW.esc(id); };
+    if (v.witnessOf) return 'another reading of ' + name(v.witnessOf) + ', not a version of its own';
+    if (!v.parent) return v.id === '1' ? 'none: the first version' : 'not placed in a line of descent';
+    return name(v.parent) +
+      (v.also.length ? '; also draws on ' + v.also.map(name).join(', ') : '') +
+      (v.influence.length ? '; with ' + v.influence.map(name).join(', ') + ' as influence, not parent' : '') +
+      ' <span class="faint">(line: ' + SW.esc(V.ancestry(v.id).map(function (id) { return V.byId(id).label.replace(/^Spacewar! /, ''); }).join(' → ')) + ')</span>';
+  }
+
   function render(b) {
     var v = b.v, a = b.asm;
     var pad = SW.el('div', { class: 'pad' });
     var dl = [
-      ['Date', v.date], ['Authors', v.authors], ['Fork', v.fork], ['Status', v.status], ['Survives as', v.medium || 'none'],
+      ['Date', v.date], ['Authors', v.authors], ['Fork', v.fork], ['Descends from', descent(v)], ['Status', v.status], ['Survives as', v.medium || 'none'],
       ['Sources', b.parts.map(function (p) {
         return '<a href="../sources/' + SW.esc(p.src) + '" target="_blank" rel="noopener">' + SW.esc(p.src) + '</a>' +
           (p.role !== 'program' ? ' <span class="faint">(supplied: ' + SW.esc(p.role) + ')</span>' : '') +
