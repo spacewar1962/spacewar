@@ -155,6 +155,19 @@
     });
     b.macros = {};
     b.asm.macros.forEach(function (m) { b.macros[m.name] = m; });
+    // What kind of line each is, for the colour marks in the Read view:
+    // def (inside a define ... term), eq (a symbol set with "="), call (a macro used).
+    b.kind = {};
+    b.asm.macros.forEach(function (m) { for (var n = m.line; n <= (m.endLine || m.line); n++) b.kind[m.file + ':' + n] = 'def'; });
+    b.lines.forEach(function (ls, pi) {
+      ls.forEach(function (L) {
+        var k = pi + ':' + L.n;
+        if (b.kind[k] || L.skipped) return;
+        var ws = (b.asm.byLine[pi] || [])[L.n];
+        if (ws && ws.some(function (w) { return w.macro; })) b.kind[k] = 'call';
+        else if (/^\s*[A-Za-z0-9\\~.]+\s*=/.test(SW.parseLine(L.norm).code)) b.kind[k] = 'eq';
+      });
+    });
     b.varRange = b.asm.variables;
     // address -> [part, line]
     b.srcOf = function (addr) {

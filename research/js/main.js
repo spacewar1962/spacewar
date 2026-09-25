@@ -59,7 +59,7 @@
     SW.status('assembling ' + id + '…');
     shown = {};
     SW.build(id).then(function (b) {
-      SW.status(b.asm ? b.asm.words.length + ' words · ' + (b.asm.errorCount ? b.asm.errorCount + ' errors' : 'clean') + ' · ' + b.ms + ' ms' : 'no source');
+      statusFor(b);
       if (SW.tape) SW.tape.strip(b);
       document.title = b.v.label + ' · Spacewar! Research Bench';
     }).catch(function (e) { SW.status('error'); SW.toast(e.message, 5000); });
@@ -67,6 +67,26 @@
     showCurrent();
   }
   SW.select = select;
+
+  // The status line: who, what, and how the build stands against the tapes.
+  function statusFor(b) {
+    var v = b.v, el = SW.$('#status');
+    if (!b.asm) { SW.status('no source survives'); el.title = v.summary; return; }
+    var parts = [v.authors.replace(/\s*\(.*?\)/g, '').replace(/^Monty /, ''), b.asm.words.length.toLocaleString('en-GB') + ' words',
+                 b.asm.errorCount ? b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : '') : 'assembles cleanly'];
+    SW.status(parts.join(' · '));
+    el.title = v.label + ' (' + v.date + ')\n' + v.summary + '\nAssembled in ' + b.ms + ' ms (' + root.SWVersions.DIALECTS[b.dialect].label + ').';
+    if (!(v.witnesses || []).length || !SW.tape) return;
+    SW.tape.witnesses(b).then(function (rows) {
+      if (SW.state.v !== v.id) return;
+      var exact = rows.filter(function (r) { return r.differ === 0 && r.missing === 0 && r.extra === 0; });
+      var best = rows.slice().sort(function (x, y) { return (x.differ + x.missing + x.extra) - (y.differ + y.missing + y.extra); })[0];
+      var t = exact.length ? 'rebuilds ' + exact.map(function (r) { return r.tape.split('/').pop(); }).join(', ') + ' exactly'
+        : best ? (best.differ + best.missing + best.extra) + ' words off ' + best.tape.split('/').pop() : '';
+      if (t) SW.status(parts.concat([t]).join(' · '));
+      el.title += '\nWitness tapes:\n' + rows.map(function (r) { return '  ' + r.tape + ': ' + (r.differ + r.missing + r.extra ? r.differ + ' differ, ' + r.missing + ' only in source, ' + r.extra + ' only on tape' : 'identical'); }).join('\n');
+    });
+  }
 
   function settings() {
     var dlg = SW.$('#dlg-settings');

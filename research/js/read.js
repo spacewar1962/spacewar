@@ -53,6 +53,7 @@
     if (L.skipped) cls += ' skip';
     if (b.errorsAt[k]) cls += ' err';
     if (L.raw !== L.norm && !L.skipped) cls += ' norm';
+    if (b.kind && b.kind[k]) cls += ' k' + b.kind[k];
     if (SW.breakpoints && words && words.some(function (w) { return SW.breakpoints[w.loc]; })) cls += ' bp';
     var a = '', w = '';
     if (words && words.length) {
@@ -91,6 +92,18 @@
       '<label class="check" title="Show the tapes supplied to make this version assemble (the macro definitions and the star table), which are not part of the version&#39;s own source; they are collapsed by default"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
       '<span class="sep"></span>';
+    tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
+      SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
+        '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
+        '<div><i class="kx kcall"></i>a macro used (the words it made are in the address column)</div>' +
+        '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
+        '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
+        '<div><i class="kx knoted"></i>covered by a note (initials at the right; click them)</div>' +
+        '<div><span class="errs">lac x</span> an assembly error (hover for the message)</div>' +
+        '<div><span style="color:var(--red)">●</span> a breakpoint (set from the selection bar)</div>' +
+        '<div><span class="faint"><i>italic grey</i></span> not assembled (a transcription header, or outside this tape segment)</div>' +
+        '<div class="faint flow" style="margin-top:6px">Text: <span class="lab">labels</span>, <b>instructions</b>, <span class="mac">macros</span>, <span class="ps">pseudo-instructions</span>, <span class="num">numbers</span>, <span class="cm">comments</span>.</div></div>');
+    } }, 'Key'));
     var info = SW.el('span', { class: 'hint' });
     if (b.asm) {
       info.innerHTML = b.asm.words.length + ' words · ' +

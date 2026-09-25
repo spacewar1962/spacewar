@@ -109,10 +109,10 @@ code, .mono { font-family: var(--mono); }
 }
 :root[data-theme="paper"] .pick select { background: rgba(255, 255, 255, 0.55); color: #0d1a20; border-color: rgba(0,0,0,0.2); }
 .pick select option { color: #111; background: #fff; }
-.tape-strip { flex: 1 1 auto; min-width: 40px; height: 30px; overflow: hidden; border-radius: 2px; opacity: 0.95; }
+.tape-strip { flex: 1 1 auto; min-width: 160px; height: 30px; overflow: hidden; border-radius: 2px; opacity: 0.95; }
 .tape-strip canvas { display: block; height: 30px; }
 .bar-right { display: flex; align-items: center; gap: 8px; flex: none; }
-.status { font-family: var(--mono); font-size: 12px; opacity: 0.85; white-space: nowrap; }
+.status { font-family: var(--mono); font-size: 12px; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30vw; cursor: help; }
 .icon-btn {
   background: transparent; border: 1px solid transparent; border-radius: 4px; cursor: pointer;
   width: 30px; height: 30px; display: inline-grid; place-items: center; color: inherit; font-size: 16px;
@@ -400,3 +400,20 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
   background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0; padding: 6px 12px; cursor: pointer; font-size: 13px; }
 .drawer-dock.on { display: block; }
 .drawer-dock:hover { border-color: var(--beam); }
+
+/* Kinds of line, in the syntax colours. */
+.ln.kdef { background: color-mix(in srgb, var(--violet) 9%, transparent); }
+.ln.keq { background: color-mix(in srgb, var(--green) 8%, transparent); }
+.ln.kcall .t { background-image: linear-gradient(to right, var(--violet) 0, var(--violet) 2px, transparent 2px); padding-left: 5px; }
+.ln.kdef:hover, .ln.keq:hover { background: var(--surface); }
+.keylist div { margin: 3px 0; display: flex; align-items: center; gap: 8px; }
+.keylist .lab { color: var(--beam); } .keylist .mac { color: var(--violet); font-weight: 600; } .keylist .ps { color: var(--green); }
+.keylist .num { color: var(--amber); } .keylist .cm { color: var(--text-dim); font-style: italic; }
+.kx { display: inline-block; width: 22px; height: 14px; border-radius: 2px; flex: none; }
+.kx.kdef { background: color-mix(in srgb, var(--violet) 30%, transparent); }
+.kx.keq { background: color-mix(in srgb, var(--green) 30%, transparent); }
+.kx.kcall { background: linear-gradient(to right, var(--violet) 0, var(--violet) 3px, transparent 3px); border: 1px solid var(--line); }
+.kx.knorm { background: linear-gradient(to left, var(--violet) 0, var(--violet) 3px, transparent 3px); border: 1px solid var(--line); }
+.kx.knoted { background: linear-gradient(to right, var(--amber) 0, var(--amber) 2px, transparent 2px); border: 1px solid var(--line); }
+.keylist .errs { text-decoration: underline wavy var(--red); text-underline-offset: 3px; font-family: var(--code-font); }
+.keylist div.flow { display: block; }
