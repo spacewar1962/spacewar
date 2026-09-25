@@ -1,0 +1,393 @@
+/*
+ * read.js - the listing: source as held, with what the assembler made of it.
+ */
+(function (root) {
+  'use strict';
+  var SW = root.SW, N = SW.notes;
+  var view = SW.$('#view-read');
+  var R = SW.views.read = {};
+  var build = null, notes = [], counts = {}, anchorSel = null;
+  var opts = { words: SW.store.get('read.words', true), norm: false, supplied: false, heat: false };
+
+  var PSEUDO = { define: 1, term: 1, terminate: 1, repeat: 1, constants: 1, variables: 1, start: 1,
+                 text: 1, decimal: 1, octal: 1, flexo: 1, 'char': 1, character: 1, noinput: 1, expunge: 1 };
+
+  // ---------- highlighting ----------
+  function hl(raw, b) {
+    var p = SW.parseLine(raw), h = '';
+    if (p.loc) h += '<span class="num">' + SW.esc(p.loc) + '</span>';
+    var lead = /^\s*/.exec(raw.slice(p.loc.length))[0];
+    var code = raw.slice(p.loc.length, raw.length - p.comment.length);
+    // labels
+    var rest = code, m;
+    while ((m = /^(\s*)([A-Za-z0-9\\~.]*[A-Za-z][A-Za-z0-9\\~.]*)(,)/.exec(rest))) {
+      h += SW.esc(m[1]) + '<span class="lab sym" data-s="' + SW.esc(m[2].replace(/[\\~.]/g, '')) + '">' + SW.esc(m[2]) + '</span>,';
+      rest = rest.slice(m[0].length);
+    }
+    var first = true;
+    h += rest.replace(/[A-Za-z0-9\\~.]+|[^A-Za-z0-9\\~.]+/g, function (tok) {
+      if (!/[A-Za-z0-9]/.test(tok)) return SW.esc(tok);
+      var name = tok.replace(/[\\~]/g, '').replace(/^\.(?=[a-z0-9])/i, ''), cls = 'sym';
+      var over = /[\\~]/.test(tok) || (/^\.[a-z0-9]/i.test(tok) && b.parts.length && tok.length > 1);
+      var isOp = first && /[a-z]/i.test(tok);
+      var key = name.slice(0, 6);
+      if (/^[0-9]+$/.test(tok)) cls = 'num';
+      else if (PSEUDO[name]) cls = 'ps';
+      else if (b.macros && b.macros[key]) cls = 'mac sym';
+      else if (b.asm && b.asm.permanent && b.asm.permanent[key] !== undefined) cls = 'op sym';
+      else if (tok === '.') cls = 'num';
+      if (/[a-z]/i.test(tok)) first = false;
+      if (over) cls += ' var';
+      void isOp;
+      return '<span class="' + cls + '" data-s="' + SW.esc(key) + '">' + SW.esc(tok) + '</span>';
+    });
+    if (p.comment) h += '<span class="cm">' + SW.esc(p.comment) + '</span>';
+    void lead;
+    return h;
+  }
+
+  // ---------- rendering ----------
+  function rowHTML(b, L) {
+    var k = L.p + ':' + L.n, cls = 'ln';
+    var words = b.asm && b.asm.byLine[L.p] && b.asm.byLine[L.p][L.n];
+    if (L.skipped) cls += ' skip';
+    if (b.errorsAt[k]) cls += ' err';
+    if (L.raw !== L.norm && !L.skipped) cls += ' norm';
+    if (SW.breakpoints && words && words.some(function (w) { return SW.breakpoints[w.loc]; })) cls += ' bp';
+    var a = '', w = '';
+    if (words && words.length) {
+      a = SW.oct(words[0].loc, 4);
+      w = SW.oct(words[0].val) + (words.length > 1 ? ' <span class="faint">+' + (words.length - 1) + '</span>' : '');
+    }
+    var text = opts.norm ? L.norm : L.raw;
+    var c = counts[k], mk = c ? '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '">' + c.n + '</span>' : '';
+    var heat = '';
+    if (opts.heat && SW.profile && SW.profile.build === b && words) {
+      var ex = 0;
+      words.forEach(function (x) { ex += SW.profile.exec[x.loc] || 0; });
+      if (ex) heat = ' style="background:rgba(255,206,122,' + Math.min(0.5, 0.06 + Math.log10(1 + ex) / 12).toFixed(3) + ')"';
+    }
+    var title = '';
+    if (b.errorsAt[k]) title = b.errorsAt[k].map(function (e) { return e.message + (e.symbol ? ' "' + e.symbol + '"' : ''); }).join('; ');
+    else if (L.raw !== L.norm && !L.skipped) title = 'Normalised for assembly: ' + L.norm;
+    else if (L.skipped) title = 'Not assembled (transcription header or outside this tape segment)';
+    return '<div class="' + cls + '" id="L' + L.p + '-' + L.n + '" data-p="' + L.p + '" data-n="' + L.n + '"' +
+      (title ? ' title="' + SW.esc(title) + '"' : '') + '>' +
+      '<span class="n"' + heat + '>' + L.n + '</span><span class="a">' + a + '</span><span class="w">' + w + '</span>' +
+      '<span class="t">' + (text ? hl(text, b) : ' ') + '</span><span class="mk">' + mk + '</span></div>';
+  }
+
+  function render() {
+    var b = build;
+    view.innerHTML = '';
+    var tb = SW.el('div', { class: 'toolbar' });
+    tb.innerHTML =
+      '<input type="search" id="rd-find" placeholder="Find text or /regex/ …">' +
+      '<button class="btn" id="rd-prev" title="Previous match">↑</button><button class="btn" id="rd-next" title="Next match">↓</button>' +
+      '<span class="hint" id="rd-hits"></span><span class="sep"></span>' +
+      '<label class="check"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
+      '<label class="check" title="Show the text the assembler read, after documented normalisations"><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
+      '<label class="check" title="Show supplied macro and star tapes"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
+      '<label class="check" title="Shade lines by how often they ran (from the Run view)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
+      '<span class="sep"></span>';
+    var info = SW.el('span', { class: 'hint' });
+    if (b.asm) {
+      info.innerHTML = b.asm.words.length + ' words · ' +
+        (b.asm.errorCount ? '<span class="badge err">' + b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : '') + '</span>' : '<span class="badge ok">assembles cleanly</span>') +
+        ' · start ' + SW.oct(b.asm.start, 4);
+    } else info.textContent = 'No source survives for this version.';
+    tb.appendChild(info);
+    tb.appendChild(SW.el('span', { class: 'sep' }));
+    tb.appendChild(SW.exportButtons(function () { return listingDoc(b, null); }, function () { return 'spacewar-' + b.v.id + '-listing'; }));
+    view.appendChild(tb);
+
+    if (!b.v.build) {
+      var lost = SW.el('div', { class: 'pad prose' });
+      lost.innerHTML = '<h2>' + SW.esc(b.v.label) + '</h2><p>' + SW.esc(b.v.summary) + '</p><p class="muted">What is absent is also part of the record. Notes on this version can still be kept under “Version &amp; notes”.</p>';
+      view.appendChild(lost);
+      return;
+    }
+    var box = SW.el('div', { class: 'listing' + (opts.words ? '' : ' hide-words') });
+    b.parts.forEach(function (part, pi) {
+      var supplied = part.role !== 'program';
+      var sec = SW.el('div', { class: 'part' + (supplied && !opts.supplied ? ' collapsed' : '') });
+      var errs = b.asm.errors.filter(function (e) { return e.file === pi; }).length;
+      sec.innerHTML = '<div class="part-head" data-p="' + pi + '"><span class="src">' + SW.esc(part.src) + '</span>' +
+        '<span class="role">' + SW.esc(supplied ? 'supplied: ' + part.role : 'program') +
+        (part.end ? ' · lines ' + part.title + '–' + part.end : part.title > 1 ? ' · from line ' + part.title : '') + '</span>' +
+        (errs ? '<span class="badge err">' + errs + ' error' + (errs > 1 ? 's' : '') + '</span>' : '') +
+        '<span class="faint" style="margin-left:auto">' + (supplied && !opts.supplied ? 'show ▸' : '') + '</span></div>';
+      var html = [];
+      if (!supplied || opts.supplied) b.lines[pi].forEach(function (L) { html.push(rowHTML(b, L)); });
+      sec.insertAdjacentHTML('beforeend', html.join(''));
+      box.appendChild(sec);
+    });
+    view.appendChild(box);
+    var bar = SW.el('div', { class: 'selbar', id: 'rd-selbar' });
+    view.appendChild(bar);
+    wire(box, tb);
+    paintSel();
+  }
+
+  // ---------- selection ----------
+  function paintSel() {
+    SW.$$('.ln.sel', view).forEach(function (e) { e.classList.remove('sel'); });
+    var s = SW.state.sel, bar = SW.$('#rd-selbar', view);
+    if (!s || !bar) { if (bar) bar.classList.remove('on'); return; }
+    for (var n = s.n0; n <= s.n1; n++) { var e = SW.$('#L' + s.p + '-' + n, view); if (e) e.classList.add('sel'); }
+    bar.classList.add('on');
+    bar.innerHTML = '<b>' + SW.esc(SW.cite(build, s.p, s.n0, s.n1)) + '</b>';
+    var acts = [
+      ['✎ Annotate', annotateSel], ['❝ Copy citation', copyCite], ['🔗 Copy link', copyLink],
+      ['⤓ Word', function () { exportSel('docx'); }], ['⤓ Markdown', function () { exportSel('md'); }],
+      ['▣ Figure', figureSel], ['● Breakpoint', bpSel], ['▶ Run to here', runToSel], ['✕', function () { SW.state.sel = null; paintSel(); SW.writeQuery(); }]
+    ];
+    acts.forEach(function (a) { bar.appendChild(SW.el('button', { class: 'btn', onclick: a[1] }, a[0])); });
+  }
+  function selLines() {
+    var s = SW.state.sel;
+    return build.lines[s.p].slice(s.n0 - 1, s.n1);
+  }
+  function quote() { return selLines().map(function (L) { return L.raw; }).join('\n'); }
+  function annotateSel() {
+    var s = SW.state.sel;
+    N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: s.p, n0: s.n0, n1: s.n1, src: build.parts[s.p].src },
+               quote: quote(), heading: 'Annotate', anchorText: SW.cite(build, s.p, s.n0, s.n1) });
+  }
+  function copy(text, msg) {
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+      .then(function () { SW.toast(msg); }, function () { window.prompt('Copy:', text); });
+  }
+  function copyCite() { var s = SW.state.sel; copy(SW.cite(build, s.p, s.n0, s.n1), 'Citation copied'); }
+  function copyLink() {
+    var s = SW.state.sel;
+    copy(SW.permalink({ v: build.v.id, l: s.p + ':' + s.n0 + (s.n1 !== s.n0 ? '-' + s.n1 : '') }), 'Link copied');
+  }
+  function exportSel(fmt) {
+    var s = SW.state.sel;
+    SW.exportDoc(listingDoc(build, s), 'spacewar-' + build.v.id + '-ll' + s.n0 + '-' + s.n1, fmt);
+  }
+  function figureSel() {
+    var s = SW.state.sel;
+    SW.figures.codeFigureDialog(build, selLines(), SW.cite(build, s.p, s.n0, s.n1));
+  }
+  function bpSel() {
+    var ws = [];
+    selLines().forEach(function (L) { ((build.asm.byLine[L.p] || [])[L.n] || []).forEach(function (w) { ws.push(w.loc); }); });
+    if (!ws.length) { SW.toast('No assembled words on these lines'); return; }
+    SW.breakpoints = SW.breakpoints || {};
+    var on = !SW.breakpoints[ws[0]];
+    SW.breakpoints[ws[0]] = on;
+    if (!on) delete SW.breakpoints[ws[0]];
+    SW.emit('breakpoints');
+    SW.toast((on ? 'Breakpoint set at ' : 'Breakpoint cleared at ') + SW.oct(ws[0], 4));
+    render();
+  }
+  function runToSel() {
+    var L = selLines().filter(function (x) { return (build.asm.byLine[x.p] || [])[x.n]; })[0];
+    if (!L) { SW.toast('No assembled words on these lines'); return; }
+    SW.emit('runTo', build.asm.byLine[L.p][L.n][0].loc);
+  }
+
+  // ---------- export model ----------
+  function listingDoc(b, s) {
+    var lines = s ? b.lines[s.p].slice(s.n0 - 1, s.n1) : [].concat.apply([], b.lines.filter(function (x, pi) { return b.parts[pi].role === 'program'; }));
+    return N.list(b.v.id).then(function (all) {
+      var threads = N.threads(all);
+      var byLine = {};
+      threads.forEach(function (t) {
+        if (!t.note.anchor) return;
+        var k = t.note.anchor.p + ':' + t.note.anchor.n0;
+        (byLine[k] = byLine[k] || []).push(t);
+      });
+      var blocks = [];
+      if (!s) blocks.push({ type: 'p', text: b.v.summary });
+      var cur = null;
+      lines.forEach(function (L) {
+        if (!cur || cur.p !== L.p) {
+          cur = { type: 'code', caption: b.parts[L.p].src, lines: [], p: L.p };
+          blocks.push(cur);
+        }
+        var ws = b.asm && (b.asm.byLine[L.p] || [])[L.n];
+        cur.lines.push({
+          n: L.n, addr: ws && ws.length ? SW.oct(ws[0].loc, 4) : '', word: ws && ws.length ? SW.oct(ws[0].val) : '',
+          text: L.raw, mark: b.errorsAt[L.p + ':' + L.n] ? 'del' : undefined,
+          notes: (byLine[L.p + ':' + L.n] || []).map(function (t) {
+            var reps = [];
+            (function walk(rs) { rs.forEach(function (r) { reps.push({ by: r.note.by, date: String(r.note.date).slice(0, 10), text: r.note.text }); walk(r.replies); }); })(t.replies);
+            return { by: t.note.by, date: String(t.note.date).slice(0, 10), text: t.note.text, replies: reps };
+          })
+        });
+      });
+      var errs = b.asm ? b.asm.errors.filter(function (e) { return !s || (e.file === s.p && e.line >= s.n0 && e.line <= s.n1); }) : [];
+      if (errs.length) {
+        blocks.push({ type: 'h2', text: 'Assembly errors' });
+        blocks.push({ type: 'table', head: ['File', 'Line', 'Message', 'Symbol'], rows: errs.map(function (e) {
+          return [b.parts[e.file].src, String(e.line), e.message, e.symbol || ''];
+        }) });
+      }
+      return {
+        title: s ? SW.cite(b, s.p, s.n0, s.n1) : b.v.label + ': annotated listing',
+        subtitle: s ? b.v.summary : b.v.date + ' · ' + b.v.authors,
+        meta: SW.docMeta(b), blocks: blocks
+      };
+    });
+  }
+  R.listingDoc = listingDoc;
+
+  // ---------- events ----------
+  function wire(box, tb) {
+    box.addEventListener('click', function (e) {
+      var head = e.target.closest('.part-head');
+      if (head) {
+        var sec = head.parentNode;
+        if (sec.classList.contains('collapsed') && !sec.querySelector('.ln')) { opts.supplied = true; render(); }
+        else sec.classList.toggle('collapsed');
+        return;
+      }
+      var dot = e.target.closest('.note-dot');
+      if (dot) { showNotesFor(dot.dataset.k); return; }
+      var sym = e.target.closest('.sym');
+      if (sym) { symbolPop(sym.dataset.s, e.clientX, e.clientY); return; }
+      var row = e.target.closest('.ln');
+      if (!row) return;
+      var p = +row.dataset.p, n = +row.dataset.n;
+      if (e.target.closest('.a') || e.target.closest('.w')) { toggleExpansion(row, p, n); return; }
+      if (e.shiftKey && anchorSel && anchorSel.p === p) {
+        SW.state.sel = { p: p, n0: Math.min(anchorSel.n, n), n1: Math.max(anchorSel.n, n) };
+      } else {
+        anchorSel = { p: p, n: n };
+        SW.state.sel = { p: p, n0: n, n1: n };
+      }
+      paintSel();
+      SW.writeQuery();
+      var k = p + ':' + n;
+      if (counts[k]) showNotesFor(k);
+    });
+    SW.$('#rd-words', tb).onchange = function (e) { opts.words = e.target.checked; SW.store.set('read.words', opts.words); box.classList.toggle('hide-words', !opts.words); };
+    SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
+    SW.$('#rd-sup', tb).onchange = function (e) { opts.supplied = e.target.checked; render(); };
+    SW.$('#rd-heat', tb).onchange = function (e) {
+      opts.heat = e.target.checked;
+      if (opts.heat && !(SW.profile && SW.profile.build === build)) SW.toast('Run the program in the Run view to collect a profile.');
+      render();
+    };
+    var find = SW.$('#rd-find', tb), hits = [], hi = -1;
+    function search() {
+      SW.$$('.ln.cur', view).forEach(function (e) { e.classList.remove('cur'); });
+      hits = [];
+      var q = find.value;
+      if (!q) { SW.$('#rd-hits', tb).textContent = ''; return; }
+      var re;
+      try { re = /^\/.*\/$/.test(q) ? new RegExp(q.slice(1, -1), 'i') : new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
+      catch (err) { SW.$('#rd-hits', tb).textContent = 'bad pattern'; return; }
+      build.lines.forEach(function (ls, pi) { ls.forEach(function (L) { if (re.test(L.raw)) hits.push(L); }); });
+      SW.$('#rd-hits', tb).textContent = hits.length + ' match' + (hits.length === 1 ? '' : 'es');
+      hi = -1; step(1);
+    }
+    function step(d) {
+      if (!hits.length) return;
+      hi = (hi + d + hits.length) % hits.length;
+      R.goto(hits[hi].p, hits[hi].n, true);
+    }
+    find.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.shiftKey ? step(-1) : (hits.length && find.dataset.q === find.value ? step(1) : (find.dataset.q = find.value, search())); } });
+    SW.$('#rd-next', tb).onclick = function () { if (find.dataset.q !== find.value) { find.dataset.q = find.value; search(); } else step(1); };
+    SW.$('#rd-prev', tb).onclick = function () { step(-1); };
+  }
+
+  function toggleExpansion(row, p, n) {
+    var nx = row.nextElementSibling;
+    if (nx && nx.classList.contains('expansion')) { nx.remove(); return; }
+    var ws = (build.asm.byLine[p] || [])[n];
+    if (!ws) return;
+    var h = ws.map(function (w) {
+      var ex = SW.profile && SW.profile.build === build ? SW.profile.exec[w.loc] : null;
+      return SW.oct(w.loc, 4) + '  ' + SW.oct(w.val) + '  ' + SW.esc(root.PDP1CPU.disasm(w.val, build.symAt)) +
+        (w.macro ? '  <span class="faint">(macro ' + SW.esc(w.macro) + ')</span>' : '') +
+        (w.kind ? '  <span class="faint">(' + w.kind + ')</span>' : '') +
+        (ex ? '  <span class="num">×' + ex + '</span>' : '');
+    }).join('\n');
+    var d = SW.el('div', { class: 'expansion' }, h);
+    d.style.whiteSpace = 'pre';
+    row.insertAdjacentElement('afterend', d);
+  }
+
+  function symbolPop(name, x, y) {
+    var b = build, s = b.sym[name];
+    var g = SW.glosses && SW.glosses[name];
+    var h = '<h4>' + SW.esc(name) + '</h4>';
+    if (g) {
+      h += '<div><b>' + SW.esc(g.name) + '</b> <span class="faint">' + SW.esc(g.params || '') + ' · opcode ' + SW.esc(g.octal || '') + '</span></div>' +
+        '<div style="margin-top:4px;font-family:var(--serif);font-size:14px">' + SW.esc(g.description) + '</div>';
+    }
+    if (b.macros[name]) {
+      var m = b.macros[name];
+      h += '<div>Macro, dummies: <span class="mono">' + SW.esc(m.args.join(', ') || '(none)') + '</span></div>' +
+        '<div class="refs"><a href="#" data-p="' + m.file + '" data-n="' + m.line + '">defined at ' + SW.esc(b.parts[m.file].src) + ':' + m.line + '</a></div>' +
+        '<pre class="mono" style="font-size:12px;max-height:160px;overflow:auto;margin:6px 0 0">' + SW.esc(m.body) + '</pre>';
+    }
+    if (s) {
+      h += '<div>' + (s.variable ? 'Variable' : s.label ? 'Label' : 'Symbol') + ' = <span class="num mono">' + SW.oct(s.val) + '</span>' +
+        (!s.defined ? ' <span class="badge err">undefined</span>' : '') + '</div>';
+      var list = s.defs.map(function (d) { return ['def', d]; }).concat(s.refs.map(function (r) { return ['ref', r]; }));
+      h += '<div class="refs">' + list.slice(0, 200).map(function (x) {
+        var L = b.lines[x[1].file][x[1].line - 1];
+        return '<a href="#" data-p="' + x[1].file + '" data-n="' + x[1].line + '">' + (x[0] === 'def' ? '◆ ' : '· ') +
+          x[1].line + '  ' + SW.esc((L ? L.raw : '').trim().slice(0, 44)) + '</a>';
+      }).join('') + '</div><div class="faint">' + s.defs.length + ' definition(s), ' + s.refs.length + ' reference(s)</div>';
+    }
+    if (!g && !s && !b.macros[name]) h += '<div class="faint">No symbol of this name in this build.</div>';
+    var pop = SW.pop(x, y, h);
+    pop.addEventListener('click', function (e) {
+      var a = e.target.closest('a[data-n]');
+      if (!a) return;
+      e.preventDefault();
+      SW.unpop();
+      R.goto(+a.dataset.p, +a.dataset.n, true);
+    });
+  }
+
+  function showNotesFor(k) {
+    var parts = k.split(':'), p = +parts[0], n = +parts[1];
+    var ts = N.threads(notes).filter(function (t) { return t.note.anchor && t.note.anchor.p === p && t.note.anchor.n0 === n; });
+    var body = SW.drawer('Notes on ' + SW.cite(build, p, n, n).replace(/^.*?, /, ''), ts.map(function (t) { return N.renderThread(t, build); }).join('') || '<p class="hint">No notes yet.</p>');
+    N.wire(body, build.v.id, notes);
+  }
+
+  R.goto = function (p, n, flash) {
+    var part = build.parts[p];
+    if (part && part.role !== 'program' && !opts.supplied) { opts.supplied = true; render(); }
+    var el = SW.$('#L' + p + '-' + n, view);
+    if (!el) return;
+    el.scrollIntoView({ block: 'center' });
+    if (flash) {
+      SW.$$('.ln.cur', view).forEach(function (e) { e.classList.remove('cur'); });
+      el.classList.add('cur');
+    }
+  };
+
+  function refreshNotes() {
+    if (!build) return;
+    N.list(build.v.id).then(function (all) {
+      notes = all;
+      counts = N.countsByLine(all);
+      SW.$$('.ln', view).forEach(function (row) {
+        var k = row.dataset.p + ':' + row.dataset.n, c = counts[k], mk = row.querySelector('.mk');
+        if (mk) mk.innerHTML = c ? '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '">' + c.n + '</span>' : '';
+      });
+    });
+  }
+
+  R.show = function (b) {
+    build = b;
+    R.build = b;
+    SW.loadGlosses();
+    render();
+    refreshNotes();
+    var s = SW.state.sel;
+    if (s) setTimeout(function () { R.goto(s.p, s.n0, false); }, 0);
+  };
+  SW.on('notes', function (vid) { if (build && vid === build.v.id) refreshNotes(); });
+  SW.on('goto', function (g) { if (build && g.tab === 'read') { SW.setTab('read'); setTimeout(function () { R.goto(g.p, g.n, true); }, 0); } });
+  SW.on('profile', function () { if (opts.heat && build) render(); });
+})(this);
