@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <title>Spacewar! Research Bench</title>
+  <meta name="description" content="A working bench for the critical reading of the Spacewar! source code: assemble, run, step, compare, trace genealogies, annotate and export.">
+  <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/research.css">
+</head>
+<body>
+  <header class="bar">
+    <a class="brand" href="./" title="Spacewar! Research Bench">
+      <img src="img/tape-icon.svg" alt="" width="26" height="26">
+      <span class="brand-name">Spacewar!<b>research bench</b></span>
+    </a>
+    <label class="pick">
+      <span>Version</span>
+      <select id="pick-a" aria-label="Version"></select>
+    </label>
+    <div class="tape-strip" id="tape-strip" title="The assembled paper tape for this version"></div>
+    <div class="bar-right">
+      <span class="status" id="status" role="status" aria-live="polite"></span>
+      <button class="icon-btn" id="btn-theme" title="Switch between phosphor and listing paper">◐</button>
+      <button class="icon-btn" id="btn-settings" title="Your initials and the Hypothesis group">⚙</button>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Views">
+    <button data-tab="read" class="on">Read</button>
+    <button data-tab="run">Run</button>
+    <button data-tab="analyse">Analyse</button>
+    <button data-tab="compare">Compare</button>
+    <button data-tab="genealogy">Genealogy</button>
+    <button data-tab="tape">Tape</button>
+    <button data-tab="about">Version &amp; notes</button>
+  </nav>
+
+  <main id="main">
+    <section class="view on" id="view-read"></section>
+    <section class="view" id="view-run"></section>
+    <section class="view" id="view-analyse"></section>
+    <section class="view" id="view-compare"></section>
+    <section class="view" id="view-genealogy"></section>
+    <section class="view" id="view-tape"></section>
+    <section class="view" id="view-about"></section>
+  </main>
+
+  <aside class="drawer" id="drawer" aria-label="Details">
+    <div class="drawer-head">
+      <h2 id="drawer-title">Notes</h2>
+      <button class="icon-btn" id="drawer-close" title="Close">✕</button>
+    </div>
+    <div class="drawer-body" id="drawer-body"></div>
+  </aside>
+
+  <dialog id="dlg-settings">
+    <form method="dialog" class="settings">
+      <h2>Your details</h2>
+      <p class="hint">Initials and a date are attached to every annotation, so discussions can be followed. They are kept in this browser.</p>
+      <label>Initials <input id="set-initials" maxlength="6" placeholder="DMB" autocomplete="off"></label>
+      <label>Name <input id="set-name" placeholder="David M. Berry" autocomplete="off"></label>
+      <h2>Shared annotations</h2>
+      <p class="hint">Annotations are shared through a private Hypothesis group. Paste the group ID (from the group's invite link, hypothes.is/groups/<b>ID</b>/…) and a personal API token (hypothes.is/account/developer). Without them, notes are kept as drafts in this browser and can be exported or published later.</p>
+      <label>Group ID <input id="set-group" placeholder="e.g. Ab12Cd34" autocomplete="off"></label>
+      <label>API token <input id="set-token" type="password" placeholder="6879-…" autocomplete="off"></label>
+      <p class="hint" id="set-check"></p>
+      <div class="row">
+        <button value="cancel" class="btn ghost">Cancel</button>
+        <button id="set-test" type="button" class="btn ghost">Test connection</button>
+        <button value="save" id="set-save" class="btn">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="dlg-note">
+    <form method="dialog" class="settings" id="note-form">
+      <h2 id="note-title">Annotate</h2>
+      <p class="hint" id="note-anchor"></p>
+      <textarea id="note-text" rows="7" placeholder="Your note. Markdown is fine."></textarea>
+      <label>Tags <input id="note-tags" placeholder="e.g. gravity, labour, provenance" autocomplete="off"></label>
+      <p class="hint" id="note-who"></p>
+      <div class="row">
+        <button value="cancel" class="btn ghost">Cancel</button>
+        <button value="save" class="btn">Save note</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/pdp1asm.js"></script>
+  <script src="js/pdp1cpu.js"></script>
+  <script src="js/versions.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/genealogy.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/notes.js"></script>
+  <script src="js/figures.js"></script>
+  <script src="js/read.js"></script>
+  <script src="js/run.js"></script>
+  <script src="js/analyse.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/tape.js"></script>
+  <script src="js/about.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
