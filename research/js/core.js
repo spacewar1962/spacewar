@@ -206,6 +206,15 @@
     };
   }
 
+  // Open a version at a line range (or its notes page when there is none).
+  SW.openAt = function (vid, a) {
+    var same = !vid || vid === SW.state.v;
+    if (!same) SW.select(vid);
+    if (!a) { SW.setTab('about'); return; }
+    SW.state.sel = { p: a.p, n0: a.n0, n1: a.n1 != null ? a.n1 : a.n0 };
+    SW.setTab('read');   // draws Read at the selection if it was not yet showing this version
+    if (same) SW.emit('goto', { p: a.p, n: a.n0, tab: 'read' });
+  };
   SW.current = function () { return SW.state.v ? SW.build(SW.state.v) : Promise.reject(new Error('no version')); };
 
   // Citation for a line range of a build.
@@ -403,6 +412,24 @@
     SW.toast('Code text ' + n + ' px');
   };
 
+  // ---------- hands: the people whose initials or names are written into the text ----------
+  // Colours read on both the dark plate and white.
+  SW.HANDS = [
+    { k: 'prs', who: 'Peter R. Samson', re: /\bprs\b/i, colour: '#2a9d6f' },
+    { k: 'adams', who: 'Adams Associates', re: /\badams associates\b/i, colour: '#c0622d' },
+    { k: 'ddp', who: 'D. D. “Monty” Preonas', re: /\bddp\b/i, colour: '#d99a1e' },
+    { k: 'dfw', who: '“dfw” (not yet identified)', re: /\bdfw\b/i, colour: '#3f8fd0' },
+    { k: 'jcm', who: 'Joe C. Morris', re: /\bjcm\b/i, colour: '#c05a93' },
+    { k: 'dje', who: 'Dan Edwards', re: /\bdje\b/i, colour: '#8f7a1a' },
+    { k: 'jmg', who: 'J. Martin Graetz', re: /\bjmg\b/i, colour: '#7d5a45' },
+    { k: 'nl', who: 'Norbert Landsteiner (2014–21)', re: /\bn\.\s?l\.|\bnl\b|\blandsteiner\b/i, colour: '#8a7ae0' }
+  ];
+  SW.handOf = function (k) { return SW.HANDS.filter(function (h) { return h.k === k; })[0] || null; };
+  // The hands named in a piece of text, in the order of SW.HANDS.
+  SW.handsIn = function (text) {
+    return SW.HANDS.filter(function (h) { return h.re.test(text || ''); }).map(function (h) { return h.k; });
+  };
+
   // ---------- colour schemes for the genealogy figures ----------
   SW.PALETTES = [
     ['phosphor', 'Phosphor (default)'], ['okabe', 'Colour-blind safe (Okabe–Ito)'], ['tol', 'Colour-blind safe (Tol)'],
@@ -418,6 +445,7 @@
   // A select for choosing a scheme; onChange re-renders the caller's figure.
   SW.paletteSelect = function (onChange) {
     var l = SW.el('label', { class: 'check', title: 'Colours for retained, moved, edited, added and removed, on screen and in exported figures' }, 'Colours ');
+    l.classList.add('pal-pick');
     var sel = SW.el('select', {}, SW.PALETTES.map(function (p) { return '<option value="' + p[0] + '"' + (p[0] === SW.palette() ? ' selected' : '') + '>' + SW.esc(p[1]) + '</option>'; }).join(''));
     sel.onchange = function (e) { e.stopPropagation(); SW.applyPalette(sel.value); if (onChange) onChange(); };
     l.appendChild(sel);

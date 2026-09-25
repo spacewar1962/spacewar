@@ -35,6 +35,8 @@
   };
 
   var shown = {};
+  // Drop a view's cached rendering so the next visit draws it afresh.
+  SW.forget = function (tab) { delete shown[tab]; };
   function showCurrent() {
     var tab = SW.state.tab, id = SW.state.v;
     if (!id) return;
@@ -134,6 +136,11 @@
       if (b) SW.setTab(b.dataset.tab);
     });
     SW.$('#btn-settings').onclick = settings;
+    // The side panel opens below the top bar, so the bar's buttons stay in reach.
+    function barH() { document.documentElement.style.setProperty('--bar-h', SW.$('header.bar').offsetHeight + 'px'); }
+    barH();
+    window.addEventListener('resize', barH);
+    SW.notes.initNews();
     SW.applyCodeText();
     SW.applyPalette();
     SW.$('#btn-smaller').onclick = function () { SW.setCodeSize(SW.codeSize() - 1); };

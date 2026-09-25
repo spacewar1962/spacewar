@@ -810,7 +810,7 @@
     var scale = opts.perLine || Math.max(0.05, (H - gap * maxUnits) / maxTotal);
     var labels = opts.labels || texts.map(function (t) { return t.label; });
     var cols = fl.units.map(function (us, i) { return layoutColumn(us, top, scale, gap, !!opts.code); });
-    var totalH = Math.max.apply(null, cols.map(function (c) { return c.bottom; })) + 34;
+    var totalH = Math.max.apply(null, cols.map(function (c) { return c.bottom; })) + 34 + (opts.extraLegend ? 18 : 0);
     var s = svgOpen(W, totalH, 'g-alluvial', opts.title || ('Genealogy flow (' + fl.granularity + ')'));
     // ribbons
     s += '<g class="g-ribbons" fill-opacity="0.55">';
@@ -859,9 +859,11 @@
       if (us.length <= maxBoxes || opts.names || opts.code) {
         us.forEach(function (u, k) {
           var p = c.pos[k];
+          var bf = opts.boxFill ? opts.boxFill(i, k) : null;
           s += '<rect x="' + f1(x) + '" y="' + f1(p.y) + '" width="' + bw + '" height="' + f1(Math.max(p.h, 0.5)) +
-            '" fill="' + COLORS.box + '" stroke="' + COLORS.stroke + '" stroke-width="0.4" data-col="' + i + '" data-u="' + k + '"><title>' +
-            esc(texts[i].label + ' · ' + u.name + ' (' + u.file + ' ' + u.n0 + '–' + u.n1 + ', ' + u.lines + ' lines)') +
+            '" fill="' + (bf || COLORS.box) + '" stroke="' + COLORS.stroke + '" stroke-width="0.4" data-col="' + i + '" data-u="' + k + '"><title>' +
+            esc(texts[i].label + ' · ' + u.name + ' (' + u.file + ' ' + u.n0 + '–' + u.n1 + ', ' + u.lines + ' lines)' +
+                (opts.boxTip ? opts.boxTip(i, k) : '')) +
             '</title></rect>';
         });
         // Zoomed in: the unit's name, then (further in) its code, clipped to the box.
@@ -891,7 +893,18 @@
         '" transform="rotate(-40 ' + f1(lx) + ' ' + f1(ly) + ')"><title>' + esc(texts[i].label) + '</title>' +
         esc(trunc(labels[i], 22)) + '</text></g>';
     });
-    s += legend(left, totalH - 20, STATUSES);
+    s += legend(left, totalH - 20 - (opts.extraLegend ? 18 : 0), STATUSES);
+    if (opts.extraLegend) {
+      // a second key, for box colours (e.g. hands): [[colour, label], ...]
+      var ex = left;
+      s += '<g font-size="10">';
+      opts.extraLegend.forEach(function (e) {
+        s += '<rect x="' + f1(ex) + '" y="' + f1(totalH - 20) + '" width="10" height="10" fill="' + e[0] + '" stroke="' + COLORS.stroke + '" stroke-width="0.4"/>' +
+          '<text x="' + f1(ex + 14) + '" y="' + f1(totalH - 11) + '" fill="' + COLORS.text + '">' + esc(e[1]) + '</text>';
+        ex += 22 + e[1].length * 6;
+      });
+      s += '</g>';
+    }
     return s + '</svg>';
   }
 
@@ -1039,7 +1052,43 @@
     return s + '</g></svg>';
   }
 
+  /*
+   * attributeHands(texts, flows, handsIn) -> per column, per unit:
+   *   {hand, how, line, from}
+   * how: 'signed' (initials in the unit's own comments), 'inherited' (from
+   * its ancestor in the previous column), 'tape' (new here, on a tape whose
+   * title is signed), or null (unattributed). handsIn(text) -> [keys].
+   */
+  function attributeHands(texts, fl, handsIn) {
+    var out = [];
+    fl.units.forEach(function (us, i) {
+      var t = texts[i], col = [], tapeHand = {};
+      t.lines.forEach(function (L) {
+        if (L.kind === 'title' && !(L.file in tapeHand)) { var th = handsIn(L.raw); if (th.length) tapeHand[L.file] = { hand: th[0], line: L }; }
+      });
+      var anc = {};
+      if (i > 0) fl.steps[i - 1].pairs.forEach(function (p) { if (p.b != null && p.a != null) anc[p.b] = p; });
+      us.forEach(function (u, k) {
+        var own = null;
+        for (var j = u.start; j <= u.end && !own; j++) {
+          var L = t.lines[j];
+          if (!L || L.kind === 'title' || !L.comment) continue;
+          var hs = handsIn(L.comment);
+          if (hs.length) own = { hand: hs[0], all: hs, how: 'signed', line: L };
+        }
+        if (own) { col.push(own); return; }
+        var p = anc[k], prev = p && out[i - 1][p.a];
+        if (prev && prev.hand) { col.push({ hand: prev.hand, how: 'inherited', from: prev, status: p.status }); return; }
+        if (i > 0 && !p && tapeHand[u.file]) { col.push({ hand: tapeHand[u.file].hand, how: 'tape', line: tapeHand[u.file].line }); return; }
+        col.push({ hand: null, how: null });
+      });
+      out.push(col);
+    });
+    return out;
+  }
+
   var api = {
+    attributeHands: attributeHands,
     STATUSES: STATUSES, COLORS: COLORS,
     parseLine: parseLine, normalize: normalize, prepare: prepare, units: units,
     compare: compare, editScript: editScript, similarity: seqSimilarity,
