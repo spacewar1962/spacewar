@@ -271,6 +271,10 @@
   SW.unpop = function () { if (popEl) { popEl.remove(); popEl = null; } };
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') SW.unpop(); });
   document.addEventListener('mousedown', function (e) { if (popEl && !popEl.contains(e.target)) SW.unpop(); });
+  // Toolbar drop-down menus (<details class="menu">) close on a click elsewhere.
+  document.addEventListener('mousedown', function (e) {
+    SW.$$('details.menu[open]').forEach(function (d) { if (!d.contains(e.target)) d.open = false; });
+  });
 
   // A click on a modal's backdrop closes it. Both ends of the click must fall
   // outside the box, so a text selection dragged out of a field does not.

@@ -87,11 +87,12 @@
       '<input type="search" id="rd-find" placeholder="Find text or /regex/ …">' +
       '<button class="btn" id="rd-prev" title="Previous match">↑</button><button class="btn" id="rd-next" title="Next match">↓</button>' +
       '<span class="hint" id="rd-hits"></span><span class="sep"></span>' +
+      '<details class="menu"><summary class="btn" title="What the listing shows">View ▾</summary><div class="menu-body">' +
       '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
       '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
       '<label class="check" title="Show the tapes supplied to make this version assemble (the macro definitions and the star table), which are not part of the version&#39;s own source; they are collapsed by default"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
-      '<span class="sep"></span>';
+      '</div></details>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
@@ -104,13 +105,12 @@
         '<div><span class="faint"><i>italic grey</i></span> not assembled (a transcription header, or outside this tape segment)</div>' +
         '<div class="faint flow" style="margin-top:6px">Text: <span class="lab">labels</span>, <b>instructions</b>, <span class="mac">macros</span>, <span class="ps">pseudo-instructions</span>, <span class="num">numbers</span>, <span class="cm">comments</span>.</div></div>');
     } }, 'Key'));
-    var info = SW.el('span', { class: 'hint' });
-    if (b.asm) {
-      info.innerHTML = b.asm.words.length + ' words · ' +
-        (b.asm.errorCount ? '<span class="badge err">' + b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : '') + '</span>' : '<span class="badge ok">assembles cleanly</span>') +
-        ' · start ' + SW.oct(b.asm.start, 4);
-    } else info.textContent = 'No source survives for this version.';
-    tb.appendChild(info);
+    // Only assembly errors are flagged here; the word count and start address
+    // are on the Version & notes page.
+    if (b.asm && b.asm.errorCount) {
+      tb.appendChild(SW.el('span', { class: 'badge err', title: b.asm.words.length + ' words; start ' + SW.oct(b.asm.start, 4) },
+        b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : '')));
+    } else if (!b.asm) tb.appendChild(SW.el('span', { class: 'hint' }, 'No source survives.'));
     tb.appendChild(SW.el('span', { class: 'sep' }));
     tb.appendChild(SW.exportButtons(function () { return listingDoc(b, null); }, function () { return 'spacewar-' + b.v.id + '-listing'; }));
     view.appendChild(tb);
@@ -126,11 +126,21 @@
       var supplied = part.role !== 'program';
       var sec = SW.el('div', { class: 'part' + (supplied && !opts.supplied ? ' collapsed' : '') });
       var errs = b.asm.errors.filter(function (e) { return e.file === pi; }).length;
-      sec.innerHTML = '<div class="part-head" data-p="' + pi + '"><span class="src">' + SW.esc(part.src) + '</span>' +
-        '<span class="role">' + SW.esc(supplied ? 'supplied: ' + part.role : 'program') +
-        (part.end ? ' · lines ' + part.title + '–' + part.end : part.title > 1 ? ' · from line ' + part.title : '') + '</span>' +
+      // Heading: what the part is (a program tape's own title, or what was
+      // supplied); underneath, where it comes from and which lines are used.
+      var title = (b.asm.titles.filter(function (t) { return t.file === pi; })[0] || {}).text;
+      var heading = supplied ? part.role.charAt(0).toUpperCase() + part.role.slice(1)
+                             : (title && title.trim()) || part.src.split('/').pop();
+      var span = part.end ? 'lines ' + part.title + '–' + part.end : part.title > 1 ? 'from line ' + part.title : 'whole file';
+      var closed = supplied && !opts.supplied;
+      sec.innerHTML = '<div class="part-head" data-p="' + pi + '" title="Click to ' + (closed ? 'show' : 'hide') + ' this part">' +
+        '<div class="ph-main"><span class="kind ' + (supplied ? 'k-sup' : 'k-prog') + '">' + (supplied ? 'Supplied' : 'Program') + '</span>' +
+        '<span class="ph-title">' + SW.esc(heading) + '</span>' +
         (errs ? '<span class="badge err">' + errs + ' error' + (errs > 1 ? 's' : '') + '</span>' : '') +
-        '<span class="faint" style="margin-left:auto">' + (supplied && !opts.supplied ? 'show ▸' : '') + '</span></div>';
+        '<span class="ph-toggle">' + (closed ? 'show ▸' : 'hide ▾') + '</span></div>' +
+        '<div class="ph-sub">Part ' + (pi + 1) + ' of ' + b.parts.length + ' · ' + SW.sourceLink(part.src, part.src.split('/').pop()) +
+        ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
+        (supplied ? ' · not part of this version’s own source; added so it assembles' : '') + '</div></div>';
       var html = [];
       if (!supplied || opts.supplied) b.lines[pi].forEach(function (L) { html.push(rowHTML(b, L)); });
       sec.insertAdjacentHTML('beforeend', html.join(''));
@@ -253,10 +263,15 @@
   function wire(box, tb) {
     box.addEventListener('click', function (e) {
       var head = e.target.closest('.part-head');
+      if (head && e.target.closest('a')) return;   // the source link opens GitHub
       if (head) {
         var sec = head.parentNode;
         if (sec.classList.contains('collapsed') && !sec.querySelector('.ln')) { opts.supplied = true; render(); }
-        else sec.classList.toggle('collapsed');
+        else {
+          var c = sec.classList.toggle('collapsed');
+          head.querySelector('.ph-toggle').textContent = c ? 'show ▸' : 'hide ▾';
+          head.title = 'Click to ' + (c ? 'show' : 'hide') + ' this part';
+        }
         return;
       }
       var dot = e.target.closest('.note-dot');

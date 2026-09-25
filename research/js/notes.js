@@ -62,6 +62,20 @@
   var deleted = {};
   // Notes edited this session, shown as edited until the group's search agrees.
   var edits = {};
+  // The bin. Deleting a note tags it sw:deleted (and sw:deleted-at:<date>)
+  // rather than removing it, since Hypothesis cannot undelete; binned notes
+  // are hidden everywhere and can be restored until the bin is emptied.
+  // These record this session's moves, while the group's search catches up.
+  var binnedNow = {}, restoredNow = {};
+  function isBinTag(t) { return t === 'sw:deleted' || t.indexOf('sw:deleted-at:') === 0; }
+  function isBinned(n) {
+    if (n.source === 'draft') return !!n.deleted;
+    return !!binnedNow[n.id] || (!!n.binned && !restoredNow[n.id]);
+  }
+  // A note's tags with the bin marks taken off (user tags as last edited).
+  function keptTags(note) {
+    return (note.rawTags || []).filter(function (t) { return t.indexOf('sw:') === 0 && !isBinTag(t); }).concat(note.tags || []);
+  }
 
   N.test = function () {
     return hx('GET', '/profile').then(function (p) {
@@ -92,6 +106,7 @@
       anchor: anchor, text: a.text || '', by: by, name: (a.user_info && a.user_info.display_name) || '',
       date: a.created, updated: a.updated, parent: (a.references || []).slice(-1)[0] || null,
       tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis', user: a.user || '', rawTags: tags,
+      binned: tags.indexOf('sw:deleted') >= 0, binnedAt: tagVal(tags, 'sw:deleted-at:'),
       link: a.links && (a.links.incontext || a.links.html)
     };
   }
@@ -106,31 +121,55 @@
       return { id: 'log-' + vid + '-' + i, vid: vid, kind: 'version', anchor: null, text: bn.text,
                by: bn.by, name: bn.who, date: bn.date, parent: null, tags: ['build log'], source: 'buildlog' };
     });
-    var local = drafts().filter(function (d) { return d.vid === vid; });
+    var local = drafts().filter(function (d) { return d.vid === vid && !isBinned(d); });
     var remote = N.configured()
       ? N.whoami().then(function () {
           return hx('GET', '/search?limit=200&sort=created&order=asc&group=' + encodeURIComponent(cfg().group) +
                     '&uri=' + encodeURIComponent(SW.versionURI(vid)));
         })
           .then(function (r) {
-            return (r.rows || []).map(fromH).filter(function (n) { return !deleted[n.id]; }).map(function (n) {
+            var rows = (r.rows || []).map(fromH).filter(function (n) { return !deleted[n.id]; }).map(function (n) {
               var e = edits[n.id];
               if (!e) return n;
               if (n.text === e.text) { delete edits[n.id]; return n; }
               n.text = e.text; n.tags = e.tags; n.updated = e.updated;
               return n;
             });
+            // Binned notes still count as present here, so their reactions are
+            // not taken for orphans and return if the note is restored.
+            if ((r.rows || []).length < 200) sweepOrphans(rows.concat(pending[vid] || []));
+            return rows.filter(function (n) { return !isBinned(n); });
           })
           .catch(function (e) { SW.toast(e.message, 5000); return []; })
       : Promise.resolve([]);
     cache[vid] = remote.then(function (rows) {
       var have = {};
       rows.forEach(function (r) { have[r.id] = 1; });
-      pending[vid] = (pending[vid] || []).filter(function (p) { return !have[p.id]; });
+      pending[vid] = (pending[vid] || []).filter(function (p) { return !have[p.id] && !isBinned(p); });
       return log.concat(rows, pending[vid], local);
     });
     return cache[vid];
   };
+
+  // Your own reactions left on notes that no longer exist (deleted outright,
+  // by you or before this was added) are deleted. Each is checked against
+  // Hypothesis first: only a note that answers 404 counts as gone. Everyone's
+  // browser clears their own, since no one can delete another's annotation.
+  var swept = {};
+  function sweepOrphans(rows) {
+    if (!N.me) return;
+    var ids = {};
+    rows.forEach(function (n) { ids[n.id] = 1; });
+    rows.filter(function (n) {
+      return N.isReaction(n) && n.parent && !ids[n.parent] && !swept[n.id] && myReaction(n);
+    }).forEach(function (r) {
+      swept[r.id] = 1;
+      hx('GET', '/annotations/' + r.parent).then(null, function (e) {
+        if (!/^Hypothesis 404/.test(e.message)) return;
+        return hx('DELETE', '/annotations/' + r.id).then(function () { deleted[r.id] = true; });
+      }).catch(function () {});
+    });
+  }
 
   // Every note in the group, every draft, and every build log, all versions.
   N.listAll = function () {
@@ -142,11 +181,11 @@
                     name: bn.who, date: bn.date, parent: null, tags: ['build log'], source: 'buildlog' });
       });
     });
-    var local = drafts();
+    var local = drafts().filter(function (d) { return !isBinned(d); });
     function page(offset, acc) {
       return hx('GET', '/search?limit=200&sort=created&order=asc&offset=' + offset + '&group=' + encodeURIComponent(cfg().group))
         .then(function (r) {
-          var rows = (r.rows || []).map(fromH).filter(function (n) { return n.vid && !deleted[n.id]; });
+          var rows = (r.rows || []).map(fromH).filter(function (n) { return n.vid && !deleted[n.id] && !isBinned(n); });
           acc = acc.concat(rows);
           return (r.rows || []).length === 200 && offset < 5000 ? page(offset + 200, acc) : acc;
         });
@@ -201,9 +240,10 @@
     });
   };
 
+  // Permanent deletion: emptying the bin, or taking back a reaction.
   N.remove = function (note, quiet) {
     if (note.source === 'draft') {
-      saveDrafts(drafts().filter(function (d) { return d.id !== note.id; }));
+      saveDrafts(drafts().filter(function (d) { return d.id !== note.id && !(d.kind === 'reaction' && d.parent === note.id); }));
       N.invalidate(note.vid);
       return Promise.resolve();
     }
@@ -216,6 +256,75 @@
       });
     }
     return Promise.resolve();
+  };
+
+  // Move a note of one's own to the bin (hidden, restorable).
+  N.bin = function (note) {
+    var now = new Date().toISOString();
+    if (note.source === 'draft') {
+      saveDrafts(drafts().map(function (d) { if (d.id === note.id) d.deleted = now; return d; }));
+      N.invalidate(note.vid);
+      return Promise.resolve();
+    }
+    if (note.source !== 'hypothesis') return Promise.resolve();
+    return hx('PATCH', '/annotations/' + note.id, { tags: keptTags(note).concat(['sw:deleted', 'sw:deleted-at:' + now]) }).then(function (r) {
+      var n = r ? fromH(r) : note;
+      n.binnedAt = n.binnedAt || now;
+      binnedNow[note.id] = n;
+      delete restoredNow[note.id];
+      N.invalidate(note.vid);
+    });
+  };
+
+  N.restore = function (note) {
+    if (note.source === 'draft') {
+      saveDrafts(drafts().map(function (d) { if (d.id === note.id) delete d.deleted; return d; }));
+      N.invalidate(note.vid);
+      return Promise.resolve();
+    }
+    return hx('PATCH', '/annotations/' + note.id, { tags: keptTags(note) }).then(function () {
+      restoredNow[note.id] = true;
+      delete binnedNow[note.id];
+      N.invalidate(note.vid);
+    });
+  };
+
+  // Your binned notes, every version, most recently binned first.
+  N.binList = function () {
+    var local = drafts().filter(function (d) { return d.deleted; }).map(function (d) { d.binnedAt = d.deleted; return d; });
+    var remote = N.configured()
+      ? N.whoami().then(function (me) {
+          if (!me) return [];
+          return hx('GET', '/search?limit=200&sort=updated&order=desc&group=' + encodeURIComponent(cfg().group) +
+                    '&tag=sw:deleted&user=' + encodeURIComponent(me)).then(function (r) {
+            var rows = (r.rows || []).map(fromH).filter(function (n) { return !deleted[n.id] && !restoredNow[n.id]; });
+            var have = {};
+            rows.forEach(function (n) { have[n.id] = 1; });
+            Object.keys(binnedNow).forEach(function (id) { if (!have[id]) rows.push(binnedNow[id]); });
+            return rows;
+          });
+        }).catch(function (e) { SW.toast(e.message, 5000); return []; })
+      : Promise.resolve([]);
+    return remote.then(function (rows) {
+      return local.concat(rows).sort(function (a, b) { return String(b.binnedAt) < String(a.binnedAt) ? -1 : 1; });
+    });
+  };
+
+  // Empty the bin: delete each note for good, with your own reactions on it.
+  N.emptyBin = function (notes) {
+    var vids = {};
+    return notes.reduce(function (p, n) {
+      vids[n.vid] = 1;
+      if (n.source === 'draft') return p.then(function () { return N.remove(n, true); });
+      return p.then(function () { return N.list(n.vid, true); }).then(function (all) {
+        var mine = all.filter(function (r) { return N.isReaction(r) && r.parent === n.id && myReaction(r); });
+        return mine.reduce(function (q, r) { return q.then(function () { return N.remove(r, true); }); }, Promise.resolve());
+      }).then(function () {
+        return N.remove(n, true).then(function () { delete binnedNow[n.id]; });
+      });
+    }, Promise.resolve()).then(function () {
+      Object.keys(vids).forEach(N.invalidate);
+    });
   };
 
   // Edit a note of one's own: its text, and for a note (not a reply) its tags.
@@ -245,7 +354,7 @@
   // Publish drafts to the group, oldest first, keeping reply links.
   N.publishDrafts = function () {
     if (!N.configured()) { SW.toast('Set the Hypothesis group and token first.'); return Promise.resolve(); }
-    var ds = drafts().slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    var ds = drafts().filter(function (d) { return !d.deleted; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
     var idMap = {}, done = 0;
     return ds.reduce(function (p, d) {
       return p.then(function () {
@@ -331,7 +440,7 @@
       var mine = rs.some(myReaction);
       var who = rs.map(function (r) { return r.by; }).filter(function (x, i, a) { return a.indexOf(x) === i; });
       h += '<button class="react' + (mine ? ' mine' : '') + '" data-act="react" data-emoji="' + SW.esc(e) + '" title="' +
-        SW.esc(who.join(', ') + (mine ? ' (click to take yours back)' : ' (click to add yours)')) + '">' + e + '<small>' + SW.esc(who.join(' ')) + '</small></button>';
+        SW.esc(who.join(', ') + (mine ? ' (click to take yours back)' : ' (click to add yours)')) + '">' + SW.esc(e) + '<small>' + SW.esc(who.join(' ')) + '</small></button>';
     });
     h += '<button class="react add" data-act="react-pick" title="Add a reaction">☺<small>+</small></button>' +
       '<span class="react-pick" hidden>' + N.EMOJI.map(function (e) { return '<button class="react" data-act="react" data-emoji="' + e + '">' + e + '</button>'; }).join('') + '</span></div>';
@@ -398,11 +507,10 @@
       if (btn.dataset.act === 'reply') {
         inlineReply(btn.closest('.note'), vid, note);
       } else if (btn.dataset.act === 'delete') {
-        var replies = all.filter(function (x) { return x.parent === note.id; }).length;
-        var msg = 'Delete this note' + (note.source === 'draft' ? ' draft' : ' from the group') + '?\n\n“' + note.text.slice(0, 140) + (note.text.length > 140 ? '…' : '') + '”' +
-          (replies ? '\n\nIt has ' + replies + ' repl' + (replies > 1 ? 'ies' : 'y') + ', which will stay, shown on their own.' : '') + '\n\nThis cannot be undone.';
-        if (!window.confirm(msg)) return;
-        N.remove(note).catch(function (e) { SW.toast(e.message, 5000); });
+        // Into the bin, so no confirmation: it can be restored.
+        N.bin(note).then(function () {
+          SW.toast('Moved to the bin. Restore it under Deleted notes on the Version & notes page.', 5000);
+        }, function (e) { SW.toast(e.message, 5000); });
       }
     });
   };
