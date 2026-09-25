@@ -129,6 +129,7 @@
       SW.store.set('name', SW.$('#set-name').value.trim());
       SW.store.set('group', SW.notes.groupId(grp.value));
       SW.store.set('token', tok.value.trim());
+      SW.notes.forget();
       SW.notes.invalidate(SW.state.v);
       SW.toast('Saved');
     };

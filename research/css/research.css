@@ -423,3 +423,5 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 .reply-box textarea { width: 100%; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; font-family: var(--serif); font-size: 15px; resize: vertical; }
 .reply-box textarea:focus { outline: none; border-color: var(--beam); }
 .reply-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; }
+
+.note .acts button.del-note { color: var(--red); }

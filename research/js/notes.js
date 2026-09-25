@@ -48,6 +48,19 @@
     });
   }
 
+  // Who the token belongs to (acct:name@hypothes.is), so a person can delete
+  // their own notes and no one else's. Cached for the session.
+  var whoP = null;
+  N.whoami = function () {
+    if (!N.configured()) return Promise.resolve(null);
+    if (!whoP) whoP = hx('GET', '/profile').then(function (p) { N.me = p.userid || null; return N.me; }, function () { whoP = null; return null; });
+    return whoP;
+  };
+  N.forget = function () { whoP = null; N.me = null; cache = {}; };
+  N.mine = function (n) { return n.source === 'draft' || (n.source === 'hypothesis' && !!N.me && n.user === N.me); };
+  // Notes deleted this session, hidden even if the group's search still returns them for a moment.
+  var deleted = {};
+
   N.test = function () {
     return hx('GET', '/profile').then(function (p) {
       var g = cfg().group, found = (p.groups || []).filter(function (x) { return x.id === g; })[0];
@@ -76,7 +89,7 @@
       id: a.id, vid: tagVal(tags, 'sw:v:'), kind: tagVal(tags, 'sw:kind:') || (anchor ? 'line' : 'version'),
       anchor: anchor, text: a.text || '', by: by, name: (a.user_info && a.user_info.display_name) || '',
       date: a.created, updated: a.updated, parent: (a.references || []).slice(-1)[0] || null,
-      tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis',
+      tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis', user: a.user || '',
       link: a.links && (a.links.incontext || a.links.html)
     };
   }
@@ -93,9 +106,11 @@
     });
     var local = drafts().filter(function (d) { return d.vid === vid; });
     var remote = N.configured()
-      ? hx('GET', '/search?limit=200&sort=created&order=asc&group=' + encodeURIComponent(cfg().group) +
-           '&uri=' + encodeURIComponent(SW.versionURI(vid)))
-          .then(function (r) { return (r.rows || []).map(fromH); })
+      ? N.whoami().then(function () {
+          return hx('GET', '/search?limit=200&sort=created&order=asc&group=' + encodeURIComponent(cfg().group) +
+                    '&uri=' + encodeURIComponent(SW.versionURI(vid)));
+        })
+          .then(function (r) { return (r.rows || []).map(fromH).filter(function (n) { return !deleted[n.id]; }); })
           .catch(function (e) { SW.toast(e.message, 5000); return []; })
       : Promise.resolve([]);
     cache[vid] = remote.then(function (rows) {
@@ -121,7 +136,7 @@
     function page(offset, acc) {
       return hx('GET', '/search?limit=200&sort=created&order=asc&offset=' + offset + '&group=' + encodeURIComponent(cfg().group))
         .then(function (r) {
-          var rows = (r.rows || []).map(fromH).filter(function (n) { return n.vid; });
+          var rows = (r.rows || []).map(fromH).filter(function (n) { return n.vid && !deleted[n.id]; });
           acc = acc.concat(rows);
           return (r.rows || []).length === 200 && offset < 5000 ? page(offset + 200, acc) : acc;
         });
@@ -183,7 +198,12 @@
       return Promise.resolve();
     }
     if (note.source === 'hypothesis') {
-      return hx('DELETE', '/annotations/' + note.id).then(function () { N.invalidate(note.vid); });
+      return hx('DELETE', '/annotations/' + note.id).then(function () {
+        deleted[note.id] = true;
+        pending[note.vid] = (pending[note.vid] || []).filter(function (p) { return p.id !== note.id; });
+        N.invalidate(note.vid);
+        SW.toast('Note deleted from the group.');
+      });
     }
     return Promise.resolve();
   };
@@ -264,7 +284,7 @@
       '<div class="body">' + SW.esc(n.text) + '</div>' +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button>' : '') +
-      (n.source === 'draft' ? '<button data-act="delete">Delete draft</button>' : '') +
+      (N.mine(n) ? '<button data-act="delete" class="del-note">' + (n.source === 'draft' ? 'Delete draft' : 'Delete') + '</button>' : '') +
       (n.link ? '<a href="' + SW.esc(n.link) + '" target="_blank" rel="noopener">Hypothesis ↗</a>' : '') + '</div></div>';
   };
 
@@ -292,7 +312,11 @@
       if (btn.dataset.act === 'reply') {
         inlineReply(btn.closest('.note'), vid, note);
       } else if (btn.dataset.act === 'delete') {
-        N.remove(note);
+        var replies = all.filter(function (x) { return x.parent === note.id; }).length;
+        var msg = 'Delete this note' + (note.source === 'draft' ? ' draft' : ' from the group') + '?\n\n“' + note.text.slice(0, 140) + (note.text.length > 140 ? '…' : '') + '”' +
+          (replies ? '\n\nIt has ' + replies + ' repl' + (replies > 1 ? 'ies' : 'y') + ', which will stay, shown on their own.' : '') + '\n\nThis cannot be undone.';
+        if (!window.confirm(msg)) return;
+        N.remove(note).catch(function (e) { SW.toast(e.message, 5000); });
       }
     });
   };
