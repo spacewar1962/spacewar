@@ -849,7 +849,7 @@
       var blocks = XFNS[L[0]](vs, bs, cards, render);
       if (blocks) head.appendChild(SW.exportButtons(function () {
         return { title: 'Spacewar! across the variorum: ' + L[1].toLowerCase(), subtitle: L[2],
-                 meta: [['Versions', vs.map(function (v) { return v.label + ' (' + v.date + ')'; }).join('; ')], ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench']],
+                 meta: [['Versions', vs.map(function (v) { return v.label + ' (' + v.date + ')'; }).join('; ')], ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]],
                  blocks: blocks() };
       }, 'spacewar-variorum-lens-' + L[0]));
     }).catch(function (e) { wait.textContent = e.message; });

@@ -6,14 +6,19 @@
   <meta name="robots" content="noindex, nofollow, noarchive">
   <title>Spacewar! Research Bench</title>
   <meta name="description" content="A working bench for the critical reading of the Spacewar! source code: assemble, run, step, compare, trace genealogies, annotate and export.">
+  <!-- Bench version: the ?v= on every script and stylesheet below. Raise it on
+       every change to research/ (last digit for fixes, middle digit for new
+       features), all tags alike, so browsers fetch fresh copies. The page shows
+       it beside the title (core.js reads it from its own tag). -->
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css">
+  <link rel="stylesheet" href="css/research.css?v=0.5.0">
 </head>
 <body>
   <header class="bar">
     <a class="brand" href="./" title="Spacewar! Research Bench">
       <img src="img/tape-icon.svg" alt="" width="26" height="26">
       <span class="brand-name">Spacewar!<b>research bench</b></span>
+      <span class="bench-ver" id="bench-ver"></span>
     </a>
     <label class="pick">
       <span>Version</span>
@@ -112,21 +117,21 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js"></script>
-  <script src="js/pdp1cpu.js"></script>
-  <script src="js/fiodec.js"></script>
-  <script src="js/versions.js"></script>
-  <script src="js/export.js"></script>
-  <script src="js/genealogy.js"></script>
-  <script src="js/core.js"></script>
-  <script src="js/notes.js"></script>
-  <script src="js/figures.js"></script>
-  <script src="js/read.js"></script>
-  <script src="js/run.js"></script>
-  <script src="js/analyse.js"></script>
-  <script src="js/compare.js"></script>
-  <script src="js/tape.js"></script>
-  <script src="js/about.js"></script>
-  <script src="js/main.js"></script>
+  <script src="js/pdp1asm.js?v=0.5.0"></script>
+  <script src="js/pdp1cpu.js?v=0.5.0"></script>
+  <script src="js/fiodec.js?v=0.5.0"></script>
+  <script src="js/versions.js?v=0.5.0"></script>
+  <script src="js/export.js?v=0.5.0"></script>
+  <script src="js/genealogy.js?v=0.5.0"></script>
+  <script src="js/core.js?v=0.5.0"></script>
+  <script src="js/notes.js?v=0.5.0"></script>
+  <script src="js/figures.js?v=0.5.0"></script>
+  <script src="js/read.js?v=0.5.0"></script>
+  <script src="js/run.js?v=0.5.0"></script>
+  <script src="js/analyse.js?v=0.5.0"></script>
+  <script src="js/compare.js?v=0.5.0"></script>
+  <script src="js/tape.js?v=0.5.0"></script>
+  <script src="js/about.js?v=0.5.0"></script>
+  <script src="js/main.js?v=0.5.0"></script>
 </body>
 </html>

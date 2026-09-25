@@ -14,6 +14,11 @@
   SW.BASE_URI = 'https://spacewar1962.github.io/spacewar/research/';
   SW.state = { v: null, tab: 'read', sel: null, b: null };
   SW.views = {};
+  // The bench's version: the ?v= on this script's own tag in index.html (the
+  // one place it is set), shown beside the title and recorded in exports.
+  SW.VERSION = ((document.currentScript && /[?&]v=([^&#]+)/.exec(document.currentScript.src)) || [])[1] || 'dev';
+  var verEl = document.getElementById('bench-ver');
+  if (verEl) { verEl.textContent = 'v' + SW.VERSION; verEl.title = 'Research bench version ' + SW.VERSION; }
 
   // ---------- small helpers ----------
   SW.$ = function (sel, el) { return (el || document).querySelector(sel); };
@@ -486,7 +491,7 @@
       ['Version', b.v.label], ['Date', b.v.date], ['Authors', b.v.authors],
       ['Sources', b.parts.map(function (p) { return p.src + (p.role !== 'program' ? ' (' + p.role + ')' : ''); }).join('; ')],
       ['Assembler', V.DIALECTS[b.dialect].label],
-      ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench']
+      ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]
     ];
   };
 })(this);
