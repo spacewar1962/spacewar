@@ -195,13 +195,14 @@
 
   // Programs that assume the automatic multiply/divide option (mul/div);
   // the 1962 programs use the step instructions mus/dis on the same opcodes.
-  var NO_MDV = { '1': 1, '2b-pre': 1, '2b': 1, '3.1': 1 };
+  var NO_MDV = { '1': 1, '2b-pre': 1, '2b': 1, '3.1': 1, '3.1t': 1 };
 
   VERSIONS.forEach(function (v) {
     v.dialect = v.dialect || 'macro1963';
     if (v.mdv === undefined) v.mdv = !NO_MDV[v.id];
     v.buildNotes = (v.buildNotes || []).map(function (t) {
-      return { by: 'CC', who: 'Claude Code (build log)', date: '2026-09-25', text: t };
+      // Signed 'log', not initials: 'CC' read as a team member's.
+      return { by: 'log', who: 'Claude Code (build log)', date: '2026-09-25', text: t };
     });
     if (v.runnable === undefined) v.runnable = !!v.build && v.id !== 'stars';
     v.url = function () { return '#v=' + encodeURIComponent(v.id); };
