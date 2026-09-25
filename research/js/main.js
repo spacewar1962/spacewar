@@ -95,8 +95,16 @@
         SW.$('#set-check').textContent = 'Connected as ' + r.user + (r.group ? '; group “' + r.group + '” found.' : '; but that group was not found for this account.');
       }, function (e) { SW.$('#set-check').textContent = e.message; });
     };
+    SW.$('#set-figbg').value = SW.figBg();
+    var fontSel = SW.$('#set-font'), size = SW.$('#set-size'), sizeOut = SW.$('#set-size-out');
+    var was = { font: SW.codeFont(), size: SW.codeSize() };
+    fontSel.value = was.font; size.value = was.size; sizeOut.textContent = was.size + ' px';
+    // Preview live; Cancel puts them back.
+    fontSel.onchange = function () { SW.store.set('codeFont', fontSel.value); SW.applyCodeText(); };
+    size.oninput = function () { sizeOut.textContent = size.value + ' px'; SW.store.set('codeSize', +size.value); SW.applyCodeText(); };
     dlg.onclose = function () {
-      if (dlg.returnValue !== 'save') return;
+      if (dlg.returnValue !== 'save') { SW.store.set('codeFont', was.font); SW.store.set('codeSize', was.size); SW.applyCodeText(); return; }
+      SW.store.set('figbg', SW.$('#set-figbg').value);
       SW.store.set('initials', SW.$('#set-initials').value.trim().toUpperCase());
       SW.store.set('name', SW.$('#set-name').value.trim());
       SW.store.set('group', SW.notes.groupId(grp.value));
@@ -120,6 +128,10 @@
       if (b) SW.setTab(b.dataset.tab);
     });
     SW.$('#btn-settings').onclick = settings;
+    SW.applyCodeText();
+    SW.applyPalette();
+    SW.$('#btn-smaller').onclick = function () { SW.setCodeSize(SW.codeSize() - 1); };
+    SW.$('#btn-larger').onclick = function () { SW.setCodeSize(SW.codeSize() + 1); };
     SW.$('#btn-theme').onclick = function () { theme(document.documentElement.getAttribute('data-theme') === 'paper' ? 'phosphor' : 'paper'); };
     SW.$('#drawer-close').onclick = SW.closeDrawer;
     var q = SW.readQuery();

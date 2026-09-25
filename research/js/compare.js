@@ -19,24 +19,8 @@
     });
     return out;
   }
-  // Resolve CSS custom properties so SVG figures stand alone.
-  function resolveVars(svg) {
-    var cs = getComputedStyle(document.documentElement);
-    return svg.replace(/var\((--[\w-]+)\s*,\s*([^)]+)\)/g, function (m, name, fb) {
-      var v = cs.getPropertyValue(name).trim();
-      return v || fb.trim();
-    }).replace(/var\((--[\w-]+)\)/g, function (m, name) { return cs.getPropertyValue(name).trim() || '#888'; });
-  }
-  SW.resolveVars = resolveVars;
-  function svgActions(getSvg, name) {
-    var w = SW.el('span');
-    w.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download(name + '.svg', resolveVars(getSvg()), 'image/svg+xml'); } }, '▣ SVG'));
-    w.appendChild(document.createTextNode(' '));
-    w.appendChild(SW.el('button', { class: 'btn', onclick: function () {
-      SW.figures.svgToPNG(resolveVars(getSvg()), 3).then(function (r) { root.SWExport.download(name + '.png', r.png, 'image/png'); });
-    } }, '▣ PNG'));
-    return w;
-  }
+  function svgActions(getSvg, name) { return SW.figureButtons(function () { return getSvg(); }, name); }
+
 
   // ======================= Compare =======================
   var cview = SW.$('#view-compare');
@@ -190,8 +174,10 @@
     }).join('') + '<span>overall similarity ' + Math.round(s.similarity * 100) + '%</span></div>';
     var svgBox = SW.el('div', { class: 'svgbox', style: 'margin:10px 0' });
     var svg = function () { return G.svgBlockMap(ta, tb, c, { title: A.v.label + ' → ' + B.v.label }); };
-    svgBox.innerHTML = resolveVars(svg());
+    svgBox.innerHTML = SW.displaySVG(svg());
     var acts = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+    acts.appendChild(SW.paletteSelect(function () { renderCompare(A); }));
+    acts.appendChild(SW.el('span', { class: 'sep' }));
     acts.appendChild(svgActions(svg, 'spacewar-' + A.v.id + '-' + B.v.id + '-blockmap'));
     pad.appendChild(acts);
     pad.appendChild(svgBox);
@@ -280,8 +266,9 @@
       return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '">' + { alluvial: 'Flow through versions', matrix: 'Similarity & family tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '')) }[m] + '</button>';
     }).join('') + '<span class="sep"></span>' +
       '<label class="check">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
-      '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied tapes</label><span class="sep"></span><span id="gn-exp"></span>';
+      '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied tapes</label><span class="sep"></span><span id="gn-pal"></span><span class="sep"></span><span id="gn-exp"></span>';
     gview.appendChild(tb);
+    SW.$('#gn-pal', tb).appendChild(SW.paletteSelect(function () { renderGen(cur); }));
     var picks = SW.el('div', { class: 'pad', style: 'padding-bottom:0;max-width:none' });
     picks.innerHTML = '<div class="hint">Versions (chronological): ' + buildable().filter(function (v) { return v.id !== 'stars'; }).map(function (v) {
       return '<label class="check" style="margin-right:10px"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</label>';
@@ -322,8 +309,17 @@
     var svg = function () { return G.svgAlluvial(ts, fl, { granularity: gst.gran }); };
     body.innerHTML = '<p class="hint prose">Each column is a version in date order; each box a ' + gst.gran + ', stacked in source order with height by length. Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped. Hover for names.</p>' +
       '<div class="legend">' + ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('') + '</div>';
-    var box = SW.el('div', { class: 'svgbox', style: 'margin-top:10px' }, resolveVars(svg()));
+    var box = SW.el('div', { class: 'svgbox flow', style: 'margin-top:10px' }, SW.displaySVG(svg()));
     body.appendChild(box);
+    body.querySelector('.hint').insertAdjacentHTML('beforeend', ' <b>Click a box or a ribbon</b> to read the code it stands for, coloured by what happened to it.');
+    box.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-col],[data-step]');
+      if (!t) return;
+      SW.$$('.picked', box).forEach(function (x) { x.classList.remove('picked'); });
+      t.classList.add('picked');
+      if (t.dataset.col != null) showUnit(ts, fl, +t.dataset.col, +t.dataset.u);
+      else showRibbon(ts, fl, t.dataset);
+    });
     exp.appendChild(svgActions(svg, 'spacewar-genealogy-flow-' + gst.gran));
     var rows = fl.steps.map(function (s) {
       var m = s.summary;
@@ -338,14 +334,97 @@
     }, 'spacewar-genealogy-steps'));
   }
 
+  // ---------- the flow, made readable ----------
+  var STATUS_BG = { same: '', change: 'chg', add: 'add', del: 'del' };
+  function unitLines(t, u) {
+    var out = [];
+    for (var i = u.start; i <= u.end; i++) if (t.lines[i]) out.push(t.lines[i]);
+    return out;
+  }
+  function key(l) { return l.norm || l.raw.replace(/\s+/g, ' ').trim(); }
+  // Side-by-side rows for two units, the changed lines marked.
+  function pairRows(ta, ua, tb, ub) {
+    var la = ua ? unitLines(ta, ua) : [], lb = ub ? unitLines(tb, ub) : [];
+    var ops = G.editScript(la.map(key), lb.map(key));
+    return ops.map(function (o) {
+      var a = o.a != null ? la[o.a] : null, b = o.b != null ? lb[o.b] : null, cls = STATUS_BG[o.op];
+      var ha = a ? SW.esc(a.raw) : '', hb = b ? SW.esc(b.raw) : '';
+      if (o.op === 'change') { var d = tokDiff(a.raw, b.raw); ha = d[0]; hb = d[1]; }
+      return '<div class="row"><span class="n">' + (a ? a.n : '') + '</span><span class="' + (a ? cls : '') + '">' + ha + '</span>' +
+        '<span class="n">' + (b ? b.n : '') + '</span><span class="' + (b ? cls : '') + '">' + hb + '</span></div>';
+    }).join('');
+  }
+  function statusChip(st, sim) {
+    return '<span class="badge" style="color:var(--g-' + st + ');border-color:currentColor">' + st + (st === 'edited' && sim != null ? ' ' + Math.round(sim * 100) + '%' : '') + '</span>';
+  }
+  function openButton(t, u) {
+    var L = t.lines[u.start];
+    return '<button class="btn" data-open="' + SW.esc(t.id) + '" data-p="' + L.part + '" data-n0="' + L.n + '" data-n1="' + t.lines[u.end].n + '">Open in Read ↗</button>';
+  }
+  function wireOpen(el) {
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-open]');
+      if (!b) return;
+      SW.state.sel = { p: +b.dataset.p, n0: +b.dataset.n0, n1: +b.dataset.n1 };
+      SW.closeDrawer();
+      document.body.classList.remove('drawer-wide');
+      if (b.dataset.open !== SW.state.v) SW.select(b.dataset.open);
+      SW.setTab('read');
+    });
+  }
+  function drawerWide(title, html) {
+    var el = SW.drawer(title, html);
+    document.body.classList.add('drawer-wide');
+    wireOpen(el);
+    return el;
+  }
+  // A box: the unit, its ancestor in the previous column and its heir in the next.
+  function showUnit(ts, fl, col, k) {
+    var t = ts[col], u = fl.units[col][k];
+    var prev = col > 0 ? fl.steps[col - 1].pairs.filter(function (p) { return p.b === k; })[0] : null;
+    var next = col < fl.steps.length ? fl.steps[col].pairs.filter(function (p) { return p.a === k; })[0] : null;
+    var h = '<p class="mono" style="margin-top:0">' + SW.esc(u.file) + ', ll. ' + u.n0 + '–' + u.n1 + ' · ' + u.lines + ' lines</p>';
+    if (prev) {
+      var ua = prev.a != null ? fl.units[col - 1][prev.a] : null;
+      h += '<h3>From ' + SW.esc(ts[col - 1].label) + ' ' + statusChip(prev.status, prev.similarity) + '</h3>' +
+        (ua ? '<p class="hint">Ancestor: <span class="mono">' + SW.esc(ua.name) + '</span> (ll. ' + ua.n0 + '–' + ua.n1 + '). Left: ' + SW.esc(ts[col - 1].label) + '; right: ' + SW.esc(t.label) + '.</p>' : '<p class="hint">New in this version: no ancestor in ' + SW.esc(ts[col - 1].label) + '.</p>') +
+        '<div class="diff">' + pairRows(ts[col - 1], ua, t, u) + '</div>';
+    } else {
+      h += '<div class="diff">' + pairRows(t, null, t, u).replace(/class="add"/g, 'class=""') + '</div>';
+    }
+    if (next) h += '<p class="hint" style="margin-top:10px">In ' + SW.esc(ts[col + 1].label) + ': ' + statusChip(next.status, next.similarity) +
+      (next.b != null ? ' as <span class="mono">' + SW.esc(fl.units[col + 1][next.b].name) + '</span>' : '') + '</p>';
+    h += '<p>' + openButton(t, u) + '</p>';
+    drawerWide(t.label + ' · ' + u.name, h);
+  }
+  // A ribbon: every unit pair it carries, side by side.
+  function showRibbon(ts, fl, d) {
+    var si = +d.step, st = fl.steps[si], ta = ts[st.from], tb = ts[st.to];
+    var a0 = d.a0 === '' ? null : +d.a0, a1 = d.a1 === '' ? null : +d.a1, b0 = d.b0 === '' ? null : +d.b0, b1 = d.b1 === '' ? null : +d.b1;
+    var pairs = st.pairs.filter(function (p) {
+      if (a0 == null) return p.a == null && p.b === b0;
+      if (b0 == null) return p.b == null && p.a === a0;
+      return p.a != null && p.b != null && p.a >= a0 && p.a <= a1 && p.b >= b0 && p.b <= b1 && p.status === d.status;
+    });
+    var h = '<p class="hint" style="margin-top:0">' + SW.esc(ta.label) + ' → ' + SW.esc(tb.label) + ': ' + statusChip(d.status) + ' ' + pairs.length + ' ' + gst.gran + (pairs.length === 1 ? '' : 's') +
+      '. Left: ' + SW.esc(ta.label) + '; right: ' + SW.esc(tb.label) + '. Shaded: <span class="chg" style="padding:0 3px">changed</span> <span class="del" style="padding:0 3px">only left</span> <span class="add" style="padding:0 3px">only right</span>.</p>';
+    pairs.slice(0, 40).forEach(function (p) {
+      var ua = p.a != null ? fl.units[st.from][p.a] : null, ub = p.b != null ? fl.units[st.to][p.b] : null;
+      h += '<h3>' + SW.esc(ua ? ua.name : '') + (ua && ub && ua.name !== ub.name ? ' → ' : '') + SW.esc(ub && (!ua || ub.name !== ua.name) ? ub.name : '') + ' ' + statusChip(p.status, p.similarity) + '</h3>' +
+        '<div class="diff">' + pairRows(ta, ua, tb, ub) + '</div><p>' + (ua ? openButton(ta, ua) + ' ' : '') + (ub ? openButton(tb, ub) : '') + '</p>';
+    });
+    if (pairs.length > 40) h += '<p class="hint">…and ' + (pairs.length - 40) + ' more.</p>';
+    drawerWide(ta.label + ' → ' + tb.label, h);
+  }
+
   function showMatrix(body, exp, ts) {
     var m = G.matrix(ts, { granularity: gst.gran === 'section' ? 'routine' : gst.gran });
     var t = G.tree(m);
     var sm = function () { return G.svgMatrix(m, {}); }, st = function () { return G.svgTree(t, m.labels, {}); };
     body.innerHTML = '<p class="hint prose">How much of each version’s program survives in each other version (retained, moved, and edited lines weighted by similarity), and the family tree that groups versions by that measure (UPGMA). A tree built from shared text, not from dates: read it against the documented history.</p>';
     var row = SW.el('div', { style: 'display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-top:10px' });
-    row.appendChild(SW.el('div', { class: 'svgbox' }, resolveVars(sm())));
-    row.appendChild(SW.el('div', { class: 'svgbox' }, resolveVars(st())));
+    row.appendChild(SW.el('div', { class: 'svgbox' }, SW.displaySVG(sm())));
+    row.appendChild(SW.el('div', { class: 'svgbox' }, SW.displaySVG(st())));
     body.appendChild(row);
     exp.appendChild(svgActions(sm, 'spacewar-similarity-matrix'));
     exp.appendChild(document.createTextNode(' '));

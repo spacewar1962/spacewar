@@ -213,13 +213,14 @@
 
   // ---------- drawer and popover ----------
   SW.drawer = function (title, html) {
+    document.body.classList.remove('drawer-wide');
     SW.$('#drawer-title').textContent = title;
     var body = SW.$('#drawer-body');
     if (typeof html === 'string') body.innerHTML = html; else { body.innerHTML = ''; body.appendChild(html); }
     document.body.classList.add('drawer-open');
     return body;
   };
-  SW.closeDrawer = function () { document.body.classList.remove('drawer-open'); };
+  SW.closeDrawer = function () { document.body.classList.remove('drawer-open', 'drawer-wide'); };
 
   var popEl = null;
   SW.pop = function (x, y, html) {
@@ -313,6 +314,99 @@
         return String(c == null ? '' : c);
       });
     }) };
+  };
+
+  // ---------- code text: font and size, for reading ----------
+  var WEBFONTS = { 'JetBrains Mono': 1, 'IBM Plex Mono': 1, 'Source Code Pro': 1, 'Fira Code': 1, 'Courier Prime': 1 };
+  SW.codeFont = function () { return SW.store.get('codeFont', 'system'); };
+  SW.codeSize = function () { var n = +SW.store.get('codeSize', 13); return n >= 9 && n <= 24 ? n : 13; };
+  SW.applyCodeText = function () {
+    var f = SW.codeFont(), de = document.documentElement;
+    if (WEBFONTS[f] && !document.getElementById('font-' + SW.slug(f))) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet'; l.id = 'font-' + SW.slug(f);
+      l.href = 'https://fonts.googleapis.com/css2?family=' + encodeURIComponent(f).replace(/%20/g, '+') + ':wght@400;700&display=swap';
+      document.head.appendChild(l);
+    }
+    de.style.setProperty('--code-font', f === 'system' ? 'var(--mono)' : '"' + f + '", var(--mono)');
+    de.style.setProperty('--code-size', SW.codeSize() + 'px');
+  };
+  SW.setCodeSize = function (n) {
+    n = Math.max(9, Math.min(24, Math.round(n)));
+    SW.store.set('codeSize', n);
+    SW.applyCodeText();
+    SW.toast('Code text ' + n + ' px');
+  };
+
+  // ---------- colour schemes for the genealogy figures ----------
+  SW.PALETTES = [
+    ['phosphor', 'Phosphor (default)'], ['okabe', 'Colour-blind safe (Okabe–Ito)'], ['tol', 'Colour-blind safe (Tol)'],
+    ['muted', 'Muted (print)'], ['bold', 'Bold, high contrast'], ['warm', 'Warm'], ['grey', 'Greyscale']
+  ];
+  SW.palette = function () { return SW.store.get('gen.palette', 'phosphor'); };
+  SW.applyPalette = function (k) {
+    if (k) SW.store.set('gen.palette', k);
+    k = SW.palette();
+    if (k === 'phosphor') document.documentElement.removeAttribute('data-gpal');
+    else document.documentElement.setAttribute('data-gpal', k);
+  };
+  // A select for choosing a scheme; onChange re-renders the caller's figure.
+  SW.paletteSelect = function (onChange) {
+    var l = SW.el('label', { class: 'check', title: 'Colours for retained, moved, edited, added and removed, on screen and in exported figures' }, 'Colours ');
+    var sel = SW.el('select', {}, SW.PALETTES.map(function (p) { return '<option value="' + p[0] + '"' + (p[0] === SW.palette() ? ' selected' : '') + '>' + SW.esc(p[1]) + '</option>'; }).join(''));
+    sel.onchange = function (e) { e.stopPropagation(); SW.applyPalette(sel.value); if (onChange) onChange(); };
+    l.appendChild(sel);
+    return l;
+  };
+
+  // ---------- figures: on screen, a dark plate; in export, the chosen background ----------
+  SW.FIGBG = { white: '#ffffff', paper: '#f4f1e8', black: '#04060b', transparent: null };
+  SW.figBg = function () { var b = SW.store.get('figbg', 'white'); return b in SW.FIGBG ? b : 'white'; };
+
+  // Resolve CSS custom properties in an SVG against a given theme, so the
+  // figure stands alone. The theme attribute is switched and restored
+  // synchronously, which reads the other palette without a repaint.
+  SW.resolveVars = function (svg, theme) {
+    var de = document.documentElement, was = de.getAttribute('data-theme');
+    if (theme) de.setAttribute('data-theme', theme);
+    var cs = getComputedStyle(de), cache = {};
+    function val(name, fb) {
+      if (!(name in cache)) cache[name] = cs.getPropertyValue(name).trim();
+      return cache[name] || (fb || '#888').trim();
+    }
+    var out = svg.replace(/var\((--[\w-]+)\s*(?:,\s*([^)]+))?\)/g, function (m, name, fb) { return val(name, fb); });
+    if (theme) { if (was == null) de.removeAttribute('data-theme'); else de.setAttribute('data-theme', was); }
+    return out;
+  };
+  // Figures on screen always sit on a dark plate, in both themes.
+  SW.displaySVG = function (svg) { return SW.resolveVars(svg, 'phosphor'); };
+  // Palettes for figures that draw their own ground (sky, ships).
+  SW.PLATE = { bg: '#02040a', ink: '#e6f4ff', ink2: '#8fc3d6', dim: '#7fa6c4', accent: '#ffce7a', dark: true };
+  SW.exportPalette = function () {
+    var k = SW.figBg(), dark = k === 'black';
+    return { bg: SW.FIGBG[k], dark: dark, ink: dark ? '#e6f4ff' : '#1b1f23', ink2: dark ? '#8fc3d6' : '#0f6f86',
+             dim: dark ? '#7fa6c4' : '#56606a', accent: dark ? '#ffce7a' : '#9a5b00' };
+  };
+  // An SVG for export: coloured for the chosen background, with that background laid under it.
+  SW.exportSVG = function (svg) {
+    var k = SW.figBg(), bg = SW.FIGBG[k];
+    svg = SW.resolveVars(svg, k === 'black' ? 'phosphor' : 'paper');
+    if (bg) svg = svg.replace(/(<svg\b[^>]*>)/, '$1<rect x="0" y="0" width="100%" height="100%" fill="' + bg + '"/>');
+    return svg;
+  };
+  // SVG and PNG buttons for a figure. getSvg(palette) returns the markup.
+  SW.figureButtons = function (getSvg, name) {
+    var w = SW.el('span');
+    w.appendChild(SW.el('button', { class: 'btn', title: 'Save as SVG (background: ' + SW.figBg() + '; change under ⚙)', onclick: function () {
+      root.SWExport.download(name + '.svg', SW.exportSVG(getSvg(SW.exportPalette())), 'image/svg+xml');
+    } }, '▣ SVG'));
+    w.appendChild(document.createTextNode(' '));
+    w.appendChild(SW.el('button', { class: 'btn', title: 'Save as PNG at three times screen size (background: ' + SW.figBg() + '; change under ⚙)', onclick: function () {
+      SW.figures.svgToPNG(SW.exportSVG(getSvg(SW.exportPalette())), 3, SW.FIGBG[SW.figBg()]).then(function (r) {
+        root.SWExport.download(name + '.png', r.png, 'image/png');
+      });
+    } }, '▣ PNG'));
+    return w;
   };
 
   // Export a document model as .docx or .md.

@@ -812,23 +812,26 @@
     var s = svgOpen(W, totalH, 'g-alluvial', opts.title || ('Genealogy flow (' + fl.granularity + ')'));
     // ribbons
     s += '<g class="g-ribbons" fill-opacity="0.55">';
-    fl.steps.forEach(function (st) {
+    fl.steps.forEach(function (st, si) {
       var xa = left + st.from * cw + bw, xb = left + st.to * cw;
       var UA = fl.units[st.from], UB = fl.units[st.to], PA = cols[st.from].pos, PB = cols[st.to].pos;
       coalesce(st.pairs).forEach(function (r) {
         var col = COLORS[r.status], tip;
+        // data-* attributes let a host page make the ribbons clickable
+        var da = ' data-step="' + si + '" data-status="' + r.status + '" data-a0="' + (r.a0 === null ? '' : r.a0) +
+          '" data-a1="' + (r.a1 === null ? '' : r.a1) + '" data-b0="' + (r.b0 === null ? '' : r.b0) + '" data-b1="' + (r.b1 === null ? '' : r.b1) + '"';
         if (r.a0 === null) {           // added: stub into B
           var pb = PB[r.b0];
           tip = texts[st.to].label + ': ' + UB[r.b0].name + ' added (' + UB[r.b0].lines + ' lines)';
           s += '<path d="' + band(xb - stub, pb.y + pb.h / 2, pb.y + pb.h / 2, xb, pb.y, pb.y + Math.max(pb.h, 0.5)) +
-            '" fill="' + col + '"><title>' + esc(tip) + '</title></path>';
+            '" fill="' + col + '"' + da + '><title>' + esc(tip) + '</title></path>';
           return;
         }
         if (r.b0 === null) {           // removed: stub out of A
           var pa = PA[r.a0];
           tip = texts[st.from].label + ': ' + UA[r.a0].name + ' removed (' + UA[r.a0].lines + ' lines)';
           s += '<path d="' + band(xa, pa.y, pa.y + Math.max(pa.h, 0.5), xa + stub, pa.y + pa.h / 2, pa.y + pa.h / 2) +
-            '" fill="' + col + '"><title>' + esc(tip) + '</title></path>';
+            '" fill="' + col + '"' + da + '><title>' + esc(tip) + '</title></path>';
           return;
         }
         var ya0 = PA[r.a0].y, ya1 = PA[r.a1].y + PA[r.a1].h, yb0 = PB[r.b0].y, yb1 = PB[r.b1].y + PB[r.b1].h;
@@ -837,7 +840,7 @@
            (UB[r.b0].name !== UA[r.a0].name ? ' → ' + UB[r.b0].name : '')) +
           (r.status === 'edited' ? ' (' + pct(r.sim) + ')' : '');
         s += '<path d="' + band(xa, ya0, Math.max(ya1, ya0 + 0.5), xb, yb0, Math.max(yb1, yb0 + 0.5)) +
-          '" fill="' + COLORS[r.status] + '"' + (r.status === 'moved' ? ' fill-opacity="0.8"' : '') +
+          '" fill="' + COLORS[r.status] + '"' + (r.status === 'moved' ? ' fill-opacity="0.8"' : '') + da +
           '><title>' + esc(tip) + '</title></path>';
       });
     });
@@ -855,7 +858,7 @@
         us.forEach(function (u, k) {
           var p = c.pos[k];
           s += '<rect x="' + f1(x) + '" y="' + f1(p.y) + '" width="' + bw + '" height="' + f1(Math.max(p.h, 0.5)) +
-            '" fill="' + COLORS.box + '" stroke="' + COLORS.stroke + '" stroke-width="0.4"><title>' +
+            '" fill="' + COLORS.box + '" stroke="' + COLORS.stroke + '" stroke-width="0.4" data-col="' + i + '" data-u="' + k + '"><title>' +
             esc(texts[i].label + ' · ' + u.name + ' (' + u.file + ' ' + u.n0 + '–' + u.n1 + ', ' + u.lines + ' lines)') +
             '</title></rect>';
         });

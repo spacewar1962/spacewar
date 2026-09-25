@@ -51,7 +51,7 @@
     return o.join('');
   };
 
-  F.svgToPNG = function (svg, scale) {
+  F.svgToPNG = function (svg, scale, bg) {
     return new Promise(function (resolve, reject) {
       var img = new Image();
       var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
@@ -59,6 +59,7 @@
         var c = document.createElement('canvas');
         c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
         var g = c.getContext('2d');
+        if (bg) { g.fillStyle = bg; g.fillRect(0, 0, c.width, c.height); }
         g.scale(scale, scale);
         g.drawImage(img, 0, 0);
         URL.revokeObjectURL(url);

@@ -324,7 +324,7 @@
       var m = b.macros[name];
       h += '<div>Macro, dummies: <span class="mono">' + SW.esc(m.args.join(', ') || '(none)') + '</span></div>' +
         '<div class="refs"><a href="#" data-p="' + m.file + '" data-n="' + m.line + '">defined at ' + SW.esc(b.parts[m.file].src) + ':' + m.line + '</a></div>' +
-        '<pre class="mono" style="font-size:12px;max-height:160px;overflow:auto;margin:6px 0 0">' + SW.esc(m.body) + '</pre>';
+        '<pre class="mono" style="max-height:160px;overflow:auto;margin:6px 0 0">' + SW.esc(m.body) + '</pre>';
     }
     if (s) {
       h += '<div>' + (s.variable ? 'Variable' : s.label ? 'Label' : 'Symbol') + ' = <span class="num mono">' + SW.oct(s.val) + '</span>' +
