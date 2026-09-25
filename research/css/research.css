@@ -37,6 +37,7 @@
   --g-retained: #6cf2ff;
   --g-moved: #c7a6ff;
   --g-edited: #ffce7a;
+  --g-rewritten: #ff9f43;
   --g-added: #7be3a0;
   --g-removed: #ff8a8a;
   --g-text: #cfd8dc; --g-muted: #78909c; --g-stroke: #455a64; --g-box: #263238; --g-heat: #6cf2ff; --g-line: #90a4ae; --g-cell-dark: #0b1018;
@@ -65,6 +66,7 @@
   --g-retained: #0f6f86;
   --g-moved: #6b3fb5;
   --g-edited: #b36b00;
+  --g-rewritten: #c2410c;
   --g-added: #1d7a45;
   --g-removed: #b3261e;
   /* figure ink for exports on white or paper */
@@ -424,12 +426,12 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 
 /* Colour schemes for the genealogy figures (flow, block map, legends). Chosen in the
    Genealogy toolbar; they apply on screen and in exported figures alike. */
-:root[data-gpal="okabe"], :root[data-gpal="okabe"] .legend { --g-retained: #56b4e9; --g-moved: #cc79a7; --g-edited: #e69f00; --g-added: #009e73; --g-removed: #d55e00; }
-:root[data-gpal="tol"], :root[data-gpal="tol"] .legend { --g-retained: #4477aa; --g-moved: #aa3377; --g-edited: #ccbb44; --g-added: #228833; --g-removed: #ee6677; }
-:root[data-gpal="muted"], :root[data-gpal="muted"] .legend { --g-retained: #6f93a8; --g-moved: #9483c2; --g-edited: #c9a24d; --g-added: #6aa67a; --g-removed: #c46a5f; }
-:root[data-gpal="bold"], :root[data-gpal="bold"] .legend { --g-retained: #00e5ff; --g-moved: #ff3df5; --g-edited: #ffe600; --g-added: #00ff85; --g-removed: #ff2d55; }
-:root[data-gpal="grey"], :root[data-gpal="grey"] .legend { --g-retained: #8f969c; --g-moved: #c9ced3; --g-edited: #5f666d; --g-added: #e6e8ea; --g-removed: #3a4046; }
-:root[data-gpal="warm"], :root[data-gpal="warm"] .legend { --g-retained: #e0a458; --g-moved: #b56576; --g-edited: #f2d492; --g-added: #88b04b; --g-removed: #d1495b; }
+:root[data-gpal="okabe"], :root[data-gpal="okabe"] .legend { --g-retained: #56b4e9; --g-moved: #cc79a7; --g-edited: #e69f00; --g-rewritten: #0072b2; --g-added: #009e73; --g-removed: #d55e00; }
+:root[data-gpal="tol"], :root[data-gpal="tol"] .legend { --g-retained: #4477aa; --g-moved: #aa3377; --g-edited: #ccbb44; --g-rewritten: #66ccee; --g-added: #228833; --g-removed: #ee6677; }
+:root[data-gpal="muted"], :root[data-gpal="muted"] .legend { --g-retained: #6f93a8; --g-moved: #9483c2; --g-edited: #c9a24d; --g-rewritten: #b9774a; --g-added: #6aa67a; --g-removed: #c46a5f; }
+:root[data-gpal="bold"], :root[data-gpal="bold"] .legend { --g-retained: #00e5ff; --g-moved: #ff3df5; --g-edited: #ffe600; --g-rewritten: #ff8c00; --g-added: #00ff85; --g-removed: #ff2d55; }
+:root[data-gpal="grey"], :root[data-gpal="grey"] .legend { --g-retained: #8f969c; --g-moved: #c9ced3; --g-edited: #5f666d; --g-rewritten: #aeb4ba; --g-added: #e6e8ea; --g-removed: #3a4046; }
+:root[data-gpal="warm"], :root[data-gpal="warm"] .legend { --g-retained: #e0a458; --g-moved: #b56576; --g-edited: #f2d492; --g-rewritten: #e07a3a; --g-added: #88b04b; --g-removed: #d1495b; }
 
 /* Notes in the margin: initials in small type; a thin amber rule on the lines a note covers. */
 .note-dot { min-width: 0; padding: 0 5px; border-radius: 7px; font-size: 10px; letter-spacing: 0.5px; line-height: 1.5; white-space: nowrap; }

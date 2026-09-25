@@ -169,7 +169,7 @@
     var c = G.compare(ta, tb, { granularity: 'routine', withComments: !cst.noComments });
     var s = c.summary;
     var pad = SW.el('div', { class: 'pad', style: 'max-width:none' });
-    pad.innerHTML = '<div class="legend">' + ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) {
+    pad.innerHTML = '<div class="legend">' + G.STATUSES.map(function (k) {
       return '<span><i style="background:var(--g-' + k + ')"></i>' + k + ' ' + s[k] + '</span>';
     }).join('') + '<span>overall similarity ' + Math.round(s.similarity * 100) + '%</span></div>';
     pad.appendChild(routineMap(ta, tb, c, A, B));
@@ -313,7 +313,7 @@
     o.push('<text x="' + (xB + colW) + '" y="22" font-size="13" font-weight="700" fill="var(--g-text)" text-anchor="end">' + SW.esc(lb) + '</text>');
     var s = c.summary;
     o.push('<text x="' + ((xA + colW + xB) / 2) + '" y="44" font-size="11" fill="var(--g-muted)" text-anchor="middle">' +
-      Math.round(s.similarity * 100) + '% similar · ' + s.retained + ' retained · ' + s.moved + ' moved · ' + s.edited + ' edited · ' + s.added + ' added · ' + s.removed + ' removed</text>');
+      Math.round(s.similarity * 100) + '% similar · ' + s.retained + ' retained · ' + s.moved + ' moved · ' + s.edited + ' edited · ' + s.rewritten + ' rewritten · ' + s.added + ' added · ' + s.removed + ' removed</text>');
     // bands between matched units
     o.push('<g fill-opacity="0.5">');
     c.pairs.forEach(function (p, i) {
@@ -359,7 +359,7 @@
     column(tb, c.unitsB, LB, xB, statusB, pairB, 'b', marksB);
     // legend
     var lx = 12;
-    ['retained', 'moved', 'edited', 'added', 'removed'].forEach(function (k) {
+    G.STATUSES.forEach(function (k) {
       o.push('<rect x="' + lx + '" y="' + (H - 24) + '" width="11" height="11" fill="' + COL(k) + '"/><text x="' + (lx + 16) + '" y="' + (H - 14) + '" font-size="11" fill="var(--g-text)">' + k + '</text>');
       lx += 92;
     });
@@ -406,7 +406,7 @@
         r = routineDiff(body, A, B);
         exp.appendChild(SW.exportButtons(function () {
           return { title: A.v.label + ' and ' + B.v.label + ': routines', blocks: [
-            { type: 'p', text: 'Routine-level genealogy: retained ' + r.c.summary.retained + ', moved ' + r.c.summary.moved + ', edited ' + r.c.summary.edited + ', added ' + r.c.summary.added + ', removed ' + r.c.summary.removed + '; overall similarity ' + Math.round(r.c.summary.similarity * 100) + '%.' },
+            { type: 'p', text: 'Routine-level genealogy: retained ' + r.c.summary.retained + ', moved ' + r.c.summary.moved + ', edited ' + r.c.summary.edited + ', rewritten ' + r.c.summary.rewritten + ', added ' + r.c.summary.added + ', removed ' + r.c.summary.removed + '; overall similarity ' + Math.round(r.c.summary.similarity * 100) + '%.' },
             SW.tableBlock('Routines matched', [A.v.label, 'Lines', 'Status', 'Similarity %', B.v.label, 'Lines'], r.rows)] };
         }, 'spacewar-' + A.v.id + '-vs-' + B.v.id + '-routines'));
       }
@@ -634,7 +634,7 @@
       if (document.fullscreenElement) document.exitFullscreen(); else if (stage.requestFullscreen) stage.requestFullscreen();
     } }, '⛶ Full screen'));
     zbar.appendChild(SW.el('span', { class: 'legend tb-right', title: 'Ribbon colours: what happened to each ' + gst.gran + ' between one version and the next' },
-      ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('')));
+      G.STATUSES.map(function (k) { return '<span><i style="background:var(--g-' + k + ')"></i>' + k + '</span>'; }).join('')));
     body.appendChild(stage);
     stage.appendChild(zbar);
     stage.appendChild(ov.el);
@@ -701,12 +701,12 @@
     exp.appendChild(svgActions(svg, 'spacewar-genealogy-flow-' + gst.gran));
     var rows = fl.steps.map(function (s) {
       var m = s.summary;
-      return [s.from, s.to, m.retained, m.moved, m.edited, m.added, m.removed, Math.round(m.similarity * 100)];
+      return [s.from, s.to, m.retained, m.moved, m.edited, m.rewritten, m.added, m.removed, Math.round(m.similarity * 100)];
     });
     var extra = SW.el('div', { class: 'gen-extra' });
     body.appendChild(extra);
     extra.insertAdjacentHTML('beforeend', '<h3 style="margin-top:18px">Step by step</h3>');
-    extra.appendChild(SW.table(['From', 'To', 'Retained', 'Moved', 'Edited', 'Added', 'Removed', 'Similarity %'], rows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num', 'num'] }));
+    extra.appendChild(SW.table(['From', 'To', 'Retained', 'Moved', 'Edited', 'Rewritten', 'Added', 'Removed', 'Similarity %'], rows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num', 'num', 'num'] }));
     // Lines by hand, version by version (shown with the hand colouring).
     var hkeys = SW.HANDS.map(function (h) { return h.k; }).filter(function (k) { return hands.some(function (col) { return col.some(function (a) { return a.hand === k; }); }); });
     var hHead = ['Version'].concat(hkeys, ['no hand']);
@@ -727,7 +727,7 @@
     exp.appendChild(SW.exportButtons(function () {
       var bl = [
         { type: 'p', text: 'Consecutive versions compared at ' + gst.gran + ' granularity' + (gst.supplied ? ', counting supplied macro and star tapes' : '') + '.' },
-        SW.tableBlock('Step by step', ['From', 'To', 'Retained', 'Moved', 'Edited', 'Added', 'Removed', 'Similarity %'], rows)];
+        SW.tableBlock('Step by step', ['From', 'To', 'Retained', 'Moved', 'Edited', 'Rewritten', 'Added', 'Removed', 'Similarity %'], rows)];
       if (gst.boxes === 'hand') bl.push(SW.tableBlock('Lines by hand (signed, inherited, or new on a signed tape)', hHead, hRows));
       return { title: 'Spacewar! genealogy: ' + gst.gran + ' flow', blocks: bl };
     }, 'spacewar-genealogy-steps'));
@@ -754,7 +754,7 @@
     }).join('');
   }
   function statusChip(st, sim) {
-    return '<span class="badge" style="color:var(--g-' + st + ');border-color:currentColor">' + st + (st === 'edited' && sim != null ? ' ' + Math.round(sim * 100) + '%' : '') + '</span>';
+    return '<span class="badge" style="color:var(--g-' + st + ');border-color:currentColor">' + st + ((st === 'edited' || st === 'rewritten') && sim != null ? ' ' + Math.round(sim * 100) + '%' : '') + '</span>';
   }
   function openButton(t, u) {
     var L = t.lines[u.start];
@@ -865,7 +865,7 @@
     body.appendChild(bars);
     var rows = lin.rows.map(function (r) {
       return [r.unit.name, { html: r.unit.n0 + '–' + r.unit.n1, sort: r.unit.n0 }, r.unit.codeLines, r.firstSeen || '(new)', r.status,
-              r.chain.map(function (c) { return c.versionId + (c.status && c.status !== 'retained' ? ' (' + c.status + (c.similarity != null && c.status === 'edited' ? ' ' + Math.round(c.similarity * 100) + '%' : '') + ')' : '') + (c.gap ? '*' : ''); }).join(' ← ')];
+              r.chain.map(function (c) { return c.versionId + (c.status && c.status !== 'retained' ? ' (' + c.status + (c.similarity != null && (c.status === 'edited' || c.status === 'rewritten') ? ' ' + Math.round(c.similarity * 100) + '%' : '') + ')' : '') + (c.gap ? '*' : ''); }).join(' ← ')];
     });
     body.appendChild(SW.table(['Unit', 'Lines', 'Code lines', 'First seen', 'Status', 'Chain (newest first; * bridged)'], rows,
       { cls: ['mono', 'mono', 'num', 'mono', '', 'mono'], onRow: function (r) {

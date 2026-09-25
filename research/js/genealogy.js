@@ -21,17 +21,20 @@
  *   3. Remaining units: candidates from an IDF-weighted inverted index
  *      (top-k) plus the unmatched A units lying in the same LCS "gap";
  *      similarity >= threshold, best-first = 'edited'.
+ *   3b. Routines left unmatched under the same entry label on both sides
+ *      (similarity >= 0.2) = 'rewritten': the same routine, mostly changed.
  *   4. The rest: 'added' (B only) / 'removed' (A only).
  * The comparison is a heuristic reading aid, not a proof of descent.
  */
 (function (root) {
   'use strict';
 
-  var STATUSES = ['retained', 'moved', 'edited', 'added', 'removed'];
+  var STATUSES = ['retained', 'moved', 'edited', 'rewritten', 'added', 'removed'];
   var COLORS = {
     retained: 'var(--g-retained, #6cf2ff)',
     moved: 'var(--g-moved, #c77dff)',
     edited: 'var(--g-edited, #ffd166)',
+    rewritten: 'var(--g-rewritten, #ff9f43)',
     added: 'var(--g-added, #7bd88f)',
     removed: 'var(--g-removed, #ff6b6b)',
     text: 'var(--g-text, #cfd8dc)',
@@ -563,8 +566,25 @@
       matchA[c.a] = c.b; matchB[c.b] = c.a; status[c.b] = 'edited'; sim[c.b] = c.s;
     });
 
+    // 3b. rewritten, by name: a routine left unmatched on both sides under the same
+    // entry label is the same routine rewritten, even below the threshold (4.2's
+    // bck gave its dislis calls to new subroutines 1m-4m and fell to about half).
+    // Only a label unique among the unmatched on each side, and not below 0.2.
+    if (g !== 'line') {
+      var nameA = Object.create(null), nameB = Object.create(null);
+      for (i = 0; i < nA; i++) if (matchA[i] < 0 && UA[i].name) nameA[UA[i].name] = nameA[UA[i].name] == null ? i : -2;
+      for (j = 0; j < nB; j++) if (matchB[j] < 0 && UB[j].name) nameB[UB[j].name] = nameB[UB[j].name] == null ? j : -2;
+      for (var nm in nameB) {
+        var bj = nameB[nm], ax = nameA[nm];
+        if (bj < 0 || ax == null || ax < 0 || nm === '(unnamed)') continue;
+        var s2 = unitSimilarity(UA[ax], UB[bj], g);
+        if (s2 < 0.2) continue;
+        matchA[ax] = bj; matchB[bj] = ax; status[bj] = 'rewritten'; sim[bj] = s2;
+      }
+    }
+
     // 4. assemble pairs in B order, removed A units after their predecessor
-    var pairs = [], la = 0, lb = 0, acc = 0, counts = { retained: 0, moved: 0, edited: 0, added: 0, removed: 0 };
+    var pairs = [], la = 0, lb = 0, acc = 0, counts = { retained: 0, moved: 0, edited: 0, rewritten: 0, added: 0, removed: 0 };
     UA.forEach(function (u) { la += u.lines; });
     UB.forEach(function (u) { lb += u.lines; });
     var removedAfter = {};                   // A index -> list of removed A units following it
@@ -584,7 +604,7 @@
       var ai = matchB[j];
       if (ai < 0) { pairs.push({ a: null, b: j, status: 'added', similarity: 0 }); counts.added++; continue; }
       var pr = { a: ai, b: j, status: status[j], similarity: +sim[j].toFixed(4) };
-      if (pr.status === 'edited') {
+      if (pr.status === 'edited' || pr.status === 'rewritten') {
         pr.inOrder = ai >= lo[j] && ai <= hi[j];
         if (opts.script !== false) {
           pr.script = g === 'line' ? [{ op: 'change', a: UA[ai].start, b: UB[j].start }] :
@@ -854,7 +874,7 @@
         tip = texts[st.from].label + ' → ' + texts[st.to].label + ': ' + r.status + ' ' +
           (r.n > 1 ? r.n + ' units, ' + UA[r.a0].name + ' … ' + UA[r.a1].name : UA[r.a0].name +
            (UB[r.b0].name !== UA[r.a0].name ? ' → ' + UB[r.b0].name : '')) +
-          (r.status === 'edited' ? ' (' + pct(r.sim) + ')' : '');
+          (r.status === 'edited' || r.status === 'rewritten' ? ' (' + pct(r.sim) + ')' : '');
         s += '<path d="' + band(xa, ya0, Math.max(ya1, ya0 + 0.5), xb, yb0, Math.max(yb1, yb0 + 0.5)) +
           '" fill="' + COLORS[r.status] + '"' + (r.status === 'moved' ? ' fill-opacity="0.8"' : '') + da +
           '><title>' + esc(tip) + '</title></path>';
@@ -951,7 +971,7 @@
     order.forEach(function (p) {
       var pa = ca.pos[p.a], pb = cb.pos[p.b];
       var tip = UA[p.a].name + ' → ' + UB[p.b].name + ': ' + p.status +
-        (p.status === 'edited' ? ' ' + pct(p.similarity) : '') + ' (' + a.id + ' ' + UA[p.a].n0 + ', ' + b.id + ' ' + UB[p.b].n0 + ')';
+        (p.status === 'edited' || p.status === 'rewritten' ? ' ' + pct(p.similarity) : '') + ' (' + a.id + ' ' + UA[p.a].n0 + ', ' + b.id + ' ' + UB[p.b].n0 + ')';
       s += '<path d="' + band(xa + bw, pa.y, pa.y + Math.max(pa.h, 0.5), xb, pb.y, pb.y + Math.max(pb.h, 0.5)) +
         '" fill="' + COLORS[p.status] + '"' + (p.status === 'moved' ? ' fill-opacity="0.85" stroke="' +
         COLORS.moved + '" stroke-width="0.5"' : '') + '><title>' + esc(tip) + '</title></path>';
