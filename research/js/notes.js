@@ -290,13 +290,47 @@
       var note = all.filter(function (x) { return x.id === id; })[0];
       if (!note) return;
       if (btn.dataset.act === 'reply') {
-        N.dialog({ vid: vid, parent: note.id, kind: note.kind, anchor: note.anchor,
-                   heading: 'Reply to ' + note.by, anchorText: SW.fmtDate(note.date) + ': ' + note.text.slice(0, 120) });
+        inlineReply(btn.closest('.note'), vid, note);
       } else if (btn.dataset.act === 'delete') {
         N.remove(note);
       }
     });
   };
+
+  // A reply box opened in place, under the note being answered (no tags).
+  function inlineReply(noteEl, vid, note) {
+    var open = noteEl.parentNode.querySelector('.reply-box');
+    if (open) { open.querySelector('textarea').focus(); return; }
+    var me = SW.me();
+    var box = SW.el('div', { class: 'reply-box' });
+    box.innerHTML = '<textarea rows="3" placeholder="Reply to ' + SW.esc(note.by) + '…"></textarea>' +
+      '<div class="reply-foot"><span class="hint">' + (me.initials ? 'Signed <b>' + SW.esc(me.initials) + '</b> · ' + SW.fmtDate(SW.today()) +
+      (N.configured() ? '' : ' · draft') : '<span style="color:var(--red)">Set your initials first (⚙).</span>') + '</span>' +
+      '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Reply</button></span></div>';
+    noteEl.insertAdjacentElement('afterend', box);
+    var ta = box.querySelector('textarea');
+    ta.focus();
+    function save() {
+      var text = ta.value.trim();
+      if (!text) { ta.focus(); return; }
+      box.querySelector('[data-r="save"]').disabled = true;
+      N.create({ vid: vid, parent: note.id, kind: note.kind, anchor: note.anchor, text: text, tags: [] })
+        .then(function () { box.remove(); }, function (e) {
+          box.querySelector('[data-r="save"]').disabled = false;
+          if (e.message !== 'no initials') SW.toast(e.message, 5000);
+        });
+    }
+    box.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var b = e.target.closest('[data-r]');
+      if (!b) return;
+      if (b.dataset.r === 'cancel') box.remove(); else save();
+    });
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); save(); }
+      if (e.key === 'Escape') { e.stopPropagation(); box.remove(); }
+    });
+  }
 
   // The note dialog. opts: {vid, kind, anchor, quote, parent, heading, anchorText}
   N.dialog = function (opts) {
