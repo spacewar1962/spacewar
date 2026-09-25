@@ -93,10 +93,10 @@
     for (var j = 17; j >= 0; j--) tw += '<label><input type="checkbox" data-tw="' + j + '"' + ((cpu.tw >> j) & 1 ? ' checked' : '') + '>' + (17 - j) + '</label>';
     el.innerHTML =
       '<div id="c-regs"></div>' +
-      '<h4>Sense switches</h4><div class="switches">' + sw + '</div>' +
-      '<h4>Test word</h4><div class="switches">' + tw + '</div>' +
-      '<h4>Machine</h4><label class="check" style="color:inherit"><input type="checkbox" id="c-mdv"' + (cpu.mdv ? ' checked' : '') +
-      '> automatic multiply/divide (mul, div)</label><br><label class="check" style="color:inherit"><input type="checkbox" id="c-strict"' +
+      '<h4 title="The six console switches the program reads with szs: game options such as a heavy or light central star, or the background stars on and off">Sense switches</h4><div class="switches">' + sw + '</div>' +
+      '<h4 title="The eighteen front-panel switches read by lat: in some versions an alternative to the control boxes, or a way to tune a value while the game runs">Test word</h4><div class="switches">' + tw + '</div>' +
+      '<h4>Machine</h4><label class="check" style="color:inherit" title="The PDP-1&#39;s optional automatic multiply and divide. The 4.x versions assume it (mul, div); the 1962 versions do without, using the step instructions mus and dis on the same opcodes. Change it to see what a program does on the other machine."><input type="checkbox" id="c-mdv"' + (cpu.mdv ? ' checked' : '') +
+      '> automatic multiply/divide (mul, div)</label><br><label class="check" style="color:inherit" title="A word with no defined instruction (a reserved opcode, such as the stray 4 in the 4.4 listings) either stops the machine, or is passed over and logged under Anomalies"><input type="checkbox" id="c-strict"' +
       (cpu.strictOps ? ' checked' : '') + '> reserved opcodes halt</label>';
     el.onchange = function (e) {
       var t = e.target;

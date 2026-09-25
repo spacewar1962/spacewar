@@ -6,7 +6,7 @@
   var SW = root.SW, N = SW.notes;
   var view = SW.$('#view-read');
   var R = SW.views.read = {};
-  var build = null, notes = [], counts = {}, anchorSel = null;
+  var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   var opts = { words: SW.store.get('read.words', true), norm: false, supplied: false, heat: false };
 
   var PSEUDO = { define: 1, term: 1, terminate: 1, repeat: 1, constants: 1, variables: 1, start: 1,
@@ -60,7 +60,8 @@
       w = SW.oct(words[0].val) + (words.length > 1 ? ' <span class="faint">+' + (words.length - 1) + '</span>' : '');
     }
     var text = opts.norm ? L.norm : L.raw;
-    var c = counts[k], mk = c ? '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '">' + c.n + '</span>' : '';
+    var mk = N.marginMark(k, counts[k]);
+    if (noted[k]) cls += ' noted';
     var heat = '';
     if (opts.heat && SW.profile && SW.profile.build === b && words) {
       var ex = 0;
@@ -85,10 +86,10 @@
       '<input type="search" id="rd-find" placeholder="Find text or /regex/ …">' +
       '<button class="btn" id="rd-prev" title="Previous match">↑</button><button class="btn" id="rd-next" title="Next match">↓</button>' +
       '<span class="hint" id="rd-hits"></span><span class="sep"></span>' +
-      '<label class="check"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
-      '<label class="check" title="Show the text the assembler read, after documented normalisations"><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
-      '<label class="check" title="Show supplied macro and star tapes"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
-      '<label class="check" title="Shade lines by how often they ran (from the Run view)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
+      '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
+      '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
+      '<label class="check" title="Show the tapes supplied to make this version assemble (the macro definitions and the star table), which are not part of the version&#39;s own source; they are collapsed by default"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
+      '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
       '<span class="sep"></span>';
     var info = SW.el('span', { class: 'hint' });
     if (b.asm) {
@@ -347,11 +348,24 @@
     });
   }
 
-  function showNotesFor(k) {
+  var openNotesKey = null;
+  function showNotesFor(k, quiet) {
     var parts = k.split(':'), p = +parts[0], n = +parts[1];
     var ts = N.threads(notes).filter(function (t) { return t.note.anchor && t.note.anchor.p === p && t.note.anchor.n0 === n; });
-    var body = SW.drawer('Notes on ' + SW.cite(build, p, n, n).replace(/^.*?, /, ''), ts.map(function (t) { return N.renderThread(t, build); }).join('') || '<p class="hint">No notes yet.</p>');
+    var c = counts[k], n1 = c ? c.n1 : n;
+    var html = '<p class="mono" style="margin-top:0">' + SW.esc(SW.cite(build, p, n, n1)) + '</p>' +
+      '<p><button class="btn" data-act="new">✎ Add a note on this line</button></p>' +
+      (ts.map(function (t) { return N.renderThread(t, build); }).join('') || '<p class="hint">No notes yet.</p>');
+    var body = SW.drawer('Notes', html);
+    body.dataset.notes = k;
+    openNotesKey = k;
     N.wire(body, build.v.id, notes);
+    body.querySelector('[data-act="new"]').onclick = function () {
+      var L = build.lines[p][n - 1];
+      N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: p, n0: n, n1: n, src: build.parts[p].src }, quote: L ? L.raw : '',
+                 heading: 'Annotate', anchorText: SW.cite(build, p, n, n) });
+    };
+    void quiet;
   }
 
   R.goto = function (p, n, flash) {
@@ -371,10 +385,17 @@
     N.list(build.v.id).then(function (all) {
       notes = all;
       counts = N.countsByLine(all);
-      SW.$$('.ln', view).forEach(function (row) {
-        var k = row.dataset.p + ':' + row.dataset.n, c = counts[k], mk = row.querySelector('.mk');
-        if (mk) mk.innerHTML = c ? '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '">' + c.n + '</span>' : '';
+      noted = {};
+      Object.keys(counts).forEach(function (k) {
+        var c = counts[k];
+        for (var n = c.n0; n <= c.n1; n++) noted[c.p + ':' + n] = true;
       });
+      SW.$$('.ln', view).forEach(function (row) {
+        var k = row.dataset.p + ':' + row.dataset.n, mk = row.querySelector('.mk');
+        if (mk) mk.innerHTML = N.marginMark(k, counts[k]);
+        row.classList.toggle('noted', !!noted[k]);
+      });
+      if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey) showNotesFor(openNotesKey, true);
     });
   }
 

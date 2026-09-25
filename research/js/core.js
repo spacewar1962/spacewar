@@ -212,15 +212,36 @@
   };
 
   // ---------- drawer and popover ----------
+  // The side panel. Closing it minimises it to a tab at the foot of the screen,
+  // which brings it back with its contents as they were.
   SW.drawer = function (title, html) {
     document.body.classList.remove('drawer-wide');
+    delete SW.$('#drawer-body').dataset.notes;
     SW.$('#drawer-title').textContent = title;
     var body = SW.$('#drawer-body');
     if (typeof html === 'string') body.innerHTML = html; else { body.innerHTML = ''; body.appendChild(html); }
     document.body.classList.add('drawer-open');
+    var dk = SW.$('#drawer-dock');
+    if (dk) dk.classList.remove('on');
     return body;
   };
-  SW.closeDrawer = function () { document.body.classList.remove('drawer-open', 'drawer-wide'); };
+  SW.closeDrawer = function () {
+    var wide = document.body.classList.contains('drawer-wide');
+    document.body.classList.remove('drawer-open', 'drawer-wide');
+    var dock = SW.$('#drawer-dock');
+    if (!dock) {
+      dock = SW.el('button', { id: 'drawer-dock', class: 'drawer-dock', title: 'Show the side panel again' });
+      document.body.appendChild(dock);
+      dock.onclick = function () {
+        document.body.classList.add('drawer-open');
+        if (dock.dataset.wide === '1') document.body.classList.add('drawer-wide');
+        dock.classList.remove('on');
+      };
+    }
+    dock.dataset.wide = wide ? '1' : '';
+    dock.textContent = '▴ ' + (SW.$('#drawer-title').textContent || 'Side panel');
+    dock.classList.add('on');
+  };
 
   var popEl = null;
   SW.pop = function (x, y, html) {
@@ -379,7 +400,7 @@
     return out;
   };
   // Figures on screen always sit on a dark plate, in both themes.
-  SW.displaySVG = function (svg) { return SW.resolveVars(svg, 'phosphor'); };
+  SW.displaySVG = function (svg) { return SW.resolveVars(svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, ''), 'phosphor'); };
   // Palettes for figures that draw their own ground (sky, ships).
   SW.PLATE = { bg: '#02040a', ink: '#e6f4ff', ink2: '#8fc3d6', dim: '#7fa6c4', accent: '#ffce7a', dark: true };
   SW.exportPalette = function () {
@@ -390,6 +411,8 @@
   // An SVG for export: coloured for the chosen background, with that background laid under it.
   SW.exportSVG = function (svg) {
     var k = SW.figBg(), bg = SW.FIGBG[k];
+    // XML 1.0 forbids most control characters; the sources carry form feeds.
+    svg = svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '');
     svg = SW.resolveVars(svg, k === 'black' ? 'phosphor' : 'paper');
     if (bg) svg = svg.replace(/(<svg\b[^>]*>)/, '$1<rect x="0" y="0" width="100%" height="100%" fill="' + bg + '"/>');
     return svg;
@@ -402,9 +425,10 @@
     } }, '▣ SVG'));
     w.appendChild(document.createTextNode(' '));
     w.appendChild(SW.el('button', { class: 'btn', title: 'Save as PNG at three times screen size (background: ' + SW.figBg() + '; change under ⚙)', onclick: function () {
+      SW.toast('Rendering PNG…');
       SW.figures.svgToPNG(SW.exportSVG(getSvg(SW.exportPalette())), 3, SW.FIGBG[SW.figBg()]).then(function (r) {
         root.SWExport.download(name + '.png', r.png, 'image/png');
-      });
+      }, function () { SW.toast('The PNG could not be made from this figure; try SVG, or zoom out first.', 6000); });
     } }, '▣ PNG'));
     return w;
   };

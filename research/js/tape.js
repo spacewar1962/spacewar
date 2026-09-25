@@ -101,7 +101,7 @@
         '<p class="prose">A <b>frame</b> is one column of holes across the tape: one character on a source tape, one six-bit part of a word on an object tape, at ten frames to the inch. Eight data channels run along the tape, with the small sprocket hole between the third and fourth. Choose where to start (counted from the very beginning of the tape image, leader included) and how many frames to draw.</p>' +
         (reals.length ? '' : '<p class="prose"><b>No real tape survives for this version</b> in the project’s sources; only the reconstruction can be shown.</p>');
       var tb = SW.el('div', { class: 'toolbar' });
-      tb.innerHTML = '<label class="check">Tape <select id="tp-which">' +
+      tb.innerHTML = '<label class="check" title="Real tapes are digitised images of the surviving paper tapes; the reconstruction is the tape the assembler would punch today">Tape <select id="tp-which">' +
         reals.map(function (r, i) { return '<option value="r' + i + '">Real: ' + SW.esc(r.path) + ' (' + SW.esc(r.kind) + ')</option>'; }).join('') +
         '<option value="asm">Reconstruction: assembled today (macro1 format)</option></select></label>' +
         '<label class="check" title="A frame is one column of holes across the tape: one character or byte. Frames are counted from the very start of the tape image, leader included.">Start at frame <input type="number" id="tp-from" min="0" value="0" style="width:7em"></label>' +

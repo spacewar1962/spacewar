@@ -56,6 +56,8 @@
       var img = new Image();
       var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
       img.onload = function () {
+        // Stay within the browser's canvas limits (32,767 px a side, ~250 megapixels).
+        scale = Math.min(scale, 32000 / img.height, 32000 / img.width, Math.sqrt(2.4e8 / (img.width * img.height)));
         var c = document.createElement('canvas');
         c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
         var g = c.getContext('2d');
@@ -85,8 +87,8 @@
 
   F.codeFigureDialog = function (b, lines, caption) {
     var body = SW.el('div');
-    body.innerHTML = '<label class="check">Style <select id="fg-theme"><option value="print">Print (white)</option><option value="paper">Listing paper</option><option value="phosphor">Phosphor</option></select></label> ' +
-      '<label class="check"><input type="checkbox" id="fg-words"> addresses and words</label>' +
+    body.innerHTML = '<label class="check" title="The look of the figure: black on white for print, the cream of listing paper, or the phosphor of the screen">Style <select id="fg-theme"><option value="print">Print (white)</option><option value="paper">Listing paper</option><option value="phosphor">Phosphor</option></select></label> ' +
+      '<label class="check" title="Include the octal address and assembled word beside each line"><input type="checkbox" id="fg-words"> addresses and words</label>' +
       '<label>Caption <input id="fg-cap" value="' + SW.esc(caption) + '"></label><div class="svgbox" id="fg-prev" style="max-height:50vh"></div>';
     function svg() { return F.codeSVG(b, lines, SW.$('#fg-cap').value, SW.$('#fg-theme').value, SW.$('#fg-words').checked); }
     var d = dialog('Code figure', body, [
@@ -155,10 +157,10 @@
     pts = pts.slice();
     var body = SW.el('div');
     body.innerHTML = '<p class="hint">The display as it stood when you pressed the button, re-rendered from the plotted points, not grabbed from the screen.</p>' +
-      '<label class="check">Size <select id="sf-size"><option>2048</option><option selected>4096</option><option>1024</option></select></label> ' +
-      '<label class="check">Persistence <select id="sf-pers"><option value="0.05">short</option><option value="0.12" selected>P7 (default)</option><option value="0.4">long exposure</option><option value="2">very long</option></select></label> ' +
-      '<label class="check">Ink <select id="sf-ink"><option value="dark">phosphor on black</option><option value="light">black on white (print)</option></select></label> ' +
-      '<label class="check"><input type="checkbox" id="sf-round" checked> round tube</label>' +
+      '<label class="check" title="Width and height of the PNG in pixels (4096 is enough for a full-page plate at 300 dpi)">Size <select id="sf-size"><option>2048</option><option selected>4096</option><option>1024</option></select></label> ' +
+      '<label class="check" title="How long each plotted point glows: the P7 phosphor faded over a fraction of a second; a long exposure shows motion as trails">Persistence <select id="sf-pers"><option value="0.05">short</option><option value="0.12" selected>P7 (default)</option><option value="0.4">long exposure</option><option value="2">very long</option></select></label> ' +
+      '<label class="check" title="Light points on black, as the screen was; or black points on white, for print">Ink <select id="sf-ink"><option value="dark">phosphor on black</option><option value="light">black on white (print)</option></select></label> ' +
+      '<label class="check" title="Crop to the round face of the Type 30 tube, or keep the square raster"><input type="checkbox" id="sf-round" checked> round tube</label>' +
       '<div id="sf-prev" style="margin-top:8px;text-align:center"></div>';
     function opts() {
       var light = SW.$('#sf-ink').value === 'light';

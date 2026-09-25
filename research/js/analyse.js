@@ -567,7 +567,7 @@
     });
   }
   function onlyToggle(el, rerender) {
-    var l = SW.el('label', { class: 'check', style: 'margin-bottom:8px' }, '<input type="checkbox"' + (xst.onlyChanges ? ' checked' : '') + '> only rows that change between versions');
+    var l = SW.el('label', { class: 'check', style: 'margin-bottom:8px', title: 'Hide rows whose value is the same in every selected version, leaving only what changes' }, '<input type="checkbox"' + (xst.onlyChanges ? ' checked' : '') + '> only rows that change between versions');
     l.firstChild.onchange = function (e) { xst.onlyChanges = e.target.checked; rerender(); };
     el.appendChild(l);
   }
@@ -832,7 +832,7 @@
     var picks = SW.el('div', { class: 'hint', style: 'grid-column:1/-1;margin-bottom:4px' });
     var set = SW.store.get('gen.set', DEFAULT_SET);
     picks.innerHTML = 'Versions (shared with Genealogy): ' + V.VERSIONS.filter(function (v) { return v.build && v.id !== 'stars'; }).sort(function (a, b) { return a.sort - b.sort; }).map(function (v) {
-      return '<label class="check" style="margin-right:10px"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(short(v)) + '</label>';
+      return '<label class="check" style="margin-right:10px" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(short(v)) + '</label>';
     }).join('');
     picks.addEventListener('change', function (e) {
       var id = e.target.dataset.id, s = SW.store.get('gen.set', DEFAULT_SET).filter(function (x) { return x !== id; });

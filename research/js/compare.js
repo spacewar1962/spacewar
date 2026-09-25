@@ -172,15 +172,7 @@
     pad.innerHTML = '<div class="legend">' + ['retained', 'moved', 'edited', 'added', 'removed'].map(function (k) {
       return '<span><i style="background:var(--g-' + k + ')"></i>' + k + ' ' + s[k] + '</span>';
     }).join('') + '<span>overall similarity ' + Math.round(s.similarity * 100) + '%</span></div>';
-    var svgBox = SW.el('div', { class: 'svgbox', style: 'margin:10px 0' });
-    var svg = function () { return G.svgBlockMap(ta, tb, c, { title: A.v.label + ' → ' + B.v.label }); };
-    svgBox.innerHTML = SW.displaySVG(svg());
-    var acts = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
-    acts.appendChild(SW.paletteSelect(function () { renderCompare(A); }));
-    acts.appendChild(SW.el('span', { class: 'sep' }));
-    acts.appendChild(svgActions(svg, 'spacewar-' + A.v.id + '-' + B.v.id + '-blockmap'));
-    pad.appendChild(acts);
-    pad.appendChild(svgBox);
+    pad.appendChild(routineMap(ta, tb, c, A, B));
     var rows = c.pairs.map(function (p) {
       var ua = p.a != null ? c.unitsA[p.a] : null, ub = p.b != null ? c.unitsB[p.b] : null;
       return [ua ? ua.name : '', ua ? ua.n0 + '–' + ua.n1 : '', p.status, p.similarity != null ? Math.round(p.similarity * 100) : '', ub ? ub.name : '', ub ? ub.n0 + '–' + ub.n1 : ''];
@@ -188,6 +180,151 @@
     pad.appendChild(SW.table([A.v.label, 'Lines', 'Status', 'Sim %', B.v.label, 'Lines'], rows, { cls: ['mono', 'mono', '', 'num', 'mono', 'mono'] }));
     el.appendChild(pad);
     return { c: c, rows: rows };
+  }
+
+  // ---------- the routine map: two versions side by side, zoomable to the code ----------
+  var rmZoom = SW.store.get('rm.zoom', 1.2);          // pixels per source line
+  var CODE_AT = 9;                                     // show code from this zoom up
+  function routineMap(ta, tb, c, A, B) {
+    var wrap = SW.el('div');
+    var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+    var box = SW.el('div', { class: 'svgbox flow', style: 'margin:6px 0 14px;max-height:78vh' });
+    var readout = SW.el('span', { class: 'hint' });
+    function zoomTo(z, keepCentre) {
+      var frac = box.scrollHeight ? (box.scrollTop + box.clientHeight / 2) / box.scrollHeight : 0;
+      rmZoom = Math.max(0.3, Math.min(16, z));
+      SW.store.set('rm.zoom', rmZoom);
+      draw();
+      if (keepCentre) box.scrollTop = frac * box.scrollHeight - box.clientHeight / 2;
+    }
+    function fit() {
+      var n = Math.max(linesOf(c.unitsA, ta), linesOf(c.unitsB, tb), 1);
+      zoomTo((Math.max(300, box.clientHeight || 600) - 90) / n, false);
+    }
+    [['−', 'Zoom out', function () { zoomTo(rmZoom / 1.5, true); }],
+     ['+', 'Zoom in (the code appears when there is room to read it)', function () { zoomTo(rmZoom * 1.5, true); }],
+     ['Fit', 'Fit both versions in the window', fit],
+     ['Code', 'Zoom in far enough to read the code', function () { zoomTo(Math.max(CODE_AT, 12), true); }]].forEach(function (b) {
+      bar.appendChild(SW.el('button', { class: 'btn', title: b[1], onclick: b[2] }, b[0]));
+    });
+    var slider = SW.el('input', { type: 'range', min: '0', max: '100', title: 'Zoom' });
+    slider.style.width = '160px';
+    slider.oninput = function () { zoomTo(0.3 * Math.pow(16 / 0.3, +slider.value / 100), true); };
+    bar.appendChild(slider);
+    bar.appendChild(readout);
+    bar.appendChild(SW.el('span', { class: 'sep' }));
+    bar.appendChild(SW.paletteSelect(function () { draw(); }));
+    bar.appendChild(SW.el('span', { class: 'sep' }));
+    bar.appendChild(SW.figureButtons(function () { return svgOf(rmZoom); }, 'spacewar-' + A.v.id + '-' + B.v.id + '-routines'));
+    wrap.appendChild(bar);
+    wrap.appendChild(box);
+    function linesOf(us, t) { var n = 0; us.forEach(function (u) { n += u.end - u.start + 1; }); return n; }
+    function svgOf(z) { return routineMapSVG(ta, tb, c, z, A.v.label, B.v.label); }
+    function draw() {
+      box.innerHTML = SW.displaySVG(svgOf(rmZoom));
+      slider.value = String(Math.round(100 * Math.log(rmZoom / 0.3) / Math.log(16 / 0.3)));
+      readout.textContent = rmZoom.toFixed(1) + ' px per line' + (rmZoom >= CODE_AT ? ' · code shown' : ' · zoom in to read the code');
+    }
+    box.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-pair]');
+      if (!t) return;
+      var p = c.pairs[+t.dataset.pair];
+      var ua = p.a != null ? c.unitsA[p.a] : null, ub = p.b != null ? c.unitsB[p.b] : null;
+      var h = '<p class="hint" style="margin-top:0">Left: ' + SW.esc(ta.label) + '; right: ' + SW.esc(tb.label) + '. ' + statusChip(p.status, p.similarity) + '</p>' +
+        '<div class="diff">' + pairRows(ta, ua, tb, ub) + '</div><p>' + (ua ? openButton(ta, ua) + ' ' : '') + (ub ? openButton(tb, ub) : '') + '</p>';
+      drawerWide((ua ? ua.name : '') + (ua && ub && ua.name !== ub.name ? ' → ' : '') + (ub && (!ua || ub.name !== ua.name) ? ub.name : ''), h);
+    });
+    setTimeout(draw, 0);
+    return wrap;
+  }
+
+  // Line-level marks for a matched pair: which lines of each side changed.
+  function lineMarks(ta, ua, tb, ub) {
+    var la = [], lb = [], i;
+    for (i = ua.start; i <= ua.end; i++) la.push(ta.lines[i]);
+    for (i = ub.start; i <= ub.end; i++) lb.push(tb.lines[i]);
+    var ma = {}, mb = {};
+    G.editScript(la.map(key), lb.map(key)).forEach(function (o) {
+      if (o.op === 'same') return;
+      if (o.a != null) ma[ua.start + o.a] = o.op;
+      if (o.b != null) mb[ub.start + o.b] = o.op;
+    });
+    return [ma, mb];
+  }
+
+  function routineMapSVG(ta, tb, c, z, la, lb) {
+    var showCode = z >= CODE_AT, fs = Math.min(13, Math.max(7, z - 1.5));
+    var colW = showCode ? 440 : 28, gap = showCode ? 170 : 220, nameW = showCode ? 0 : 150;
+    var xA = 12 + nameW, xB = xA + colW + gap, W = xB + colW + nameW + 12, top = 64;
+    var COL = function (st) { return 'var(--g-' + st + ')'; };
+    function layout(us) {
+      var y = top, pos = [];
+      us.forEach(function (u) { var h = (u.end - u.start + 1) * z; pos.push({ y: y, h: h }); y += h + (showCode ? 6 : 1); });
+      return { pos: pos, bottom: y };
+    }
+    var LA = layout(c.unitsA), LB = layout(c.unitsB), H = Math.max(LA.bottom, LB.bottom) + 40;
+    var statusA = {}, statusB = {}, pairA = {}, pairB = {};
+    c.pairs.forEach(function (p, i) {
+      if (p.a != null) { statusA[p.a] = p.status; pairA[p.a] = i; }
+      if (p.b != null) { statusB[p.b] = p.status; pairB[p.b] = i; }
+    });
+    var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H.toFixed(0) + '" viewBox="0 0 ' + W + ' ' + H.toFixed(0) + '" font-family="var(--g-font, ui-monospace, Menlo, Consolas, monospace)">'];
+    // titles: one per column, and the similarity on its own line in the middle
+    o.push('<text x="' + xA + '" y="22" font-size="13" font-weight="700" fill="var(--g-text)">' + SW.esc(la) + '</text>');
+    o.push('<text x="' + (xB + colW) + '" y="22" font-size="13" font-weight="700" fill="var(--g-text)" text-anchor="end">' + SW.esc(lb) + '</text>');
+    var s = c.summary;
+    o.push('<text x="' + ((xA + colW + xB) / 2) + '" y="44" font-size="11" fill="var(--g-muted)" text-anchor="middle">' +
+      Math.round(s.similarity * 100) + '% similar · ' + s.retained + ' retained · ' + s.moved + ' moved · ' + s.edited + ' edited · ' + s.added + ' added · ' + s.removed + ' removed</text>');
+    // bands between matched units
+    o.push('<g fill-opacity="0.5">');
+    c.pairs.forEach(function (p, i) {
+      if (p.a == null || p.b == null) return;
+      var a = LA.pos[p.a], b = LB.pos[p.b], x0 = xA + colW, x1 = xB, mx = (x0 + x1) / 2;
+      o.push('<path data-pair="' + i + '" d="M' + x0 + ' ' + a.y.toFixed(1) + ' C' + mx + ' ' + a.y.toFixed(1) + ' ' + mx + ' ' + b.y.toFixed(1) + ' ' + x1 + ' ' + b.y.toFixed(1) +
+        ' L' + x1 + ' ' + (b.y + b.h).toFixed(1) + ' C' + mx + ' ' + (b.y + b.h).toFixed(1) + ' ' + mx + ' ' + (a.y + a.h).toFixed(1) + ' ' + x0 + ' ' + (a.y + a.h).toFixed(1) + ' Z" fill="' + COL(p.status) + '"' +
+        (p.status === 'moved' ? ' fill-opacity="0.85"' : '') + '><title>' + SW.esc(c.unitsA[p.a].name + ' → ' + c.unitsB[p.b].name + ': ' + p.status + (p.status === 'edited' ? ' ' + Math.round(p.similarity * 100) + '%' : '')) + '</title></path>');
+    });
+    o.push('</g>');
+    // the two columns
+    function column(t, us, L, x, status, pairOf, side, marks) {
+      us.forEach(function (u, k) {
+        var P = L.pos[k], st = status[k] || (side === 'a' ? 'removed' : 'added');
+        var pi = pairOf[k] != null ? pairOf[k] : '';
+        o.push('<g data-pair="' + pi + '"><rect x="' + x + '" y="' + P.y.toFixed(1) + '" width="' + colW + '" height="' + Math.max(P.h, 0.6).toFixed(1) + '" fill="var(--g-box)" stroke="' + COL(st) + '" stroke-width="' + (showCode ? 1.4 : 1) + '"><title>' + SW.esc(t.label + ' · ' + u.name + ' (ll. ' + u.n0 + '–' + u.n1 + '): ' + st) + '</title></rect>');
+        if (st === 'added' || st === 'removed') o.push('<rect x="' + x + '" y="' + P.y.toFixed(1) + '" width="' + (showCode ? 5 : colW) + '" height="' + Math.max(P.h, 0.6).toFixed(1) + '" fill="' + COL(st) + '" fill-opacity="' + (showCode ? 1 : 0.8) + '" pointer-events="none"/>');
+        if (!showCode && P.h >= 9 && nameW) {
+          var nx = side === 'a' ? x - 6 : x + colW + 6;
+          o.push('<text x="' + nx + '" y="' + (P.y + Math.min(P.h, 14) / 2 + 3.5).toFixed(1) + '" font-size="10" fill="var(--g-text)"' + (side === 'a' ? ' text-anchor="end"' : '') + ' pointer-events="none">' + SW.esc(u.name.slice(0, 20)) + '</text>');
+        }
+        if (showCode) {
+          var mk = marks && marks[k] ? marks[k] : {};
+          for (var i = u.start; i <= u.end; i++) {
+            var Ln = t.lines[i], y = P.y + (i - u.start) * z;
+            if (!Ln) continue;
+            if (mk[i]) o.push('<rect x="' + (x + 5) + '" y="' + y.toFixed(1) + '" width="' + (colW - 5) + '" height="' + z.toFixed(1) + '" fill="' + COL(mk[i] === 'change' ? 'edited' : side === 'a' ? 'removed' : 'added') + '" fill-opacity="0.28" pointer-events="none"/>');
+            var txt = Ln.raw.replace(/\t/g, '    ').replace(/[\x00-\x1f]/g, '').replace(/\s+$/, '');
+            if (txt.length > 62) txt = txt.slice(0, 61) + '…';
+            o.push('<text x="' + (x + 8) + '" y="' + (y + z * 0.78).toFixed(1) + '" font-size="' + fs.toFixed(1) + '" fill="var(--g-text)" xml:space="preserve" pointer-events="none"><tspan fill="var(--g-muted)">' + String(Ln.n).padStart(5) + '  </tspan>' + SW.esc(txt) + '</text>');
+          }
+        }
+        o.push('</g>');
+      });
+    }
+    var marksA = {}, marksB = {};
+    if (showCode) c.pairs.forEach(function (p) {
+      if (p.a == null || p.b == null || p.status === 'retained' || p.status === 'moved') return;
+      var m = lineMarks(ta, c.unitsA[p.a], tb, c.unitsB[p.b]);
+      marksA[p.a] = m[0]; marksB[p.b] = m[1];
+    });
+    column(ta, c.unitsA, LA, xA, statusA, pairA, 'a', marksA);
+    column(tb, c.unitsB, LB, xB, statusB, pairB, 'b', marksB);
+    // legend
+    var lx = 12;
+    ['retained', 'moved', 'edited', 'added', 'removed'].forEach(function (k) {
+      o.push('<rect x="' + lx + '" y="' + (H - 24) + '" width="11" height="11" fill="' + COL(k) + '"/><text x="' + (lx + 16) + '" y="' + (H - 14) + '" font-size="11" fill="var(--g-text)">' + k + '</text>');
+      lx += 92;
+    });
+    return o.concat(['</svg>']).join('');
   }
 
   function renderCompare(A) {
@@ -198,10 +335,10 @@
     tb.innerHTML = '<b>' + SW.esc(A.v.label) + '</b> <span class="muted">against</span> <select id="cp-b">' + options(bid) + '</select><span class="sep"></span>' +
       ['text', 'constants', 'routines'].map(function (m) { return '<button class="btn' + (cst.mode === m ? ' on' : '') + '" data-m="' + m + '">' + { text: 'Text', constants: 'Constants & symbols', routines: 'Routines' }[m] + '</button>'; }).join('') +
       '<span class="sep"></span>' +
-      '<label class="check"><input type="checkbox" data-o="noComments"' + (cst.noComments ? ' checked' : '') + '> ignore comments</label>' +
-      '<label class="check"><input type="checkbox" data-o="norm"' + (cst.norm ? ' checked' : '') + '> normalised</label>' +
-      '<label class="check"><input type="checkbox" data-o="supplied"' + (cst.supplied ? ' checked' : '') + '> supplied tapes</label>' +
-      '<label class="check"><input type="checkbox" data-o="fold"' + (cst.fold ? ' checked' : '') + '> fold unchanged</label><span class="sep"></span><span id="cp-exp"></span>';
+      '<label class="check" title="Compare the code only: comments (after /) are left out, so a changed comment does not count as a change"><input type="checkbox" data-o="noComments"' + (cst.noComments ? ' checked' : '') + '> ignore comments</label>' +
+      '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" data-o="norm"' + (cst.norm ? ' checked' : '') + '> normalised</label>' +
+      '<label class="check" title="Include the tapes supplied to make a version assemble (the macro definitions and the star table), not only the version&#39;s own program text"><input type="checkbox" data-o="supplied"' + (cst.supplied ? ' checked' : '') + '> supplied tapes</label>' +
+      '<label class="check" title="Collapse long runs of identical lines to a single bar (click it to open), so the differences stand together"><input type="checkbox" data-o="fold"' + (cst.fold ? ' checked' : '') + '> fold unchanged</label><span class="sep"></span><span id="cp-exp"></span>';
     cview.appendChild(tb);
     var body = SW.el('div');
     cview.appendChild(body);
@@ -265,13 +402,13 @@
     tb.innerHTML = ['alluvial', 'matrix', 'lineage'].map(function (m) {
       return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '">' + { alluvial: 'Flow through versions', matrix: 'Similarity & family tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '')) }[m] + '</button>';
     }).join('') + '<span class="sep"></span>' +
-      '<label class="check">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
+      '<label class="check" title="The size of the pieces traced from version to version: section (large blocks under a header or tape title), routine (from one label after a break to the next), or line">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
       '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied tapes</label><span class="sep"></span><span id="gn-pal"></span><span class="sep"></span><span id="gn-exp"></span>';
     gview.appendChild(tb);
     SW.$('#gn-pal', tb).appendChild(SW.paletteSelect(function () { renderGen(cur); }));
     var picks = SW.el('div', { class: 'pad', style: 'padding-bottom:0;max-width:none' });
     picks.innerHTML = '<div class="hint">Versions (chronological): ' + buildable().filter(function (v) { return v.id !== 'stars'; }).map(function (v) {
-      return '<label class="check" style="margin-right:10px"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</label>';
+      return '<label class="check" style="margin-right:10px" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</label>';
     }).join('') + '</div>';
     gview.appendChild(picks);
     var body = SW.el('div', { class: 'pad', style: 'max-width:none' });

@@ -172,9 +172,9 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .part-head .src { font-family: var(--mono); color: var(--amber); }
 .part-head .role { color: var(--text-dim); }
 .part.collapsed .ln { display: none; }
-.ln { display: grid; grid-template-columns: 4.2em 3.6em 5.2em 1fr 2.2em; column-gap: 10px; padding: 0 14px 0 6px; white-space: pre; min-height: 1.5em; }
+.ln { display: grid; grid-template-columns: 4.8em 3.6em 5.2em 1fr minmax(2.2em, max-content); column-gap: 10px; padding: 0 14px 0 6px; white-space: pre; min-height: 1.5em; }
 .ln:hover { background: var(--surface); }
-.ln .n { color: var(--text-faint); text-align: right; cursor: pointer; user-select: none; }
+.ln .n { color: var(--text-faint); text-align: right; cursor: pointer; user-select: none; padding-right: 9px; }
 .ln .a { color: var(--amber); opacity: 0.85; }
 .ln .w { color: var(--text-dim); }
 .ln .t { overflow: hidden; text-overflow: ellipsis; }
@@ -185,7 +185,7 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .ln.bp .n { color: var(--red); font-weight: 700; }
 .ln.bp .n::before { content: "● "; }
 .ln.err .t { text-decoration: underline wavy var(--red); text-underline-offset: 3px; }
-.ln.norm .n { box-shadow: inset -2px 0 0 var(--violet); }
+.ln.norm .n { box-shadow: inset -3px 0 0 var(--violet); }
 .ln .heat { display: inline-block; height: 0.7em; background: var(--amber); opacity: 0.7; vertical-align: middle; border-radius: 1px; }
 .t .lab { color: var(--beam); }
 .t .op { color: var(--text); font-weight: 600; }
@@ -196,7 +196,7 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .t .sym:hover { text-decoration: underline; }
 .t .var { font-style: italic; }
 .t .cm { color: var(--text-dim); font-style: italic; }
-.hide-words .ln { grid-template-columns: 4.2em 1fr 2.2em; }
+.hide-words .ln { grid-template-columns: 4.8em 1fr minmax(2.2em, max-content); }
 .hide-words .ln .a, .hide-words .ln .w { display: none; }
 .note-dot { display: inline-block; min-width: 1.6em; padding: 0 4px; border-radius: 8px; background: var(--amber); color: #1a1100; font-size: 11px; text-align: center; cursor: pointer; font-family: var(--sans); font-weight: 600; }
 .note-dot.draft { background: transparent; color: var(--amber); border: 1px dashed var(--amber); }
@@ -389,3 +389,14 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 :root[data-gpal="bold"], :root[data-gpal="bold"] .legend { --g-retained: #00e5ff; --g-moved: #ff3df5; --g-edited: #ffe600; --g-added: #00ff85; --g-removed: #ff2d55; }
 :root[data-gpal="grey"], :root[data-gpal="grey"] .legend { --g-retained: #8f969c; --g-moved: #c9ced3; --g-edited: #5f666d; --g-added: #e6e8ea; --g-removed: #3a4046; }
 :root[data-gpal="warm"], :root[data-gpal="warm"] .legend { --g-retained: #e0a458; --g-moved: #b56576; --g-edited: #f2d492; --g-added: #88b04b; --g-removed: #d1495b; }
+
+/* Notes in the margin: initials in small type; a thin amber rule on the lines a note covers. */
+.note-dot { min-width: 0; padding: 0 5px; border-radius: 7px; font-size: 10px; letter-spacing: 0.5px; line-height: 1.5; white-space: nowrap; }
+.note-dot b { font-weight: 700; opacity: 0.8; }
+.ln.noted .t { box-shadow: inset 2px 0 0 var(--amber); padding-left: 4px; }
+.ln .mk { text-align: left; padding-left: 4px; }
+/* The minimised side panel. */
+.drawer-dock { position: fixed; right: 16px; bottom: 0; z-index: 19; display: none; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-bottom: 0; border-radius: 6px 6px 0 0; padding: 6px 12px; cursor: pointer; font-size: 13px; }
+.drawer-dock.on { display: block; }
+.drawer-dock:hover { border-color: var(--beam); }

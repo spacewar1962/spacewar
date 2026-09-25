@@ -17,6 +17,9 @@
   var API = 'https://api.hypothes.is/api';
   var N = SW.notes = {};
   var cache = {};
+  // Notes just saved to the group, shown until the group's search returns them
+  // (Hypothesis takes a moment to index a new annotation).
+  var pending = {};
 
   // Accepts a group's URL (https://hypothes.is/groups/ID/name) or its bare ID.
   N.groupId = function (s) {
@@ -95,7 +98,12 @@
           .then(function (r) { return (r.rows || []).map(fromH); })
           .catch(function (e) { SW.toast(e.message, 5000); return []; })
       : Promise.resolve([]);
-    cache[vid] = remote.then(function (rows) { return log.concat(rows, local); });
+    cache[vid] = remote.then(function (rows) {
+      var have = {};
+      rows.forEach(function (r) { have[r.id] = 1; });
+      pending[vid] = (pending[vid] || []).filter(function (p) { return !have[p.id]; });
+      return log.concat(rows, pending[vid], local);
+    });
     return cache[vid];
   };
 
@@ -158,8 +166,12 @@
       body.target[0].selector = [{ type: 'TextQuoteSelector', exact: note.quote.slice(0, 1200) }];
     }
     if (note.parent) body.references = [note.parent];
-    return hx('POST', '/annotations', body).then(function () {
+    return hx('POST', '/annotations', body).then(function (r) {
+      var n = fromH(r);
+      if (!n.anchor && note.anchor) n.anchor = note.anchor;
+      (pending[note.vid] = pending[note.vid] || []).push(n);
       N.invalidate(note.vid);
+      setTimeout(function () { N.invalidate(note.vid); }, 4000);
       SW.toast('Note saved to the group.');
     });
   };
@@ -218,17 +230,30 @@
     return roots;
   };
 
-  // "p:n" -> number of threads anchored on that line (first line of the range)
+  // "p:n" (first line of a note's range) -> { n threads, replies, by: [initials], draft, n1 }
   N.countsByLine = function (notes) {
-    var c = {};
+    var c = {}, byId = {};
+    notes.forEach(function (n) { byId[n.id] = n; });
+    function root(n) { var guard = 0; while (n.parent && byId[n.parent] && guard++ < 50) n = byId[n.parent]; return n; }
     notes.forEach(function (n) {
-      if (n.parent || !n.anchor) return;
-      var k = n.anchor.p + ':' + n.anchor.n0;
-      c[k] = c[k] || { n: 0, draft: false };
-      c[k].n++;
-      if (n.source === 'draft') c[k].draft = true;
+      var r = root(n);
+      if (!r.anchor) return;
+      var k = r.anchor.p + ':' + r.anchor.n0;
+      var e = c[k] = c[k] || { n: 0, replies: 0, by: [], draft: false, p: r.anchor.p, n0: r.anchor.n0, n1: r.anchor.n1 };
+      if (n === r) e.n++; else e.replies++;
+      e.n1 = Math.max(e.n1, r.anchor.n1);
+      if (n.by && e.by.indexOf(n.by) < 0) e.by.push(n.by);
+      if (n.source === 'draft') e.draft = true;
     });
     return c;
+  };
+  // The margin mark: initials, and the number of replies.
+  N.marginMark = function (k, c) {
+    if (!c) return '';
+    var who = c.by.slice(0, 3).join(' ') + (c.by.length > 3 ? '…' : '');
+    return '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '" title="' + c.n + ' note' + (c.n > 1 ? 's' : '') +
+      (c.replies ? ', ' + c.replies + ' repl' + (c.replies > 1 ? 'ies' : 'y') : '') + ' by ' + SW.esc(c.by.join(', ')) + (c.draft ? ' (includes drafts)' : '') + '. Click to read and reply.">' +
+      SW.esc(who || '•') + (c.replies ? ' <b>+' + c.replies + '</b>' : '') + '</span>';
   };
 
   N.renderNote = function (n, isReply) {
