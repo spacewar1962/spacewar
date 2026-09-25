@@ -6,7 +6,7 @@
   var SW = root.SW, N = SW.notes;
   var view = SW.$('#view-read');
   var R = SW.views.read = {};
-  var build = null, notes = [], counts = {}, anchorSel = null;
+  var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   var opts = { words: SW.store.get('read.words', true), norm: false, supplied: false, heat: false };
 
   var PSEUDO = { define: 1, term: 1, terminate: 1, repeat: 1, constants: 1, variables: 1, start: 1,
@@ -53,6 +53,7 @@
     if (L.skipped) cls += ' skip';
     if (b.errorsAt[k]) cls += ' err';
     if (L.raw !== L.norm && !L.skipped) cls += ' norm';
+    if (b.kind && b.kind[k]) cls += ' k' + b.kind[k];
     if (SW.breakpoints && words && words.some(function (w) { return SW.breakpoints[w.loc]; })) cls += ' bp';
     var a = '', w = '';
     if (words && words.length) {
@@ -60,7 +61,8 @@
       w = SW.oct(words[0].val) + (words.length > 1 ? ' <span class="faint">+' + (words.length - 1) + '</span>' : '');
     }
     var text = opts.norm ? L.norm : L.raw;
-    var c = counts[k], mk = c ? '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '">' + c.n + '</span>' : '';
+    var mk = N.marginMark(k, counts[k]);
+    if (noted[k]) cls += ' noted';
     var heat = '';
     if (opts.heat && SW.profile && SW.profile.build === b && words) {
       var ex = 0;
@@ -85,11 +87,23 @@
       '<input type="search" id="rd-find" placeholder="Find text or /regex/ …">' +
       '<button class="btn" id="rd-prev" title="Previous match">↑</button><button class="btn" id="rd-next" title="Next match">↓</button>' +
       '<span class="hint" id="rd-hits"></span><span class="sep"></span>' +
-      '<label class="check"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
-      '<label class="check" title="Show the text the assembler read, after documented normalisations"><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
-      '<label class="check" title="Show supplied macro and star tapes"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
-      '<label class="check" title="Shade lines by how often they ran (from the Run view)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
+      '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
+      '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
+      '<label class="check" title="Show the tapes supplied to make this version assemble (the macro definitions and the star table), which are not part of the version&#39;s own source; they are collapsed by default"><input type="checkbox" id="rd-sup"' + (opts.supplied ? ' checked' : '') + '> Supplied tapes</label>' +
+      '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
       '<span class="sep"></span>';
+    tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
+      SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
+        '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
+        '<div><i class="kx kcall"></i>a macro used (the words it made are in the address column)</div>' +
+        '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
+        '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
+        '<div><i class="kx knoted"></i>covered by a note (initials at the right; click them)</div>' +
+        '<div><span class="errs">lac x</span> an assembly error (hover for the message)</div>' +
+        '<div><span style="color:var(--red)">●</span> a breakpoint (set from the selection bar)</div>' +
+        '<div><span class="faint"><i>italic grey</i></span> not assembled (a transcription header, or outside this tape segment)</div>' +
+        '<div class="faint flow" style="margin-top:6px">Text: <span class="lab">labels</span>, <b>instructions</b>, <span class="mac">macros</span>, <span class="ps">pseudo-instructions</span>, <span class="num">numbers</span>, <span class="cm">comments</span>.</div></div>');
+    } }, 'Key'));
     var info = SW.el('span', { class: 'hint' });
     if (b.asm) {
       info.innerHTML = b.asm.words.length + ' words · ' +
@@ -324,7 +338,7 @@
       var m = b.macros[name];
       h += '<div>Macro, dummies: <span class="mono">' + SW.esc(m.args.join(', ') || '(none)') + '</span></div>' +
         '<div class="refs"><a href="#" data-p="' + m.file + '" data-n="' + m.line + '">defined at ' + SW.esc(b.parts[m.file].src) + ':' + m.line + '</a></div>' +
-        '<pre class="mono" style="font-size:12px;max-height:160px;overflow:auto;margin:6px 0 0">' + SW.esc(m.body) + '</pre>';
+        '<pre class="mono" style="max-height:160px;overflow:auto;margin:6px 0 0">' + SW.esc(m.body) + '</pre>';
     }
     if (s) {
       h += '<div>' + (s.variable ? 'Variable' : s.label ? 'Label' : 'Symbol') + ' = <span class="num mono">' + SW.oct(s.val) + '</span>' +
@@ -347,11 +361,24 @@
     });
   }
 
-  function showNotesFor(k) {
+  var openNotesKey = null;
+  function showNotesFor(k, quiet) {
     var parts = k.split(':'), p = +parts[0], n = +parts[1];
     var ts = N.threads(notes).filter(function (t) { return t.note.anchor && t.note.anchor.p === p && t.note.anchor.n0 === n; });
-    var body = SW.drawer('Notes on ' + SW.cite(build, p, n, n).replace(/^.*?, /, ''), ts.map(function (t) { return N.renderThread(t, build); }).join('') || '<p class="hint">No notes yet.</p>');
+    var c = counts[k], n1 = c ? c.n1 : n;
+    var html = '<p class="mono" style="margin-top:0">' + SW.esc(SW.cite(build, p, n, n1)) + '</p>' +
+      '<p><button class="btn" data-act="new">✎ Add a note on this line</button></p>' +
+      (ts.map(function (t) { return N.renderThread(t, build); }).join('') || '<p class="hint">No notes yet.</p>');
+    var body = SW.drawer('Notes', html);
+    body.dataset.notes = k;
+    openNotesKey = k;
     N.wire(body, build.v.id, notes);
+    body.querySelector('[data-act="new"]').onclick = function () {
+      var L = build.lines[p][n - 1];
+      N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: p, n0: n, n1: n, src: build.parts[p].src }, quote: L ? L.raw : '',
+                 heading: 'Annotate', anchorText: SW.cite(build, p, n, n) });
+    };
+    void quiet;
   }
 
   R.goto = function (p, n, flash) {
@@ -371,10 +398,17 @@
     N.list(build.v.id).then(function (all) {
       notes = all;
       counts = N.countsByLine(all);
-      SW.$$('.ln', view).forEach(function (row) {
-        var k = row.dataset.p + ':' + row.dataset.n, c = counts[k], mk = row.querySelector('.mk');
-        if (mk) mk.innerHTML = c ? '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '">' + c.n + '</span>' : '';
+      noted = {};
+      Object.keys(counts).forEach(function (k) {
+        var c = counts[k];
+        for (var n = c.n0; n <= c.n1; n++) noted[c.p + ':' + n] = true;
       });
+      SW.$$('.ln', view).forEach(function (row) {
+        var k = row.dataset.p + ':' + row.dataset.n, mk = row.querySelector('.mk');
+        if (mk) mk.innerHTML = N.marginMark(k, counts[k]);
+        row.classList.toggle('noted', !!noted[k]);
+      });
+      if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey) showNotesFor(openNotesKey, true);
     });
   }
 

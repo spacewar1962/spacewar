@@ -22,6 +22,7 @@
     <div class="tape-strip" id="tape-strip" title="The assembled paper tape for this version"></div>
     <div class="bar-right">
       <span class="status" id="status" role="status" aria-live="polite"></span>
+      <span class="size-btns"><button class="icon-btn" id="btn-smaller" title="Smaller code text">A−</button><button class="icon-btn" id="btn-larger" title="Larger code text">A+</button></span>
       <button class="icon-btn" id="btn-theme" title="Switch between phosphor and listing paper">◐</button>
       <button class="icon-btn" id="btn-settings" title="Your initials and the Hypothesis group">⚙</button>
     </div>
@@ -67,6 +68,26 @@
       <label for="set-token">API token</label>
       <div class="token-row"><input id="set-token" type="password" placeholder="6879-…" autocomplete="off" spellcheck="false"><button id="set-token-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
       <p class="hint" id="set-check"></p>
+      <h2>Reading code</h2>
+      <p class="hint">Applies wherever code is shown: listings, comparisons, traces, tables. The A− and A+ buttons in the top bar change the size too.</p>
+      <label>Code font <select id="set-font">
+        <option value="system">System monospace</option>
+        <option value="JetBrains Mono">JetBrains Mono</option>
+        <option value="IBM Plex Mono">IBM Plex Mono</option>
+        <option value="Source Code Pro">Source Code Pro</option>
+        <option value="Fira Code">Fira Code</option>
+        <option value="Courier Prime">Courier Prime (typewriter)</option>
+        <option value="Courier New">Courier New</option>
+      </select></label>
+      <label>Code size <span class="token-row"><input id="set-size" type="range" min="9" max="24" step="1"><span id="set-size-out" class="mono" style="min-width:3.5em"></span></span></label>
+      <h2>Figures</h2>
+      <p class="hint">The background given to exported figures (PNG and SVG). On a white or paper background figures are drawn in dark ink; on black, in phosphor. Transparent leaves the background empty, for layering in other software.</p>
+      <label>Background for exported figures <select id="set-figbg">
+        <option value="white">White (for print and Word)</option>
+        <option value="paper">Listing paper</option>
+        <option value="black">Black (phosphor)</option>
+        <option value="transparent">Transparent</option>
+      </select></label>
       <div class="row">
         <button value="cancel" class="btn ghost">Cancel</button>
         <button id="set-test" type="button" class="btn ghost">Test connection</button>

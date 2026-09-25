@@ -24,14 +24,15 @@
     for (var i = 0; i < n; i++) {
       var b = bytes[from + i], x = pitch + i * pitch + pitch / 2;
       g.fillStyle = hole;
-      // channels 1..8 from the bottom; sprocket between 3 and 4
+      // channel 1 at the top, 8 at the bottom, sprocket between 3 and 4: the
+      // way round in which a title punched in the leader reads correctly
       for (var c = 0; c < 8; c++) {
         if (!((b >> c) & 1)) continue;
         var slot = c < 3 ? c : c + 1;
-        var y = h - 4 - row * (slot + 0.5);
+        var y = 4 + row * (slot + 0.5);
         g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
       }
-      g.beginPath(); g.arc(x, h - 4 - row * 3.5, rs, 0, 6.2832); g.fill();
+      g.beginPath(); g.arc(x, 4 + row * 3.5, rs, 0, 6.2832); g.fill();
     }
     return canvas;
   };
@@ -65,9 +66,9 @@
       for (var c = 0; c < 8; c++) {
         if (!((byte >> c) & 1)) continue;
         var slot = c < 3 ? c : c + 1;
-        out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (h - 4 - row * (slot + 0.5)).toFixed(1) + '" r="' + r.toFixed(2) + '"/>');
+        out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (4 + row * (slot + 0.5)).toFixed(1) + '" r="' + r.toFixed(2) + '"/>');
       }
-      out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (h - 4 - row * 3.5).toFixed(1) + '" r="' + rs.toFixed(2) + '"/>');
+      out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (4 + row * 3.5).toFixed(1) + '" r="' + rs.toFixed(2) + '"/>');
     }
     out.push('</g></svg>');
     return out.join('');
@@ -101,7 +102,7 @@
         '<p class="prose">A <b>frame</b> is one column of holes across the tape: one character on a source tape, one six-bit part of a word on an object tape, at ten frames to the inch. Eight data channels run along the tape, with the small sprocket hole between the third and fourth. Choose where to start (counted from the very beginning of the tape image, leader included) and how many frames to draw.</p>' +
         (reals.length ? '' : '<p class="prose"><b>No real tape survives for this version</b> in the project’s sources; only the reconstruction can be shown.</p>');
       var tb = SW.el('div', { class: 'toolbar' });
-      tb.innerHTML = '<label class="check">Tape <select id="tp-which">' +
+      tb.innerHTML = '<label class="check" title="Real tapes are digitised images of the surviving paper tapes; the reconstruction is the tape the assembler would punch today">Tape <select id="tp-which">' +
         reals.map(function (r, i) { return '<option value="r' + i + '">Real: ' + SW.esc(r.path) + ' (' + SW.esc(r.kind) + ')</option>'; }).join('') +
         '<option value="asm">Reconstruction: assembled today (macro1 format)</option></select></label>' +
         '<label class="check" title="A frame is one column of holes across the tape: one character or byte. Frames are counted from the very start of the tape image, leader included.">Start at frame <input type="number" id="tp-from" min="0" value="0" style="width:7em"></label>' +

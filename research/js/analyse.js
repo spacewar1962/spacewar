@@ -50,35 +50,59 @@
   var STOP = { the: 1, a: 1, of: 1, to: 1, and: 1, is: 1, in: 1, for: 1, if: 1, on: 1, at: 1, by: 1, it: 1, be: 1, or: 1, as: 1, from: 1, with: 1, this: 1, that: 1, not: 1, no: 1, an: 1, are: 1 };
 
   // ---------- 1 comments ----------
+  var STARLINE = /^\s*(?:[0-9a-z]+,)?\s*mark\s/i;
+  // Keyword-in-context rows: line | left context | keyword | right context.
+  function kwicRows(items, q, width) {
+    width = width || 70;
+    var h = [];
+    items.forEach(function (x, i) {
+      var s = x.c, idx = q ? s.toLowerCase().indexOf(q) : 0;
+      if (q && idx < 0) return;
+      var l = q ? s.slice(Math.max(0, idx - width), idx) : '', k = q ? s.slice(idx, idx + q.length) : '', r = q ? s.slice(idx + q.length, idx + q.length + width) : s;
+      h.push('<div class="kw" data-i="' + i + '"><span class="kn">' + SW.esc(x.tag || x.L.n) + '</span><span class="kl">' + SW.esc(l) +
+        '</span><span class="k">' + SW.esc(k) + '</span><span class="kr">' + SW.esc(r) + '</span></div>');
+    });
+    return h;
+  }
   function comments(b, el) {
-    var cs = progLines(b).map(function (L) { var p = SW.parseLine(L.raw); return { L: L, c: p.comment.replace(/^\/\s?/, ''), own: !p.code.trim() && !p.labels.length }; })
+    var noStars = SW.store.get('an.nostars', true);
+    var all = progLines(b).map(function (L) { var p = SW.parseLine(L.raw); return { L: L, c: p.comment.replace(/^\/\s?/, ''), own: !p.code.trim() && !p.labels.length, star: STARLINE.test(L.raw) }; })
       .filter(function (x) { return x.c.trim(); });
+    var stars = all.filter(function (x) { return x.star; }).length;
+    var cs = noStars ? all.filter(function (x) { return !x.star; }) : all;
     var freq = {};
     cs.forEach(function (x) { (x.c.toLowerCase().match(/[a-z][a-z'-]+/g) || []).forEach(function (w) { if (!STOP[w] && w.length > 2) freq[w] = (freq[w] || 0) + 1; }); });
     var top = Object.keys(freq).map(function (w) { return [w, freq[w]]; }).sort(function (a, b) { return b[1] - a[1]; }).slice(0, 40);
-    var c1 = card(cs.length + ' comments', 'Comments are where the program addresses a human reader. ' + cs.filter(function (x) { return x.own; }).length + ' stand on their own lines (headers, section titles); the rest gloss an instruction. Words used most often:');
-    c1.insertAdjacentHTML('beforeend', '<div class="scroll">' + bars(top) + '</div>');
-    el.appendChild(c1);
-    var c2 = card('Keyword in context', 'Search the comments. Click a line to read it in the listing.');
-    var inp = SW.el('input', { type: 'search', placeholder: 'e.g. torpedo, gravity, hyperspace', class: 'btn', style: 'width:100%;margin-bottom:6px' });
-    var out = SW.el('div', { class: 'kwic scroll' });
+
+    var c2 = card('Keyword in context', 'Search the comments; the match is centred with its context either side. Click a line to read it in the listing.');
+    var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding:0 0 8px' });
+    var inp = SW.el('input', { type: 'search', placeholder: 'e.g. torpedo, gravity, hyperspace', style: 'flex:1;min-width:220px' });
+    bar.appendChild(inp);
+    var tog = SW.el('label', { class: 'check', title: 'The star table carries a comment on every star (their names and constellations); leave them out to hear the programmers' }, '<input type="checkbox"' + (noStars ? ' checked' : '') + '> leave out the star table (' + stars + ' star comments)');
+    tog.firstChild.onchange = function (e) { SW.store.set('an.nostars', e.target.checked); render(); };
+    bar.appendChild(tog);
+    var count = SW.el('span', { class: 'hint' });
+    bar.appendChild(count);
+    c2.appendChild(bar);
+    var out = SW.el('div', { class: 'kwic scroll', style: 'max-height:520px' });
     function run() {
-      var q = inp.value.trim().toLowerCase(), h = [];
-      cs.forEach(function (x, i) {
-        var s = x.c, idx = q ? s.toLowerCase().indexOf(q) : 0;
-        if (q && idx < 0) return;
-        var l = s.slice(Math.max(0, idx - 34), idx), k = s.slice(idx, idx + q.length), r = s.slice(idx + q.length, idx + q.length + 40);
-        h.push('<div data-i="' + i + '">' + String(x.L.n).padStart(5) + '  ' + SW.esc(l.padStart(34)) + '<span class="k">' + SW.esc(k) + '</span>' + SW.esc(r) + '</div>');
-      });
-      out.innerHTML = h.slice(0, 500).join('') || '<div class="faint">No matches.</div>';
+      var q = inp.value.trim().toLowerCase(), h = kwicRows(cs, q, 80);
+      count.textContent = h.length + (q ? ' matches' : ' comments');
+      out.innerHTML = h.slice(0, 800).join('') || '<div class="faint">No matches.</div>';
     }
     inp.addEventListener('input', run);
     out.addEventListener('click', function (e) { var d = e.target.closest('[data-i]'); if (d) goto(cs[+d.dataset.i].L); });
-    c2.appendChild(inp); c2.appendChild(out);
+    c2.appendChild(out);
+    c2.style.gridColumn = '1 / -1';
     el.appendChild(c2);
+
+    var c1 = card(cs.length + ' comments' + (noStars ? ' (star table left out)' : ''), 'Comments are where the program addresses a human reader. ' + cs.filter(function (x) { return x.own; }).length + ' stand on their own lines (headers, section titles); the rest gloss an instruction. Words used most often:');
+    c1.insertAdjacentHTML('beforeend', '<div class="scroll" style="columns:2 260px;column-gap:28px;max-height:none">' + bars(top) + '</div>');
+    c1.style.gridColumn = '1 / -1';
+    el.appendChild(c1);
     run();
     return function () {
-      return [{ type: 'p', text: cs.length + ' comments in the program text.' },
+      return [{ type: 'p', text: cs.length + ' comments in the program text' + (noStars ? ', leaving out the ' + stars + ' comments of the star table.' : '.') },
         SW.tableBlock('Most frequent words in comments', ['Word', 'Count'], top),
         SW.tableBlock('All comments', ['Line', 'Comment'], cs.map(function (x) { return [String(x.L.n), x.c]; }))];
     };
@@ -256,8 +280,8 @@
       return o.concat(['</svg>']).join('');
     };
     var c0 = card('The call structure', 'Routines along the line in memory order; each arc a call (blue: to a routine later in memory, amber: to one earlier), thicker for more call sites. Hover for names.');
-    c0.appendChild(SW.el('div', { class: 'svgbox' }, SW.resolveVars(arcSVG())));
-    c0.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download('spacewar-' + b.v.id + '-calls.svg', SW.resolveVars(arcSVG()), 'image/svg+xml'); } }, '▣ SVG'));
+    c0.appendChild(SW.el('div', { class: 'svgbox' }, SW.displaySVG(arcSVG())));
+    c0.appendChild(SW.figureButtons(arcSVG, 'spacewar-' + b.v.id + '-calls'));
     c0.style.gridColumn = '1 / -1';
     el.appendChild(c0);
     var c1 = card('Most called', 'Subroutines by the number of call sites (jsp and jda).');
@@ -309,10 +333,10 @@
     var counts = {}; kind.forEach(function (k) { counts[k || 'unused'] = (counts[k || 'unused'] || 0) + 1; });
     var c = card('The 4096 words', 'Each square one 18-bit word, 64 to a row (octal addresses at left). ' + Object.keys(counts).map(function (k) { return k + ' ' + counts[k]; }).join(' · '));
     c.insertAdjacentHTML('beforeend', '<div class="legend">' + Object.keys(col).filter(Boolean).map(function (k) { return '<span><i style="background:' + col[k] + '"></i>' + k + '</span>'; }).join('') + '<span><i style="background:var(--line-soft)"></i>unused</span></div>');
-    var box = SW.el('div', { class: 'svgbox', style: 'margin-top:6px' }, SW.resolveVars ? SW.resolveVars(svg()) : svg());
+    var box = SW.el('div', { class: 'svgbox', style: 'margin-top:6px' }, SW.displaySVG(svg()));
     box.addEventListener('click', function (e) { var t = e.target.closest('rect'); if (!t) return; var addr = parseInt(t.textContent, 8), s = b.srcOf(addr); if (s) goto(b.lines[s.p][s.n - 1]); });
     c.appendChild(box);
-    c.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download('spacewar-' + b.v.id + '-memory.svg', SW.resolveVars(svg()), 'image/svg+xml'); } }, '▣ SVG'));
+    c.appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-memory'));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
     return function () { return [SW.tableBlock('Memory use', ['Kind', 'Words'], Object.keys(counts).map(function (k) { return [k, counts[k]]; }))]; };
@@ -345,20 +369,21 @@
     var c = card('The Expensive Planetarium', stars.length ? stars.length + ' stars, each entered as “mark X, Y” (X increasing across 8192 units of right ascension, Y declination), with Samson’s own identifications. Groups begin at the labels 1j, 2j, 3j, 4j (magnitude groups).' : 'This build carries no star table.');
     if (!stars.length) { el.appendChild(c); return null; }
     var mag = 1, W = 1024, H = 280;
-    var svg = function () {
-      var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><rect width="' + W + '" height="' + H + '" fill="#02040a"/>'];
+    var svg = function (pal) {
+      pal = pal || SW.PLATE;
+      var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + (pal.bg ? '<rect width="' + W + '" height="' + H + '" fill="' + pal.bg + '"/>' : '')];
       mag = 1;
       stars.forEach(function (s) {
         var mm = /^(\d)j$/.exec(s.label); if (mm) mag = +mm[1];
         var x = W - (s.x / 8192) * W, y = H / 2 - s.y * (H / 2 - 8) / 512;
-        o.push('<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (4.4 - mag * 0.8).toFixed(1) + '" fill="#e6f4ff"><title>' + SW.esc(s.name + ' (mark ' + s.x + ', ' + s.y + ')') + '</title></circle>');
-        if (mag === 1) o.push('<text x="' + (x + 5).toFixed(1) + '" y="' + (y - 4).toFixed(1) + '" font-size="9" fill="#7fa6c4">' + SW.esc(s.name.replace(/^\d+\s*/, '').split(',').pop().trim()) + '</text>');
+        o.push('<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="' + (4.4 - mag * 0.8).toFixed(1) + '" fill="' + pal.ink + '"><title>' + SW.esc(s.name + ' (mark ' + s.x + ', ' + s.y + ')') + '</title></circle>');
+        if (mag === 1) o.push('<text x="' + (x + 5).toFixed(1) + '" y="' + (y - 4).toFixed(1) + '" font-size="9" fill="' + pal.dim + '">' + SW.esc(s.name.replace(/^\d+\s*/, '').split(',').pop().trim()) + '</text>');
       });
       return o.concat(['</svg>']).join('');
     };
     var box = SW.el('div', { class: 'svgbox' }, svg());
     c.appendChild(box);
-    c.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download('spacewar-' + b.v.id + '-sky.svg', svg(), 'image/svg+xml'); } }, '▣ SVG'));
+    c.appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-sky'));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
     return function () { return [SW.tableBlock('Star table', ['Label', 'X', 'Y', 'Identification', 'Line'], stars.map(function (s) { return [s.label, String(s.x), String(s.y), s.name, String(s.L.n)]; }))]; };
@@ -396,19 +421,20 @@
     return { name: name, addr: s.val, digits: digits, pts: pts,
              words: digits.join('').match(/.{1,6}/g) };
   }
-  function outlineSVG(o, cell, title) {
+  function outlineSVG(o, cell, title, pal) {
     cell = cell || 7;
+    pal = pal || SW.PLATE;
     var xs = o.pts.map(function (p) { return p[0]; }), ys = o.pts.map(function (p) { return p[1]; });
     var minx = Math.min.apply(null, xs.concat([0])), maxx = Math.max.apply(null, xs.concat([0]));
     var miny = Math.min.apply(null, ys.concat([0])), maxy = Math.max.apply(null, ys.concat([0]));
     var w = (maxx - minx + 3) * cell, h = (maxy - miny + 3) * cell + (title ? 18 : 0);
-    var o2 = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '"><rect width="' + w + '" height="' + h + '" fill="#02040a"/>'];
+    var o2 = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' + (pal.bg ? '<rect width="' + w + '" height="' + h + '" fill="' + pal.bg + '"/>' : '')];
     var X = function (x) { return (x - minx + 1.5) * cell; }, Y = function (y) { return (maxy - y + 1.5) * cell; };
-    o2.push('<circle cx="' + X(0) + '" cy="' + Y(0) + '" r="' + (cell * 0.22) + '" fill="#ffce7a"><title>start</title></circle>');
+    o2.push('<circle cx="' + X(0) + '" cy="' + Y(0) + '" r="' + (cell * 0.22) + '" fill="' + pal.accent + '"><title>start</title></circle>');
     o.pts.forEach(function (p, i) {
-      o2.push('<circle cx="' + X(p[0]).toFixed(1) + '" cy="' + Y(p[1]).toFixed(1) + '" r="' + (cell * 0.32).toFixed(1) + '" fill="' + (p[2] > 0 ? '#e6f4ff' : '#8fc3d6') + '"><title>' + (i + 1) + '</title></circle>');
+      o2.push('<circle cx="' + X(p[0]).toFixed(1) + '" cy="' + Y(p[1]).toFixed(1) + '" r="' + (cell * 0.32).toFixed(1) + '" fill="' + (p[2] > 0 ? pal.ink : pal.ink2) + '"><title>' + (i + 1) + '</title></circle>');
     });
-    if (title) o2.push('<text x="4" y="' + (h - 5) + '" font-size="11" fill="#7fa6c4">' + SW.esc(title) + '</text>');
+    if (title) o2.push('<text x="4" y="' + (h - 5) + '" font-size="11" fill="' + pal.dim + '">' + SW.esc(title) + '</text>');
     return o2.concat(['</svg>']).join('');
   }
   function ships(b, el) {
@@ -419,7 +445,7 @@
       var c = card(label, 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. Pale points are the first side, blue the mirrored pass; the amber point is the start (the nose). ' + o.pts.length + ' points, each plotted every frame.');
       var svg = outlineSVG(o, 9);
       c.appendChild(SW.el('div', { class: 'svgbox', style: 'text-align:center' }, svg));
-      c.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download('spacewar-' + b.v.id + '-' + o.name + '.svg', outlineSVG(o, 12, b.v.label + ' ' + label), 'image/svg+xml'); } }, '▣ SVG'));
+      c.appendChild(SW.figureButtons(function (pal) { return outlineSVG(o, 12, b.v.label + ' ' + label, pal); }, 'spacewar-' + b.v.id + '-' + o.name));
       el.appendChild(c);
     });
     var c2 = card('How to read the codes', 'From the outline compiler in the source: 1 continue along the axis; 2 step outward; 3 outward and along; 4 step inward; 5 inward and along; 6 remember this point, and at the next 6 return to it; 7 end, then draw the other side as its mirror. The compiler turns these into display instructions when the game starts: Dan Edwards’s outline compiler, compiling data into code at run time.');
@@ -541,7 +567,7 @@
     });
   }
   function onlyToggle(el, rerender) {
-    var l = SW.el('label', { class: 'check', style: 'margin-bottom:8px' }, '<input type="checkbox"' + (xst.onlyChanges ? ' checked' : '') + '> only rows that change between versions');
+    var l = SW.el('label', { class: 'check', style: 'margin-bottom:8px', title: 'Hide rows whose value is the same in every selected version, leaving only what changes' }, '<input type="checkbox"' + (xst.onlyChanges ? ' checked' : '') + '> only rows that change between versions');
     l.firstChild.onchange = function (e) { xst.onlyChanges = e.target.checked; rerender(); };
     el.appendChild(l);
   }
@@ -565,15 +591,12 @@
     var inp = SW.el('input', { type: 'search', placeholder: 'e.g. torpedo, gravity, score', class: 'btn', style: 'width:100%;margin-bottom:6px' });
     var out = SW.el('div', { class: 'kwic scroll' });
     inp.addEventListener('input', function () {
-      var q = inp.value.trim().toLowerCase(), h = [];
+      var q = inp.value.trim().toLowerCase(), items = [];
       if (q) fs.forEach(function (f, i) {
-        Object.keys(f.comments).forEach(function (k) {
-          var s = f.comments[k].text, idx = s.toLowerCase().indexOf(q);
-          if (idx < 0) return;
-          h.push(short(vs[i]).slice(0, 12).padEnd(13) + SW.esc(s.slice(Math.max(0, idx - 30), idx).padStart(30)) + '<span class="k">' + SW.esc(s.slice(idx, idx + q.length)) + '</span>' + SW.esc(s.slice(idx + q.length, idx + q.length + 36)));
-        });
+        Object.keys(f.comments).forEach(function (k) { items.push({ c: f.comments[k].text, tag: short(vs[i]) }); });
       });
-      out.innerHTML = h.slice(0, 800).map(function (x) { return '<div>' + x + '</div>'; }).join('') || '<div class="faint">' + (q ? 'No matches.' : 'Type to search.') + '</div>';
+      var h = q ? kwicRows(items, q, 70) : [];
+      out.innerHTML = h.slice(0, 800).join('') || '<div class="faint">' + (q ? 'No matches.' : 'Type to search.') + '</div>';
     });
     c.appendChild(inp); c.appendChild(out); c.style.gridColumn = '1 / -1';
     el.appendChild(c);
@@ -746,8 +769,8 @@
     };
     var c = card('How each version fills the 4096 words', 'Words of memory by use.');
     c.insertAdjacentHTML('beforeend', '<div class="legend">' + kinds.map(function (k) { return '<span><i style="background:' + col[k] + '"></i>' + k + '</span>'; }).join('') + '</div>');
-    c.appendChild(SW.el('div', { class: 'svgbox', style: 'margin-top:6px' }, SW.resolveVars(svg())));
-    c.appendChild(SW.el('button', { class: 'btn', onclick: function () { root.SWExport.download('spacewar-memory-across-versions.svg', SW.resolveVars(svg()), 'image/svg+xml'); } }, '▣ SVG'));
+    c.appendChild(SW.el('div', { class: 'svgbox', style: 'margin-top:6px' }, SW.displaySVG(svg())));
+    c.appendChild(SW.figureButtons(svg, 'spacewar-memory-across-versions'));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
     var m = matrix(kinds, vs, function (k, v, i) { return fs[i].mem[k] || 0; });
@@ -809,7 +832,7 @@
     var picks = SW.el('div', { class: 'hint', style: 'grid-column:1/-1;margin-bottom:4px' });
     var set = SW.store.get('gen.set', DEFAULT_SET);
     picks.innerHTML = 'Versions (shared with Genealogy): ' + V.VERSIONS.filter(function (v) { return v.build && v.id !== 'stars'; }).sort(function (a, b) { return a.sort - b.sort; }).map(function (v) {
-      return '<label class="check" style="margin-right:10px"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(short(v)) + '</label>';
+      return '<label class="check" style="margin-right:10px" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(short(v)) + '</label>';
     }).join('');
     picks.addEventListener('change', function (e) {
       var id = e.target.dataset.id, s = SW.store.get('gen.set', DEFAULT_SET).filter(function (x) { return x !== id; });
