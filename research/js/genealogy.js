@@ -235,7 +235,7 @@
       if (isDefine(l)) { name = 'define ' + macroName(L, i); inDef = true; }
       else if (!inDef && l.kind === 'code' && l.labels.length && prev &&
                ((pnb && pnb.kind === 'comment') ||
-                (o.flowStarts !== false && noFallThrough(L, i)))) {
+                (o.flowStarts !== false && flowStart(L, i)))) {
         name = l.labels.filter(function (x) { return !/^\d+$/.test(x); })[0] || l.labels[0];
       }
       if (inDef && isTerm(l)) inDef = false;
@@ -259,6 +259,16 @@
   // True if line i cannot be reached by falling through from the code line
   // above it: that line is a location assignment ("40/"), the end of a
   // macro definition, or an unconditional jmp not preceded by a skip.
+  // A plain data word, such as `sq1, 0`: a routine's own storage.
+  function isData(l) { return !!l && l.kind === 'code' && /^-?[0-7]+$/.test(String(l.code).replace(/\s+/g, '')); }
+  // Where the flow of control begins a routine (a comment above also does, in
+  // routineUnits). Storage after a routine's last jump stays with that routine
+  // (sqt's sq1 and sq2). A switch from data back to code is not a boundary:
+  // the constants table (tno … hd1) mixes instructions and numbers throughout.
+  function flowStart(L, i) {
+    return !isData(L[i]) && noFallThrough(L, i);
+  }
+
   function noFallThrough(L, i) {
     var k = i - 1;
     while (k >= 0 && L[k].kind !== 'code' && L[k].kind !== 'title') k--;

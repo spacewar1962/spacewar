@@ -505,19 +505,36 @@
   // a strip that sticks to the top of the scrolling box and moves sideways with the
   // columns; the chart itself is pulled up under it. Exports keep the labels in place.
   function pinLabels(box) {
-    var main = box.querySelector('svg'), labs = main ? main.querySelectorAll('.g-collabel') : [];
+    var main = box.querySelector('svg'), labs = main ? Array.prototype.slice.call(main.querySelectorAll('.g-collabel')) : [];
     if (!labs.length) return;
-    var band = +labs[0].getAttribute('y') + 8, W = main.getAttribute('width');
+    // The chart leaves a tall band for its angled labels; the pinned strip is a
+    // single 20px line instead, each name level and centred on its column, cut
+    // to the column's width (the full name on hover).
+    var band = +labs[0].getAttribute('y') + 8, W = main.getAttribute('width'), H = 20, NS = 'http://www.w3.org/2000/svg';
+    var xs = labs.map(function (t) { return +t.getAttribute('x'); });
     var head = main.cloneNode(false);
-    head.setAttribute('height', band);
-    head.setAttribute('viewBox', '0 0 ' + W + ' ' + band);
+    head.setAttribute('height', H);
+    head.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     head.setAttribute('aria-hidden', 'true');
     head.removeAttribute('role');
-    Array.prototype.forEach.call(labs, function (t) { head.appendChild(t.cloneNode(true)); t.setAttribute('visibility', 'hidden'); });
+    labs.forEach(function (t, i) {
+      var full = (t.querySelector('title') || {}).textContent || t.textContent;
+      var room = (i + 1 < xs.length ? xs[i + 1] - xs[i] : i > 0 ? xs[i] - xs[i - 1] : 200) - 12;
+      var max = Math.max(3, Math.floor(room / 6.7));
+      var n = document.createElementNS(NS, 'text');
+      n.setAttribute('x', xs[i]); n.setAttribute('y', 14); n.setAttribute('text-anchor', 'middle');
+      n.setAttribute('font-size', '11'); n.setAttribute('fill', t.getAttribute('fill'));
+      n.textContent = full.length > max ? full.slice(0, max - 1) + '…' : full;
+      var tt = document.createElementNS(NS, 'title'); tt.textContent = full; n.appendChild(tt);
+      head.appendChild(n);
+      t.setAttribute('visibility', 'hidden');
+    });
     var strip = SW.el('div', { class: 'flow-head' });
     strip.appendChild(head);
     box.insertBefore(strip, main);
-    main.style.marginTop = -(head.getBoundingClientRect().height || band) + 'px';   // natural size if not yet laid out
+    // Pull the chart up by its whole label band (now empty), so its columns start
+    // right under the strip; the chart is drawn at its natural size.
+    main.style.marginTop = -band + 'px';
   }
 
   function showAlluvial(body, exp, ts) {
