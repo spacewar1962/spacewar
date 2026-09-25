@@ -174,12 +174,16 @@ main { position: relative; overflow: hidden; min-height: 0; }
 
 /* ---------- listing ---------- */
 .listing { font-family: var(--code-font); font-size: var(--code-size); line-height: 1.5; padding: 4px 0 60px; tab-size: 8; -moz-tab-size: 8; }
+/* One line per tape: number and name, then the file details (cut short with … if too long). */
 .part-head {
-  position: sticky; top: 45px; z-index: 3; display: grid; gap: 2px;
+  position: sticky; top: 45px; z-index: 3; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 2px;
   padding: 5px 14px; background: var(--surface-2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
   font-family: var(--sans); font-size: 12.5px;
 }
-.part-head .ph-main { display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+.part-head .ph-main { display: flex; gap: 10px; align-items: baseline; flex: none; max-width: 60%; min-width: 0; }
+.part-head .ph-sub { flex: 1 1 0; min-width: 0; }
+.part-head .ph-sub::before { content: '·'; margin-right: 8px; color: var(--text-faint); }
+.part-head .lncols { flex: 0 0 calc(100% + 28px); }
 .part-head .ph-num { font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-faint); white-space: nowrap; }
 .part-head .ph-title { color: var(--amber); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .part-head .ph-sub { color: var(--text-dim); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

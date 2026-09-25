@@ -146,6 +146,25 @@
                  skipped: n < p.title || n > end, title: n === p.title };
       });
     });
+    // When a tape is cut from a longer file (Landsteiner's 3.1, 4.0TS, the macro
+    // lines of 3.1 supplied to 3.1t), its part still holds the whole file, so line
+    // numbers stay the file's own. Lines that are not this tape's are marked
+    // "away": the listing, search and exports leave them out. A tape keeps the
+    // lines up to the next tape's start (or its own end), so a header before its
+    // title stays with it.
+    b.parts.forEach(function (p, pi) {
+      var same = b.parts.map(function (q, qi) { return qi; }).filter(function (qi) { return b.parts[qi].src === p.src; });
+      if (same.length < 2) {
+        if (p.end) b.lines[pi].forEach(function (L) { if (L.n > p.end) L.away = true; });
+        return;
+      }
+      var start = function (qi) { return b.parts[qi].title || 1; };
+      same.sort(function (x, y) { return start(x) - start(y); });
+      var at = same.indexOf(pi), prev = same[at - 1], next = same[at + 1];
+      var from = prev == null ? 1 : (b.parts[prev].end || start(pi) - 1) + 1;
+      var to = p.end || (next == null ? b.lines[pi].length : start(next) - 1);
+      b.lines[pi].forEach(function (L) { if (L.n < from || L.n > to) L.away = true; });
+    });
     b.sym = {};
     b.labelAt = {};
     b.errorsAt = {};

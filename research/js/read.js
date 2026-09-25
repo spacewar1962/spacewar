@@ -191,13 +191,13 @@
         (errs ? '<span class="badge err">' + errs + ' error' + (errs > 1 ? 's' : '') + '</span>' : '') + '</div>' +
         '<div class="ph-sub">' + SW.sourceLink(part.src, part.src.split('/').pop()) +
         ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
-        (t.title ? ' · tape title “' + SW.esc(t.title) + '”' : '') + '</div>' +
+        (t.title ? ' · <span title="The tape’s own title line">“' + SW.esc(t.title) + '”</span>' : '') + '</div>' +
         '<div class="lncols"><span class="n" title="The line’s number in the source file">Line</span>' +
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
         '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word</span>' +
         '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)">Source</span>' +
         '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Notes</span></div></div>';
-      sec.insertAdjacentHTML('beforeend', b.lines[pi].map(function (L) { return rowHTML(b, L); }).join(''));
+      sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
     });
     view.insertBefore(box, bar);
@@ -267,7 +267,8 @@
 
   // ---------- export model ----------
   function listingDoc(b, s) {
-    var lines = s ? b.lines[s.p].slice(s.n0 - 1, s.n1) : [].concat.apply([], b.lines.filter(function (x, pi) { return b.parts[pi].role === 'program'; }));
+    var lines = s ? b.lines[s.p].slice(s.n0 - 1, s.n1)
+      : [].concat.apply([], b.lines.filter(function (x, pi) { return b.parts[pi].role === 'program'; })).filter(function (L) { return !L.away; });
     return N.list(b.v.id).then(function (all) {
       var threads = N.threads(all);
       var byLine = {};
@@ -359,7 +360,7 @@
       var re;
       try { re = /^\/.*\/$/.test(q) ? new RegExp(q.slice(1, -1), 'i') : new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
       catch (err) { SW.$('#rd-hits', tb).textContent = 'bad pattern'; return; }
-      build.lines.forEach(function (ls, pi) { ls.forEach(function (L) { if (re.test(L.raw)) hits.push(L); }); });
+      build.lines.forEach(function (ls, pi) { ls.forEach(function (L) { if (!L.away && re.test(L.raw)) hits.push(L); }); });
       SW.$('#rd-hits', tb).textContent = hits.length + ' match' + (hits.length === 1 ? '' : 'es');
       hi = -1; step(1);
     }
