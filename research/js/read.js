@@ -171,7 +171,7 @@
     if (!s || !bar) { if (bar) bar.classList.remove('on'); return; }
     for (var n = s.n0; n <= s.n1; n++) { var e = SW.$('#L' + s.p + '-' + n, view); if (e) e.classList.add('sel'); }
     bar.classList.add('on');
-    bar.innerHTML = '<b>' + SW.esc(SW.cite(build, s.p, s.n0, s.n1)) + '</b>';
+    bar.innerHTML = '';   // the version and file are in the page title and part header; Copy citation gives the full form
     var acts = [
       ['✎ Annotate', annotateSel], ['❝ Copy citation', copyCite], ['🔗 Copy link', copyLink],
       ['⤓ Word', function () { exportSel('docx'); }], ['⤓ Markdown', function () { exportSel('md'); }],
