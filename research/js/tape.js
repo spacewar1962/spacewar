@@ -24,14 +24,15 @@
     for (var i = 0; i < n; i++) {
       var b = bytes[from + i], x = pitch + i * pitch + pitch / 2;
       g.fillStyle = hole;
-      // channels 1..8 from the bottom; sprocket between 3 and 4
+      // channel 1 at the top, 8 at the bottom, sprocket between 3 and 4: the
+      // way round in which a title punched in the leader reads correctly
       for (var c = 0; c < 8; c++) {
         if (!((b >> c) & 1)) continue;
         var slot = c < 3 ? c : c + 1;
-        var y = h - 4 - row * (slot + 0.5);
+        var y = 4 + row * (slot + 0.5);
         g.beginPath(); g.arc(x, y, r, 0, 6.2832); g.fill();
       }
-      g.beginPath(); g.arc(x, h - 4 - row * 3.5, rs, 0, 6.2832); g.fill();
+      g.beginPath(); g.arc(x, 4 + row * 3.5, rs, 0, 6.2832); g.fill();
     }
     return canvas;
   };
@@ -65,9 +66,9 @@
       for (var c = 0; c < 8; c++) {
         if (!((byte >> c) & 1)) continue;
         var slot = c < 3 ? c : c + 1;
-        out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (h - 4 - row * (slot + 0.5)).toFixed(1) + '" r="' + r.toFixed(2) + '"/>');
+        out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (4 + row * (slot + 0.5)).toFixed(1) + '" r="' + r.toFixed(2) + '"/>');
       }
-      out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (h - 4 - row * 3.5).toFixed(1) + '" r="' + rs.toFixed(2) + '"/>');
+      out.push('<circle cx="' + x.toFixed(1) + '" cy="' + (4 + row * 3.5).toFixed(1) + '" r="' + rs.toFixed(2) + '"/>');
     }
     out.push('</g></svg>');
     return out.join('');

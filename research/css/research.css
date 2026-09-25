@@ -425,3 +425,22 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 .reply-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; }
 
 .note .acts button.del-note { color: var(--red); }
+
+/* Reactions: emoji with the initials of those who left them, in tiny type. */
+.reacts { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 2px; align-items: center; }
+.react { display: inline-flex; align-items: center; gap: 3px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 0 6px; font-size: 13px; line-height: 1.6; cursor: pointer; color: var(--text); }
+.react small { font-size: 9px; letter-spacing: 0.5px; color: var(--text-dim); font-family: var(--mono); }
+.react.mine { border-color: var(--beam); background: color-mix(in srgb, var(--beam) 12%, transparent); }
+.react:hover { border-color: var(--beam); }
+.react.add { color: var(--text-dim); }
+.react-pick { display: inline-flex; gap: 2px; }
+.react-pick[hidden] { display: none; }
+.react-pick .react { border-color: transparent; background: none; }
+
+.note .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; }
+.note .acts button.ico { font-size: 14px; color: var(--text-dim); padding: 0 5px; }
+.note .acts button.ico:hover { color: var(--beam); }
+.dl-pick { display: inline-flex; gap: 4px; margin-left: 2px; }
+.dl-pick[hidden] { display: none; }
+.dl-pick button { border: 1px solid var(--line) !important; border-radius: 4px; padding: 0 6px !important; }
+.edit-box .edit-tags { width: 100%; margin-top: 4px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; padding: 4px 8px; font-size: 13px; }

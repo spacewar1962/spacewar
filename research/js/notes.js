@@ -60,6 +60,8 @@
   N.mine = function (n) { return n.source === 'draft' || (n.source === 'hypothesis' && !!N.me && n.user === N.me); };
   // Notes deleted this session, hidden even if the group's search still returns them for a moment.
   var deleted = {};
+  // Notes edited this session, shown as edited until the group's search agrees.
+  var edits = {};
 
   N.test = function () {
     return hx('GET', '/profile').then(function (p) {
@@ -89,7 +91,7 @@
       id: a.id, vid: tagVal(tags, 'sw:v:'), kind: tagVal(tags, 'sw:kind:') || (anchor ? 'line' : 'version'),
       anchor: anchor, text: a.text || '', by: by, name: (a.user_info && a.user_info.display_name) || '',
       date: a.created, updated: a.updated, parent: (a.references || []).slice(-1)[0] || null,
-      tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis', user: a.user || '',
+      tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis', user: a.user || '', rawTags: tags,
       link: a.links && (a.links.incontext || a.links.html)
     };
   }
@@ -110,7 +112,15 @@
           return hx('GET', '/search?limit=200&sort=created&order=asc&group=' + encodeURIComponent(cfg().group) +
                     '&uri=' + encodeURIComponent(SW.versionURI(vid)));
         })
-          .then(function (r) { return (r.rows || []).map(fromH).filter(function (n) { return !deleted[n.id]; }); })
+          .then(function (r) {
+            return (r.rows || []).map(fromH).filter(function (n) { return !deleted[n.id]; }).map(function (n) {
+              var e = edits[n.id];
+              if (!e) return n;
+              if (n.text === e.text) { delete edits[n.id]; return n; }
+              n.text = e.text; n.tags = e.tags; n.updated = e.updated;
+              return n;
+            });
+          })
           .catch(function (e) { SW.toast(e.message, 5000); return []; })
       : Promise.resolve([]);
     cache[vid] = remote.then(function (rows) {
@@ -142,7 +152,7 @@
         });
     }
     var remote = N.configured() ? page(0, []).catch(function (e) { SW.toast(e.message, 5000); return []; }) : Promise.resolve([]);
-    return remote.then(function (rows) { return logs.concat(rows, local); });
+    return remote.then(function (rows) { return logs.concat(rows, local).filter(function (n) { return !N.isReaction(n); }); });
   };
 
   N.invalidate = function (vid) { delete cache[vid]; SW.emit('notes', vid); };
@@ -161,13 +171,13 @@
       .concat(note.tags || []);
     if (!N.configured()) {
       var d = drafts();
-      d.push({ id: 'draft-' + Date.now(), vid: note.vid, kind: note.kind || 'line', anchor: note.anchor,
+      d.push({ id: 'draft-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6), vid: note.vid, kind: note.kind || 'line', anchor: note.anchor,
                quote: note.quote || '', text: note.text, by: me.initials, name: me.name,
                date: new Date().toISOString(), parent: note.parent || null, tags: note.tags || [],
                source: 'draft', hTags: tags });
       saveDrafts(d);
       N.invalidate(note.vid);
-      SW.toast('Saved as a draft in this browser (no Hypothesis group set).');
+      if (!note.quiet) SW.toast('Saved as a draft in this browser (no Hypothesis group set).');
       return Promise.resolve();
     }
     var uri = SW.versionURI(note.vid);
@@ -187,11 +197,11 @@
       (pending[note.vid] = pending[note.vid] || []).push(n);
       N.invalidate(note.vid);
       setTimeout(function () { N.invalidate(note.vid); }, 4000);
-      SW.toast('Note saved to the group.');
+      if (!note.quiet) SW.toast('Note saved to the group.');
     });
   };
 
-  N.remove = function (note) {
+  N.remove = function (note, quiet) {
     if (note.source === 'draft') {
       saveDrafts(drafts().filter(function (d) { return d.id !== note.id; }));
       N.invalidate(note.vid);
@@ -202,10 +212,34 @@
         deleted[note.id] = true;
         pending[note.vid] = (pending[note.vid] || []).filter(function (p) { return p.id !== note.id; });
         N.invalidate(note.vid);
-        SW.toast('Note deleted from the group.');
+        if (!quiet) SW.toast('Note deleted from the group.');
       });
     }
     return Promise.resolve();
+  };
+
+  // Edit a note of one's own: its text, and for a note (not a reply) its tags.
+  N.update = function (note, text, tags) {
+    var now = new Date().toISOString();
+    if (note.source === 'draft') {
+      saveDrafts(drafts().map(function (d) {
+        if (d.id !== note.id) return d;
+        d.text = text; d.updated = now;
+        if (tags) { d.tags = tags; d.hTags = (d.hTags || []).filter(function (t) { return t.indexOf('sw:') === 0; }).concat(tags); }
+        return d;
+      }));
+      N.invalidate(note.vid);
+      return Promise.resolve();
+    }
+    if (note.source !== 'hypothesis') return Promise.resolve();
+    var body = { text: text };
+    if (tags) body.tags = (note.rawTags || []).filter(function (t) { return t.indexOf('sw:') === 0; }).concat(tags);
+    return hx('PATCH', '/annotations/' + note.id, body).then(function (r) {
+      edits[note.id] = { text: text, tags: tags || note.tags, updated: (r && r.updated) || now };
+      (pending[note.vid] || []).forEach(function (p) { if (p.id === note.id) { p.text = text; if (tags) p.tags = tags; p.updated = now; } });
+      N.invalidate(note.vid);
+      SW.toast('Note updated.');
+    });
   };
 
   // Publish drafts to the group, oldest first, keeping reply links.
@@ -238,10 +272,15 @@
   };
 
   // Group notes into threads (roots with replies), in date order.
+  // Reactions: an emoji left on a note, stored as a tiny reply marked
+  // sw:kind:reaction, so it is shared, signed and dated like any note.
+  N.EMOJI = ['👍', '👎', '✅', '😊', '❓', '💡', '❗', '👀'];
+  N.isReaction = function (n) { return n.kind === 'reaction'; };
   N.threads = function (notes) {
     var byId = {}, roots = [];
-    notes.forEach(function (n) { byId[n.id] = { note: n, replies: [] }; });
+    notes.forEach(function (n) { if (!N.isReaction(n)) byId[n.id] = { note: n, replies: [], reactions: [] }; });
     notes.forEach(function (n) {
+      if (N.isReaction(n)) { if (n.parent && byId[n.parent]) byId[n.parent].reactions.push(n); return; }
       if (n.parent && byId[n.parent]) byId[n.parent].replies.push(byId[n.id]);
       else roots.push(byId[n.id]);
     });
@@ -256,6 +295,7 @@
     notes.forEach(function (n) { byId[n.id] = n; });
     function root(n) { var guard = 0; while (n.parent && byId[n.parent] && guard++ < 50) n = byId[n.parent]; return n; }
     notes.forEach(function (n) {
+      if (N.isReaction(n)) return;
       var r = root(n);
       if (!r.anchor) return;
       var k = r.anchor.p + ':' + r.anchor.n0;
@@ -276,16 +316,43 @@
       SW.esc(who || '•') + (c.replies ? ' <b>+' + c.replies + '</b>' : '') + '</span>';
   };
 
-  N.renderNote = function (n, isReply) {
+  function myReaction(r) {
+    if (r.source === 'draft') return r.by === SW.me().initials;
+    return r.source === 'hypothesis' && !!N.me && r.user === N.me;
+  }
+  function renderReactions(n, reactions) {
+    if (n.source === 'buildlog') return '';
+    var by = {};
+    (reactions || []).forEach(function (r) { (by[r.text] = by[r.text] || []).push(r); });
+    var h = '<div class="reacts">';
+    N.EMOJI.concat(Object.keys(by).filter(function (e) { return N.EMOJI.indexOf(e) < 0; })).forEach(function (e) {
+      var rs = by[e];
+      if (!rs) return;
+      var mine = rs.some(myReaction);
+      var who = rs.map(function (r) { return r.by; }).filter(function (x, i, a) { return a.indexOf(x) === i; });
+      h += '<button class="react' + (mine ? ' mine' : '') + '" data-act="react" data-emoji="' + SW.esc(e) + '" title="' +
+        SW.esc(who.join(', ') + (mine ? ' (click to take yours back)' : ' (click to add yours)')) + '">' + e + '<small>' + SW.esc(who.join(' ')) + '</small></button>';
+    });
+    h += '<button class="react add" data-act="react-pick" title="Add a reaction">☺<small>+</small></button>' +
+      '<span class="react-pick" hidden>' + N.EMOJI.map(function (e) { return '<button class="react" data-act="react" data-emoji="' + e + '">' + e + '</button>'; }).join('') + '</span></div>';
+    return h;
+  }
+
+  N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
-      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + '</div>' +
+      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') +
+      (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
       '<div class="body">' + SW.esc(n.text) + '</div>' +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
+      renderReactions(n, reactions) +
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button>' : '') +
+      '<button data-act="copy" class="ico" title="Copy the note, with its citation and replies">⧉</button>' +
+      '<button data-act="dl" class="ico" title="Download the note with its code and replies (Markdown)">⤓</button>' +
+      (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
       (N.mine(n) ? '<button data-act="delete" class="del-note">' + (n.source === 'draft' ? 'Delete draft' : 'Delete') + '</button>' : '') +
-      (n.link ? '<a href="' + SW.esc(n.link) + '" target="_blank" rel="noopener">Hypothesis ↗</a>' : '') + '</div></div>';
+      '</div></div>';
   };
 
   N.renderThread = function (t, b) {
@@ -294,14 +361,17 @@
       h += '<div class="anchor" data-p="' + n.anchor.p + '" data-n="' + n.anchor.n0 + '">' +
         SW.esc(SW.cite(b, n.anchor.p, n.anchor.n0, n.anchor.n1)) + '</div>';
     }
-    h += N.renderNote(n, false);
-    (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true); walk(r.replies); }); })(t.replies);
+    h += N.renderNote(n, false, t.reactions);
+    (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
     return h + '</div>';
   };
 
   // Wire reply/delete/anchor clicks inside a container.
   N.wire = function (el, vid, all) {
-    el.addEventListener('click', function (e) {
+    // One handler per panel: the panel is re-rendered in place when notes
+    // change, and stale handlers holding an old list would answer too.
+    if (el._swNotes) el.removeEventListener('click', el._swNotes);
+    el.addEventListener('click', el._swNotes = function (e) {
       var btn = e.target.closest('button[data-act]');
       var anc = e.target.closest('.anchor');
       if (anc) { SW.emit('goto', { p: +anc.dataset.p, n: +anc.dataset.n, tab: 'read' }); return; }
@@ -309,6 +379,22 @@
       var id = btn.closest('.note').dataset.id;
       var note = all.filter(function (x) { return x.id === id; })[0];
       if (!note) return;
+      if (btn.dataset.act === 'edit') { inlineEdit(btn.closest('.note'), note); return; }
+      if (btn.dataset.act === 'copy') { copyNote(note, all); return; }
+      if (btn.dataset.act === 'dl') { downloadNote(note, all, 'md'); return; }
+      if (btn.dataset.act === 'react-pick') {
+        var pk = btn.parentNode.querySelector('.react-pick');
+        pk.hidden = !pk.hidden;
+        return;
+      }
+      if (btn.dataset.act === 'react') {
+        var emoji = btn.dataset.emoji;
+        var mineR = all.filter(function (x) { return N.isReaction(x) && x.parent === note.id && x.text === emoji && myReaction(x); })[0];
+        btn.disabled = true;
+        (mineR ? N.remove(mineR, true) : N.create({ vid: vid, parent: note.id, kind: 'reaction', anchor: note.anchor, text: emoji, tags: [], quiet: true }))
+          .catch(function (err) { btn.disabled = false; if (err.message !== 'no initials') SW.toast(err.message, 5000); });
+        return;
+      }
       if (btn.dataset.act === 'reply') {
         inlineReply(btn.closest('.note'), vid, note);
       } else if (btn.dataset.act === 'delete') {
@@ -320,6 +406,87 @@
       }
     });
   };
+
+  // ---------- copying and downloading a single note ----------
+  function rootOf(note, all) {
+    var byId = {}, n = note, guard = 0;
+    all.forEach(function (x) { byId[x.id] = x; });
+    while (n.parent && byId[n.parent] && guard++ < 50) n = byId[n.parent];
+    return n;
+  }
+  function threadOf(note, all) {
+    var r = rootOf(note, all);
+    return N.threads(all).filter(function (t) { return t.note.id === r.id; })[0] || { note: note, replies: [], reactions: [] };
+  }
+  function citeOf(note) {
+    var b = SW.views.read && SW.views.read.build;
+    if (note.anchor && b && b.v.id === note.vid) return SW.cite(b, note.anchor.p, note.anchor.n0, note.anchor.n1);
+    var v = root.SWVersions.byId(note.vid);
+    return (v ? v.label + ' (' + v.date + ')' : note.vid) + (note.anchor ? ', ' + (note.anchor.src || '') + ', ll. ' + note.anchor.n0 + '–' + note.anchor.n1 : '');
+  }
+  function copyNote(note, all) {
+    var t = threadOf(note, all), lines = [];
+    var head = note.id === t.note.id ? t : null;
+    lines.push('“' + note.text + '” (' + note.by + ', ' + SW.fmtDate(note.date) + '; ' + citeOf(t.note) + ')');
+    if (head) (function walk(rs, d) { rs.forEach(function (r) {
+      lines.push(new Array(d + 1).join('  ') + '↳ ' + r.note.by + ', ' + SW.fmtDate(r.note.date) + ': ' + r.note.text); walk(r.replies, d + 1);
+    }); })(t.replies, 1);
+    var text = lines.join('\n');
+    (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
+      .then(function () { SW.toast('Note copied'); }, function () { window.prompt('Copy:', text); });
+  }
+  function downloadNote(note, all, fmt) {
+    var t = threadOf(note, all), a = t.note.anchor;
+    SW.build(t.note.vid).then(function (b) {
+      var blocks = [];
+      if (a && b.lines[a.p]) {
+        blocks.push({ type: 'code', caption: SW.cite(b, a.p, a.n0, a.n1), lines: b.lines[a.p].slice(a.n0 - 1, a.n1).map(function (L) {
+          var ws = b.asm && (b.asm.byLine[L.p] || [])[L.n];
+          return { n: L.n, addr: ws && ws.length ? SW.oct(ws[0].loc, 4) : '', word: ws && ws.length ? SW.oct(ws[0].val) : '', text: L.raw };
+        }) });
+      }
+      blocks = blocks.concat(N.blocks([t], b));
+      var doc = { title: 'Note by ' + t.note.by + ', ' + SW.fmtDate(t.note.date), subtitle: citeOf(t.note),
+                  meta: [['Version', b.v.label + ' (' + b.v.date + ')'], ['Where', a ? SW.cite(b, a.p, a.n0, a.n1) : 'the version as a whole'],
+                         ['Link', SW.permalink({ v: b.v.id, l: a ? a.p + ':' + a.n0 + (a.n1 !== a.n0 ? '-' + a.n1 : '') : null })]],
+                  blocks: blocks };
+      SW.exportDoc(doc, 'spacewar-' + b.v.id + '-note-' + t.note.by + '-' + String(t.note.date).slice(0, 10), fmt);
+    });
+  }
+
+  // Editing in place: the note's text (and tags, for a note rather than a reply).
+  function inlineEdit(noteEl, note) {
+    if (noteEl.querySelector('.edit-box')) return;
+    var body = noteEl.querySelector('.body');
+    var box = SW.el('div', { class: 'reply-box edit-box' });
+    box.innerHTML = '<textarea rows="4"></textarea>' +
+      (note.parent ? '' : '<input class="edit-tags" placeholder="Tags, separated by commas">') +
+      '<div class="reply-foot"><span class="hint">Editing your ' + (note.parent ? 'reply' : 'note') + '</span>' +
+      '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Save</button></span></div>';
+    var ta = box.querySelector('textarea'), tg = box.querySelector('.edit-tags');
+    ta.value = note.text;
+    if (tg) tg.value = (note.tags || []).join(', ');
+    body.hidden = true;
+    body.insertAdjacentElement('afterend', box);
+    ta.focus();
+    function close() { box.remove(); body.hidden = false; }
+    function save() {
+      var text = ta.value.trim();
+      if (!text) { ta.focus(); return; }
+      var tags = tg ? tg.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean) : null;
+      box.querySelector('[data-r="save"]').disabled = true;
+      N.update(note, text, tags).then(close, function (e) { box.querySelector('[data-r="save"]').disabled = false; SW.toast(e.message, 5000); });
+    }
+    box.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var b = e.target.closest('[data-r]');
+      if (b) (b.dataset.r === 'cancel' ? close : save)();
+    });
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); save(); }
+      if (e.key === 'Escape') { e.stopPropagation(); close(); }
+    });
+  }
 
   // A reply box opened in place, under the note being answered (no tags).
   function inlineReply(noteEl, vid, note) {
@@ -386,7 +553,10 @@
     return threads.map(function (t) {
       var flat = [];
       (function walk(rs) { rs.forEach(function (r) { flat.push({ by: r.note.by, date: r.note.date.slice(0, 10), text: r.note.text }); walk(r.replies); }); })(t.replies);
-      return { type: 'note', by: t.note.by, date: String(t.note.date).slice(0, 10), text: t.note.text,
+      var rx = {};
+      (t.reactions || []).forEach(function (r) { (rx[r.text] = rx[r.text] || []).push(r.by); });
+      var rtext = Object.keys(rx).map(function (e) { return e + ' ' + rx[e].join(', '); }).join('  ');
+      return { type: 'note', by: t.note.by, date: String(t.note.date).slice(0, 10), text: t.note.text + (rtext ? '\n[' + rtext + ']' : ''),
                anchor: t.note.anchor && b ? SW.cite(b, t.note.anchor.p, t.note.anchor.n0, t.note.anchor.n1) : (t.note.source === 'buildlog' ? 'build log' : 'version note'),
                replies: flat };
     });
