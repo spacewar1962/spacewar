@@ -184,16 +184,10 @@
 
   // Overview and back, for a zoomable chart. The first press goes out to the whole
   // chart and remembers the zoom and place; the next press returns there. Zooming
-  // any other way forgets it. The same button floats in the chart's corner while
-  // zoomed in (or while there is a place to return to), so a deep dive can be left
-  // without scrolling back to the toolbar.
+  // any other way forgets it.
   // o: { zoomed(): bool, zoom(): current zoom, set(z): redraw at z (null = overview) }
   function overviewFlip(box, o) {
     var back = null, btns = [];
-    var floating = SW.el('button', { class: 'btn zoom-back' });
-    var holder = SW.el('div', { class: 'zoom-wrap' });
-    holder.appendChild(box);
-    holder.appendChild(floating);
     function returning() { return !!back && !o.zoomed(); }
     function flip() {
       if (o.zoomed()) {
@@ -212,12 +206,9 @@
         b.textContent = returning() ? '⤡ Back to your zoom' : '⤢ Overview';
         b.title = returning() ? 'Return to the zoom and place you left' : 'Out to the whole chart; press again to come back';
       });
-      floating.hidden = !(o.zoomed() || back);
     }
-    btns.push(floating);
-    floating.onclick = flip;
     return {
-      el: holder, refresh: refresh,
+      el: box, refresh: refresh,
       forget: function () { back = null; },
       button: function () { var b = SW.el('button', { class: 'btn' }); b.onclick = flip; btns.push(b); return b; }
     };

@@ -256,10 +256,6 @@ body.drawer-open.drawer-wide main { margin-right: min(760px, 60vw); }
 body.drawer-wide .drawer { width: min(760px, 60vw); }
 .drawer .diff .row { grid-template-columns: 3em 1fr 3em 1fr; }
 .svgbox.flow [data-col], .svgbox.flow [data-step] { cursor: pointer; }
-/* "Back to overview", floating in a zoomed chart's corner. */
-.zoom-wrap { position: relative; }
-.zoom-back { position: absolute; top: 14px; right: 20px; z-index: 4; box-shadow: 0 2px 10px rgba(0,0,0,0.4); border-color: var(--beam); }
-.zoom-back[hidden] { display: none; }
 /* Version names pinned above the flow as it scrolls (compare.js pinLabels). */
 .svgbox.flow .flow-head { position: sticky; top: -8px; z-index: 2; background: inherit; margin-top: -8px; padding-top: 8px; width: max-content; }
 .svgbox.flow .flow-head svg { display: block; }
