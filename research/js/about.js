@@ -9,8 +9,8 @@
 
   function timeline(cur) {
     return '<div class="timeline">' + V.VERSIONS.slice().sort(function (a, b) { return a.sort - b.sort; }).map(function (v) {
-      return '<div class="v' + (v.id === cur ? ' on' : '') + (v.status === 'lost' ? ' lost' : '') + '" data-v="' + SW.esc(v.id) + '" title="' + SW.esc(v.summary) + '">' +
-        '<b>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</b>' + SW.esc(v.date) + '<br><span class="faint">' + SW.esc(v.fork) + ' · ' + SW.esc(v.status) + '</span></div>';
+      return '<div class="v' + (v.id === cur ? ' on' : '') + (v.status === 'lost' ? ' lost' : '') + '" data-v="' + SW.esc(v.id) + '" title="' + SW.esc(v.label + ' · ' + v.date + '\n' + v.summary) + '">' +
+        '<b>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</b><span>' + SW.esc(v.date) + '</span><span class="faint">' + SW.esc(v.fork) + ' · ' + SW.esc(v.status) + '</span></div>';
     }).join('') + '</div>';
   }
 

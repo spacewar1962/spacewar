@@ -314,8 +314,9 @@ svg text { font-family: var(--mono); }
 .meta dt { color: var(--text-dim); }
 .meta dd { margin: 0; }
 .prose { font-family: var(--serif); font-size: 16px; line-height: 1.6; max-width: 46em; }
-.timeline { display: flex; flex-wrap: wrap; gap: 6px; }
-.timeline .v { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; cursor: pointer; font-size: 12px; background: var(--surface); min-width: 110px; }
+.timeline { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 6px; }
+.timeline .v { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; cursor: pointer; font-size: 12px; background: var(--surface); height: 64px; overflow: hidden; min-width: 0; }
+.timeline .v > * { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .timeline .v.on { border-color: var(--beam); }
 .timeline .v.lost { opacity: 0.55; border-style: dashed; cursor: default; }
 .timeline .v b { display: block; font-family: var(--mono); font-size: 13px; }
