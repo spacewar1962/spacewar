@@ -182,6 +182,47 @@
     return { c: c, rows: rows };
   }
 
+  // Overview and back, for a zoomable chart. The first press goes out to the whole
+  // chart and remembers the zoom and place; the next press returns there. Zooming
+  // any other way forgets it. The same button floats in the chart's corner while
+  // zoomed in (or while there is a place to return to), so a deep dive can be left
+  // without scrolling back to the toolbar.
+  // o: { zoomed(): bool, zoom(): current zoom, set(z): redraw at z (null = overview) }
+  function overviewFlip(box, o) {
+    var back = null, btns = [];
+    var floating = SW.el('button', { class: 'btn zoom-back' });
+    var holder = SW.el('div', { class: 'zoom-wrap' });
+    holder.appendChild(box);
+    holder.appendChild(floating);
+    function returning() { return !!back && !o.zoomed(); }
+    function flip() {
+      if (o.zoomed()) {
+        back = { z: o.zoom(), top: box.scrollTop, left: box.scrollLeft };
+        o.set(null);
+        box.scrollTop = 0; box.scrollLeft = 0;
+      } else if (back) {
+        var b = back; back = null;
+        o.set(b.z);
+        box.scrollTop = b.top; box.scrollLeft = b.left;
+      }
+      refresh();
+    }
+    function refresh() {
+      btns.forEach(function (b) {
+        b.textContent = returning() ? '⤡ Back to your zoom' : '⤢ Overview';
+        b.title = returning() ? 'Return to the zoom and place you left' : 'Out to the whole chart; press again to come back';
+      });
+      floating.hidden = !(o.zoomed() || back);
+    }
+    btns.push(floating);
+    floating.onclick = flip;
+    return {
+      el: holder, refresh: refresh,
+      forget: function () { back = null; },
+      button: function () { var b = SW.el('button', { class: 'btn' }); b.onclick = flip; btns.push(b); return b; }
+    };
+  }
+
   // ---------- the routine map: two versions side by side, zoomable to the code ----------
   var rmZoom = SW.store.get('rm.zoom', 1.2);          // pixels per source line
   var CODE_AT = 9;                                     // show code from this zoom up
@@ -197,19 +238,25 @@
       draw();
       if (keepCentre) box.scrollTop = frac * box.scrollHeight - box.clientHeight / 2;
     }
-    function fit() {
+    function fitZoom() {
       var n = Math.max(linesOf(c.unitsA, ta), linesOf(c.unitsB, tb), 1);
-      zoomTo((Math.max(300, box.clientHeight || 600) - 90) / n, false);
+      return Math.max(0.3, Math.min(16, (Math.max(300, box.clientHeight || 600) - 90) / n));
     }
-    [['−', 'Zoom out', function () { zoomTo(rmZoom / 1.5, true); }],
-     ['+', 'Zoom in (the code appears when there is room to read it)', function () { zoomTo(rmZoom * 1.5, true); }],
-     ['Fit', 'Fit both versions in the window', fit],
-     ['Code', 'Zoom in far enough to read the code', function () { zoomTo(Math.max(CODE_AT, 12), true); }]].forEach(function (b) {
+    var ov = overviewFlip(box, {
+      zoomed: function () { return rmZoom > fitZoom() * 1.05; },
+      zoom: function () { return rmZoom; },
+      set: function (z) { zoomTo(z == null ? fitZoom() : z, false); }
+    });
+    function userZoom(z, keep) { ov.forget(); zoomTo(z, keep); }
+    bar.appendChild(ov.button());
+    [['−', 'Zoom out', function () { userZoom(rmZoom / 1.5, true); }],
+     ['+', 'Zoom in (the code appears when there is room to read it)', function () { userZoom(rmZoom * 1.5, true); }],
+     ['Code', 'Zoom in far enough to read the code', function () { userZoom(Math.max(CODE_AT, 12), true); }]].forEach(function (b) {
       bar.appendChild(SW.el('button', { class: 'btn', title: b[1], onclick: b[2] }, b[0]));
     });
     var slider = SW.el('input', { type: 'range', min: '0', max: '100', title: 'Zoom' });
     slider.style.width = '160px';
-    slider.oninput = function () { zoomTo(0.3 * Math.pow(16 / 0.3, +slider.value / 100), true); };
+    slider.oninput = function () { userZoom(0.3 * Math.pow(16 / 0.3, +slider.value / 100), true); };
     bar.appendChild(slider);
     bar.appendChild(readout);
     bar.appendChild(SW.el('span', { class: 'sep' }));
@@ -217,11 +264,12 @@
     bar.appendChild(SW.el('span', { class: 'sep' }));
     bar.appendChild(SW.figureButtons(function () { return svgOf(rmZoom); }, 'spacewar-' + A.v.id + '-' + B.v.id + '-routines'));
     wrap.appendChild(bar);
-    wrap.appendChild(box);
+    wrap.appendChild(ov.el);
     function linesOf(us, t) { var n = 0; us.forEach(function (u) { n += u.end - u.start + 1; }); return n; }
     function svgOf(z) { return routineMapSVG(ta, tb, c, z, A.v.label, B.v.label); }
     function draw() {
       box.innerHTML = SW.displaySVG(svgOf(rmZoom));
+      ov.refresh();
       slider.value = String(Math.round(100 * Math.log(rmZoom / 0.3) / Math.log(16 / 0.3)));
       readout.textContent = rmZoom.toFixed(1) + ' px per line' + (rmZoom >= CODE_AT ? ' · code shown' : ' · zoom in to read the code');
     }
@@ -440,6 +488,25 @@
     }, 20);
   }
 
+  // The version names pinned above the flow: the chart's label band is copied into
+  // a strip that sticks to the top of the scrolling box and moves sideways with the
+  // columns; the chart itself is pulled up under it. Exports keep the labels in place.
+  function pinLabels(box) {
+    var main = box.querySelector('svg'), labs = main ? main.querySelectorAll('.g-collabel') : [];
+    if (!labs.length) return;
+    var band = +labs[0].getAttribute('y') + 8, W = main.getAttribute('width');
+    var head = main.cloneNode(false);
+    head.setAttribute('height', band);
+    head.setAttribute('viewBox', '0 0 ' + W + ' ' + band);
+    head.setAttribute('aria-hidden', 'true');
+    head.removeAttribute('role');
+    Array.prototype.forEach.call(labs, function (t) { head.appendChild(t.cloneNode(true)); t.setAttribute('visibility', 'hidden'); });
+    var strip = SW.el('div', { class: 'flow-head' });
+    strip.appendChild(head);
+    box.insertBefore(strip, main);
+    main.style.marginTop = -(head.getBoundingClientRect().height || band) + 'px';   // natural size if not yet laid out
+  }
+
   function showAlluvial(body, exp, ts) {
     if (gst.gran === 'line') { body.innerHTML = '<p class="hint">Line granularity is too fine for the flow view; choose routine or section, or use Compare → Routines for a pair.</p>'; return; }
     var fl = G.flows(ts, { granularity: gst.gran });
@@ -464,6 +531,8 @@
     slider.style.width = '160px';
     function drawFlow() {
       box.innerHTML = SW.displaySVG(svg());
+      pinLabels(box);
+      if (ov) ov.refresh();
       var k = z();
       slider.value = String(Math.round(100 * Math.log(k / 0.1) / Math.log(16 / 0.1)));
       readout.textContent = (gst.zoom ? k.toFixed(1) + ' px per line' : 'fitted') +
@@ -477,18 +546,24 @@
       drawFlow();
       if (keep) { box.scrollTop = fy * box.scrollHeight - box.clientHeight / 2; box.scrollLeft = fx * box.scrollWidth - box.clientWidth / 2; }
     }
-    [['−', 'Zoom out', function () { zoomTo(z() / 1.5, true); }],
-     ['+', 'Zoom in: routine names appear, then the code', function () { zoomTo(z() * 1.5, true); }],
-     ['Fit', 'Fit every version in the window', function () { zoomTo(0, false); }],
-     ['Names', 'Zoom in far enough to read the names of the ' + gst.gran + 's', function () { zoomTo(Math.max(NAMES_AT, 3), true); }],
-     ['Code', 'Zoom in far enough to read the code', function () { zoomTo(Math.max(CODE_AT_G, 11), true); }]].forEach(function (b) {
+    var ov = overviewFlip(box, {
+      zoomed: function () { return !!gst.zoom && gst.zoom > fitZ * 1.05; },
+      zoom: function () { return gst.zoom; },
+      set: function (k) { zoomTo(k || 0, false); }
+    });
+    function userZoom(k, keep) { ov.forget(); zoomTo(k, keep); }
+    zbar.appendChild(ov.button());
+    [['−', 'Zoom out', function () { userZoom(z() / 1.5, true); }],
+     ['+', 'Zoom in: routine names appear, then the code', function () { userZoom(z() * 1.5, true); }],
+     ['Names', 'Zoom in far enough to read the names of the ' + gst.gran + 's', function () { userZoom(Math.max(NAMES_AT, 3), true); }],
+     ['Code', 'Zoom in far enough to read the code', function () { userZoom(Math.max(CODE_AT_G, 11), true); }]].forEach(function (b) {
       zbar.appendChild(SW.el('button', { class: 'btn', title: b[1], onclick: b[2] }, b[0]));
     });
-    slider.oninput = function () { zoomTo(0.1 * Math.pow(16 / 0.1, +slider.value / 100), true); };
+    slider.oninput = function () { userZoom(0.1 * Math.pow(16 / 0.1, +slider.value / 100), true); };
     zbar.appendChild(slider);
     zbar.appendChild(readout);
     body.appendChild(zbar);
-    body.appendChild(box);
+    body.appendChild(ov.el);
     drawFlow();
     body.querySelector('.hint').insertAdjacentHTML('beforeend', ' <b>Click a box or a ribbon</b> to read the code it stands for, coloured by what happened to it.');
     box.addEventListener('click', function (e) {

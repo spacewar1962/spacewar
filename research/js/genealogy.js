@@ -886,7 +886,8 @@
         }
       }
       var lx = x + bw / 2, ly = top - 8;
-      s += '<text x="' + f1(lx) + '" y="' + f1(ly) + '" font-size="11" fill="' + COLORS.text +
+      // class g-collabel: the bench pins these above the flow while it scrolls (compare.js)
+      s += '<text class="g-collabel" x="' + f1(lx) + '" y="' + f1(ly) + '" font-size="11" fill="' + COLORS.text +
         '" transform="rotate(-40 ' + f1(lx) + ' ' + f1(ly) + ')"><title>' + esc(texts[i].label) + '</title>' +
         esc(trunc(labels[i], 22)) + '</text></g>';
     });
