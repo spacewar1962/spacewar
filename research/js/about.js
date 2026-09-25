@@ -18,23 +18,23 @@
     var v = b.v, a = b.asm;
     var pad = SW.el('div', { class: 'pad' });
     var dl = [
-      ['Date', v.date], ['Authors', v.authors], ['Fork', v.fork], ['Status', v.status], ['Survives as', v.medium || '—'],
+      ['Date', v.date], ['Authors', v.authors], ['Fork', v.fork], ['Status', v.status], ['Survives as', v.medium || 'none'],
       ['Sources', b.parts.map(function (p) {
         return '<a href="../sources/' + SW.esc(p.src) + '" target="_blank" rel="noopener">' + SW.esc(p.src) + '</a>' +
           (p.role !== 'program' ? ' <span class="faint">(supplied: ' + SW.esc(p.role) + ')</span>' : '') +
           (p.title > 1 || p.end ? ' <span class="faint">lines ' + p.title + (p.end ? '–' + p.end : '–') + '</span>' : '');
-      }).join('<br>') || '—'],
-      ['Scans', (v.scans || []).map(function (s) { return '<a href="../sources/' + SW.esc(s) + '" target="_blank" rel="noopener">' + SW.esc(s) + '</a>'; }).join('<br>') || '—'],
-      ['Witness tapes', (v.witnesses || []).map(SW.esc).join('<br>') || '—'],
-      ['Source tapes', (v.sourceTapes || []).map(SW.esc).join('<br>') || '—'],
+      }).join('<br>') || 'none'],
+      ['Scans', (v.scans || []).map(function (s) { return '<a href="../sources/' + SW.esc(s) + '" target="_blank" rel="noopener">' + SW.esc(s) + '</a>'; }).join('<br>') || 'none'],
+      ['Witness tapes', (v.witnesses || []).map(SW.esc).join('<br>') || 'none'],
+      ['Source tapes', (v.sourceTapes || []).map(SW.esc).join('<br>') || 'none'],
       ['Normalisations', (v.transforms || []).map(function (k) { return SW.esc(V.TRANSFORMS[k].label); }).join('<br>') || 'none'],
       ['Assembler', SW.esc(V.DIALECTS[b.dialect].label)],
       ['Machine', v.runnable ? (v.mdv ? 'PDP-1 with automatic multiply/divide (mul, div)' : 'PDP-1 without multiply/divide (mus, dis steps)') : 'not runnable'],
       ['Assembly', a ? a.words.length + ' words; ' + (a.errorCount ? a.errorCount + ' errors' : 'no errors') + '; start ' + SW.oct(a.start, 4) +
         '; constants ' + a.constants.map(function (c) { return SW.oct(c.start, 4) + ' (' + c.count + ')'; }).join(', ') +
         (a.variables ? '; variables ' + SW.oct(a.variables.start, 4) + '–' + SW.oct(a.variables.end - 1, 4) : '') +
-        '; ' + a.symbols.length + ' symbols; ' + a.macros.length + ' macros' : '—'],
-      ['Tape titles', a ? a.titles.map(function (t) { return '<span class="mono">' + SW.esc(t.text.trim()) + '</span>'; }).join('<br>') : '—'],
+        '; ' + a.symbols.length + ' symbols; ' + a.macros.length + ' macros' : 'none'],
+      ['Tape titles', a ? a.titles.map(function (t) { return '<span class="mono">' + SW.esc(t.text.trim()) + '</span>'; }).join('<br>') : 'none'],
       ['Cite this version', SW.esc(v.label + ' (' + v.date + '). ' + (v.authors || '') + '. Spacewar! research bench, ' + SW.versionURI(v.id))]
     ];
     pad.innerHTML = '<h2 style="margin-top:0">' + SW.esc(v.label) + '</h2><p class="prose">' + SW.esc(v.summary) + '</p>' +
