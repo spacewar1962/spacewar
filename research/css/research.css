@@ -352,12 +352,13 @@ svg text { font-family: var(--mono); }
 .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-dim); }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 .svgbox { overflow: auto; border: 1px solid #1a2638; border-radius: 6px; background: #0b1018; padding: 8px; }
-/* Figures sit on a dark plate in both themes; their legends take the plate's colours. */
-:root[data-theme="paper"] .legend {
-  --beam: #6cf2ff; --amber: #ffce7a; --violet: #c7a6ff; --green: #7be3a0; --red: #ff8a8a; --line-soft: #1a2638;
-  --g-retained: #6cf2ff; --g-moved: #c7a6ff; --g-edited: #ffce7a; --g-added: #7be3a0; --g-removed: #ff8a8a;
-}
-:root[data-theme="paper"] .legend i { box-shadow: 0 0 0 1px #0b1018; }
+/* On listing paper, figures are drawn in dark ink on white. */
+:root[data-theme="paper"] .svgbox { background: #ffffff; border-color: var(--line); }
+:root[data-theme="paper"] .svgbox.flow [data-col]:hover, :root[data-theme="paper"] .svgbox.flow .picked { stroke: #1d2327; }
+:root[data-theme="paper"] .legend i { box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25); }
+/* Tape on listing paper is white, with an edge, so it stands off the page. */
+:root[data-theme="paper"] .tape-roll canvas, :root[data-theme="paper"] .tape-strip canvas,
+:root[data-theme="paper"] .tape-title-img svg { box-shadow: 0 0 0 1px var(--line); }
 
 /* ---------- tape ---------- */
 .tape-view canvas { display: block; margin: 0 auto; }

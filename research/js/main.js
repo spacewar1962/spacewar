@@ -117,6 +117,13 @@
     document.documentElement.setAttribute('data-theme', t);
     SW.store.set('theme', t);
     SW.emit('theme', t);
+    // Figures and tapes are coloured for the theme when drawn, so draw them again.
+    if (SW.state.v) {
+      ['analyse', 'compare', 'genealogy', 'tape', 'findings'].forEach(function (k) { delete shown[k]; });
+      if (SW.views.findings && SW.views.findings.reset) SW.views.findings.reset();
+      if (['analyse', 'compare', 'genealogy', 'tape', 'findings'].indexOf(SW.state.tab) >= 0) showCurrent();
+      if (SW.tape) SW.build(SW.state.v).then(function (b) { SW.tape.strip(b); }).catch(function () {});
+    }
   }
 
   function init() {

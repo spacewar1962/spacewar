@@ -276,6 +276,6 @@
     run();
   }
 
-  SW.views.findings = { show: function () { if (!done) render(); } };
+  SW.views.findings = { show: function () { if (!done) render(); }, reset: function () { done = false; } };
   SW.findings = { list: FIND };
 })(this);

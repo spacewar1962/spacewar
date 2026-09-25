@@ -9,6 +9,12 @@
   var T = SW.tape = {};
   var view = SW.$('#view-tape');
 
+  // Tape colours: ivory on the dark theme, white on listing paper (where
+  // ivory would merge with the page).
+  T.colours = function () {
+    return SW.lightTheme && SW.lightTheme() ? { paper: '#ffffff', hole: '#1c2a31' } : { paper: '#e7e1d0', hole: '#1c2a31' };
+  };
+
   // Draw bytes on a canvas: one column per frame (tape runs left to right).
   T.draw = function (canvas, bytes, opts) {
     opts = opts || {};
@@ -17,7 +23,7 @@
     canvas.width = Math.max(1, n * pitch + 2 * pitch);
     canvas.height = h;
     var g = canvas.getContext('2d');
-    var paper = opts.paper || '#e7e1d0', hole = opts.hole || '#1c2a31';
+    var tc = T.colours(), paper = opts.paper || tc.paper, hole = opts.hole || tc.hole;
     g.fillStyle = paper;
     g.fillRect(0, 0, canvas.width, h);
     var row = (h - 8) / 9, r = Math.max(1, row * 0.34), rs = Math.max(0.7, row * 0.16);
@@ -60,7 +66,7 @@
     pitch = pitch || 10; h = h || 100;
     var row = (h - 8) / 9, r = row * 0.34, rs = row * 0.16, w = (n + 2) * pitch;
     var out = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">',
-               '<rect width="' + w + '" height="' + h + '" fill="#e7e1d0"/><g fill="#1c2a31">'];
+               '<rect width="' + w + '" height="' + h + '" fill="' + T.colours().paper + '"/><g fill="' + T.colours().hole + '">'];
     for (var i = 0; i < n; i++) {
       var byte = bytes[from + i], x = pitch + i * pitch + pitch / 2;
       for (var c = 0; c < 8; c++) {
