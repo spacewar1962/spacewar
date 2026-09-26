@@ -8,7 +8,7 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '' };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', margin: SW.store.get('read.margin', true) };
 
   // ---------- the tapes a version is read from ----------
   // A version is assembled from its tapes read one after another as one
@@ -135,10 +135,11 @@
       '<details class="menu"><summary class="btn" title="What the listing shows">View ▾</summary><div class="menu-body">' +
       '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
       '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
+      '<label class="check" title="Show each note beside its line in a margin on the right, with its replies a click away, refreshed every 20 seconds so the group\'s work appears as it happens. Unticked: notes stay out of the way, shown as initials at the end of the line; click them to read in the side panel."><input type="checkbox" id="rd-margin"' + (opts.margin ? ' checked' : '') + '> Notes in the margin</label>' +
       '<label class="check" title="Hide every line that no note covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
       '<label class="check" title="Show only notes (and the lines they cover) in which these initials take part, as author or in a reply">Notes by <select id="rd-by"><option value="">anyone</option></select></label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
-      '</div></details><span class="hint" id="rd-nf"></span>';
+      '</div></details><span class="hint" id="rd-nf"></span><span class="hint live-dot" id="rd-live"></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
@@ -181,8 +182,10 @@
   // The listing alone, so choosing a tape keeps the toolbar (and a search) as it is.
   function renderListing() {
     var b = build, info = tapeInfo(b), bar = SW.$('#rd-selbar', view);
-    SW.$$('.listing', view).forEach(function (x) { x.remove(); });
+    SW.$$('.rd-body', view).forEach(function (x) { x.remove(); });
+    var wrap = SW.el('div', { class: 'rd-body' + (opts.margin ? ' with-margin' : '') });
     var box = SW.el('div', { class: 'listing' + (opts.words ? '' : ' hide-words') });
+    var margin = SW.el('div', { class: 'note-margin', 'aria-label': 'Notes' });
     b.parts.forEach(function (part, pi) {
       if (!showsTape(pi)) return;
       var t = info[pi], sec = SW.el('div', { class: 'part' });
@@ -203,10 +206,119 @@
       sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
     });
-    view.insertBefore(box, bar);
+    wrap.appendChild(box);
+    wrap.appendChild(margin);
+    view.insertBefore(wrap, bar);
     wireBox(box);
+    wireMargin(margin);
     applyFilter();
     paintSel();
+    paintMargin();
+  }
+
+  // ---------- notes in the margin ----------
+  // Each thread as a card beside the line it starts on; cards that would
+  // overlap are pushed down. Replies open under a card with its + button.
+  var openCards = {}, marginTimer = null;
+  function paintMargin() {
+    var wrap = SW.$('.rd-body', view), margin = SW.$('.note-margin', view);
+    if (!wrap || !margin) return;
+    wrap.classList.toggle('with-margin', !!opts.margin);
+    if (!opts.margin) { margin.innerHTML = ''; return; }
+    // Keep what is being typed: a refresh waits while a reply or edit is open.
+    if (margin.querySelector('.reply-box, .edit-box')) return;
+    var keep = filtering() ? keptLines() : null;
+    var ts = N.threads(notes).filter(function (t) {
+      var a = t.note.anchor;
+      if (!a || !showsTape(a.p)) return false;
+      if (keep && !keep[a.p + ':' + a.n0]) return false;
+      return !!SW.$('#L' + a.p + '-' + a.n0, view);
+    });
+    var top0 = wrap.getBoundingClientRect().top;
+    var items = ts.map(function (t) {
+      var a = t.note.anchor, row = SW.$('#L' + a.p + '-' + a.n0, view);
+      return { t: t, y: row.getBoundingClientRect().top - top0 };
+    }).sort(function (x, y) { return x.y - y.y; });
+    margin.innerHTML = items.map(function (it) {
+      var t = it.t, a = t.note.anchor, nrep = 0;
+      (function walk(rs) { rs.forEach(function (r) { nrep++; walk(r.replies); }); })(t.replies);
+      var open = !!openCards[t.note.id], h = '';
+      if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
+      return '<div class="mcard' + (open ? ' open' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
+        '<div class="mc-where">l. ' + a.n0 + (a.n1 !== a.n0 ? '–' + a.n1 : '') + '</div>' +
+        N.renderNote(t.note, false, t.reactions) +
+        (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
+        (open ? '<div class="mc-replies">' + h + '</div>' : '') + '</div>';
+    }).join('');
+    layoutMargin(items.map(function (it) { return it.y; }));
+    N.wire(margin, build.v.id, notes);
+  }
+  function layoutMargin(ys) {
+    var margin = SW.$('.note-margin', view);
+    if (!margin) return;
+    var cards = SW.$$('.mcard', margin), bottom = 0;
+    if (!ys) {
+      var wrap = SW.$('.rd-body', view), top0 = wrap.getBoundingClientRect().top;
+      ys = cards.map(function (c) { var row = SW.$('#L' + c.dataset.p + '-' + c.dataset.n0, view); return row ? row.getBoundingClientRect().top - top0 : 0; });
+    }
+    cards.forEach(function (c, i) {
+      var y = Math.max(ys[i], bottom + 6);
+      c.style.top = y + 'px';
+      c.classList.toggle('pushed', y - ys[i] > 12);
+      bottom = y + c.offsetHeight;
+    });
+    margin.style.minHeight = bottom + 'px';
+  }
+  function linesLit(c, on) {
+    for (var n = +c.dataset.n0; n <= +c.dataset.n1; n++) {
+      var r = SW.$('#L' + c.dataset.p + '-' + n, view);
+      if (r) r.classList.toggle('mlit', on);
+    }
+  }
+  function wireMargin(margin) {
+    margin.addEventListener('click', function (e) {
+      var more = e.target.closest('[data-more]');
+      if (more) {
+        var c = more.closest('.mcard');
+        openCards[c.dataset.tid] = !openCards[c.dataset.tid];
+        paintMargin();
+        return;
+      }
+      var w = e.target.closest('.mc-where');
+      if (w) {
+        var cw = w.closest('.mcard');
+        SW.state.sel = { p: +cw.dataset.p, n0: +cw.dataset.n0, n1: +cw.dataset.n1 };
+        paintSel(); SW.writeQuery();
+      }
+      // a reply or edit box changes the card's height
+      setTimeout(function () { layoutMargin(); }, 0);
+    });
+    margin.addEventListener('input', function () { layoutMargin(); });
+    margin.addEventListener('mouseover', function (e) { var c = e.target.closest('.mcard'); if (c) linesLit(c, true); });
+    margin.addEventListener('mouseout', function (e) { var c = e.target.closest('.mcard'); if (c && !c.contains(e.relatedTarget)) linesLit(c, false); });
+  }
+  // Clicking a noted line in margin mode brings its card forward instead of the side panel.
+  function cardFor(k) {
+    var parts = k.split(':');
+    return SW.$('.mcard[data-p="' + parts[0] + '"][data-n0="' + parts[1] + '"]', view);
+  }
+  // Live: while the margin shows, fetch the group's notes every 20 seconds.
+  function live() {
+    clearInterval(marginTimer);
+    var el = SW.$('#rd-live', view);
+    if (el) {
+      el.textContent = opts.margin ? (N.configured() ? '● live' : 'drafts only') : '';
+      el.title = opts.margin ? (N.configured() ? 'Notes refresh every 20 seconds, so others\' notes and replies appear as they are written' : 'No Hypothesis group is set (⚙), so notes are drafts in this browser; they are not shared') : '';
+    }
+    if (!opts.margin || !N.configured()) return;
+    marginTimer = setInterval(function () {
+      if (!build || SW.state.tab !== 'read' || document.hidden) return;
+      var m = SW.$('.note-margin', view);
+      if (m && m.querySelector('.reply-box, .edit-box')) return;
+      N.invalidate(build.v.id);
+      var t = SW.$('#rd-live', view);
+      if (t) t.textContent = '● live · ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    }, 20000);
   }
 
   // ---------- selection ----------
@@ -338,7 +450,11 @@
       paintSel();
       SW.writeQuery();
       var k = p + ':' + n;
-      if (counts[k]) showNotesFor(k);
+      if (counts[k]) {
+        var card = opts.margin && cardFor(k);
+        if (card) { card.classList.add('flash'); setTimeout(function () { card.classList.remove('flash'); }, 900); }
+        else showNotesFor(k);
+      }
     });
   }
 
@@ -351,6 +467,7 @@
     SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
     var tapeSel = SW.$('#rd-tape', tb);
     if (tapeSel) tapeSel.onchange = function () { opts.tapes = tapeSel.value; renderListing(); view.scrollTop = 0; };
+    SW.$('#rd-margin', tb).onchange = function (e) { opts.margin = e.target.checked; SW.store.set('read.margin', opts.margin); paintMargin(); live(); };
     SW.$('#rd-noted', tb).onchange = function (e) { opts.onlyNoted = e.target.checked; applyFilter(); view.scrollTop = 0; };
     SW.$('#rd-by', tb).onchange = function (e) { opts.by = e.target.value; applyFilter(); view.scrollTop = 0; };
     fillBy();
@@ -531,6 +648,7 @@
       if (on && !shown && !none) box.insertBefore(SW.el('p', { class: 'hint nf-none pad' }, opts.by ? 'No notes by ' + opts.by + ' on this version' + (opts.tapes === 'all' ? '' : ' and tape') + '.' : 'No annotated lines on this version' + (opts.tapes === 'all' ? '' : ' and tape') + ' yet.'), box.firstChild);
       else if ((!on || shown) && none) none.remove();
     }
+    if (build && SW.$('.note-margin', view)) paintMargin();   // the cards follow the lines left showing
   }
 
   function refreshNotes() {
@@ -550,6 +668,7 @@
       });
       fillBy();
       applyFilter();
+      paintMargin();
       if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey) showNotesFor(openNotesKey, true);
     });
   }
@@ -561,10 +680,15 @@
     SW.loadGlosses();
     render();
     refreshNotes();
+    live();
     var s = SW.state.sel;
     if (s) setTimeout(function () { R.goto(s.p, s.n0, false); }, 0);
   };
   SW.on('notes', function (vid) { if (build && vid === build.v.id) refreshNotes(); });
   SW.on('goto', function (g) { if (build && g.tab === 'read') { SW.setTab('read'); setTimeout(function () { R.goto(g.p, g.n, true); paintSel(); }, 0); } });
   SW.on('profile', function () { if (opts.heat && build) render(); });
+  // Lines change height with the window or the code size: the cards follow.
+  var relay = null;
+  window.addEventListener('resize', function () { clearTimeout(relay); relay = setTimeout(function () { if (build && opts.margin) layoutMargin(); }, 120); });
+  SW.on('codetext', function () { if (build && opts.margin) setTimeout(function () { layoutMargin(); }, 50); });
 })(this);

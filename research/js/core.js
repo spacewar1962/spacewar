@@ -415,6 +415,7 @@
     }
     de.style.setProperty('--code-font', f === 'system' ? 'var(--mono)' : '"' + f + '", var(--mono)');
     de.style.setProperty('--code-size', SW.codeSize() + 'px');
+    SW.emit('codetext');
   };
   SW.setCodeSize = function (n) {
     n = Math.max(9, Math.min(24, Math.round(n)));
