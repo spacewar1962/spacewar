@@ -150,6 +150,9 @@
   function load() {
     cpu = new C.PDP1({ mdv: build.v.mdv });
     cpu.load(build.asm.memory, build.asm.start);
+    cpu.srcMap = new Uint8Array(4096);
+    for (var k in build.asm.memory) cpu.srcMap[+k] = 1;
+    cpu.lastSrcPc = -1;
     cpu.onDisplay = plot;
     pts = [];
     if (ctx) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, scopeSize, scopeSize); }
@@ -268,20 +271,22 @@
   function paneSource(el) {
     var s = build.srcOf(cpu.pc), note = '';
     // Code the program wrote into core as it ran (Spacewar! compiles its ship
-    // outlines into instructions) has no source line: show the source of the
-    // instruction that wrote the word instead, so the listing stays in view.
+    // outlines into instructions) has no source line: show the last program
+    // line run before it (the code that called it), and say what wrote it.
     if (!s) {
       var wpc = cpu.lastWriter ? cpu.lastWriter[cpu.pc] : -1, ws = wpc >= 0 ? build.srcOf(wpc) : null, who = wpc >= 0 && build.symAt(wpc);
       // the routine that wrote it, by the nearest label (at or before) whose line carries a comment
       var said = '';
-      for (var a = wpc; wpc >= 0 && a >= Math.max(0, wpc - 64) && !said; a--) {
+      for (var a = wpc; wpc >= 0 && a >= Math.max(0, wpc - 128) && !said; a--) {
         if (!(a in build.labelAt)) continue;
         var ls = build.srcOf(a), L = ls && build.lines[ls.p][ls.n - 1], m = L && /(^|\s)\/\s*(.+)$/.exec(L.raw);
         if (m) said = build.labelAt[a] + ', “' + m[2].trim() + '”';
       }
-      note = '<p class="pad hint run-gen">PC ' + SW.oct(cpu.pc, 4) + ' is ' + (wpc >= 0 ? 'in code the program wrote into core as it ran, put there by the instruction at ' + SW.oct(wpc, 4) + (who ? ' (' + SW.esc(who) + ')' : '') + (said ? ', in ' + SW.esc(said) : '') + '. It has no source line; shown is the source of the instruction that wrote it.' : 'outside the assembled program and has no source line.') + '</p>';
-      if (!ws) { el.innerHTML = note; return; }
-      s = ws;
+      var last = cpu.lastSrcPc >= 0 ? build.srcOf(cpu.lastSrcPc) : null;
+      note = '<p class="pad hint run-gen">PC ' + SW.oct(cpu.pc, 4) + ' is ' + (wpc >= 0 ? 'in code the program wrote into core as it ran (put there by the instruction at ' + SW.oct(wpc, 4) + (who ? ', ' + SW.esc(who) : '') + (said ? ', in ' + SW.esc(said) : '') + ')' : 'outside the assembled program') + ', which has no source line. ' +
+        (last ? 'Shown: the last program line run before it, at ' + SW.oct(cpu.lastSrcPc, 4) + (build.symAt(cpu.lastSrcPc) ? ' (' + SW.esc(build.symAt(cpu.lastSrcPc)) + ')' : '') + '.' : ws ? 'Shown: the instruction that wrote it.' : '') + '</p>';
+      if (!last && !ws) { el.innerHTML = note; return; }
+      s = last || ws;
     }
     var lines = build.lines[s.p], from = Math.max(0, s.n - 18), to = Math.min(lines.length, s.n + 22);
     var h = '<div class="listing" style="padding-top:6px">';

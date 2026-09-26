@@ -92,6 +92,8 @@
     this.curPC = pc0;
     this.lastPC = pc0;
     this.execCount[pc0]++;
+    // the last instruction run that has a source line (srcMap, set by the Run view)
+    if (this.srcMap && this.srcMap[pc0]) this.lastSrcPc = pc0;
     var md = this.mem[pc0];
     this.pc = (this.pc + 1) & 0o7777;
     var before = this.tracing ? { ac: this.ac, io: this.io } : null;
