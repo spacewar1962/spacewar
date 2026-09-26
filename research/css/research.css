@@ -784,3 +784,16 @@ dialog.nudge { animation: nudge 0.35s; }
 .tape-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .tape-at { flex: none; width: 5.5em; text-align: right; font-size: 11px; color: var(--text-faint); }
 .tape-one { display: flex; width: max-content; }
+
+/* Tape: the rows run to the window's edge; the magnifier and the close-up */
+#view-tape .pad { max-width: none; }
+.tape-row.full canvas { flex: 1 1 auto; min-width: 0; height: 70px; }
+.tape-roll canvas { cursor: zoom-in; }
+.tape-lens { position: fixed; z-index: 40; display: none; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 6px; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+.tape-lens canvas { display: block; border-radius: 4px; cursor: default; }
+.tape-lens-cap { font-size: 12px; margin-top: 4px; max-width: 400px; line-height: 1.45; }
+.tape-zoom { margin: 4px 0 12px 6.2em; padding: 6px 8px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); overflow-x: auto; }
+.tape-zoom canvas { display: block; cursor: default; }
+.tape-zoom canvas.zr { box-shadow: none; }
+.tape-zoom-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.tape-zoom-bar .hint { margin-right: auto; }

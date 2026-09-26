@@ -307,13 +307,17 @@
         '<label class="check" title="What to draw: the whole tape, one of its stretches as the tape is built, a punched title, or your own range">Show <select id="tp-show"></select></label>' +
         '<label class="check" title="A frame is one column of holes across the tape: one character or byte. Frames are counted from the very start of the tape image, leader included.">From frame <input type="number" id="tp-from" min="0" value="0" style="width:6.5em"></label>' +
         '<label class="check" title="How many frames to draw (ten frames to the inch of real tape)">Frames <input type="number" id="tp-n" min="1" value="600" style="width:6.5em"></label>' +
+        '<button class="btn" id="tp-lens" title="Magnifier: hover over the tape to see the frames under the cursor enlarged, with each frame\'s value and the stretch it belongs to. Click the tape to open a close-up of that part under the row.">🔍</button>' +
         '<label class="check" title="Wrapped: the stretch cut into rows that fit the window, each starting with its first frame\'s number. One strip: a single band to scroll along, as the tape runs through the reader.">Layout <select id="tp-layout"><option value="wrap">Wrapped rows</option><option value="strip">One strip</option></select></label>';
       var info = SW.el('div', { class: 'hint', style: 'margin:6px 0' });
       var roll = SW.el('div', { class: 'tape-roll' });
       var decoded = SW.el('pre', { class: 'mono', style: 'display:none;max-height:260px;overflow:auto;font-size:12px;background:var(--surface);padding:8px;border-radius:6px' });
       var titlesBox = SW.el('div', { class: 'tape-titles' });
       var anatBox = SW.el('div', { class: 'tape-anat' });
-      var cur = { bytes: [], name: '', source: false, an: null };
+      var cur = { bytes: [], name: '', source: false, an: null, chars: null };
+      var lensOn = SW.store.get('tape.lens', true);
+      var lens = SW.el('div', { class: 'tape-lens' });
+      lens.innerHTML = '<canvas></canvas><div class="tape-lens-cap"></div>';
       SW.$('#tp-layout', tb).value = SW.store.get('tape.layout', 'wrap');
       // Anatomy: the tape as stretches (leader, loader, blocks and their checksums, jmp).
       function showAnatomy() {
@@ -407,9 +411,10 @@
         if (wrap) {
           var pitch = 7, per = Math.max(40, Math.floor(((roll.clientWidth || 1000) - 70) / pitch) - 2);
           for (s = from; s < from + n; s += per) {
-            var row = SW.el('div', { class: 'tape-row' }), c = document.createElement('canvas');
+            var row = SW.el('div', { class: 'tape-row' + (s + per <= from + n ? ' full' : '') }), c = document.createElement('canvas');
             row.appendChild(SW.el('span', { class: 'tape-at mono' }, s.toLocaleString('en-GB')));
             T.draw(c, cur.bytes, { from: s, max: Math.min(per, from + n - s), pitch: pitch, height: 70 });
+            c.dataset.from = s; c.dataset.pitch = pitch;
             row.appendChild(c);
             roll.appendChild(row);
           }
@@ -418,6 +423,7 @@
           for (s = from; s < from + n; s += 3000) {
             var c2 = document.createElement('canvas');
             T.draw(c2, cur.bytes, { from: s, max: Math.min(3000, from + n - s), pitch: 9, height: 90 });
+            c2.dataset.from = s; c2.dataset.pitch = 9;
             one.appendChild(c2);
           }
           roll.appendChild(one);
@@ -425,8 +431,76 @@
       }
       // The first view of a tape: where the Findings page sent us, else the whole
       // tape (or your own range, from the end of the leader, if that was last used).
+      // ---------- magnifier and close-up ----------
+      // The frame under the pointer on one of the roll's canvases (drawn with a
+      // pitch-wide margin, and perhaps stretched to fill its row).
+      function frameAt(c, e) {
+        var r = c.getBoundingClientRect(), p = +c.dataset.pitch, x = (e.clientX - r.left) * c.width / r.width;
+        var f = +c.dataset.from + Math.floor((x - p) / p);
+        return f >= 0 && f < cur.bytes.length ? f : null;
+      }
+      function frameInfo(f) {
+        var x = cur.bytes[f], bits = '';
+        for (var k = 7; k >= 0; k--) bits += (x >> k) & 1 ? '●' : '·';
+        var sg = cur.an && cur.an.segs.filter(function (s) { return s.f0 <= f && f <= s.f1; })[0];
+        var what = !x ? 'blank' : cur.source ? (cur.chars && cur.chars[f]) || '' : x & 0o200 ? 'binary: six bits of a word, ' + SW.oct(x & 0o77, 2) : 'no channel 8: skipped by the loader (a title, or leader)';
+        return '<b>frame ' + f.toLocaleString('en-GB') + '</b> · ' + SW.oct(x, 3) + ' <span class="mono" title="channels 8 to 1">' + bits + '</span>' +
+          (what ? ' · ' + SW.esc(what) : '') + (sg ? '<br><span class="hint">' + SW.esc(stretchName(sg)) + '</span>' : '');
+      }
+      function lensAt(e) {
+        var c = e.target.closest ? e.target.closest('.tape-roll canvas') : null;
+        var f = c && lensOn ? frameAt(c, e) : null;
+        if (f == null) { lens.style.display = 'none'; return; }
+        var lc = SW.$('canvas', lens), P = 16, K = 25, s0 = Math.max(0, Math.min(cur.bytes.length - K, f - 12));
+        T.draw(lc, cur.bytes, { from: s0, max: K, pitch: P, height: 140 });
+        var g = lc.getContext('2d');
+        g.strokeStyle = SW.cssVar('--amber') || '#c80'; g.lineWidth = 2;
+        g.strokeRect(P + (f - s0) * P + 1, 1, P - 2, 138);
+        SW.$('.tape-lens-cap', lens).innerHTML = frameInfo(f);
+        lens.style.display = 'block';
+        var w = lens.offsetWidth, h = lens.offsetHeight;
+        lens.style.left = (e.clientX + 18 + w > window.innerWidth ? e.clientX - w - 18 : e.clientX + 18) + 'px';
+        lens.style.top = (e.clientY + 18 + h > window.innerHeight ? e.clientY - h - 18 : e.clientY + 18) + 'px';
+      }
+      // A close-up under the row: the frames around the click, large, with
+      // frame numbers every ten; ◀ ▶ move along, ✕ closes.
+      function closeUp(anchor, f) {
+        SW.$$('.tape-zoom', roll).forEach(function (z) { z.remove(); });
+        var P = 16, K = Math.max(40, Math.floor((roll.clientWidth - 40) / P) - 2), s0 = Math.max(0, Math.min(cur.bytes.length - K, f - Math.floor(K / 2)));
+        var z = SW.el('div', { class: 'tape-zoom' });
+        var bar = SW.el('div', { class: 'tape-zoom-bar' });
+        function paint() {
+          var c = z.querySelector('canvas.zc') || z.appendChild(SW.el('canvas', { class: 'zc' }));
+          T.draw(c, cur.bytes, { from: s0, max: K, pitch: P, height: 150 });
+          c.dataset.from = s0; c.dataset.pitch = P;
+          var ru = z.querySelector('canvas.zr') || z.appendChild(SW.el('canvas', { class: 'zr' }));
+          ru.width = c.width; ru.height = 18;
+          var g = ru.getContext('2d');
+          g.fillStyle = SW.cssVar('--text-dim') || '#888'; g.font = '11px ' + (SW.cssVar('--mono') || 'monospace'); g.textAlign = 'center';
+          for (var i = 0; i < K; i++) if ((s0 + i) % 10 === 0) { var x = P + i * P + P / 2; g.fillRect(x, 0, 1, 5); g.fillText((s0 + i).toLocaleString('en-GB'), x, 16); }
+          bar.firstChild.textContent = 'Close-up: frames ' + s0.toLocaleString('en-GB') + '–' + (s0 + K - 1).toLocaleString('en-GB');
+        }
+        bar.innerHTML = '<span class="hint"></span>';
+        [['◀', -1, 'Earlier frames'], ['▶', 1, 'Later frames']].forEach(function (d) {
+          bar.appendChild(SW.el('button', { class: 'btn ghost', title: d[2], onclick: function () { s0 = Math.max(0, Math.min(cur.bytes.length - K, s0 + d[1] * Math.floor(K / 2))); paint(); } }, d[0]));
+        });
+        bar.appendChild(SW.el('button', { class: 'btn ghost', title: 'Close', onclick: function () { z.remove(); } }, '✕'));
+        z.appendChild(bar);
+        paint();
+        anchor.insertAdjacentElement('afterend', z);
+      }
+      roll.addEventListener('mousemove', lensAt);
+      roll.addEventListener('mouseleave', function () { lens.style.display = 'none'; });
+      roll.addEventListener('click', function (e) {
+        var c = e.target.closest('canvas');
+        if (!c || c.closest('.tape-zoom')) return;
+        var f = frameAt(c, e);
+        if (f != null) closeUp(c.closest('.tape-row, .tape-one') || c, f);
+      });
+
       function firstShow(path) {
         cur.an = cur.source ? T.sourceAnatomy(cur.bytes) : T.anatomy(cur.bytes);
+        cur.chars = cur.source && root.SWFiodec && root.SWFiodec.frameChars ? root.SWFiodec.frameChars(cur.bytes) : null;
         fillShow();
         var goTo = SW.state.tapeGo;
         SW.state.tapeGo = null;
@@ -490,6 +564,10 @@
       SW.$('#tp-n', tb).addEventListener('change', custom);
       SW.$('#tp-show', tb).addEventListener('change', function (e) { show(e.target.value); });
       SW.$('#tp-layout', tb).addEventListener('change', function (e) { SW.store.set('tape.layout', e.target.value); draw(); });
+      var lb = SW.$('#tp-lens', tb);
+      lb.classList.toggle('on', lensOn);
+      lb.onclick = function () { lensOn = !lensOn; SW.store.set('tape.lens', lensOn); lb.classList.toggle('on', lensOn); lens.style.display = 'none'; };
+      pad.appendChild(lens);
       // Wrapped rows fit the window: draw them again when it changes width.
       var lastW = 0, relay = null;
       if (root.ResizeObserver) new ResizeObserver(function () {

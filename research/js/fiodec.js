@@ -55,7 +55,25 @@
              isSource: frames > 0 && bad / frames < 0.01 };
   }
 
-  var api = { decode: decode, parityOK: parityOK };
+  // What each frame of a source tape is, frame by frame (for the Tape view's
+  // magnifier): '' for blank tape, else the character, or a word for a code.
+  function frameChars(bytes) {
+    var uc = false, out = new Array(bytes.length);
+    for (var i = 0; i < bytes.length; i++) {
+      var x = bytes[i], c = x & 0o77;
+      if (x === 0) { out[i] = ''; continue; }
+      if (x & 0o100) { out[i] = 'control code'; continue; }
+      if (c === 0o72) { uc = false; out[i] = 'lower case'; continue; }
+      if (c === 0o74) { uc = true; out[i] = 'upper case'; continue; }
+      if (c === 0o13) { out[i] = 'stop code'; continue; }
+      if (c === 0o75) { out[i] = 'backspace'; continue; }
+      var ch = (uc ? UC : LC)[c];
+      out[i] = ch === undefined ? '' : ch === ' ' ? 'space' : ch === '\t' ? 'tab' : ch === '\n' ? 'carriage return' : '“' + ch + '”';
+    }
+    return out;
+  }
+
+  var api = { decode: decode, parityOK: parityOK, frameChars: frameChars };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SWFiodec = api;
 })(this);
