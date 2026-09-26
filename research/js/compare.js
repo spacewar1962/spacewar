@@ -438,64 +438,90 @@
   }
 
   // ---------- your own wiring ----------
-  // A line of descent of your own: a parent for any version, then the version to
-  // follow back from. Kept in this browser; the bench's own reading is untouched.
+  // A line of descent of your own: versions added one by one and put in order
+  // (drag, or the arrows). Kept in this browser; the bench's own reading is untouched.
+  // Stored as { ids: [...] }; an older { parents, tip } wiring is read as its chain.
   gst.custom = SW.store.get('gen.custom', null);
   // Versions hidden from the flow by clicking their name: the flow closes up
   // around them, comparing their neighbours directly.
   gst.hidden = SW.store.get('gen.hidden', []);
-  function wiredChain(parents, tip) {
-    var chain = [], cur = tip, seen = {}, loop = null;
-    while (cur) { if (seen[cur]) { loop = cur; break; } seen[cur] = 1; chain.unshift(cur); cur = parents[cur]; }
-    return { ids: chain, loop: loop };
+  function customIds() {
+    var c = gst.custom;
+    if (!c) return [];
+    if (c.ids) return c.ids;
+    var chain = [], cur = c.tip, seen = {};
+    while (cur && !seen[cur]) { seen[cur] = 1; chain.unshift(cur); cur = (c.parents || {})[cur]; }
+    return chain;
   }
   function shortName(id) { var v = V.byId(id); return v ? v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '') : id; }
   function wireDialog(done) {
     var vs = buildable().filter(function (v) { return v.id !== 'stars'; }).sort(function (a, b) { return a.sort - b.sort; });
-    var c = gst.custom || { parents: {}, tip: '' };
-    var parents = Object.assign({}, c.parents), tip = c.tip || vs[vs.length - 1].id;
+    var list = customIds().slice(), dragFrom = -1;
     var d = SW.el('dialog', { class: 'wire-dlg' });
-    function opts(sel, skip) {
-      return '<option value="">(none: a starting point)</option>' + vs.filter(function (v) { return v.id !== skip; }).map(function (v) {
-        return '<option value="' + SW.esc(v.id) + '"' + (v.id === sel ? ' selected' : '') + '>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</option>';
-      }).join('');
-    }
     d.innerHTML = '<form method="dialog" class="settings"><h2>Wire up your own line</h2>' +
-      '<p class="hint">Give any version the parent you think it was made from, then choose the version to follow back from. The flow then compares each version with the parent you gave it. Kept in this browser only; the bench’s own reading of the descent is unchanged.</p>' +
-      '<div class="row-btns"><button type="button" class="btn ghost" data-w="bench">Start from the bench’s reading</button> <button type="button" class="btn ghost" data-w="clear">Clear all</button></div>' +
-      '<div class="wire-list">' + vs.map(function (v) {
-        return '<div class="wire-row"><span><span class="mono">' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</span> <span class="faint">' + SW.esc(v.date) + '</span></span>' +
-          '<span class="wire-from">made from <select data-p="' + SW.esc(v.id) + '">' + opts(parents[v.id] || '', v.id) + '</select></span></div>';
-      }).join('') + '</div>' +
-      '<label>Follow the line back from <select id="wr-tip">' + opts(tip, null).replace('<option value="">(none: a starting point)</option>', '') + '</select></label>' +
+      '<p class="hint">Add versions and put them in the order you think they descend, earliest first. Drag to reorder (or use the arrows). The flow then compares each version with the one above it. Kept in this browser only; the bench’s own reading of the descent is unchanged.</p>' +
+      '<div class="wire-add"><select id="wr-pick"></select> <button type="button" class="btn" id="wr-add">+ Add</button> <button type="button" class="btn ghost" id="wr-clear">Clear</button></div>' +
+      '<ol class="wire-chain" id="wr-list"></ol>' +
       '<p class="wire-preview mono" id="wr-prev"></p>' +
       '<div class="row"><button value="cancel" class="btn ghost">Cancel</button><button type="button" class="btn" id="wr-save">Show this line</button></div></form>';
     document.body.appendChild(d);
     d.addEventListener('close', function () { d.remove(); });
-    var save = SW.$('#wr-save', d), prev = SW.$('#wr-prev', d);
-    function preview() {
-      var w = wiredChain(parents, tip);
-      prev.textContent = w.loop ? 'A loop: ' + shortName(w.loop) + ' is its own ancestor. Change one of its parents.'
-        : w.ids.length < 2 ? 'Only ' + shortName(tip) + ': give it a parent to make a line.'
-        : 'The line: ' + w.ids.map(shortName).join(' → ');
-      prev.classList.toggle('bad', !!w.loop || w.ids.length < 2);
-      save.disabled = !!w.loop || w.ids.length < 2;
+    var ol = SW.$('#wr-list', d), pick = SW.$('#wr-pick', d), save = SW.$('#wr-save', d), prev = SW.$('#wr-prev', d);
+    function label(id) { var v = V.byId(id); return v ? v.label.replace(/^Spacewar! /, '') : id; }
+    function draw() {
+      var left = vs.filter(function (v) { return list.indexOf(v.id) < 0; });
+      pick.innerHTML = left.length ? left.map(function (v) { return '<option value="' + SW.esc(v.id) + '">' + SW.esc(v.label.replace(/^Spacewar! /, '') + ' · ' + v.date) + '</option>'; }).join('')
+        : '<option value="">(every version is in the line)</option>';
+      SW.$('#wr-add', d).disabled = !left.length;
+      ol.innerHTML = list.length ? list.map(function (id, i) {
+        var v = V.byId(id);
+        return '<li draggable="true" data-i="' + i + '"><span class="wire-grip" aria-hidden="true">⋮⋮</span><span class="wire-name"><span class="mono">' + SW.esc(label(id)) + '</span> <span class="faint">' + SW.esc(v ? v.date : '') + '</span></span>' +
+          '<span class="wire-acts"><button type="button" class="icon-btn" data-m="up" title="Move up"' + (i ? '' : ' disabled') + '>↑</button>' +
+          '<button type="button" class="icon-btn" data-m="down" title="Move down"' + (i < list.length - 1 ? '' : ' disabled') + '>↓</button>' +
+          '<button type="button" class="icon-btn" data-m="del" title="Remove">✕</button></span></li>';
+      }).join('') : '<li class="wire-empty hint">No versions yet: choose one above and press + Add.</li>';
+      prev.textContent = list.length < 2 ? 'Add at least two versions to make a line.' : 'The line: ' + list.map(shortName).join(' → ');
+      prev.classList.toggle('bad', list.length < 2);
+      save.disabled = list.length < 2;
     }
-    d.addEventListener('change', function (e) {
-      if (e.target.dataset.p) { if (e.target.value) parents[e.target.dataset.p] = e.target.value; else delete parents[e.target.dataset.p]; }
-      if (e.target.id === 'wr-tip') tip = e.target.value;
-      preview();
-    });
-    d.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-w]');
+    SW.$('#wr-add', d).onclick = function () { if (pick.value) { list.push(pick.value); draw(); } };
+    SW.$('#wr-clear', d).onclick = function () { list = []; draw(); };
+    ol.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-m]');
       if (!b) return;
-      parents = {};
-      if (b.dataset.w === 'bench') V.VERSIONS.forEach(function (v) { var p = v.witnessOf ? V.byId(v.witnessOf).parent : v.parent; if (p) parents[v.id] = p; });
-      SW.$$('select[data-p]', d).forEach(function (s) { s.value = parents[s.dataset.p] || ''; });
-      preview();
+      var i = +b.closest('li').dataset.i, m = b.dataset.m;
+      if (m === 'del') list.splice(i, 1);
+      else { var j = m === 'up' ? i - 1 : i + 1; var x = list[i]; list[i] = list[j]; list[j] = x; }
+      draw();
     });
+    // Drag and drop: drop onto a row to put the dragged version in its place.
+    ol.addEventListener('dragstart', function (e) {
+      var li = e.target.closest('li[data-i]');
+      if (!li) return;
+      dragFrom = +li.dataset.i;
+      li.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', String(dragFrom));
+    });
+    ol.addEventListener('dragover', function (e) {
+      var li = e.target.closest('li[data-i]');
+      if (!li || dragFrom < 0) return;
+      e.preventDefault();
+      SW.$$('li.drop', ol).forEach(function (x) { x.classList.remove('drop'); });
+      li.classList.add('drop');
+    });
+    ol.addEventListener('drop', function (e) {
+      var li = e.target.closest('li[data-i]');
+      if (!li || dragFrom < 0) return;
+      e.preventDefault();
+      var to = +li.dataset.i, x = list.splice(dragFrom, 1)[0];
+      list.splice(to, 0, x);
+      dragFrom = -1;
+      draw();
+    });
+    ol.addEventListener('dragend', function () { dragFrom = -1; SW.$$('li.dragging, li.drop', ol).forEach(function (x) { x.classList.remove('dragging', 'drop'); }); });
     save.onclick = function () {
-      gst.custom = { parents: parents, tip: tip };
+      gst.custom = { ids: list.slice() };
       SW.store.set('gen.custom', gst.custom);
       gst.line = 'custom';
       SW.store.set('gen.line', 'custom');
@@ -503,7 +529,7 @@
       done();
     };
     d.showModal();
-    preview();
+    draw();
   }
 
   function renderGen(cur) {
@@ -515,7 +541,7 @@
       '<label class="check" id="gn-line-l" title="Which line of descent to follow. After 4.0 the program forks into ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8); the CHM builds and 2015 descend from dfw 4.1. Each step compares a version with its parent. &#39;Chosen versions&#39; compares the versions you tick in date order, which mixes the forks.">Line <select id="gn-line">' +
       V.LINES.map(function (l) { return '<option value="' + l.id + '"' + (gst.line === l.id ? ' selected' : '') + '>' + SW.esc(l.label) + '</option>'; }).join('') +
       '<option value="chosen"' + (gst.line === 'chosen' ? ' selected' : '') + '>Chosen versions, by date (mixes the forks)</option>' +
-      '<option value="custom"' + (gst.line === 'custom' ? ' selected' : '') + '>' + (gst.custom ? 'Your own line (' + SW.esc(shortName(gst.custom.tip)) + ')' : 'Wire up your own…') + '</option></select></label>' +
+      '<option value="custom"' + (gst.line === 'custom' ? ' selected' : '') + '>' + (customIds().length ? 'Your own line (' + SW.esc(customIds().map(shortName).join(' → ')) + ')' : 'Wire up your own…') + '</option></select></label>' +
       (gst.line === 'custom' ? '<button class="btn" id="gn-wire" title="Change the parents you have given, or the version followed">✎ Edit wiring</button>' : '') +
       '<label class="check" title="The size of the pieces traced from version to version: section (large blocks under a header or tape title), routine (from one label after a break to the next), or line">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
       '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied</label><span id="gn-pal"></span>' +
@@ -564,7 +590,7 @@
     tb.addEventListener('change', function (e) {
       if (e.target.dataset.id) return;   // a version box: applied when the menu closes
       if (e.target.id === 'gn-gran') gst.gran = e.target.value;
-      if (e.target.id === 'gn-line' && e.target.value === 'custom' && !gst.custom) {
+      if (e.target.id === 'gn-line' && e.target.value === 'custom' && !customIds().length) {
         e.target.value = gst.line;
         wireDialog(function () { renderGen(cur); });
         return;
@@ -576,7 +602,7 @@
     // The versions to trace: the chosen line (each a chain of parents), or the ticked
     // versions; the lineage of the open version follows its own ancestors.
     var line = V.LINES.filter(function (l) { return l.id === gst.line; })[0];
-    var ids = line ? line.ids : gst.line === 'custom' && gst.custom ? wiredChain(gst.custom.parents, gst.custom.tip).ids : gst.set;
+    var ids = line ? line.ids : gst.line === 'custom' && customIds().length ? customIds() : gst.set;
     if (gst.show === 'lineage') {
       var anc = V.ancestry(cur.v.id);
       ids = anc.length > 1 ? anc : (gst.set.indexOf(cur.v.id) < 0 ? gst.set.concat([cur.v.id]) : gst.set);

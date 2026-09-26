@@ -547,14 +547,23 @@ body.drawer-open .notes-tab { display: none; }
 .flow-bar .legend { font-size: 11px; gap: 8px; }
 .pal-pick select { max-width: 11.5em; }
 
-/* Wire up your own line of descent (compare.js wireDialog). */
-dialog.wire-dlg { width: min(720px, 94vw); }
-.wire-dlg .wire-list { max-height: 48vh; overflow: auto; display: grid; gap: 3px; border: 1px solid var(--line-soft); border-radius: 4px; padding: 6px 8px; }
-.wire-dlg .wire-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 2px 12px; font-size: 13px; padding: 2px 0; border-bottom: 1px solid var(--line-soft); }
-.wire-dlg .wire-from { display: block; color: var(--text-dim); white-space: nowrap; }
-.wire-dlg .wire-from select { margin-left: 6px; max-width: 58vw; }
+/* Wire up your own line of descent (compare.js wireDialog): a list built by adding and dragging. */
+dialog.wire-dlg { width: min(560px, 94vw); }
+.wire-dlg .wire-add { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.wire-dlg .wire-add select { flex: 1; min-width: 12em; background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 5px 6px; color: var(--text); }
+.wire-dlg .wire-chain { list-style: none; counter-reset: wire; margin: 4px 0 0; padding: 0; max-height: 46vh; overflow: auto; display: grid; gap: 4px; }
+.wire-dlg .wire-chain li { counter-increment: wire; display: flex; align-items: center; gap: 8px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface-2); cursor: grab; font-size: 13px; }
+.wire-dlg .wire-chain li::before { content: counter(wire); min-width: 1.4em; color: var(--text-faint); font-size: 11px; text-align: right; }
+.wire-dlg .wire-chain li.wire-empty { counter-increment: none; cursor: default; border-style: dashed; background: none; justify-content: center; }
+.wire-dlg .wire-chain li.wire-empty::before { content: none; }
+.wire-dlg .wire-chain li.dragging { opacity: 0.4; }
+.wire-dlg .wire-chain li.drop { border-color: var(--beam); box-shadow: 0 -2px 0 var(--beam); }
+.wire-dlg .wire-grip { color: var(--text-faint); letter-spacing: -2px; }
+.wire-dlg .wire-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.wire-dlg .wire-acts { display: flex; gap: 2px; }
+.wire-dlg .wire-acts .icon-btn { padding: 0 6px; }
 .wire-dlg .wire-preview { margin: 4px 0 0; font-size: 12px; color: var(--beam); }
-.wire-dlg .wire-preview.bad { color: var(--red); }
+.wire-dlg .wire-preview.bad { color: var(--text-dim); }
 
 /* Genealogy flow: click a pinned version name to hide that version; chips bring it back. */
 .svgbox.flow .flow-head text.g-pin { cursor: pointer; }
