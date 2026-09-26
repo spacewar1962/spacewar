@@ -617,3 +617,9 @@ dialog.wire-dlg { width: min(560px, 94vw); }
 .about-meta td { padding: 6px 8px; border-top: 1px solid var(--line-soft); vertical-align: top; line-height: 1.45; }
 .about-meta td:first-child { color: var(--text-dim); white-space: nowrap; width: 7em; }
 .about-cite { font-family: var(--serif, Georgia, serif); }
+
+/* The note dialog refuses an outside click while it holds text: a shake and a line saying why */
+.keep-hint { margin: -4px 0 8px; font-size: 12.5px; color: var(--amber); }
+dialog.nudge { animation: nudge 0.35s; }
+@keyframes nudge { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+@media (prefers-reduced-motion: reduce) { dialog.nudge { animation: none; outline: 2px solid var(--amber); } }

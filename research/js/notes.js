@@ -762,6 +762,7 @@
         (N.configured() ? ' · shared with the group' : ' · kept as a draft (no group set)')
       : '<span style="color:var(--red)">Set your initials first (⚙).</span>';
     dlg.returnValue = '';
+    SW.$('.keep-hint', dlg).hidden = true;
     dlg.showModal();
     SW.$('#note-text').focus();
     dlg.onclose = function () {

@@ -13,7 +13,7 @@
        below to the day of the release; the About box shows both. -->
   <meta name="bench-date" content="2026-09-26">
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css?v=1.0.1">
+  <link rel="stylesheet" href="css/research.css?v=1.0.2">
 </head>
 <body>
   <header class="bar">
@@ -108,9 +108,10 @@
     </form>
   </dialog>
 
-  <dialog id="dlg-note">
+  <dialog id="dlg-note" data-keep>
     <form method="dialog" class="settings" id="note-form">
       <h2 id="note-title">Annotate</h2>
+      <p class="keep-hint" hidden>Unsaved note. Save it, or Cancel to discard it.</p>
       <p class="hint" id="note-anchor"></p>
       <textarea id="note-text" rows="7" placeholder="Your note. Markdown is fine."></textarea>
       <label>Tags <input id="note-tags" placeholder="e.g. gravity, labour, provenance" autocomplete="off"></label>
@@ -146,25 +147,25 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js?v=1.0.1"></script>
-  <script src="js/pdp1cpu.js?v=1.0.1"></script>
-  <script src="js/fiodec.js?v=1.0.1"></script>
-  <script src="js/versions.js?v=1.0.1"></script>
-  <script src="js/export.js?v=1.0.1"></script>
-  <script src="js/genealogy.js?v=1.0.1"></script>
-  <script src="js/core.js?v=1.0.1"></script>
-  <script src="js/notes.js?v=1.0.1"></script>
-  <script src="js/tray.js?v=1.0.1"></script>
-  <script src="js/figures.js?v=1.0.1"></script>
-  <script src="js/read.js?v=1.0.1"></script>
-  <script src="js/run.js?v=1.0.1"></script>
-  <script src="js/analyse.js?v=1.0.1"></script>
-  <script src="js/compare.js?v=1.0.1"></script>
-  <script src="js/stemma.js?v=1.0.1"></script>
-  <script src="js/tape.js?v=1.0.1"></script>
-  <script src="js/about.js?v=1.0.1"></script>
-  <script src="js/edition.js?v=1.0.1"></script>
-  <script src="js/findings.js?v=1.0.1"></script>
-  <script src="js/main.js?v=1.0.1"></script>
+  <script src="js/pdp1asm.js?v=1.0.2"></script>
+  <script src="js/pdp1cpu.js?v=1.0.2"></script>
+  <script src="js/fiodec.js?v=1.0.2"></script>
+  <script src="js/versions.js?v=1.0.2"></script>
+  <script src="js/export.js?v=1.0.2"></script>
+  <script src="js/genealogy.js?v=1.0.2"></script>
+  <script src="js/core.js?v=1.0.2"></script>
+  <script src="js/notes.js?v=1.0.2"></script>
+  <script src="js/tray.js?v=1.0.2"></script>
+  <script src="js/figures.js?v=1.0.2"></script>
+  <script src="js/read.js?v=1.0.2"></script>
+  <script src="js/run.js?v=1.0.2"></script>
+  <script src="js/analyse.js?v=1.0.2"></script>
+  <script src="js/compare.js?v=1.0.2"></script>
+  <script src="js/stemma.js?v=1.0.2"></script>
+  <script src="js/tape.js?v=1.0.2"></script>
+  <script src="js/about.js?v=1.0.2"></script>
+  <script src="js/edition.js?v=1.0.2"></script>
+  <script src="js/findings.js?v=1.0.2"></script>
+  <script src="js/main.js?v=1.0.2"></script>
 </body>
 </html>

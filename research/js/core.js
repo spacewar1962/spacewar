@@ -322,9 +322,20 @@
   document.addEventListener('mousedown', function (e) {
     downOnBackdrop = e.target.tagName === 'DIALOG' && e.target.open && outside(e.target, e) ? e.target : null;
   });
+  // A dialog marked data-keep (the note) stays open while it holds text: the
+  // click shakes it and shows its .keep-hint instead.
   document.addEventListener('click', function (e) {
     var d = e.target;
-    if (d === downOnBackdrop && d.open && outside(d, e)) d.close();
+    if (d === downOnBackdrop && d.open && outside(d, e)) {
+      var held = d.hasAttribute('data-keep') &&
+        SW.$$('textarea, input:not([type]), input[type="text"]', d).some(function (x) { return x.value.trim(); });
+      if (!held) d.close();
+      else {
+        d.classList.remove('nudge'); void d.offsetWidth; d.classList.add('nudge');
+        var k = SW.$('.keep-hint', d); if (k) k.hidden = false;
+        var f = SW.$('textarea', d); if (f) f.focus();
+      }
+    }
     downOnBackdrop = null;
   });
 
