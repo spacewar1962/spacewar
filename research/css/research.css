@@ -114,7 +114,7 @@ code, .mono { font-family: var(--mono); }
 }
 :root[data-theme="paper"] .pick select { background: rgba(255, 255, 255, 0.55); color: #0d1a20; border-color: rgba(0,0,0,0.2); }
 .pick select option { color: #111; background: #fff; }
-.tape-strip { flex: 1 1 auto; min-width: 40px; height: 30px; overflow: hidden; border-radius: 2px; opacity: 0.95; }
+.tape-strip { flex: 1 1 0; min-width: 0; height: 30px; overflow: hidden; border-radius: 2px; opacity: 0.95; }
 .tape-strip canvas { display: block; height: 30px; }
 .bar-right { display: flex; align-items: center; gap: 8px; flex: none; }
 .status { font-family: var(--mono); font-size: 12px; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30vw; cursor: help; }
@@ -602,9 +602,6 @@ dialog.wire-dlg { width: min(560px, 94vw); }
   .brand-name b, .bench-ver, .pick > span { display: none; }
   .bar { gap: 10px; }
   .bar-right { gap: 2px; }
-}
-@media (max-width: 1000px) and (min-width: 861px) {
-  .tape-strip { display: none; }
 }
 /* the tab row stops where the side panel begins, as the page does */
 @media (min-width: 861px) {
