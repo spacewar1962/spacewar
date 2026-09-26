@@ -266,8 +266,23 @@
   }
 
   function paneSource(el) {
-    var s = build.srcOf(cpu.pc);
-    if (!s) { el.innerHTML = '<p class="pad hint">PC ' + SW.oct(cpu.pc, 4) + ' has no source line (outside the assembled program).</p>'; return; }
+    var s = build.srcOf(cpu.pc), note = '';
+    // Code the program wrote into core as it ran (Spacewar! compiles its ship
+    // outlines into instructions) has no source line: show the source of the
+    // instruction that wrote the word instead, so the listing stays in view.
+    if (!s) {
+      var wpc = cpu.lastWriter ? cpu.lastWriter[cpu.pc] : -1, ws = wpc >= 0 ? build.srcOf(wpc) : null, who = wpc >= 0 && build.symAt(wpc);
+      // the routine that wrote it, by the nearest label (at or before) whose line carries a comment
+      var said = '';
+      for (var a = wpc; wpc >= 0 && a >= Math.max(0, wpc - 64) && !said; a--) {
+        if (!(a in build.labelAt)) continue;
+        var ls = build.srcOf(a), L = ls && build.lines[ls.p][ls.n - 1], m = L && /(^|\s)\/\s*(.+)$/.exec(L.raw);
+        if (m) said = build.labelAt[a] + ', “' + m[2].trim() + '”';
+      }
+      note = '<p class="pad hint run-gen">PC ' + SW.oct(cpu.pc, 4) + ' is ' + (wpc >= 0 ? 'in code the program wrote into core as it ran, put there by the instruction at ' + SW.oct(wpc, 4) + (who ? ' (' + SW.esc(who) + ')' : '') + (said ? ', in ' + SW.esc(said) : '') + '. It has no source line; shown is the source of the instruction that wrote it.' : 'outside the assembled program and has no source line.') + '</p>';
+      if (!ws) { el.innerHTML = note; return; }
+      s = ws;
+    }
     var lines = build.lines[s.p], from = Math.max(0, s.n - 18), to = Math.min(lines.length, s.n + 22);
     var h = '<div class="listing" style="padding-top:6px">';
     for (var i = from; i < to; i++) {
@@ -278,7 +293,7 @@
         '<span class="n" title="Toggle breakpoint">' + L.n + '</span><span class="a">' + (ws[0] ? SW.oct(ws[0].loc, 4) : '') +
         '</span><span class="w">' + (ex ? '×' + ex : '') + '</span><span class="t">' + SW.esc(L.raw) + '</span><span></span></div>';
     }
-    el.innerHTML = h + '</div><p class="pad hint">Click a line number to set or clear a breakpoint. Use “Run to here” in the Read view to run to any line.</p>';
+    el.innerHTML = note + h + '</div><p class="pad hint">Click a line number to set or clear a breakpoint. Use “Run to here” in the Read view to run to any line.</p>';
     el.onclick = function (e) {
       var row = e.target.closest('.ln');
       if (!row || !row.dataset.a) return;
