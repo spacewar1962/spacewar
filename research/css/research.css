@@ -797,3 +797,13 @@ dialog.nudge { animation: nudge 0.35s; }
 .tape-zoom canvas.zr { box-shadow: none; }
 .tape-zoom-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .tape-zoom-bar .hint { margin-right: auto; }
+
+/* Load tape: the PDP-1 reader and console, running */
+dialog.reader-dlg { width: min(940px, 96vw); max-height: 96vh; overflow: auto; padding: 12px 16px 14px; }
+.reader-dlg .rd-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.reader-dlg .rd-head h2 { margin: 0; font-size: 16px; }
+.reader-dlg canvas.rd-machine { display: block; width: 100%; aspect-ratio: 900 / 620; border-radius: 6px; }
+.reader-dlg .rd-print { margin: 8px 0 0; padding: 8px 10px; background: #f6f1e2; color: #222; border-radius: 4px; font-size: 12px; min-height: 7.5em; white-space: pre-wrap; }
+.reader-dlg .rd-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
+.reader-dlg .rd-status { margin: 8px 0 0; min-height: 1.5em; }
+.reader-dlg .rd-note { margin: 4px 0 0; font-size: 12px; }

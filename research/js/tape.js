@@ -187,9 +187,16 @@
     for (;;) {
       var sw = getw();
       if (!sw) break;
-      if ((sw.w & 0o760000) === JMP) { out.jmp = { to: sw.w & 0o7777, f0: sw.f0, f1: sw.f1 }; segs.push({ kind: 'jmp', f0: sw.f0, f1: sw.f1, label: 'jmp ' + SW.oct(sw.w & 0o7777, 4) }); break; }
+      if ((sw.w & 0o760000) === JMP) {
+        // a jmp back to the loader's start: the loader runs again and reads on (the dfw tape)
+        if (rimJ && (sw.w & 0o7777) === (rimJ.w & 0o7777)) { segs.push({ kind: 'jmp', f0: sw.f0, f1: sw.f1, label: 'jmp ' + SW.oct(sw.w & 0o7777, 4) + ', back into the loader, which reads on' }); out.chained = (out.chained || 0) + 1; continue; }
+        out.jmp = { to: sw.w & 0o7777, f0: sw.f0, f1: sw.f1 }; segs.push({ kind: 'jmp', f0: sw.f0, f1: sw.f1, label: 'jmp ' + SW.oct(sw.w & 0o7777, 4) }); break;
+      }
       var ew = getw();
       if (!ew) break;
+      // blank tape (and a title) between a chained jmp and the next block
+      var prevEnd = segs[segs.length - 1].f1;
+      if (out.chained && sw.f0 > prevEnd + 1) segs.push({ kind: 'leader', f0: prevEnd + 1, f1: sw.f0 - 1, label: 'blank tape' + (titles.some(function (t) { return t.from > prevEnd && t.to < sw.f0; }) ? ' and title' : '') });
       var a0 = sw.w & 0o7777, a1 = ew.w & 0o7777, sum = sw.w + ew.w, n = 0, last = ew;
       for (var a = a0; a < a1; a++) { var d = getw(); if (!d) break; sum += d.w; n++; last = d; }
       var ck = getw();
@@ -535,6 +542,10 @@
           showAnatomy();
         }).catch(function (e) { info.textContent = e.message; });
       }
+      tb.appendChild(SW.el('button', { class: 'btn', title: 'Run this tape through the PDP-1’s photoelectric reader: Read-In mode, then the tape’s own loader on the emulator, with the console lights', onclick: function () {
+        if (!cur.bytes.length || !SW.reader) return;
+        SW.reader.open(cur.bytes, { name: cur.name, source: cur.source, an: cur.an, buildMem: b.asm.memory, label: b.v.label.replace(/^Spacewar! /, ''), onRun: function () { SW.setTab('run'); } });
+      } }, '▶ Load tape'));
       tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
         var from = +SW.$('#tp-from', tb).value, n = +SW.$('#tp-n', tb).value;
         root.SWExport.download(cur.name + '.svg', T.svg(cur.bytes, from, Math.min(n, cur.bytes.length - from), 10, 100), 'image/svg+xml');
