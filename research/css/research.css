@@ -617,3 +617,29 @@ dialog.wire-dlg { width: min(560px, 94vw); }
 .about-meta td { padding: 6px 8px; border-top: 1px solid var(--line-soft); vertical-align: top; line-height: 1.45; }
 .about-meta td:first-child { color: var(--text-dim); white-space: nowrap; width: 7em; }
 .about-cite { font-family: var(--serif, Georgia, serif); }
+
+/* ---------- Read: notes in the margin ---------- */
+.rd-body { position: relative; }
+.rd-body .note-margin { display: none; }
+@media (min-width: 900px) {
+  .rd-body.with-margin { display: grid; grid-template-columns: minmax(0, 1fr) clamp(240px, 26vw, 340px); }
+  .rd-body.with-margin .listing { min-width: 0; overflow-x: auto; }
+  .rd-body.with-margin .note-margin { display: block; position: relative; border-left: 1px solid var(--line-soft); background: var(--bg-2); }
+  .rd-body.with-margin .ln .mk, .rd-body.with-margin .lncols .mk { visibility: hidden; }   /* the cards say who; the column stays for alignment */
+}
+.mcard { position: absolute; left: 8px; right: 8px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--amber);
+  border-radius: 5px; padding: 6px 8px; font-size: 12.5px; box-shadow: 0 1px 4px rgba(0,0,0,0.25); transition: top 0.15s ease; }
+.mcard.draft { border-left-color: var(--text-faint); }
+.mcard.pushed::before { content: ''; position: absolute; left: -9px; top: 10px; width: 8px; border-top: 1px dashed var(--line); }
+.mcard.flash { box-shadow: 0 0 0 2px var(--amber); }
+.mcard .mc-where { font: 10.5px var(--mono); color: var(--text-faint); cursor: pointer; float: right; }
+.mcard .mc-where:hover { color: var(--beam); }
+.mcard .note { margin: 0; padding: 0; border: 0; background: none; }
+.mcard .note .body { white-space: pre-wrap; line-height: 1.45; }
+.mcard .note .acts { opacity: 0.55; }
+.mcard:hover .note .acts { opacity: 1; }
+.mcard .mc-more { margin-top: 4px; background: none; border: 1px solid var(--line); border-radius: 10px; color: var(--beam); font-size: 11px; padding: 1px 8px; cursor: pointer; }
+.mcard .mc-replies { margin-top: 6px; padding-left: 8px; border-left: 1px solid var(--line-soft); }
+.mcard .mc-replies .note { margin-top: 6px; }
+.ln.mlit { background: rgba(255, 206, 122, 0.14); }
+.live-dot { color: var(--green); font-size: 11px; }
