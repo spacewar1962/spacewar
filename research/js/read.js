@@ -734,7 +734,8 @@
       });
       fillBy();
       applyFilter();
-      if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey) showNotesFor(openNotesKey, true);
+      // keep an open panel current; a closed one stays closed (the refresh runs every 20 seconds)
+      if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey && document.body.classList.contains('drawer-open')) showNotesFor(openNotesKey, true);
     });
   }
 
