@@ -23,7 +23,7 @@
   'use strict';
   var SW = root.SW;
   var DIO = 0o320000, JMP = 0o600000, M = 0o777777;
-  var W = 900, H = 620, HX = 450, TY = 176, PITCH = 5;
+  var W = 900, H = 620, CW = 400, HX = 450, TY = 176, PITCH = 5;
   var RATE = 400;   // lines a second (Manual, 1961, p. 22)
 
   // A reader: the tape and how far it has moved; words for binary reading.
@@ -67,32 +67,48 @@
     var an = o.an, N = bytes.length;
     var tx = o.source && root.SWFiodec ? textIndex(bytes) : null;
     var dlg = SW.el('dialog', { class: 'reader-dlg' });
-    dlg.innerHTML = '<div class="rd-head"><h2>Loading ' + SW.esc(o.name || 'the tape') + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
-      '<canvas class="rd-machine"></canvas>' +
+    dlg.innerHTML = '<div class="rd-head"><h2>Tape Load Simulator: ' + SW.esc(o.name || 'the tape') + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
+      '<div class="rd-body"><canvas class="rd-machine"></canvas><div class="rd-coreside"><canvas class="rd-core"></canvas><p class="hint rd-corecap">Hover over core to see a word.</p></div></div>' +
       (tx ? '<pre class="rd-print mono"></pre>' : '') +
-      '<div class="rd-ctl"><button class="btn" data-a="play">❚❚ Pause</button><button class="btn ghost" data-a="restart" title="Back to the start of the tape">↺</button>' +
+      '<div class="rd-ctl"><button class="btn" data-a="play">▶ Play</button><button class="btn ghost" data-a="restart" title="Back to the start of the tape">↺</button>' +
       '<label class="check">Speed <select data-a="speed"><option value="1" selected>400 lines a second, as the PDP-1 read</option><option value="4">× 4</option><option value="16">× 16</option><option value="64">× 64</option></select></label>' +
       '<button class="btn ghost" data-a="skip" title="Read the rest of the tape at once">Skip to end ⏭</button><span class="rd-run"></span></div>' +
       '<p class="rd-status hint"></p>' +
       '<p class="hint rd-note">' + (tx ? 'A source tape is read by the assembler, which the bench does not emulate: the reader runs and the text is printed as it is read; the console stays dark.'
         : 'Read-In mode loads the loader punched at the head of the tape; the loader then runs on the bench’s PDP-1 emulator, taking each word as the reader delivers it and checking each block against its checksum. Reader speed and console lights as in DEC’s PDP-1 Manual (1961).') + '</p>';
     document.body.appendChild(dlg);
-    var cv = SW.$('canvas', dlg), g = cv.getContext('2d'), dpr = Math.min(2, root.devicePixelRatio || 1);
+    var cv = SW.$('canvas.rd-machine', dlg), g = cv.getContext('2d'), dpr = Math.min(2, root.devicePixelRatio || 1);
     cv.width = W * dpr; cv.height = H * dpr; g.scale(dpr, dpr);
+    var kv = SW.$('canvas.rd-core', dlg), k = kv.getContext('2d');
+    kv.width = CW * dpr; kv.height = H * dpr; k.scale(dpr, dpr);
+    var corecap = SW.$('.rd-corecap', dlg);
     var status = SW.$('.rd-status', dlg), print = SW.$('.rd-print', dlg), runBox = SW.$('.rd-run', dlg);
     var pos, playing, speed = 1, last = null, raf = 0, shown;
     var cpu, rd, phase, lamps, lo, hi, outcome, chains;
+    // core as it fills: 0 empty, 1 loaded, 2 loaded over an earlier word; when (frame) each was last written
+    var core = new Uint8Array(4096), when = new Float64Array(4096), deposits = 0;
+    function deposit(a, before, v) {
+      var f = rd ? rd.p - 1 : pos;                // the frame the word's last line was read from
+      if (core[a] && before !== v && f - when[a] > 30) core[a] = 2;   // (a block's first word briefly holds its dio: not counted)
+      else if (!core[a]) { core[a] = 1; deposits++; }
+      when[a] = f;
+    }
 
     function reset() {
-      pos = 0; playing = true; shown = -1; outcome = null; chains = [];
+      pos = 0; playing = false; shown = -1; outcome = null; chains = [];
+      core.fill(0); when.fill(0); deposits = 0;
       rd = new Reader(bytes);
       cpu = tx ? null : new root.PDP1CPU.PDP1({});
-      if (cpu) cpu.mem.fill(0);
+      if (cpu) {
+        cpu.mem.fill(0);
+        var wr0 = cpu.wr;
+        cpu.wr = function (a, v) { var before = this.mem[a]; wr0.call(this, a, v); deposit(a, before, v & M); };
+      }
       phase = tx ? 'source' : 'readin';
       lamps = { pc: null, ir: null, ma: null, mb: null, ac: null, io: null, run: false, readin: !tx, iohalt: false };
       lo = 0o7777; hi = 0;
       runBox.innerHTML = '';
-      var pb = SW.$('[data-a="play"]', dlg); if (pb) pb.textContent = '❚❚ Pause';
+      var pb = SW.$('[data-a="play"]', dlg); if (pb) pb.textContent = '▶ Play';
     }
 
     // Move the machine on to where the tape now is.
@@ -105,19 +121,22 @@
           var a = rd.peek();
           if (!a) { outcome = { end: true, text: 'The tape ran out in Read-In mode.' }; return; }
           if (a.f > pos) return;                       // the reader has not got there yet
-          rd.p = a.next;
-          lamps.mb = a.w; lamps.io = a.w;
           if ((a.w & 0o760000) === JMP) {             // Read-In ends: start at Y
+            rd.p = a.next; lamps.mb = a.w; lamps.io = a.w;
             cpu.pc = a.w & 0o7777; phase = 'run';
             lamps.readin = false; lamps.run = true; lamps.pc = cpu.pc;
             continue;
           }
           if ((a.w & 0o760000) !== DIO) { outcome = { end: true, text: 'Read-In mode stopped: ' + SW.oct(a.w) + ' is neither dio nor jmp.' }; return; }
+          // the dio and its word go together: take neither until the word has been read
+          var at = rd.p; rd.p = a.next;
           var v = rd.peek();
+          rd.p = at;
           if (!v) { outcome = { end: true, text: 'The tape ran out in Read-In mode.' }; return; }
           if (v.f > pos) return;
           rd.p = v.next;
           var y = a.w & 0o7777;
+          deposit(y, cpu.mem[y], v.w);
           cpu.mem[y] = v.w; lo = Math.min(lo, y); hi = Math.max(hi, y);
           lamps.ma = y; lamps.mb = v.w; lamps.io = v.w;
           continue;
@@ -207,7 +226,7 @@
       for (var k = 0; k < 3; k++) { var a = ang + k * 2.094; g.beginPath(); g.moveTo(x + Math.cos(a) * r * 0.25, y + Math.sin(a) * r * 0.25); g.lineTo(x + Math.cos(a) * r * 0.8, y + Math.sin(a) * r * 0.8); g.stroke(); }
     }
     function draw() {
-      var f = Math.min(N - 1, Math.floor(pos)), moving = playing && pos < N && !outcome;
+      var f = Math.min(N - 1, Math.floor(pos)), moving = playing && pos < N && !(outcome && outcome.halted);
       g.fillStyle = '#d6d9d2'; g.fillRect(0, 0, W, H);
       g.fillStyle = '#c3c7bf'; g.fillRect(0, 96, W, 3); g.fillRect(0, 338, W, 3);
       // fold bins: the tape feeds from the right-hand bin and folds into the left
@@ -254,12 +273,41 @@
       lampRow(340, 400, 'MEMORY BUFFER', 18, L.mb);
       lampRow(340, 468, 'ACCUMULATOR', 18, L.ac);
       lampRow(340, 536, 'IN-OUT', 18, L.io);
-      [['RUN', L.run], ['READ IN', L.readin && moving], ['IN-OUT HALT', L.iohalt && moving]].forEach(function (l, i) {
+      [['RUN', L.run], ['READ IN', L.readin && moving && !outcome], ['IN-OUT HALT', L.iohalt && moving && !outcome]].forEach(function (l, i) {
         var y = 400 + i * 34;
         lamp(752, y, !!l[1]);
         g.fillStyle = '#e8eef3'; g.font = '10px Helvetica, Arial, sans-serif'; g.textAlign = 'left'; g.fillText(l[0], 766, y + 4);
       });
     }
+    // Core: 4,096 words, 64 to a row, 0000 at the top left; a row of eight is 1000 octal.
+    var CX = 52, CY = 44, CS = 5;
+    function drawCore() {
+      k.fillStyle = '#16202a'; k.fillRect(0, 0, CW, H);
+      k.fillStyle = '#e8eef3'; k.font = '11px Helvetica, Arial, sans-serif'; k.textAlign = 'left';
+      k.fillText('CORE MEMORY · 4,096 WORDS', CX, 22);
+      k.fillStyle = '#9fb1c1'; k.font = '10px ' + (SW.cssVar('--mono') || 'monospace'); k.textAlign = 'right';
+      for (var r = 0; r < 64; r += 8) k.fillText(SW.oct(r * 64, 4), CX - 6, CY + r * CS + 8);
+      var fresh = Math.max(40, 400 * speed * 0.25);
+      for (var a = 0; a < 4096; a++) {
+        var c = core[a], x = CX + (a & 63) * CS, y = CY + (a >> 6) * CS;
+        k.fillStyle = !c ? '#223140' : pos - when[a] < fresh ? '#ffd76a' : an && an.kind === 'blocks' && a >= lo && lo <= hi ? '#a58ad8' : c === 2 ? '#e07a5f' : '#6fb3d9';
+        k.fillRect(x, y, CS - 1, CS - 1);
+      }
+      var ly = CY + 64 * CS + 26;
+      [['#6fb3d9', 'loaded'], ['#ffd76a', 'just loaded'], ['#e07a5f', 'loaded over an earlier word'], ['#a58ad8', 'the loader and its working words'], ['#223140', 'empty']].forEach(function (l, i) {
+        k.fillStyle = l[0]; k.fillRect(CX, ly + i * 18 - 8, 9, 9);
+        k.fillStyle = '#c9d6e2'; k.font = '11px Helvetica, Arial, sans-serif'; k.textAlign = 'left'; k.fillText(l[1], CX + 16, ly + i * 18);
+      });
+      k.fillStyle = '#e8eef3'; k.font = '12px Helvetica, Arial, sans-serif';
+      k.fillText(cpu ? deposits.toLocaleString('en-GB') + ' words in core' : 'A source tape is not loaded into core', CX, ly + 5 * 18 + 10);
+    }
+    kv.addEventListener('mousemove', function (e) {
+      var r = kv.getBoundingClientRect(), sx = CW / r.width, x = (e.clientX - r.left) * sx - CX, y = (e.clientY - r.top) * sx - CY;
+      if (x < 0 || y < 0 || x >= 64 * CS || y >= 64 * CS || !cpu) { corecap.textContent = 'Hover over core to see a word.'; return; }
+      var a = (Math.floor(y / CS) << 6) | Math.floor(x / CS), w = cpu.mem[a];
+      corecap.textContent = SW.oct(a, 4) + ': ' + (core[a] ? SW.oct(w) + '  ' + root.PDP1CPU.disasm(w, o.symAt) + (o.symAt && o.symAt(a) ? '  (' + o.symAt(a) + ' in the build)' : '') + ' · written at frame ' + Math.round(when[a]).toLocaleString('en-GB') + (core[a] === 2 ? ', over an earlier word' : '') : 'empty');
+    });
+
     function update() {
       advance();
       var f = Math.min(N - 1, Math.floor(pos));
@@ -268,11 +316,11 @@
         print.textContent = tx.text.slice(0, tx.idx[f]).split(/\n/).slice(-6).join('\n').replace(/\f/g, '↡');
       }
       var sg = segAt(f);
-      status.textContent = outcome ? outcome.text :
+      status.textContent = outcome ? outcome.text + (pos < N && !outcome.halted ? ' The rest of the tape (' + Math.round(N - pos).toLocaleString('en-GB') + ' frames) runs out through the reader here; on the machine the reader stops once the loader stops asking for words.' : '') :
         'Frame ' + f.toLocaleString('en-GB') + ' of ' + N.toLocaleString('en-GB') + (sg ? ' · ' + sg.label : '') +
         (cpu ? ' · ' + (phase === 'readin' ? 'Read-In mode' : lamps.iohalt ? 'the loader waits for the reader' : 'the loader running') : '') +
         ' · ' + ((N - pos) / RATE).toFixed(1) + ' s of tape left at 400 lines a second';
-      if ((outcome || pos >= N) && playing) {
+      if ((pos >= N || (outcome && outcome.halted)) && !(outcome && outcome.checked) && (playing || pos >= N)) {
         if (!outcome) outcome = { end: true, text: tx ? 'The whole tape has been read: ' + tx.text.length.toLocaleString('en-GB') + ' characters of source.' : 'The tape has run through.' };
         if (!outcome.checked) {
           outcome.checked = true;
@@ -284,13 +332,14 @@
         status.textContent = outcome.text;
         playing = false;
         SW.$('[data-a="play"]', dlg).textContent = '▶ Play';
+        drawCore();
         if ((outcome.loaded || outcome.waiting) && outcome.same && o.onRun && !runBox.firstChild) runBox.appendChild(SW.el('button', { class: 'btn', title: 'Go to the Run view, where this version is run on the emulator', onclick: function () { close(); o.onRun(); } }, '▶ Run this version'));
       }
     }
     function tick(t) {
       if (last != null && playing) pos = Math.min(N, pos + (t - last) / 1000 * RATE * speed);
       last = t;
-      update(); draw();
+      update(); draw(); drawCore();
       raf = requestAnimationFrame(tick);
     }
     function close() { cancelAnimationFrame(raf); if (dlg.open) dlg.close(); dlg.remove(); }
@@ -301,17 +350,17 @@
       var a = b.dataset.a;
       if (a === 'close') close();
       else if (a === 'play') {
-        if (outcome || pos >= N) reset(); else playing = !playing;
+        if (outcome && outcome.checked) { reset(); playing = true; } else playing = !playing;
         b.textContent = playing ? '❚❚ Pause' : '▶ Play';
       } else if (a === 'restart') reset();
-      else if (a === 'skip' && !outcome) { playing = true; pos = N; }
+      else if (a === 'skip' && !(outcome && outcome.checked)) { playing = true; pos = N; }
     });
     SW.$('[data-a="speed"]', dlg).onchange = function (e) { speed = +e.target.value; };
     dlg.addEventListener('keydown', function (e) {
       if (e.key === ' ' && e.target.tagName !== 'SELECT') { e.preventDefault(); SW.$('[data-a="play"]', dlg).click(); }
     });
     // Move on by some seconds of reading and draw (for testing without animation frames).
-    dlg.advance = function (sec) { pos = Math.min(N, pos + sec * RATE * speed); update(); draw(); };
+    dlg.advance = function (sec) { pos = Math.min(N, pos + sec * RATE * speed); update(); draw(); drawCore(); };
     reset();
     dlg.showModal();
     raf = requestAnimationFrame(tick);
