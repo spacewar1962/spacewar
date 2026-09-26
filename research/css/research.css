@@ -638,14 +638,31 @@ dialog.nudge { animation: nudge 0.35s; }
 .mcard.draft { border-left-color: var(--text-faint); }
 .mcard.pushed::before { content: ''; position: absolute; left: -9px; top: 10px; width: 8px; border-top: 1px dashed var(--line); }
 .mcard.flash { box-shadow: 0 0 0 2px var(--amber); }
-.mcard .mc-where { font: 10.5px var(--mono); color: var(--text-faint); cursor: pointer; float: right; }
-.mcard .mc-where:hover { color: var(--beam); }
+.mcard .mc-where, .ithread .mc-where { font: 10.5px var(--mono); color: var(--text-faint); cursor: pointer; float: right; }
+.mcard .mc-where:hover, .ithread .mc-where:hover { color: var(--beam); }
 .mcard .note { margin: 0; padding: 0; border: 0; background: none; }
 .mcard .note .body { white-space: pre-wrap; line-height: 1.45; }
 .mcard .note .acts { opacity: 0.55; }
 .mcard:hover .note .acts { opacity: 1; }
-.mcard .mc-more { margin-top: 4px; background: none; border: 1px solid var(--line); border-radius: 10px; color: var(--beam); font-size: 11px; padding: 1px 8px; cursor: pointer; }
-.mcard .mc-replies { margin-top: 6px; padding-left: 8px; border-left: 1px solid var(--line-soft); }
-.mcard .mc-replies .note { margin-top: 6px; }
+.mcard .mc-more, .ithread .mc-more { margin-top: 4px; background: none; border: 1px solid var(--line); border-radius: 10px; color: var(--beam); font-size: 11px; padding: 1px 8px; cursor: pointer; }
+.mcard .mc-replies, .ithread .mc-replies { margin-top: 6px; padding-left: 8px; border-left: 1px solid var(--line-soft); }
+.mcard .mc-replies .note, .ithread .mc-replies .note { margin-top: 6px; }
 .ln.mlit { background: rgba(255, 206, 122, 0.14); }
 .live-dot { color: var(--green); font-size: 11px; }
+
+/* ---------- Read: notes inline (the default), under the last line each covers ---------- */
+.inote { margin: 3px 14px 8px calc(6px + 13.6em + 30px); white-space: normal; font: 13px/1.45 var(--sans); }
+.hide-words .inote { margin-left: calc(6px + 4.8em + 10px); }
+@media (max-width: 860px) { .inote { margin-left: calc(6px + 3.2em + 10px); } }
+.ithread { max-width: 78ch; background: var(--bg-2); border-left: 3px solid var(--amber); border-radius: 0 5px 5px 0; padding: 4px 10px 5px; margin: 0 0 4px; }
+.ithread.draft { border-left-color: var(--text-faint); }
+.ithread.flash { box-shadow: 0 0 0 2px var(--amber); }
+.ithread .note { margin: 0; }
+.ithread .note .body { font-size: 14px; }
+.ithread .note .acts { opacity: 0.55; }
+.ithread:hover .note .acts { opacity: 1; }
+.notes-menu { display: grid; gap: 2px; min-width: 15em; }
+.notes-menu button { background: none; border: 0; text-align: left; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+.notes-menu button:hover { background: var(--surface-2); }
+.notes-menu button.on { color: var(--beam); }
+.notes-menu hr { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 0; width: 100%; }

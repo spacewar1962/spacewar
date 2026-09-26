@@ -832,9 +832,15 @@
     if (body && body.dataset.panel === 'version' && body.dataset.vid === vid && document.body.classList.contains('drawer-open')) N.openPanel(vid);
   });
 
-  var tab = SW.el('button', { id: 'notes-tab', class: 'notes-tab', title: 'Notes on this version' }, '▴ Notes');
+  var tab = SW.el('button', { id: 'notes-tab', class: 'notes-tab', title: 'Notes on this version; on Read, also how they show there' }, '▴ Notes');
   document.body.appendChild(tab);
   tab.onclick = function () {
+    // On Read the button also chooses how notes show there (inline, cards, initials).
+    if (SW.state.tab === 'read' && SW.views.read && SW.views.read.notesMenu && SW.views.read.build) {
+      var r = tab.getBoundingClientRect();
+      SW.views.read.notesMenu(r.left, r.top - 4);
+      return;
+    }
     var body = SW.$('#drawer-body');
     var lastWasNotes = SW.$('#drawer-title').textContent === 'Notes' && body && body.innerHTML &&
       (body.dataset.notes || (body.dataset.panel === 'version' && body.dataset.vid === SW.state.v));

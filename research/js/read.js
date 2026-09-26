@@ -8,7 +8,10 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', margin: SW.store.get('read.margin', true) };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline') };
+  // notes: 'inline' (each thread under its lines, the default), 'margin' (cards
+  // beside the lines) or 'off' (initials at the line end); chosen from the ▴ Notes button.
+  function marginOn() { return opts.notes === 'margin'; }
 
   // ---------- the tapes a version is read from ----------
   // A version is assembled from its tapes read one after another as one
@@ -135,7 +138,6 @@
       '<details class="menu"><summary class="btn" title="What the listing shows">View ▾</summary><div class="menu-body">' +
       '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
       '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
-      '<label class="check" title="Show each note beside its line in a margin on the right, with its replies a click away, refreshed every 20 seconds so the group\'s work appears as it happens. Unticked: notes stay out of the way, shown as initials at the end of the line; click them to read in the side panel."><input type="checkbox" id="rd-margin"' + (opts.margin ? ' checked' : '') + '> Notes in the margin</label>' +
       '<label class="check" title="Hide every line that no note covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
       '<label class="check" title="Show only notes (and the lines they cover) in which these initials take part, as author or in a reply">Notes by <select id="rd-by"><option value="">anyone</option></select></label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
@@ -183,7 +185,7 @@
   function renderListing() {
     var b = build, info = tapeInfo(b), bar = SW.$('#rd-selbar', view);
     SW.$$('.rd-body', view).forEach(function (x) { x.remove(); });
-    var wrap = SW.el('div', { class: 'rd-body' + (opts.margin ? ' with-margin' : '') });
+    var wrap = SW.el('div', { class: 'rd-body' + (marginOn() ? ' with-margin' : '') });
     var box = SW.el('div', { class: 'listing' + (opts.words ? '' : ' hide-words') });
     var margin = SW.el('div', { class: 'note-margin', 'aria-label': 'Notes' });
     b.parts.forEach(function (part, pi) {
@@ -213,43 +215,85 @@
     wireMargin(margin);
     applyFilter();
     paintSel();
-    paintMargin();
+    // Cards placed while Read was hidden all measure 0: place them again when it shows.
+    if (ro) ro.disconnect();
+    if (root.ResizeObserver) {
+      ro = new ResizeObserver(function () {
+        if (!marginOn() || !wrap.getClientRects().length) return;
+        if (marginStale) { marginStale = false; paintMargin(); } else layoutMargin();
+      });
+      ro.observe(wrap);
+    }
   }
 
   // ---------- notes in the margin ----------
   // Each thread as a card beside the line it starts on; cards that would
   // overlap are pushed down. Replies open under a card with its + button.
-  var openCards = {}, marginTimer = null;
-  function paintMargin() {
-    var wrap = SW.$('.rd-body', view), margin = SW.$('.note-margin', view);
-    if (!wrap || !margin) return;
-    wrap.classList.toggle('with-margin', !!opts.margin);
-    if (!opts.margin) { margin.innerHTML = ''; return; }
-    // Keep what is being typed: a refresh waits while a reply or edit is open.
-    if (margin.querySelector('.reply-box, .edit-box')) return;
+  var openCards = {}, marginTimer = null, ro = null, marginStale = false;
+  // One thread: its first note, a + for its replies, the replies when open.
+  // The same block is an inline note or a margin card (cls).
+  function threadBlock(t, cls) {
+    var a = t.note.anchor, nrep = 0, open = !!openCards[t.note.id], h = '';
+    (function walk(rs) { rs.forEach(function (r) { nrep++; walk(r.replies); }); })(t.replies);
+    if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
+    return '<div class="' + cls + (open ? ' open' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
+      '<div class="mc-where" title="Select the lines">l. ' + a.n0 + (a.n1 !== a.n0 ? '–' + a.n1 : '') + '</div>' +
+      N.renderNote(t.note, false, t.reactions) +
+      (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
+      (open ? '<div class="mc-replies">' + h + '</div>' : '') + '</div>';
+  }
+  // The threads to show: anchored on a tape shown, on a line left by the notes filter.
+  function shownThreads() {
     var keep = filtering() ? keptLines() : null;
-    var ts = N.threads(notes).filter(function (t) {
+    return N.threads(notes).filter(function (t) {
       var a = t.note.anchor;
       if (!a || !showsTape(a.p)) return false;
       if (keep && !keep[a.p + ':' + a.n0]) return false;
       return !!SW.$('#L' + a.p + '-' + a.n0, view);
     });
+  }
+  function paintNotes() { paintInline(); paintMargin(); }
+
+  // ---------- notes inline ----------
+  // Each thread under the last line it covers, in the listing itself.
+  function paintInline() {
+    var box = SW.$('.listing', view);
+    if (!box) return;
+    // Keep what is being typed: a refresh waits while a reply or edit is open.
+    if (box.querySelector('.inote .reply-box, .inote .edit-box')) return;
+    SW.$$('.inote', box).forEach(function (x) { x.remove(); });
+    if (opts.notes !== 'inline') return;
+    var at = {}, order = [];
+    shownThreads().forEach(function (t) {
+      var a = t.note.anchor, row = SW.$('#L' + a.p + '-' + a.n1, view) || SW.$('#L' + a.p + '-' + a.n0, view);
+      if (!at[row.id]) { at[row.id] = { row: row, ts: [] }; order.push(row.id); }
+      at[row.id].ts.push(t);
+    });
+    order.forEach(function (id) {
+      var g = at[id], el = SW.el('div', { class: 'inote' }), after = g.row;
+      el.innerHTML = g.ts.map(function (t) { return threadBlock(t, 'ithread'); }).join('');
+      while (after.nextElementSibling && after.nextElementSibling.classList.contains('expansion')) after = after.nextElementSibling;
+      after.insertAdjacentElement('afterend', el);
+    });
+    N.wire(box, build.v.id, notes);
+  }
+
+  // ---------- notes in the margin ----------
+  function paintMargin() {
+    var wrap = SW.$('.rd-body', view), margin = SW.$('.note-margin', view);
+    if (!wrap || !margin) return;
+    wrap.classList.toggle('with-margin', marginOn());
+    if (!marginOn()) { margin.innerHTML = ''; return; }
+    if (!wrap.getClientRects().length) { marginStale = true; return; }
+    // Keep what is being typed: a refresh waits while a reply or edit is open.
+    if (margin.querySelector('.reply-box, .edit-box')) return;
+    var ts = shownThreads();
     var top0 = wrap.getBoundingClientRect().top;
     var items = ts.map(function (t) {
       var a = t.note.anchor, row = SW.$('#L' + a.p + '-' + a.n0, view);
       return { t: t, y: row.getBoundingClientRect().top - top0 };
     }).sort(function (x, y) { return x.y - y.y; });
-    margin.innerHTML = items.map(function (it) {
-      var t = it.t, a = t.note.anchor, nrep = 0;
-      (function walk(rs) { rs.forEach(function (r) { nrep++; walk(r.replies); }); })(t.replies);
-      var open = !!openCards[t.note.id], h = '';
-      if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
-      return '<div class="mcard' + (open ? ' open' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
-        '<div class="mc-where">l. ' + a.n0 + (a.n1 !== a.n0 ? '–' + a.n1 : '') + '</div>' +
-        N.renderNote(t.note, false, t.reactions) +
-        (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
-        (open ? '<div class="mc-replies">' + h + '</div>' : '') + '</div>';
-    }).join('');
+    margin.innerHTML = items.map(function (it) { return threadBlock(it.t, 'mcard'); }).join('');
     layoutMargin(items.map(function (it) { return it.y; }));
     N.wire(margin, build.v.id, notes);
   }
@@ -275,46 +319,73 @@
       if (r) r.classList.toggle('mlit', on);
     }
   }
+  // A click on a thread's + or its line reference (inline or card); true if handled.
+  function threadClick(e) {
+    var more = e.target.closest('[data-more]');
+    if (more) {
+      var c = more.closest('.mcard, .ithread');
+      openCards[c.dataset.tid] = !openCards[c.dataset.tid];
+      paintNotes();
+      return true;
+    }
+    var w = e.target.closest('.mc-where');
+    if (w) {
+      var cw = w.closest('.mcard, .ithread');
+      SW.state.sel = { p: +cw.dataset.p, n0: +cw.dataset.n0, n1: +cw.dataset.n1 };
+      paintSel(); SW.writeQuery();
+      return true;
+    }
+    return false;
+  }
+  function wireLit(el, sel) {
+    el.addEventListener('mouseover', function (e) { var c = e.target.closest(sel); if (c) linesLit(c, true); });
+    el.addEventListener('mouseout', function (e) { var c = e.target.closest(sel); if (c && !c.contains(e.relatedTarget)) linesLit(c, false); });
+  }
   function wireMargin(margin) {
     margin.addEventListener('click', function (e) {
-      var more = e.target.closest('[data-more]');
-      if (more) {
-        var c = more.closest('.mcard');
-        openCards[c.dataset.tid] = !openCards[c.dataset.tid];
-        paintMargin();
-        return;
-      }
-      var w = e.target.closest('.mc-where');
-      if (w) {
-        var cw = w.closest('.mcard');
-        SW.state.sel = { p: +cw.dataset.p, n0: +cw.dataset.n0, n1: +cw.dataset.n1 };
-        paintSel(); SW.writeQuery();
-      }
+      threadClick(e);
       // a reply or edit box changes the card's height
       setTimeout(function () { layoutMargin(); }, 0);
     });
     margin.addEventListener('input', function () { layoutMargin(); });
-    margin.addEventListener('mouseover', function (e) { var c = e.target.closest('.mcard'); if (c) linesLit(c, true); });
-    margin.addEventListener('mouseout', function (e) { var c = e.target.closest('.mcard'); if (c && !c.contains(e.relatedTarget)) linesLit(c, false); });
+    wireLit(margin, '.mcard');
   }
-  // Clicking a noted line in margin mode brings its card forward instead of the side panel.
-  function cardFor(k) {
+  // Clicking a noted line brings its note forward (inline or card) instead of the side panel.
+  function threadFor(k) {
     var parts = k.split(':');
-    return SW.$('.mcard[data-p="' + parts[0] + '"][data-n0="' + parts[1] + '"]', view);
+    return SW.$((marginOn() ? '.mcard' : '.ithread') + '[data-p="' + parts[0] + '"][data-n0="' + parts[1] + '"]', view);
   }
-  // Live: while the margin shows, fetch the group's notes every 20 seconds.
+
+  // The ▴ Notes button, on Read: how notes show, and every note in the side panel.
+  R.notesMenu = function (x, y) {
+    var modes = [['inline', 'Under their lines', 'each note in the listing, under the last line it covers'],
+                 ['margin', 'Cards in the margin', 'beside the lines, in a column on the right (a window 900px wide or more)'],
+                 ['off', 'Initials only', 'at the line end; click them to read in the side panel']];
+    var pop = SW.pop(x, y, '<h4>Notes in Read</h4><div class="notes-menu">' + modes.map(function (m) {
+      return '<button data-m="' + m[0] + '"' + (opts.notes === m[0] ? ' class="on"' : '') + ' title="' + SW.esc(m[2]) + '">' + (opts.notes === m[0] ? '● ' : '○ ') + m[1] + '</button>';
+    }).join('') + '<hr><button data-m="panel">All notes on this version…</button></div>');
+    pop.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-m]');
+      if (!b) return;
+      SW.unpop();
+      if (b.dataset.m === 'panel') { N.openPanel(build.v.id); return; }
+      opts.notes = b.dataset.m;
+      SW.store.set('read.notes', opts.notes);
+      paintNotes(); live();
+    });
+  };
+  // Live: while notes show (inline or cards), fetch the group's notes every 20 seconds.
   function live() {
     clearInterval(marginTimer);
-    var el = SW.$('#rd-live', view);
+    var on = opts.notes !== 'off', el = SW.$('#rd-live', view);
     if (el) {
-      el.textContent = opts.margin ? (N.configured() ? '● live' : 'drafts only') : '';
-      el.title = opts.margin ? (N.configured() ? 'Notes refresh every 20 seconds, so others\' notes and replies appear as they are written' : 'No Hypothesis group is set (⚙), so notes are drafts in this browser; they are not shared') : '';
+      el.textContent = on ? (N.configured() ? '● live' : 'drafts only') : '';
+      el.title = on ? (N.configured() ? 'Notes refresh every 20 seconds, so others\' notes and replies appear as they are written' : 'No Hypothesis group is set (⚙), so notes are drafts in this browser; they are not shared') : '';
     }
-    if (!opts.margin || !N.configured()) return;
+    if (!on || !N.configured()) return;
     marginTimer = setInterval(function () {
       if (!build || SW.state.tab !== 'read' || document.hidden) return;
-      var m = SW.$('.note-margin', view);
-      if (m && m.querySelector('.reply-box, .edit-box')) return;
+      if (SW.$('.rd-body .reply-box, .rd-body .edit-box', view)) return;
       N.invalidate(build.v.id);
       var t = SW.$('#rd-live', view);
       if (t) t.textContent = '● live · ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -431,8 +502,10 @@
 
   // ---------- events ----------
   function wireBox(box) {
+    wireLit(box, '.ithread');
     box.addEventListener('click', function (e) {
       if (e.target.closest('.part-head')) return;   // tape headers only label (their source link opens GitHub)
+      if (e.target.closest('.inote')) { threadClick(e); return; }   // note buttons are wired by N.wire
       var dot = e.target.closest('.note-dot');
       if (dot) { showNotesFor(dot.dataset.k); return; }
       var sym = e.target.closest('.sym');
@@ -451,8 +524,8 @@
       SW.writeQuery();
       var k = p + ':' + n;
       if (counts[k]) {
-        var card = opts.margin && cardFor(k);
-        if (card) { card.classList.add('flash'); setTimeout(function () { card.classList.remove('flash'); }, 900); }
+        var card = opts.notes !== 'off' && threadFor(k);
+        if (card) { card.scrollIntoView({ block: 'nearest' }); card.classList.add('flash'); setTimeout(function () { card.classList.remove('flash'); }, 900); }
         else showNotesFor(k);
       }
     });
@@ -467,7 +540,6 @@
     SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
     var tapeSel = SW.$('#rd-tape', tb);
     if (tapeSel) tapeSel.onchange = function () { opts.tapes = tapeSel.value; renderListing(); view.scrollTop = 0; };
-    SW.$('#rd-margin', tb).onchange = function (e) { opts.margin = e.target.checked; SW.store.set('read.margin', opts.margin); paintMargin(); live(); };
     SW.$('#rd-noted', tb).onchange = function (e) { opts.onlyNoted = e.target.checked; applyFilter(); view.scrollTop = 0; };
     SW.$('#rd-by', tb).onchange = function (e) { opts.by = e.target.value; applyFilter(); view.scrollTop = 0; };
     fillBy();
@@ -648,7 +720,7 @@
       if (on && !shown && !none) box.insertBefore(SW.el('p', { class: 'hint nf-none pad' }, opts.by ? 'No notes by ' + opts.by + ' on this version' + (opts.tapes === 'all' ? '' : ' and tape') + '.' : 'No annotated lines on this version' + (opts.tapes === 'all' ? '' : ' and tape') + ' yet.'), box.firstChild);
       else if ((!on || shown) && none) none.remove();
     }
-    if (build && SW.$('.note-margin', view)) paintMargin();   // the cards follow the lines left showing
+    if (build && SW.$('.rd-body', view)) paintNotes();   // the notes follow the lines left showing
   }
 
   function refreshNotes() {
@@ -668,7 +740,6 @@
       });
       fillBy();
       applyFilter();
-      paintMargin();
       if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey) showNotesFor(openNotesKey, true);
     });
   }
@@ -689,6 +760,6 @@
   SW.on('profile', function () { if (opts.heat && build) render(); });
   // Lines change height with the window or the code size: the cards follow.
   var relay = null;
-  window.addEventListener('resize', function () { clearTimeout(relay); relay = setTimeout(function () { if (build && opts.margin) layoutMargin(); }, 120); });
-  SW.on('codetext', function () { if (build && opts.margin) setTimeout(function () { layoutMargin(); }, 50); });
+  window.addEventListener('resize', function () { clearTimeout(relay); relay = setTimeout(function () { if (build && marginOn()) layoutMargin(); }, 120); });
+  SW.on('codetext', function () { if (build && marginOn()) setTimeout(function () { layoutMargin(); }, 50); });
 })(this);
