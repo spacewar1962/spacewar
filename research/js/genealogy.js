@@ -90,6 +90,9 @@
     var comment = ci < 0 ? '' : s.slice(ci + 1).replace(/^\s+|\s+$/g, '');
     var labels = [];
     var m, rest = codePart;
+    // a label pushed right by spaces alone (the page-break padding in the dfw
+    // transcription, '<65 spaces>a1,') is still a label; a tab starts the code field
+    if (/^ +[A-Za-z0-9.~\\]+[ \t]*,/.test(rest)) rest = rest.replace(/^ +/, '');
     if (!/^\s/.test(rest)) {
       while ((m = /^([A-Za-z0-9.~\\]+)[ \t]*,[ \t]*/.exec(rest))) {
         labels.push(m[1]);
