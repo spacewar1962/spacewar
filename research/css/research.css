@@ -441,9 +441,12 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 .note-dot { min-width: 0; padding: 0 5px; border-radius: 7px; font-size: 10px; letter-spacing: 0.5px; line-height: 1.5; white-space: nowrap; }
 .note-dot b { font-weight: 700; opacity: 0.8; }
 /* An annotated line: a faint ground, not a rule, so its text keeps its column (off in ⚙ Settings) */
-:root:not(.no-note-shade) .ln.noted:not(.sel):not(.cur):not(.mlit):not(:hover) { background: var(--noted-bg); }
+:root:not(.no-note-shade) .rd-body:not(.notes-hidden) .ln.noted:not(.sel):not(.cur):not(.mlit):not(:hover) { background: var(--noted-bg); }
 /* Inline notes show the note itself, so the line-end initials go (as with the cards) */
-.rd-body.with-inline .ln .mk { visibility: hidden; }
+.rd-body.with-inline .ln .mk, .rd-body.notes-hidden .ln .mk { visibility: hidden; }
+/* the Read toolbar's notes button, at its right end: cycles inline, cards, initials, hidden */
+.toolbar .notes-mode { margin-left: auto; min-width: 2.6em; font-size: 15px; }
+.toolbar .notes-mode:not(.on) { opacity: 0.55; }
 .ln .mk { text-align: left; padding-left: 4px; }
 /* The minimised side panel. */
 .drawer-dock { position: fixed; right: 16px; bottom: 0; z-index: 19; display: none; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

@@ -168,6 +168,10 @@
     tb.appendChild(SW.el('span', { class: 'sep' }));
     if (b.v.build && SW.edition) tb.appendChild(SW.edition.menu(function () { return build; }));
     tb.appendChild(SW.exportButtons(function () { return listingDoc(b, null); }, function () { return 'spacewar-' + b.v.id + '-listing'; }));
+    tb.appendChild(SW.el('button', { class: 'btn notes-mode', id: 'rd-notes-mode', onclick: function () {
+      var i = MODES.indexOf(modeOf(opts.notes));
+      setNotes(MODES[(i + 1) % MODES.length][0]);
+    } }));
     view.appendChild(tb);
 
     if (!b.v.build) {
@@ -179,6 +183,7 @@
     view.appendChild(SW.el('div', { class: 'selbar', id: 'rd-selbar' }));
     renderListing();
     wireTb(tb);
+    modeBtn();
   }
 
   // The listing alone, so choosing a tape keeps the toolbar (and a search) as it is.
@@ -263,7 +268,7 @@
     if (box.querySelector('.inote .reply-box, .inote .edit-box')) return;
     SW.$$('.inote', box).forEach(function (x) { x.remove(); });
     var wrap = SW.$('.rd-body', view);
-    if (wrap) wrap.classList.toggle('with-inline', opts.notes === 'inline');
+    if (wrap) { wrap.classList.toggle('with-inline', opts.notes === 'inline'); wrap.classList.toggle('notes-hidden', opts.notes === 'hide'); }
     if (opts.notes !== 'inline') return;
     var at = {}, order = [];
     shownThreads().forEach(function (t) {
@@ -358,11 +363,30 @@
     return SW.$((marginOn() ? '.mcard' : '.ithread') + '[data-p="' + parts[0] + '"][data-n0="' + parts[1] + '"]', view);
   }
 
+  // How notes show in Read, in the order the toolbar button cycles through them:
+  // [mode, name, what it does, the button's icon].
+  var MODES = [['inline', 'Under their lines', 'each note in the listing, under the last line it covers', '▤'],
+               ['margin', 'Cards in the margin', 'beside the lines, in a column on the right (a window 900px wide or more)', '▥'],
+               ['off', 'Initials only', 'at the line end; click them to read in the side panel', 'ᴬᴮ'],
+               ['hide', 'Hidden', 'no notes, initials or tint in the listing', '⊘']];
+  function modeOf(m) { return MODES.filter(function (x) { return x[0] === m; })[0] || MODES[0]; }
+  function setNotes(m) {
+    opts.notes = m;
+    SW.store.set('read.notes', m);
+    paintNotes(); live(); modeBtn();
+  }
+  function modeBtn() {
+    var b = SW.$('#rd-notes-mode', view);
+    if (!b) return;
+    var i = MODES.indexOf(modeOf(opts.notes)), cur = MODES[i], next = MODES[(i + 1) % MODES.length];
+    b.textContent = cur[3];
+    b.title = 'Notes: ' + cur[1].toLowerCase() + '. Click for ' + next[1].toLowerCase() + '.';
+    b.classList.toggle('on', opts.notes !== 'hide');
+  }
+
   // The ▴ Notes button, on Read: how notes show, and every note in the side panel.
   R.notesMenu = function (x, y) {
-    var modes = [['inline', 'Under their lines', 'each note in the listing, under the last line it covers'],
-                 ['margin', 'Cards in the margin', 'beside the lines, in a column on the right (a window 900px wide or more)'],
-                 ['off', 'Initials only', 'at the line end; click them to read in the side panel']];
+    var modes = MODES;
     var pop = SW.pop(x, y, '<h4>Notes in Read</h4><div class="notes-menu">' + modes.map(function (m) {
       return '<button data-m="' + m[0] + '"' + (opts.notes === m[0] ? ' class="on"' : '') + ' title="' + SW.esc(m[2]) + '">' + (opts.notes === m[0] ? '● ' : '○ ') + m[1] + '</button>';
     }).join('') + '<hr><button data-m="panel">All notes on this version…</button></div>');
@@ -371,15 +395,13 @@
       if (!b) return;
       SW.unpop();
       if (b.dataset.m === 'panel') { N.openPanel(build.v.id); return; }
-      opts.notes = b.dataset.m;
-      SW.store.set('read.notes', opts.notes);
-      paintNotes(); live();
+      setNotes(b.dataset.m);
     });
   };
   // Live: while notes show (inline or cards), fetch the group's notes every 20 seconds.
   function live() {
     clearInterval(marginTimer);
-    var on = opts.notes !== 'off';
+    var on = opts.notes === 'inline' || opts.notes === 'margin';
     if (!on || !N.configured()) return;
     marginTimer = setInterval(function () {
       if (!build || SW.state.tab !== 'read' || document.hidden) return;
@@ -519,7 +541,7 @@
       paintSel();
       SW.writeQuery();
       var k = p + ':' + n;
-      if (counts[k]) {
+      if (counts[k] && opts.notes !== 'hide') {
         var card = opts.notes !== 'off' && threadFor(k);
         if (card) { card.scrollIntoView({ block: 'nearest' }); card.classList.add('flash'); setTimeout(function () { card.classList.remove('flash'); }, 900); }
         else showNotesFor(k);
