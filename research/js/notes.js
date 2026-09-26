@@ -552,7 +552,7 @@
     if (n.source === 'buildlog') return '';
     var by = {};
     (reactions || []).forEach(function (r) { (by[r.text] = by[r.text] || []).push(r); });
-    var h = '<div class="reacts">';
+    var h = '<span class="reacts">';
     N.EMOJI.concat(Object.keys(by).filter(function (e) { return N.EMOJI.indexOf(e) < 0; })).forEach(function (e) {
       var rs = by[e];
       if (!rs) return;
@@ -562,7 +562,7 @@
         SW.esc(who.join(', ') + (mine ? ' (click to take yours back)' : ' (click to add yours)')) + '">' + SW.esc(e) + '<small>' + SW.esc(who.join(' ')) + '</small></button>';
     });
     h += '<button class="react add" data-act="react-pick" title="Add a reaction">☺<small>+</small></button>' +
-      '<span class="react-pick" hidden>' + N.EMOJI.map(function (e) { return '<button class="react" data-act="react" data-emoji="' + e + '">' + e + '</button>'; }).join('') + '</span></div>';
+      '<span class="react-pick" hidden>' + N.EMOJI.map(function (e) { return '<button class="react" data-act="react" data-emoji="' + e + '">' + e + '</button>'; }).join('') + '</span></span>';
     return h;
   }
 
@@ -574,8 +574,8 @@
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
       '<div class="body">' + SW.esc(n.text) + '</div>' +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
-      renderReactions(n, reactions) +
-      '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button>' : '') +
+      // one row: Reply | reactions | copy, download, edit, delete
+      '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
       '<button data-act="copy" class="ico" title="Copy the note, with its citation and replies">⧉</button>' +
       '<button data-act="dl" class="ico" title="Download the note with its code and replies (Markdown)">⤓</button>' +
       (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
