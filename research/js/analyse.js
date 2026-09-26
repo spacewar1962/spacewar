@@ -359,12 +359,116 @@
   }
 
   // ---------- 12 the sky ----------
-  function sky(b, el) {
+  function starsOf(b) {
     var stars = [];
     allLines(b).forEach(function (L) {
-      var m = /^\s*(?:([0-9a-z]+),)?\s*mark\s+(-?\d+)\s*,\s*(-?\d+)\s*(\/.*)?$/i.exec(L.raw);
+      var m = /^\s*(?:([0-9a-z]+),)?\s*mar[kc]\s+(-?\d+)\s*,\s*(-?\d+)\s*(\/.*)?$/i.exec(L.raw);
       if (m) stars.push({ x: +m[2], y: +m[3], name: (m[4] || '').replace(/^\/\s*/, '').trim(), label: m[1] || '', L: L });
     });
+    return stars;
+  }
+
+  // The star map: Samson's table as a chart of the sky, in a modal. "mark X, Y"
+  // measures both in 8192ths of a circle (X right ascension, Y declination:
+  // Aldebaran's 1537, 371 is 67.5 degrees, +16.3 degrees), so the chart is drawn
+  // at one scale in both directions, in two strips of twelve hours, right
+  // ascension increasing to the left as on a map of the sky. Constellations
+  // are Samson's own identifications, outlined around their stars (no stick
+  // figures: the table has none).
+  var CONST = { Orio: 'Orion', Taur: 'Taurus', Ophi: 'Ophiuchus', Aqar: 'Aquarius', Virg: 'Virgo', Erid: 'Eridanus', Ceti: 'Cetus', Hyda: 'Hydra', Leon: 'Leo',
+    Serp: 'Serpens', Pisc: 'Pisces', Aqil: 'Aquila', Pegs: 'Pegasus', Mono: 'Monoceros', Capr: 'Capricornus', Herc: 'Hercules', Leps: 'Lepus', Libr: 'Libra',
+    CMaj: 'Canis Major', Boot: 'Boötes', Gemi: 'Gemini', Sgtr: 'Sagittarius', Scor: 'Scorpius', Dlph: 'Delphinus', Crat: 'Crater', Sgte: 'Sagitta', Scut: 'Scutum',
+    Corv: 'Corvus', Canc: 'Cancer', CMin: 'Canis Minor', Arie: 'Aries', Vulp: 'Vulpecula', Equl: 'Equuleus', Coma: 'Coma Berenices', Sext: 'Sextans', Pupp: 'Puppis' };
+  function hull(pts) {
+    pts = pts.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+    if (pts.length < 3) return pts;
+    function cr(o, a, b) { return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]); }
+    var lo = [], up = [];
+    pts.forEach(function (p) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); });
+    pts.slice().reverse().forEach(function (p) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); });
+    return lo.slice(0, -1).concat(up.slice(0, -1));
+  }
+  SW.skyMap = function (b) {
+    var stars = starsOf(b);
+    if (!stars.length) { SW.toast('This version carries no star table.'); return; }
+    var mag = 1;
+    stars.forEach(function (st) {
+      var mm = /^(\d)j$/.exec(st.label); if (mm) mag = +mm[1];
+      st.mag = mag;
+      var c = /(?:^|\s)([A-Z][A-Za-z]{2,4})\b/.exec(st.name.split(',')[0]); st.con = c && CONST[c[1]] ? c[1] : '';   // '87 Taur', 'nu Hyda'
+      st.proper = st.name.indexOf(',') > 0 ? st.name.split(',').slice(1).join(',').trim() : '';
+      st.ra = st.x * 360 / 8192; st.dec = st.y * 360 / 8192;
+    });
+    var cons = [], byCon = {};
+    stars.forEach(function (st) { if (!st.con) return; if (!byCon[st.con]) { byCon[st.con] = []; cons.push(st.con); } byCon[st.con].push(st); });
+    cons.sort(function (a, c) { return byCon[c].length - byCon[a].length; });
+    var hue = {}; cons.forEach(function (c, i) { hue[c] = Math.round((i * 137.508) % 360); });
+    var unnamed = stars.filter(function (st) { return !st.con; }).length;
+    var maxDec = Math.ceil(Math.max.apply(null, stars.map(function (st) { return Math.abs(st.dec); })) / 5) * 5;
+    var W = 1400, ML = 44, MR = 18, S = (W - ML - MR) / 180, SH = 2 * maxDec * S, GAP = 56, TOP = 30;
+    var H = TOP + 2 * SH + GAP + 40;
+    function hms(deg) { var h = deg / 15, hh = Math.floor(h), mm = Math.round((h - hh) * 60); if (mm === 60) { hh++; mm = 0; } return hh + 'h ' + (mm < 10 ? '0' : '') + mm + 'm'; }
+    function sgn(d) { return (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1) + '°'; }
+    // strip 0: 12h (left) to 0h (right); strip 1: 24h to 12h
+    function place(st) { var k = st.ra >= 180 ? 1 : 0, ra0 = k ? 360 : 180; return { k: k, x: ML + (ra0 - st.ra) * S, y: TOP + k * (SH + GAP) + (maxDec - st.dec) * S }; }
+    function svg(pal) {
+      var dark = !pal || !pal.bg || /^#0|^#1|black/i.test(pal.bg);
+      var bg = pal && pal.bg ? pal.bg : '#04070d', ink = dark ? '#f4f1e6' : '#111', dim = dark ? '#8fa3b5' : '#555', grid = dark ? 'rgba(143,163,181,0.18)' : 'rgba(0,0,0,0.12)';
+      var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" font-family="Helvetica, Arial, sans-serif">', '<rect width="' + W + '" height="' + H + '" fill="' + bg + '"/>'];
+      for (var k = 0; k < 2; k++) {
+        var y0 = TOP + k * (SH + GAP);
+        o.push('<rect x="' + ML + '" y="' + y0 + '" width="' + (180 * S) + '" height="' + SH + '" fill="none" stroke="' + grid + '"/>');
+        for (var h = 0; h <= 12; h++) { var x = ML + h * 15 * S, lab = (k ? 24 : 12) - h; o.push('<line x1="' + x + '" y1="' + y0 + '" x2="' + x + '" y2="' + (y0 + SH) + '" stroke="' + grid + '"/><text x="' + x + '" y="' + (y0 + SH + 14) + '" font-size="11" fill="' + dim + '" text-anchor="middle">' + (lab % 24) + 'h</text>'); }
+        for (var d = -maxDec; d <= maxDec; d += 10) { if (d === -maxDec) continue; var yy = y0 + (maxDec - d) * S; o.push('<line x1="' + ML + '" y1="' + yy + '" x2="' + (ML + 180 * S) + '" y2="' + yy + '" stroke="' + grid + '"' + (d === 0 ? ' stroke-dasharray="4 4"' : '') + '/><text x="' + (ML - 6) + '" y="' + (yy + 4) + '" font-size="10" fill="' + dim + '" text-anchor="end">' + (d > 0 ? '+' : d < 0 ? '−' : '') + Math.abs(d) + '°</text>'); }
+      }
+      // constellations: an outline round each one's stars in each strip, and its name
+      cons.forEach(function (c) {
+        [0, 1].forEach(function (k) {
+          var pts = byCon[c].map(place).filter(function (p) { return p.k === k; });
+          if (!pts.length) return;
+          var col = 'hsl(' + hue[c] + ',65%,' + (dark ? 66 : 38) + '%)';
+          var hp = hull(pts.map(function (p) { return [p.x, p.y]; }));
+          var cx = pts.reduce(function (a, p) { return a + p.x; }, 0) / pts.length, cy = pts.reduce(function (a, p) { return a + p.y; }, 0) / pts.length;
+          var pad = hp.map(function (q) { var dx = q[0] - cx, dy = q[1] - cy, l = Math.sqrt(dx * dx + dy * dy) || 1; return [q[0] + dx / l * 9, q[1] + dy / l * 9]; });
+          if (pad.length >= 3) o.push('<path class="sky-con" data-c="' + c + '" d="M' + pad.map(function (q) { return q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' L') + ' Z" fill="' + col + '" fill-opacity="0.06" stroke="' + col + '" stroke-opacity="0.75" stroke-width="1.2" stroke-dasharray="5 4" stroke-linejoin="round"><title>' + SW.esc((CONST[c] || c) + ': ' + byCon[c].length + ' stars') + '</title></path>');
+          else o.push('<circle class="sky-con" data-c="' + c + '" cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="12" fill="none" stroke="' + col + '" stroke-opacity="0.75" stroke-dasharray="5 4"/>');
+          if (pts.length * 2 >= byCon[c].filter(function () { return true; }).length || pts.length >= 3)
+            o.push('<text x="' + cx.toFixed(1) + '" y="' + (Math.max.apply(null, pts.map(function (p) { return p.y; })) + 22).toFixed(1) + '" font-size="10.5" letter-spacing="1.2" fill="' + col + '" text-anchor="middle">' + SW.esc((CONST[c] || c).toUpperCase()) + '</text>');
+        });
+      });
+      // the stars, by Samson's groups (1 the brightest)
+      var R = { 1: 4.6, 2: 3.3, 3: 2.3, 4: 1.6 };
+      stars.forEach(function (st) {
+        var p = place(st);
+        o.push('<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (R[st.mag] || 1.6) + '" fill="' + ink + '"><title>' + SW.esc(st.name + ' · mark ' + st.x + ', ' + st.y + ' · RA ' + hms(st.ra) + ', Dec ' + sgn(st.dec) + ' · group ' + st.mag + ' · line ' + st.L.n) + '</title></circle>');
+        if (st.proper) o.push('<text x="' + (p.x + 6).toFixed(1) + '" y="' + (p.y - 5).toFixed(1) + '" font-size="10" fill="' + ink + '" fill-opacity="0.85">' + SW.esc(st.proper) + '</text>');
+      });
+      o.push('<text x="' + ML + '" y="18" font-size="12" fill="' + dim + '">' + SW.esc(b.v.label + ': the Expensive Planetarium, ' + stars.length + ' stars in ' + cons.length + ' constellations (right ascension increasing to the left; declination ' + '±' + maxDec + '°)') + '</text>');
+      return o.concat(['</svg>']).join('');
+    }
+    var dlg = SW.el('dialog', { class: 'sky-dlg' });
+    dlg.innerHTML = '<div class="rd-head"><h2>Star map: ' + SW.esc(b.v.label) + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
+      '<p class="hint">Peter Samson’s star table (“stars by prs”), ' + stars.length + ' stars from the line <span class="mono">' + SW.esc(stars[0].L.raw.trim()) + '</span> on. Each <span class="mono">mark X, Y</span> is drawn at X and Y in 8192ths of a circle: right ascension and declination. Dot sizes follow Samson’s four groups (labels 1j–1q, 2j–2q, 3j–3q, 4j–4q), the brightest largest. Constellations are his identifications, outlined round their stars' + (unnamed ? ' (' + unnamed + ' stars carry no identification in this table and belong to none)' : '') + '; hover a star for its entry.</p>' +
+      '<div class="svgbox sky-box"></div><div class="sky-cons"></div><div class="sky-exp"></div>';
+    document.body.appendChild(dlg);
+    var box = SW.$('.sky-box', dlg);
+    box.innerHTML = svg();
+    SW.$('.sky-exp', dlg).appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-star-map'));
+    SW.$('.sky-cons', dlg).innerHTML = cons.map(function (c) {
+      return '<span class="sky-chip" data-c="' + c + '"><i style="background:hsl(' + hue[c] + ',65%,60%)"></i>' + SW.esc(CONST[c] || c) + ' <b>' + byCon[c].length + '</b></span>';
+    }).join('');
+    SW.$('.sky-cons', dlg).addEventListener('mouseover', function (e) {
+      var ch = e.target.closest('.sky-chip');
+      SW.$$('.sky-con', box).forEach(function (p) { p.classList.toggle('lit', !!ch && p.getAttribute('data-c') === ch.dataset.c); });
+    });
+    SW.$('.sky-cons', dlg).addEventListener('mouseleave', function () { SW.$$('.sky-con', box).forEach(function (p) { p.classList.remove('lit'); }); });
+    SW.$('[data-a="close"]', dlg).onclick = function () { dlg.close(); };
+    dlg.addEventListener('close', function () { dlg.remove(); });
+    dlg.showModal();
+  };
+
+  function sky(b, el) {
+    var stars = starsOf(b);
     var c = card('The Expensive Planetarium', stars.length ? stars.length + ' stars, each entered as “mark X, Y” (X increasing across 8192 units of right ascension, Y declination), with Samson’s own identifications. Groups begin at the labels 1j, 2j, 3j, 4j (magnitude groups).' : 'This build carries no star table.');
     if (!stars.length) { el.appendChild(c); return null; }
     var mag = 1, W = 1024, H = 280;
@@ -380,9 +484,12 @@
       });
       return o.concat(['</svg>']).join('');
     };
-    var box = SW.el('div', { class: 'svgbox' }, svg());
+    var box = SW.el('div', { class: 'svgbox', style: 'cursor:zoom-in', title: 'Open the star map, with the constellations marked' }, svg());
+    box.onclick = function () { SW.skyMap(b); };
     c.appendChild(box);
-    c.appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-sky'));
+    var fb = SW.figureButtons(svg, 'spacewar-' + b.v.id + '-sky');
+    fb.insertBefore(SW.el('button', { class: 'btn', onclick: function () { SW.skyMap(b); } }, '✦ Star map'), fb.firstChild);
+    c.appendChild(fb);
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
     return function () { return [SW.tableBlock('Star table', ['Label', 'X', 'Y', 'Identification', 'Line'], stars.map(function (s) { return [s.label, String(s.x), String(s.y), s.name, String(s.L.n)]; }))]; };
@@ -971,7 +1078,12 @@
     var fs = bs.map(facts), all = [], seen = {};
     fs.forEach(function (f) { f.starOrder.forEach(function (s) { if (!seen[s]) { seen[s] = 1; all.push(s); } }); });
     var sum = vs.map(function (v, i) { return [short(v), fs[i].starOrder.length]; });
-    el.appendChild(matrixCard('Stars in each version', 'Entries in the star table carried by (or supplied to) each build.', ['Version', 'Stars'], sum, ['mono', 'num']));
+    var sc = matrixCard('Stars in each version', 'Entries in the star table carried by (or supplied to) each build. Click a version to open its star map, with the constellations marked.', ['Version', 'Stars'], sum, ['mono', 'num']);
+    var chips = SW.el('div', { class: 'sky-vers' });
+    vs.forEach(function (v, i) { if (fs[i].starOrder.length) chips.appendChild(SW.el('button', { class: 'btn', title: 'Open the star map of ' + v.label, onclick: function () { SW.skyMap(bs[i]); } }, '✦ ' + SW.esc(short(v)))); });
+    sc.insertBefore(chips, sc.querySelector('.scroll'));
+    SW.$$('tbody tr', sc).forEach(function (tr, i) { if (fs[i] && fs[i].starOrder.length) { tr.style.cursor = 'pointer'; tr.title = 'Open the star map'; tr.addEventListener('click', function () { SW.skyMap(bs[i]); }); } });
+    el.appendChild(sc);
     var m = matrix(all, vs, function (s, v, i) { return fs[i].stars[s] || ''; }, { onlyChanges: xst.onlyChanges });
     var c = matrixCard('The sky across versions', 'Each star by Samson\'s identification, with its “mark X, Y” position in each version. Shaded cells mark a star added, moved or removed.', ['Star'].concat(vs.map(short)), m, [''].concat(vs.map(function () { return 'mono'; })));
     onlyToggle(c, rerender);
