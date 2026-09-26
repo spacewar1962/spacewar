@@ -778,3 +778,9 @@ dialog.nudge { animation: nudge 0.35s; }
 .theme-swatches { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 2px 0 8px; }
 .theme-swatches .hint { flex-basis: 100%; }
 .theme-swatches i { width: 22px; height: 16px; border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
+
+/* Tape: wrapped rows, each with its first frame's number; or one strip to scroll along */
+.tape-roll.wrapped { overflow-x: hidden; }
+.tape-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.tape-at { flex: none; width: 5.5em; text-align: right; font-size: 11px; color: var(--text-faint); }
+.tape-one { display: flex; width: max-content; }

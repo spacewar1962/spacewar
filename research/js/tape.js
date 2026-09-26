@@ -296,28 +296,31 @@
       var pad = SW.el('div', { class: 'pad' });
       pad.innerHTML = '<h2>' + SW.esc(b.v.label) + ': tapes</h2>' +
         '<p class="prose">Two kinds of tape are shown here, and they should not be confused. <b>Real tapes</b> are the digitised images of the surviving paper tapes (for the 1962–63 versions, mostly from Steve Russell’s box, read for bitsavers in 2003–04): every frame as the tape reader saw it. <b>The reconstruction</b> is the tape the assembler here would punch from the source today, in macro1’s loader and block format, not the format MIT’s MACRO punched.</p>' +
-        '<p class="prose">A <b>frame</b> is one column of holes across the tape: one character on a source tape, one six-bit part of a word on an object tape, at ten frames to the inch. Eight data channels run along the tape, with the small sprocket hole between the third and fourth. Choose where to start (counted from the very beginning of the tape image, leader included) and how many frames to draw.</p>' +
+        '<p class="prose">A <b>frame</b> is one column of holes across the tape: one character on a source tape, one six-bit part of a word on an object tape, at ten frames to the inch. Eight data channels run along the tape, with the small sprocket hole between the third and fourth. Show chooses what to draw: the whole tape, one of its stretches (leader, read-in loader, each checksummed block, the closing jump; on a source tape, each page between stop codes), a punched title, or a range of your own, counted in frames from the very beginning of the tape image, leader included. A version read from several physical tapes lists each one under Tape.</p>' +
         (reals.length ? '' : '<p class="prose"><b>No real tape survives for this version</b> in the project’s sources; only the reconstruction can be shown.</p>');
+      var mode = SW.store.get('tape.mode', 'holes');
       var tb = SW.el('div', { class: 'toolbar' });
       tb.innerHTML = '<span class="seg-btns"><button class="btn' + (mode === 'holes' ? ' on' : '') + '" data-mode="holes" title="The tape as holes, frame by frame">Holes</button><button class="btn' + (mode === 'anatomy' ? ' on' : '') + '" data-mode="anatomy" title="The tape as stretches: leader and title, the read-in loader, each block of words with its checksum (checked), and the closing jump; for a source tape, its pages between stop codes">Anatomy</button></span>' +
         '<label class="check" title="Real tapes are digitised images of the surviving paper tapes; the reconstruction is the tape the assembler would punch today">Tape <select id="tp-which">' +
         reals.map(function (r, i) { return '<option value="r' + i + '">Real: ' + SW.esc(r.path) + ' (' + SW.esc(r.kind) + ')</option>'; }).join('') +
         '<option value="asm">Reconstruction: assembled today (macro1 format)</option></select></label>' +
-        '<label class="check" title="A frame is one column of holes across the tape: one character or byte. Frames are counted from the very start of the tape image, leader included.">Start at frame <input type="number" id="tp-from" min="0" value="0" style="width:7em"></label>' +
-        '<label class="check" title="How many frames to draw (ten frames to the inch of real tape)">Number of frames <input type="number" id="tp-n" min="10" value="600" style="width:6em"></label>';
+        '<label class="check" title="What to draw: the whole tape, one of its stretches as the tape is built, a punched title, or your own range">Show <select id="tp-show"></select></label>' +
+        '<label class="check" title="A frame is one column of holes across the tape: one character or byte. Frames are counted from the very start of the tape image, leader included.">From frame <input type="number" id="tp-from" min="0" value="0" style="width:6.5em"></label>' +
+        '<label class="check" title="How many frames to draw (ten frames to the inch of real tape)">Frames <input type="number" id="tp-n" min="1" value="600" style="width:6.5em"></label>' +
+        '<label class="check" title="Wrapped: the stretch cut into rows that fit the window, each starting with its first frame\'s number. One strip: a single band to scroll along, as the tape runs through the reader.">Layout <select id="tp-layout"><option value="wrap">Wrapped rows</option><option value="strip">One strip</option></select></label>';
       var info = SW.el('div', { class: 'hint', style: 'margin:6px 0' });
       var roll = SW.el('div', { class: 'tape-roll' });
       var decoded = SW.el('pre', { class: 'mono', style: 'display:none;max-height:260px;overflow:auto;font-size:12px;background:var(--surface);padding:8px;border-radius:6px' });
       var titlesBox = SW.el('div', { class: 'tape-titles' });
       var anatBox = SW.el('div', { class: 'tape-anat' });
-      var cur = { bytes: [], name: '', source: false };
-      var mode = SW.store.get('tape.mode', 'holes');
+      var cur = { bytes: [], name: '', source: false, an: null };
+      SW.$('#tp-layout', tb).value = SW.store.get('tape.layout', 'wrap');
       // Anatomy: the tape as stretches (leader, loader, blocks and their checksums, jmp).
       function showAnatomy() {
         anatBox.innerHTML = '';
         anatBox.style.display = mode === 'anatomy' ? '' : 'none';
         if (mode !== 'anatomy' || !cur.bytes.length) return;
-        var an = cur.source ? T.sourceAnatomy(cur.bytes) : T.anatomy(cur.bytes);
+        var an = cur.an;
         var box = SW.el('div', { class: 'svgbox', style: 'margin:6px 0' }, SW.displaySVG(T.anatomySVG(an, cur.name, 1100)));
         anatBox.appendChild(box);
         var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
@@ -331,7 +334,9 @@
                   (b.symAt && bk && b.symAt(bk.a0)) || (sg.kind === 'block' || sg.kind === 'bad' ? '' : sg.label)];
         });
         var tbl = SW.table(['Stretch', 'Frames', 'Length', 'Addresses', 'Words', 'Checksum', 'Note'], rows, { cls: ['', 'mono', 'num', 'mono', 'num', 'mono', 'mono'], onRow: function (r) {
-          SW.$('#tp-from', tb).value = Math.max(0, parseInt(r[1], 10) - 4); draw(); roll.scrollIntoView({ block: 'nearest' });
+          var f0 = parseInt(r[1], 10);
+          for (var i = 0; i < an.segs.length; i++) if (an.segs[i].f0 === f0) { show('s' + i); break; }
+          roll.scrollIntoView({ block: 'nearest' });
         } });
         var sc = SW.el('div', { class: 'scroll', style: 'max-height:360px;overflow:auto' });
         sc.appendChild(tbl);
@@ -339,8 +344,7 @@
         box.addEventListener('click', function (e) {
           var r = e.target.closest('.an-seg');
           if (!r) return;
-          var sg = an.segs[+r.getAttribute('data-i')];
-          SW.$('#tp-from', tb).value = Math.max(0, sg.f0 - 4); draw(); roll.scrollIntoView({ block: 'nearest' });
+          show('s' + r.getAttribute('data-i')); roll.scrollIntoView({ block: 'nearest' });
         });
         anatBox.appendChild(SW.exportButtons(function () {
           return { title: 'Anatomy of ' + cur.name, meta: SW.docMeta(b), blocks: [SW.tableBlock('Stretches of the tape', ['Stretch', 'Frames', 'Length', 'Addresses', 'Words', 'Checksum', 'Note'], rows)] };
@@ -353,24 +357,84 @@
         titlesBox.appendChild(SW.el('h3', {}, 'Punched titles'));
         titlesBox.appendChild(SW.el('p', { class: 'hint', title: 'Each letter is punched as five columns of holes in channels 1 to 6; the reading is made by matching the columns against the letters observed on the surviving tapes. A ? marks a shape not yet in that set.' },
           'Letters punched into the tape as holes, to be read by eye when the tape is held up. The reading is the bench’s, made against the letter shapes found on the surviving tapes.'));
-        ts.forEach(function (t) {
+        ts.forEach(function (t, ti) {
           var row = SW.el('div', { class: 'tape-title' });
           row.innerHTML = '<div class="tape-title-img">' + T.titleSVG(bytes, t) + '</div>' +
             '<div><b class="mono">“' + SW.esc(t.text) + '”</b> <span class="hint">frames ' + t.from + '–' + t.to + '</span></div>';
           row.appendChild(SW.el('button', { class: 'btn ghost', title: 'Draw the tape from just before this title', onclick: function () {
-            SW.$('#tp-from', tb).value = Math.max(0, t.from - 10);
-            draw();
+            show('t' + ti);
             roll.scrollIntoView({ block: 'nearest' });
           } }, 'Show on tape'));
           titlesBox.appendChild(row);
         });
       }
       function start(bytes) { var s = 0; while (s < bytes.length && bytes[s] === 0) s++; return s; }
+      // What Show offers: the whole tape, its stretches as the tape is built
+      // (anatomy), its punched titles, and a range of your own.
+      function stretchName(sg) {
+        return sg.block ? 'block ' + sg.block.n + ', ' + sg.label + (sg.kind === 'bad' ? ' (checksum fails)' : '') : sg.label;
+      }
+      function fillShow() {
+        var an = cur.an, n = cur.bytes.length;
+        var h = '<option value="whole">Whole tape (' + n.toLocaleString('en-GB') + ' frames, ' + (n / 120).toFixed(1) + ' ft)</option>';
+        if (an && an.segs.length) h += '<optgroup label="' + (an.kind === 'source' ? 'Pages, between stop codes' : 'Stretches of the tape') + '">' + an.segs.map(function (sg, i) {
+          return '<option value="s' + i + '">' + SW.esc(stretchName(sg)) + ' · ' + (sg.f1 - sg.f0 + 1).toLocaleString('en-GB') + ' frames</option>';
+        }).join('') + '</optgroup>';
+        if (an && an.titles.length) h += '<optgroup label="Punched titles">' + an.titles.map(function (t, i) {
+          return '<option value="t' + i + '">“' + SW.esc(t.text) + '”, frames ' + t.from + '–' + t.to + '</option>';
+        }).join('') + '</optgroup>';
+        SW.$('#tp-show', tb).innerHTML = h + '<option value="custom">Your own range (From frame, Frames)</option>';
+      }
+      function show(v) {
+        var an = cur.an, f0 = 0, len = cur.bytes.length;
+        if (v[0] === 's' && an && an.segs[+v.slice(1)]) { var sg = an.segs[+v.slice(1)]; f0 = sg.f0; len = sg.f1 - sg.f0 + 1; }
+        else if (v[0] === 't' && an && an.titles[+v.slice(1)]) { var t = an.titles[+v.slice(1)]; f0 = Math.max(0, t.from - 10); len = t.to - f0 + 11; }
+        if (v !== 'custom') { SW.$('#tp-from', tb).value = f0; SW.$('#tp-n', tb).value = len; }
+        SW.$('#tp-show', tb).value = v;
+        if (v === 'whole' || v === 'custom') SW.store.set('tape.show', v);
+        draw();
+      }
+      // Wrapped: rows that fit the window, each labelled with its first frame.
+      // One strip: canvases of up to 3,000 frames side by side (a canvas has a
+      // width limit), to scroll along.
       function draw() {
         roll.innerHTML = '';
-        var c = document.createElement('canvas');
-        T.draw(c, cur.bytes, { from: +SW.$('#tp-from', tb).value, max: +SW.$('#tp-n', tb).value, pitch: 9, height: 90 });
-        roll.appendChild(c);
+        if (!cur.bytes.length) return;
+        var from = Math.max(0, Math.min(cur.bytes.length - 1, +SW.$('#tp-from', tb).value || 0));
+        var n = Math.max(1, Math.min(cur.bytes.length - from, +SW.$('#tp-n', tb).value || 1));
+        var wrap = SW.$('#tp-layout', tb).value === 'wrap', s;
+        roll.classList.toggle('wrapped', wrap);
+        if (wrap) {
+          var pitch = 7, per = Math.max(40, Math.floor(((roll.clientWidth || 1000) - 70) / pitch) - 2);
+          for (s = from; s < from + n; s += per) {
+            var row = SW.el('div', { class: 'tape-row' }), c = document.createElement('canvas');
+            row.appendChild(SW.el('span', { class: 'tape-at mono' }, s.toLocaleString('en-GB')));
+            T.draw(c, cur.bytes, { from: s, max: Math.min(per, from + n - s), pitch: pitch, height: 70 });
+            row.appendChild(c);
+            roll.appendChild(row);
+          }
+        } else {
+          var one = SW.el('div', { class: 'tape-one' });
+          for (s = from; s < from + n; s += 3000) {
+            var c2 = document.createElement('canvas');
+            T.draw(c2, cur.bytes, { from: s, max: Math.min(3000, from + n - s), pitch: 9, height: 90 });
+            one.appendChild(c2);
+          }
+          roll.appendChild(one);
+        }
+      }
+      // The first view of a tape: where the Findings page sent us, else the whole
+      // tape (or your own range, from the end of the leader, if that was last used).
+      function firstShow(path) {
+        cur.an = cur.source ? T.sourceAnatomy(cur.bytes) : T.anatomy(cur.bytes);
+        fillShow();
+        var goTo = SW.state.tapeGo;
+        SW.state.tapeGo = null;
+        if (goTo && goTo.path === path && goTo.from != null) {
+          SW.$('#tp-from', tb).value = Math.max(0, goTo.from - 10); SW.$('#tp-n', tb).value = 600; show('custom');
+        } else if (SW.store.get('tape.show', 'whole') === 'custom') {
+          SW.$('#tp-from', tb).value = start(cur.bytes); SW.$('#tp-n', tb).value = 600; show('custom');
+        } else show('whole');
       }
       function select() {
         var w = SW.$('#tp-which', tb).value;
@@ -379,8 +443,7 @@
         if (w === 'asm') {
           cur = { bytes: b.asm.tape, name: 'spacewar-' + b.v.id + '-reconstruction', source: false };
           info.innerHTML = '<b>Reconstruction.</b> ' + cur.bytes.length.toLocaleString('en-GB') + ' frames (' + (cur.bytes.length / 120).toFixed(1) + ' ft): blank leader, macro1’s RIM read-in loader, the program in checksummed blocks, a closing <code>jmp</code> to the start address.';
-          SW.$('#tp-from', tb).value = start(cur.bytes);
-          draw();
+          firstShow(null);
           showAnatomy();
           return;
         }
@@ -393,10 +456,7 @@
             'an <b>object tape</b>: binary words for the loader' + (d ? ' (' + Math.round(100 * d.parityErrors / Math.max(1, d.frames)) + '% of frames fail the FIO-DEC parity test, as binary does)' : '');
           info.innerHTML = '<b>Real tape.</b> <span class="mono">' + SW.sourceLink(r.path) + '</span>: ' + bytes.length.toLocaleString('en-GB') + ' frames (' + (bytes.length / 120).toFixed(1) + ' ft), ' + kind + '.';
           if (d && d.isSource) { decoded.style.display = 'block'; decoded.textContent = d.text.slice(0, 6000) + (d.text.length > 6000 ? '\n…' : ''); }
-          var goTo = SW.state.tapeGo;
-          SW.$('#tp-from', tb).value = goTo && goTo.path === r.path && goTo.from != null ? Math.max(0, goTo.from - 10) : start(bytes);
-          SW.state.tapeGo = null;
-          draw();
+          firstShow(r.path);
           showTitles(bytes);
           showAnatomy();
         }).catch(function (e) { info.textContent = e.message; });
@@ -425,8 +485,18 @@
       // Sent here from elsewhere (the Findings page) to a particular tape.
       var want = SW.state.tapeGo ? reals.map(function (r) { return r.path; }).indexOf(SW.state.tapeGo.path) : -1;
       if (want >= 0) SW.$('#tp-which', tb).value = 'r' + want; else SW.state.tapeGo = null;
-      SW.$('#tp-from', tb).addEventListener('change', draw);
-      SW.$('#tp-n', tb).addEventListener('change', draw);
+      function custom() { SW.$('#tp-show', tb).value = 'custom'; SW.store.set('tape.show', 'custom'); draw(); }
+      SW.$('#tp-from', tb).addEventListener('change', custom);
+      SW.$('#tp-n', tb).addEventListener('change', custom);
+      SW.$('#tp-show', tb).addEventListener('change', function (e) { show(e.target.value); });
+      SW.$('#tp-layout', tb).addEventListener('change', function (e) { SW.store.set('tape.layout', e.target.value); draw(); });
+      // Wrapped rows fit the window: draw them again when it changes width.
+      var lastW = 0, relay = null;
+      if (root.ResizeObserver) new ResizeObserver(function () {
+        var w = roll.clientWidth;
+        if (!w || Math.abs(w - lastW) < 20 || SW.$('#tp-layout', tb).value !== 'wrap') return;
+        lastW = w; clearTimeout(relay); relay = setTimeout(draw, 120);
+      }).observe(roll);
       select();
       var wit = b.v.witnesses || [];
       if (wit.length) {
