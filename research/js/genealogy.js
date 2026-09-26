@@ -235,7 +235,10 @@
       for (var q = i - 1; q >= 0 && L[q].part === l.part; q--) if (L[q].kind !== 'blank') { pnb = L[q]; break; }
       var name = null;
       if (l.kind === 'title' || !prev || prev.part !== l.part) name = l.kind === 'title' ? words(l.code, 4) : null;
-      if (isDefine(l)) { name = 'define ' + macroName(L, i); inDef = true; }
+      // A macro may be defined on one line, tab-separated, ending in its own term
+      // (Russell's 3.1 tape: "define mult Z<tab>jda mpy<tab>lac Z<tab>term"); only a
+      // define without one opens a body to wait for.
+      if (isDefine(l)) { name = 'define ' + macroName(L, i); inDef = !/\bterm[a-z]*\s*$/i.test(l.code || ''); }
       else if (!inDef && l.kind === 'code' && l.labels.length && prev &&
                ((pnb && pnb.kind === 'comment') ||
                 (o.flowStarts !== false && flowStart(L, i)))) {

@@ -570,3 +570,7 @@ dialog.wire-dlg { width: min(560px, 94vw); }
 .svgbox.flow .flow-head text.g-pin:hover { text-decoration: line-through; fill: var(--amber); }
 .gen-hidden { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 2px 0 6px; font-size: 12px; }
 .gen-hidden .chip { padding: 1px 8px; font-size: 12px; }
+
+/* Genealogy toolbar on one line: short menus, exports in one drop-down (opens leftwards). */
+#gn-pal select { max-width: 11em; }
+.toolbar .exp-menu > .menu-body { left: auto; right: 0; min-width: 0; justify-items: end; }

@@ -536,27 +536,30 @@
     gview.innerHTML = '';
     var tb = SW.el('div', { class: 'toolbar' });
     tb.innerHTML = ['alluvial', 'matrix', 'lineage'].map(function (m) {
-      return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '" title="' + { alluvial: 'Flow through versions: every version side by side, routines joined to their ancestors', matrix: 'Similarity matrix and family tree of the chosen versions', lineage: 'The line of descent of the version open now' }[m] + '">' + { alluvial: 'Flow', matrix: 'Similarity &amp; tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '')) }[m] + '</button>';
+      return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '" title="' + { alluvial: 'Flow through versions: every version side by side, routines joined to their ancestors', matrix: 'Similarity matrix and family tree of the chosen versions', lineage: 'The line of descent of the version open now' }[m] + '">' + { alluvial: 'Flow', matrix: 'Tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '')) }[m] + '</button>';
     }).join('') + '<span class="sep"></span>' +
       '<label class="check" id="gn-line-l" title="Which line of descent to follow. After 4.0 the program forks into ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8); the CHM builds and 2015 descend from dfw 4.1. Each step compares a version with its parent. &#39;Chosen versions&#39; compares the versions you tick in date order, which mixes the forks.">Line <select id="gn-line">' +
-      V.LINES.map(function (l) { return '<option value="' + l.id + '"' + (gst.line === l.id ? ' selected' : '') + '>' + SW.esc(l.label) + '</option>'; }).join('') +
-      '<option value="chosen"' + (gst.line === 'chosen' ? ' selected' : '') + '>Chosen versions, by date (mixes the forks)</option>' +
-      '<option value="custom"' + (gst.line === 'custom' ? ' selected' : '') + '>' + (customIds().length ? 'Your own line (' + SW.esc(customIds().map(shortName).join(' → ')) + ')' : 'Wire up your own…') + '</option></select></label>' +
-      (gst.line === 'custom' ? '<button class="btn" id="gn-wire" title="Change the parents you have given, or the version followed">✎ Edit wiring</button>' : '') +
-      '<label class="check" title="The size of the pieces traced from version to version: section (large blocks under a header or tape title), routine (from one label after a break to the next), or line">Granularity <select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option' + (g === gst.gran ? ' selected' : '') + '>' + g + '</option>'; }).join('') + '</select></label>' +
+      V.LINES.map(function (l) { return '<option value="' + l.id + '" title="' + SW.esc(l.label) + '"' + (gst.line === l.id ? ' selected' : '') + '>' + { ddp: 'ddp line', dfw: 'dfw line', chm: 'CHM line' }[l.id] + '</option>'; }).join('') +
+      '<option value="chosen" title="The versions you tick, in date order (mixes the forks)"' + (gst.line === 'chosen' ? ' selected' : '') + '>By date</option>' +
+      '<option value="custom" title="' + SW.esc(customIds().length ? customIds().map(shortName).join(' → ') : 'Build a line of your own') + '"' + (gst.line === 'custom' ? ' selected' : '') + '>' + (customIds().length ? 'Your own line' : 'Wire up your own…') + '</option></select></label>' +
+      (gst.line === 'custom' ? '<button class="icon-btn" id="gn-wire" title="Edit your own line: ' + SW.esc(customIds().map(shortName).join(' → ')) + '">✎</button>' : '') +
+      '<label class="check" title="The size of the pieces traced from version to version: section (large blocks under a header or tape title), routine (from one label after a break to the next), or line"><select id="gn-gran">' + ['section', 'routine', 'line'].map(function (g) { return '<option value="' + g + '"' + (g === gst.gran ? ' selected' : '') + '>by ' + g + '</option>'; }).join('') + '</select></label>' +
       '<label class="check" title="Count the supplied macro and star tapes as part of each version"><input type="checkbox" id="gn-sup"' + (gst.supplied ? ' checked' : '') + '> supplied</label><span id="gn-pal"></span>' +
-      '<span class="help-dot" id="gn-help" tabindex="0">?</span><span class="tb-right" id="gn-exp"></span>';
+      '<span class="help-dot" id="gn-help" tabindex="0">?</span>' +
+      '<details class="menu tb-right exp-menu"><summary class="btn" title="Save the figure (SVG, PNG) or the tables (Word, Markdown)">⤓ Export ▾</summary><div class="menu-body" id="gn-exp"></div></details>';
     // The versions: a menu, not a wall of checkboxes. Changes apply when it closes.
     var all = buildable().filter(function (v) { return v.id !== 'stars'; });
     var vm = SW.el('details', { class: 'menu' });
-    vm.innerHTML = '<summary class="btn" title="Which versions to trace, in date order">Versions ' + gst.set.filter(function (id) { return all.some(function (v) { return v.id === id; }); }).length + ' of ' + all.length + ' ▾</summary>' +
+    vm.innerHTML = '<summary class="btn" title="Which versions to trace, in date order">' + gst.set.filter(function (id) { return all.some(function (v) { return v.id === id; }); }).length + ' of ' + all.length + ' ▾</summary>' +
       '<div class="menu-body gen-versions"><div class="row-btns"><button class="btn ghost" data-vs="all">All</button><button class="btn ghost" data-vs="none">None</button><button class="btn ghost" data-vs="default">Default</button></div>' +
       all.map(function (v) {
         return '<label class="check" title="' + SW.esc(v.label + ' · ' + v.date + ': ' + v.summary) + '"><input type="checkbox" data-id="' + SW.esc(v.id) + '"' + (gst.set.indexOf(v.id) >= 0 ? ' checked' : '') + '> ' + SW.esc(v.label.replace(/^Spacewar! /, '')) + ' <span class="faint">' + SW.esc(v.date) + '</span></label>';
       }).join('') + '<div class="hint">Applied when this menu closes.</div></div>';
     if (gst.line === 'chosen') tb.insertBefore(vm, SW.$('#gn-line-l', tb).nextSibling);
     gview.appendChild(tb);
-    SW.$('#gn-pal', tb).appendChild(SW.paletteSelect(function () { renderGen(cur); }));
+    var pal = SW.paletteSelect(function () { renderGen(cur); });
+    if (pal.firstChild && pal.firstChild.nodeType === 3) pal.removeChild(pal.firstChild);   // no 'Colours' word here: the menu says it
+    SW.$('#gn-pal', tb).appendChild(pal);
     SW.$('#gn-help', tb).title = gst.show === 'alluvial' ? '' : 'Choose versions, granularity and colours here; the figure and its exports are below.';
     gview.classList.toggle('gen-big', gst.show === 'alluvial' && !!SW.store.get('gen.big', false));
     var dirty = false;
