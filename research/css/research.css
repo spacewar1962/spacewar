@@ -6,6 +6,7 @@
    ============================================================ */
 
 :root {
+  --noted-bg: rgba(255, 206, 122, 0.075);
   --bg: #0a0e15;
   --bg-2: #0f1520;
   --surface: #111926;
@@ -45,6 +46,7 @@
 }
 
 :root[data-theme="paper"] {
+  --noted-bg: rgba(154, 91, 0, 0.08);
   --bg: #ece7da;
   --bg-2: #e3ddcd;
   --surface: #faf8f2;
@@ -438,7 +440,10 @@ pre.mono, .pop pre { font-family: var(--code-font); font-size: calc(var(--code-s
 /* Notes in the margin: initials in small type; a thin amber rule on the lines a note covers. */
 .note-dot { min-width: 0; padding: 0 5px; border-radius: 7px; font-size: 10px; letter-spacing: 0.5px; line-height: 1.5; white-space: nowrap; }
 .note-dot b { font-weight: 700; opacity: 0.8; }
-.ln.noted .t { box-shadow: inset 2px 0 0 var(--amber); padding-left: 4px; }
+/* An annotated line: a faint ground, not a rule, so its text keeps its column (off in ⚙ Settings) */
+:root:not(.no-note-shade) .ln.noted:not(.sel):not(.cur):not(.mlit):not(:hover) { background: var(--noted-bg); }
+/* Inline notes show the note itself, so the line-end initials go (as with the cards) */
+.rd-body.with-inline .ln .mk { visibility: hidden; }
 .ln .mk { text-align: left; padding-left: 4px; }
 /* The minimised side panel. */
 .drawer-dock { position: fixed; right: 16px; bottom: 0; z-index: 19; display: none; max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;

@@ -96,6 +96,7 @@
       }, function (e) { SW.$('#set-check').textContent = e.message; });
     };
     SW.$('#set-figbg').value = SW.figBg();
+    SW.$('#set-noteshade').checked = SW.store.get('noteShade', true);
     var fontSel = SW.$('#set-font'), size = SW.$('#set-size'), sizeOut = SW.$('#set-size-out');
     var was = { font: SW.codeFont(), size: SW.codeSize() };
     fontSel.value = was.font; size.value = was.size; sizeOut.textContent = was.size + ' px';
@@ -105,6 +106,8 @@
     dlg.onclose = function () {
       if (dlg.returnValue !== 'save') { SW.store.set('codeFont', was.font); SW.store.set('codeSize', was.size); SW.applyCodeText(); return; }
       SW.store.set('figbg', SW.$('#set-figbg').value);
+      SW.store.set('noteShade', SW.$('#set-noteshade').checked);
+      SW.applyNoteShade();
       SW.store.set('initials', SW.$('#set-initials').value.trim().toUpperCase());
       SW.store.set('name', SW.$('#set-name').value.trim());
       SW.store.set('group', SW.notes.groupId(grp.value));
@@ -172,6 +175,7 @@
     }, true);
     SW.tray.init();
     SW.applyCodeText();
+    SW.applyNoteShade();
     SW.applyPalette();
     SW.$('#btn-smaller').onclick = function () { SW.setCodeSize(SW.codeSize() - 1); };
     SW.$('#btn-larger').onclick = function () { SW.setCodeSize(SW.codeSize() + 1); };

@@ -262,6 +262,8 @@
     // Keep what is being typed: a refresh waits while a reply or edit is open.
     if (box.querySelector('.inote .reply-box, .inote .edit-box')) return;
     SW.$$('.inote', box).forEach(function (x) { x.remove(); });
+    var wrap = SW.$('.rd-body', view);
+    if (wrap) wrap.classList.toggle('with-inline', opts.notes === 'inline');
     if (opts.notes !== 'inline') return;
     var at = {}, order = [];
     shownThreads().forEach(function (t) {

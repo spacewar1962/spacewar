@@ -405,6 +405,10 @@
   var WEBFONTS = { 'JetBrains Mono': 1, 'IBM Plex Mono': 1, 'Source Code Pro': 1, 'Fira Code': 1, 'Courier Prime': 1 };
   SW.codeFont = function () { return SW.store.get('codeFont', 'system'); };
   SW.codeSize = function () { var n = +SW.store.get('codeSize', 13); return n >= 9 && n <= 24 ? n : 13; };
+  // A faint ground on annotated lines, unless turned off in Settings.
+  SW.applyNoteShade = function () {
+    document.documentElement.classList.toggle('no-note-shade', !SW.store.get('noteShade', true));
+  };
   SW.applyCodeText = function () {
     var f = SW.codeFont(), de = document.documentElement;
     if (WEBFONTS[f] && !document.getElementById('font-' + SW.slug(f))) {
