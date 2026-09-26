@@ -105,14 +105,16 @@ code, .mono { font-family: var(--mono); }
 .brand-name { font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: 1px; }
 .brand-name b { font-weight: 400; opacity: 0.8; margin-left: 6px; letter-spacing: 2px; text-transform: uppercase; font-size: 11px; }
 .bench-ver { font-family: var(--mono); font-size: 9.5px; color: var(--text-faint); align-self: flex-end; margin-bottom: 2px; }
-.pick { display: flex; align-items: center; gap: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; flex: none; }
+.pick { display: flex; align-items: center; gap: 6px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; flex: 0 1 auto; min-width: 0; }
+.pick select { min-width: 12em; }
+.pick { flex-shrink: 0; }
 .pick select {
   background: rgba(0, 0, 0, 0.28); border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 4px;
   padding: 4px 6px; font-size: 14px; text-transform: none; letter-spacing: 0; max-width: 300px; color: #fff;
 }
 :root[data-theme="paper"] .pick select { background: rgba(255, 255, 255, 0.55); color: #0d1a20; border-color: rgba(0,0,0,0.2); }
 .pick select option { color: #111; background: #fff; }
-.tape-strip { flex: 1 1 auto; min-width: 160px; height: 30px; overflow: hidden; border-radius: 2px; opacity: 0.95; }
+.tape-strip { flex: 1 1 auto; min-width: 40px; height: 30px; overflow: hidden; border-radius: 2px; opacity: 0.95; }
 .tape-strip canvas { display: block; height: 30px; }
 .bar-right { display: flex; align-items: center; gap: 8px; flex: none; }
 .status { font-family: var(--mono); font-size: 12px; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 30vw; cursor: help; }
@@ -574,3 +576,47 @@ dialog.wire-dlg { width: min(560px, 94vw); }
 /* Genealogy toolbar on one line: short menus, exports in one drop-down (opens leftwards). */
 #gn-pal select { max-width: 11em; }
 .toolbar .exp-menu > .menu-body { left: auto; right: 0; min-width: 0; justify-items: end; }
+
+/* Stemma */
+.svgbox.stemma .st-node:hover rect { stroke-width: 2; }
+.svgbox.stemma path.lit { stroke: var(--amber) !important; stroke-width: 2.6 !important; }
+.stemma-info { margin: 8px 2px; line-height: 1.6; }
+
+/* Tray */
+.tray-head label { display: grid; gap: 4px; font-size: 13px; }
+.tray-head input { padding: 6px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
+.tray-list { list-style: none; padding: 0; margin: 8px 0; }
+.tray-item { border: 1px solid var(--line-soft); border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; }
+.tray-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.tray-acts { margin-left: auto; display: flex; gap: 2px; }
+.tray-cap, .tray-text { width: 100%; margin: 6px 0; padding: 5px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; }
+.tray-fig { max-height: 180px; overflow: hidden; background: #0b1018; border-radius: 4px; padding: 4px; }
+:root[data-theme="paper"] .tray-fig { background: #fff; }
+.tray-fig svg { max-width: 100%; height: auto; max-height: 170px; }
+.tray-code { font-size: 11px; max-height: 150px; overflow: hidden; margin: 4px 0; }
+.pgbrk { color: var(--text-faint); font-size: 0.85em; margin-right: 2px; }
+.seg-btns { display: inline-flex; gap: 2px; }
+
+/* Narrower windows: the top bar gives way (label words, then the tape strip) so its buttons stay on screen */
+@media (max-width: 1240px) {
+  .brand-name b, .bench-ver, .pick > span { display: none; }
+  .bar { gap: 10px; }
+  .bar-right { gap: 2px; }
+}
+@media (max-width: 1000px) and (min-width: 861px) {
+  .tape-strip { display: none; }
+}
+/* the tab row stops where the side panel begins, as the page does */
+@media (min-width: 861px) {
+  body.drawer-open .tabs { margin-right: 380px; }
+  body.drawer-open.drawer-wide .tabs { margin-right: min(760px, 60vw); }
+}
+
+/* About */
+#dlg-about { max-width: 640px; max-height: 92vh; overflow: auto; }
+.about-head { display: flex; align-items: center; gap: 14px; }
+.about-head h2 { margin: 0; }
+.about-meta { border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+.about-meta td { padding: 6px 8px; border-top: 1px solid var(--line-soft); vertical-align: top; line-height: 1.45; }
+.about-meta td:first-child { color: var(--text-dim); white-space: nowrap; width: 7em; }
+.about-cite { font-family: var(--serif, Georgia, serif); }

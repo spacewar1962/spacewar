@@ -120,7 +120,9 @@
       var from = Math.max(1, part.title || 1), to = Math.min(tl.length, part.end || tl.length);
       var afterStart = false;
       for (var n = from; n <= to; n++) {
-        var t = tl[n - 1];
+        // control characters (a tape's stop code, read as a form feed, can sit at the
+        // head of a line) are not part of the code: left in, '\fa1,' is not 'a1,'
+        var t = String(tl[n - 1]).replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, '');
         var p = parseLine(t);
         var isTitle = n === from || (TITLE_RE.test(t) && !/^\s*\//.test(t)) ||
                       (afterStart && p.kind !== 'blank');
@@ -131,7 +133,7 @@
         var lab = p.labels.join(', ');
         var norm = p.kind === 'title' ? '' :
           normalize((p.labels.length ? p.labels.join(',') + ',' : '') + p.code);
-        lines.push({ file: part.src, part: pi, n: n, raw: (rl[n - 1] || '').replace(/\r$/, ''),
+        lines.push({ file: part.src, part: pi, n: n, raw: (rl[n - 1] || '').replace(/\r$/, '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]/g, ''),
                      label: p.labels[0] || '', labels: p.labels, code: p.code,
                      comment: p.comment, norm: norm, cnorm: normComment(p.comment),
                      kind: p.kind });

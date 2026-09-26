@@ -535,8 +535,8 @@
   function renderGen(cur) {
     gview.innerHTML = '';
     var tb = SW.el('div', { class: 'toolbar' });
-    tb.innerHTML = ['alluvial', 'matrix', 'lineage'].map(function (m) {
-      return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '" title="' + { alluvial: 'Flow through versions: every version side by side, routines joined to their ancestors', matrix: 'Similarity matrix and family tree of the chosen versions', lineage: 'The line of descent of the version open now' }[m] + '">' + { alluvial: 'Flow', matrix: 'Tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '')) }[m] + '</button>';
+    tb.innerHTML = ['stemma', 'alluvial', 'matrix', 'lineage'].map(function (m) {
+      return '<button class="btn' + (gst.show === m ? ' on' : '') + '" data-s="' + m + '" title="' + { stemma: 'The family tree of all the texts: each version under the one it was made from, witnesses beside it, lost versions dashed', alluvial: 'Flow through versions: every version side by side, routines joined to their ancestors', matrix: 'Similarity matrix and family tree of the chosen versions', lineage: 'The line of descent of the version open now' }[m] + '">' + { stemma: 'Stemma', alluvial: 'Flow', matrix: 'Tree', lineage: 'Lineage of ' + SW.esc(cur.v.label.replace(/^Spacewar! /, '').replace(/ \(.*\)$/, '')) }[m] + '</button>';
     }).join('') + '<span class="sep"></span>' +
       '<label class="check" id="gn-line-l" title="Which line of descent to follow. After 4.0 the program forks into ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8); the CHM builds and 2015 descend from dfw 4.1. Each step compares a version with its parent. &#39;Chosen versions&#39; compares the versions you tick in date order, which mixes the forks.">Line <select id="gn-line">' +
       V.LINES.map(function (l) { return '<option value="' + l.id + '" title="' + SW.esc(l.label) + '"' + (gst.line === l.id ? ' selected' : '') + '>' + { ddp: 'ddp line', dfw: 'dfw line', chm: 'CHM line' }[l.id] + '</option>'; }).join('') +
@@ -609,6 +609,14 @@
     if (gst.show === 'lineage') {
       var anc = V.ancestry(cur.v.id);
       ids = anc.length > 1 ? anc : (gst.set.indexOf(cur.v.id) < 0 ? gst.set.concat([cur.v.id]) : gst.set);
+    }
+    if (gst.show === 'stemma') {
+      // the whole family at once: no line, versions or supplied tapes to choose
+      ['#gn-line-l', '#gn-wire', '#gn-sup'].forEach(function (q) { var x = SW.$(q, tb); if (x) (x.closest('label') || x).style.display = 'none'; });
+      if (vm.parentNode) vm.remove();
+      SW.$('#gn-help', tb).title = 'A stemma, as textual scholars draw the family of a text: each version under the version it was made from (percentages: routine similarity to the parent), other readings of the same version as tags beneath it, lost versions dashed where the catalogue places them, grafts and influences as dashed and dotted lines. Click a version to light its line back to the first Spacewar!.';
+      SW.stemma.render(body, SW.$('#gn-exp', tb), cur, { gran: gst.gran });
+      return;
     }
     var hiddenHere = [];
     if (gst.show === 'alluvial') {

@@ -115,6 +115,23 @@
     };
   }
 
+  // The About box: author, version and date, what it holds, how to cite it.
+  function about() {
+    var dm = document.querySelector('meta[name="bench-date"]'), date = dm ? dm.content : '';
+    var url = SW.BASE_URI || location.href.split('?')[0];
+    var vs = V.VERSIONS.filter(function (v) { return v.id !== 'stars'; });
+    SW.$('#about-v').textContent = SW.VERSION;
+    SW.$('#about-date').textContent = date ? SW.fmtDate(date) : '';
+    SW.$('#about-ver').textContent = 'Version ' + SW.VERSION + (date ? ', ' + SW.fmtDate(date) : '');
+    SW.$('#about-cat').textContent = vs.length + ' versions catalogued, ' + vs.filter(function (v) { return v.build; }).length + ' of them assembled from source; ' + vs.filter(function (v) { return v.status === 'lost'; }).length + ' known only as lost.';
+    var cite = 'Berry, D. M. (' + (date ? date.slice(0, 4) : new Date().getFullYear()) + ') Spacewar! Research Bench (version ' + SW.VERSION + '). Available at: ' + url + ' (Accessed: ' + SW.fmtDate(SW.today()) + ').';
+    SW.$('#about-cite').textContent = cite;
+    SW.$('#about-copy').onclick = function () {
+      (navigator.clipboard ? navigator.clipboard.writeText(cite) : Promise.reject()).then(function () { SW.toast('Citation copied'); }, function () { window.prompt('Copy:', cite); });
+    };
+    SW.$('#dlg-about').showModal();
+  }
+
   function theme(t) {
     document.documentElement.setAttribute('data-theme', t);
     SW.store.set('theme', t);
@@ -136,11 +153,24 @@
       if (b) SW.setTab(b.dataset.tab);
     });
     SW.$('#btn-settings').onclick = settings;
+    SW.$('#btn-about').onclick = about;
+    SW.$('.brand').addEventListener('click', function (e) { e.preventDefault(); about(); });
     // The side panel opens below the top bar, so the bar's buttons stay in reach.
     function barH() { document.documentElement.style.setProperty('--bar-h', SW.$('header.bar').offsetHeight + 'px'); }
     barH();
     window.addEventListener('resize', barH);
     SW.notes.initNews();
+    // A drop-down menu near the right edge opens leftwards, so it stays on screen.
+    document.addEventListener('toggle', function (e) {
+      var d = e.target;
+      if (!d.classList || !d.classList.contains('menu') || !d.open) return;
+      var body = d.querySelector('.menu-body');
+      if (!body) return;
+      body.style.left = ''; body.style.right = '';
+      var r = body.getBoundingClientRect();
+      if (r.right > document.documentElement.clientWidth - 4) { body.style.left = 'auto'; body.style.right = '0'; }
+    }, true);
+    SW.tray.init();
     SW.applyCodeText();
     SW.applyPalette();
     SW.$('#btn-smaller').onclick = function () { SW.setCodeSize(SW.codeSize() - 1); };

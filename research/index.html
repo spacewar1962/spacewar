@@ -9,9 +9,11 @@
   <!-- Bench version: the ?v= on every script and stylesheet below. Raise it on
        every change to research/ (last digit for fixes, middle digit for new
        features), all tags alike, so browsers fetch fresh copies. The page shows
-       it beside the title (core.js reads it from its own tag). -->
+       it beside the title (core.js reads it from its own tag). Set bench-date
+       below to the day of the release; the About box shows both. -->
+  <meta name="bench-date" content="2026-09-26">
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css?v=0.12.2">
+  <link rel="stylesheet" href="css/research.css?v=1.0.0">
 </head>
 <body>
   <header class="bar">
@@ -29,7 +31,9 @@
       <span class="status" id="status" role="status" aria-live="polite"></span>
       <span class="size-btns"><button class="icon-btn" id="btn-smaller" title="Smaller code text">A−</button><button class="icon-btn" id="btn-larger" title="Larger code text">A+</button></span>
       <button class="icon-btn" id="btn-theme" title="Switch between phosphor and listing paper">◐</button>
+      <button class="icon-btn news-btn" id="btn-tray" title="The tray">❐<span class="news-n" id="tray-n"></span></button>
       <button class="icon-btn news-btn" id="btn-news" title="What’s new in the group’s notes">✉<span class="news-n" id="news-n"></span></button>
+      <button class="icon-btn" id="btn-about" title="About the bench: author, version, sources, how to cite">ⓘ</button>
       <button class="icon-btn" id="btn-settings" title="Your initials and the Hypothesis group">⚙</button>
     </div>
   </header>
@@ -118,24 +122,49 @@
     </form>
   </dialog>
 
+  <dialog id="dlg-about">
+    <form method="dialog" class="settings about-box">
+      <div class="about-head"><img src="img/tape-icon.svg" alt="" width="40" height="40"><div><h2>Spacewar! Research Bench</h2><div class="hint" id="about-ver"></div></div></div>
+      <table class="about-meta">
+        <tr><td>Author</td><td>David M. Berry</td></tr>
+        <tr><td>Version</td><td id="about-v"></td></tr>
+        <tr><td>Released</td><td id="about-date"></td></tr>
+        <tr><td>Purpose</td><td>A working bench for the critical reading of the Spacewar! source code (1961 to 1963 and after), made for the Spacewar! book project: assemble and run each version, compare them, trace their genealogy, annotate together, and export for writing.</td></tr>
+        <tr><td>Tech stack</td><td>Static HTML, CSS and plain JavaScript: no framework, no libraries, no build step. Served from GitHub Pages and run entirely in the browser; the sources and tape images are read from the repository’s <span class="mono">sources/</span> folder as they are needed. Word files are written directly as Office Open XML (zipped in the browser), figures as SVG and, through the canvas, PNG. The optional code fonts come from Google Fonts. Shared notes go through the Hypothesis API; settings, drafts and the tray are kept in the browser’s local storage.</td></tr>
+        <tr><td>Inside</td><td>A JavaScript port of the macro1 cross-assembler from the SIMH project, with the 1962–63 MACRO rules the tapes show; a PDP-1 emulator with the Type 30 display; FIO-DEC tape reading; shared notes through Hypothesis.</td></tr>
+        <tr><td>Sources</td><td>The program by Steve Russell, Peter Samson, Dan Edwards, Martin Graetz, Alan Kotok and others at MIT; later versions by Monty Preonas (“ddp”), “dfw” and Joe Morris; tapes from Steve Russell’s box (bitsavers); transcriptions and reconstructions by Norbert Landsteiner and the Computer History Museum. Each version’s sources and provenance are under Version &amp; notes.</td></tr>
+        <tr><td>Catalogue</td><td id="about-cat"></td></tr>
+        <tr><td>Code</td><td><a href="https://github.com/spacewar1962/spacewar" target="_blank" rel="noopener">github.com/spacewar1962/spacewar ↗</a></td></tr>
+        <tr><td>Cite as</td><td id="about-cite" class="about-cite"></td></tr>
+      </table>
+      <div class="row">
+        <button type="button" class="btn ghost" id="about-copy">Copy citation</button>
+        <button value="close" class="btn">Close</button>
+      </div>
+    </form>
+  </dialog>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js?v=0.12.2"></script>
-  <script src="js/pdp1cpu.js?v=0.12.2"></script>
-  <script src="js/fiodec.js?v=0.12.2"></script>
-  <script src="js/versions.js?v=0.12.2"></script>
-  <script src="js/export.js?v=0.12.2"></script>
-  <script src="js/genealogy.js?v=0.12.2"></script>
-  <script src="js/core.js?v=0.12.2"></script>
-  <script src="js/notes.js?v=0.12.2"></script>
-  <script src="js/figures.js?v=0.12.2"></script>
-  <script src="js/read.js?v=0.12.2"></script>
-  <script src="js/run.js?v=0.12.2"></script>
-  <script src="js/analyse.js?v=0.12.2"></script>
-  <script src="js/compare.js?v=0.12.2"></script>
-  <script src="js/tape.js?v=0.12.2"></script>
-  <script src="js/about.js?v=0.12.2"></script>
-  <script src="js/findings.js?v=0.12.2"></script>
-  <script src="js/main.js?v=0.12.2"></script>
+  <script src="js/pdp1asm.js?v=1.0.0"></script>
+  <script src="js/pdp1cpu.js?v=1.0.0"></script>
+  <script src="js/fiodec.js?v=1.0.0"></script>
+  <script src="js/versions.js?v=1.0.0"></script>
+  <script src="js/export.js?v=1.0.0"></script>
+  <script src="js/genealogy.js?v=1.0.0"></script>
+  <script src="js/core.js?v=1.0.0"></script>
+  <script src="js/notes.js?v=1.0.0"></script>
+  <script src="js/tray.js?v=1.0.0"></script>
+  <script src="js/figures.js?v=1.0.0"></script>
+  <script src="js/read.js?v=1.0.0"></script>
+  <script src="js/run.js?v=1.0.0"></script>
+  <script src="js/analyse.js?v=1.0.0"></script>
+  <script src="js/compare.js?v=1.0.0"></script>
+  <script src="js/stemma.js?v=1.0.0"></script>
+  <script src="js/tape.js?v=1.0.0"></script>
+  <script src="js/about.js?v=1.0.0"></script>
+  <script src="js/edition.js?v=1.0.0"></script>
+  <script src="js/findings.js?v=1.0.0"></script>
+  <script src="js/main.js?v=1.0.0"></script>
 </body>
 </html>
