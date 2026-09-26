@@ -143,6 +143,111 @@
     return out;
   };
 
+  // ---------- anatomy: what each stretch of an object tape is ----------
+  // An object tape, as the PDP-1 read it: blank leader (and any punched title),
+  // the read-in (RIM) section of dio/value pairs ending in a jmp, then, if that
+  // section is macro1's block loader, blocks of words each closed by a
+  // checksum, and a final jmp to the program's start. Frames without channel 8
+  // are skipped by the reader in binary mode (titles live there).
+  var DIO = 0o320000, JMP = 0o600000;
+  T.anatomy = function (bytes) {
+    var p = 0, segs = [], blocks = [], rim = [];
+    function getw() {
+      var w = 0, f0 = -1;
+      for (var i = 0; i < 3;) {
+        if (p >= bytes.length) return null;
+        var c = bytes[p++];
+        if (c & 0o200) { if (f0 < 0) f0 = p - 1; w = (w << 6) | (c & 0o77); i++; }
+      }
+      return { w: w, f0: f0, f1: p - 1 };
+    }
+    var first = 0;
+    while (first < bytes.length && !(bytes[first] & 0o200)) first++;
+    var titles = T.titles(bytes);
+    if (first > 0) segs.push({ kind: 'leader', f0: 0, f1: first - 1, label: 'leader' + (titles.some(function (t) { return t.to < first; }) ? ' and title' : '') });
+    var out = { segs: segs, blocks: blocks, titles: titles, frames: bytes.length, rimWords: 0 };
+    if (first >= bytes.length) { out.kind = 'blank'; return out; }
+    var rimJ = null, bad = null;
+    for (;;) {
+      var w = getw();
+      if (!w) break;
+      if ((w.w & 0o760000) === JMP) { rimJ = w; break; }
+      if ((w.w & 0o760000) !== DIO) { bad = w; break; }
+      var v = getw();
+      if (!v) break;
+      rim.push({ a: w.w & 0o7777, v: v.w, f0: w.f0, f1: v.f1 });
+    }
+    out.rimWords = rim.length;
+    if (bad || !rim.length) { out.kind = 'unknown'; segs.push({ kind: 'other', f0: first, f1: bytes.length - 1, label: 'not in read-in format' }); return out; }
+    var loader = rim.some(function (r) { return r.a === 0o7751 && r.v === 0o730002; });
+    segs.push({ kind: loader ? 'loader' : 'rim', f0: rim[0].f0, f1: rimJ ? rimJ.f1 : rim[rim.length - 1].f1,
+                label: loader ? 'read-in loader (' + rim.length + ' words, then jmp ' + SW.oct(rimJ ? rimJ.w & 0o7777 : 0, 4) + ')' : 'program in read-in mode (' + rim.length + ' words)' });
+    out.kind = loader ? 'blocks' : 'rim';
+    if (!loader) { out.start = rimJ ? rimJ.w & 0o7777 : null; addTail(); return out; }
+    for (;;) {
+      var sw = getw();
+      if (!sw) break;
+      if ((sw.w & 0o760000) === JMP) { out.jmp = { to: sw.w & 0o7777, f0: sw.f0, f1: sw.f1 }; segs.push({ kind: 'jmp', f0: sw.f0, f1: sw.f1, label: 'jmp ' + SW.oct(sw.w & 0o7777, 4) }); break; }
+      var ew = getw();
+      if (!ew) break;
+      var a0 = sw.w & 0o7777, a1 = ew.w & 0o7777, sum = sw.w + ew.w, n = 0, last = ew;
+      for (var a = a0; a < a1; a++) { var d = getw(); if (!d) break; sum += d.w; n++; last = d; }
+      var ck = getw();
+      while (sum > 0o777777) sum = (sum & 0o777777) + Math.floor(sum / 0o1000000);
+      var blk = { n: blocks.length + 1, a0: a0, a1: a1 - 1, words: n, f0: sw.f0, f1: ck ? ck.f1 : last.f1, ck: ck ? ck.w : null, sum: sum, ok: !!ck && ck.w === sum };
+      blocks.push(blk);
+      segs.push({ kind: blk.ok ? 'block' : 'bad', f0: blk.f0, f1: blk.f1, block: blk, label: SW.oct(a0, 4) + '–' + SW.oct(a1 - 1, 4) });
+    }
+    out.start = out.jmp ? out.jmp.to : null;
+    addTail();
+    return out;
+    function addTail() {
+      var lastF = segs.length ? segs[segs.length - 1].f1 : -1;
+      if (lastF < bytes.length - 1) segs.push({ kind: 'trailer', f0: lastF + 1, f1: bytes.length - 1, label: 'trailer' + (titles.some(function (t) { return t.from > lastF; }) ? ' and title' : '') });
+    }
+  };
+  // A source tape: leader, then the text in pages ended by stop codes (013).
+  T.sourceAnatomy = function (bytes) {
+    var first = 0, segs = [];
+    while (first < bytes.length && !bytes[first]) first++;
+    var last = bytes.length - 1;
+    while (last > first && !bytes[last]) last--;
+    if (first) segs.push({ kind: 'leader', f0: 0, f1: first - 1, label: 'leader' });
+    var f0 = first, page = 1;
+    for (var i = first; i <= last; i++) {
+      if (bytes[i] === 0o13) { segs.push({ kind: page % 2 ? 'block' : 'page2', f0: f0, f1: i, label: 'page ' + page + ' (to the stop code at frame ' + i + ')' }); page++; f0 = i + 1; }
+    }
+    if (f0 <= last) segs.push({ kind: page % 2 ? 'block' : 'page2', f0: f0, f1: last, label: 'page ' + page });
+    if (last < bytes.length - 1) segs.push({ kind: 'trailer', f0: last + 1, f1: bytes.length - 1, label: 'trailer' });
+    return { kind: 'source', segs: segs, blocks: [], titles: T.titles(bytes), frames: bytes.length, pages: page - (f0 > last ? 1 : 0) };
+  };
+  var ANAT_COL = { leader: 'var(--g-muted)', trailer: 'var(--g-muted)', loader: 'var(--g-moved)', rim: 'var(--g-moved)', block: 'var(--g-retained)', bad: 'var(--g-removed)', jmp: 'var(--g-added)', other: 'var(--g-edited)', page2: 'var(--g-heat)' };
+  T.anatomySVG = function (an, name, W) {
+    W = W || 1100;
+    var H = 150, top = 46, h = 30, sx = (W - 40) / Math.max(1, an.frames);
+    var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" font-family="ui-monospace, Menlo, Consolas, monospace">',
+             '<title>' + SW.esc('Anatomy of ' + name) + '</title>',
+             '<text x="20" y="20" font-size="13" fill="var(--g-text)">' + SW.esc(name) + '</text>',
+             '<text x="20" y="36" font-size="10" fill="var(--g-muted)">' + an.frames.toLocaleString('en-GB') + ' frames · ' + (an.kind === 'source' ? 'a source tape in FIO-DEC, ' + an.pages + ' pages between stop codes' : an.kind === 'blocks' ? an.blocks.length + ' blocks, ' + an.blocks.filter(function (b) { return !b.ok; }).length + ' failing their checksum · ' + (an.start != null ? 'ends jmp ' + SW.oct(an.start, 4) : 'no closing jmp') : an.kind === 'rim' ? 'read-in mode only' : 'not an object tape') + '</text>'];
+    an.segs.forEach(function (sg, i) {
+      var x = 20 + sg.f0 * sx, w = Math.max(1, (sg.f1 - sg.f0 + 1) * sx), alt = sg.kind === 'block' && sg.block && sg.block.n % 2 === 0;
+      o.push('<rect class="an-seg" data-i="' + i + '" x="' + x.toFixed(2) + '" y="' + top + '" width="' + w.toFixed(2) + '" height="' + h + '" fill="' + ANAT_COL[sg.kind] + '" fill-opacity="' + (sg.kind === 'leader' || sg.kind === 'trailer' ? 0.35 : alt ? 0.6 : 0.9) + '" stroke="var(--g-stroke)" stroke-width="0.4"><title>' +
+        SW.esc(sg.label + ' · frames ' + sg.f0 + '–' + sg.f1 + (sg.block ? ' · ' + sg.block.words + ' words · checksum ' + SW.oct(sg.block.ck) + (sg.block.ok ? ' (checks)' : ' (the words sum to ' + SW.oct(sg.block.sum) + ')') : '')) + '</title></rect>');
+      if (sg.kind === 'bad') o.push('<text x="' + (x + w / 2).toFixed(1) + '" y="' + (top - 4) + '" font-size="10" text-anchor="middle" fill="var(--g-removed)">✕ ' + SW.esc(sg.label) + '</text>');
+    });
+    an.titles.forEach(function (t) {
+      var x = 20 + t.from * sx, w = Math.max(2, (t.to - t.from + 1) * sx);
+      o.push('<rect x="' + x.toFixed(2) + '" y="' + (top + h + 3) + '" width="' + w.toFixed(2) + '" height="4" fill="var(--g-edited)"><title>' + SW.esc('Punched title “' + t.text + '”') + '</title></rect>');
+    });
+    var kx = 20, ky = H - 22;
+    [['leader', 'leader / trailer'], ['loader', 'read-in loader'], ['block', 'block (checksum good)'], ['bad', 'checksum fails'], ['jmp', 'closing jmp'], ['other', 'punched title']].forEach(function (k) {
+      o.push('<rect x="' + kx + '" y="' + (ky - 9) + '" width="14" height="10" fill="' + (k[0] === 'other' ? 'var(--g-edited)' : ANAT_COL[k[0]]) + '"/><text x="' + (kx + 18) + '" y="' + ky + '" font-size="10" fill="var(--g-text)">' + k[1] + '</text>');
+      kx += 34 + k[1].length * 6.2;
+    });
+    o.push('</svg>');
+    return o.join('');
+  };
+
   // Every tape image the catalogue refers to, with the versions that use it.
   T.EXTRA = [{ path: 'SteveRussell_box1/stars.bin', note: 'star table, not used in any build here' }];
   T.allTapes = function () {
@@ -194,7 +299,8 @@
         '<p class="prose">A <b>frame</b> is one column of holes across the tape: one character on a source tape, one six-bit part of a word on an object tape, at ten frames to the inch. Eight data channels run along the tape, with the small sprocket hole between the third and fourth. Choose where to start (counted from the very beginning of the tape image, leader included) and how many frames to draw.</p>' +
         (reals.length ? '' : '<p class="prose"><b>No real tape survives for this version</b> in the project’s sources; only the reconstruction can be shown.</p>');
       var tb = SW.el('div', { class: 'toolbar' });
-      tb.innerHTML = '<label class="check" title="Real tapes are digitised images of the surviving paper tapes; the reconstruction is the tape the assembler would punch today">Tape <select id="tp-which">' +
+      tb.innerHTML = '<span class="seg-btns"><button class="btn' + (mode === 'holes' ? ' on' : '') + '" data-mode="holes" title="The tape as holes, frame by frame">Holes</button><button class="btn' + (mode === 'anatomy' ? ' on' : '') + '" data-mode="anatomy" title="The tape as stretches: leader and title, the read-in loader, each block of words with its checksum (checked), and the closing jump; for a source tape, its pages between stop codes">Anatomy</button></span>' +
+        '<label class="check" title="Real tapes are digitised images of the surviving paper tapes; the reconstruction is the tape the assembler would punch today">Tape <select id="tp-which">' +
         reals.map(function (r, i) { return '<option value="r' + i + '">Real: ' + SW.esc(r.path) + ' (' + SW.esc(r.kind) + ')</option>'; }).join('') +
         '<option value="asm">Reconstruction: assembled today (macro1 format)</option></select></label>' +
         '<label class="check" title="A frame is one column of holes across the tape: one character or byte. Frames are counted from the very start of the tape image, leader included.">Start at frame <input type="number" id="tp-from" min="0" value="0" style="width:7em"></label>' +
@@ -203,7 +309,43 @@
       var roll = SW.el('div', { class: 'tape-roll' });
       var decoded = SW.el('pre', { class: 'mono', style: 'display:none;max-height:260px;overflow:auto;font-size:12px;background:var(--surface);padding:8px;border-radius:6px' });
       var titlesBox = SW.el('div', { class: 'tape-titles' });
-      var cur = { bytes: [], name: '' };
+      var anatBox = SW.el('div', { class: 'tape-anat' });
+      var cur = { bytes: [], name: '', source: false };
+      var mode = SW.store.get('tape.mode', 'holes');
+      // Anatomy: the tape as stretches (leader, loader, blocks and their checksums, jmp).
+      function showAnatomy() {
+        anatBox.innerHTML = '';
+        anatBox.style.display = mode === 'anatomy' ? '' : 'none';
+        if (mode !== 'anatomy' || !cur.bytes.length) return;
+        var an = cur.source ? T.sourceAnatomy(cur.bytes) : T.anatomy(cur.bytes);
+        var box = SW.el('div', { class: 'svgbox', style: 'margin:6px 0' }, SW.displaySVG(T.anatomySVG(an, cur.name, 1100)));
+        anatBox.appendChild(box);
+        var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+        bar.appendChild(SW.figureButtons(function () { return T.anatomySVG(an, cur.name, 1100); }, cur.name + '-anatomy'));
+        anatBox.appendChild(bar);
+        anatBox.appendChild(SW.el('p', { class: 'hint' }, 'Click a stretch, or a row, to draw the holes from there.'));
+        var rows = an.segs.map(function (sg) {
+          var bk = sg.block;
+          return [sg.kind === 'bad' ? 'block (fails)' : sg.kind === 'page2' ? 'page' : sg.kind, sg.f0 + '–' + sg.f1, sg.f1 - sg.f0 + 1, bk ? SW.oct(bk.a0, 4) + '–' + SW.oct(bk.a1, 4) : '', bk ? bk.words : '',
+                  bk ? { html: bk.ok ? '<span class="badge ok">' + SW.oct(bk.ck) + ' checks</span>' : '<span class="badge err">' + SW.oct(bk.ck) + ' punched; words sum to ' + SW.oct(bk.sum) + '</span>', text: bk.ok ? SW.oct(bk.ck) + ' checks' : SW.oct(bk.ck) + ' punched, words sum to ' + SW.oct(bk.sum), sort: bk.ok ? 1 : 0 } : '',
+                  (b.symAt && bk && b.symAt(bk.a0)) || (sg.kind === 'block' || sg.kind === 'bad' ? '' : sg.label)];
+        });
+        var tbl = SW.table(['Stretch', 'Frames', 'Length', 'Addresses', 'Words', 'Checksum', 'Note'], rows, { cls: ['', 'mono', 'num', 'mono', 'num', 'mono', 'mono'], onRow: function (r) {
+          SW.$('#tp-from', tb).value = Math.max(0, parseInt(r[1], 10) - 4); draw(); roll.scrollIntoView({ block: 'nearest' });
+        } });
+        var sc = SW.el('div', { class: 'scroll', style: 'max-height:360px;overflow:auto' });
+        sc.appendChild(tbl);
+        anatBox.appendChild(sc);
+        box.addEventListener('click', function (e) {
+          var r = e.target.closest('.an-seg');
+          if (!r) return;
+          var sg = an.segs[+r.getAttribute('data-i')];
+          SW.$('#tp-from', tb).value = Math.max(0, sg.f0 - 4); draw(); roll.scrollIntoView({ block: 'nearest' });
+        });
+        anatBox.appendChild(SW.exportButtons(function () {
+          return { title: 'Anatomy of ' + cur.name, meta: SW.docMeta(b), blocks: [SW.tableBlock('Stretches of the tape', ['Stretch', 'Frames', 'Length', 'Addresses', 'Words', 'Checksum', 'Note'], rows)] };
+        }, cur.name + '-anatomy'));
+      }
       function showTitles(bytes) {
         var ts = T.titles(bytes);
         titlesBox.innerHTML = '';
@@ -235,17 +377,18 @@
         decoded.style.display = 'none';
         titlesBox.innerHTML = '';
         if (w === 'asm') {
-          cur = { bytes: b.asm.tape, name: 'spacewar-' + b.v.id + '-reconstruction' };
+          cur = { bytes: b.asm.tape, name: 'spacewar-' + b.v.id + '-reconstruction', source: false };
           info.innerHTML = '<b>Reconstruction.</b> ' + cur.bytes.length.toLocaleString('en-GB') + ' frames (' + (cur.bytes.length / 120).toFixed(1) + ' ft): blank leader, macro1’s RIM read-in loader, the program in checksummed blocks, a closing <code>jmp</code> to the start address.';
           SW.$('#tp-from', tb).value = start(cur.bytes);
           draw();
+          showAnatomy();
           return;
         }
         var r = reals[+w.slice(1)];
         info.textContent = 'Reading ' + r.path + '…';
         SW.fetchBytes(r.path).then(function (bytes) {
-          cur = { bytes: bytes, name: r.path.split('/').pop().replace(/\.[a-z]+$/, '') };
           var d = root.SWFiodec ? root.SWFiodec.decode(bytes) : null;
+          cur = { bytes: bytes, name: r.path.split('/').pop().replace(/\.[a-z]+$/, ''), source: !!(d && d.isSource) };
           var kind = d && d.isSource ? 'a <b>source tape</b>: FIO-DEC text, every frame passing the odd-parity check (' + d.stops + ' stop codes)' :
             'an <b>object tape</b>: binary words for the loader' + (d ? ' (' + Math.round(100 * d.parityErrors / Math.max(1, d.frames)) + '% of frames fail the FIO-DEC parity test, as binary does)' : '');
           info.innerHTML = '<b>Real tape.</b> <span class="mono">' + SW.sourceLink(r.path) + '</span>: ' + bytes.length.toLocaleString('en-GB') + ' frames (' + (bytes.length / 120).toFixed(1) + ' ft), ' + kind + '.';
@@ -255,6 +398,7 @@
           SW.state.tapeGo = null;
           draw();
           showTitles(bytes);
+          showAnatomy();
         }).catch(function (e) { info.textContent = e.message; });
       }
       tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
@@ -266,10 +410,18 @@
       } }, '⤓ Tape image (.bin)'));
       pad.appendChild(tb);
       pad.appendChild(info);
+      pad.appendChild(anatBox);
       pad.appendChild(roll);
       pad.appendChild(titlesBox);
       pad.appendChild(decoded);
       SW.$('#tp-which', tb).addEventListener('change', select);
+      tb.addEventListener('click', function (e) {
+        var m = e.target.closest('[data-mode]');
+        if (!m) return;
+        mode = m.dataset.mode; SW.store.set('tape.mode', mode);
+        SW.$$('[data-mode]', tb).forEach(function (x) { x.classList.toggle('on', x.dataset.mode === mode); });
+        showAnatomy();
+      });
       // Sent here from elsewhere (the Findings page) to a particular tape.
       var want = SW.state.tapeGo ? reals.map(function (r) { return r.path; }).indexOf(SW.state.tapeGo.path) : -1;
       if (want >= 0) SW.$('#tp-which', tb).value = 'r' + want; else SW.state.tapeGo = null;

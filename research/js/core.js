@@ -503,6 +503,10 @@
         root.SWExport.download(name + '.png', r.png, 'image/png');
       }, function () { SW.toast('The PNG could not be made from this figure; try SVG, or zoom out first.', 6000); });
     } }, '▣ PNG'));
+    w.appendChild(document.createTextNode(' '));
+    w.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put this figure in the tray, to gather with others for a chapter', onclick: function () {
+      if (SW.tray) SW.tray.addFigure(getSvg(SW.exportPalette()), name);
+    } }, '＋ Tray'));
     return w;
   };
 
@@ -531,6 +535,10 @@
     wrap.appendChild(SW.el('button', { class: 'btn', title: 'Export to Markdown', onclick: function () {
       Promise.resolve(makeDoc()).then(function (d) { SW.exportDoc(d, typeof base === 'function' ? base() : base, 'md'); });
     } }, '⤓ Markdown'));
+    wrap.appendChild(document.createTextNode(' '));
+    wrap.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put this (as it would export) in the tray, to gather with others for a chapter', onclick: function () {
+      Promise.resolve(makeDoc()).then(function (d) { if (SW.tray) SW.tray.addDoc(d); });
+    } }, '＋ Tray'));
     return wrap;
   };
 

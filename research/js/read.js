@@ -121,7 +121,7 @@
       (title ? ' title="' + SW.esc(title) + '"' : '') + '>' +
       '<span class="n"' + heat + '>' + L.n + '</span><span class="a"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + a + '</span>' +
       '<span class="w"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + w + '</span>' +
-      '<span class="t">' + (text ? hl(text, b) : ' ') + '</span><span class="mk">' + mk + '</span></div>';
+      '<span class="t">' + (text ? hl(text, b).replace(/\f/g, '<span class="pgbrk" title="Page break: a stop code on the tape, or a form feed in the listing">↡</span>') : ' ') + '</span><span class="mk">' + mk + '</span></div>';
   }
 
   function render() {
@@ -163,6 +163,7 @@
         b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : '')));
     } else if (!b.asm) tb.appendChild(SW.el('span', { class: 'hint' }, 'No source survives.'));
     tb.appendChild(SW.el('span', { class: 'sep' }));
+    if (b.v.build && SW.edition) tb.appendChild(SW.edition.menu(function () { return build; }));
     tb.appendChild(SW.exportButtons(function () { return listingDoc(b, null); }, function () { return 'spacewar-' + b.v.id + '-listing'; }));
     view.appendChild(tb);
 
@@ -219,7 +220,7 @@
     var acts = [
       ['✎ Annotate', annotateSel], ['❝ Copy citation', copyCite], ['🔗 Copy link', copyLink],
       ['⤓ Word', function () { exportSel('docx'); }], ['⤓ Markdown', function () { exportSel('md'); }],
-      ['▣ Figure', figureSel], ['● Breakpoint', bpSel], ['▶ Run to here', runToSel], ['✕', function () { SW.state.sel = null; paintSel(); SW.writeQuery(); }]
+      ['▣ Figure', figureSel], ['＋ Tray', function () { listingDoc(build, SW.state.sel).then(function (d) { d.title = SW.cite(build, SW.state.sel.p, SW.state.sel.n0, SW.state.sel.n1); SW.tray.addDoc(d); }); }], ['● Breakpoint', bpSel], ['▶ Run to here', runToSel], ['✕', function () { SW.state.sel = null; paintSel(); SW.writeQuery(); }]
     ];
     acts.forEach(function (a) { bar.appendChild(SW.el('button', { class: 'btn', onclick: a[1] }, a[0])); });
   }
