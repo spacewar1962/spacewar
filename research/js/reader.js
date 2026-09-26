@@ -68,12 +68,12 @@
     var tx = o.source && root.SWFiodec ? textIndex(bytes) : null;
     var dlg = SW.el('dialog', { class: 'reader-dlg' });
     dlg.innerHTML = '<div class="rd-head"><h2>Tape Load Simulator: ' + SW.esc(o.name || 'the tape') + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
-      '<div class="rd-body"><canvas class="rd-machine"></canvas><div class="rd-coreside"><canvas class="rd-core"></canvas><p class="hint rd-corecap">Hover over core to see a word.</p></div></div>' +
+      '<div class="rd-body"><canvas class="rd-machine"></canvas><div class="rd-coreside"><canvas class="rd-core"></canvas><button class="btn ghost rd-divebtn" data-a="dive" title="What each stretch of core holds and why, worked out from this tape and the version’s source">What is where in core ▸</button><p class="hint rd-corecap">Hover over core to see a word.</p></div></div>' +
       (tx ? '<pre class="rd-print mono"></pre>' : '') +
       '<div class="rd-ctl"><button class="btn" data-a="play">▶ Play</button><button class="btn ghost" data-a="restart" title="Back to the start of the tape">↺</button>' +
       '<label class="check">Speed <select data-a="speed"><option value="1" selected>400 lines a second, as the PDP-1 read</option><option value="4">× 4</option><option value="16">× 16</option><option value="64">× 64</option></select></label>' +
       '<button class="btn ghost" data-a="skip" title="Read the rest of the tape at once">Skip to end ⏭</button><span class="rd-run"></span></div>' +
-      '<p class="rd-status hint"></p>' +
+      '<p class="rd-status hint"></p><div class="rd-dive" hidden></div>' +
       '<p class="hint rd-note">' + (tx ? 'A source tape is read by the assembler, which the bench does not emulate: the reader runs and the text is printed as it is read; the console stays dark.'
         : 'Read-In mode loads the loader punched at the head of the tape; the loader then runs on the bench’s PDP-1 emulator, taking each word as the reader delivers it and checking each block against its checksum. Reader speed and console lights as in DEC’s PDP-1 Manual (1961).') + '</p>';
     document.body.appendChild(dlg);
@@ -86,7 +86,7 @@
     var pos, playing, speed = 1, last = null, raf = 0, shown;
     var cpu, rd, phase, lamps, lo, hi, outcome, chains;
     // core as it fills: 0 empty, 1 loaded, 2 loaded over an earlier word; when (frame) each was last written
-    var core = new Uint8Array(4096), when = new Float64Array(4096), deposits = 0;
+    var core = new Uint8Array(4096), when = new Float64Array(4096), deposits = 0, rimAt = new Uint8Array(4096);
     function deposit(a, before, v) {
       var f = rd ? rd.p - 1 : pos;                // the frame the word's last line was read from
       if (core[a] && before !== v && f - when[a] > 30) core[a] = 2;   // (a block's first word briefly holds its dio: not counted)
@@ -96,7 +96,7 @@
 
     function reset() {
       pos = 0; playing = false; shown = -1; outcome = null; chains = [];
-      core.fill(0); when.fill(0); deposits = 0;
+      core.fill(0); when.fill(0); deposits = 0; rimAt.fill(0);
       rd = new Reader(bytes);
       cpu = tx ? null : new root.PDP1CPU.PDP1({});
       if (cpu) {
@@ -136,7 +136,7 @@
           if (v.f > pos) return;
           rd.p = v.next;
           var y = a.w & 0o7777;
-          deposit(y, cpu.mem[y], v.w);
+          deposit(y, cpu.mem[y], v.w); rimAt[y] = 1;
           cpu.mem[y] = v.w; lo = Math.min(lo, y); hi = Math.max(hi, y);
           lamps.ma = y; lamps.mb = v.w; lamps.io = v.w;
           continue;
@@ -308,6 +308,112 @@
       corecap.textContent = SW.oct(a, 4) + ': ' + (core[a] ? SW.oct(w) + '  ' + root.PDP1CPU.disasm(w, o.symAt) + (o.symAt && o.symAt(a) ? '  (' + o.symAt(a) + ' in the build)' : '') + ' · written at frame ' + Math.round(when[a]).toLocaleString('en-GB') + (core[a] === 2 ? ', over an earlier word' : '') : 'empty');
     });
 
+    // ---------- what is where in core ----------
+    // Core walked in address order, in stretches: loaded by the tape (and from
+    // which source lines), loaded twice, the loader, or left empty (and the
+    // source lines and symbols that account for the gap).
+    function deepDive(box) {
+      var B = o.build;
+      box.innerHTML = '';
+      if (!cpu) { box.innerHTML = '<p class="hint">A source tape is read by the assembler, not loaded into core, so there is no core to describe.</p>'; return; }
+      var kinds = new Array(4096), loaderLo = an && an.kind === 'blocks' ? lo : 4096;
+      for (var a = 0; a < 4096; a++) kinds[a] = a >= loaderLo && (core[a] || rimAt[a]) ? 'loader' : core[a] === 2 ? 'twice' : core[a] ? 'loaded' : 'empty';
+      var runs = [], r0 = 0;
+      for (a = 1; a <= 4096; a++) if (a === 4096 || kinds[a] !== kinds[r0]) { runs.push({ a0: r0, a1: a - 1, kind: kinds[r0] }); r0 = a; }
+      function line(pn) { return B && pn ? B.lines[pn.p][pn.n - 1] : null; }
+      function code(t) { return '<code>' + SW.esc(String(t).replace(/\s+$/, '')) + '</code>'; }
+      var syms = B ? Object.keys(B.sym).map(function (k) { return { name: k, s: B.sym[k] }; }).filter(function (x) { return x.s && x.s.defined !== false && (x.s.variable || (x.s.defs && x.s.defs.length)); }) : [];
+      // A label names its address only if its own line puts a word there, or puts no word
+      // anywhere (p, mtb: labels on reserved space); labels written relative to R
+      // (the outline compiler's fuu, flo) carry offsets, not addresses.
+      function placed(x) {
+        if (!x.s.label) return true;
+        var d = x.s.defs && x.s.defs[0];
+        if (!d || !B.asm.byLine || !B.asm.byLine[d.file]) return true;
+        var ws = B.asm.byLine[d.file][d.line];
+        return !ws || !ws.length || ws.some(function (w) { return w.loc === x.s.val; });
+      }
+      function symsIn(a0, a1) { return syms.filter(function (x) { return x.s.val >= a0 && x.s.val <= a1 && placed(x); }).sort(function (x, y) { return x.s.val - y.s.val; }); }
+      function defComment(x) {
+        var d = x.s.defs && x.s.defs[0], L = d && B.lines[d.file] && B.lines[d.file][d.line - 1];
+        var m = L && /(^|\s)\/\s*(.+)$/.exec(L.raw);   // a comment's slash follows a space; '. 200/' is not one
+        return m ? m[2].trim() : '';
+      }
+      // the source's own lines between two words, non-blank, as written
+      function linesBetween(pa, pb) {
+        var out = [];
+        if (!B || !pa) return out;
+        var ls = B.lines[pa.p], end = pb && pb.p === pa.p ? pb.n - 1 : ls.length;
+        for (var n = pa.n + 1; n <= end && out.length < 8; n++) { var t = (ls[n - 1].raw || '').trim(); if (t && !/^\/?$/.test(t)) out.push(t); }
+        return out;
+      }
+      var GLOSS = [
+        [/^\.\s*\d+\//, '<code>. n/</code> moves the location on by n words (octal) without putting anything in them, so the tape carries nothing there.'],
+        [/^variables\b/, '<code>variables</code> gives each overlined variable a word here; the tape carries no values for them.'],
+        [/^constants\b/, '<code>constants</code> puts the program’s literal constants here.'],
+        [/^start\b/, '<code>start</code> ends the source and names the starting address.'],
+        [/^[a-z0-9]+,\s*\.\s*\d+\//, 'A label followed by <code>. n/</code> names the first of n words left free.']
+      ];
+      var used = {};
+      var rows = runs.map(function (r) {
+        var n = r.a1 - r.a0 + 1, what = '', from = '';
+        var range = SW.oct(r.a0, 4) + (n > 1 ? '–' + SW.oct(r.a1, 4) : '');
+        if (r.kind === 'loader') {
+          var rim = 0, work = [];
+          for (var x = r.a0; x <= r.a1; x++) { if (rimAt[x]) rim++; else work.push(SW.oct(x, 4)); }
+          what = 'The loader. Read-In mode put ' + rim + ' words here from the head of the tape before anything else' + (work.length ? '; ' + work.join(' and ') + ' are the words it works in (the running sum and the end address of each block)' : '') + '.';
+        } else if (r.kind === 'empty') {
+          if (r.a0 === 0 && r.a1 >= 2) {
+            what = 'Not on the tape. A sequence break stores the Accumulator in 0000, the Program Counter in 0001 and the In-Out register in 0002, then restarts the program at 0003 (DEC, PDP-1 Handbook, 1963, pp. 25–26)' + (r.a1 > 2 ? '; the rest is left empty too' : '') + '.';
+            var L3 = line(B && B.srcOf(3));
+            if (L3) from = code(L3.raw.trim()) + ' (line ' + B.srcOf(3).n + ', at 0003)';
+          } else {
+            what = 'Not on the tape' + (r.a1 === 4095 ? ', to the top of core' : '') + '.';
+            var before = B && B.srcOf(r.a0 - 1), after = B && B.srcOf(r.a1 + 1), ls = linesBetween(before, after);
+            if (ls.length) from = 'The source after the word at ' + SW.oct(r.a0 - 1, 4) + ': ' + ls.map(code).join(' ');
+            ls.forEach(function (t) { GLOSS.forEach(function (gl, i) { if (gl[0].test(t)) used[i] = 1; }); });
+            // labels and variables here; an assignment only after a label in the same stretch (nx1=mtb nob), since otherwise its value may be a plain number
+            var ss = symsIn(r.a0, r.a1), vars = ss.filter(function (x) { return x.s.variable; }), labs = ss.filter(function (x) { return x.s.label; });
+            var firstLab = labs.length ? labs[0].s.val : 4096;
+            var named = ss.filter(function (x) { return !x.s.variable && (x.s.label || x.s.val >= firstLab); });
+            var bits = [];
+            if (vars.length) bits.push(vars.length + ' variable' + (vars.length > 1 ? 's' : '') + ' at ' + SW.oct(vars[0].s.val, 4) + (vars.length > 1 ? '–' + SW.oct(vars[vars.length - 1].s.val, 4) : '') + ' (filled as the program runs)');
+            named.slice(0, 8).forEach(function (x) { var c = defComment(x); bits.push(x.name + ' = ' + SW.oct(x.s.val, 4) + (c ? ' “' + c + '”' : '')); });
+            if (named.length > 8) bits.push('and ' + (named.length - 8) + ' more names');
+            if (bits.length) what += ' Named here: ' + bits.join('; ') + '.';
+            else if (r.a0 > 0 && r.a1 < 4095) what += ' No name in the source falls in this stretch.';
+          }
+        } else {
+          var fa = B && B.srcOf(r.a0), fb = B && B.srcOf(r.a1), same = 0, total = 0;
+          if (o.buildMem) for (var y = r.a0; y <= r.a1; y++) if (o.buildMem[y] != null) { total++; var bw = o.buildMem[y]; if (cpu.mem[y] === ((typeof bw === 'object' ? bw.val : bw) & M)) same++; }
+          var ss2 = symsIn(r.a0, r.a1).filter(function (x) { return x.s.label; }).map(function (x) { return x.name; });
+          var f0 = Infinity, f1 = -1;
+          for (var z = r.a0; z <= r.a1; z++) { f0 = Math.min(f0, when[z]); f1 = Math.max(f1, when[z]); }
+          var frames = 'frames ' + Math.round(f0).toLocaleString('en-GB') + '–' + Math.round(f1).toLocaleString('en-GB');
+          what = (r.kind === 'twice' ? 'Loaded twice: words read later in the tape (' + frames + ') replaced what an earlier part had put here. ' : 'Loaded from the tape, ' + frames + '. ') +
+            (total ? (same === n ? 'Every word as in the build.' : same + ' of ' + n + ' words as in the build.') : 'The build has nothing here.') +
+            (ss2.length ? ' Labels: ' + ss2.slice(0, 8).join(', ') + (ss2.length > 8 ? ' and ' + (ss2.length - 8) + ' more' : '') + '.' : '');
+          if (fa && fb && total) {
+            var part = B.parts[fa.p], org = '';
+            for (var k = fa.n - 1; k >= Math.max(1, fa.n - 6); k--) { var t = (B.lines[fa.p][k - 1].raw || '').trim(); if (/^[0-7]+\//.test(t)) { org = t; break; } }
+            var only = fb.p === fa.p && fb.n === fa.n ? (B.lines[fa.p][fa.n - 1].raw || '').trim() : '';
+            if (/^constants\b/.test(only)) { from = 'The program’s literal constants, gathered and placed by ' + code(only) + ' (' + SW.esc(part.src.split('/').pop()) + ', line ' + fa.n + ').'; used[2] = 1; }
+            else from = (r.kind === 'twice' ? 'What the build has here (not what is here now): ' : '') + SW.esc(part.src.split('/').pop()) + ', lines ' + fa.n + (fb.p === fa.p ? '–' + fb.n : ' onwards') + (org ? '; the origin line ' + code(org) + ' puts it at ' + SW.oct(r.a0, 4) : '');
+          }
+        }
+        return [{ html: '<span class="mono">' + range + '</span>', text: range }, n, { html: SW.esc(r.kind === 'loaded' ? 'loaded' : r.kind === 'twice' ? 'loaded twice' : r.kind === 'loader' ? 'the loader' : 'empty'), text: r.kind }, { html: what, text: what }, { html: from, text: from.replace(/<[^>]+>/g, '') }];
+      });
+      box.appendChild(SW.el('h3', {}, 'What is where in core'));
+      box.appendChild(SW.el('p', { class: 'hint' }, 'Worked out from this tape as loaded (' + deposits.toLocaleString('en-GB') + ' words so far) and from ' + SW.esc(o.label || 'the version') + '’s source: each stretch of core in address order, what put it there, or why nothing did.'));
+      var tbl = SW.table(['Addresses', 'Words', 'Kind', 'What it is', 'From the source'], rows, { cls: ['mono', 'num', '', '', ''] });
+      box.appendChild(tbl);
+      var gl = Object.keys(used).map(function (i) { return '<li>' + GLOSS[i][1] + '</li>'; }).join('');
+      if (gl) box.appendChild(SW.el('ul', { class: 'hint rd-gloss' }, gl));
+      box.appendChild(SW.exportButtons(function () {
+        return { title: 'What is where in core: ' + (o.name || 'tape'), meta: B ? SW.docMeta(B) : null, blocks: [SW.tableBlock('Core after loading ' + (o.name || 'the tape'), ['Addresses', 'Words', 'Kind', 'What it is', 'From the source'], rows)] };
+      }, (o.name || 'tape') + '-core'));
+    }
+
     function update() {
       advance();
       var f = Math.min(N - 1, Math.floor(pos));
@@ -354,6 +460,12 @@
         b.textContent = playing ? '❚❚ Pause' : '▶ Play';
       } else if (a === 'restart') reset();
       else if (a === 'skip' && !(outcome && outcome.checked)) { playing = true; pos = N; }
+      else if (a === 'dive') {
+        var box = SW.$('.rd-dive', dlg);
+        box.hidden = !box.hidden;
+        b.textContent = box.hidden ? 'What is where in core ▸' : 'What is where in core ▾';
+        if (!box.hidden) { deepDive(box); box.scrollIntoView({ block: 'nearest' }); }
+      }
     });
     SW.$('[data-a="speed"]', dlg).onchange = function (e) { speed = +e.target.value; };
     dlg.addEventListener('keydown', function (e) {

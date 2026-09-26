@@ -811,3 +811,9 @@ dialog.reader-dlg { width: min(1360px, 98vw); max-height: 96vh; overflow: auto; 
 .reader-dlg .rd-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 10px; }
 .reader-dlg .rd-status { margin: 8px 0 0; min-height: 1.5em; }
 .reader-dlg .rd-note { margin: 4px 0 0; font-size: 12px; }
+.reader-dlg .rd-divebtn { margin-top: 6px; }
+.reader-dlg .rd-dive { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 8px; }
+.reader-dlg .rd-dive h3 { margin: 4px 0; }
+.reader-dlg .rd-dive table td { vertical-align: top; font-size: 12.5px; line-height: 1.45; }
+.reader-dlg .rd-dive code { font-size: 11.5px; background: var(--surface-2); padding: 0 3px; border-radius: 3px; }
+.reader-dlg .rd-gloss { margin: 8px 0; padding-left: 18px; }

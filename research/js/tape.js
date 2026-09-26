@@ -544,7 +544,7 @@
       }
       tb.appendChild(SW.el('button', { class: 'btn', title: 'Run this tape through the PDP-1’s photoelectric reader: Read-In mode, then the tape’s own loader on the emulator, with the console lights', onclick: function () {
         if (!cur.bytes.length || !SW.reader) return;
-        SW.reader.open(cur.bytes, { name: cur.name, source: cur.source, an: cur.an, buildMem: b.asm.memory, symAt: b.symAt, label: b.v.label.replace(/^Spacewar! /, ''), onRun: function () { SW.setTab('run'); } });
+        SW.reader.open(cur.bytes, { name: cur.name, source: cur.source, an: cur.an, buildMem: b.asm.memory, symAt: b.symAt, build: b, label: b.v.label.replace(/^Spacewar! /, ''), onRun: function () { SW.setTab('run'); } });
       } }, 'Tape Load Simulator'));
       tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
         var from = +SW.$('#tp-from', tb).value, n = +SW.$('#tp-n', tb).value;
