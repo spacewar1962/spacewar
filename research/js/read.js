@@ -141,7 +141,7 @@
       '<label class="check" title="Hide every line that no note covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
       '<label class="check" title="Show only notes (and the lines they cover) in which these initials take part, as author or in a reply">Notes by <select id="rd-by"><option value="">anyone</option></select></label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
-      '</div></details><span class="hint" id="rd-nf"></span><span class="hint live-dot" id="rd-live"></span>';
+      '</div></details><span class="hint" id="rd-nf"></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
@@ -377,18 +377,12 @@
   // Live: while notes show (inline or cards), fetch the group's notes every 20 seconds.
   function live() {
     clearInterval(marginTimer);
-    var on = opts.notes !== 'off', el = SW.$('#rd-live', view);
-    if (el) {
-      el.textContent = on ? (N.configured() ? '● live' : 'drafts only') : '';
-      el.title = on ? (N.configured() ? 'Notes refresh every 20 seconds, so others\' notes and replies appear as they are written' : 'No Hypothesis group is set (⚙), so notes are drafts in this browser; they are not shared') : '';
-    }
+    var on = opts.notes !== 'off';
     if (!on || !N.configured()) return;
     marginTimer = setInterval(function () {
       if (!build || SW.state.tab !== 'read' || document.hidden) return;
       if (SW.$('.rd-body .reply-box, .rd-body .edit-box', view)) return;
       N.invalidate(build.v.id);
-      var t = SW.$('#rd-live', view);
-      if (t) t.textContent = '● live · ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
     }, 20000);
   }
 
