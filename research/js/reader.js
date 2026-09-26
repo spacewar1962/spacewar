@@ -86,7 +86,7 @@
     var pos, playing, speed = 1, last = null, raf = 0, shown;
     var cpu, rd, phase, lamps, lo, hi, outcome, chains;
     // core as it fills: 0 empty, 1 loaded, 2 loaded over an earlier word; when (frame) each was last written
-    var core = new Uint8Array(4096), when = new Float64Array(4096), deposits = 0, rimAt = new Uint8Array(4096);
+    var core = new Uint8Array(4096), when = new Float64Array(4096), deposits = 0, rimAt = new Uint8Array(4096), rimWhen = new Float64Array(4096);
     function deposit(a, before, v) {
       var f = rd ? rd.p - 1 : pos;                // the frame the word's last line was read from
       if (core[a] && before !== v && f - when[a] > 30) core[a] = 2;   // (a block's first word briefly holds its dio: not counted)
@@ -136,7 +136,7 @@
           if (v.f > pos) return;
           rd.p = v.next;
           var y = a.w & 0o7777;
-          deposit(y, cpu.mem[y], v.w); rimAt[y] = 1;
+          deposit(y, cpu.mem[y], v.w); rimAt[y] = 1; rimWhen[y] = rd.p - 1;
           cpu.mem[y] = v.w; lo = Math.min(lo, y); hi = Math.max(hi, y);
           lamps.ma = y; lamps.mb = v.w; lamps.io = v.w;
           continue;
@@ -355,13 +355,22 @@
         [/^[a-z0-9]+,\s*\.\s*\d+\//, 'A label followed by <code>. n/</code> names the first of n words left free.']
       ];
       var used = {};
+      var loaderSeg = an && an.segs.filter(function (q) { return q.kind === 'loader'; })[0];
+      runs.forEach(function (r) {
+        if (r.kind === 'empty') return;
+        r.f0 = Infinity; r.f1 = -1;
+        for (var z = r.a0; z <= r.a1; z++) { var fz = rimAt[z] ? rimWhen[z] : when[z]; r.f0 = Math.min(r.f0, fz); r.f1 = Math.max(r.f1, fz); }
+        if (r.kind === 'loader' && loaderSeg) { r.f0 = loaderSeg.f0; r.f1 = loaderSeg.f1; }
+      });
       var rows = runs.map(function (r) {
         var n = r.a1 - r.a0 + 1, what = '', from = '';
         var range = SW.oct(r.a0, 4) + (n > 1 ? '–' + SW.oct(r.a1, 4) : '');
         if (r.kind === 'loader') {
-          var rim = 0, work = [];
-          for (var x = r.a0; x <= r.a1; x++) { if (rimAt[x]) rim++; else work.push(SW.oct(x, 4)); }
-          what = 'The loader. Read-In mode put ' + rim + ' words here from the head of the tape before anything else' + (work.length ? '; ' + work.join(' and ') + ' are the words it works in (the running sum and the end address of each block)' : '') + '.';
+          var rim = 0, work = [], rf0 = Infinity, rf1 = -1;
+          for (var x = r.a0; x <= r.a1; x++) { if (rimAt[x]) { rim++; rf0 = Math.min(rf0, rimWhen[x]); rf1 = Math.max(rf1, rimWhen[x]); } else work.push(SW.oct(x, 4)); }
+          var ls0 = an && an.segs.filter(function (q) { return q.kind === 'loader'; })[0];
+          if (ls0) { rf0 = ls0.f0; rf1 = ls0.f1; }
+          what = 'The loader. It is first on the tape (frames ' + Math.round(rf0).toLocaleString('en-GB') + '–' + Math.round(rf1).toLocaleString('en-GB') + ', after the leader) but goes to the top of core: each of its ' + rim + ' words is punched after a dio naming its address, and Read-In mode puts it there, above everything the program loads' + (work.length ? '. ' + work.join(' and ') + ' are the words it works in (the running sum and the end address of each block)' : '') + '.';
         } else if (r.kind === 'empty') {
           if (r.a0 === 0 && r.a1 >= 2) {
             what = 'Not on the tape. A sequence break stores the Accumulator in 0000, the Program Counter in 0001 and the In-Out register in 0002, then restarts the program at 0003 (DEC, PDP-1 Handbook, 1963, pp. 25–26)' + (r.a1 > 2 ? '; the rest is left empty too' : '') + '.';
@@ -401,16 +410,29 @@
             else from = (r.kind === 'twice' ? 'What the build has here (not what is here now): ' : '') + SW.esc(part.src.split('/').pop()) + ', lines ' + fa.n + (fb.p === fa.p ? '–' + fb.n : ' onwards') + (org ? '; the origin line ' + code(org) + ' puts it at ' + SW.oct(r.a0, 4) : '');
           }
         }
-        return [{ html: '<span class="mono">' + range + '</span>', text: range }, n, { html: SW.esc(r.kind === 'loaded' ? 'loaded' : r.kind === 'twice' ? 'loaded twice' : r.kind === 'loader' ? 'the loader' : 'empty'), text: r.kind }, { html: what, text: what }, { html: from, text: from.replace(/<[^>]+>/g, '') }];
+        var fr = r.kind === 'empty' ? '' : Math.round(r.f0).toLocaleString('en-GB') + '–' + Math.round(r.f1).toLocaleString('en-GB');
+        var row = [{ html: '<span class="mono">' + range + '</span>', text: range, sort: r.a0 }, { html: fr || '<span class="faint">not on the tape</span>', text: fr || 'not on the tape', sort: r.kind === 'empty' ? 1e9 + r.a0 : r.f0 }, n, { html: SW.esc(r.kind === 'loaded' ? 'loaded' : r.kind === 'twice' ? 'loaded twice' : r.kind === 'loader' ? 'the loader' : 'empty'), text: r.kind }, { html: what, text: what }, { html: from, text: from.replace(/<[^>]+>/g, '') }];
+        row.f0 = r.kind === 'empty' ? 1e9 + r.a0 : r.f0; row.a0 = r.a0;
+        return row;
       });
+      // by address in core, or in the order the tape was read (stretches not on the tape last)
+      var order = SW.store.get('reader.order', 'tape');
+      function ordered() { return rows.slice().sort(function (x, y) { return order === 'tape' ? x.f0 - y.f0 : x.a0 - y.a0; }); }
+      var HEAD = ['Addresses', 'Frames on the tape', 'Words', 'Kind', 'What it is', 'From the source'];
       box.appendChild(SW.el('h3', {}, 'What is where in core'));
-      box.appendChild(SW.el('p', { class: 'hint' }, 'Worked out from this tape as loaded (' + deposits.toLocaleString('en-GB') + ' words so far) and from ' + SW.esc(o.label || 'the version') + '’s source: each stretch of core in address order, what put it there, or why nothing did.'));
-      var tbl = SW.table(['Addresses', 'Words', 'Kind', 'What it is', 'From the source'], rows, { cls: ['mono', 'num', '', '', ''] });
-      box.appendChild(tbl);
+      box.appendChild(SW.el('p', { class: 'hint' }, 'Worked out from this tape as loaded (' + deposits.toLocaleString('en-GB') + ' words so far) and from ' + SW.esc(o.label || 'the version') + '’s source: each stretch of core, what put it there, or why nothing did. Where a stretch sits on the tape and where it goes in core are different things: the loader is read first but goes to the top of core.'));
+      var ob = SW.el('label', { class: 'check' }, 'Order <select><option value="tape">as read from the tape</option><option value="core">by address in core</option></select>');
+      var osel = SW.$('select', ob); osel.value = order;
+      box.appendChild(ob);
+      var holder = SW.el('div');
+      box.appendChild(holder);
+      function paint() { holder.innerHTML = ''; holder.appendChild(SW.table(HEAD, ordered(), { cls: ['mono', 'num', 'num', '', '', ''] })); }
+      osel.onchange = function () { order = osel.value; SW.store.set('reader.order', order); paint(); };
+      paint();
       var gl = Object.keys(used).map(function (i) { return '<li>' + GLOSS[i][1] + '</li>'; }).join('');
       if (gl) box.appendChild(SW.el('ul', { class: 'hint rd-gloss' }, gl));
       box.appendChild(SW.exportButtons(function () {
-        return { title: 'What is where in core: ' + (o.name || 'tape'), meta: B ? SW.docMeta(B) : null, blocks: [SW.tableBlock('Core after loading ' + (o.name || 'the tape'), ['Addresses', 'Words', 'Kind', 'What it is', 'From the source'], rows)] };
+        return { title: 'What is where in core: ' + (o.name || 'tape'), meta: B ? SW.docMeta(B) : null, blocks: [SW.tableBlock('Core after loading ' + (o.name || 'the tape') + (order === 'tape' ? ', in the order read' : ', by address'), HEAD, ordered())] };
       }, (o.name || 'tape') + '-core'));
     }
 
