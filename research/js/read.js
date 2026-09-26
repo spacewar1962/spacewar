@@ -114,7 +114,7 @@
     if (opts.heat && SW.profile && SW.profile.build === b && words) {
       var ex = 0;
       words.forEach(function (x) { ex += SW.profile.exec[x.loc] || 0; });
-      if (ex) heat = ' style="background:rgba(255,206,122,' + Math.min(0.5, 0.06 + Math.log10(1 + ex) / 12).toFixed(3) + ')"';
+      if (ex) heat = ' style="background:color-mix(in srgb, var(--amber) ' + (100 * Math.min(0.5, 0.06 + Math.log10(1 + ex) / 12)).toFixed(1) + '%, transparent)"';
     }
     var title = '';
     if (b.errorsAt[k]) title = b.errorsAt[k].map(function (e) { return e.message + (e.symbol ? ' "' + e.symbol + '"' : ''); }).join('; ');

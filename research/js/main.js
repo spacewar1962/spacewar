@@ -95,6 +95,21 @@
         SW.$('#set-check').textContent = 'Connected as ' + r.user + (r.group ? '; group “' + r.group + '” found.' : '; but that group was not found for this account.');
       }, function (e) { SW.$('#set-check').textContent = e.message; });
     };
+    // Colour theme: previewed live, put back on Cancel.
+    var themeSel = SW.$('#set-theme'), wasTheme = SW.theme();
+    themeSel.innerHTML = ['Dark', 'Light'].map(function (g) {
+      return '<optgroup label="' + g + '">' + SW.THEMES.filter(function (t) { return t.dark === (g === 'Dark'); }).map(function (t) {
+        return '<option value="' + t.id + '"' + (t.id === wasTheme ? ' selected' : '') + ' title="' + SW.esc(t.note) + '">' + SW.esc(t.label) + '</option>';
+      }).join('') + '</optgroup>';
+    }).join('');
+    function swatches() {
+      var t = SW.themeInfo(themeSel.value), sw = SW.$('#set-theme-sw');
+      sw.innerHTML = '<span class="hint">' + SW.esc(t.note) + '</span>' + ['--bg', '--surface', '--text', '--beam', '--amber', '--green', '--violet', '--red', '--g-retained', '--g-edited'].map(function (n) {
+        return '<i style="background:' + SW.cssVar(n) + '" title="' + n.slice(2) + '"></i>';
+      }).join('');
+    }
+    themeSel.onchange = function () { theme(themeSel.value); swatches(); };
+    swatches();
     SW.$('#set-figbg').value = SW.figBg();
     SW.$('#set-noteshade').checked = SW.store.get('noteShade', true);
     var fontSel = SW.$('#set-font'), size = SW.$('#set-size'), sizeOut = SW.$('#set-size-out');
@@ -104,7 +119,7 @@
     fontSel.onchange = function () { SW.store.set('codeFont', fontSel.value); SW.applyCodeText(); };
     size.oninput = function () { sizeOut.textContent = size.value + ' px'; SW.store.set('codeSize', +size.value); SW.applyCodeText(); };
     dlg.onclose = function () {
-      if (dlg.returnValue !== 'save') { SW.store.set('codeFont', was.font); SW.store.set('codeSize', was.size); SW.applyCodeText(); return; }
+      if (dlg.returnValue !== 'save') { SW.store.set('codeFont', was.font); SW.store.set('codeSize', was.size); SW.applyCodeText(); if (SW.theme() !== wasTheme) theme(wasTheme); return; }
       SW.store.set('figbg', SW.$('#set-figbg').value);
       SW.store.set('noteShade', SW.$('#set-noteshade').checked);
       SW.applyNoteShade();
@@ -126,7 +141,7 @@
     SW.$('#about-v').textContent = SW.VERSION;
     SW.$('#about-date').textContent = date ? SW.fmtDate(date) : '';
     SW.$('#about-ver').textContent = 'Version ' + SW.VERSION + (date ? ', ' + SW.fmtDate(date) : '');
-    SW.$('#about-cat').textContent = vs.length + ' versions catalogued, ' + vs.filter(function (v) { return v.build; }).length + ' of them assembled from source; ' + vs.filter(function (v) { return v.status === 'lost'; }).length + ' known only as lost.';
+    SW.$('#about-cat').textContent = vs.length + ' versions: ' + vs.filter(function (v) { return v.build; }).length + ' assembled from source, ' + vs.filter(function (v) { return v.status === 'lost'; }).length + ' lost.';
     var cite = 'Berry, D. M. (' + (date ? date.slice(0, 4) : new Date().getFullYear()) + ') Spacewar! Research Bench (version ' + SW.VERSION + '). Available at: ' + url + ' (Accessed: ' + SW.fmtDate(SW.today()) + ').';
     SW.$('#about-cite').textContent = cite;
     SW.$('#about-copy').onclick = function () {
@@ -136,8 +151,10 @@
   }
 
   function theme(t) {
+    t = SW.themeInfo(t).id;   // an unknown or retired name falls back to phosphor
     document.documentElement.setAttribute('data-theme', t);
     SW.store.set('theme', t);
+    SW.store.set(SW.themeInfo(t).dark ? 'theme.dark' : 'theme.light', t);   // for the ◐ switch
     SW.emit('theme', t);
     // Figures and tapes are coloured for the theme when drawn, so draw them again.
     if (SW.state.v) {
@@ -179,7 +196,10 @@
     SW.applyPalette();
     SW.$('#btn-smaller').onclick = function () { SW.setCodeSize(SW.codeSize() - 1); };
     SW.$('#btn-larger').onclick = function () { SW.setCodeSize(SW.codeSize() + 1); };
-    SW.$('#btn-theme').onclick = function () { theme(document.documentElement.getAttribute('data-theme') === 'paper' ? 'phosphor' : 'paper'); };
+    // ◐: to the last light theme from a dark one, and back.
+    SW.$('#btn-theme').onclick = function () {
+      theme(SW.themeInfo().dark ? SW.store.get('theme.light', 'paper') : SW.store.get('theme.dark', 'phosphor'));
+    };
     SW.$('#drawer-close').onclick = SW.closeDrawer;
     var q = SW.readQuery();
     if (q.l) {

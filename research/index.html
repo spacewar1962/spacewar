@@ -13,7 +13,7 @@
        below to the day of the release; the About box shows both. -->
   <meta name="bench-date" content="2026-09-26">
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css?v=1.2.0">
+  <link rel="stylesheet" href="css/research.css?v=1.3.0">
 </head>
 <body>
   <header class="bar">
@@ -30,7 +30,7 @@
     <div class="bar-right">
       <span class="status" id="status" role="status" aria-live="polite"></span>
       <span class="size-btns"><button class="icon-btn" id="btn-smaller" title="Smaller code text">A−</button><button class="icon-btn" id="btn-larger" title="Larger code text">A+</button></span>
-      <button class="icon-btn" id="btn-theme" title="Switch between phosphor and listing paper">◐</button>
+      <button class="icon-btn" id="btn-theme" title="Switch between your last light and dark colour themes (choose themes in ⚙ Settings)">◐</button>
       <button class="icon-btn news-btn" id="btn-tray" title="The tray">❐<span class="news-n" id="tray-n"></span></button>
       <button class="icon-btn news-btn" id="btn-news" title="What’s new in the group’s notes">✉<span class="news-n" id="news-n"></span></button>
       <button class="icon-btn" id="btn-about" title="About the bench: author, version, sources, how to cite">ⓘ</button>
@@ -80,6 +80,10 @@
       <label for="set-token">API token</label>
       <div class="token-row"><input id="set-token" type="password" placeholder="6879-…" autocomplete="off" spellcheck="false"><button id="set-token-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
       <p class="hint" id="set-check"></p>
+      <h2>Colour theme</h2>
+      <p class="hint">The colours of the whole bench: listings, notes, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.</p>
+      <label>Theme <select id="set-theme"></select></label>
+      <div class="theme-swatches" id="set-theme-sw"></div>
       <h2>Reading code</h2>
       <p class="hint">Applies wherever code is shown: listings, comparisons, traces, tables. The A− and A+ buttons in the top bar change the size too.</p>
       <label>Code font <select id="set-font">
@@ -100,6 +104,7 @@
         <option value="paper">Listing paper</option>
         <option value="black">Black (phosphor)</option>
         <option value="transparent">Transparent</option>
+        <option value="theme">The current colour theme</option>
       </select></label>
       <div class="row">
         <button value="cancel" class="btn ghost">Cancel</button>
@@ -131,10 +136,10 @@
         <tr><td>Author</td><td>David M. Berry</td></tr>
         <tr><td>Version</td><td id="about-v"></td></tr>
         <tr><td>Released</td><td id="about-date"></td></tr>
-        <tr><td>Purpose</td><td>A working bench for the critical reading of the Spacewar! source code (1961 to 1963 and after), made for the Spacewar! book project: assemble and run each version, compare them, trace their genealogy, annotate together, and export for writing.</td></tr>
-        <tr><td>Tech stack</td><td>Static HTML, CSS and plain JavaScript: no framework, no libraries, no build step. Served from GitHub Pages and run entirely in the browser; the sources and tape images are read from the repository’s <span class="mono">sources/</span> folder as they are needed. Word files are written directly as Office Open XML (zipped in the browser), figures as SVG and, through the canvas, PNG. The optional code fonts come from Google Fonts. Shared notes go through the Hypothesis API; settings, drafts and the tray are kept in the browser’s local storage.</td></tr>
-        <tr><td>Inside</td><td>A JavaScript port of the macro1 cross-assembler from the SIMH project, with the 1962–63 MACRO rules the tapes show; a PDP-1 emulator with the Type 30 display; FIO-DEC tape reading; shared notes through Hypothesis.</td></tr>
-        <tr><td>Sources</td><td>The program by Steve Russell, Peter Samson, Dan Edwards, Martin Graetz, Alan Kotok and others at MIT; later versions by Monty Preonas (“ddp”), “dfw” and Joe Morris; tapes from Steve Russell’s box (bitsavers); transcriptions and reconstructions by Norbert Landsteiner and the Computer History Museum. Each version’s sources and provenance are under Version &amp; notes.</td></tr>
+        <tr><td>Purpose</td><td>A bench for the critical reading of the Spacewar! source code, made for the Spacewar! book project.</td></tr>
+        <tr><td>Tech stack</td><td>Plain HTML, CSS and JavaScript; no framework or build step. Runs in the browser from GitHub Pages; notes via Hypothesis; settings, drafts and the tray in local storage.</td></tr>
+        <tr><td>Inside</td><td>The macro1 assembler (from SIMH) with the 1962–63 MACRO rules; a PDP-1 emulator with the Type 30 display; a FIO-DEC tape reader.</td></tr>
+        <tr><td>Sources</td><td>Code by Russell, Samson, Edwards, Graetz, Kotok and others at MIT; later versions by Preonas (“ddp”), “dfw” and Morris; tapes from Russell’s box (bitsavers); transcriptions by Landsteiner and the Computer History Museum. Details under Version &amp; notes.</td></tr>
         <tr><td>Catalogue</td><td id="about-cat"></td></tr>
         <tr><td>Code</td><td><a href="https://github.com/spacewar1962/spacewar" target="_blank" rel="noopener">github.com/spacewar1962/spacewar ↗</a></td></tr>
         <tr><td>Cite as</td><td id="about-cite" class="about-cite"></td></tr>
@@ -148,25 +153,25 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js?v=1.2.0"></script>
-  <script src="js/pdp1cpu.js?v=1.2.0"></script>
-  <script src="js/fiodec.js?v=1.2.0"></script>
-  <script src="js/versions.js?v=1.2.0"></script>
-  <script src="js/export.js?v=1.2.0"></script>
-  <script src="js/genealogy.js?v=1.2.0"></script>
-  <script src="js/core.js?v=1.2.0"></script>
-  <script src="js/notes.js?v=1.2.0"></script>
-  <script src="js/tray.js?v=1.2.0"></script>
-  <script src="js/figures.js?v=1.2.0"></script>
-  <script src="js/read.js?v=1.2.0"></script>
-  <script src="js/run.js?v=1.2.0"></script>
-  <script src="js/analyse.js?v=1.2.0"></script>
-  <script src="js/compare.js?v=1.2.0"></script>
-  <script src="js/stemma.js?v=1.2.0"></script>
-  <script src="js/tape.js?v=1.2.0"></script>
-  <script src="js/about.js?v=1.2.0"></script>
-  <script src="js/edition.js?v=1.2.0"></script>
-  <script src="js/findings.js?v=1.2.0"></script>
-  <script src="js/main.js?v=1.2.0"></script>
+  <script src="js/pdp1asm.js?v=1.3.0"></script>
+  <script src="js/pdp1cpu.js?v=1.3.0"></script>
+  <script src="js/fiodec.js?v=1.3.0"></script>
+  <script src="js/versions.js?v=1.3.0"></script>
+  <script src="js/export.js?v=1.3.0"></script>
+  <script src="js/genealogy.js?v=1.3.0"></script>
+  <script src="js/core.js?v=1.3.0"></script>
+  <script src="js/notes.js?v=1.3.0"></script>
+  <script src="js/tray.js?v=1.3.0"></script>
+  <script src="js/figures.js?v=1.3.0"></script>
+  <script src="js/read.js?v=1.3.0"></script>
+  <script src="js/run.js?v=1.3.0"></script>
+  <script src="js/analyse.js?v=1.3.0"></script>
+  <script src="js/compare.js?v=1.3.0"></script>
+  <script src="js/stemma.js?v=1.3.0"></script>
+  <script src="js/tape.js?v=1.3.0"></script>
+  <script src="js/about.js?v=1.3.0"></script>
+  <script src="js/edition.js?v=1.3.0"></script>
+  <script src="js/findings.js?v=1.3.0"></script>
+  <script src="js/main.js?v=1.3.0"></script>
 </body>
 </html>

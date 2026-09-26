@@ -13,6 +13,12 @@
     phosphor: { bg: '#04060b', text: '#bfe4ff', dim: '#5d7086', num: '#ffce7a', cm: '#7fa6c4', rule: '#1a2638' }
   };
 
+  // The colours of the theme in use (⚙ Settings), for a figure in that style.
+  function themeColours() {
+    function v(n) { return SW.cssVar(n); }
+    return { bg: v('--surface'), text: v('--text'), dim: v('--text-faint'), num: v('--amber'), cm: v('--text-dim'), rule: v('--line') };
+  }
+
   function expandTabs(s) {
     var out = '';
     for (var i = 0; i < s.length; i++) {
@@ -24,7 +30,7 @@
 
   // lines: [{n, raw}] from a build; returns an SVG string.
   F.codeSVG = function (b, lines, caption, theme, withWords) {
-    var t = THEMES[theme] || THEMES.print, fs = 13, lh = 18, cw = fs * 0.6;
+    var t = theme === 'theme' ? themeColours() : THEMES[theme] || THEMES.print, fs = 13, lh = 18, cw = fs * 0.6;
     var rows = lines.map(function (L) {
       var ws = b.asm && (b.asm.byLine[L.p] || [])[L.n];
       var gut = String(L.n).padStart(5) + (withWords ? '  ' + (ws && ws.length ? SW.oct(ws[0].loc, 4) + ' ' + SW.oct(ws[0].val) : '           ') : '');
@@ -87,7 +93,7 @@
 
   F.codeFigureDialog = function (b, lines, caption) {
     var body = SW.el('div');
-    body.innerHTML = '<label class="check" title="The look of the figure: black on white for print, the cream of listing paper, or the phosphor of the screen">Style <select id="fg-theme"><option value="print">Print (white)</option><option value="paper">Listing paper</option><option value="phosphor">Phosphor</option></select></label> ' +
+    body.innerHTML = '<label class="check" title="The look of the figure: black on white for print, the cream of listing paper, or the phosphor of the screen">Style <select id="fg-theme"><option value="print">Print (white)</option><option value="paper">Listing paper</option><option value="phosphor">Phosphor</option><option value="theme">The current colour theme</option></select></label> ' +
       '<label class="check" title="Include the octal address and assembled word beside each line"><input type="checkbox" id="fg-words"> addresses and words</label>' +
       '<label>Caption <input id="fg-cap" value="' + SW.esc(caption) + '"></label><div class="svgbox" id="fg-prev" style="max-height:50vh"></div>';
     function svg() { return F.codeSVG(b, lines, SW.$('#fg-cap').value, SW.$('#fg-theme').value, SW.$('#fg-words').checked); }

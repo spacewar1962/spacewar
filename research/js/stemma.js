@@ -218,7 +218,7 @@
       });
       Object.keys(L.wit).forEach(function (k) { L.wit[k].forEach(function (w) { rows.push([short(w), w.date, 'another reading of', short(V.byId(k)), '']); }); });
       L.lost.forEach(function (p) { rows.push([short(p.v), p.v.date, 'lost; placed between', short(V.byId(p.between[0])) + ' and ' + short(V.byId(p.between[1])), '']); });
-      return SW.figures.svgToPNG(SW.exportSVG(fig()), 2, SW.FIGBG[SW.figBg()]).then(function (r) {
+      return SW.figures.svgToPNG(SW.exportSVG(fig()), 2, SW.figBgColour()).then(function (r) {
         return { title: 'Spacewar!: a stemma of the texts', meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]], blocks: [
           { type: 'figure', caption: 'Stemma of the Spacewar! texts. Percentages are routine similarity of each version to its parent.', png: r.png, width: r.width / 2, height: r.height / 2 },
           SW.tableBlock('Relations', ['Version', 'Date', 'Relation', 'To', 'Similarity'], rows)] };
