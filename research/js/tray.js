@@ -111,7 +111,7 @@
     var t = load();
     if (!t.items.length) { SW.toast('The tray is empty'); return; }
     SW.toast('Preparing ' + t.items.length + ' items…');
-    var bg = SW.FIGBG[SW.figBg()];
+    var bg = SW.figBgColour();
     Promise.all(t.items.map(function (it) {
       if (it.kind !== 'figure') return Promise.resolve(null);
       var svg = SW.exportSVG(it.svg);

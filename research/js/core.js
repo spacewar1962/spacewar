@@ -448,7 +448,7 @@
 
   // ---------- colour schemes for the genealogy figures ----------
   SW.PALETTES = [
-    ['phosphor', 'Phosphor (default)'], ['okabe', 'Colour-blind safe (Okabe–Ito)'], ['tol', 'Colour-blind safe (Tol)'],
+    ['phosphor', 'Theme colours (default)'], ['okabe', 'Colour-blind safe (Okabe–Ito)'], ['tol', 'Colour-blind safe (Tol)'],
     ['muted', 'Muted (print)'], ['bold', 'Bold, high contrast'], ['warm', 'Warm'], ['grey', 'Greyscale']
   ];
   SW.palette = function () { return SW.store.get('gen.palette', 'phosphor'); };
@@ -468,9 +468,34 @@
     return l;
   };
 
-  // ---------- figures: on screen, a dark plate; in export, the chosen background ----------
-  SW.FIGBG = { white: '#ffffff', paper: '#f4f1e8', black: '#04060b', transparent: null };
+  // ---------- colour themes ----------
+  // Each is a set of CSS custom properties (css/research.css, :root[data-theme]).
+  // 'dark' says whether its ground is dark, for figures that draw their own.
+  SW.THEMES = [
+    { id: 'phosphor', label: 'Phosphor', dark: true, note: 'blue-white on near black, after the PDP-1’s display (the default)' },
+    { id: 'green', label: 'Terminal, green', dark: true, note: 'green phosphor on black' },
+    { id: 'amber', label: 'Terminal, amber', dark: true, note: 'amber phosphor on black' },
+    { id: 'contrast', label: 'High contrast', dark: true, note: 'white and bright colours on black' },
+    { id: 'paper', label: 'Listing paper', dark: false, note: 'dark ink on the cream of a printed listing' },
+    { id: 'white', label: 'Paper', dark: false, note: 'black on white' },
+    { id: 'sepia', label: 'Sepia', dark: false, note: 'brown ink on warm paper, for long reading' }
+  ];
+  SW.themeInfo = function (id) {
+    id = id || document.documentElement.getAttribute('data-theme') || 'phosphor';
+    return SW.THEMES.filter(function (t) { return t.id === id; })[0] || SW.THEMES[0];
+  };
+  SW.theme = function () { return SW.themeInfo().id; };
+  // A custom property as the current theme (or a given one) sets it.
+  SW.cssVar = function (name, theme) { return SW.resolveVars('var(' + name + ')', theme); };
+
+  // ---------- figures: on screen in the theme's colours; in export, the chosen background ----------
+  // 'theme' exports in the colours of the theme in use, on its own figure plate.
+  SW.FIGBG = { white: '#ffffff', paper: '#f4f1e8', black: '#04060b', transparent: null, theme: 'theme' };
   SW.figBg = function () { var b = SW.store.get('figbg', 'white'); return b in SW.FIGBG ? b : 'white'; };
+  // The theme whose colours an export uses, and the colour laid under it.
+  var FIGBG_THEME = { white: 'white', paper: 'paper', black: 'phosphor', transparent: 'white' };
+  SW.figTheme = function () { var k = SW.figBg(); return k === 'theme' ? SW.theme() : FIGBG_THEME[k]; };
+  SW.figBgColour = function () { var k = SW.figBg(); return k === 'theme' ? SW.cssVar('--plate') : SW.FIGBG[k]; };
 
   // Resolve CSS custom properties in an SVG against a given theme, so the
   // figure stands alone. The theme attribute is switched and restored
@@ -487,22 +512,27 @@
     if (theme) { if (was == null) de.removeAttribute('data-theme'); else de.setAttribute('data-theme', was); }
     return out;
   };
-  // Figures on screen follow the theme: a dark plate in phosphor, white with dark ink on listing paper.
-  SW.lightTheme = function () { return document.documentElement.getAttribute('data-theme') === 'paper'; };
-  SW.displaySVG = function (svg) { return SW.resolveVars(svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, ''), SW.lightTheme() ? 'paper' : 'phosphor'); };
+  // Figures on screen take the colours of the theme in use, on its figure plate.
+  SW.lightTheme = function () { return !SW.themeInfo().dark; };
+  SW.displaySVG = function (svg) { return SW.resolveVars(svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')); };
   // Palettes for figures that draw their own ground (sky, ships).
   SW.PLATE = { bg: '#02040a', ink: '#e6f4ff', ink2: '#8fc3d6', dim: '#7fa6c4', accent: '#ffce7a', dark: true };
   SW.exportPalette = function () {
-    var k = SW.figBg(), dark = k === 'black';
+    var k = SW.figBg();
+    if (k === 'theme') {
+      var t = SW.themeInfo();
+      return { bg: SW.cssVar('--plate'), dark: t.dark, ink: SW.cssVar('--g-text'), ink2: SW.cssVar('--beam'), dim: SW.cssVar('--g-muted'), accent: SW.cssVar('--amber') };
+    }
+    var dark = k === 'black';
     return { bg: SW.FIGBG[k], dark: dark, ink: dark ? '#e6f4ff' : '#1b1f23', ink2: dark ? '#8fc3d6' : '#0f6f86',
              dim: dark ? '#7fa6c4' : '#56606a', accent: dark ? '#ffce7a' : '#9a5b00' };
   };
   // An SVG for export: coloured for the chosen background, with that background laid under it.
   SW.exportSVG = function (svg) {
-    var k = SW.figBg(), bg = SW.FIGBG[k];
+    var bg = SW.figBgColour();
     // XML 1.0 forbids most control characters; the sources carry form feeds.
     svg = svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '');
-    svg = SW.resolveVars(svg, k === 'black' ? 'phosphor' : 'paper');
+    svg = SW.resolveVars(svg, SW.figTheme());
     if (bg) svg = svg.replace(/(<svg\b[^>]*>)/, '$1<rect x="0" y="0" width="100%" height="100%" fill="' + bg + '"/>');
     return svg;
   };
@@ -515,7 +545,7 @@
     w.appendChild(document.createTextNode(' '));
     w.appendChild(SW.el('button', { class: 'btn', title: 'Save as PNG at three times screen size (background: ' + SW.figBg() + '; change under ⚙)', onclick: function () {
       SW.toast('Rendering PNG…');
-      SW.figures.svgToPNG(SW.exportSVG(getSvg(SW.exportPalette())), 3, SW.FIGBG[SW.figBg()]).then(function (r) {
+      SW.figures.svgToPNG(SW.exportSVG(getSvg(SW.exportPalette())), 3, SW.figBgColour()).then(function (r) {
         root.SWExport.download(name + '.png', r.png, 'image/png');
       }, function () { SW.toast('The PNG could not be made from this figure; try SVG, or zoom out first.', 6000); });
     } }, '▣ PNG'));

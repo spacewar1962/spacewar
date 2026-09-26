@@ -9,10 +9,10 @@
   var T = SW.tape = {};
   var view = SW.$('#view-tape');
 
-  // Tape colours: ivory on the dark theme, white on listing paper (where
-  // ivory would merge with the page).
+  // Tape colours come from the theme (--tape-paper, --tape-hole): ivory on
+  // dark grounds, white or near-white on light ones, where ivory would merge.
   T.colours = function () {
-    return SW.lightTheme && SW.lightTheme() ? { paper: '#ffffff', hole: '#1c2a31' } : { paper: '#e7e1d0', hole: '#1c2a31' };
+    return { paper: SW.cssVar('--tape-paper') || '#e7e1d0', hole: SW.cssVar('--tape-hole') || '#1c2a31' };
   };
 
   // Draw bytes on a canvas: one column per frame (tape runs left to right).
