@@ -1437,28 +1437,45 @@
       wait.remove();
       if (!vs.length) { cards.appendChild(SW.el('p', { class: 'hint' }, 'Choose some versions.')); return; }
       var blocks = XFNS[L[0]](vs, bs, cards, render);
-      if (blocks) head.appendChild(SW.exportButtons(function () {
+      if (blocks) head.appendChild(expMenu(SW.exportButtons(function () {
         return { title: 'Spacewar! across the variorum: ' + L[1].toLowerCase(), subtitle: L[2],
                  meta: [['Versions', vs.map(function (v) { return v.label + ' (' + v.date + ')'; }).join('; ')], ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]],
                  blocks: blocks() };
-      }, 'spacewar-variorum-lens-' + L[0]));
+      }, 'spacewar-variorum-lens-' + L[0])));
     }).catch(function (e) { wait.textContent = e.message; });
   }
 
+  // The lenses in a drop-down, grouped; exports in a menu of their own.
+  var GROUPS = [['Reading the text', [1, 2, 3, 14]], ['The program', [4, 8, 9, 11]], ['The machine', [5, 6, 10]], ['The record', [7]], ['What it draws', [12, 13]]];
+  function expMenu(w) {
+    var d = SW.el('details', { class: 'menu exp-menu tb-right' });
+    d.innerHTML = '<summary class="btn" title="Export this lens">⤓ Export ▾</summary>';
+    var body = SW.el('div', { class: 'menu-body' });
+    body.appendChild(w);
+    d.appendChild(body);
+    return d;
+  }
   function render() {
     var b = build;
     view.innerHTML = '';
     var pad = SW.el('div', { class: 'pad', style: 'max-width:none' });
-    var nav = SW.el('div', { class: 'lens-nav' });
-    nav.innerHTML = LENSES.map(function (l) { return '<button class="btn' + (l[0] === lens ? ' on' : '') + '" data-l="' + l[0] + '" title="' + SW.esc(l[2]) + '">' + l[0] + '. ' + SW.esc(l[1]) + '</button>'; }).join('');
-    nav.addEventListener('click', function (e) { var t = e.target.closest('[data-l]'); if (t) { lens = +t.dataset.l; SW.store.set('an.lens', lens); render(); } });
-    pad.appendChild(nav);
     var L = LENSES[lens - 1];
-    var head = SW.el('div', { class: 'toolbar', style: 'position:static;padding:0 0 10px' });
-    head.innerHTML = '<button class="btn' + (mode === 'one' ? ' on' : '') + '" data-mode="one">This version</button>' +
-      '<button class="btn' + (mode === 'across' ? ' on' : '') + '" data-mode="across">Across the variorum</button><span class="sep"></span>' +
-      '<span class="prose" style="font-size:15px"><b>' + L[0] + '. ' + SW.esc(L[1]) + '.</b> ' + SW.esc(L[2]) + '.</span><span class="sep"></span>';
-    head.addEventListener('click', function (e) { var m = e.target.closest('[data-mode]'); if (m) { mode = m.dataset.mode; SW.store.set('an.mode', mode); render(); } });
+    var head = SW.el('div', { class: 'toolbar an-head', style: 'position:static;padding:0 0 10px' });
+    head.innerHTML = '<details class="menu lens-menu"><summary class="btn" title="Choose a lens">' + L[0] + '. ' + SW.esc(L[1]) + ' ▾</summary><div class="menu-body lens-list">' +
+      GROUPS.map(function (gr) {
+        return '<div class="lens-g"><h5>' + SW.esc(gr[0]) + '</h5>' + gr[1].map(function (n) {
+          var l = LENSES[n - 1];
+          return '<button data-l="' + n + '"' + (n === lens ? ' class="on"' : '') + '><b>' + n + '. ' + SW.esc(l[1]) + '</b><span>' + SW.esc(l[2]) + '</span></button>';
+        }).join('') + '</div>';
+      }).join('') + '</div></details>' +
+      '<span class="seg-btns"><button class="btn' + (mode === 'one' ? ' on' : '') + '" data-mode="one">This version</button>' +
+      '<button class="btn' + (mode === 'across' ? ' on' : '') + '" data-mode="across">Across the variorum</button></span>' +
+      '<span class="hint an-desc">' + SW.esc(L[2]) + '.</span>';
+    head.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-l]');
+      if (t) { lens = +t.dataset.l; SW.store.set('an.lens', lens); render(); return; }
+      var m = e.target.closest('[data-mode]'); if (m) { mode = m.dataset.mode; SW.store.set('an.mode', mode); render(); }
+    });
     pad.appendChild(head);
     var cards = SW.el('div', { class: 'cards' });
     pad.appendChild(cards);
@@ -1468,17 +1485,17 @@
       SW.$$('[data-mode]', head).forEach(function (x) { x.style.display = 'none'; });
       if (!b.asm) { cards.innerHTML = '<p class="hint">Choose a version with a surviving source; its names are offered for following.</p>'; return; }
       var bb = biography(b, cards);
-      head.appendChild(SW.exportButtons(function () {
+      head.appendChild(expMenu(SW.exportButtons(function () {
         return { title: 'Spacewar!: the life of “' + bioName + '”', subtitle: L[2], meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]], blocks: bb() };
-      }, function () { return 'spacewar-biography-' + bioName; }));
+      }, function () { return 'spacewar-biography-' + bioName; })));
       return;
     }
     if (mode === 'across') { renderAcross(cards, head, L); return; }
     if (!b.asm && lens !== 7) { cards.innerHTML = '<p class="hint">No source survives for this version.</p>'; return; }
     var blocks = FNS[lens](b, cards);
-    if (blocks) head.appendChild(SW.exportButtons(function () {
+    if (blocks) head.appendChild(expMenu(SW.exportButtons(function () {
       return { title: b.v.label + ': ' + L[1].toLowerCase(), subtitle: L[2], meta: SW.docMeta(b), blocks: blocks() };
-    }, 'spacewar-' + b.v.id + '-lens-' + L[0]));
+    }, 'spacewar-' + b.v.id + '-lens-' + L[0])));
   }
 
   SW.views.analyse = { show: function (b) { build = b; render(); } };
