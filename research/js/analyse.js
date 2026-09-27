@@ -444,12 +444,15 @@
         if (st.proper) o.push('<text x="' + (p.x + 6).toFixed(1) + '" y="' + (p.y - 5).toFixed(1) + '" font-size="10" fill="' + ink + '" fill-opacity="0.85">' + SW.esc(st.proper) + '</text>');
       });
       o.push('<text x="' + ML + '" y="18" font-size="12" fill="' + dim + '">' + SW.esc(b.v.label + ': the Expensive Planetarium, ' + stars.length + ' stars in ' + cons.length + ' constellations (right ascension increasing to the left; declination ' + '±' + maxDec + '°)') + '</text>');
+      if (!pal) o.push('<g class="sky-win"></g>');   // the scope's window, drawn live (not exported)
       return o.concat(['</svg>']).join('');
     }
     var dlg = SW.el('dialog', { class: 'sky-dlg' });
     dlg.innerHTML = '<div class="rd-head"><h2>Star map: ' + SW.esc(b.v.label) + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
       '<p class="hint">Peter Samson’s star table (“stars by prs”), ' + stars.length + ' stars from the line <span class="mono">' + SW.esc(stars[0].L.raw.trim()) + '</span> on. Each <span class="mono">mark X, Y</span> is drawn at X and Y in 8192ths of a circle: right ascension and declination. Dot sizes follow Samson’s four groups (labels 1j–1q, 2j–2q, 3j–3q, 4j–4q), the brightest largest. Constellations are his identifications, outlined round their stars' + (unnamed ? ' (' + unnamed + ' stars carry no identification in this table and belong to none)' : '') + '; hover a star for its entry.</p>' +
-      '<div class="svgbox sky-box"></div><div class="sky-cons"></div><div class="sky-exp"></div>';
+      '<div class="svgbox sky-box"></div><div class="sky-cons"></div><div class="sky-exp"></div>' +
+      '<div class="sky-scope"><h3>On the scope</h3><div class="sky-scope-row"><canvas class="sky-crt" width="440" height="440"></canvas>' +
+      '<div class="sky-scope-side"><div class="sky-scope-ctl"></div><p class="sky-scope-read mono"></p><div class="sky-scope-how"></div></div></div></div>';
     document.body.appendChild(dlg);
     var box = SW.$('.sky-box', dlg);
     box.innerHTML = svg();
@@ -463,8 +466,159 @@
     });
     SW.$('.sky-cons', dlg).addEventListener('mouseleave', function () { SW.$$('.sky-con', box).forEach(function (p) { p.classList.remove('lit'); }); });
     SW.$('[data-a="close"]', dlg).onclick = function () { dlg.close(); };
-    dlg.addEventListener('close', function () { dlg.remove(); });
+    var stopScope = scopeDemo();
+    dlg.addEventListener('close', function () { stopScope(); dlg.remove(); });
     dlg.showModal();
+
+    // ---------- on the scope ----------
+    // The background display as each version's own code does it (read from its
+    // source): dislis takes each star's stored X (8192 minus the mark X), less
+    // fpr, keeps it if it falls in the 1024 units below fpr (wrapping round the
+    // circle), centres it and plots it with its Y: a window 45 degrees square.
+    // Brightness is by intensity (dislis J, Q, B: 3.1 on) or by how often a group
+    // is redrawn (1m to 4m: 2B, and the ddp line 4.2 to 4.4); fpr falls by one
+    // unit every so many passes of the main loop, so the sky drifts.
+    function scopeDemo() {
+      var src = allLines(b).map(function (L) { return L.raw.replace(/\/.*$/, '').trim(); });
+      var calls = {}, mode = 'refresh';
+      src.forEach(function (t) { var m = /^dislis\s+([1-4])j\s*,\s*\1q\s*,\s*([0-7])/.exec(t); if (m) { calls[+m[1]] = +m[2]; mode = 'intensity'; } });
+      var rate = { 1: 2, 2: 1, 3: 0.5, 4: 0.25 };   // 1m twice a pass, 2m once, 3m when bcc is odd, 4m when bcc & 3 is 0
+      var fpr0 = 0, scrollN = 0, fastN = 0, bccN = 0, twoB = false;
+      // 'law i N', directly or through 'xct name' to a constant 'name, …, law i N' (the CHM builds)
+      function lawOf(t) {
+        var m = /^(?:\w+,\s*)?law i\s+([0-7]+)/.exec(t); if (m) return parseInt(m[1], 8);
+        var x = /^(?:\w+,\s*)?xct\s+(\w+)/.exec(t);
+        if (x) for (var k = 0; k < src.length; k++) { var d = new RegExp('^' + x[1] + ',.*law i\\s+([0-7]+)').exec(src[k]); if (d) return parseInt(d[1], 8); }
+        return 0;
+      }
+      for (var i = 0; i < src.length; i++) {
+        var fm = /^fpr,\s*([0-7]+)/.exec(src[i]); if (fm) fpr0 = parseInt(fm[1], 8);
+        if (/^(?:\w+,\s*)?isp\s+\\?bkc/.test(src[i])) {
+          var got = [];
+          for (var j = i + 1; j < i + 6 && j < src.length; j++) { var lv = lawOf(src[j]); if (lv) got.push(lv); if (/^(?:\w+,\s*)?dac\s+\\?bkc/.test(src[j])) break; }
+          if (got.length) { scrollN = got[0]; if (got.length > 1) fastN = got[1]; }
+        }
+        if (/^bcx,\s*jmp \.$/.test(src[i])) bccN = lawOf(src[i + 1] || '') || bccN;
+        if (/^bck,/.test(src[i])) for (var j2 = i; j2 < i + 5 && j2 < src.length; j2++) if (/^szs\s+30/.test(src[j2])) twoB = true;   // 2B's switches, in bck itself
+      }
+      var unread = !scrollN || (mode === 'intensity' && !bccN);
+      if (!scrollN) scrollN = 32;
+      if (!bccN) bccN = 2;
+      var perUnit = mode === 'intensity' ? scrollN * bccN : scrollN;       // passes per unit of drift
+      var perFast = fastN ? fastN : 0;
+      var groups = mode === 'intensity' ? Object.keys(calls).map(Number) : [1, 2, 3, 4];
+      // the main loop's rate, measured: run the build for two emulated seconds and count calls of bck
+      var passes = 0, bckAt = B_SYM('bck');
+      function B_SYM(n) { return b.sym[n] && b.sym[n].defined !== false ? b.sym[n].val : -1; }
+      try {
+        var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv });
+        cpu.load(b.asm.memory, b.asm.start);
+        cpu.run(400000);
+        if (bckAt >= 0) passes = cpu.execCount[bckAt] / (cpu.cycles * 5e-6);
+      } catch (e) { passes = 0; }
+      if (!passes) passes = 30;
+      // each star as the code holds it
+      var pts = stars.filter(function (st) { return groups.indexOf(st.mag) >= 0; }).map(function (st) {
+        return { st: st, S: (8192 - st.x) & 8191, Y: st.y, g: st.mag };
+      });
+      var cv = SW.$('canvas.sky-crt', dlg), g = cv.getContext('2d'), N = cv.width;
+      g.fillStyle = '#000'; g.fillRect(0, 0, N, N);
+      var fpr = fpr0, acc = 0, pass = 0, playing = false, speed = 1, sw3 = false, sw4 = false, last = null, raf = 0, winAt = -1;
+      function inView(p) { var u = ((p.S - fpr) % 8192 + 8192) % 8192; return u > 7168 ? u - 7680 : null; }
+      function plot(p, x, s) {
+        var px = (x + 512) * N / 1024, py = (511 - p.Y) * N / 1024;
+        g.fillStyle = 'rgba(200,236,255,' + Math.max(0.25, Math.min(1, 0.62 + 0.13 * s)).toFixed(3) + ')';
+        g.fillRect(px - 1.2, py - 1.2, 2.6, 2.6);
+      }
+      function sgn3(v) { return v & 4 ? -(v ^ 7) : v; }   // intensity: 3 bits, ones' complement
+      function drawGroup(gr, s) { pts.forEach(function (p) { if (p.g !== gr) return; var x = inView(p); if (x !== null) plot(p, x, s); }); }
+      function onePass() {
+        pass++;
+        var starsOff = twoB ? (sw3 && sw4) : sw4;
+        if (!starsOff) {
+          if (mode === 'intensity') { if (pass % bccN === 0) groups.forEach(function (gr) { drawGroup(gr, sgn3(calls[gr])); }); }
+          else { drawGroup(1, 0); drawGroup(2, 0); if (pass & 1) drawGroup(3, 0); if ((pass & 3) === 0) drawGroup(4, 0); drawGroup(1, 0); }
+        }
+        var still = twoB ? sw3 : false, every = twoB && sw4 && perFast ? perFast : perUnit;
+        if (!still && pass % every === 0) { fpr = fpr - 1; if (fpr < 0) fpr += 8192; }
+      }
+      function fade(dt) { var keep = Math.exp(-dt / 0.12); g.fillStyle = 'rgba(0,2,4,' + (1 - keep).toFixed(4) + ')'; g.fillRect(0, 0, N, N); }
+      function hms(deg) { deg = ((deg % 360) + 360) % 360; var h = deg / 15, hh = Math.floor(h), mm = Math.round((h - hh) * 60); if (mm === 60) { hh++; mm = 0; } return (hh % 24) + 'h' + (mm < 10 ? '0' : '') + mm + 'm'; }
+      // the window on the map: stored X from fpr-1024 to fpr is mark X from 8192-fpr to 9216-fpr
+      function drawWindow() {
+        var gw = SW.$('.sky-win', box); if (!gw) return;
+        var x0 = 8192 - fpr, ra0 = x0 * 360 / 8192, ra1 = ra0 + 45, h = '';
+        [[ra0, ra1]].forEach(function (iv) {
+          for (var k = 0; k < 2; k++) {
+            var lo = k ? 180 : 0, hi = k ? 360 : 180;
+            [[iv[0], iv[1]], [iv[0] - 360, iv[1] - 360], [iv[0] + 360, iv[1] + 360]].forEach(function (q) {
+              var a = Math.max(q[0], lo), c = Math.min(q[1], hi);
+              if (c <= a) return;
+              var ra00 = k ? 360 : 180, xL = ML + (ra00 - c) * S, xR = ML + (ra00 - a) * S, y0 = TOP + k * (SH + GAP);
+              h += '<rect x="' + xL.toFixed(1) + '" y="' + y0 + '" width="' + (xR - xL).toFixed(1) + '" height="' + SH + '" fill="rgba(255,206,122,0.10)" stroke="#ffce7a" stroke-width="1.6"/>';
+            });
+          }
+        });
+        gw.innerHTML = h;
+        var n = pts.filter(function (p) { return inView(p) !== null; }).length;
+        var turn = 8192 * perUnit / passes;
+        read.textContent = 'fpr ' + SW.oct(fpr, 5) + ' · window RA ' + hms(ra0) + '–' + hms(ra1) + ' · ' + n + ' stars in view · main loop ' + passes.toFixed(1) + ' passes a second (measured) · drift one unit every ' + perUnit + ' passes' + (twoB && sw4 && perFast ? ' (' + perFast + ' with sense switch 4)' : '') + ', a full turn of the sky in ' + (turn / 60).toFixed(0) + ' minutes' + (unread ? ' (the timing could not be read from this source; 3.1’s is assumed)' : '');
+      }
+      function tick(t) {
+        var dt = last == null ? 0 : Math.min(0.1, (t - last) / 1000);
+        last = t;
+        if (playing) {
+          acc += dt * passes * speed;
+          var n = Math.floor(acc); acc -= n;
+          fade(dt);
+          var drawn = Math.min(n, 60);   // at speed, only the latest passes are drawn; the drift keeps count
+          for (var q = 0; q < n; q++) { if (q < n - drawn) { var sv = pass; pass++; var still = twoB ? sw3 : false, every = twoB && sw4 && perFast ? perFast : perUnit; if (!still && pass % every === 0) { fpr = (fpr + 8191) % 8192; } void sv; } else onePass(); }
+          if (fpr !== winAt) { winAt = fpr; drawWindow(); }
+        }
+        raf = requestAnimationFrame(tick);
+      }
+      var ctl = SW.$('.sky-scope-ctl', dlg), read = SW.$('.sky-scope-read', dlg);
+      ctl.innerHTML = '<button class="btn" data-s="play">▶ Run the sky</button> <label class="check">Speed <select data-s="speed"><option value="1">as the program ran</option><option value="16">× 16</option><option value="256">× 256</option><option value="2048">× 2048</option></select></label> ' +
+        (twoB ? '<label class="check" title="2B: sense switch 3 holds the sky still (and with switch 4 turns the stars off)"><input type="checkbox" data-s="sw3"> Sense switch 3</label> <label class="check" title="2B: sense switch 4 makes the sky drift every ' + perFast + ' passes (and with switch 3 turns the stars off)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>'
+              : '<label class="check" title="Sense switch 4 turns the stars off (szs 40, jmp bcx)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>') +
+        ' <span class="hint">Click the map to move the window.</span>';
+      ctl.addEventListener('click', function (e) {
+        var bt = e.target.closest('[data-s="play"]');
+        if (bt) { playing = !playing; bt.textContent = playing ? '❚❚ Pause' : '▶ Run the sky'; }
+      });
+      ctl.addEventListener('change', function (e) {
+        var d = e.target.dataset.s;
+        if (d === 'speed') speed = +e.target.value;
+        if (d === 'sw3') sw3 = e.target.checked;
+        if (d === 'sw4') sw4 = e.target.checked;
+        drawWindow();
+      });
+      box.addEventListener('click', function (e) {
+        var svgEl = SW.$('svg', box), r = svgEl.getBoundingClientRect(), k2 = W / r.width, x = (e.clientX - r.left) * k2, y = (e.clientY - r.top) * k2;
+        var strip = y < TOP + SH + GAP / 2 ? 0 : 1, ra = (strip ? 360 : 180) - (x - ML) / S;
+        if (x < ML || x > ML + 180 * S) return;
+        // centre the window on the click: its middle is stored X fpr - 512, mark X 8192 - (fpr - 512)
+        var X = Math.round(ra * 8192 / 360);
+        fpr = ((8192 - X) + 512 + 8192) % 8192;
+        g.fillStyle = '#000'; g.fillRect(0, 0, N, N);
+        if (!playing) { for (var q = 0; q < 4; q++) onePass(); }
+        winAt = fpr; drawWindow();
+      });
+      var how = SW.$('.sky-scope-how', dlg);
+      how.innerHTML = '<p>How the stars reach the round screen, as this version’s code does it:</p><ol>' +
+        '<li><b>Stored.</b> <span class="mono">mark X, Y</span> puts two words in core: <span class="mono">8192−X</span>, and <span class="mono">Y</span> shifted left 8 bits (<span class="mono">repeat 8, Y=Y+Y</span>), so Y is already in scope units.</li>' +
+        '<li><b>The window.</b> <span class="mono">dislis</span> takes the stored X less <span class="mono">fpr</span>, the right margin; a star is shown only if that falls in the 1,024 units below <span class="mono">fpr</span>, wrapping round at 8,192 (<span class="mono">add (2000</span>, <span class="mono">add (−20000+2000</span>). 1,024 units is an eighth of the circle, 45° of right ascension; Y spans ±512 points on the same scale, so the scope shows 45° by 45° of sky, the round tube cutting the corners.</li>' +
+        '<li><b>Plotted.</b> <span class="mono">sub (1000</span> centres it, <span class="mono">sal 8s</span> moves it into the display’s X bits, <span class="mono">lio</span> Y, <span class="mono">dpy</span>.</li>' +
+        (mode === 'intensity' ? '<li><b>Brightness by intensity.</b> Every ' + bccN + ' passes the groups are drawn with <span class="mono">dislis J, Q, B</span>, the intensity B set into the dpy instruction (<span class="mono">dpy-i+B</span>): ' + groups.map(function (gr) { return 'group ' + gr + ' at ' + calls[gr]; }).join(', ') + '.' + (groups.length < 4 ? ' Group ' + [1, 2, 3, 4].filter(function (gr) { return groups.indexOf(gr) < 0; }).join(', ') + ' is not drawn.' : '') + '</li>'
+          : '<li><b>Brightness by redrawing.</b> Each pass draws group 1 twice (<span class="mono">jsp 1m</span> at the start and the end), group 2 once, group 3 every second pass (<span class="mono">and (1</span>) and group 4 every fourth (<span class="mono">and (3</span>), all at one intensity; the phosphor makes the more often drawn brighter.</li>') +
+        '<li><b>The drift.</b> Every ' + perUnit + ' passes of the main loop <span class="mono">fpr</span> falls by one (' + (mode === 'intensity' ? 'every ' + scrollN + ' star frames, ' + bccN + ' passes each' : '<span class="mono">law i ' + scrollN.toString(8) + '</span>') + '), so the stars move slowly across the screen. It starts at ' + SW.oct(fpr0, 5) + '.' + (twoB ? ' Sense switch 3 holds the sky still; switch 4 makes it drift every ' + perFast + ' passes; both together turn the stars off.' : ' Sense switch 4 turns the stars off.') + '</li></ol>' +
+        '<p class="hint">The main loop’s rate is measured by running this version on the bench’s emulator for two emulated seconds and counting its calls of <span class="mono">bck</span>.</p>';
+      drawWindow();
+      for (var q0 = 0; q0 < 4; q0++) onePass();
+      raf = requestAnimationFrame(tick);
+      dlg.stepScope = function (sec) { var n = Math.round(sec * passes * speed); for (var q = 0; q < n; q++) onePass(); drawWindow(); };
+      return function () { cancelAnimationFrame(raf); };
+    }
   };
 
   function sky(b, el) {

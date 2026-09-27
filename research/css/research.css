@@ -832,3 +832,13 @@ dialog.sky-dlg { width: min(1480px, 98vw); max-height: 96vh; overflow: auto; pad
 .sky-miss { background: color-mix(in srgb, var(--red) 22%, transparent); color: var(--text); padding: 0 4px; border-radius: 2px; }
 .sky-moved { background: color-mix(in srgb, var(--amber) 26%, transparent); padding: 0 4px; border-radius: 2px; }
 .sky-extra { background: color-mix(in srgb, var(--green) 24%, transparent); padding: 0 4px; border-radius: 2px; }
+.sky-scope { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
+.sky-scope h3 { margin: 4px 0 8px; }
+.sky-scope-row { display: grid; grid-template-columns: minmax(260px, 440px) 1fr; gap: 16px; align-items: start; }
+@media (max-width: 900px) { .sky-scope-row { grid-template-columns: 1fr; } }
+canvas.sky-crt { width: 100%; aspect-ratio: 1; border-radius: 50%; background: #000; box-shadow: 0 0 0 6px #1d262e, 0 0 0 7px #3a4650; }
+.sky-scope-read { font-size: 11.5px; margin: 8px 0; color: var(--text-dim); }
+.sky-scope-how { font-size: 13px; line-height: 1.5; }
+.sky-scope-how ol { padding-left: 20px; }
+.sky-scope-how li { margin-bottom: 6px; }
+.sky-dlg .sky-box svg { cursor: crosshair; }
