@@ -526,6 +526,38 @@
   };
   // Figures on screen take the colours of the theme in use, on its figure plate.
   SW.lightTheme = function () { return !SW.themeInfo().dark; };
+  // A figure carried in an annotation's text: the SVG gzipped and base64'd on
+  // one closing line, <!-- sw:fig:gz ... -->. Shown as an <img>, so markup
+  // from someone else's finding is never run.
+  SW.figpack = {
+    RE: /\n*<!-- sw:fig:gz ([A-Za-z0-9+\/=]+) -->\s*$/,
+    pack: function (svg) {
+      var bytes = new TextEncoder().encode(svg);
+      if (!root.CompressionStream) return Promise.resolve('');
+      var cs = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'));
+      return new Response(cs).arrayBuffer().then(function (buf) {
+        var b = new Uint8Array(buf), bin = '';
+        for (var i = 0; i < b.length; i += 0x8000) bin += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+        return '\n\n<!-- sw:fig:gz ' + btoa(bin) + ' -->';
+      });
+    },
+    split: function (text) { var m = SW.figpack.RE.exec(String(text || '')); return m ? { text: String(text).slice(0, m.index), b64: m[1] } : { text: String(text || ''), b64: null }; },
+    unpack: function (b64) {
+      if (!root.DecompressionStream) return Promise.reject(new Error('This browser cannot open the figure.'));
+      var bin = atob(b64), b = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+      return new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+    },
+    img: function (svg, cls) { return '<img class="' + (cls || '') + '" alt="Figure" src="data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg) + '">'; },
+    big: function (svg, title) {
+      var d = SW.el('dialog', { class: 'tray-big' });
+      d.innerHTML = '<div class="tray-bighead"><b>' + SW.esc(title || 'Figure') + '</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="tray-fig">' + SW.figpack.img(svg, 'fig-full') + '</div>';
+      document.body.appendChild(d);
+      d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
+      d.addEventListener('close', function () { d.remove(); });
+      d.showModal();
+    }
+  };
   SW.displaySVG = function (svg) { return SW.resolveVars(svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')); };
   // Palettes for figures that draw their own ground (sky, ships).
   SW.PLATE = { bg: '#02040a', ink: '#e6f4ff', ink2: '#8fc3d6', dim: '#7fa6c4', accent: '#ffce7a', dark: true };

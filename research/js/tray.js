@@ -82,7 +82,9 @@
       SW.toast('Back in My notes');
       return;
     }
-    add({ kind: 'text', caption: '', text: n.text, from: '' }, { vid: n.vid, by: n.by, tags: tags, chapter: ch, anchor: n.anchor || null, quote: n.quote || '' });
+    var sp = SW.figpack.split(n.text), extra = { vid: n.vid, by: n.by, tags: tags, chapter: ch, anchor: n.anchor || null, quote: n.quote || '' };
+    if (sp.b64) { SW.figpack.unpack(sp.b64).then(function (svg) { var ls = sp.text.split('\n'); add({ kind: 'figure', svg: svg, caption: ls[0], note: ls.slice(1).join('\n').trim() }, extra); }); return; }
+    add({ kind: 'text', caption: '', text: n.text, from: '' }, extra);
   };
   T.count = function () { return load().items.length; };
   var host = null;   // where My notes are shown (its tab)
@@ -302,7 +304,10 @@
     if (!body.trim()) { SW.toast('Write something first: the first line is the finding’s title.', 4000); return; }
     if (!confirm('Share with the group’s Findings, signed ' + by + ', on ' + (vShort(vid) || 'the version open') + '?')) return;
     var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []).concat(['level:' + (it.level || 'notable')]);
-    SW.notes.create({ vid: vid, kind: it.anchor ? 'line' : 'version', anchor: it.anchor || null, quote: it.quote || '', text: body, tags: tags, by: by })
+    // a figure goes with it, packed into the text (see SW.figpack)
+    (it.kind === 'figure' && it.svg ? SW.figpack.pack(SW.exportSVG(it.svg)) : Promise.resolve('')).then(function (fig) {
+      return SW.notes.create({ vid: vid, kind: it.anchor ? 'line' : 'version', anchor: it.anchor || null, quote: it.quote || '', text: body + fig, tags: tags, by: by });
+    })
       .then(function (made) {
         var y = load(), j = -1; y.items.forEach(function (z, n) { if (z.id === it.id) j = n; });
         if (j >= 0) { y.items[j].shared = { date: new Date().toISOString(), draft: !SW.notes.configured(), id: made && made.id }; y.items[j].by = by; save(y); }

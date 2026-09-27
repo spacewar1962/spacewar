@@ -231,12 +231,14 @@
         '<div class="toolbar" style="position:static;padding-left:0"><label class="check">Importance <select data-e2="lvl">' + LEVELS.map(function (l) { return '<option value="' + l[0] + '"' + (l[0] === l0 ? ' selected' : '') + '>' + l[2] + ' ' + l[1] + '</option>'; }).join('') + '</select></label>' +
         '<label class="check">Category <select data-e2="cat"><option value="">Found from the words (' + SW.esc(CATNAME[catOf(n.text, []).id]) + ')</option>' + CATS.concat([['other', 'Other']]).map(function (c) { return '<option value="' + c[0] + '"' + (!c0.auto && c0.id === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
         '<button class="btn" data-e="save">Save</button><button class="btn ghost" data-e="cancel">Cancel</button></div>';
-      SW.$('textarea', ed).value = n.text;
+      var fpe = SW.figpack.split(n.text);
+      SW.$('textarea', ed).value = fpe.text;
       SW.$('input', ed).value = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).join(', ');
       ed.addEventListener('click', function (e) {
         var b = e.target.closest('[data-e]'); if (!b) return;
         if (b.dataset.e === 'cancel') { ed.remove(); return; }
         var text = SW.$('textarea', ed).value.trim(); if (!text) return;
+        var fpk = SW.figpack.split(n.text); if (fpk.b64) text += '\n\n<!-- sw:fig:gz ' + fpk.b64 + ' -->';
         var tags = keep.concat(SW.$('input', ed).value.split(',').map(function (g) { return g.trim(); }).filter(function (g) { return g && !/^(cat|level):/.test(g); }));
         tags.push('level:' + SW.$('[data-e2="lvl"]', ed).value);
         if (SW.$('[data-e2="cat"]', ed).value) tags.push('cat:' + SW.$('[data-e2="cat"]', ed).value);
@@ -283,7 +285,8 @@
   }
   function groupCard(n, i, c, lvl) {
       {
-        var lines = String(n.text).split(/\n/), title = lines[0].replace(/^#+\s*/, ''), rest = lines.slice(1).join('\n').trim();
+        var fp = SW.figpack.split(n.text);
+        var lines = fp.text.split(/\n/), title = lines[0].replace(/^#+\s*/, ''), rest = lines.slice(1).join('\n').trim();
         var where = vLabel(n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : ', the version');
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
         li.innerHTML = '<div class="fd-head"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
@@ -294,8 +297,18 @@
           if (n.vid !== SW.state.v) SW.select(n.vid);
           SW.setTab(n.anchor ? 'read' : 'about');
         };
+        if (fp.b64) {   // the figure shared with it
+          var fbox = SW.el('div', { class: 'fd-fig' }, '<p class="hint">Opening the figure…</p>');
+          li.insertBefore(fbox, SW.$('.fd-ev', li));
+          SW.figpack.unpack(fp.b64).then(function (svg) {
+            fbox.innerHTML = SW.figpack.img(svg, 'fd-thumb') + '<button class="icon-btn fd-expand" title="Open larger">⤢</button>';
+            fbox.onclick = function () { SW.figpack.big(svg, title); };
+            fbox._svg = svg;
+          }, function (e) { fbox.innerHTML = '<p class="hint">' + SW.esc(e.message) + '</p>'; });
+        }
         if (N.mine(n)) li.appendChild(ownActions(n, li));
-        li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }, { by: n.by, vid: n.vid, shared: { date: n.date }, tags: (n.tags || []).filter(function (g) { return !/^findings?$|^chapter:/i.test(g); }) }));
+        if (fp.b64) li.appendChild(SW.el('button', { class: 'btn ghost fd-mine', title: 'Put this finding’s figure in My notes (private)', onclick: function () { var fb = SW.$('.fd-fig', li); if (fb && fb._svg) SW.tray.addFigure(fb._svg, title); } }, '＋ My notes'));
+        else li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }, { by: n.by, vid: n.vid, shared: { date: n.date }, tags: (n.tags || []).filter(function (g) { return !/^findings?$|^chapter:/i.test(g); }) }));
         return li;
       }
   }
@@ -324,7 +337,7 @@
     if (live.notes && live.notes.length) {
       blocks.push({ type: 'h2', text: 'Findings from the group' });
       blocks.push(SW.tableBlock('Annotations tagged “finding”', ['Date', 'By', 'Version', 'Where', 'Finding'], live.notes.map(function (n) {
-        return [SW.fmtDate(n.date), n.by, vLabel(n.vid), n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : 'version', n.text];
+        return [SW.fmtDate(n.date), n.by, vLabel(n.vid), n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : 'version', SW.figpack.split(n.text).text + (SW.figpack.split(n.text).b64 ? ' [with a figure]' : '')];
       })));
     }
     return { title: 'Spacewar! findings', subtitle: 'What the source, the tapes and the assembler show',

@@ -1125,3 +1125,7 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-binbtn { padding: 2px 8px; font-size: 14px; line-height: 1; }
 .ov-binbtn sup { font-size: 10px; margin-left: 1px; color: var(--text-dim); }
 .ov-binbtn.on { border-color: var(--beam); background: color-mix(in srgb, var(--beam) 16%, transparent); }
+.fd-fig { position: relative; display: inline-block; margin: 6px 0; cursor: zoom-in; background: var(--plate); border-radius: 4px; padding: 4px; }
+.fd-thumb { display: block; max-width: min(100%, 520px); max-height: 200px; }
+.fd-expand { position: absolute; top: 4px; right: 4px; background: var(--surface); }
+.fig-full { display: block; width: 100%; height: auto; }
