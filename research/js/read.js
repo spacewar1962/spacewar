@@ -639,7 +639,7 @@
       }).join('') + '</div><div class="faint">' + s.defs.length + ' definition(s), ' + s.refs.length + ' reference(s)</div>';
     }
     if (!g && !s && !b.macros[name]) h += '<div class="faint">No symbol of this name in this build.</div>';
-    else if (s || b.macros[name]) h += '<div style="margin-top:6px"><a href="#" data-bio="' + SW.esc(name) + '" title="Follow this name through every version: when it appears, changes and goes (Analyse, lens 14)">Its life across the versions →</a></div>';
+    else if (s || b.macros[name]) h += '<div style="margin-top:6px"><a href="#" data-bio="' + SW.esc(name) + '" title="Follow this name through every version: when it appears, changes and goes (Text ▾ Symbol histories)">Its history across the versions →</a></div>';
     var pop = SW.pop(x, y, h);
     pop.addEventListener('click', function (e) {
       var bio = e.target.closest('a[data-bio]');

@@ -26,7 +26,7 @@
     [11, 'Macros', 'Macros and their use'],
     [12, 'The sky', 'The star table as a chart'],
     [13, 'The ships', 'The ship outlines'],
-    [14, 'Biographies', 'One name across the versions'],
+    [14, 'Symbol histories', 'One symbol across the versions'],
     [15, 'Functional overview', 'Start-up, the main loop, each object’s routine, the calls']
   ];
 
@@ -928,7 +928,7 @@
 
   var FNS = { 1: comments, 2: hands, 3: lexicon, 4: adjustable, 5: machine, 6: timeGoes, 7: absence, 8: calls, 9: instructions, 10: memmap, 11: macros, 12: sky, 13: ships };
 
-  // ---------- 14 biographies ----------
+  // ---------- 14 symbol histories (once "biographies") ----------
   // A symbol or macro followed through every version that can be built.
   var bioName = SW.store.get('an.bio', 'str');
   function bioVersions() {
@@ -1064,7 +1064,7 @@
         var sc = card(name, SW.esc(bioSummary(name, rows)));
         var fig = SW.el('div', { class: 'svgbox', style: 'margin:8px 0' }, SW.displaySVG(bioSVG(name, rows)));
         sc.appendChild(fig);
-        sc.appendChild(SW.figureButtons(function () { return bioSVG(name, rows); }, 'spacewar-biography-' + SW.slug(name)));
+        sc.appendChild(SW.figureButtons(function () { return bioSVG(name, rows); }, 'spacewar-symbol-history-' + SW.slug(name)));
         out.appendChild(sc);
         var t = SW.table(['Version', 'Date', 'Status', 'Kind', 'Definition', 'Comment', 'Value', 'Uses', 'Hand'], tableRows(rows),
           { cls: ['', 'mono', '', '', 'mono', '', 'mono', 'num', 'mono'], onRow: function (r) {
@@ -1603,8 +1603,8 @@
       if (!b.asm) { cards.innerHTML = '<p class="hint">Choose a version with a surviving source; its names are offered for following.</p>'; return; }
       var bb = biography(b, cards);
       head.appendChild(expMenu(SW.exportButtons(function () {
-        return { title: 'Spacewar!: the life of “' + bioName + '”', subtitle: L[2], meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]], blocks: bb() };
-      }, function () { return 'spacewar-biography-' + bioName; })));
+        return { title: 'Spacewar!: the history of the symbol “' + bioName + '”', subtitle: L[2], meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]], blocks: bb() };
+      }, function () { return 'spacewar-symbol-history-' + bioName; })));
       return;
     }
     if (mode === 'across') { renderAcross(cards, head, L); return; }
