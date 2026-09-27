@@ -352,6 +352,7 @@
     c.appendChild(tb);
     var row = SW.el('div', { class: 'mem-row' });
     var left = SW.el('div', { class: 'mem-left' }), right = SW.el('div', { class: 'mem-right' });
+    left.style.width = (44 + 64 * 10) + 'px';   // fixed, so the caption's length never moves the panel beside it
     var CELL = 10, LX = 44, W = LX + 64 * CELL, H = 64 * CELL, dpr = Math.min(2, root.devicePixelRatio || 1);
     var cv = SW.el('canvas', { class: 'mem-cv' }); cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px';
     var g = cv.getContext('2d'); g.scale(dpr, dpr);
@@ -1601,7 +1602,9 @@
   // The bench's pictures of the program, gathered: the star map (with the
   // scope), the ships, the memory map. Each is also a lens under Analyse.
   var GFX = [['sky', 'Star map', 'The star table, its constellations, and the scope'],
-             ['ships', 'The ships', 'The Needle and the Wedge, across the versions'],
+             ['ships', 'The ships', 'The Needle and the Wedge, and how they are drawn'],
+             ['sun', 'The sun', 'The central star, drawn slowly'],
+             ['hyper', 'Hyperspace', 'What hyperspace draws, slowed down'],
              ['memory', 'Memory map', 'Core, word by word']];
   var gfx = SW.store.get('gfx.item', 'sky'), gfxStop = null, gfxBuild = null;
   function renderGfx() {
@@ -1621,11 +1624,18 @@
     if (G[0] === 'sky') { var host = SW.el('div'); pad.appendChild(host); gfxStop = SW.skyMap(b, host); return; }
     var cards = SW.el('div', { class: 'cards' });
     pad.appendChild(cards);
+    if (G[0] === 'sun' || G[0] === 'hyper') {
+      var wait = SW.el('p', { class: 'hint' }, 'Running ' + b.v.label + ' on the emulator…');
+      cards.appendChild(wait);
+      setTimeout(function () { wait.remove(); SW.draws[G[0] === 'sun' ? 'sun' : 'hyperspace'](b, cards); }, 30);
+      return;
+    }
     var blocks = FNS[G[0] === 'ships' ? 13 : 10](b, cards);
     if (blocks) head.appendChild(expMenu(SW.exportButtons(function () {
       return { title: b.v.label + ': ' + G[1].toLowerCase(), subtitle: G[2], meta: SW.docMeta(b), blocks: blocks() };
     }, 'spacewar-' + b.v.id + '-' + G[0])));
     if (G[0] === 'ships') {
+      SW.draws.ships(b, cards);
       var vs = selected(), wait = SW.el('p', { class: 'hint', style: 'grid-column:1/-1' }, 'Drawing the ships of ' + vs.length + ' versions…');
       cards.appendChild(wait);
       Promise.all(vs.map(function (v) { return SW.build(v.id); })).then(function (bs) { wait.remove(); if (vs.length) XFNS[13](vs, bs, cards); });

@@ -176,7 +176,7 @@
 
     if (!b.v.build) {
       var lost = SW.el('div', { class: 'pad prose' });
-      lost.innerHTML = '<h2>' + SW.esc(b.v.label) + '</h2><p>' + SW.esc(b.v.summary) + '</p><p class="muted">What is absent is also part of the record. Annotations on this version can still be kept under “Version”.</p>';
+      lost.innerHTML = '<h2>' + SW.esc(b.v.label) + '</h2><p>' + SW.esc(b.v.summary) + '</p><p class="muted">What is absent is also part of the record. Annotations on this version can still be kept under “Versions”.</p>';
       view.appendChild(lost);
       return;
     }

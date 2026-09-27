@@ -197,7 +197,7 @@
       var v = V.byId(picked), anc = V.ancestry(picked).map(function (id) { var x = V.byId(id); return x ? short(x) : id; });
       info.innerHTML = '<b>' + SW.esc(v.label) + '</b> · ' + SW.esc(v.date) + ' · ' + SW.esc(v.status) + (v.medium ? ' · ' + SW.esc(v.medium) : '') +
         '<br>' + SW.esc(v.summary || '') + (anc.length > 1 ? '<br><span class="mono">' + SW.esc(anc.join(' → ')) + '</span>' : '') +
-        (v.build ? ' <button class="btn ghost" data-go="read">Read it</button> <button class="btn ghost" data-go="about">Version</button>' : ' <button class="btn ghost" data-go="about">Version</button>');
+        (v.build ? ' <button class="btn ghost" data-go="read">Read it</button> <button class="btn ghost" data-go="about">Versions</button>' : ' <button class="btn ghost" data-go="about">Versions</button>');
     });
     info.addEventListener('click', function (e) {
       var b = e.target.closest('[data-go]');

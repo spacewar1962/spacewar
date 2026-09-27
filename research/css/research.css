@@ -869,7 +869,7 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .gfx-page .sky-page { padding: 0; }
 
 /* Tab-row drop-downs (Analyse ▾, Graphics ▾), after the main site's menus */
-.tabs button .caret { font-size: 0.7em; opacity: 0.7; display: inline-block; transition: transform 0.15s ease; margin-left: 2px; }
+.tabs button .caret { font-size: 0.9em; opacity: 1; color: var(--text); display: inline-block; transition: transform 0.15s ease; margin-left: 3px; }
 .tabs button[aria-expanded="true"] .caret { transform: rotate(180deg); }
 .tabs button[aria-expanded="true"] { color: var(--text); }
 .tab-menu { position: fixed; z-index: 60; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
@@ -890,7 +890,9 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .mem-row { display: grid; grid-template-columns: auto minmax(280px, 1fr); gap: 16px; align-items: start; }
 @media (max-width: 1100px) { .mem-row { grid-template-columns: 1fr; } }
 .mem-cv { display: block; max-width: 100%; cursor: crosshair; image-rendering: pixelated; }
-.mem-cap { min-height: 2.6em; margin: 6px 0; font-size: 11.5px; }
+.mem-cap { min-height: 1.5em; margin: 6px 0; font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mem-left { max-width: 100%; }
+.mem-right { min-width: 0; overflow-wrap: anywhere; }
 .mem-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; }
 .mem-legend i, .mem-dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
 .mem-insp h4 { margin: 0 0 6px; }
@@ -902,3 +904,11 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .mem-segs h4 { margin: 12px 0 4px; }
 .ln.kdef.norm .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--violet) 70%, transparent), inset -3px 0 0 var(--violet); }
 .ln.keq.norm .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--green) 70%, transparent), inset -3px 0 0 var(--violet); }
+
+/* Graphics: how it is drawn, slowed down */
+.dr-row { display: flex; flex-wrap: wrap; gap: 18px; }
+.dr-col { flex: 1 1 420px; min-width: 0; }
+.dr-col h4 { margin: 4px 0 6px; }
+.dr-player { max-width: 540px; }
+.dr-cv { width: 100%; aspect-ratio: 1; border-radius: 8px; background: #02050a; display: block; }
+.dr-cap { font-size: 11.5px; min-height: 2.8em; margin: 6px 0 0; overflow-wrap: anywhere; }

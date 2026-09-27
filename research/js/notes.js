@@ -628,7 +628,7 @@
       } else if (btn.dataset.act === 'delete') {
         // Into the bin, so no confirmation: it can be restored.
         N.bin(note).then(function () {
-          SW.toast('Moved to the bin. Restore it under Deleted annotations on the Version page.', 5000);
+          SW.toast('Moved to the bin. Restore it under Deleted annotations on the Versions page.', 5000);
         }, function (e) { SW.toast(e.message, 5000); });
       }
     });
