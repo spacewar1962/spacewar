@@ -217,7 +217,7 @@
       var span = part.end ? 'lines ' + part.title + '–' + part.end : part.title > 1 ? 'from line ' + part.title : 'whole file';
       sec.innerHTML = '<div class="part-head" data-p="' + pi + '">' +
         '<div class="ph-main">' + (b.parts.length > 1 ? '<span class="ph-num">Tape ' + (pi + 1) + ' of ' + b.parts.length + '</span>' : '') +
-        '<span class="ph-title">' + SW.esc(t.label) + '</span>' +
+        '<span class="ph-title">' + SW.esc(t.label) + '</span> ' + SW.refTag(b.v.id, pi, null, null, b.parts.length) +
         (errs ? '<span class="badge err">' + errs + ' error' + (errs > 1 ? 's' : '') + '</span>' : '') + '</div>' +
         '<div class="ph-sub">' + SW.sourceLink(part.src, part.src.split('/').pop()) +
         ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
@@ -440,6 +440,8 @@
       ['⤓ Word', function () { exportSel('docx'); }], ['⤓ Markdown', function () { exportSel('md'); }],
       ['▣ Figure', figureSel], ['★ Finding', findingSel], ['＋ My notes', function () { listingDoc(build, SW.state.sel).then(function (d) { d.title = SW.cite(build, SW.state.sel.p, SW.state.sel.n0, SW.state.sel.n1); var s = SW.state.sel; SW.tray.addDoc(d, { anchor: { p: s.p, n0: s.n0, n1: s.n1, src: build.parts[s.p].src }, quote: quote() }); }); }], ['● Breakpoint', bpSel], ['▶ Run to here', runToSel], ['✕', function () { SW.state.sel = null; paintSel(); SW.writeQuery(); }]
     ];
+    var s0 = SW.state.sel;
+    if (s0) bar.appendChild(SW.el('span', { class: 'selref' }, SW.refTag(build.v.id, s0.p, s0.n0, s0.n1, build.parts.length)));
     acts.forEach(function (a) { bar.appendChild(SW.el('button', { class: 'btn', onclick: a[1] }, a[0])); });
   }
   function selLines() {
@@ -477,7 +479,7 @@
       var lines = build.lines[p].slice(n0 - 1, n1), text = lines.map(function (L) { return L.raw; }).join('\n'), cite = SW.cite(build, p, n0, n1);
       hideSelPop();
       selPop = SW.el('div', { class: 'selpop' });
-      selPop.appendChild(SW.el('span', { class: 'hint' }, 'l. ' + n0 + (n1 > n0 ? '–' + n1 : '')));
+      selPop.appendChild(SW.el('span', { class: 'hint' }, 'l. ' + n0 + (n1 > n0 ? '–' + n1 : '') + ' ' + SW.refTag(build.v.id, p, n0, n1, build.parts.length)));
       selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'Copy these lines of source (without numbers or addresses)', onclick: function () { copy(text, (n1 - n0 + 1) + ' line' + (n1 > n0 ? 's' : '') + ' copied'); hideSelPop(); } }, 'Copy'));
       selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put these lines in My notes (private), with their citation', onclick: function () {
         var s0 = { p: p, n0: n0, n1: n1 };

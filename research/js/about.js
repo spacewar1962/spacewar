@@ -52,7 +52,7 @@
       ['Tape titles', a ? a.titles.map(function (t) { return '<span class="mono">' + SW.esc(t.text.trim()) + '</span>'; }).join('<br>') : 'none'],
       ['Cite this version', SW.esc(v.label + ' (' + v.date + '). ' + (v.authors || '') + '. Spacewar! research bench, ' + SW.versionURI(v.id))]
     ];
-    pad.innerHTML = '<h2 style="margin-top:0">' + SW.esc(v.label) + '</h2><p class="prose">' + SW.esc(v.summary) + '</p>' +
+    pad.innerHTML = '<h2 style="margin-top:0">' + SW.esc(v.label) + (v.build ? ' ' + SW.refTag(v.id) : '') + '</h2><p class="prose">' + SW.esc(v.summary) + '</p>' +
       '<dl class="meta">' + dl.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + (/</.test(r[1]) ? r[1] : r[1]) + '</dd>'; }).join('') + '</dl>' +
       '<h3>The variorum</h3>' + timeline(v.id) +
       '<h3 style="margin-top:22px">Annotations on this version</h3>' +

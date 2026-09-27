@@ -230,10 +230,46 @@
   SW.current = function () { return SW.state.v ? SW.build(SW.state.v) : Promise.reject(new Error('no version')); };
 
   // Citation for a line range of a build.
+  // The bench's references to its sources (Help ▸ Referencing and versions): SW, the
+  // version, and a letter for the witness, the particular surviving text:
+  // T machine-read from the punched source tape, L a transcription, M a modern
+  // reassembly or edited source, R a reconstruction (B: an object tape, by
+  // address only). Then the tape and lines: [REF: SW3.1T, 2.141–146]; the tape
+  // is left out when the text has only one; @0402 cites by core address.
+  SW.REF = { '1': 'SW1R', 'stars': 'SWEPL', '2b-pre': 'SW2B-preR', '2b': 'SW2BR', '3.1': 'SW3.1L', '3.1t': 'SW3.1T',
+    '4.0': 'SW4.0L', '4.0ts': 'SW4.0TSL', '4.1': 'SW4.1L', '4.1t': 'SW4.1T', '4.1d': 'SW4.1Md', '4.1f': 'SW4.1Mf', '4.2': 'SW4.2L',
+    '4.3': 'SW4.3L', '4.3m': 'SW4.3M', '4.4': 'SW4.4L', '4.4m': 'SW4.4M', '4.4f': 'SW4.4Mf', '4.8': 'SW4.8L', '2015': 'SW2015M' };
+  SW.refOf = function (vid, p, n0, n1, nparts) {
+    var r = SW.REF[vid] || ('SW' + vid);
+    if (p == null) return r;
+    var tape = nparts > 1 ? (p + 1) + (n0 != null ? '.' : '') : '';
+    return r + ', ' + tape + (n0 != null ? n0 + (n1 && n1 !== n0 ? '–' + n1 : '') : '');
+  };
+  // Help ▸ Referencing and versions: the convention, and every source's reference
+  SW.refHelp = function () {
+    var V = root.SWVersions, vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; });
+    var d = SW.el('dialog', { class: 'tray-big refhelp' });
+    d.innerHTML = '<div class="tray-bighead"><b>Referencing and versions</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
+      '<p>The bench names each source text in one form, shown in small type beside its name across the bench, in citations and in exports:</p>' +
+      '<p class="refhelp-ex mono">[REF: SW3.1T, 2.141–146]</p>' +
+      '<p>SW, then the version (<b>3.1</b>), then a letter for the witness, the particular surviving text of that version (<b>T</b>); then the tape (<b>2</b>, as the assembler read them in) and the lines (<b>141–146</b>).</p>' +
+      '<table class="ov-sub"><thead><tr><th>Letter</th><th>The witness</th></tr></thead><tbody>' +
+      [['T', 'machine-read from the punched source tape'], ['L', 'a transcription: typed text of a listing or a tape'], ['M', 'a modern reassembly or edited source'], ['R', 'a reconstruction'], ['B', 'an object tape (binary), cited by address only']].map(function (r) { return '<tr><td class="mono">' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('') + '</tbody></table>' +
+      '<p>Shorter forms: the version and witness alone, <span class="mono">[REF: SW3.1T]</span>; a whole tape, <span class="mono">[REF: SW3.1T, 2]</span>. The tape is left out when a text has only one: <span class="mono">[REF: SW4.3M, 141]</span>. By core address, <span class="mono">[REF: SW3.1L, @0402–0407]</span>: an address holds across texts of a version that assemble to the same words, and is the only way to cite an object tape. Two texts of one version with the same letter take a lower-case qualifier: <span class="mono">SW4.4Mf</span>. A newly found text takes its version and the next letter or qualifier; a new version, its own number.</p>' +
+      '<p>For the exact bytes of a file, cite its SWHID (Software Heritage, ISO/IEC 18670:2025) alongside.</p>' +
+      '<h4>The sources on the bench</h4><table class="ov-sub"><thead><tr><th>Reference</th><th>Version</th><th>Date</th><th>Text</th></tr></thead><tbody>' +
+      vs.map(function (v) { return '<tr><td class="mono">' + SW.esc(SW.refOf(v.id)) + '</td><td>' + SW.esc(v.label) + '</td><td>' + SW.esc(v.date || '') + '</td><td>' + SW.esc(v.medium || '') + '</td></tr>'; }).join('') + '</tbody></table>';
+    document.body.appendChild(d);
+    d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
+    d.addEventListener('close', function () { d.remove(); });
+    d.showModal();
+  };
+  SW.refText = function (vid, p, n0, n1, nparts) { return '[REF: ' + SW.refOf(vid, p, n0, n1, nparts) + ']'; };
+  SW.refTag = function (vid, p, n0, n1, nparts) { return '<span class="swref" title="The bench’s reference to this source (Help ▸ Referencing and versions)">' + SW.esc(SW.refText(vid, p, n0, n1, nparts)) + '</span>'; };
   SW.cite = function (b, p, n0, n1) {
     var part = b.parts[p];
     var range = n1 && n1 !== n0 ? 'll. ' + n0 + '–' + n1 : 'l. ' + n0;
-    return b.v.label + ' (' + b.v.date + '), ' + part.src + ', ' + range;
+    return b.v.label + ' (' + b.v.date + '), ' + part.src + ', ' + range + ' ' + SW.refText(b.v.id, p, n0, n1, b.parts.length);
   };
   SW.permalink = function (params) {
     var q = [];

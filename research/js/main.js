@@ -68,6 +68,7 @@
     if (SW.state.v && SW.state.v !== id) SW.state.sel = null;
     SW.state.v = id;
     SW.$('#pick-a').value = id;
+    var vr = SW.$('#vref'); if (vr) vr.textContent = V.byId(id) && V.byId(id).build ? SW.refText(id) : '';
     shown = {};
     SW.build(id).then(function (b) {
       if (SW.tape) SW.tape.strip(b);

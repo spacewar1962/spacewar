@@ -127,7 +127,7 @@
       locate(ev).then(function (r) {
         if (!r) return;
         at = r;
-        btn.textContent = vLabel(ev.v) + ', l. ' + r.n + (ev.label ? ' (' + ev.label + ')' : '');
+        btn.innerHTML = SW.esc(vLabel(ev.v) + ', l. ' + r.n + (ev.label ? ' (' + ev.label + ')' : '')) + ' ' + SW.refTag(r.b.v.id, r.p, r.n, r.n, r.b.parts.length);
         btn.title = SW.cite(r.b, r.p, r.n, r.n);
         ev.cite = SW.cite(r.b, r.p, r.n, r.n);
       });
