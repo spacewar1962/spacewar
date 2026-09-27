@@ -94,13 +94,29 @@
   function preview(it) {
     if (it.kind === 'figure') return '<div class="tray-fig">' + SW.displaySVG(it.svg) + '</div>';
     if (it.kind === 'text') return '<textarea class="tray-text" rows="4" placeholder="A paragraph of your own, to sit between the figures">' + SW.esc(it.text || '') + '</textarea>';
-    var code = (it.blocks || []).filter(function (b) { return b.type === 'code'; })[0];
-    var tab = (it.blocks || []).filter(function (b) { return b.type === 'table'; })[0];
-    if (code) return '<pre class="mono tray-code">' + SW.esc(code.lines.slice(0, 8).map(function (l) { return (l.n != null ? String(l.n).padStart(4) + '  ' : '') + l.text; }).join('\n')) + (code.lines.length > 8 ? '\n…' : '') + '</pre>';
-    if (tab) return '<div class="hint">Table: ' + SW.esc(tab.caption || '') + ' (' + tab.rows.length + ' rows)</div>';
-    var para = (it.blocks || []).filter(function (b) { return b.type === 'p' && b.text; })[0];
-    if (para) return '<div class="tray-para">' + SW.esc(String(para.text).slice(0, 320)) + (String(para.text).length > 320 ? '…' : '') + '</div>';
-    return '<div class="hint">' + (it.blocks || []).length + ' blocks</div>';
+    // an excerpt: a line saying what it holds, opening to all of it
+    var bl = it.blocks || [], n = function (t) { return bl.filter(function (b) { return b.type === t; }); };
+    var parts = [], tabs = n('table'), codes = n('code'), paras = n('p').filter(function (b) { return b.text; }), figs = n('figure');
+    if (tabs.length) parts.push(tabs.length === 1 ? 'a table (' + tabs[0].rows.length + ' rows)' : tabs.length + ' tables');
+    if (codes.length) parts.push('code (' + codes.reduce(function (a, c) { return a + c.lines.length; }, 0) + ' lines)');
+    if (paras.length) parts.push(paras.length === 1 ? 'a paragraph' : paras.length + ' paragraphs');
+    if (figs.length) parts.push(figs.length === 1 ? 'a figure' : figs.length + ' figures');
+    return '<details class="tray-doc" data-doc="' + SW.esc(it.id) + '"' + (openDocs[it.id] ? ' open' : '') + '><summary>' + SW.esc(parts.join(' · ') || bl.length + ' blocks') + '</summary><div class="tray-body">' + blocksHTML(bl) + '</div></details>';
+  }
+  var openDocs = {};   // excerpts left open, this session
+  function cellText(c) { return c == null ? '' : typeof c === 'object' ? (c.text != null ? c.text : '') : String(c); }
+  function blocksHTML(bl) {
+    return bl.map(function (b) {
+      if (b.type === 'h2' || b.type === 'h3') return '<p class="tray-h"><b>' + SW.esc(b.text || '') + '</b></p>';
+      if (b.type === 'p') return b.text ? '<p class="tray-para">' + SW.esc(b.text) + '</p>' : '';
+      if (b.type === 'note') return '<p class="tray-para"><b>' + SW.esc(b.by || '') + '</b> ' + SW.esc(b.text || '') + '</p>';
+      if (b.type === 'figure') return b.svg ? '<div class="tray-fig">' + SW.displaySVG(b.svg) + '</div>' : '<p class="hint">' + SW.esc(b.caption || 'Figure') + '</p>';
+      if (b.type === 'code') return (b.caption ? '<p class="hint">' + SW.esc(b.caption) + '</p>' : '') + '<pre class="mono tray-code tray-full">' + SW.esc(b.lines.map(function (l) { return (l.n != null ? String(l.n).padStart(4) + '  ' : '') + l.text; }).join('\n')) + '</pre>';
+      if (b.type === 'table') return (b.caption ? '<p class="hint">' + SW.esc(b.caption) + '</p>' : '') + '<div class="tray-tblwrap"><table class="tray-tbl">' +
+        (b.head && b.head.length ? '<thead><tr>' + b.head.map(function (h) { return '<th>' + SW.esc(cellText(h)) + '</th>'; }).join('') + '</tr></thead>' : '') +
+        '<tbody>' + b.rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + SW.esc(cellText(c)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+      return '';
+    }).join('');
   }
 
   // My notes, drawn into an element (the Findings tab); T.show goes there.
@@ -193,6 +209,7 @@
     // one undo step for each stretch of typing in a field
     var armed = false;
     list.addEventListener('focusin', function () { armed = true; });
+    list.addEventListener('toggle', function (e) { var d = e.target; if (d.dataset && d.dataset.doc) openDocs[d.dataset.doc] = d.open; }, true);
     list.addEventListener('input', function (e) {
       var li = e.target.closest('.tray-item');
       if (!li) return;
