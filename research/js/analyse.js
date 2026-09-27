@@ -1684,11 +1684,12 @@
   function menuHTML(which) {
     if (which === 'help') {
       var dm = document.querySelector('meta[name="bench-date"]');
-      return [['about', 'About the bench', 'Version, sources, citation'],
-              ['refs', 'Referencing and versions', 'How the bench refers to a source: [REF: SW3.1T, 2.141–146]'],
+      // About the bench stays last
+      return [['refs', 'Referencing and versions', 'How the bench refers to a source: [REF: SW3.1T, 2.141–146]'],
               ['settings', 'Settings', 'Initials, group, theme, fonts'],
               ['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
-              ['issue', 'Report a problem ↗', 'GitHub issues']].map(function (h) {
+              ['issue', 'Report a problem ↗', 'GitHub issues'],
+              ['about', 'About the bench', 'Version, sources, citation']].map(function (h) {
         return '<button data-pick="' + h[0] + '"><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
       }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
     }
