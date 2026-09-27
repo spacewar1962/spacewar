@@ -913,3 +913,12 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .dr-player { max-width: 540px; }
 .dr-cv { width: 100%; aspect-ratio: 1; border-radius: 8px; background: #02050a; display: block; }
 .dr-cap { font-size: 11.5px; min-height: 2.8em; margin: 6px 0 0; overflow-wrap: anywhere; }
+.dr-say { font-size: 14.5px; margin: 6px 0 8px; }
+.dr-all { margin-top: 14px; }
+.dr-hrow { display: grid; grid-template-columns: minmax(320px, 560px) minmax(300px, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1000px) { .dr-hrow { grid-template-columns: 1fr; } }
+.dr-side h4 { margin: 0 0 4px; }
+.dr-vt td { font-size: 12.5px; vertical-align: top; padding: 4px 6px; line-height: 1.4; }
+.dr-vt tr { cursor: pointer; }
+.dr-vt tr.on td { background: color-mix(in srgb, var(--beam) 12%, transparent); }
+.dr-vt tr:hover td { background: color-mix(in srgb, var(--beam) 20%, transparent); }
