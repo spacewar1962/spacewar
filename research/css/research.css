@@ -964,3 +964,5 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .dr-opt { display: block; margin: 6px 0; }
 .reader-dlg .rd-mainside { min-width: 0; }
 .reader-dlg .rd-mainside .rd-ctl { margin-top: 8px; }
+.tray-filters .exp-menu > .menu-body { justify-items: stretch; min-width: 190px; }
+.tray-filters .exp-menu .menu-body .btn { text-align: left; }

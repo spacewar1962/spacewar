@@ -93,12 +93,26 @@
     function opt(v, label, cur) { return '<option value="' + SW.esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + SW.esc(label) + '</option>'; }
     var head = SW.el('div', { class: 'tray-head' });
     head.innerHTML = '<datalist id="tray-chs">' + chs.map(function (c) { return '<option value="' + SW.esc(c) + '">'; }).join('') + '</datalist>' +
-      '<div class="tray-filters">' +
+      '<div class="toolbar tray-filters" style="position:static;padding-left:0">' +
       '<label>Chapter <select data-f="chapter">' + opt('*', 'All', t.chapter) + chs.filter(function (c) { return used.indexOf(c) >= 0 || c === t.chapter; }).map(function (c) { return opt(c, c, t.chapter); }).join('') + opt('-', 'None given', t.chapter) + '<option value="+">New…</option></select></label>' +
       '<label>Version <select data-f="v">' + opt('', 'All', t.filter.v || '') + vids.map(function (v) { return opt(v, vShort(v), t.filter.v); }).join('') + '</select></label>' +
       '<label>Tag <select data-f="tag">' + opt('', 'All', t.filter.tag || '') + tags.map(function (g) { return opt(g, g, t.filter.tag); }).join('') + '</select></label></div>' +
       '<p class="hint">Private, in this browser. A note takes the version open and the chapter chosen here; Share sends it to the group’s Findings, signed with its initials.</p>';
     el.appendChild(head);
+    var vis = shown(t), tb = SW.$('.tray-filters', head);
+    tb.appendChild(SW.el('button', { class: 'btn ghost tb-right', onclick: function () { T.addText(); } }, '＋ Paragraph'));
+    var more = SW.el('details', { class: 'menu exp-menu' });
+    more.innerHTML = '<summary class="btn ghost" title="Export or remove the notes shown">⋯</summary>';
+    var mb = SW.el('div', { class: 'menu-body' });
+    mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'The notes shown, in order, as one Word document', onclick: function () { more.open = false; exportTray('docx'); } }, '⤓ Word'));
+    mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'The notes shown as Markdown, with the figures saved beside it as PNG', onclick: function () { more.open = false; exportTray('md'); } }, '⤓ Markdown'));
+    mb.appendChild(SW.el('button', { class: 'btn ghost', onclick: function () {
+      more.open = false;
+      if (!vis.length || !confirm('Remove ' + vis.length + ' note' + (vis.length === 1 ? '' : 's') + ' from My notes?')) return;
+      var x = load(); x.items = x.items.filter(function (it, i) { return vis.indexOf(i) < 0; }); save(x); paint();
+    } }, 'Remove the notes shown'));
+    more.appendChild(mb);
+    tb.appendChild(more);
     head.addEventListener('change', function (e) {
       var f = e.target.dataset.f, x = load(), val = e.target.value;
       x.filter = x.filter || {};
@@ -106,16 +120,6 @@
       else x.filter[f] = val;
       save(x); paint();
     });
-    var vis = shown(t);
-    var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
-    bar.appendChild(SW.el('button', { class: 'btn', title: 'The notes shown, in order, as one Word document', onclick: function () { exportTray('docx'); } }, '⤓ Word'));
-    bar.appendChild(SW.el('button', { class: 'btn', title: 'The notes shown as Markdown, with the figures saved beside it as PNG', onclick: function () { exportTray('md'); } }, '⤓ Markdown'));
-    bar.appendChild(SW.el('button', { class: 'btn ghost', onclick: function () { T.addText(); } }, '＋ Paragraph'));
-    bar.appendChild(SW.el('button', { class: 'btn ghost tb-right', title: 'Remove the notes shown', onclick: function () {
-      if (!vis.length || !confirm('Remove ' + vis.length + ' note' + (vis.length === 1 ? '' : 's') + ' from My notes?')) return;
-      var x = load(); x.items = x.items.filter(function (it, i) { return vis.indexOf(i) < 0; }); save(x); paint();
-    } }, 'Empty'));
-    el.appendChild(bar);
     if (!vis.length) { el.insertAdjacentHTML('beforeend', '<p class="hint">' + (t.items.length ? 'None with these filters.' : 'Nothing here yet. Add with ＋ My notes on any figure, export, finding, or selection in Read.') + '</p>'); return; }
     var fig = 0, list = SW.el('ol', { class: 'tray-list' });
     vis.forEach(function (i, k) {
