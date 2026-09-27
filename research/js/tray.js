@@ -104,6 +104,21 @@
     return '<details class="tray-doc" data-doc="' + SW.esc(it.id) + '"' + (openDocs[it.id] ? ' open' : '') + '><summary>' + SW.esc(parts.join(' · ') || bl.length + ' blocks') + '</summary><div class="tray-body">' + blocksHTML(bl) + '</div></details>';
   }
   var openDocs = {};   // excerpts left open, this session
+  // a note in a large window: a figure at full size, an excerpt all open
+  function bigView(it) {
+    if (!it) return;
+    var d = SW.el('dialog', { class: 'tray-big' });
+    var body = it.kind === 'figure' ? '<div class="tray-fig">' + SW.displaySVG(it.svg) + '</div>'
+      : it.kind === 'text' ? '<p class="tray-para">' + SW.esc(it.text || '').replace(/\n/g, '<br>') + '</p>'
+      : (it.subtitle ? '<p class="hint">' + SW.esc(it.subtitle) + '</p>' : '') + '<div class="tray-body">' + blocksHTML(it.blocks || []) + '</div>';
+    d.innerHTML = '<div class="tray-bighead"><b>' + SW.esc(it.caption || (it.kind === 'text' ? 'Paragraph' : 'Note')) + '</b> <span class="faint">' + SW.esc([it.by, it.from || vShort(it.vid)].filter(Boolean).join(' · ')) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
+      body + (it.note ? '<p class="tray-para"><i>' + SW.esc(it.note) + '</i></p>' : '');
+    document.body.appendChild(d);
+    function shut() { d.close(); d.remove(); }
+    d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) shut(); });
+    d.addEventListener('close', function () { d.remove(); });
+    d.showModal();
+  }
   function cellText(c) { return c == null ? '' : typeof c === 'object' ? (c.text != null ? c.text : '') : String(c); }
   function blocksHTML(bl) {
     return bl.map(function (b) {
@@ -195,7 +210,7 @@
         (it.vid ? ' <span class="tray-v mono">' + SW.esc(vShort(it.vid)) + '</span>' : '') +
         ' <span class="badge tray-by" title="Signed">' + SW.esc(it.by || '?') + '</span>' +
         ' <span class="faint">' + SW.esc(String(it.from || '').replace(/^[^·]*·\s*/, '')) + '</span>' +
-        '<span class="tray-acts"><button class="icon-btn" data-a="up" title="Move up"' + (k ? '' : ' disabled') + '>↑</button><button class="icon-btn" data-a="down" title="Move down"' + (k < vis.length - 1 ? '' : ' disabled') + '>↓</button><button class="icon-btn" data-a="del" title="Remove">✕</button></span></div>' +
+        '<span class="tray-acts"><button class="icon-btn" data-a="big" title="Open larger">⤢</button><button class="icon-btn" data-a="up" title="Move up"' + (k ? '' : ' disabled') + '>↑</button><button class="icon-btn" data-a="down" title="Move down"' + (k < vis.length - 1 ? '' : ' disabled') + '>↓</button><button class="icon-btn" data-a="del" title="Remove">✕</button></span></div>' +
         (it.kind !== 'text' ? '<input class="tray-cap" placeholder="Caption" value="' + SW.esc(it.caption || '') + '">' : '') + preview(it) +
         (it.kind !== 'text' ? '<textarea class="tray-note" rows="2" placeholder="Your note">' + SW.esc(it.note || '') + '</textarea>' : '') +
         '<div class="tray-meta"><label>Chapter <input class="tray-ch" list="tray-chs" value="' + SW.esc(it.chapter || '') + '" placeholder="none"></label>' +
@@ -206,10 +221,13 @@
     });
     el.appendChild(list);
     list.addEventListener('click', function (e) {
+      var fg = e.target.closest('.tray-item > .tray-fig');
+      if (fg) { bigView(load().items[+fg.closest('.tray-item').dataset.i]); return; }
       var b = e.target.closest('[data-a]');
       if (!b) return;
       var i = +b.closest('.tray-item').dataset.i, x = load();
       if (b.dataset.a === 'share') { share(i); return; }
+      if (b.dataset.a === 'big') { bigView(x.items[i]); return; }
       snap();
       if (b.dataset.a === 'del') { toBin(x, [i]); save(x); paint(); SW.toast('Moved to the bin', 0, undoAct); return; }
       var k = vis.indexOf(i), j = vis[b.dataset.a === 'up' ? k - 1 : k + 1]; var tmp = x.items[i]; x.items[i] = x.items[j]; x.items[j] = tmp;

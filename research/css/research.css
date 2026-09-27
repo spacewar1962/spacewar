@@ -696,7 +696,14 @@ dialog.wire-dlg { width: min(560px, 94vw); }
 .tray-acts { margin-left: auto; display: flex; gap: 2px; }
 .tray-cap, .tray-text { width: 100%; margin: 6px 0; padding: 5px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; }
 .tray-fig { overflow: hidden; background: var(--plate); border-radius: 4px; padding: 4px; }
-.tray-fig svg { display: block; width: 100%; max-width: 100%; height: auto; max-height: 440px; }
+.tray-fig svg { display: block; max-width: 100%; height: auto; max-height: 220px; }
+.tray-item > .tray-fig { cursor: zoom-in; }
+.tray-big { width: min(96vw, 1400px); max-height: 92vh; overflow: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); padding: 12px 16px; }
+.tray-big::backdrop { background: rgba(0,0,0,.6); }
+.tray-bighead { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.tray-bighead .icon-btn { margin-left: auto; }
+.tray-big .tray-fig svg { max-height: none; width: 100%; }
+.tray-big .tray-tblwrap, .tray-big .tray-code.tray-full { max-height: none; }
 .tray-code { font-size: 11px; max-height: 150px; overflow: hidden; margin: 4px 0; }
 .pgbrk { color: var(--text-faint); font-size: 0.85em; margin-right: 2px; }
 .seg-btns { display: inline-flex; gap: 2px; }
