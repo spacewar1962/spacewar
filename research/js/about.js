@@ -55,9 +55,9 @@
     pad.innerHTML = '<h2 style="margin-top:0">' + SW.esc(v.label) + '</h2><p class="prose">' + SW.esc(v.summary) + '</p>' +
       '<dl class="meta">' + dl.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + (/</.test(r[1]) ? r[1] : r[1]) + '</dd>'; }).join('') + '</dl>' +
       '<h3>The variorum</h3>' + timeline(v.id) +
-      '<h3 style="margin-top:22px">Notes on this version</h3>' +
-      '<p class="hint">A shared space for provenance, corrections and general discussion of the version as a whole. The build log records every correction, supplied tape and gap met in rebuilding it. Line notes are made in the Read view.</p>' +
-      '<div class="toolbar" style="position:static;padding-left:0" id="ab-tools"></div><div id="ab-notes" class="hint">Loading notes…</div>';
+      '<h3 style="margin-top:22px">Annotations on this version</h3>' +
+      '<p class="hint">A shared space for provenance, corrections and general discussion of the version as a whole. The build log records every correction, supplied tape and gap met in rebuilding it. Annotations on lines are made in the Read view.</p>' +
+      '<div class="toolbar" style="position:static;padding-left:0" id="ab-tools"></div><div id="ab-notes" class="hint">Loading annotations…</div>';
     view.innerHTML = '';
     view.appendChild(pad);
     SW.$('.timeline', pad).addEventListener('click', function (e) {
@@ -67,19 +67,19 @@
     });
     var tools = SW.$('#ab-tools', pad);
     tools.appendChild(SW.el('button', { class: 'btn', onclick: function () {
-      N.dialog({ vid: v.id, kind: 'version', anchor: null, heading: 'Note on ' + v.label, anchorText: 'A note on the version as a whole (provenance, correction, discussion).' });
-    } }, '✎ Add a version note'));
+      N.dialog({ vid: v.id, kind: 'version', anchor: null, heading: 'Annotate ' + v.label, anchorText: 'An annotation on the version as a whole (provenance, correction, discussion).' });
+    } }, '✎ Annotate the version'));
     tools.appendChild(SW.el('button', { class: 'btn', onclick: function () { N.publishDrafts(); } }, '⇪ Publish drafts to the group'));
     tools.appendChild(SW.el('span', { class: 'sep' }));
-    tools.appendChild(SW.exportButtons(function () { return doc(b); }, 'spacewar-' + v.id + '-notes'));
+    tools.appendChild(SW.exportButtons(function () { return doc(b); }, 'spacewar-' + v.id + '-annotations'));
     var binBox = SW.el('div', { style: 'margin-top:26px' });
-    binBox.innerHTML = '<h3>Deleted notes</h3><p class="hint">Notes you delete go to the bin. It shows this version’s by default; tick “all versions” for the rest. Restore them one at a time, or delete them for good.</p>';
+    binBox.innerHTML = '<h3>Deleted annotations</h3><p class="hint">Annotations you delete go to the bin. It shows this version’s by default; tick “all versions” for the rest. Restore them one at a time, or delete them for good.</p>';
     var bb = SW.el('button', { class: 'btn' }, '🗑 Show the bin');
     binBox.appendChild(bb);
     pad.appendChild(binBox);
     bb.onclick = function () { bb.remove(); N.showBin(binBox.appendChild(SW.el('div')), { vid: v.id }); };
     var logBox = SW.el('div', { style: 'margin-top:26px' });
-    logBox.innerHTML = '<h3>All notes, every version</h3><p class="hint">The whole discussion in one place: the group’s notes, your drafts and the build logs for every version, newest first. Search by word, initials or version.</p>';
+    logBox.innerHTML = '<h3>All annotations, every version</h3><p class="hint">The whole discussion in one place: the group’s annotations, your drafts and the build logs for every version, newest first. Search by word, initials or version.</p>';
     var lb = SW.el('button', { class: 'btn' }, 'Show the log');
     logBox.appendChild(lb);
     pad.appendChild(logBox);
@@ -88,14 +88,14 @@
   }
 
   function allLog(box) {
-    var wait = SW.el('p', { class: 'hint' }, 'Gathering notes…');
+    var wait = SW.el('p', { class: 'hint' }, 'Gathering annotations…');
     box.appendChild(wait);
     N.listAll().then(function (all) {
       wait.remove();
       var tb = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
-      var q = SW.el('input', { type: 'search', placeholder: 'Search notes, initials, versions…' });
+      var q = SW.el('input', { type: 'search', placeholder: 'Search annotations, initials, versions…' });
       tb.appendChild(q);
-      var src = SW.el('select', { class: 'btn' }, '<option value="">all sources</option><option value="hypothesis">group notes</option><option value="draft">my drafts</option><option value="buildlog">build logs</option>');
+      var src = SW.el('select', { class: 'btn' }, '<option value="">all sources</option><option value="hypothesis">group annotations</option><option value="draft">my drafts</option><option value="buildlog">build logs</option>');
       tb.appendChild(src);
       var holder = SW.el('div');
       var rowsNow = [];
@@ -115,8 +115,8 @@
           noteOf.set(row, n);
           return row;
         });
-        holder.innerHTML = '<p class="hint">' + list.length + ' notes</p>';
-        holder.appendChild(SW.table(['Date', 'By', 'Version', 'Where', '', 'Note'], rowsNow, { cls: ['mono', 'mono', 'mono', 'mono', '', ''], onRow: function (r) {
+        holder.innerHTML = '<p class="hint">' + list.length + ' annotations</p>';
+        holder.appendChild(SW.table(['Date', 'By', 'Version', 'Where', '', 'Annotation'], rowsNow, { cls: ['mono', 'mono', 'mono', 'mono', '', ''], onRow: function (r) {
           var n = noteOf.get(r);
           if (!n) return;
           if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
@@ -126,9 +126,9 @@
       }
       tb.appendChild(SW.el('span', { class: 'sep' }));
       tb.appendChild(SW.exportButtons(function () {
-        return { title: 'Spacewar! research notes, all versions', subtitle: 'Notes, drafts and build logs' + (q.value ? ' matching “' + q.value + '”' : ''),
-                 blocks: [SW.tableBlock('Notes', ['Date', 'By', 'Version', 'Where', '', 'Note'], rowsNow)] };
-      }, 'spacewar-notes-log'));
+        return { title: 'Spacewar! research annotations, all versions', subtitle: 'Annotations, drafts and build logs' + (q.value ? ' matching “' + q.value + '”' : ''),
+                 blocks: [SW.tableBlock('Annotations', ['Date', 'By', 'Version', 'Where', '', 'Annotation'], rowsNow)] };
+      }, 'spacewar-annotations-log'));
       q.addEventListener('input', run);
       src.addEventListener('change', run);
       box.appendChild(tb);
@@ -143,8 +143,8 @@
       var ts = N.threads(all);
       var el = SW.$('#ab-notes', view);
       var ver = ts.filter(function (t) { return !t.note.anchor; }), lines = ts.filter(function (t) { return t.note.anchor; });
-      el.innerHTML = (ver.length ? ver.map(function (t) { return N.renderThread(t, b); }).join('') : '<p>No version notes yet.</p>') +
-        (lines.length ? '<h3>Line notes (' + lines.length + ')</h3>' + lines.map(function (t) { return N.renderThread(t, b); }).join('') : '');
+      el.innerHTML = (ver.length ? ver.map(function (t) { return N.renderThread(t, b); }).join('') : '<p>No annotations on the version yet.</p>') +
+        (lines.length ? '<h3>Annotations on lines (' + lines.length + ')</h3>' + lines.map(function (t) { return N.renderThread(t, b); }).join('') : '');
       el.classList.remove('hint');
       N.wire(el, b.v.id, all);
     });
@@ -153,9 +153,9 @@
   function doc(b) {
     return N.list(b.v.id).then(function (all) {
       var ts = N.threads(all);
-      return { title: b.v.label + ': version notes', subtitle: b.v.summary, meta: SW.docMeta(b),
-               blocks: [{ type: 'h2', text: 'Version notes and build log' }].concat(N.blocks(ts.filter(function (t) { return !t.note.anchor; }), b),
-                 [{ type: 'h2', text: 'Line notes' }], N.blocks(ts.filter(function (t) { return t.note.anchor; }), b)) };
+      return { title: b.v.label + ': annotations', subtitle: b.v.summary, meta: SW.docMeta(b),
+               blocks: [{ type: 'h2', text: 'Annotations on the version, and the build log' }].concat(N.blocks(ts.filter(function (t) { return !t.note.anchor; }), b),
+                 [{ type: 'h2', text: 'Annotations on lines' }], N.blocks(ts.filter(function (t) { return t.note.anchor; }), b)) };
     });
   }
 

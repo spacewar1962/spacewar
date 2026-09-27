@@ -295,6 +295,7 @@
     return out;
   };
 
+  var tapeRO = null;
   SW.views.tape = {
     show: function (b) {
       view.innerHTML = '';
@@ -580,12 +581,14 @@
       lb.onclick = function () { lensOn = !lensOn; SW.store.set('tape.lens', lensOn); lb.classList.toggle('on', lensOn); lens.style.display = 'none'; };
       pad.appendChild(lens);
       // Wrapped rows fit the window: draw them again when it changes width.
+      // One watcher at a time: an old one would keep the last tape's rows alive.
       var lastW = 0, relay = null;
-      if (root.ResizeObserver) new ResizeObserver(function () {
+      if (tapeRO) tapeRO.disconnect();
+      if (root.ResizeObserver) (tapeRO = new ResizeObserver(function () {
         var w = roll.clientWidth;
         if (!w || Math.abs(w - lastW) < 20 || SW.$('#tp-layout', tb).value !== 'wrap') return;
         lastW = w; clearTimeout(relay); relay = setTimeout(draw, 120);
-      }).observe(roll);
+      })).observe(roll);
       select();
       var wit = b.v.witnesses || [];
       if (wit.length) {

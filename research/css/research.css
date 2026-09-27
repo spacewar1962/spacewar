@@ -8,6 +8,7 @@
    ============================================================ */
 
 :root {
+  --code-bg: #070b11;   /* the ground of code: listings, diffs */
   --noted-bg: rgba(255, 206, 122, 0.075);
   --bg: #0a0e15;
   --bg-2: #0f1520;
@@ -53,6 +54,7 @@
 }
 
 :root[data-theme="paper"] {
+  --code-bg: #fbf9f3;   /* the ground of code: listings, diffs */
   --noted-bg: rgba(154, 91, 0, 0.08);
   --bg: #ece7da;
   --bg-2: #e3ddcd;
@@ -89,6 +91,7 @@
 
 /* Paper: plain black on white */
 :root[data-theme="white"] {
+  --code-bg: #f8f9fb;   /* the ground of code: listings, diffs */
   --noted-bg: rgba(138, 75, 0, 0.06);
   --bg: #ffffff; --bg-2: #f3f4f6; --surface: #ffffff; --surface-2: #f1f3f5;
   --line: #cfd4da; --line-soft: #e3e6ea;
@@ -106,23 +109,25 @@
 
 /* Sepia: brown ink on warm paper, easy on the eyes for long reading */
 :root[data-theme="sepia"] {
-  --noted-bg: rgba(156, 107, 18, 0.08);
-  --bg: #f4ecd8; --bg-2: #eadfc4; --surface: #fbf5e6; --surface-2: #efe4ca;
-  --line: #cdbb95; --line-soft: #e0d3b4;
+  --code-bg: #fffefb;   /* the ground of code: listings, diffs */
+  --noted-bg: rgba(156, 107, 18, 0.07);
+  --bg: #f7f2e8; --bg-2: #efe9dd; --surface: #fffefb; --surface-2: #ede6d8;   /* lighter, less beige (was #f4ecd8); code sits on near-white */
+  --line: #ddd3c1; --line-soft: #ece5d8;
   --text: #3b2f22; --text-dim: #6b5a45; --text-faint: #7a684f;
   --beam: #8a4f1c; --amber: #8f5f0c; --green: #56682a; --red: #a1392b; --violet: #7b4a7a;
   --hl: rgba(156, 107, 18, 0.13); --sel: rgba(138, 79, 28, 0.12); --add-bg: rgba(86, 104, 42, 0.13); --del-bg: rgba(161, 57, 43, 0.10);
   --g-retained: #2f6f73; --g-moved: #7b4a7a; --g-edited: #a87414; --g-rewritten: #b5541c; --g-added: #56682a; --g-removed: #a1392b;
-  --g-text: #3b2f22; --g-muted: #7a6a55; --g-stroke: #b7a37c; --g-box: #e6d9bb; --g-heat: #2f6f73; --g-line: #8c7a62; --g-cell-dark: #fbf5e6;
-  --bar-1: #dccca6; --bar-2: #cdb98c; --bar-fg: #3b2f22; --bar-line: #b7a37c;
+  --g-text: #3b2f22; --g-muted: #7a6a55; --g-stroke: #c9bb9f; --g-box: #efe8da; --g-heat: #2f6f73; --g-line: #8c7a62; --g-cell-dark: #ffffff;
+  --bar-1: #ece3d1; --bar-2: #e4d9c3; --bar-fg: #3b2f22; --bar-line: #d2c5ab;
   --pick-bg: rgba(255, 250, 238, 0.7); --pick-fg: #3b2f22; --pick-line: rgba(59, 47, 34, 0.25);
-  --plate: #fbf5e6; --plate-line: #cdbb95; --pick-stroke: #3b2f22; --hl-filter: brightness(0.92) saturate(1.2);
+  --plate: #ffffff; --plate-line: #ddd3c1; --pick-stroke: #3b2f22; --hl-filter: brightness(0.92) saturate(1.2);
   --on-amber: #fffaf0; --tape-paper: #fffcf4; --tape-hole: #3b2f22;
   color-scheme: light;
 }
 
 /* Terminal, green: green phosphor on black */
 :root[data-theme="green"] {
+  --code-bg: #010602;   /* the ground of code: listings, diffs */
   --noted-bg: rgba(125, 255, 154, 0.07);
   --bg: #020a04; --bg-2: #04110a; --surface: #061a0e; --surface-2: #0a2414;
   --line: #155c2e; --line-soft: #0d3319;
@@ -140,6 +145,7 @@
 
 /* Terminal, amber: amber phosphor on black */
 :root[data-theme="amber"] {
+  --code-bg: #070400;   /* the ground of code: listings, diffs */
   --noted-bg: rgba(255, 176, 0, 0.07);
   --bg: #0c0700; --bg-2: #140c02; --surface: #1a1003; --surface-2: #241706;
   --line: #5a3a10; --line-soft: #33220b;
@@ -157,6 +163,7 @@
 
 /* High contrast: white and bright colours on black */
 :root[data-theme="contrast"] {
+  --code-bg: #0d0d0d;   /* the ground of code: listings, diffs */
   --noted-bg: rgba(255, 212, 0, 0.10);
   --bg: #000000; --bg-2: #0a0a0a; --surface: #000000; --surface-2: #141414;
   --line: #8a8a8a; --line-soft: #4a4a4a;
@@ -165,7 +172,7 @@
   --hl: rgba(255, 212, 0, 0.20); --sel: rgba(0, 229, 255, 0.18); --add-bg: rgba(61, 255, 110, 0.18); --del-bg: rgba(255, 92, 92, 0.20);
   --g-retained: #00e5ff; --g-moved: #ff3df5; --g-edited: #ffd400; --g-rewritten: #ff8c00; --g-added: #3dff6e; --g-removed: #ff5c5c;
   --g-text: #ffffff; --g-muted: #cfcfcf; --g-stroke: #9a9a9a; --g-box: #1c1c1c; --g-heat: #00e5ff; --g-line: #e6e6e6; --g-cell-dark: #000000;
-  --bar-1: #141414; --bar-2: #141414; --bar-fg: #ffffff; --bar-line: #8a8a8a;   /* surface-2, as the selection bar */
+  --bar-1: #2a2a2a; --bar-2: #222222; --bar-fg: #ffffff; --bar-line: #8a8a8a;   /* lighter than the page and tab row, so the top bar stands apart */
   --pick-bg: #000000; --pick-fg: #ffffff; --pick-line: #ffffff;
   --plate: #000000; --plate-line: #8a8a8a; --pick-stroke: #ffffff; --hl-filter: brightness(1.6);
   --on-amber: #000000; --tape-paper: #ffffff; --tape-hole: #000000;
@@ -273,7 +280,7 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .badge.lost { color: var(--text-faint); }
 
 /* ---------- listing ---------- */
-.listing { font-family: var(--code-font); font-size: var(--code-size); line-height: 1.5; padding: 4px 0 60px; tab-size: 8; -moz-tab-size: 8; }
+.listing { font-family: var(--code-font); font-size: var(--code-size); line-height: 1.5; padding: 4px 0 60px; tab-size: 8; -moz-tab-size: 8; background: var(--code-bg); }
 /* One line per tape: number and name, then the file details (cut short with … if too long). */
 .part-head {
   position: sticky; top: 45px; z-index: 3; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 8px; row-gap: 2px;
@@ -305,7 +312,7 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .hide-words .lncols { grid-template-columns: 4.8em 1fr minmax(2.2em, max-content); }
 .hide-words .lncols .a, .hide-words .lncols .w { display: none; }
 .ln { display: grid; grid-template-columns: 4.8em 3.6em 5.2em 1fr minmax(2.2em, max-content); column-gap: 10px; padding: 0 14px 0 6px; white-space: pre; min-height: 1.5em; }
-.ln:hover { background: var(--surface); }
+.ln:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
 .ln .n { color: var(--text-faint); text-align: right; cursor: pointer; user-select: none; padding-right: 9px; }
 .ln .a { color: var(--amber); opacity: 0.85; }
 .ln .w { color: var(--text-dim); }
@@ -442,7 +449,7 @@ table.data tr:hover td { background: var(--surface); }
 svg text { font-family: var(--mono); }
 
 /* ---------- compare ---------- */
-.diff { font-family: var(--code-font); font-size: calc(var(--code-size) - 0.5px); line-height: 1.45; }
+.diff { font-family: var(--code-font); font-size: calc(var(--code-size) - 0.5px); line-height: 1.45; background: var(--code-bg); }
 .diff .row { display: grid; grid-template-columns: 3.8em 1fr 3.8em 1fr; column-gap: 8px; white-space: pre; }
 .diff .row > span { overflow: hidden; text-overflow: ellipsis; }
 .diff .n { color: var(--text-faint); text-align: right; cursor: pointer; }
@@ -868,3 +875,13 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .tab-menu { position: fixed; z-index: 60; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 12px 32px rgba(0,0,0,0.45); }
 .tab-menu .help-ver { padding: 6px 10px 4px; border-top: 1px solid var(--line-soft); margin-top: 4px; font-size: 11.5px; }
 .tab-menu[data-w="help"] { width: min(380px, 92vw); }
+
+/* Findings: who added each (colour), the shared/private switch */
+.findings .fd { border-left: 4px solid var(--beam); padding-left: 12px; }
+.fd-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; margin: 4px 0 8px; font-size: 12.5px; }
+.fd-who i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.fd-mine { margin-top: 4px; font-size: 12px; padding: 2px 8px; }
+.fd-switch .btn .hint { font-size: 11px; margin-left: 3px; }
+.fd-switch .mine-n:empty { display: none; }
+.fd-switch .mine-n { display: inline-block; min-width: 16px; padding: 0 4px; border-radius: 8px; background: var(--amber); color: #000; font-size: 11px; line-height: 16px; text-align: center; }
+.tray-para { font-size: 13px; line-height: 1.45; color: var(--text-dim); margin: 4px 0; }

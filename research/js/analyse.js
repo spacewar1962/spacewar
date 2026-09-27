@@ -10,20 +10,20 @@
   var build = null, lens = SW.store.get('an.lens', 1);
 
   var LENSES = [
-    [1, 'Comments', 'The programmers’ own voice: every comment, searchable in context'],
-    [2, 'Hands and dates', 'Signatures, initials and dates written into the code'],
-    [3, 'Lexicon', 'The names the program gives to its world'],
-    [4, 'Rules made adjustable', 'Constants, sense switches, test word: what could be changed'],
-    [5, 'The machine in the code', 'Where the PDP-1 shows through: devices, arithmetic, timing'],
-    [6, 'Where the time goes', 'The run profile as an argument about priorities'],
-    [7, 'Absence', 'What the record does not hold, and how the rebuild fills it'],
-    [8, 'Calls', 'Who calls whom: subroutine calls between routines'],
-    [9, 'Instructions', 'Instruction frequency, as written and as executed'],
-    [10, 'Memory map', 'Code, constants, variables and tables across the 4096 words'],
-    [11, 'Macros', 'The macros and how often each is expanded'],
-    [12, 'The sky', 'The Expensive Planetarium’s star table drawn as a chart'],
-    [13, 'The ships', 'The Needle and the Wedge, drawn from their outline codes'],
-    [14, 'Biographies', 'One name’s life across the versions: when it appears, how its definition changes, who signs it, when it goes']
+    [1, 'Comments', 'Every comment, searchable'],
+    [2, 'Hands and dates', 'Initials, signatures and dates'],
+    [3, 'Lexicon', 'The program’s names'],
+    [4, 'Rules made adjustable', 'Constants, sense switches, test word'],
+    [5, 'The machine in the code', 'Devices, arithmetic, timing'],
+    [6, 'Where the time goes', 'The run profile'],
+    [7, 'Absence', 'Gaps in the record, and what fills them'],
+    [8, 'Calls', 'Subroutine calls'],
+    [9, 'Instructions', 'Instruction counts, written and run'],
+    [10, 'Memory map', 'Core, word by word'],
+    [11, 'Macros', 'Macros and their use'],
+    [12, 'The sky', 'The star table as a chart'],
+    [13, 'The ships', 'The ship outlines'],
+    [14, 'Biographies', 'One name across the versions']
   ];
 
   function progLines(b) {
@@ -1493,9 +1493,9 @@
   // ---------- the Graphics tab ----------
   // The bench's pictures of the program, gathered: the star map (with the
   // scope), the ships, the memory map. Each is also a lens under Analyse.
-  var GFX = [['sky', 'Star map', 'The Expensive Planetarium as a map of the sky, with its constellations, and how the program draws it on the round screen'],
-             ['ships', 'The ships', 'The Needle and the Wedge drawn from their outline codes, in this version and across the versions ticked'],
-             ['memory', 'Memory map', 'Code, constants, variables and tables across the 4,096 words of core']];
+  var GFX = [['sky', 'Star map', 'The star table, its constellations, and the scope'],
+             ['ships', 'The ships', 'The Needle and the Wedge, across the versions'],
+             ['memory', 'Memory map', 'Core, word by word']];
   var gfx = SW.store.get('gfx.item', 'sky'), gfxStop = null, gfxBuild = null;
   function renderGfx() {
     var el = SW.$('#view-graphics'), b = gfxBuild;
@@ -1534,10 +1534,10 @@
   function menuHTML(which) {
     if (which === 'help') {
       var dm = document.querySelector('meta[name="bench-date"]');
-      return [['about', 'About the bench', 'Author, version, purpose, sources, and how to cite it'],
-              ['settings', 'Settings', 'Your initials and the Hypothesis group, colour theme, code font and size, figure background'],
-              ['code', 'Source code on GitHub ↗', 'The bench and the site: github.com/spacewar1962/spacewar'],
-              ['issue', 'Report a problem ↗', 'Open an issue on GitHub']].map(function (h) {
+      return [['about', 'About the bench', 'Version, sources, citation'],
+              ['settings', 'Settings', 'Initials, group, theme, fonts'],
+              ['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
+              ['issue', 'Report a problem ↗', 'GitHub issues']].map(function (h) {
         return '<button data-pick="' + h[0] + '"><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
       }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
     }

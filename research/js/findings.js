@@ -188,32 +188,51 @@
     });
   }
 
+  // Who added a finding, as a colour: the bench (its build logs) in the beam
+  // colour, each person by their initials.
+  function hueOf(by) { var h = 0; for (var i = 0; i < by.length; i++) h = (h * 31 + by.charCodeAt(i)) % 360; return (h + 200) % 360; }
+  function colourOf(by) { return by === 'bench' ? 'var(--beam)' : 'hsl(' + hueOf(by) + ',62%,60%)'; }
+  function legend(people) {
+    var el = SW.$('.fd-legend', view);
+    if (!el) return;
+    el.innerHTML = '<span class="hint">Added by</span> <span class="fd-who"><i style="background:' + colourOf('bench') + '"></i>the bench (build logs)</span>' +
+      people.map(function (p) { return ' <span class="fd-who"><i style="background:' + colourOf(p) + '"></i>' + SW.esc(p) + '</span>'; }).join('');
+  }
+  function mineButton(make) {
+    return SW.el('button', { class: 'btn ghost fd-mine', title: 'Put this finding in My notes (private)', onclick: function () { SW.tray.addDoc(make()); } }, '＋ My notes');
+  }
+  // Annotations tagged "finding": cards in their author's colour; the first line is the title.
   function checkNotes(box) {
-    box.innerHTML = '<p class="hint">Gathering notes…</p>';
+    box.innerHTML = '<p class="hint">Gathering the group’s findings…</p>';
     return N.listAll().then(function (all) {
       var list = all.filter(function (n) {
         return (n.tags || []).some(function (t) { return /^findings?$/i.test(t); });
       }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; });
       live.notes = list;
       box.innerHTML = '';
+      var people = []; list.forEach(function (n) { if (people.indexOf(n.by) < 0) people.push(n.by); });
+      legend(people);
       if (!list.length) {
-        box.innerHTML = '<p class="hint">None yet. Tag a note “finding” (in Read, or under Version &amp; notes) and it appears here, signed and dated.</p>';
+        box.innerHTML = '<p class="hint">None from the group yet. Add one with ✎ Add a finding above, or ★ Finding on a selection in Read: it is shared with the group, signed and dated, and shown here in your colour.</p>';
         return;
       }
-      var byRow = new Map();
-      var rows = list.map(function (n) {
-        var r = [{ html: SW.esc(SW.fmtDate(n.date)), sort: String(n.date), text: SW.fmtDate(n.date) }, n.by, vLabel(n.vid),
-                 n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : 'version', n.text];
-        byRow.set(r, n);
-        return r;
+      var ol = SW.el('ol', { class: 'fd-list fd-group' });
+      list.forEach(function (n, i) {
+        var lines = String(n.text).split(/\n/), title = lines[0].replace(/^#+\s*/, ''), rest = lines.slice(1).join('\n').trim();
+        var where = vLabel(n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : ', the version');
+        var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
+        li.innerHTML = '<div class="fd-head"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span> <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
+          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
+        SW.$('.fd-go', li).onclick = function (e) {
+          e.preventDefault();
+          if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
+          if (n.vid !== SW.state.v) SW.select(n.vid);
+          SW.setTab(n.anchor ? 'read' : 'about');
+        };
+        li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }));
+        ol.appendChild(li);
       });
-      box.appendChild(SW.table(['Date', 'By', 'Version', 'Where', 'Finding'], rows, { cls: ['mono', 'mono', '', 'mono', ''], onRow: function (r) {
-        var n = byRow.get(r);
-        if (!n) return;
-        if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
-        if (n.vid !== SW.state.v) SW.select(n.vid);
-        SW.setTab(n.anchor ? 'read' : 'about');
-      } }));
+      box.appendChild(ol);
     });
   }
 
@@ -240,7 +259,7 @@
     }
     if (live.notes && live.notes.length) {
       blocks.push({ type: 'h2', text: 'Findings from the group' });
-      blocks.push(SW.tableBlock('Notes tagged “finding”', ['Date', 'By', 'Version', 'Where', 'Finding'], live.notes.map(function (n) {
+      blocks.push(SW.tableBlock('Annotations tagged “finding”', ['Date', 'By', 'Version', 'Where', 'Finding'], live.notes.map(function (n) {
         return [SW.fmtDate(n.date), n.by, vLabel(n.vid), n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : 'version', n.text];
       })));
     }
@@ -249,34 +268,57 @@
   }
 
   // ---------- view ----------
-  var done = false;
+  // Two parts: Findings (shared: the bench's and the group's) and My notes
+  // (private, this browser: what you gather for writing).
+  var done = false, part = SW.store.get('fd.part', 'shared');
   function render() {
     done = true;
     view.innerHTML = '';
     var pad = SW.el('div', { class: 'pad findings' });
+    var sw = SW.el('div', { class: 'toolbar fd-switch', style: 'position:static;padding-left:0' });
+    sw.innerHTML = '<span class="seg-btns"><button class="btn' + (part === 'shared' ? ' on' : '') + '" data-part="shared" title="What the bench and the group have established, with evidence; shared">Findings <span class="hint">shared</span></button>' +
+      '<button class="btn' + (part === 'mine' ? ' on' : '') + '" data-part="mine" title="What you have gathered for writing: figures, excerpts, findings, paragraphs; private, in this browser">My notes <span class="hint">private</span> <span class="news-n mine-n">' + (SW.tray.count() || '') + '</span></button></span>';
+    sw.addEventListener('click', function (e) { var b = e.target.closest('[data-part]'); if (b) { part = b.dataset.part; SW.store.set('fd.part', part); render(); } });
+    pad.appendChild(sw);
+    view.appendChild(pad);
+    if (part === 'mine') {
+      pad.appendChild(SW.el('h2', {}, 'My notes'));
+      var m = SW.el('div', { class: 'fd-mine-box' });
+      pad.appendChild(m);
+      SW.tray.render(m);
+      return;
+    }
     var tb = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
+    tb.appendChild(SW.el('button', { class: 'btn', title: 'A finding on the version open, shared with the group, tagged “finding”; the first line is its title. (For lines, select them in Read and use ★ Finding.)', onclick: function () {
+      var v = SW.state.v && V.byId(SW.state.v);
+      if (!v) return;
+      N.dialog({ vid: v.id, kind: 'version', anchor: null, tags: ['finding'], heading: 'Add a finding', anchorText: 'On ' + v.label + '. Shared with the group and listed under Findings; the first line is its title.' });
+    } }, '✎ Add a finding'));
     tb.appendChild(SW.exportButtons(doc, 'spacewar-findings'));
-    tb.appendChild(SW.el('button', { class: 'btn ghost', title: 'Read the tapes and compare the witnesses again, and fetch the group’s notes', onclick: function () { run(); } }, '↻ Check again'));
-    pad.innerHTML = '<h2>Findings</h2><p class="prose">What the bench has established about the Spacewar! sources, gathered from the build logs so each can be cited, with its evidence one click away. The witness tapes and punched titles below are not copied from anywhere; they are checked afresh against the tapes every time this page opens. Notes tagged “finding” by the group are added at the end.</p>';
+    tb.appendChild(SW.el('button', { class: 'btn ghost', title: 'Read the tapes and compare the witnesses again, and fetch the group’s findings', onclick: function () { run(); } }, '↻ Check again'));
+    pad.insertAdjacentHTML('beforeend', '<h2>Findings</h2><p class="prose">What the bench and the group have established about the Spacewar! sources, each with its evidence one click away, coloured by who added it. The witness tapes and punched titles are checked afresh against the tapes each time this page opens.</p><div class="fd-legend"></div>');
     pad.appendChild(tb);
+    legend([]);
     var list = SW.el('ol', { class: 'fd-list' });
     FIND.forEach(function (f) {
-      var li = SW.el('li', { class: 'fd' });
+      var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf('bench') });
       li.innerHTML = '<div class="fd-head"><span class="fd-no mono">' + f.no + '</span> <b>' + SW.esc(f.title) + '</b> <span class="badge">' + SW.esc(f.kind) + '</span></div><p>' + SW.esc(f.text) + '</p>';
       evidenceHTML(f, li);
+      li.appendChild(mineButton(function () {
+        return { title: f.no + '. ' + f.title, subtitle: 'Finding (the bench), ' + f.kind, blocks: [{ type: 'p', text: f.text }, { type: 'p', text: 'Evidence. ' + f.ev.map(function (e) { return e.tape ? e.tape + (e.from ? ' (from frame ' + e.from + ')' : '') : e.cite || (vLabel(e.v) + (e.label ? ', ' + e.label : '')); }).join('; ') + '.' }] };
+      }));
       list.appendChild(li);
     });
     pad.appendChild(list);
+    pad.appendChild(SW.el('h3', {}, 'From the group'));
+    var nBox = SW.el('div');
+    pad.appendChild(nBox);
     pad.appendChild(SW.el('h3', {}, 'Witness tapes, checked now'));
     var wBox = SW.el('div');
     pad.appendChild(wBox);
     pad.appendChild(SW.el('h3', {}, 'Punched titles, read now'));
     var tBox = SW.el('div');
     pad.appendChild(tBox);
-    pad.appendChild(SW.el('h3', {}, 'From the group: notes tagged “finding”'));
-    var nBox = SW.el('div');
-    pad.appendChild(nBox);
-    view.appendChild(pad);
     function run() {
       checkTitles(tBox);
       checkNotes(nBox);
@@ -284,7 +326,8 @@
     }
     run();
   }
+  SW.findings = { list: FIND, showMine: function () { part = 'mine'; SW.store.set('fd.part', part); done = false; SW.setTab('findings'); render(); } };
+  SW.on('notes', function () { if (done && part === 'shared' && SW.state.tab === 'findings') render(); });
 
   SW.views.findings = { show: function () { if (!done) render(); }, reset: function () { done = false; } };
-  SW.findings = { list: FIND };
 })(this);

@@ -275,8 +275,8 @@
   SW.closeDrawer = function () {
     var wide = document.body.classList.contains('drawer-wide');
     document.body.classList.remove('drawer-open', 'drawer-wide');
-    // A notes panel is reopened from the Notes tab (notes.js), which is always there.
-    if (SW.$('#drawer-title').textContent === 'Notes') { var d0 = SW.$('#drawer-dock'); if (d0) d0.classList.remove('on'); return; }
+    // An annotations panel is reopened from the Annotations tab (notes.js), which is always there.
+    if (SW.$('#drawer-title').textContent === 'Annotations') { var d0 = SW.$('#drawer-dock'); if (d0) d0.classList.remove('on'); return; }
     var dock = SW.$('#drawer-dock');
     if (!dock) {
       dock = SW.el('button', { id: 'drawer-dock', class: 'drawer-dock', title: 'Show the side panel again' });
@@ -550,9 +550,9 @@
       }, function () { SW.toast('The PNG could not be made from this figure; try SVG, or zoom out first.', 6000); });
     } }, '▣ PNG'));
     w.appendChild(document.createTextNode(' '));
-    w.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put this figure in the tray, to gather with others for a chapter', onclick: function () {
+    w.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put this figure in My notes (private), to gather with others for a chapter', onclick: function () {
       if (SW.tray) SW.tray.addFigure(getSvg(SW.exportPalette()), name);
-    } }, '＋ Tray'));
+    } }, '＋ My notes'));
     return w;
   };
 
@@ -582,9 +582,9 @@
       Promise.resolve(makeDoc()).then(function (d) { SW.exportDoc(d, typeof base === 'function' ? base() : base, 'md'); });
     } }, '⤓ Markdown'));
     wrap.appendChild(document.createTextNode(' '));
-    wrap.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put this (as it would export) in the tray, to gather with others for a chapter', onclick: function () {
+    wrap.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put this (as it would export) in My notes (private), to gather with others for a chapter', onclick: function () {
       Promise.resolve(makeDoc()).then(function (d) { if (SW.tray) SW.tray.addDoc(d); });
-    } }, '＋ Tray'));
+    } }, '＋ My notes'));
     return wrap;
   };
 

@@ -13,7 +13,7 @@
        below to the day of the release; the About box shows both. -->
   <meta name="bench-date" content="2026-09-27">
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css?v=1.14.1">
+  <link rel="stylesheet" href="css/research.css?v=1.14.2">
 </head>
 <body>
   <header class="bar">
@@ -31,8 +31,7 @@
       <span class="status" id="status" role="status" aria-live="polite"></span>
       <span class="size-btns"><button class="icon-btn" id="btn-smaller" title="Smaller code text">A−</button><button class="icon-btn" id="btn-larger" title="Larger code text">A+</button></span>
       <button class="icon-btn" id="btn-theme" title="Switch between your last light and dark colour themes (choose themes in ⚙ Settings)">◐</button>
-      <button class="icon-btn news-btn" id="btn-tray" title="The tray">❐<span class="news-n" id="tray-n"></span></button>
-      <button class="icon-btn news-btn" id="btn-news" title="What’s new in the group’s notes">✉<span class="news-n" id="news-n"></span></button>
+      <button class="icon-btn news-btn" id="btn-news" title="What’s new in the group’s annotations">✉<span class="news-n" id="news-n"></span></button>
       <!-- About is in the Help menu; this hidden button carries its handler -->
       <button class="icon-btn" id="btn-about" hidden>ⓘ</button>
       <button class="icon-btn" id="btn-settings" title="Your initials and the Hypothesis group, colour theme, code font and size">⚙</button>
@@ -47,7 +46,7 @@
     <button data-tab="genealogy">Genealogy</button>
     <button data-tab="tape">Tape</button>
     <button data-tab="graphics" data-menu="graphics" aria-expanded="false" title="The program in pictures: the star map and the scope, the ships, the memory map">Graphics <span class="caret" aria-hidden="true">▾</span></button>
-    <button data-tab="about">Version &amp; notes</button>
+    <button data-tab="about" title="The version: its catalogue record, sources, build log and annotations">Version</button>
     <button data-tab="findings" title="What the bench has established, with evidence, witness tapes and punched titles checked afresh">Findings</button>
     <button data-menu="help" aria-expanded="false" title="About the bench, settings, the code">Help <span class="caret" aria-hidden="true">▾</span></button>
   </nav>
@@ -66,7 +65,7 @@
 
   <aside class="drawer" id="drawer" aria-label="Details">
     <div class="drawer-head">
-      <h2 id="drawer-title">Notes</h2>
+      <h2 id="drawer-title">Annotations</h2>
       <button class="icon-btn" id="drawer-close" title="Close">✕</button>
     </div>
     <div class="drawer-body" id="drawer-body"></div>
@@ -79,13 +78,13 @@
       <label>Initials <input id="set-initials" maxlength="6" placeholder="DMB" autocomplete="off"></label>
       <label>Name <input id="set-name" placeholder="David M. Berry" autocomplete="off"></label>
       <h2>Shared annotations</h2>
-      <p class="hint">Annotations are shared through a private Hypothesis group. Paste the group's link (hypothes.is/groups/<b>ID</b>/…) or just its ID, and a personal API token (hypothes.is/account/developer). Without them, notes are kept as drafts in this browser and can be exported or published later.</p>
+      <p class="hint">Annotations are shared through a private Hypothesis group. Paste the group's link (hypothes.is/groups/<b>ID</b>/…) or just its ID, and a personal API token (hypothes.is/account/developer). Without them, annotations are kept as drafts in this browser and can be exported or published later.</p>
       <label>Group link or ID <input id="set-group" placeholder="https://hypothes.is/groups/Ab12Cd34/name" autocomplete="off"></label>
       <label for="set-token">API token</label>
       <div class="token-row"><input id="set-token" type="password" placeholder="6879-…" autocomplete="off" spellcheck="false"><button id="set-token-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
       <p class="hint" id="set-check"></p>
       <h2>Colour theme</h2>
-      <p class="hint">The colours of the whole bench: listings, notes, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.</p>
+      <p class="hint">The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.</p>
       <label>Theme <select id="set-theme"></select></label>
       <div class="theme-swatches" id="set-theme-sw"></div>
       <h2>Reading code</h2>
@@ -99,7 +98,7 @@
         <option value="Courier Prime">Courier Prime (typewriter)</option>
         <option value="Courier New">Courier New</option>
       </select></label>
-      <label class="check-row"><span><input type="checkbox" id="set-noteshade"> Tint annotated lines</span><span class="hint">A faint ground on every line a note covers, in the listings.</span></label>
+      <label class="check-row"><span><input type="checkbox" id="set-noteshade"> Tint annotated lines</span><span class="hint">A faint ground on every line an annotation covers, in the listings.</span></label>
       <label>Code size <span class="token-row"><input id="set-size" type="range" min="9" max="24" step="1"><span id="set-size-out" class="mono" style="min-width:3.5em"></span></span></label>
       <h2>Figures</h2>
       <p class="hint">The background given to exported figures (PNG and SVG). On a white or paper background figures are drawn in dark ink; on black, in phosphor. Transparent leaves the background empty, for layering in other software.</p>
@@ -121,14 +120,14 @@
   <dialog id="dlg-note" data-keep>
     <form method="dialog" class="settings" id="note-form">
       <h2 id="note-title">Annotate</h2>
-      <p class="keep-hint" hidden>Unsaved note. Save it, or Cancel to discard it.</p>
+      <p class="keep-hint" hidden>Unsaved annotation. Save it, or Cancel to discard it.</p>
       <p class="hint" id="note-anchor"></p>
-      <textarea id="note-text" rows="7" placeholder="Your note. Markdown is fine."></textarea>
+      <textarea id="note-text" rows="7" placeholder="Your annotation. Markdown is fine."></textarea>
       <label>Tags <input id="note-tags" placeholder="e.g. gravity, labour, provenance" autocomplete="off"></label>
       <p class="hint" id="note-who"></p>
       <div class="row">
         <button value="cancel" class="btn ghost">Cancel</button>
-        <button value="save" class="btn">Save note</button>
+        <button value="save" class="btn">Save annotation</button>
       </div>
     </form>
   </dialog>
@@ -141,9 +140,9 @@
         <tr><td>Version</td><td id="about-v"></td></tr>
         <tr><td>Released</td><td id="about-date"></td></tr>
         <tr><td>Purpose</td><td>A bench for the critical reading of the Spacewar! source code, made for the Spacewar! book project.</td></tr>
-        <tr><td>Tech stack</td><td>Plain HTML, CSS and JavaScript; no framework or build step. Runs in the browser from GitHub Pages; notes via Hypothesis; settings, drafts and the tray in local storage.</td></tr>
+        <tr><td>Tech stack</td><td>Plain HTML, CSS and JavaScript; no framework or build step. Runs in the browser from GitHub Pages; annotations via Hypothesis; settings, drafts and My notes in local storage.</td></tr>
         <tr><td>Inside</td><td>The macro1 assembler (from SIMH) with the 1962–63 MACRO rules; a PDP-1 emulator with the Type 30 display; a FIO-DEC tape reader.</td></tr>
-        <tr><td>Sources</td><td>Code by Russell, Samson, Edwards, Graetz, Kotok and others at MIT; later versions by Preonas (“ddp”), “dfw” and Morris; tapes from Russell’s box (bitsavers); transcriptions by Landsteiner and the Computer History Museum. Details under Version &amp; notes.</td></tr>
+        <tr><td>Sources</td><td>Code by Russell, Samson, Edwards, Graetz, Kotok and others at MIT; later versions by Preonas (“ddp”), “dfw” and Morris; tapes from Russell’s box (bitsavers); transcriptions by Landsteiner and the Computer History Museum. Details under Version.</td></tr>
         <tr><td>Catalogue</td><td id="about-cat"></td></tr>
         <tr><td>Code</td><td><a href="https://github.com/spacewar1962/spacewar" target="_blank" rel="noopener">github.com/spacewar1962/spacewar ↗</a></td></tr>
         <tr><td>Cite as</td><td id="about-cite" class="about-cite"></td></tr>
@@ -157,26 +156,26 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js?v=1.14.1"></script>
-  <script src="js/pdp1cpu.js?v=1.14.1"></script>
-  <script src="js/fiodec.js?v=1.14.1"></script>
-  <script src="js/versions.js?v=1.14.1"></script>
-  <script src="js/export.js?v=1.14.1"></script>
-  <script src="js/genealogy.js?v=1.14.1"></script>
-  <script src="js/core.js?v=1.14.1"></script>
-  <script src="js/notes.js?v=1.14.1"></script>
-  <script src="js/tray.js?v=1.14.1"></script>
-  <script src="js/figures.js?v=1.14.1"></script>
-  <script src="js/read.js?v=1.14.1"></script>
-  <script src="js/run.js?v=1.14.1"></script>
-  <script src="js/analyse.js?v=1.14.1"></script>
-  <script src="js/compare.js?v=1.14.1"></script>
-  <script src="js/stemma.js?v=1.14.1"></script>
-  <script src="js/tape.js?v=1.14.1"></script>
-  <script src="js/reader.js?v=1.14.1"></script>
-  <script src="js/about.js?v=1.14.1"></script>
-  <script src="js/edition.js?v=1.14.1"></script>
-  <script src="js/findings.js?v=1.14.1"></script>
-  <script src="js/main.js?v=1.14.1"></script>
+  <script src="js/pdp1asm.js?v=1.14.2"></script>
+  <script src="js/pdp1cpu.js?v=1.14.2"></script>
+  <script src="js/fiodec.js?v=1.14.2"></script>
+  <script src="js/versions.js?v=1.14.2"></script>
+  <script src="js/export.js?v=1.14.2"></script>
+  <script src="js/genealogy.js?v=1.14.2"></script>
+  <script src="js/core.js?v=1.14.2"></script>
+  <script src="js/notes.js?v=1.14.2"></script>
+  <script src="js/tray.js?v=1.14.2"></script>
+  <script src="js/figures.js?v=1.14.2"></script>
+  <script src="js/read.js?v=1.14.2"></script>
+  <script src="js/run.js?v=1.14.2"></script>
+  <script src="js/analyse.js?v=1.14.2"></script>
+  <script src="js/compare.js?v=1.14.2"></script>
+  <script src="js/stemma.js?v=1.14.2"></script>
+  <script src="js/tape.js?v=1.14.2"></script>
+  <script src="js/reader.js?v=1.14.2"></script>
+  <script src="js/about.js?v=1.14.2"></script>
+  <script src="js/edition.js?v=1.14.2"></script>
+  <script src="js/findings.js?v=1.14.2"></script>
+  <script src="js/main.js?v=1.14.2"></script>
 </body>
 </html>

@@ -93,7 +93,7 @@
     o.push('<div class="sheet"><h1>' + esc(v.label) + '</h1><div class="sub">' + esc(v.date) + ' · ' + esc(v.authors || '') + '</div>' +
       '<p style="font-size:11pt;line-height:1.5;margin-top:8mm">' + esc(v.summary || '') + '</p>' +
       '<table class="meta">' + provenance(b).map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</table>' +
-      '<p style="font-size:8.5pt;color:#666;margin-top:12mm">A reading edition made on the Spacewar! research bench v' + esc(SW.VERSION) + ', ' + esc(SW.fmtDate(SW.today())) + '. Line numbers are those of the source files in sources/; notes are the research group’s, signed and dated. ' +
+      '<p style="font-size:8.5pt;color:#666;margin-top:12mm">A reading edition made on the Spacewar! research bench v' + esc(SW.VERSION) + ', ' + esc(SW.fmtDate(SW.today())) + '. Line numbers are those of the source files in sources/; annotations are the research group’s, signed and dated. ' +
       'Cite as: ' + esc(v.label) + ' (' + esc(v.date) + '), ' + esc(SW.versionURI(v.id)) + '.</p><div class="pno">i</div></div>');
     // provenance and contents
     o.push('<div class="sheet"><h2>The text and its record</h2><div class="log">' + (v.buildNotes || []).map(function (n) { return '<p>' + esc(typeof n === 'string' ? n : n.text) + '</p>'; }).join('') + '</div>');
@@ -155,7 +155,7 @@
   E.menu = function (getBuild) {
     var m = SW.el('details', { class: 'menu' });
     var o = { words: SW.store.get('ed.words', false), supplied: SW.store.get('ed.supplied', false), perPage: +SW.store.get('ed.per', 56) };
-    m.innerHTML = '<summary class="btn" title="A reading edition of this version: title page with provenance and the build log, then the listing in numbered pages with the group’s notes as footnotes">Edition ▾</summary>' +
+    m.innerHTML = '<summary class="btn" title="A reading edition of this version: title page with provenance and the build log, then the listing in numbered pages with the group’s annotations as footnotes">Edition ▾</summary>' +
       '<div class="menu-body">' +
       '<label class="check"><input type="checkbox" data-o="words"' + (o.words ? ' checked' : '') + '> addresses &amp; words</label>' +
       '<label class="check" title="Include the macro and star tapes supplied so the version assembles"><input type="checkbox" data-o="supplied"' + (o.supplied ? ' checked' : '') + '> supplied tapes</label>' +

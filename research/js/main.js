@@ -213,7 +213,7 @@
     SW.$$('#tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === SW.state.tab); });
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + SW.state.tab); });
     select(q.v || '3.1');
-    if (!SW.store.get('initials', '')) setTimeout(function () { SW.toast('Welcome. Set your initials (⚙) so your notes are signed.', 5000); }, 800);
+    if (!SW.store.get('initials', '')) setTimeout(function () { SW.toast('Welcome. Set your initials (⚙) so your annotations are signed.', 5000); }, 800);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })(this);

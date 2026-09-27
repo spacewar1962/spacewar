@@ -218,11 +218,11 @@
     if (!n || !btn) return;
     n.textContent = newsItems.length ? (newsItems.length > 99 ? '99+' : String(newsItems.length)) : '';
     btn.classList.toggle('has-news', !!newsItems.length);
-    btn.title = newsItems.length ? newsItems.length + ' new in the group’s notes since ' + SW.fmtDate(newsSince()) : 'What’s new in the group’s notes';
+    btn.title = newsItems.length ? newsItems.length + ' new in the group’s annotations since ' + SW.fmtDate(newsSince()) : 'What’s new in the group’s annotations';
   }
   function newsLine(n, byId) {
     var V = root.SWVersions, v = V.byId(n.vid), par = n.parent && byId[n.parent];
-    var what = N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s note' : 'a note') : n.parent ? 'reply to ' + (par ? par.by : 'a note') : n.anchor ? 'note' : 'version note';
+    var what = N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
     var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
     var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
     var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + (anchor ? ', l. ' + anchor.n0 + (anchor.n1 !== anchor.n0 ? '–' + anchor.n1 : '') : '');
@@ -237,7 +237,7 @@
       var byId = {};
       newsAll.forEach(function (n) { byId[n.id] = n; });
       var lines = items.map(function (n) { return newsLine(n, byId); });
-      body.innerHTML = '<p class="hint">Notes, replies and reactions by others since ' + SW.esc(SW.fmtDate(newsSince())) + (SW.store.get('notes.seen', '') ? ', when you last marked them read' : ' (the last week; nothing has been marked read yet)') + '.</p>';
+      body.innerHTML = '<p class="hint">Annotations, replies and reactions by others since ' + SW.esc(SW.fmtDate(newsSince())) + (SW.store.get('notes.seen', '') ? ', when you last marked them read' : ' (the last week; nothing has been marked read yet)') + '.</p>';
       var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
       bar.appendChild(SW.el('button', { class: 'btn', title: 'Everything up to now counts as read; the count starts again from zero', onclick: function () {
         SW.store.set('notes.seen', new Date().toISOString());
@@ -308,7 +308,7 @@
       (pending[note.vid] = pending[note.vid] || []).push(n);
       N.invalidate(note.vid);
       setTimeout(function () { N.invalidate(note.vid); }, 4000);
-      if (!note.quiet) SW.toast('Note saved to the group.');
+      if (!note.quiet) SW.toast('Annotation saved to the group.');
     });
   };
 
@@ -324,7 +324,7 @@
         deleted[note.id] = true;
         pending[note.vid] = (pending[note.vid] || []).filter(function (p) { return p.id !== note.id; });
         N.invalidate(note.vid);
-        if (!quiet) SW.toast('Note deleted from the group.');
+        if (!quiet) SW.toast('Annotation deleted from the group.');
       });
     }
     return Promise.resolve();
@@ -418,7 +418,7 @@
       holder.innerHTML = h + list.map(function (n, i) {
         var v = V.byId(n.vid);
         return '<div class="note binned" data-i="' + i + '"><div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
-          (all ? ' · ' + SW.esc(v ? v.label.replace(/^Spacewar! /, '') : n.vid) : '') + (n.anchor ? ' · l. ' + n.anchor.n0 : ' · version note') +
+          (all ? ' · ' + SW.esc(v ? v.label.replace(/^Spacewar! /, '') : n.vid) : '') + (n.anchor ? ' · l. ' + n.anchor.n0 : ' · on the version') +
           (n.parent ? ' · reply' : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + ' · deleted ' + SW.esc(SW.fmtDate(n.binnedAt)) + '</div>' +
           '<div class="body">' + SW.esc(n.text) + '</div>' +
           '<div class="acts"><button data-r="restore">Restore</button></div></div>';
@@ -434,7 +434,7 @@
           N.restore(list[+btn.closest('.note').dataset.i]).then(function () { SW.toast('Restored.'); N.showBin(holder); },
             function (err) { btn.disabled = false; SW.toast(err.message, 5000); });
         } else if (btn.dataset.r === 'empty') {
-          if (!window.confirm('Delete ' + (list.length > 1 ? 'these ' + list.length + ' notes' : 'this note') + ' for good?\n\nThis cannot be undone.')) { btn.disabled = false; return; }
+          if (!window.confirm('Delete ' + (list.length > 1 ? 'these ' + list.length + ' annotations' : 'this annotation') + ' for good?\n\nThis cannot be undone.')) { btn.disabled = false; return; }
           N.emptyBin(list).then(function () { SW.toast('Deleted for good.'); N.showBin(holder); },
             function (err) { SW.toast(err.message, 5000); N.showBin(holder); });
         }
@@ -466,7 +466,7 @@
       edits[note.id] = { text: text, tags: tags || note.tags, updated: (r && r.updated) || now };
       (pending[note.vid] || []).forEach(function (p) { if (p.id === note.id) { p.text = text; if (tags) p.tags = tags; p.updated = now; } });
       N.invalidate(note.vid);
-      SW.toast('Note updated.');
+      SW.toast('Annotation updated.');
     });
   };
 
@@ -495,7 +495,7 @@
     }, Promise.resolve()).then(function () {
       cache = {};
       SW.emit('notes', SW.state.v);
-      SW.toast('Published ' + done + ' draft note' + (done === 1 ? '' : 's') + '.');
+      SW.toast('Published ' + done + ' draft annotation' + (done === 1 ? '' : 's') + '.');
     });
   };
 
@@ -539,7 +539,7 @@
   N.marginMark = function (k, c) {
     if (!c) return '';
     var who = c.by.slice(0, 3).join(' ') + (c.by.length > 3 ? '…' : '');
-    return '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '" title="' + c.n + ' note' + (c.n > 1 ? 's' : '') +
+    return '<span class="note-dot' + (c.draft ? ' draft' : '') + '" data-k="' + k + '" title="' + c.n + ' annotation' + (c.n > 1 ? 's' : '') +
       (c.replies ? ', ' + c.replies + ' repl' + (c.replies > 1 ? 'ies' : 'y') : '') + ' by ' + SW.esc(c.by.join(', ')) + (c.draft ? ' (includes drafts)' : '') + '. Click to read and reply.">' +
       SW.esc(who || '•') + (c.replies ? ' <b>+' + c.replies + '</b>' : '') + '</span>';
   };
@@ -576,8 +576,8 @@
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
       // one row: Reply | reactions | copy, download, edit, delete
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
-      '<button data-act="copy" class="ico" title="Copy the note, with its citation and replies">⧉</button>' +
-      '<button data-act="dl" class="ico" title="Download the note with its code and replies (Markdown)">⤓</button>' +
+      '<button data-act="copy" class="ico" title="Copy the annotation, with its citation and replies">⧉</button>' +
+      '<button data-act="dl" class="ico" title="Download the annotation with its code and replies (Markdown)">⤓</button>' +
       (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
       (N.mine(n) ? '<button data-act="delete" class="del-note">' + (n.source === 'draft' ? 'Delete draft' : 'Delete') + '</button>' : '') +
       '</div></div>';
@@ -628,7 +628,7 @@
       } else if (btn.dataset.act === 'delete') {
         // Into the bin, so no confirmation: it can be restored.
         N.bin(note).then(function () {
-          SW.toast('Moved to the bin. Restore it under Deleted notes on the Version & notes page.', 5000);
+          SW.toast('Moved to the bin. Restore it under Deleted annotations on the Version page.', 5000);
         }, function (e) { SW.toast(e.message, 5000); });
       }
     });
@@ -660,7 +660,7 @@
     }); })(t.replies, 1);
     var text = lines.join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
-      .then(function () { SW.toast('Note copied'); }, function () { window.prompt('Copy:', text); });
+      .then(function () { SW.toast('Annotation copied'); }, function () { window.prompt('Copy:', text); });
   }
   function downloadNote(note, all, fmt) {
     var t = threadOf(note, all), a = t.note.anchor;
@@ -673,7 +673,7 @@
         }) });
       }
       blocks = blocks.concat(N.blocks([t], b));
-      var doc = { title: 'Note by ' + t.note.by + ', ' + SW.fmtDate(t.note.date), subtitle: citeOf(t.note),
+      var doc = { title: 'Annotation by ' + t.note.by + ', ' + SW.fmtDate(t.note.date), subtitle: citeOf(t.note),
                   meta: [['Version', b.v.label + ' (' + b.v.date + ')'], ['Where', a ? SW.cite(b, a.p, a.n0, a.n1) : 'the version as a whole'],
                          ['Link', SW.permalink({ v: b.v.id, l: a ? a.p + ':' + a.n0 + (a.n1 !== a.n0 ? '-' + a.n1 : '') : null })]],
                   blocks: blocks };
@@ -688,7 +688,7 @@
     var box = SW.el('div', { class: 'reply-box edit-box' });
     box.innerHTML = '<textarea rows="4"></textarea>' +
       (note.parent ? '' : '<input class="edit-tags" placeholder="Tags, separated by commas">') +
-      '<div class="reply-foot"><span class="hint">Editing your ' + (note.parent ? 'reply' : 'note') + '</span>' +
+      '<div class="reply-foot"><span class="hint">Editing your ' + (note.parent ? 'reply' : 'annotation') + '</span>' +
       '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Save</button></span></div>';
     var ta = box.querySelector('textarea'), tg = box.querySelector('.edit-tags');
     ta.value = note.text;
@@ -756,7 +756,7 @@
     SW.$('#note-title').textContent = opts.heading || 'Annotate';
     SW.$('#note-anchor').textContent = opts.anchorText || '';
     SW.$('#note-text').value = '';
-    SW.$('#note-tags').value = '';
+    SW.$('#note-tags').value = (opts.tags || []).join(', ');
     SW.$('#note-who').innerHTML = me.initials
       ? 'Signed <b>' + SW.esc(me.initials) + '</b> · ' + SW.fmtDate(SW.today()) +
         (N.configured() ? ' · shared with the group' : ' · kept as a draft (no group set)')
@@ -785,7 +785,7 @@
       (t.reactions || []).forEach(function (r) { (rx[r.text] = rx[r.text] || []).push(r.by); });
       var rtext = Object.keys(rx).map(function (e) { return e + ' ' + rx[e].join(', '); }).join('  ');
       return { type: 'note', by: t.note.by, date: String(t.note.date).slice(0, 10), text: t.note.text + (rtext ? '\n[' + rtext + ']' : ''),
-               anchor: t.note.anchor && b ? SW.cite(b, t.note.anchor.p, t.note.anchor.n0, t.note.anchor.n1) : (t.note.source === 'buildlog' ? 'build log' : 'version note'),
+               anchor: t.note.anchor && b ? SW.cite(b, t.note.anchor.p, t.note.anchor.n0, t.note.anchor.n1) : (t.note.source === 'buildlog' ? 'build log' : 'annotation on the version'),
                replies: flat };
     });
   };
@@ -800,14 +800,14 @@
       var ts = N.threads(all).filter(function (t) { return t.note.source !== 'buildlog'; });
       function where(a) {
         return a ? '<div class="anchor" data-p="' + a.p + '" data-n="' + a.n0 + '">' + (b.parts.length > 1 ? 'tape ' + (a.p + 1) + ', ' : '') +
-          (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + '</div>' : '<div class="anchor-none">version note</div>';
+          (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + '</div>' : '<div class="anchor-none">on the version</div>';
       }
-      var html = '<p class="hint" style="margin-top:0">Every note on ' + SW.esc(b.v.label) + '. Click a line reference to go to it.</p>' +
-        '<p><button class="btn" data-act="vnote">✎ Add a version note</button> ' +
-        '<button class="btn' + (binInVersionPanel ? ' on' : '') + '" data-act="bin" title="Deleted notes on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
-        (ts.map(function (t) { return where(t.note.anchor) + N.renderThread(t, null); }).join('') || '<p class="hint">No notes on this version yet.</p>') +
-        '<div class="panel-bin"' + (binInVersionPanel ? '' : ' hidden') + '><h4>Deleted notes</h4><div></div></div>';
-      var body = SW.drawer('Notes', html);
+      var html = '<p class="hint" style="margin-top:0">Every annotation on ' + SW.esc(b.v.label) + '. Click a line reference to go to it.</p>' +
+        '<p><button class="btn" data-act="vnote">✎ Annotate the version</button> ' +
+        '<button class="btn' + (binInVersionPanel ? ' on' : '') + '" data-act="bin" title="Deleted annotations on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
+        (ts.map(function (t) { return where(t.note.anchor) + N.renderThread(t, null); }).join('') || '<p class="hint">No annotations on this version yet.</p>') +
+        '<div class="panel-bin"' + (binInVersionPanel ? '' : ' hidden') + '><h4>Deleted annotations</h4><div></div></div>';
+      var body = SW.drawer('Annotations', html);
       body.dataset.panel = 'version';
       body.dataset.vid = vid;
       N.wire(body, vid, all);
@@ -822,7 +822,7 @@
       };
       body.querySelector('[data-act="vnote"]').onclick = function (e) {
         e.stopPropagation();
-        N.dialog({ vid: vid, kind: 'version', anchor: null, heading: 'Note on ' + b.v.label, anchorText: 'A note on the version as a whole.' });
+        N.dialog({ vid: vid, kind: 'version', anchor: null, heading: 'Annotate ' + b.v.label, anchorText: 'An annotation on the version as a whole.' });
       };
     });
   };
@@ -832,7 +832,7 @@
     if (body && body.dataset.panel === 'version' && body.dataset.vid === vid && document.body.classList.contains('drawer-open')) N.openPanel(vid);
   });
 
-  var tab = SW.el('button', { id: 'notes-tab', class: 'notes-tab', title: 'Notes on this version; on Read, also how they show there' }, '▴ Notes');
+  var tab = SW.el('button', { id: 'notes-tab', class: 'notes-tab', title: 'Annotations on this version; on Read, also how they show there' }, '▴ Annotations');
   document.body.appendChild(tab);
   tab.onclick = function () {
     // On Read the button also chooses how notes show there (inline, cards, initials).
@@ -842,7 +842,7 @@
       return;
     }
     var body = SW.$('#drawer-body');
-    var lastWasNotes = SW.$('#drawer-title').textContent === 'Notes' && body && body.innerHTML &&
+    var lastWasNotes = SW.$('#drawer-title').textContent === 'Annotations' && body && body.innerHTML &&
       (body.dataset.notes || (body.dataset.panel === 'version' && body.dataset.vid === SW.state.v));
     if (lastWasNotes) document.body.classList.add('drawer-open');
     else if (SW.state.v) N.openPanel(SW.state.v);

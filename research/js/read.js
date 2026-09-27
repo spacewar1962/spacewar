@@ -138,8 +138,8 @@
       '<details class="menu"><summary class="btn" title="What the listing shows">View ▾</summary><div class="menu-body">' +
       '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
       '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
-      '<label class="check" title="Hide every line that no note covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
-      '<label class="check" title="Show only notes (and the lines they cover) in which these initials take part, as author or in a reply">Notes by <select id="rd-by"><option value="">anyone</option></select></label>' +
+      '<label class="check" title="Hide every line that no annotation covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
+      '<label class="check" title="Show only annotations (and the lines they cover) in which these initials take part, as author or in a reply">Annotations by <select id="rd-by"><option value="">anyone</option></select></label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
       '</div></details><span class="hint" id="rd-nf"></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
@@ -148,7 +148,7 @@
         '<div><i class="kx kcall"></i>a macro called here (hover the word column for how many words it made; “+5” means five more)</div>' +
         '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
         '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
-        '<div><i class="kx knoted"></i>covered by a note (initials at the right; click them)</div>' +
+        '<div><i class="kx knoted"></i>covered by an annotation (initials at the right; click them)</div>' +
         '<div><span class="errs">lac x</span> an assembly error (hover for the message)</div>' +
         '<div><span style="color:var(--red)">●</span> a breakpoint (set from the selection bar)</div>' +
         '<div><span class="faint"><i>italic grey</i></span> not assembled (a transcription header, or outside this tape segment)</div>' +
@@ -176,7 +176,7 @@
 
     if (!b.v.build) {
       var lost = SW.el('div', { class: 'pad prose' });
-      lost.innerHTML = '<h2>' + SW.esc(b.v.label) + '</h2><p>' + SW.esc(b.v.summary) + '</p><p class="muted">What is absent is also part of the record. Notes on this version can still be kept under “Version &amp; notes”.</p>';
+      lost.innerHTML = '<h2>' + SW.esc(b.v.label) + '</h2><p>' + SW.esc(b.v.summary) + '</p><p class="muted">What is absent is also part of the record. Annotations on this version can still be kept under “Version”.</p>';
       view.appendChild(lost);
       return;
     }
@@ -192,7 +192,7 @@
     SW.$$('.rd-body', view).forEach(function (x) { x.remove(); });
     var wrap = SW.el('div', { class: 'rd-body' + (marginOn() ? ' with-margin' : '') });
     var box = SW.el('div', { class: 'listing' + (opts.words ? '' : ' hide-words') });
-    var margin = SW.el('div', { class: 'note-margin', 'aria-label': 'Notes' });
+    var margin = SW.el('div', { class: 'note-margin', 'aria-label': 'Annotations' });
     b.parts.forEach(function (part, pi) {
       if (!showsTape(pi)) return;
       var t = info[pi], sec = SW.el('div', { class: 'part' });
@@ -209,7 +209,7 @@
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
         '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word</span>' +
         '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)">Source</span>' +
-        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Notes</span></div></div>';
+        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations</span></div></div>';
       sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
     });
@@ -365,10 +365,10 @@
 
   // How notes show in Read, in the order the toolbar button cycles through them:
   // [mode, name, what it does, the button's icon].
-  var MODES = [['inline', 'Under their lines', 'each note in the listing, under the last line it covers', '▤'],
+  var MODES = [['inline', 'Under their lines', 'each annotation in the listing, under the last line it covers', '▤'],
                ['margin', 'Cards in the margin', 'beside the lines, in a column on the right (a window 900px wide or more)', '▥'],
                ['off', 'Initials only', 'at the line end; click them to read in the side panel', 'ᴬᴮ'],
-               ['hide', 'Hidden', 'no notes, initials or tint in the listing', '⊘']];
+               ['hide', 'Hidden', 'no annotations, initials or tint in the listing', '⊘']];
   function modeOf(m) { return MODES.filter(function (x) { return x[0] === m; })[0] || MODES[0]; }
   function setNotes(m) {
     opts.notes = m;
@@ -380,16 +380,16 @@
     if (!b) return;
     var i = MODES.indexOf(modeOf(opts.notes)), cur = MODES[i], next = MODES[(i + 1) % MODES.length];
     b.textContent = cur[3];
-    b.title = 'Notes: ' + cur[1].toLowerCase() + '. Click for ' + next[1].toLowerCase() + '.';
+    b.title = 'Annotations: ' + cur[1].toLowerCase() + '. Click for ' + next[1].toLowerCase() + '.';
     b.classList.toggle('on', opts.notes !== 'hide');
   }
 
   // The ▴ Notes button, on Read: how notes show, and every note in the side panel.
   R.notesMenu = function (x, y) {
     var modes = MODES;
-    var pop = SW.pop(x, y, '<h4>Notes in Read</h4><div class="notes-menu">' + modes.map(function (m) {
+    var pop = SW.pop(x, y, '<h4>Annotations in Read</h4><div class="notes-menu">' + modes.map(function (m) {
       return '<button data-m="' + m[0] + '"' + (opts.notes === m[0] ? ' class="on"' : '') + ' title="' + SW.esc(m[2]) + '">' + (opts.notes === m[0] ? '● ' : '○ ') + m[1] + '</button>';
-    }).join('') + '<hr><button data-m="panel">All notes on this version…</button></div>');
+    }).join('') + '<hr><button data-m="panel">All annotations on this version…</button></div>');
     pop.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-m]');
       if (!b) return;
@@ -421,7 +421,7 @@
     var acts = [
       ['✎ Annotate', annotateSel], ['❝ Copy citation', copyCite], ['🔗 Copy link', copyLink],
       ['⤓ Word', function () { exportSel('docx'); }], ['⤓ Markdown', function () { exportSel('md'); }],
-      ['▣ Figure', figureSel], ['＋ Tray', function () { listingDoc(build, SW.state.sel).then(function (d) { d.title = SW.cite(build, SW.state.sel.p, SW.state.sel.n0, SW.state.sel.n1); SW.tray.addDoc(d); }); }], ['● Breakpoint', bpSel], ['▶ Run to here', runToSel], ['✕', function () { SW.state.sel = null; paintSel(); SW.writeQuery(); }]
+      ['▣ Figure', figureSel], ['★ Finding', findingSel], ['＋ My notes', function () { listingDoc(build, SW.state.sel).then(function (d) { d.title = SW.cite(build, SW.state.sel.p, SW.state.sel.n0, SW.state.sel.n1); SW.tray.addDoc(d); }); }], ['● Breakpoint', bpSel], ['▶ Run to here', runToSel], ['✕', function () { SW.state.sel = null; paintSel(); SW.writeQuery(); }]
     ];
     acts.forEach(function (a) { bar.appendChild(SW.el('button', { class: 'btn', onclick: a[1] }, a[0])); });
   }
@@ -434,6 +434,12 @@
     var s = SW.state.sel;
     N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: s.p, n0: s.n0, n1: s.n1, src: build.parts[s.p].src },
                quote: quote(), heading: 'Annotate', anchorText: SW.cite(build, s.p, s.n0, s.n1) });
+  }
+  // A finding: an annotation on these lines, tagged "finding", shown in Findings under your initials.
+  function findingSel() {
+    var s = SW.state.sel;
+    N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: s.p, n0: s.n0, n1: s.n1, src: build.parts[s.p].src }, tags: ['finding'],
+               quote: quote(), heading: 'Add a finding', anchorText: SW.cite(build, s.p, s.n0, s.n1) + '. Shared with the group and listed under Findings; the first line is its title.' });
   }
   function copy(text, msg) {
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
@@ -653,11 +659,11 @@
     // No citation here: the version and file are in the page title and part
     // header, and every thread in this panel is on the line just clicked.
     void n1;
-    var html = '<p style="margin-top:0"><button class="btn" data-act="new">✎ Add a note on this line</button> ' +
-      '<button class="btn" data-act="bin" title="Deleted notes on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
-      (ts.map(function (t) { return N.renderThread(t, null); }).join('') || '<p class="hint">No notes yet.</p>') +
-      '<div class="panel-bin"' + (binInPanel ? '' : ' hidden') + '><h4>Deleted notes</h4><div></div></div>';
-    var body = SW.drawer('Notes', html);
+    var html = '<p style="margin-top:0"><button class="btn" data-act="new">✎ Annotate this line</button> ' +
+      '<button class="btn" data-act="bin" title="Deleted annotations on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
+      (ts.map(function (t) { return N.renderThread(t, null); }).join('') || '<p class="hint">No annotations yet.</p>') +
+      '<div class="panel-bin"' + (binInPanel ? '' : ' hidden') + '><h4>Deleted annotations</h4><div></div></div>';
+    var body = SW.drawer('Annotations', html);
     body.dataset.notes = k;
     openNotesKey = k;
     N.wire(body, build.v.id, notes);
@@ -735,7 +741,7 @@
     var box = SW.$('.listing', view);
     if (box) {
       var none = SW.$('.nf-none', box);
-      if (on && !shown && !none) box.insertBefore(SW.el('p', { class: 'hint nf-none pad' }, opts.by ? 'No notes by ' + opts.by + ' on this version' + (opts.tapes === 'all' ? '' : ' and tape') + '.' : 'No annotated lines on this version' + (opts.tapes === 'all' ? '' : ' and tape') + ' yet.'), box.firstChild);
+      if (on && !shown && !none) box.insertBefore(SW.el('p', { class: 'hint nf-none pad' }, opts.by ? 'No annotations by ' + opts.by + ' on this version' + (opts.tapes === 'all' ? '' : ' and tape') + '.' : 'No annotated lines on this version' + (opts.tapes === 'all' ? '' : ' and tape') + ' yet.'), box.firstChild);
       else if ((!on || shown) && none) none.remove();
     }
     if (build && SW.$('.rd-body', view)) paintNotes();   // the notes follow the lines left showing
