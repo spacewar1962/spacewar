@@ -475,9 +475,8 @@
       if (callsN && incN) st.push(Math.round(incN / callsN).toLocaleString('en-GB') + ' a call');
       if (ranIn[e] && ranIn[e].length < NF) st.push('frames ' + ranges(ranIn[e]));
       var cd = e === 'rt' ? null : codeOf(e);
-      var trail = hist.slice(Math.max(0, hpos - 4), hpos).map(function (h0, n0, arr) { var at = hpos - arr.length + n0; return '<a href="#" class="mono" data-hist="' + at + '">' + SW.esc(nm(h0)) + '</a>'; }).join(' › ');
-      var navh = '<div class="ov-hist"><button class="btn ghost" data-hnav="-1" title="Back"' + (hpos > 0 ? '' : ' disabled') + '>←</button><button class="btn ghost" data-hnav="1" title="Forward"' + (hpos < hist.length - 1 ? '' : ' disabled') + '>→</button>' +
-        (trail ? '<span class="ov-trail">' + trail + ' ›</span>' : '') + '</div>';
+      var navh = '<div class="ov-hist"><button class="btn ghost" data-hnav="-1" title="' + (hpos > 0 ? 'Back to ' + SW.esc(nm(hist[hpos - 1])) : 'Back') + '"' + (hpos > 0 ? '' : ' disabled') + '>←</button><button class="btn ghost" data-hnav="1" title="' + (hpos < hist.length - 1 ? 'Forward to ' + SW.esc(nm(hist[hpos + 1])) : 'Forward') + '"' + (hpos < hist.length - 1 ? '' : ' disabled') + '>→</button>' +
+        '</div>';
       var hh = ['<div class="ov-phead"><div><div class="ov-ptitle">' + navh + '<h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4></div>' +
         '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div>'];
       // values | code | relations
@@ -549,8 +548,6 @@
       if (ev.target.closest('[data-snap]')) { snapDialog(); return; }
       var hn = ev.target.closest('[data-hnav]');
       if (hn) { var np = hpos + (+hn.dataset.hnav); if (np >= 0 && np < hist.length) { hpos = np; inspect(hist[hpos], true); } return; }
-      var ht = ev.target.closest('[data-hist]');
-      if (ht) { ev.preventDefault(); hpos = +ht.dataset.hist; inspect(hist[hpos], true); return; }
       var rd = ev.target.closest('[data-read]');
       if (rd) { var pn = rd.dataset.read.split(':'); goRead(b, +pn[0], +pn[1]); return; }
       var x = ev.target.closest('[data-e]');
