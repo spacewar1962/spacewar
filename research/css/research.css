@@ -977,7 +977,7 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .tray-binned { font-size: 13px; padding: 3px 0; }
 .tray-binned .btn { font-size: 12px; padding: 2px 8px; }
 /* functional overview */
-.ov { display: grid; gap: 12px; max-width: 1100px; }
+.ov { display: grid; gap: 12px; max-width: none; }
 .ov-run { font-size: 12.5px; }
 .ov-box { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 14px; background: color-mix(in srgb, var(--surface-2) 35%, transparent); }
 .ov-box h4 { margin: 0 0 8px; font-size: 14px; }
@@ -1034,9 +1034,11 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-vt td { text-align: right; padding: 0 4px; color: var(--text-dim); border-top: 1px solid var(--line-soft); }
 .ov-vt tr.ch td { color: var(--amber); }
 /* overview layout: screen and player, the data panel, then the rest */
-.ov-top { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 14px; align-items: start; }
-.ov-top .ov-scope canvas { max-width: 340px; }
-@media (max-width: 860px) { .ov-top { grid-template-columns: 1fr; } }
+.ov-top { display: grid; grid-template-columns: clamp(240px, 28vw, 460px) minmax(0, 1fr); gap: 14px; align-items: start; }
+.ov-top .ov-scope canvas { max-width: 100%; }
+@media (max-width: 860px) { .ov-top { grid-template-columns: minmax(0, 1fr); } }
+.ov-top > *, .ov-rest > *, .ov-panel { min-width: 0; }
+.ov-flame { overflow: hidden; }
 .ov-run { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; border-top: 1px solid var(--line-soft); padding-top: 8px; margin-top: 8px; }
 .ov-run p { margin: 0; font-size: 12.5px; }
 .ov-insp { border: none; padding: 0; background: none; display: grid; grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.3fr) minmax(220px, 1fr); gap: 16px; align-items: start; }
@@ -1072,3 +1074,6 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-trail { font-size: 12px; margin-left: 6px; color: var(--text-faint); }
 .ov-trail a { color: var(--beam); text-decoration: none; }
 .ov-trail a:hover { text-decoration: underline; }
+/* very wide screens: the static boxes two to a row */
+@media (min-width: 1700px) { .ov-rest { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
+@media (max-width: 860px) { .ov-player .ov-fctl { flex-wrap: wrap; } .ov-run { flex-direction: column; } .ov-top .ov-scope canvas { max-width: 420px; } }

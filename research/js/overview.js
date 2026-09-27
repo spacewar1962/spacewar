@@ -337,7 +337,7 @@
     if (T) h.push('<section class="ov-box"><h4>The object table <span class="faint">(' + (T.nob != null ? T.nob + ' objects (nob, octal ' + T.nob.toString(8) + '), ' : '') + 'as the main loop sets its pointers; words in decimal)</span></h4><table class="ov-sub"><thead><tr><th>Field</th><th>Words</th><th>The program’s comment</th></tr></thead><tbody>' +
       T.fields.map(function (f) { return '<tr><td><a href="#" class="ov-nm mono" data-p="' + f.p + '" data-n="' + f.n + '">' + SW.esc(f.field) + '</a></td><td class="num">' + (f.size == null ? '' : f.size) + '</td><td class="ov-g">' + SW.esc(f.what) + '</td></tr>'; }).join('') + '</tbody></table></section>');
 
-    el.innerHTML = '<div class="ov-top"><div class="ov-scope"><canvas width="520" height="520"></canvas><p class="hint ov-scap"></p></div>' + frameBox + '</div>' +
+    el.innerHTML = '<div class="ov-top"><div class="ov-scope"><canvas width="720" height="720"></canvas><p class="hint ov-scap"></p></div>' + frameBox + '</div>' +
       '<section class="ov-box ov-panel"><div class="ov-insp"></div></section>' +
       '<div class="ov-rest">' + h.join('') + '</div>';
     var insp = SW.$('.ov-insp', el), scv = SW.$('.ov-scope canvas', el), sg = scv.getContext('2d'), scap = SW.$('.ov-scap', el), picked = null, hovered = null, shownFrame = 0;
