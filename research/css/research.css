@@ -1087,3 +1087,10 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-opt input { margin-top: 3px; }
 .ov-opt .hint { display: block; font-size: 12.5px; margin-top: 2px; }
 .ov-ver { font: 400 11px var(--mono); color: var(--text-faint); margin-left: 8px; letter-spacing: 0.02em; }
+.ov-icons { float: right; display: inline-flex; gap: 2px; margin-left: 8px; }
+.ov-ic { font: 600 9.5px var(--mono); letter-spacing: 0.03em; padding: 1px 5px; border: 1px solid var(--line); border-radius: 3px; background: none; color: var(--text-faint); cursor: pointer; line-height: 14px; }
+.ov-ic:hover { color: var(--text); border-color: var(--beam); }
+.ov-scapline { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.ov-scapline .ov-icons { float: none; }
+.ov-phact { display: flex; align-items: center; gap: 8px; }
+.ov-phact .ov-icons { float: none; }

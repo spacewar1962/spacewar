@@ -238,6 +238,12 @@
     function per(n) { var v = n / F; return v >= 10 ? Math.round(v) + ' a frame' : v >= 0.95 ? (Math.round(v * 10) / 10) + ' a frame' : 'in ' + Math.round(100 * v) + '% of frames'; }
     function rate(n) { var v = n / F; return v >= 1 ? String(Math.round(v)) : v >= 0.1 ? (Math.round(10 * v) / 10).toString() : '<0.1'; }
     function cyc(n) { return Math.round(n).toLocaleString('en-GB') + ' cycles (' + (n * US / 1000).toFixed(n * US < 10000 ? 2 : 1) + ' ms)'; }
+    // small icons on a panel: save as SVG or PNG, and add to My notes
+    function icons(k, fig) {
+      return '<span class="ov-icons">' + (fig ? '<button class="ov-ic" data-ic="svg" data-k="' + k + '" title="Save as SVG">SVG</button><button class="ov-ic" data-ic="png" data-k="' + k + '" title="Save as PNG">PNG</button>' : '') +
+        '<button class="ov-ic" data-ic="note" data-k="' + k + '" title="Add to My notes (private)">＋</button></span>';
+    }
+    var vshort = b.v.label.replace(/^Spacewar! /, ''), fileBase = 'spacewar-' + b.v.id;
     function callsOf(e, depth, seen) {
       var r = A.R[e]; if (!r) return '';
       var ks = Object.keys(r.calls).sort(function (x, y) { return r.calls[y] - r.calls[x]; });
@@ -255,7 +261,7 @@
       '<button class="btn" data-snap title="Choose the controls held, and take a new snapshot">New snapshot…</button></div>';
 
     // one frame against time
-    var frameBox = ('<section class="ov-box ov-player"><h4>Frame Player <span class="ov-ver">' + SW.esc(b.v.label.replace(/^Spacewar! /, '')) + '</span></h4>' +
+    var frameBox = ('<section class="ov-box ov-player"><h4>Frame Player <span class="ov-ver">' + SW.esc(vshort) + '</span>' + icons('player', true) + '</h4>' +
       '<div class="toolbar ov-fctl" style="position:static;padding:0 0 6px"><button class="btn ghost" data-f="prev" title="Previous frame">◀</button><button class="btn ghost" data-f="play">▶ Play</button><button class="btn ghost" data-f="next" title="Next frame">▶</button>' +
       '<select class="ov-speed" title="Frames a second when playing; real time plays each frame for as long as it took on the PDP-1">' + [['1', '1 a second'], ['2', '2 a second'], ['4', '4 a second'], ['8', '8 a second'], ['16', '16 a second'], ['rt', 'real time']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === speedPref() ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
       '<input type="range" class="ov-fr" min="0" max="' + (NF - 1) + '" value="' + (keep.frame != null ? keep.frame : Math.min(NF - 1, Math.round(NF * 0.1))) + '"><span class="hint ov-fcap"></span></div>' +
@@ -264,7 +270,7 @@
     // where the time goes
     var rows = Object.keys(A.ex).map(function (e) { return { e: e, ex: A.ex[e], inc: e === 'main' ? A.total : e === 'wait' ? A.ex[e] : (A.inc[e] || A.ex[e]) }; })
       .filter(function (r) { return r.ex > 0; }).sort(function (x, y) { return y.ex - x.ex; });
-    h.push('<section class="ov-box"><h4>Where each frame’s time goes <span class="faint">(a frame is about ' + cyc(avgLen) + ')</span></h4><div class="ov-budget">' +
+    h.push('<section class="ov-box"><h4>Where each frame’s time goes <span class="faint">(a frame is about ' + cyc(avgLen) + ')</span>' + icons('budget', true) + '</h4><div class="ov-budget">' +
       rows.map(function (r) {
         var pc = 100 * r.ex / A.total;
         return '<div class="ov-brow" data-e="' + SW.esc(String(r.e)) + '"><span class="ov-bnm mono">' + SW.esc(nm(r.e)) + '</span><span class="ov-bar"><i style="width:' + Math.max(0.3, pc).toFixed(2) + '%;background:' + colour(nm(r.e)) + '"></i></span>' +
@@ -296,7 +302,7 @@
       }).join('');
     }
     function glossVar(k) { var s0 = b.sym[k], d = s0 && ((s0.defs && s0.defs[0]) || (s0.refs && s0.refs[0])); if (!d || !b.lines[d.file]) return ''; return SW.esc(commentOf(b.lines[d.file][d.line - 1].raw)); }
-    h.push('<section class="ov-box"><h4>Data flow <span class="faint">(reads and writes a frame, by routine)</span></h4>' +
+    h.push('<section class="ov-box"><h4>Data flow <span class="faint">(reads and writes a frame, by routine)</span>' + icons('flow') + '</h4>' +
       '<details open><summary>The object table, by field</summary><table class="ov-sub"><thead><tr><th>Field</th><th>The program’s comment</th><th>Written by</th><th>Read by</th></tr></thead><tbody>' + flowRows('field') + '</tbody></table></details>' +
       '<details><summary>Variables</summary><table class="ov-sub"><thead><tr><th>Variable</th><th>A comment where it is used</th><th>Written by</th><th>Read by</th></tr></thead><tbody>' + flowRows('var') + '</tbody></table></details>' +
       '<details><summary>Instructions rewritten while the program runs</summary><p class="hint">Words the program both runs and writes: return addresses set by dap, pointers stepped by idx, calls aimed at the next object.</p><table class="ov-sub"><thead><tr><th>Where</th><th>The line</th><th>Written by</th></tr></thead><tbody>' + flowRows('code') + '</tbody></table></details>' +
@@ -329,7 +335,7 @@
     // subroutines
     var subs = Object.keys(A.R).filter(function (e) { var r = A.R[e]; return e !== 'main' && e !== 'startup' && r.n && !Object.keys(r.callers).every(function (c) { return c === 'main'; }); });
     subs.sort(function (x, y) { return A.R[y].n - A.R[x].n; });
-    h.push('<section class="ov-box"><h4>Subroutines</h4><table class="ov-sub"><thead><tr><th>Routine</th><th>Calls</th><th>Called from</th><th>The program’s comment</th></tr></thead><tbody>' +
+    h.push('<section class="ov-box"><h4>Subroutines' + icons('subs') + '</h4><table class="ov-sub"><thead><tr><th>Routine</th><th>Calls</th><th>Called from</th><th>The program’s comment</th></tr></thead><tbody>' +
       subs.map(function (e) {
         var r = A.R[e];
         return '<tr><td>' + link(e) + '</td><td class="num">' + (r.startup === r.n ? r.n + ' at start-up' : per(r.n - r.startup)) + '</td><td>' +
@@ -337,10 +343,10 @@
       }).join('') + '</tbody></table></section>');
     // the object table
     var T = tableFields(b);
-    if (T) h.push('<section class="ov-box"><h4>The object table <span class="faint">(' + (T.nob != null ? T.nob + ' objects (nob, octal ' + T.nob.toString(8) + '), ' : '') + 'as the main loop sets its pointers; words in decimal)</span></h4><table class="ov-sub"><thead><tr><th>Field</th><th>Words</th><th>The program’s comment</th></tr></thead><tbody>' +
+    if (T) h.push('<section class="ov-box"><h4>The object table <span class="faint">(' + (T.nob != null ? T.nob + ' objects (nob, octal ' + T.nob.toString(8) + '), ' : '') + 'as the main loop sets its pointers; words in decimal)</span>' + icons('table') + '</h4><table class="ov-sub"><thead><tr><th>Field</th><th>Words</th><th>The program’s comment</th></tr></thead><tbody>' +
       T.fields.map(function (f) { return '<tr><td><a href="#" class="ov-nm mono" data-p="' + f.p + '" data-n="' + f.n + '">' + SW.esc(f.field) + '</a></td><td class="num">' + (f.size == null ? '' : f.size) + '</td><td class="ov-g">' + SW.esc(f.what) + '</td></tr>'; }).join('') + '</tbody></table></section>');
 
-    el.innerHTML = '<div class="ov-top"><div class="ov-scope"><canvas width="720" height="720"></canvas><p class="hint ov-scap"></p></div>' + frameBox + '</div>' +
+    el.innerHTML = '<div class="ov-top"><div class="ov-scope"><canvas width="720" height="720"></canvas><div class="ov-scapline"><p class="hint ov-scap"></p>' + icons('screen', true) + '</div></div>' + frameBox + '</div>' +
       '<section class="ov-box ov-panel"><div class="ov-insp"></div></section>' +
       '<div class="ov-rest">' + h.join('') + '</div>';
     var insp = SW.$('.ov-insp', el), scv = SW.$('.ov-scope canvas', el), sg = scv.getContext('2d'), scap = SW.$('.ov-scap', el), picked = null, hovered = null, shownFrame = 0;
@@ -482,7 +488,7 @@
       var navh = '<div class="ov-hist"><button class="btn ghost" data-hnav="-1" title="' + (hpos > 0 ? 'Back to ' + SW.esc(nm(hist[hpos - 1])) : 'Back') + '"' + (hpos > 0 ? '' : ' disabled') + '>←</button><button class="btn ghost" data-hnav="1" title="' + (hpos < hist.length - 1 ? 'Forward to ' + SW.esc(nm(hist[hpos + 1])) : 'Forward') + '"' + (hpos < hist.length - 1 ? '' : ' disabled') + '>→</button>' +
         '</div>';
       var hh = ['<div class="ov-phead"><div><div class="ov-ptitle">' + navh + '<h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4></div>' +
-        '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div>'];
+        '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + '<div class="ov-phact">' + icons('panel') + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div></div>'];
       // values | code | relations
       hh.push('<div class="ov-pvals"><div class="ov-vals"></div></div>');
       hh.push('<div class="ov-pcode">');
@@ -526,6 +532,75 @@
       SW.$$('.ov-brow', el).forEach(function (rw) { rw.classList.toggle('on', rw.dataset.e === String(e)); });
       var pr = insp.getBoundingClientRect(); if (pr.bottom < 60 || pr.top > window.innerHeight - 60) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
+    // ---------- figures and notes from the panels ----------
+    function svgWrap(W, H, pal, body) { return '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + (pal.bg ? '<rect width="' + W + '" height="' + H + '" fill="' + pal.bg + '"/>' : '') + body + '</svg>'; }
+    function screenSVG(pal) {
+      var N = 520, R = N / 2, k = N / 1024, hi = picked != null ? String(picked) : null, o = ['<circle cx="' + R + '" cy="' + R + '" r="' + (R - 2) + '" fill="#02050a" stroke="#3a5068" stroke-width="3"/>'];
+      [[FL[shownFrame - 1], 0.28], [FL[shownFrame], 1]].forEach(function (pr) {
+        var f = pr[0]; if (!f) return;
+        for (var j = 0; j < f.pts.length; j += 3) {
+          var own = pr[1] === 1 && hi != null && String(f.pts[j + 2]) === hi, x = R + f.pts[j] * k, y = R - f.pts[j + 1] * k;
+          o.push(own ? '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3" fill="' + colour(nm(f.pts[j + 2])) + '"/>' : '<rect x="' + (x - 1.1).toFixed(1) + '" y="' + (y - 1.1).toFixed(1) + '" width="2.2" height="2.2" fill="#cfe6ff" opacity="' + pr[1] + '"/>');
+        }
+      });
+      return svgWrap(N, N, { bg: '#000' }, o.join(''));
+    }
+    function playerSVG(pal) {
+      var f = FL[shownFrame]; if (!f) return svgWrap(10, 10, pal, '');
+      var W = 1000, RH = 20, H = (maxDepth + 1) * RH + 28, sc = maxLen, len = f.len || 1, o = [];
+      f.spans.forEach(function (sp) {
+        var t1 = sp.t1 == null ? len : sp.t1, x = W * sp.t0 / sc, w = Math.max(0.8, W * (t1 - sp.t0) / sc), y = sp.d * RH, n0 = nm(sp.e);
+        o.push('<rect x="' + x.toFixed(1) + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + (RH - 2) + '" fill="' + colour(n0) + '"/>' + (w > 34 ? '<text x="' + (x + 3).toFixed(1) + '" y="' + (y + RH - 7) + '" font-family="monospace" font-size="11" fill="#fff">' + SW.esc(n0) + '</text>' : ''));
+      });
+      for (var tk = 0; tk <= 4; tk++) o.push('<text x="' + Math.min(W - 60, W * tk / 4 + 2) + '" y="' + (H - 6) + '" font-family="monospace" font-size="10" fill="' + (pal.dim || '#888') + '">' + Math.round(sc * tk / 4).toLocaleString('en-GB') + '</text>');
+      var ex0 = W * len / sc; o.push('<line x1="' + ex0 + '" x2="' + ex0 + '" y1="0" y2="' + (H - 22) + '" stroke="' + (pal.dim || '#888') + '" stroke-dasharray="3 3"/>');
+      return svgWrap(W, H, pal, o.join(''));
+    }
+    function budgetSVG(pal) {
+      var W = 760, RH = 20, o = [];
+      rows.forEach(function (r, n) {
+        var pc = 100 * r.ex / A.total, y = n * RH;
+        o.push('<text x="0" y="' + (y + 14) + '" font-family="monospace" font-size="12" fill="' + (pal.ink || '#ddd') + '">' + SW.esc(nm(r.e)) + '</text>' +
+          '<rect x="110" y="' + (y + 5) + '" width="' + (4.4 * Math.max(0.3, pc)).toFixed(1) + '" height="10" fill="' + colour(nm(r.e)) + '"/>' +
+          '<text x="' + (120 + 4.4 * pc).toFixed(1) + '" y="' + (y + 14) + '" font-family="monospace" font-size="11" fill="' + (pal.dim || '#999') + '">' + pc.toFixed(1) + '%</text>');
+      });
+      return svgWrap(W, rows.length * RH + 4, pal, o.join(''));
+    }
+    function tableBlocks(box) {   // the tables in a panel, as the page shows them
+      return SW.$$('table', box).map(function (t) {
+        var head = SW.$$('thead th', t).map(function (x) { return x.textContent.trim(); });
+        return SW.tableBlock(t.closest('details') ? SW.$('summary', t.closest('details')).textContent : '', head, SW.$$('tbody tr', t).map(function (tr) { return SW.$$('td', tr).map(function (x) { return x.textContent.trim(); }); }));
+      });
+    }
+    function boxOf(k) { return SW.$('[data-k="' + k + '"]', el).closest('section'); }
+    var FIG = { screen: { svg: screenSVG, name: function () { return fileBase + '-screen-frame-' + (shownFrame + 1); } },
+                player: { svg: playerSVG, name: function () { return fileBase + '-frame-' + (shownFrame + 1) + '-calls'; } },
+                budget: { svg: budgetSVG, name: function () { return fileBase + '-frame-time'; } } };
+    function docOf(k) {
+      var base = { title: '', subtitle: vshort + ', functional overview; ' + A.phases.map(function (P) { return P.what; }).join(', then '), blocks: [] };
+      if (k === 'panel') {
+        var e = String(picked), cd = e === 'rt' ? null : codeOf(e);
+        base.title = nm(e) + ', frame ' + (shownFrame + 1) + ' (' + vshort + ')';
+        base.blocks.push({ type: 'p', text: [glossAt(b, e), SW.$('.ov-pstat', insp) ? SW.$('.ov-pstat', insp).textContent : ''].filter(Boolean).join('. ') });
+        base.blocks = base.blocks.concat(tableBlocks(SW.$('.ov-pvals', insp)), tableBlocks(SW.$('.ov-prel', insp)));
+        if (cd) base.blocks.push({ type: 'code', caption: SW.cite(b, cd.p, cd.n0, cd.n1), lines: b.lines[cd.p].slice(cd.n0 - 1, cd.n1).map(function (L) { return { n: L.n, addr: '', word: '', text: L.raw }; }) });
+        return base;
+      }
+      var titles = { flow: 'Data flow', subs: 'Subroutines', table: 'The object table' };
+      base.title = titles[k] + ' (' + vshort + ')';
+      base.blocks = tableBlocks(boxOf(k));
+      return base;
+    }
+    function iconAct(btn) {
+      var k = btn.dataset.k, act = btn.dataset.ic, F0 = FIG[k];
+      if (act === 'svg' && F0) root.SWExport.download(F0.name() + '.svg', SW.exportSVG(F0.svg(SW.exportPalette())), 'image/svg+xml');
+      else if (act === 'png' && F0) {
+        SW.toast('Rendering PNG…');
+        SW.figures.svgToPNG(SW.exportSVG(F0.svg(SW.exportPalette())), 3, SW.figBgColour()).then(function (r) { root.SWExport.download(F0.name() + '.png', r.png, 'image/png'); }, function () { SW.toast('The PNG could not be made; try SVG.', 5000); });
+      }
+      else if (act === 'note' && SW.tray) { if (F0) SW.tray.addFigure(F0.svg(SW.exportPalette()), F0.name()); else SW.tray.addDoc(docOf(k)); }
+    }
+
     // the snapshot's options in a dialog: the controls held, and for how long
     function snapDialog() {
       var d = SW.el('dialog', { class: 'ov-snapdlg' }), mcw = mine ? mine.cw : 0;
@@ -552,6 +627,7 @@
     if (el._ovClick) el.removeEventListener('click', el._ovClick);
     el.addEventListener('click', el._ovClick = function (ev) {
       if (ev.target.closest('[data-snap]')) { snapDialog(); return; }
+      var icb = ev.target.closest('[data-ic]'); if (icb) { ev.preventDefault(); iconAct(icb); return; }
       var hn = ev.target.closest('[data-hnav]');
       if (hn) { var np = hpos + (+hn.dataset.hnav); if (np >= 0 && np < hist.length) { hpos = np; keep.hpos = hpos; inspect(hist[hpos], true); } return; }
       var rd = ev.target.closest('[data-read]');
