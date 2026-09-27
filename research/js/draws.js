@@ -146,7 +146,7 @@
     }
     ctl.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-a]'); if (!b) return;
-      if (b.dataset.a === 'play') { if (i >= seq.length) { i = 0; events = []; } playing = !playing; b.textContent = playing ? '❚❚ Pause' : '▶ Play'; }
+      if (b.dataset.a === 'play') { if (i >= seq.length) { i = 0; events = []; } playing = !playing; D.playing = playing; b.textContent = playing ? '❚❚ Pause' : '▶ Play'; }
       if (b.dataset.a === 'step') { if (i >= seq.length) { i = 0; events = []; } plot(); render(); }
       if (b.dataset.a === 'restart') { i = 0; events = []; render(); }
     });
@@ -158,6 +158,8 @@
       if (a === 'grid') { grid = e.target.checked; dirty = true; }
       D.prefs({ speed: speed, loop: loop, fade: fade, grid: grid });
     });
+    // still playing when the version is switched, so versions can be compared running
+    if (D.playing && seq.length) { playing = true; SW.$('[data-a="play"]', ctl).textContent = '❚❚ Pause'; }
     render();
     requestAnimationFrame(tick);
     // time passing, for testing without animation frames: sec of play (or of glow if paused)
@@ -173,8 +175,9 @@
   // Beside a card's content: every version, grouped by what it does (its short
   // summary), filled in as each runs on the emulator; a version's button
   // switches the page to it.
-  function across(c, b, key, analyse) {
-    var side = SW.el('div', { class: 'dr-side' });
+  // top: a strip under the heading, above the content, instead of a column beside it
+  function across(c, b, key, analyse, top) {
+    var side = SW.el('div', { class: top ? 'dr-side dr-top' : 'dr-side' });
     side.innerHTML = '<h4>Across the versions</h4><p class="hint">Click a version to switch to it.</p>';
     var box = SW.el('div', { class: 'dr-groups' });
     side.appendChild(box);
@@ -193,10 +196,13 @@
     }
     box.addEventListener('click', function (e) { var t = e.target.closest('button[data-v]'); if (t && t.dataset.v !== b.v.id) SW.select(t.dataset.v); });
     paint();
-    var row = SW.el('div', { class: 'dr-hrow' }), main = SW.el('div', { class: 'dr-hmain' });
-    while (c.children.length > 1) main.appendChild(c.children[1]);   // everything after the heading
-    row.appendChild(main); row.appendChild(side);
-    c.appendChild(row);
+    if (top) c.insertBefore(side, c.children[1] || null);
+    else {
+      var row = SW.el('div', { class: 'dr-hrow' }), main = SW.el('div', { class: 'dr-hmain' });
+      while (c.children.length > 1) main.appendChild(c.children[1]);   // everything after the heading
+      row.appendChild(main); row.appendChild(side);
+      c.appendChild(row);
+    }
     var todo = vs.filter(function (v) { return shortOf[v.id] == null; }), k = 0;
     function next() {
       if (!side.isConnected || k >= todo.length) return;
@@ -256,7 +262,7 @@
         row.appendChild(col);
       });
     }
-    across(c, b, 'ships', shipsOf);
+    across(c, b, 'ships', shipsOf, true);
   };
 
   // ---------- the sun ----------

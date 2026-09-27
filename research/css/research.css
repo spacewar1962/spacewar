@@ -932,3 +932,11 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .dr-gv button:hover { background: color-mix(in srgb, var(--beam) 22%, transparent); color: var(--text); }
 .dr-gv button.on { background: color-mix(in srgb, var(--beam) 30%, transparent); color: var(--text); border-color: var(--beam); }
 .an-title { font-size: 15px; margin-right: 6px; }
+/* the versions as a strip above the ships */
+.dr-top { margin: 2px 0 12px; }
+.dr-top h4 { display: none; }
+.dr-top > .hint { margin: 0 0 6px; }
+.dr-top .dr-groups { display: flex; flex-wrap: wrap; gap: 6px; }
+.dr-top .dr-g { display: flex; align-items: center; gap: 8px; }
+.dr-top .dr-gk { margin: 0; white-space: nowrap; }
+.dr-row .dr-col { flex: 1 1 380px; }
