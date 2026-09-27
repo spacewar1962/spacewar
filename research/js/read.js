@@ -515,23 +515,27 @@
 
   // ---------- export model ----------
   function listingDoc(b, s) {
+    // the whole listing follows the Tape menu: every tape, or the one shown
     var lines = s ? b.lines[s.p].slice(s.n0 - 1, s.n1)
-      : [].concat.apply([], b.lines.filter(function (x, pi) { return b.parts[pi].role === 'program'; })).filter(function (L) { return !L.away; });
+      : [].concat.apply([], b.lines.filter(function (x, pi) { return showsTape(pi); })).filter(function (L) { return !L.away; });
     if (!s && filtering()) { var keep = keptLines(); lines = lines.filter(function (L) { return keep[L.p + ':' + L.n]; }); }
     return N.list(b.v.id).then(function (all) {
       var threads = N.threads(all);
+      // each annotation goes after the last of its lines that is exported, so
+      // one that begins above a selection is still included
+      var out = {}; lines.forEach(function (L) { out[L.p + ':' + L.n] = 1; });
       var byLine = {};
       threads.forEach(function (t) {
-        if (!t.note.anchor) return;
-        var k = t.note.anchor.p + ':' + t.note.anchor.n0;
-        (byLine[k] = byLine[k] || []).push(t);
+        var a = t.note.anchor; if (!a) return;
+        for (var n = a.n1 || a.n0; n >= a.n0; n--) if (out[a.p + ':' + n]) { (byLine[a.p + ':' + n] = byLine[a.p + ':' + n] || []).push(t); break; }
       });
       var blocks = [];
       if (!s) blocks.push({ type: 'p', text: b.v.summary });
       var cur = null;
       lines.forEach(function (L) {
         if (!cur || cur.p !== L.p) {
-          cur = { type: 'code', caption: b.parts[L.p].src, lines: [], p: L.p };
+          var ti0 = tapeInfo(b)[L.p];   // headed by its tape, as the Tape menu names it, then the file
+          cur = { type: 'code', caption: (b.parts.length > 1 && ti0 ? 'Tape ' + (L.p + 1) + ' of ' + b.parts.length + ': ' + ti0.label + ' · ' : '') + b.parts[L.p].src, lines: [], p: L.p };
           blocks.push(cur);
         }
         var ws = b.asm && (b.asm.byLine[L.p] || [])[L.n];
@@ -541,7 +545,8 @@
           notes: (byLine[L.p + ':' + L.n] || []).map(function (t) {
             var reps = [];
             (function walk(rs) { rs.forEach(function (r) { reps.push({ by: r.note.by, date: String(r.note.date).slice(0, 10), text: r.note.text }); walk(r.replies); }); })(t.replies);
-            return { by: t.note.by, date: String(t.note.date).slice(0, 10), text: t.note.text, replies: reps };
+            var a = t.note.anchor;
+            return { by: t.note.by, date: String(t.note.date).slice(0, 10), text: t.note.text, replies: reps, ref: a.n1 && a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0 };
           })
         });
       });

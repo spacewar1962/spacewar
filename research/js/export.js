@@ -584,17 +584,20 @@
     var longest = 2;
     body.forEach(function (t) { (t.match(/`+/g) || []).forEach(function (r) { longest = Math.max(longest, r.length); }); });
     var fence = new Array(longest + 2).join('`');
-    var out = [];
-    if (b.caption) out.push('*' + mdEsc(b.caption) + '*', '');
-    out.push(fence + '\n' + body.join('\n') + '\n' + fence);
-    var notes = [];
-    lines.forEach(function (l) {
-      (l.notes || []).forEach(function (n) {
-        notes.push(mdNote(n, (l.n != null && l.n !== '') ? 'l. ' + l.n : (l.addr ? mdEsc(l.addr) : '')));
-      });
+    // annotations in the code: the block is broken after the lines a note
+    // covers, the note given as a quotation, and the code carried on
+    var out = [], chunk = [];
+    if (b.caption) out.push('*' + mdEsc(b.caption) + '*');
+    function flush() { if (chunk.length) { out.push(fence + '\n' + chunk.join('\n') + '\n' + fence); chunk = []; } }
+    lines.forEach(function (l, i) {
+      chunk.push(body[i]);
+      if ((l.notes || []).length) {
+        flush();
+        out.push(l.notes.map(function (n) { return mdNote(n, n.ref || ((l.n != null && l.n !== '') ? 'l. ' + l.n : (l.addr ? mdEsc(l.addr) : ''))); }).join('\n>\n'));
+      }
     });
-    if (notes.length) out.push('', notes.join('\n>\n'));
-    return out.join('\n');
+    flush();
+    return out.join('\n\n');
   }
 
   // doc -> Markdown string. Figures are referenced as figure-N.png (and
