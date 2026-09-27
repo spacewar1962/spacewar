@@ -5,7 +5,7 @@
   'use strict';
   var SW = root.SW, V = root.SWVersions;
 
-  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'sky', 'about', 'findings'];
+  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'graphics', 'about', 'findings'];
 
   function fillPicker() {
     var sel = SW.$('#pick-a');
@@ -24,6 +24,7 @@
   }
 
   SW.setTab = function (tab) {
+    if (tab === 'sky') tab = 'graphics';   // the Star map tab became Graphics
     if (ORDER.indexOf(tab) < 0) tab = 'read';
     var prev = SW.state.tab;
     if (prev !== tab && SW.views[prev] && SW.views[prev].hide) SW.views[prev].hide();
@@ -207,6 +208,7 @@
       if (m) SW.state.sel = { p: +m[1], n0: +m[2], n1: +(m[3] || m[2]) };
     }
     if (q.b) SW.state.b = q.b;
+    if (q.tab === 'sky') q.tab = 'graphics';   // the Star map tab became Graphics
     SW.state.tab = ORDER.indexOf(q.tab) >= 0 ? q.tab : 'read';
     SW.$$('#tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === SW.state.tab); });
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + SW.state.tab); });

@@ -718,16 +718,6 @@
     }
   };
 
-  // The Star map tab: the map and the scope for the version open.
-  var skyStop = null;
-  SW.views.sky = {
-    show: function (b) {
-      var el = SW.$('#view-sky');
-      if (skyStop) { skyStop(); skyStop = null; }
-      if (!b.lines || !b.asm) { el.innerHTML = '<div class="pad hint">No source survives for ' + SW.esc(b.v.label) + ', so there is no star table to map.</div>'; return; }
-      skyStop = SW.skyMap(b, el);
-    }
-  };
 
   function sky(b, el) {
     var stars = starsOf(b);
@@ -1499,6 +1489,97 @@
   }
 
   SW.views.analyse = { show: function (b) { build = b; render(); } };
+
+  // ---------- the Graphics tab ----------
+  // The bench's pictures of the program, gathered: the star map (with the
+  // scope), the ships, the memory map. Each is also a lens under Analyse.
+  var GFX = [['sky', 'Star map', 'The Expensive Planetarium as a map of the sky, with its constellations, and how the program draws it on the round screen'],
+             ['ships', 'The ships', 'The Needle and the Wedge drawn from their outline codes, in this version and across the versions ticked'],
+             ['memory', 'Memory map', 'Code, constants, variables and tables across the 4,096 words of core']];
+  var gfx = SW.store.get('gfx.item', 'sky'), gfxStop = null, gfxBuild = null;
+  function renderGfx() {
+    var el = SW.$('#view-graphics'), b = gfxBuild;
+    if (gfxStop) { gfxStop(); gfxStop = null; }
+    el.innerHTML = '';
+    var G = GFX.filter(function (x) { return x[0] === gfx; })[0] || GFX[0];
+    var pad = SW.el('div', { class: 'pad gfx-page', style: 'max-width:none' });
+    var head = SW.el('div', { class: 'toolbar an-head', style: 'position:static;padding:0 0 10px' });
+    head.innerHTML = '<details class="menu lens-menu"><summary class="btn" title="Choose a graphic">' + SW.esc(G[1]) + ' ▾</summary><div class="menu-body lens-list">' +
+      GFX.map(function (g) { return '<button data-g="' + g[0] + '"' + (g[0] === G[0] ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('') +
+      '</div></details><span class="hint an-desc">' + SW.esc(G[2]) + '.</span>';
+    head.addEventListener('click', function (e) { var t = e.target.closest('[data-g]'); if (t) { gfx = t.dataset.g; SW.store.set('gfx.item', gfx); renderGfx(); } });
+    pad.appendChild(head);
+    el.appendChild(pad);
+    if (!b.lines || !b.asm) { pad.appendChild(SW.el('p', { class: 'hint' }, 'No source survives for ' + SW.esc(b.v.label) + ', so there is nothing to draw.')); return; }
+    if (G[0] === 'sky') { var host = SW.el('div'); pad.appendChild(host); gfxStop = SW.skyMap(b, host); return; }
+    var cards = SW.el('div', { class: 'cards' });
+    pad.appendChild(cards);
+    var blocks = FNS[G[0] === 'ships' ? 13 : 10](b, cards);
+    if (blocks) head.appendChild(expMenu(SW.exportButtons(function () {
+      return { title: b.v.label + ': ' + G[1].toLowerCase(), subtitle: G[2], meta: SW.docMeta(b), blocks: blocks() };
+    }, 'spacewar-' + b.v.id + '-' + G[0])));
+    if (G[0] === 'ships') {
+      var vs = selected(), wait = SW.el('p', { class: 'hint', style: 'grid-column:1/-1' }, 'Drawing the ships of ' + vs.length + ' versions…');
+      cards.appendChild(wait);
+      Promise.all(vs.map(function (v) { return SW.build(v.id); })).then(function (bs) { wait.remove(); if (vs.length) XFNS[13](vs, bs, cards); });
+    }
+  }
+  SW.views.graphics = { show: function (b) { gfxBuild = b; renderGfx(); } };
+
+  // ---------- drop-downs in the tab row, as on the main site ----------
+  // Analyse ▾ and Graphics ▾ open a menu under the tab (click; a click outside
+  // or Esc closes it); choosing an item goes to that lens or graphic.
+  var tabMenu = null;
+  function closeTabMenu() { if (!tabMenu) return; tabMenu.el.remove(); tabMenu.btn.setAttribute('aria-expanded', 'false'); tabMenu = null; }
+  function menuHTML(which) {
+    if (which === 'help') {
+      var dm = document.querySelector('meta[name="bench-date"]');
+      return [['about', 'About the bench', 'Author, version, purpose, sources, and how to cite it'],
+              ['settings', 'Settings', 'Your initials and the Hypothesis group, colour theme, code font and size, figure background'],
+              ['code', 'Source code on GitHub ↗', 'The bench and the site: github.com/spacewar1962/spacewar'],
+              ['issue', 'Report a problem ↗', 'Open an issue on GitHub']].map(function (h) {
+        return '<button data-pick="' + h[0] + '"><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
+      }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
+    }
+    if (which === 'graphics') return GFX.map(function (g) { return '<button data-pick="' + g[0] + '"' + (SW.state.tab === 'graphics' && g[0] === gfx ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('');
+    return GROUPS.map(function (gr) {
+      return '<div class="lens-g"><h5>' + SW.esc(gr[0]) + '</h5>' + gr[1].map(function (n) {
+        var l = LENSES[n - 1];
+        return '<button data-pick="' + n + '"' + (SW.state.tab === 'analyse' && n === lens ? ' class="on"' : '') + '><b>' + n + '. ' + SW.esc(l[1]) + '</b><span>' + SW.esc(l[2]) + '</span></button>';
+      }).join('') + '</div>';
+    }).join('');
+  }
+  SW.$$('#tabs [data-menu]').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();   // the menu, not the tab: choosing an item goes there
+      var which = btn.dataset.menu;
+      if (tabMenu && tabMenu.btn === btn) { closeTabMenu(); return; }
+      closeTabMenu();
+      var r = btn.getBoundingClientRect(), el = SW.el('div', { class: 'tab-menu lens-list', role: 'menu', 'data-w': which }, menuHTML(which));
+      document.body.appendChild(el);
+      el.style.top = r.bottom + 'px';
+      el.style.left = Math.max(6, Math.min(r.left, window.innerWidth - el.offsetWidth - 6)) + 'px';
+      btn.setAttribute('aria-expanded', 'true');
+      tabMenu = { el: el, btn: btn };
+      el.addEventListener('click', function (ev) {
+        var t = ev.target.closest('[data-pick]');
+        if (!t) return;
+        closeTabMenu();
+        if (which === 'help') {
+          var p = t.dataset.pick;
+          if (p === 'about') SW.$('#btn-about').click();
+          else if (p === 'settings') SW.$('#btn-settings').click();
+          else window.open(p === 'code' ? 'https://github.com/spacewar1962/spacewar' : 'https://github.com/spacewar1962/spacewar/issues', '_blank', 'noopener');
+          return;
+        }
+        if (which === 'graphics') { gfx = t.dataset.pick; SW.store.set('gfx.item', gfx); SW.forget('graphics'); SW.setTab('graphics'); }
+        else { lens = +t.dataset.pick; SW.store.set('an.lens', lens); SW.forget('analyse'); SW.setTab('analyse'); }
+      });
+    });
+  });
+  document.addEventListener('mousedown', function (e) { if (tabMenu && !tabMenu.el.contains(e.target) && !tabMenu.btn.contains(e.target)) closeTabMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTabMenu(); });
+  window.addEventListener('resize', closeTabMenu);
   // Open a biography from elsewhere (the symbol pop-up in Read).
   SW.biography = function (name) {
     bioName = name; SW.store.set('an.bio', name);
