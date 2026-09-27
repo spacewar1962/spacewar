@@ -314,31 +314,138 @@
   }
 
   // ---------- 10 memory map ----------
+  // Core as a programmer looks at it: each of the 4,096 words by kind, routine,
+  // or how often it is executed, read or written in two emulated seconds of the
+  // program running (which also shows what exists only at run time: the ship
+  // outlines compiled into code, the object table); hover for a word, click to
+  // inspect it, a segment table like a linker map, and go to an address or name.
+  function memRun(b) {
+    if (b._memRun) return b._memRun;
+    var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv });
+    cpu.load(b.asm.memory, b.asm.start);
+    try { cpu.run(400000); } catch (e) { /* what ran is still counted */ }
+    return (b._memRun = { mem: cpu.mem.slice(), exec: cpu.execCount.slice(), read: cpu.readCount.slice(), write: cpu.writeCount.slice(), writer: cpu.lastWriter.slice(), secs: cpu.cycles * 5e-6 });
+  }
+  var MEMCOL = { code: 'var(--beam)', constant: 'var(--amber)', variable: 'var(--violet)', supplied: 'var(--green)', text: 'var(--red)', 'run-time code': '#e8a0ff', 'run-time data': '#8fa3b5', unused: 'var(--line-soft)' };
   function memmap(b, el) {
     if (!b.asm) return null;
-    var kind = new Array(4096).fill('');
+    var run = memRun(b), kind = new Array(4096).fill('unused');
     b.asm.words.forEach(function (w) { kind[w.loc] = w.kind === 'constant' ? 'constant' : w.kind === 'text' ? 'text' : b.parts[w.file].role !== 'program' ? 'supplied' : 'code'; });
-    if (b.asm.variables) for (var a = b.asm.variables.start; a < b.asm.variables.end; a++) if (!kind[a]) kind[a] = 'variable';
-    var col = { code: 'var(--beam)', constant: 'var(--amber)', variable: 'var(--violet)', supplied: 'var(--green)', text: 'var(--red)', '': 'var(--line-soft)' };
-    var W = 64, cell = 9, svg = function () {
-      var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + (W * cell + 60) + '" height="' + (4096 / W * cell + 10) + '" viewBox="0 0 ' + (W * cell + 60) + ' ' + (4096 / W * cell + 10) + '">'];
+    if (b.asm.variables) for (var a = b.asm.variables.start; a < b.asm.variables.end; a++) if (kind[a] === 'unused') kind[a] = 'variable';
+    for (a = 0; a < 4096; a++) if (kind[a] === 'unused' && run.write[a]) kind[a] = run.exec[a] ? 'run-time code' : 'run-time data';
+    var colOf = function (k) { return SW.cssVar ? (MEMCOL[k].indexOf('var(') === 0 ? SW.cssVar(MEMCOL[k].slice(4, -1)) : MEMCOL[k]) : MEMCOL[k]; };
+    // routine of each word: the nearest code label at or below it
+    // labels that name their own address (not those written relative to R, whose values are offsets)
+    function placedLab(ad) {
+      var sy = b.sym[b.labelAt[ad]], d = sy && sy.defs && sy.defs[0], ws = d && b.asm.byLine && b.asm.byLine[d.file] ? b.asm.byLine[d.file][d.line] : null;
+      return !ws || !ws.length || ws.some(function (w) { return w.loc === ad; });
+    }
+    var labs = Object.keys(b.labelAt).map(Number).filter(placedLab).sort(function (x, y) { return x - y; }), routine = new Array(4096);
+    for (a = 0, i2 = -1; a < 4096; a++) { while (i2 + 1 < labs.length && labs[i2 + 1] <= a) i2++; routine[a] = i2 >= 0 && b.asm.memory[a] ? b.labelAt[labs[i2]] : ''; }   // assembled words only: run-time code has no routine of its own
+    var i2;
+    function hue(n) { var h = 0; for (var k = 0; k < n.length; k++) h = (h * 37 + n.charCodeAt(k)) % 360; return h; }
+    var mode = SW.store.get('mem.mode', 'kind'), sel = -1, selRun = null;
+    var c = card('The 4,096 words', 'Each square one 18-bit word, 64 to a row, addresses in octal. Run-time kinds and counts come from two emulated seconds of this version running (' + run.secs.toFixed(1) + ' s).');
+    var tb = SW.el('div', { class: 'toolbar mem-tb', style: 'position:static;padding:0 0 6px' });
+    tb.innerHTML = '<label class="check">Colour by <select data-m="mode"><option value="kind">kind</option><option value="routine">routine</option><option value="exec">executed</option><option value="read">read</option><option value="write">written</option></select></label>' +
+      '<label class="check">Go to <input data-m="go" placeholder="octal address or name" style="width:12em"></label><span class="mem-legend"></span>';
+    c.appendChild(tb);
+    var row = SW.el('div', { class: 'mem-row' });
+    var left = SW.el('div', { class: 'mem-left' }), right = SW.el('div', { class: 'mem-right' });
+    var CELL = 10, LX = 44, W = LX + 64 * CELL, H = 64 * CELL, dpr = Math.min(2, root.devicePixelRatio || 1);
+    var cv = SW.el('canvas', { class: 'mem-cv' }); cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px';
+    var g = cv.getContext('2d'); g.scale(dpr, dpr);
+    var cap = SW.el('p', { class: 'mem-cap mono hint' }, 'Hover over a word; click to inspect it.');
+    left.appendChild(cv); left.appendChild(cap);
+    var insp = SW.el('div', { class: 'mem-insp' }), segs = SW.el('div', { class: 'mem-segs' });
+    right.appendChild(insp); right.appendChild(segs);
+    row.appendChild(left); row.appendChild(right);
+    c.appendChild(row);
+    function cellColour(a) {
+      if (mode === 'kind') return colOf(kind[a]);
+      if (mode === 'routine') return kind[a] === 'unused' ? colOf('unused') : routine[a] ? 'hsl(' + hue(routine[a]) + ',55%,' + (kind[a] === 'code' ? 58 : 40) + '%)' : colOf('unused');
+      var arr = run[mode], v = arr[a];
+      if (!v) return kind[a] === 'unused' ? colOf('unused') : 'rgba(128,140,150,0.28)';
+      var t = Math.min(1, Math.log10(1 + v) / 5);
+      return 'hsl(' + (mode === 'write' ? 0 : mode === 'read' ? 200 : 40) + ',90%,' + (30 + t * 40).toFixed(0) + '%)';
+    }
+    function draw() {
+      g.clearRect(0, 0, W, H);
+      g.font = '9px ' + (SW.cssVar('--mono') || 'monospace'); g.textAlign = 'right';
+      for (var a = 0; a < 4096; a++) {
+        var x = LX + (a & 63) * CELL, y = (a >> 6) * CELL;
+        g.fillStyle = cellColour(a);
+        g.globalAlpha = selRun && (a < selRun.a0 || a > selRun.a1) ? 0.3 : 1;
+        g.fillRect(x, y, CELL - 1, CELL - 1);
+        if ((a & 63) === 0 && ((a >> 6) & 3) === 0) { g.globalAlpha = 1; g.fillStyle = SW.cssVar('--text-dim') || '#888'; g.fillText(SW.oct(a, 4), LX - 5, y + 8); }
+      }
+      g.globalAlpha = 1;
+      if (sel >= 0) { g.strokeStyle = SW.cssVar('--text') || '#fff'; g.lineWidth = 2; g.strokeRect(LX + (sel & 63) * CELL - 1, (sel >> 6) * CELL - 1, CELL + 1, CELL + 1); }
+      var leg = SW.$('.mem-legend', tb);
+      if (mode === 'kind') leg.innerHTML = Object.keys(MEMCOL).map(function (k) { var n = kind.filter(function (x) { return x === k; }).length; return n ? '<span><i style="background:' + colOf(k) + '"></i>' + k + ' ' + n + '</span>' : ''; }).join('');
+      else if (mode === 'routine') leg.innerHTML = '<span class="hint">each routine (from its label) in its own colour; code bright, its data darker</span>';
+      else { var tot = 0, used = 0; run[mode].forEach(function (v) { tot += v; if (v) used++; }); leg.innerHTML = '<span class="hint">' + used + ' words ' + ({ exec: 'executed', read: 'read', write: 'written' })[mode] + ', ' + tot.toLocaleString('en-GB') + ' times in ' + run.secs.toFixed(1) + ' s; brighter is more</span>'; }
+    }
+    function addrAt(e) { var r = cv.getBoundingClientRect(), x = (e.clientX - r.left) * W / r.width - LX, y = (e.clientY - r.top) * W / r.width; if (x < 0 || y < 0 || x >= 64 * CELL || y >= H) return -1; return (Math.floor(y / CELL) << 6) | Math.floor(x / CELL); }
+    function srcLine(a) { var sq = b.srcOf(a); return sq ? { sq: sq, L: b.lines[sq.p][sq.n - 1] } : null; }
+    cv.addEventListener('mousemove', function (e) {
+      var a = addrAt(e); if (a < 0) { cap.textContent = 'Hover over a word; click to inspect it.'; return; }
+      var w = b.asm.memory[a], val = w ? w.val : run.mem[a], sl = srcLine(a);
+      cap.textContent = SW.oct(a, 4) + '  ' + kind[a] + (b.symAt(a) ? '  ' + b.symAt(a) : '') + (val || kind[a] !== 'unused' ? '  ' + SW.oct(val) + '  ' + root.PDP1CPU.disasm(val, b.symAt) : '') + (sl ? '   · line ' + sl.sq.n + ': ' + sl.L.raw.trim().slice(0, 60) : '');
+    });
+    cv.addEventListener('click', function (e) { var a = addrAt(e); if (a >= 0) inspect(a); });
+    function inspect(a) {
+      sel = a; selRun = null; draw();
+      var w = b.asm.memory[a], asmv = w ? w.val : null, now = run.mem[a], sl = srcLine(a), name = b.labelAt[a], sym = name && b.sym[name];
+      var h = '<h4>' + SW.oct(a, 4) + (b.symAt(a) ? ' <span class="mono">' + SW.esc(b.symAt(a)) + '</span>' : '') + ' <span class="badge" style="background:' + colOf(kind[a]) + ';color:#000">' + kind[a] + '</span></h4><table class="mem-kv">' +
+        (asmv != null ? '<tr><td>assembled</td><td class="mono">' + SW.oct(asmv) + '  ' + SW.esc(root.PDP1CPU.disasm(asmv, b.symAt)) + '</td></tr>' : '') +
+        (asmv == null || now !== asmv ? '<tr><td>after ' + run.secs.toFixed(1) + ' s</td><td class="mono">' + SW.oct(now) + '  ' + SW.esc(root.PDP1CPU.disasm(now, b.symAt)) + '</td></tr>' : '') +
+        '<tr><td>routine</td><td class="mono">' + SW.esc(routine[a] || '·') + '</td></tr>' +
+        '<tr><td>in ' + run.secs.toFixed(1) + ' s</td><td>executed ' + run.exec[a].toLocaleString('en-GB') + ' · read ' + run.read[a].toLocaleString('en-GB') + ' · written ' + run.write[a].toLocaleString('en-GB') + (run.writer[a] >= 0 ? ', last by ' + SW.oct(run.writer[a], 4) + (b.symAt(run.writer[a]) ? ' (' + SW.esc(b.symAt(run.writer[a])) + ')' : '') : '') + '</td></tr>' +
+        (sl ? '<tr><td>source</td><td><a href="#" data-go="' + a + '">' + SW.esc(b.parts[sl.sq.p].src.split('/').pop()) + ', line ' + sl.sq.n + '</a><div class="mono mem-src">' + SW.esc(sl.L.raw.trim()) + '</div></td></tr>' : '') + '</table>';
+      if (sym && sym.refs && sym.refs.length) h += '<div class="hint">Used on ' + sym.refs.length + ' line' + (sym.refs.length > 1 ? 's' : '') + ':</div><div class="mem-refs">' + sym.refs.slice(0, 24).map(function (r) { var L = b.lines[r.file] && b.lines[r.file][r.line - 1]; return '<a href="#" data-ref="' + r.file + ':' + r.line + '" class="mono">' + r.line + '  ' + SW.esc(L ? L.raw.trim().slice(0, 40) : '') + '</a>'; }).join('') + (sym.refs.length > 24 ? '<span class="hint">and ' + (sym.refs.length - 24) + ' more</span>' : '') + '</div>';
+      insp.innerHTML = h;
+    }
+    insp.addEventListener('click', function (e) {
+      var go = e.target.closest('[data-go]'), rf = e.target.closest('[data-ref]');
+      if (go) { e.preventDefault(); var sq = b.srcOf(+go.dataset.go); if (sq) goto(b.lines[sq.p][sq.n - 1]); }
+      if (rf) { e.preventDefault(); var pr = rf.dataset.ref.split(':'); var L = b.lines[+pr[0]][+pr[1] - 1]; if (L) goto(L); }
+    });
+    // the segment table: contiguous stretches of one kind, with their labels
+    var runs = [], r0 = 0;
+    for (a = 1; a <= 4096; a++) if (a === 4096 || kind[a] !== kind[r0]) { runs.push({ a0: r0, a1: a - 1, kind: kind[r0] }); r0 = a; }
+    var srows = runs.map(function (r) {
+      var ls = labs.filter(function (x) { return x >= r.a0 && x <= r.a1; }).map(function (x) { return b.labelAt[x]; });
+      return [{ html: '<span class="mono">' + SW.oct(r.a0, 4) + '–' + SW.oct(r.a1, 4) + '</span>', text: SW.oct(r.a0, 4) + '–' + SW.oct(r.a1, 4), sort: r.a0 }, r.a1 - r.a0 + 1,
+              { html: '<i class="mem-dot" style="background:' + colOf(r.kind) + '"></i>' + r.kind, text: r.kind }, { html: '<span class="mono">' + SW.esc(ls.slice(0, 6).join(' ')) + (ls.length > 6 ? ' +' + (ls.length - 6) : '') + '</span>', text: ls.join(' ') }];
+    });
+    segs.appendChild(SW.el('h4', {}, 'Segments'));
+    var st = SW.table(['Addresses', 'Words', 'Kind', 'Labels'], srows, { cls: ['mono', 'num', '', 'mono'], onRow: function (rw) { var a0 = rw[0].sort, rr = runs.filter(function (x) { return x.a0 === a0; })[0]; selRun = selRun === rr ? null : rr; sel = -1; draw(); } });
+    var sc = SW.el('div', { class: 'scroll', style: 'max-height:300px;overflow:auto' }); sc.appendChild(st); segs.appendChild(sc);
+    SW.$('[data-m="mode"]', tb).value = mode;
+    SW.$('[data-m="mode"]', tb).onchange = function (e) { mode = e.target.value; SW.store.set('mem.mode', mode); draw(); };
+    SW.$('[data-m="go"]', tb).addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      var q = e.target.value.trim(), a2 = /^[0-7]{1,4}$/.test(q) ? parseInt(q, 8) : b.sym[q] && b.sym[q].defined !== false ? b.sym[q].val & 0o7777 : -1;
+      if (a2 >= 0) inspect(a2); else SW.toast('No address or name “' + q + '” in this build.');
+    });
+    draw();
+    insp.innerHTML = '<p class="hint">Click a word to inspect it: its value as assembled and as the program left it, its source line, the lines that use it, and how often it was executed, read and written.</p>';
+    // the figure: the map by kind, as SVG
+    var svg = function () {
+      var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + (64 * 9 + 60) + '" height="' + (64 * 9 + 10) + '" viewBox="0 0 ' + (64 * 9 + 60) + ' ' + (64 * 9 + 10) + '">'];
       for (var i = 0; i < 4096; i++) {
-        var x = 52 + (i % W) * cell, y = Math.floor(i / W) * cell;
-        o.push('<rect x="' + x + '" y="' + y + '" width="' + (cell - 1) + '" height="' + (cell - 1) + '" fill="' + col[kind[i]] + '"><title>' + i.toString(8).padStart(4, '0') + ' ' + (kind[i] || 'unused') + (b.labelAt[i] ? ' ' + b.labelAt[i] : '') + '</title></rect>');
-        if (i % W === 0) o.push('<text x="0" y="' + (y + cell - 1) + '" font-size="8" fill="var(--text-dim)">' + i.toString(8).padStart(4, '0') + '</text>');
+        var x = 52 + (i % 64) * 9, y = Math.floor(i / 64) * 9;
+        o.push('<rect x="' + x + '" y="' + y + '" width="8" height="8" fill="' + MEMCOL[kind[i]] + '"><title>' + SW.oct(i, 4) + ' ' + kind[i] + (b.labelAt[i] ? ' ' + b.labelAt[i] : '') + '</title></rect>');
+        if (i % 64 === 0) o.push('<text x="0" y="' + (y + 8) + '" font-size="8" fill="var(--text-dim)">' + SW.oct(i, 4) + '</text>');
       }
       return o.concat(['</svg>']).join('');
     };
-    var counts = {}; kind.forEach(function (k) { counts[k || 'unused'] = (counts[k || 'unused'] || 0) + 1; });
-    var c = card('The 4096 words', 'Each square one 18-bit word, 64 to a row (octal addresses at left). ' + Object.keys(counts).map(function (k) { return k + ' ' + counts[k]; }).join(' · '));
-    c.insertAdjacentHTML('beforeend', '<div class="legend">' + Object.keys(col).filter(Boolean).map(function (k) { return '<span><i style="background:' + col[k] + '"></i>' + k + '</span>'; }).join('') + '<span><i style="background:var(--line-soft)"></i>unused</span></div>');
-    var box = SW.el('div', { class: 'svgbox', style: 'margin-top:6px' }, SW.displaySVG(svg()));
-    box.addEventListener('click', function (e) { var t = e.target.closest('rect'); if (!t) return; var addr = parseInt(t.textContent, 8), s = b.srcOf(addr); if (s) goto(b.lines[s.p][s.n - 1]); });
-    c.appendChild(box);
     c.appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-memory'));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
-    return function () { return [SW.tableBlock('Memory use', ['Kind', 'Words'], Object.keys(counts).map(function (k) { return [k, counts[k]]; }))]; };
+    var counts = {}; kind.forEach(function (k) { counts[k] = (counts[k] || 0) + 1; });
+    return function () { return [SW.tableBlock('Memory use', ['Kind', 'Words'], Object.keys(counts).map(function (k) { return [k, counts[k]]; })), SW.tableBlock('Segments', ['Addresses', 'Words', 'Kind', 'Labels'], srows)]; };
   }
 
   // ---------- 11 macros ----------
@@ -800,7 +907,7 @@
     if (!os.length) { el.appendChild(card('No outline tables', 'This build has no ot1/ot2 outline tables.')); return null; }
     os.forEach(function (o) {
       var label = o.name === 'ot1' ? 'ot1, the Needle' : 'ot2, the Wedge';
-      var c = card(label, 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. Pale points are the first side, blue the mirrored pass; the amber point is the start (the nose). ' + o.pts.length + ' points, each plotted every frame.');
+      var c = card(label, 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. The table describes one side of the ship (pale points). At code 7 the compiled code complements its sideways terms and runs again, drawing the other side as a mirror image (blue points). The amber point is the start, the nose. ' + o.pts.length + ' points, each plotted every frame.');
       var svg = outlineSVG(o, 9);
       c.appendChild(SW.el('div', { class: 'svgbox', style: 'text-align:center' }, svg));
       c.appendChild(SW.figureButtons(function (pal) { return outlineSVG(o, 12, b.v.label + ' ' + label, pal); }, 'spacewar-' + b.v.id + '-' + o.name));

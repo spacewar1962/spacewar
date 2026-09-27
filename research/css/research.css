@@ -560,17 +560,17 @@ body.drawer-open .notes-tab { display: none; }
 .drawer-dock:hover { border-color: var(--beam); }
 
 /* Kinds of line, in the syntax colours. */
-.ln.kdef { background: color-mix(in srgb, var(--violet) 9%, transparent); }
-.ln.keq { background: color-mix(in srgb, var(--green) 8%, transparent); }
+/* definitions marked by a thin rule at the left of the line number, not a ground (a ground was distracting) */
+.ln.kdef .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--violet) 70%, transparent); }
+.ln.keq .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--green) 70%, transparent); }
 /* Macro calls: a dotted cyan rule, unlike the solid violet of definitions and normalised lines. */
 .ln.kcall .t { background-image: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px); background-size: 2px 100%; background-repeat: no-repeat; padding-left: 5px; }
-.ln.kdef:hover, .ln.keq:hover { background: var(--surface); }
 .keylist div { margin: 3px 0; display: flex; align-items: center; gap: 8px; }
 .keylist .lab { color: var(--beam); } .keylist .mac { color: var(--violet); font-weight: 600; } .keylist .ps { color: var(--green); }
 .keylist .num { color: var(--amber); } .keylist .cm { color: var(--text-dim); font-style: italic; }
 .kx { display: inline-block; width: 22px; height: 14px; border-radius: 2px; flex: none; }
-.kx.kdef { background: color-mix(in srgb, var(--violet) 30%, transparent); }
-.kx.keq { background: color-mix(in srgb, var(--green) 30%, transparent); }
+.kx.kdef { background: linear-gradient(to right, var(--violet) 0, var(--violet) 2px, transparent 2px); border: 1px solid var(--line); }
+.kx.keq { background: linear-gradient(to right, var(--green) 0, var(--green) 2px, transparent 2px); border: 1px solid var(--line); }
 .kx.kcall { background: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px) left / 3px 100% no-repeat; border: 1px solid var(--line); }
 .kx.knorm { background: linear-gradient(to left, var(--violet) 0, var(--violet) 3px, transparent 3px); border: 1px solid var(--line); }
 .kx.knoted { background: linear-gradient(to right, var(--amber) 0, var(--amber) 2px, transparent 2px); border: 1px solid var(--line); }
@@ -885,3 +885,20 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .fd-switch .mine-n:empty { display: none; }
 .fd-switch .mine-n { display: inline-block; min-width: 16px; padding: 0 4px; border-radius: 8px; background: var(--amber); color: #000; font-size: 11px; line-height: 16px; text-align: center; }
 .tray-para { font-size: 13px; line-height: 1.45; color: var(--text-dim); margin: 4px 0; }
+
+/* Memory map */
+.mem-row { display: grid; grid-template-columns: auto minmax(280px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .mem-row { grid-template-columns: 1fr; } }
+.mem-cv { display: block; max-width: 100%; cursor: crosshair; image-rendering: pixelated; }
+.mem-cap { min-height: 2.6em; margin: 6px 0; font-size: 11.5px; }
+.mem-legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; }
+.mem-legend i, .mem-dot { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.mem-insp h4 { margin: 0 0 6px; }
+.mem-kv td { padding: 3px 8px 3px 0; vertical-align: top; font-size: 12.5px; }
+.mem-kv td:first-child { color: var(--text-dim); white-space: nowrap; }
+.mem-src { font-size: 12px; margin-top: 2px; }
+.mem-refs { display: grid; gap: 1px; margin: 4px 0 10px; max-height: 180px; overflow: auto; }
+.mem-refs a { font-size: 11.5px; text-decoration: none; }
+.mem-segs h4 { margin: 12px 0 4px; }
+.ln.kdef.norm .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--violet) 70%, transparent), inset -3px 0 0 var(--violet); }
+.ln.keq.norm .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--green) 70%, transparent), inset -3px 0 0 var(--violet); }
