@@ -263,6 +263,10 @@
       case 0o37:
         if (y & 0o200) this.ac = 0;
         if (y & 0o4000) this.io = 0;
+        // 0040 and 0020: lai (IO to AC), lia (AC to IO), both together swp
+        // (exchange). Operate instructions of the PDP-1D, in DEC's PDP-1
+        // Supplement (PDP-1D-45), 1964; Spacewar! 4.4 uses swp (opr 60).
+        if (y & 0o60) { var ta = this.ac, ti = this.io; if (y & 0o40) this.ac = ti; if (y & 0o20) this.io = ta; }
         if (y & 0o2000) this.ac |= this.tw;
         if (y & 0o1000) this.ac ^= M;
         if (y & 0o100) this.ac |= (this.ov << 17) | this.pc;
@@ -377,6 +381,7 @@
         if (y & 0o2000) o.push('lat');
         if (y & 0o400) o.push('hlt');
         if (y & 0o100) o.push('lap');
+        if ((y & 0o60) === 0o60) o.push('swp'); else if (y & 0o40) o.push('lai'); else if (y & 0o20) o.push('lia');
         if (y & 7) o.push((y & 0o10 ? 'stf ' : 'clf ') + (y & 7));
         return o.length ? o.join(' ') : 'nop';
       }

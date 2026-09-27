@@ -157,7 +157,7 @@
       summary: 'Lost. Three versions between the 4.4 experiment and the stable 4.8; a comment in 4.8 shows one carried dual thrust/velocity controls. No source survives.' },
     { id: '4.8', label: 'Spacewar! 4.8', date: '24 Jul 1963', sort: 19630724,
       authors: '"dfw"; scorer reworked by Samson', fork: 'dfw', status: 'recovered', medium: 'Source listing',
-      buildNotes: ["Assembled from pt 1, pt 2 and the scorer, with the June 1963 macro tape and the star table supplied; '.' overbar marks read as '~' as for 4.1.", "Five errors remain, all in the scorer transcription: '( jmpscc 1' (line 12), and 'isc', 'is', 'lai', '2sc' undefined (lines 24, 38, 68, 79). These look like readings of overlined or damaged characters in the scan and should be checked against spacewar-4.8-scorer-24jul1963.pdf."],
+      buildNotes: ["Assembled from pt 1, pt 2 and the scorer, with the June 1963 macro tape and the star table supplied; '.' overbar marks read as '~' as for 4.1.", "Five errors remain, all in the scorer transcription: '( jmpscc 1' (line 12), and 'isc', 'is', 'lai', '2sc' undefined (lines 24, 38, 68, 79). 'lai' is the PDP-1D instruction 760040 (AC from I/O), which the June 1963 macro tape does not define; the others look like readings of overlined or damaged characters and should be checked against spacewar-4.8-scorer-24jul1963.pdf."],
       summary: 'The last classic MIT version, with the score display reworked by Samson. The identity of "dfw" has never been established.',
       build: [MACROS, { src: 'spacewar-4.8-pt1-24jul1963.txt', titleMatch: true },
               { src: 'spacewar-4.8-pt2-24jul1963.txt', titleMatch: true },

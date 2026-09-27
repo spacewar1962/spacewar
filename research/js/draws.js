@@ -46,13 +46,19 @@
   // ---------- the player ----------
   // seq: [{x, y, s, col, frame, cap}] in plotting order. Drawn magnified, one
   // point at a time. Loop starts again at the end. Phosphor fade dims each
-  // point after it is plotted (time constant 1.2 s of replay, shortened so
+  // point after it is plotted (time constant 2 s of replay, shortened so
   // it can be seen; the real glow lasted about 2.4 of the program's redraws).
   // Without fade, earlier frames dim when a new frame begins.
   // a coordinate as the display took it: 10 bits, ones' complement (−5 is 1772)
   function oc10(v) { return (v >= 0 ? v : (-v) ^ 0o1777).toString(8).padStart(4, '0'); }
-  var FADE_SECONDS = 1.2;
+  var FADE_SECONDS = 2;
   D.TYPE30 = 'Type 30 Precision CRT Display: a 16-inch cathode ray tube, random point plotting on a raster 9.25 by 9.25 inches; 1,024 by 1,024 addressable locations, origin fixed at the centre, ones’ complement coordinates; 20,000 points a second; 512 points discernible along each axis. One instruction, dpy (address 0007): X from bits 0–9 of the AC, Y from bits 0–9 of the In-Out register. (DEC, PDP-1 Handbook, 1963, pp. 33–34.)';   // shortened so it can be seen: on the scope the glow lasted about 2.4 redraws
+  // the player's settings, kept across versions, pages and visits
+  D.prefs = function (set) {
+    var d = { speed: 16, loop: false, fade: false, grid: false };
+    try { if (set) localStorage.setItem('swbench.player', JSON.stringify(set)); Object.assign(d, JSON.parse(localStorage.getItem('swbench.player') || '{}')); } catch (e) {}
+    return d;
+  };
   function player(host, seq, o) {
     o = o || {};
     var wrap = SW.el('div', { class: 'dr-player' });
@@ -62,10 +68,10 @@
       '<label class="check">Speed <select data-a="speed"><option value="1">1 point a second</option><option value="4">4 a second</option><option value="16" selected>16 a second</option><option value="64">64 a second</option></select></label>' +
       '<label class="check" title="Start again at the end"><input type="checkbox" data-a="loop"> Loop</label>' +
       '<label class="check" title="The display’s addressable positions as faint dots (1,024 by 1,024; the screen holds no bitmap: each point is lit at an address by a display instruction), and each point’s coordinates in octal"><input type="checkbox" data-a="grid"> Grid</label>' +
-      '<label class="check" title="Each point fades after it is plotted, as the phosphor did. Shortened so it can be seen here (a time constant of 1.2 s of replay); on the scope the glow lasted about two and a half redraws, which with Loop kept the image steady"><input type="checkbox" data-a="fade"> Phosphor fade</label>';
+      '<label class="check" title="Each point fades after it is plotted, as the phosphor did. Shortened so it can be seen here (a time constant of 2 s of replay); on the scope the glow lasted about two and a half redraws, which with Loop kept the image steady"><input type="checkbox" data-a="fade"> Phosphor fade</label>';
     var cap = SW.el('p', { class: 'dr-cap mono hint' });
     wrap.appendChild(cv); wrap.appendChild(ctl); wrap.appendChild(cap);
-    wrap.appendChild(SW.el('p', { class: 'dr-t30' }, SW.esc(D.TYPE30)));
+    if (!o.noT30) wrap.appendChild(SW.el('p', { class: 'dr-t30' }, SW.esc(D.TYPE30)));
     host.appendChild(wrap);
     // one scale for x and y, the points' extent with a margin
     var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, frames = {};
@@ -73,7 +79,9 @@
     var perFrame = seq.length / Math.max(1, Object.keys(frames).length);
     var span = Math.max(8, x1 - x0, y1 - y0) * 1.18, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, k = N / span;
     function px(p) { return [N / 2 + (p.x - cx) * k, N / 2 - (p.y - cy) * k]; }
-    var i = 0, events = [], clock = 0, playing = false, speed = 16, loop = false, fade = false, grid = false, acc = 0, last = null, dirty = true;
+    var pref = D.prefs(), i = 0, events = [], clock = 0, playing = false, speed = pref.speed, loop = pref.loop, fade = pref.fade, grid = pref.grid, acc = 0, last = null, dirty = true;
+    SW.$('[data-a="speed"]', ctl).value = String(speed);
+    ['loop', 'fade', 'grid'].forEach(function (a) { SW.$('[data-a="' + a + '"]', ctl).checked = pref[a]; });
     function tau() { return FADE_SECONDS; }
     function dot(p, alpha, ring) {
       var q = px(p), r = Math.max(2.5, Math.min(7, k * 0.45));
@@ -96,8 +104,8 @@
       g.fillStyle = '#02050a'; g.fillRect(0, 0, N, N);
       if (grid) {   // the addressable positions in view (thinned when they would crowd)
         var st = Math.max(1, Math.ceil(5 / k)), gx0 = Math.ceil((cx - N / 2 / k) / st) * st, gy0 = Math.ceil((cy - N / 2 / k) / st) * st;
-        g.fillStyle = 'rgba(143,163,181,0.35)';
-        for (var gx = gx0; gx <= cx + N / 2 / k; gx += st) for (var gy = gy0; gy <= cy + N / 2 / k; gy += st) { var gq = px({ x: gx, y: gy }); g.fillRect(gq[0] - 0.6, gq[1] - 0.6, 1.2, 1.2); }
+        g.fillStyle = 'rgba(160,180,200,0.7)';
+        for (var gx = gx0; gx <= cx + N / 2 / k; gx += st) for (var gy = gy0; gy <= cy + N / 2 / k; gy += st) { var gq = px({ x: gx, y: gy }); g.fillRect(gq[0] - 1, gq[1] - 1, 2, 2); }
       }
       var lastE = events[events.length - 1], f = lastE ? seq[lastE.j].frame : null, T = tau();
       if (fade) events = events.filter(function (e) { return Math.exp(-(clock - e.t) / T) > 0.01; });
@@ -148,6 +156,7 @@
       if (a === 'loop') loop = e.target.checked;
       if (a === 'fade') { fade = e.target.checked; dirty = true; }
       if (a === 'grid') { grid = e.target.checked; dirty = true; }
+      D.prefs({ speed: speed, loop: loop, fade: fade, grid: grid });
     });
     render();
     requestAnimationFrame(tick);
@@ -159,37 +168,45 @@
   }
   function note(t) { return SW.el('p', { class: 'hint' }, t); }
 
-  // Beside a card's content: every version, with what compute(build) says of
-  // it, filled in as each runs on the emulator (kept for the session); click a
-  // version to switch the page to it.
-  function across(c, b, key, compute, here) {
+  // Each version's recording, made once and kept for the session.
+  function memo(key, b, fn) { var m = (D._res = D._res || {})[key] = (D._res[key] || {}); return m[b.v.id] || (m[b.v.id] = fn(b)); }
+  // Beside a card's content: every version, grouped by what it does (its short
+  // summary), filled in as each runs on the emulator; a version's button
+  // switches the page to it.
+  function across(c, b, key, analyse) {
     var side = SW.el('div', { class: 'dr-side' });
-    side.innerHTML = '<h4>Across the versions</h4><p class="hint">Each version run on the emulator the same way. Click one to switch to it.</p>';
-    var tb = SW.el('table', { class: 'data dr-vt' });
-    side.appendChild(tb);
+    side.innerHTML = '<h4>Across the versions</h4><p class="hint">Click a version to switch to it.</p>';
+    var box = SW.el('div', { class: 'dr-groups' });
+    side.appendChild(box);
     var vs = root.SWVersions.VERSIONS.filter(function (v) { return v.build && v.id !== 'stars'; }).sort(function (x, y) { return x.sort - y.sort; });
-    var cache = (D._cache = D._cache || {})[key] = (D._cache[key] || {});
-    if (here != null) cache[b.v.id] = here;
+    var shortOf = {}, res = (D._res = D._res || {})[key] || {};
+    vs.forEach(function (v) { if (res[v.id]) shortOf[v.id] = res[v.id].short; });
+    function name(v) { return v.label.replace(/^Spacewar! /, '').replace(/ \((ddp, )?Morris listing\)/, ' (Morris)').replace(/ \(source tapes?\)/, ' tape').replace(/\(dfw, source tape\)/, 'tape'); }
     function paint() {
-      tb.innerHTML = '<tbody>' + vs.map(function (v) {
-        return '<tr data-v="' + v.id + '"' + (v.id === b.v.id ? ' class="on"' : '') + '><td class="mono">' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</td><td>' + (cache[v.id] != null ? SW.esc(cache[v.id]) : '<span class="hint">…</span>') + '</td></tr>';
-      }).join('') + '</tbody>';
+      var groups = [], at = {};
+      vs.forEach(function (v) { var k = shortOf[v.id]; if (k == null) return; if (!(k in at)) { at[k] = groups.length; groups.push({ k: k, vs: [] }); } groups[at[k]].vs.push(v); });
+      var waiting = vs.filter(function (v) { return shortOf[v.id] == null; }).length;
+      box.innerHTML = groups.map(function (gp) {
+        return '<div class="dr-g' + (gp.vs.some(function (v) { return v.id === b.v.id; }) ? ' on' : '') + '"><div class="dr-gk">' + SW.esc(gp.k) + '</div><div class="dr-gv">' +
+          gp.vs.map(function (v) { return '<button data-v="' + v.id + '"' + (v.id === b.v.id ? ' class="on"' : '') + ' title="' + SW.esc(v.label) + '">' + SW.esc(name(v)) + '</button>'; }).join('') + '</div></div>';
+      }).join('') + (waiting ? '<p class="hint">' + waiting + ' still to run…</p>' : '');
     }
-    tb.addEventListener('click', function (e) { var r = e.target.closest('tr[data-v]'); if (r && r.dataset.v !== b.v.id) SW.select(r.dataset.v); });
+    box.addEventListener('click', function (e) { var t = e.target.closest('button[data-v]'); if (t && t.dataset.v !== b.v.id) SW.select(t.dataset.v); });
     paint();
     var row = SW.el('div', { class: 'dr-hrow' }), main = SW.el('div', { class: 'dr-hmain' });
     while (c.children.length > 1) main.appendChild(c.children[1]);   // everything after the heading
     row.appendChild(main); row.appendChild(side);
     c.appendChild(row);
-    var todo = vs.filter(function (v) { return cache[v.id] == null; }), k = 0;
-    (function next() {
+    var todo = vs.filter(function (v) { return shortOf[v.id] == null; }), k = 0;
+    function next() {
       if (!side.isConnected || k >= todo.length) return;
       var v = todo[k++];
       SW.build(v.id).then(function (bv) {
-        try { cache[v.id] = bv.asm && bv.sym.bck ? compute(bv) : 'No source to run.'; } catch (e) { cache[v.id] = 'The emulator stopped: ' + e.message; }
+        try { shortOf[v.id] = bv.asm && bv.sym.bck ? memo(key, bv, analyse).short : 'no source to run'; } catch (e) { shortOf[v.id] = 'emulator stopped'; }
         paint(); setTimeout(next, 20);
-      }, function () { cache[v.id] = 'Could not be built.'; paint(); setTimeout(next, 20); });
-    })();
+      }, function () { shortOf[v.id] = 'could not be built'; paint(); setTimeout(next, 20); });
+    }
+    setTimeout(next, 50);   // once the card is in the page
   }
 
   // ---------- the ships ----------
@@ -201,7 +218,7 @@
     cpu.run(SETTLE); record(b, cpu, 60000, pts);
     var byF = {}; pts.forEach(function (p) { if (p.rt) (byF[p.f] = byF[p.f] || []).push(p); });
     var best = null; Object.keys(byF).forEach(function (f) { if (!best || byF[f].length > best.length) best = byF[f]; });
-    if (!best) return { ships: [], say: 'No points were plotted from compiled outline code in the first seconds.' };
+    if (!best) return { ships: [], short: 'none recorded', say: 'No points were plotted from compiled outline code in the first seconds.' };
     // the display wraps at ±512: distances and positions are taken modulo 1,024
     function wd(a) { return ((a % 1024) + 1536) % 1024 - 512; }
     var ships = [[]];
@@ -213,15 +230,15 @@
       var k = sp.length; for (var j = 1; j < sp.length; j++) if (sp[j].pc < sp[j - 1].pc - 1) { k = j; break; }
       return sp.length + ' points (' + k + ' on the first side, ' + (sp.length - k) + ' in the mirror pass)';
     });
-    return { ships: ships, labs: labs, say: (ships.length === 2 ? 'The two ships: ' : ships.length + ' ship' + (ships.length === 1 ? '' : 's') + ': ') + parts.join('; ') + ' in a frame' + (via ? ', the compiled outlines entered from ' + via : '') + '.' };
+    return { ships: ships, labs: labs, short: ships.map(function (sp) { return sp.length; }).join(' + ') + ' points' + (via ? ' · from ' + via : ''), say: (ships.length === 2 ? 'The two ships: ' : ships.length + ' ship' + (ships.length === 1 ? '' : 's') + ': ') + parts.join('; ') + ' in a frame' + (via ? ', the compiled outlines entered from ' + via : '') + '.' };
   }
   D.ships = function (b, host) {
     var c = SW.el('div', { class: 'card', style: 'grid-column:1/-1' });
     c.innerHTML = '<h3>How the PDP-1 draws them</h3>';
     host.appendChild(c);
     var S;
-    try { S = shipsOf(b); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
-    c.insertAdjacentHTML('beforeend', '<p class="dr-say"><b>' + SW.esc(b.v.label) + ':</b> ' + SW.esc(S.say) + '</p>');
+    try { S = memo('ships', b, shipsOf); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
+    if (!S.ships.length) c.appendChild(note(S.say));
     if (S.ships.length) {
       c.insertAdjacentHTML('beforeend', '<p class="lede">Recorded from this version running on the emulator: every point the display instruction plotted for the ships in one frame, in the order plotted, magnified. The outlines are not drawn from the table directly: at the start of the game the outline compiler turns each table into instructions, and each frame those instructions plot the ship at its position and angle.</p>');
       var row = SW.el('div', { class: 'dr-row' });
@@ -235,29 +252,29 @@
           return { x: p.x, y: p.y, s: p.s, col: j === 0 ? '#ffce7a' : pass === 1 ? '#dfeeff' : '#5aa0ff',
                    cap: (pass === 1 ? 'first side' : 'mirror pass') + ' · PC ' + SW.oct(p.pc, 4) + ' ' + C.disasm(p.md, b.symAt) + (who ? ' · compiled by ' + who : '') + ' · (' + p.x + ', ' + p.y + ')' };
         });
-        player(col, seq, { intro: 'Pale: the first side; blue: the mirror pass; amber: the first point.' });
+        player(col, seq, { intro: 'Pale: the first side; blue: the mirror pass; amber: the first point.', noT30: n < S.ships.length - 1 });
         row.appendChild(col);
       });
     }
-    across(c, b, 'ships', function (bv) { return shipsOf(bv).say; }, S.say);
+    across(c, b, 'ships', shipsOf);
   };
 
   // ---------- the sun ----------
   // The points plotted from blp up to bck (the central star), ten frames.
   function sunOf(b) {
     var blp = b.sym.blp, bck = b.sym.bck;
-    if (!blp || !bck) return { say: 'No star routine by the name blp.', frames: [], pts: [] };
+    if (!blp || !bck) return { short: 'no star routine (blp)', say: 'No star routine by the name blp.', frames: [], pts: [] };
     var cpu = machine(b), pts = [];
     cpu.run(SETTLE); record(b, cpu, 160000, pts);
     var sun = pts.filter(function (p) { return !p.rt && p.pc >= blp.val && p.pc < bck.val; });
     var frames = []; sun.forEach(function (p) { if (frames.indexOf(p.f) < 0) frames.push(p.f); });
     frames = frames.slice(0, 10);
     sun = sun.filter(function (p) { return frames.indexOf(p.f) >= 0; });
-    if (!sun.length) return { say: 'Nothing was plotted from blp in this run.', frames: [], pts: [] };
+    if (!sun.length) return { short: 'nothing plotted', say: 'Nothing was plotted from blp in this run.', frames: [], pts: [] };
     var per = frames.map(function (f) { return sun.filter(function (p) { return p.f === f; }).length; });
     var src = []; b.lines.forEach(function (ls) { ls.forEach(function (L) { src.push(L.raw); }); });
     var ray = src.some(function (t) { return /repeat\s+10,\s*starp/.test(t); });
-    return { frames: frames, pts: sun, ray: ray,
+    return { frames: frames, pts: sun, ray: ray, short: Math.round(sun.length / frames.length) + ' points a frame (' + Math.min.apply(null, per) + '–' + Math.max.apply(null, per) + ')' + (ray ? ' · ray and mirror' : ''),
              say: Math.round(sun.length / frames.length) + ' points a frame on average (' + Math.min.apply(null, per) + ' to ' + Math.max.apply(null, per) + ') over ' + frames.length + ' frames, from blp' + (ray ? '; a random ray of up to ten points (repeat 10, starp) and its mirror' : '') + '.' };
   }
   D.sun = function (b, host) {
@@ -265,8 +282,8 @@
     c.innerHTML = '<h3>The sun</h3>';
     host.appendChild(c);
     var U;
-    try { U = sunOf(b); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
-    c.insertAdjacentHTML('beforeend', '<p class="dr-say"><b>' + SW.esc(b.v.label) + ':</b> ' + SW.esc(U.say) + '</p>');
+    try { U = memo('sun', b, sunOf); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
+    if (!U.pts.length) c.appendChild(note(U.say));
     if (U.pts.length) {
       var labs = placedLabels(b);
       c.insertAdjacentHTML('beforeend', '<p class="lede">Recorded from this version running: the points plotted by the star routine (from blp) in ' + U.frames.length + ' successive frames, point by point, magnified; each new frame dims the one before.' +
@@ -279,7 +296,7 @@
       });
       player(c, seq, { intro: 'Press Play: each frame’s ray, point by point.' });
     }
-    across(c, b, 'sun', function (bv) { return sunOf(bv).say; }, U.say);
+    across(c, b, 'sun', sunOf);
   };
 
   // ---------- hyperspace ----------
@@ -324,7 +341,8 @@
     else if (r.h.length <= nf * 1.2) { kind = 'moving'; say = 'A single dot that moves: one point a frame at ' + np + ' positions over ' + nf + ' frames, while the ship is away.'; }
     else if (nf <= 8) { kind = 'burst'; say = 'A brief burst: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
     else { kind = 'pattern'; say = 'A pattern: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
-    return { h: r.h, frames: frames, np: np, byR: byR, kind: kind, say: say, labs: labs, before: r0 && r0.before, all: r0 && r0.all, vanished: r.vanished };
+    var short = { none: 'no hyperspace', untriggered: 'could not be triggered', nothing: 'nothing drawn', minskytron: 'Minskytron (2015)', dot: 'a still dot, ' + nf + ' frames', moving: 'a moving dot, ' + np + ' positions', burst: 'a burst, ' + nf + ' frames', pattern: 'a pattern, ' + r.h.length + ' points' }[kind];
+    return { h: r.h, frames: frames, np: np, byR: byR, kind: kind, say: say, short: short, labs: labs, before: r0 && r0.before, all: r0 && r0.all, vanished: r.vanished };
   }
   D.hyperOf = hyperOf;
 
@@ -333,8 +351,8 @@
     c.innerHTML = '<h3>Hyperspace</h3>';
     host.appendChild(c);
     var H;
-    try { H = hyperOf(b); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
-    c.insertAdjacentHTML('beforeend', '<p class="dr-say"><b>' + SW.esc(b.v.label) + ':</b> ' + SW.esc(H.say) + '</p>');
+    try { H = memo('hyper', b, hyperOf); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
+    if (!H.h.length) c.appendChild(note(H.say));
     if (H.h.length) {
       c.insertAdjacentHTML('beforeend', '<p class="lede">Recorded from this version running: a ship sent into hyperspace through its control bits (both rotate bits), and the points plotted then from code that plots nothing in the same run without it, frame by frame, magnified. ' +
         Object.keys(H.byR).map(function (k) { return SW.esc(k) + ' ' + H.byR[k] + ' point' + (H.byR[k] === 1 ? '' : 's'); }).join(', ') + '. (Anything drawn for hyperspace by the same code that draws the ships normally would not be picked out this way.)</p>');
@@ -366,6 +384,6 @@
       c.insertAdjacentHTML('beforeend', '<p class="hint">Pale: the ship in its last frames before the jump; green: what hyperspace draws while it is away; amber: the ship where it breaks out.</p>');
       player(c, seq, { intro: 'Press Play: the ship, hyperspace, and the ship again.' });
     }
-    across(c, b, 'hyper', function (bv) { return hyperOf(bv).say; }, H.say);
+    across(c, b, 'hyper', hyperOf);
   };
 })(this);

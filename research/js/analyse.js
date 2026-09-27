@@ -1636,7 +1636,9 @@
       return { title: b.v.label + ': ' + G[1].toLowerCase(), subtitle: G[2], meta: SW.docMeta(b), blocks: blocks() };
     }, 'spacewar-' + b.v.id + '-' + G[0])));
     if (G[0] === 'ships') {
-      SW.draws.ships(b, cards);
+      var hold = SW.el('div', { style: 'grid-column:1/-1' }, '<p class="hint">Running ' + SW.esc(b.v.label) + ' on the emulator…</p>');
+      cards.insertBefore(hold, cards.firstChild);
+      setTimeout(function () { var tmp = SW.el('div'); SW.draws.ships(b, tmp); while (tmp.firstChild) cards.insertBefore(tmp.firstChild, hold); hold.remove(); }, 30);
       var vs = selected(), wait = SW.el('p', { class: 'hint', style: 'grid-column:1/-1' }, 'Drawing the ships of ' + vs.length + ' versions…');
       cards.appendChild(wait);
       Promise.all(vs.map(function (v) { return SW.build(v.id); })).then(function (bs) { wait.remove(); if (vs.length) XFNS[13](vs, bs, cards); });
