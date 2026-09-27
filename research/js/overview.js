@@ -366,14 +366,17 @@
       sg.restore();
       sg.strokeStyle = '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
       var f = FL[i];
-      scap.textContent = f ? 'The screen in frame ' + (i + 1) + ': ' + (f.pts.length / 3) + ' points' + (hi != null ? '; ' + nm(hi) + ' plotted ' + (nHi || 'none') + (!nHi && nPrev ? ' (' + nPrev + ' in the frame before, shown faint)' : '') : '') : '';
+      scap.textContent = f ? 'The screen in frame ' + (i + 1) + ': ' + (f.pts.length / 3) + ' points' + (hi != null ? '; ' + nm(hi) + (!runsIn(hi, i) ? ' did not run in this frame' : ' plotted ' + (nHi || 'none') + (!nHi && nPrev ? ' (' + nPrev + ' in the frame before, shown faint)' : '')) : '') : '';
     }
 
     // ---------- the flame chart ----------
     var fl = SW.$('.ov-flame', el), fr = SW.$('.ov-fr', el), fcap = SW.$('.ov-fcap', el), playT = null;
     // one scale for every frame: the longest frame across, the deepest down, so
     // frames can be compared and the chart keeps still as they change
-    var maxLen = 1, maxDepth = 0;
+    var maxLen = 1, maxDepth = 0, ranIn = {};
+    FL.forEach(function (f, n) { f.spans.forEach(function (sp) { var k = String(sp.e); (ranIn[k] = ranIn[k] || []); if (ranIn[k][ranIn[k].length - 1] !== n) ranIn[k].push(n); }); });
+    function runsIn(e, i) { var l = ranIn[String(e)]; return !l || e === 'main' || l.indexOf(i) >= 0; }
+    function ranges(l) { var out = [], a = null, p = null; l.forEach(function (n) { if (a === null) { a = p = n; } else if (n === p + 1) p = n; else { out.push(a === p ? String(a + 1) : (a + 1) + '–' + (p + 1)); a = p = n; } }); if (a !== null) out.push(a === p ? String(a + 1) : (a + 1) + '–' + (p + 1)); return out.join(', '); }
     // (the first frame, which runs long as the game begins, is left out of the scale and may run off the edge)
     FL.forEach(function (f, n) { if (n || FL.length === 1) maxLen = Math.max(maxLen, f.len); f.spans.forEach(function (sp) { maxDepth = Math.max(maxDepth, sp.d); }); });
     function chart(i) {
@@ -460,6 +463,7 @@
       if (r.startup) st.push(r.startup + ' at start-up');
       if (exN) st.push(Math.round(exN / NF).toLocaleString('en-GB') + ' cycles a frame in itself' + (incN > exN * 1.05 ? ', ' + Math.round(incN / NF).toLocaleString('en-GB') + ' with its calls' : '') + ' (' + (100 * incN / A.total).toFixed(1) + '% of the frame)');
       if (callsN && incN) st.push(Math.round(incN / callsN).toLocaleString('en-GB') + ' cycles a call');
+      if (ranIn[e] && ranIn[e].length < NF) st.push('runs in frames ' + ranges(ranIn[e]) + ' of ' + NF);
       hh.push('<ul class="ov-stats">' + st.map(function (x) { return '<li>' + SW.esc(x) + '</li>'; }).join('') + '</ul>');
       var cs = Object.keys(r.callers || {});
       if (cs.length) hh.push('<p><b>Called from</b> ' + cs.map(link).join(', ') + '</p>');
@@ -486,7 +490,13 @@
           '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>');
       }
       insp.innerHTML = hh.join('');
-      insp.hidden = false; picked = e; scope(shownFrame); values();
+      insp.hidden = false; picked = e;
+      // to watch it, the chart goes to the nearest frame in which it runs
+      var l = ranIn[String(e)];
+      if (l && l.length && l.indexOf(shownFrame) < 0) {
+        var best = l.reduce(function (a, n) { return Math.abs(n - shownFrame) < Math.abs(a - shownFrame) ? n : a; }, l[0]);
+        fr.value = best; chart(best);
+      } else { scope(shownFrame); values(); }
       SW.$$('.ov-sp', fl).forEach(function (gg) { gg.classList.toggle('on', gg.dataset.e === String(e)); });
       SW.$$('.ov-brow', el).forEach(function (rw) { rw.classList.toggle('on', rw.dataset.e === String(e)); });
       if (window.innerWidth < 1000) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
