@@ -13,7 +13,22 @@
   var KEY = 'swbench.tray';
   var T = SW.tray = {};
 
-  function load() { try { return JSON.parse(localStorage.getItem(KEY) || '{"title":"","items":[]}'); } catch (e) { return { title: '', items: [] }; } }
+  // Each note has a number given when it is made and never reused, with the
+  // initials of whoever's notes these are (DMB-N12), so numbers from different
+  // people stay distinct once shared. t.seq is the last given; notes from before
+  // numbering get theirs once, in order.
+  function refFor(n) { var me = SW.me().initials; return (me ? me + '-' : '') + 'N' + n; }
+  function load() {
+    var t; try { t = JSON.parse(localStorage.getItem(KEY) || '{"title":"","items":[]}'); } catch (e) { t = { title: '', items: [] }; }
+    var all = (t.items || []).concat(t.bin || []), need = all.filter(function (it) { return !it.ref; });
+    if (need.length) {
+      need.sort(function (a, b) { return String(a.added) < String(b.added) ? -1 : 1; });
+      t.seq = Math.max(t.seq || 0, all.reduce(function (m, it) { var mm = /N(\d+)$/.exec(String(it.ref || '')); return Math.max(m, mm ? +mm[1] : 0); }, 0));
+      need.forEach(function (it) { it.ref = refFor(++t.seq); });
+      try { localStorage.setItem(KEY, JSON.stringify(t)); } catch (e) {}
+    }
+    return t;
+  }
   function save(t) {
     try { localStorage.setItem(KEY, JSON.stringify(t)); return true; }
     catch (e) { SW.toast('My notes are full (this browser’s storage). Export them, then remove some figures.', 6000); return false; }
@@ -43,6 +58,7 @@
     var t = load();
     Object.assign(item, extra || {});
     item.id = 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    t.seq = (t.seq || 0) + 1; item.ref = refFor(t.seq);
     item.added = new Date().toISOString();
     item.from = item.from || where();
     item.vid = item.vid || SW.state.v || '';
@@ -160,6 +176,7 @@
       if (f.tag && (it.tags || []).indexOf(f.tag) < 0) return;
       if (f.lvl && (it.level || 'notable') !== f.lvl) return;
       if (f.by && (it.by || '') !== f.by) return;
+      if (f.q && [it.ref, it.caption, it.text, it.note, (it.tags || []).join(' ')].join(' ').toLowerCase().indexOf(f.q.toLowerCase()) < 0) return;
       out.push(i);
     });
     return out;
@@ -189,7 +206,8 @@
       '<label>Version <select data-f="v">' + opt('', 'All', t.filter.v || '') + vids.map(function (v) { return opt(v, vShort(v), t.filter.v); }).join('') + '</select></label>' +
       '<label>Tag <select data-f="tag">' + opt('', 'All', t.filter.tag || '') + tags.map(function (g) { return opt(g, g, t.filter.tag); }).join('') + '</select></label>' +
       '<label>Importance <select data-f="lvl">' + opt('', 'All', t.filter.lvl || '') + opt('key', '★★★ Key', t.filter.lvl) + opt('notable', '★★ Notable', t.filter.lvl) + opt('minor', '★ Minor', t.filter.lvl) + '</select></label>' +
-      '<label>By <select data-f="by">' + opt('', 'Anyone', t.filter.by || '') + bys.map(function (x) { return opt(x, x, t.filter.by); }).join('') + '</select></label></div>' +
+      '<label>By <select data-f="by">' + opt('', 'Anyone', t.filter.by || '') + bys.map(function (x) { return opt(x, x, t.filter.by); }).join('') + '</select></label>' +
+      '<input type="search" data-f="q" class="tray-q" placeholder="Find (number or words)" value="' + SW.esc(t.filter.q || '') + '"></div>' +
       '<p class="hint">Private, in this browser. A note takes the version open and the chapter chosen here; Share sends it to the group’s Findings, signed with its initials.</p>';
     el.appendChild(head);
     var vis = shown(t), tb = SW.$('.tray-filters', head);
@@ -218,6 +236,15 @@
       else x.filter[f] = val;
       save(x); paint();
     });
+    // the search box filters as you type, keeping its place
+    head.addEventListener('input', function (e) {
+      if (!e.target.classList.contains('tray-q')) return;
+      clearTimeout(T._qt);
+      T._qt = setTimeout(function () {
+        var x = load(); x.filter = x.filter || {}; x.filter.q = e.target.value; save(x); paint();
+        var q = SW.$('.tray-q', host); if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+      }, 300);
+    });
     if (binOpen) el.appendChild(binView(t));
     if (!vis.length) { el.insertAdjacentHTML('beforeend', '<p class="hint">' + (t.items.length ? 'None with these filters.' : 'Nothing here yet. Add with ＋ My notes on any figure, export, finding, or selection in Read.') + '</p>'); return; }
     var fig = 0, list = SW.el('ol', { class: 'tray-list' });
@@ -225,7 +252,7 @@
       var it = t.items[i];
       var lab = it.kind === 'figure' ? 'Figure ' + (++fig) : it.kind === 'text' ? 'Paragraph' : 'Excerpt';
       var li = SW.el('li', { class: 'tray-item', 'data-i': i });
-      li.innerHTML = '<div class="tray-row"><b>' + lab + '</b>' +
+      li.innerHTML = '<div class="tray-row"><span class="tray-ref mono" title="Its number, which does not change">' + SW.esc(it.ref || '') + '</span><b>' + lab + '</b>' +
         (it.vid ? ' <span class="tray-v mono">' + SW.esc(vShort(it.vid)) + '</span>' : '') +
         ' <span class="badge tray-by" title="Signed">' + SW.esc(it.by || '?') + '</span>' +
         ' <span class="faint">' + SW.esc(String(it.from || '').replace(/^[^·]*·\s*/, '')) + '</span>' +
@@ -315,7 +342,7 @@
     if (code) body += '\n\n' + code.lines.slice(0, 12).map(function (l) { return (l.n != null ? l.n + '  ' : '') + l.text; }).join('\n');
     if (!body.trim()) { SW.toast('Write something first: the first line is the finding’s title.', 4000); return; }
     if (!confirm('Share with the group’s Findings, signed ' + by + ', on ' + (vShort(vid) || 'the version open') + '?')) return;
-    var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []).concat(['level:' + (it.level || 'notable')]);
+    var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []).concat(['level:' + (it.level || 'notable')]).concat(it.ref ? ['note:' + it.ref] : []);
     // a figure goes with it, packed into the text (see SW.figpack)
     (it.kind === 'figure' && it.svg ? SW.figpack.pack(SW.exportSVG(it.svg)) : Promise.resolve('')).then(function (fig) {
       return SW.notes.create({ vid: vid, kind: it.anchor ? 'line' : 'version', anchor: it.anchor || null, quote: it.quote || '', text: body + fig, tags: tags, by: by });

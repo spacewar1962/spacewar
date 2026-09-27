@@ -1160,3 +1160,5 @@ a.ov-nm:hover { text-decoration: underline; }
 .tray-anno > div { color: #3f9a62; }
 .tray-anno-r { color: var(--text-dim); margin-top: 2px; }
 .more-menu .menu-body .hint { margin: 4px 0 0; font-size: 11.5px; }
+.tray-ref, .fd-ref { font-size: 10.5px; color: var(--text-faint); letter-spacing: 0.02em; margin-right: 6px; }
+.fd-noteref { font-size: 10.5px; }

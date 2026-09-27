@@ -12,71 +12,73 @@
   // Evidence is either a line, found by pattern in a version's assembled
   // source (so it survives renumbering), or a tape image in sources/.
   var FINDINGS = [
-    { kind: 'Rebuild', title: 'The reconstructed 2B source rebuilds the April 1962 binary exactly',
+    { no: 'F1', kind: 'Rebuild', title: 'The reconstructed 2B source rebuilds the April 1962 binary exactly',
       text: 'Landsteiner’s 2014 reconstruction of the 2B source, assembled with the 1962–63 MACRO rules, reproduces bin-files/spacewar2B_2apr62.bin word for word (2,297 words); with macro1’s rule 174 words differ, all variable addresses. The tape’s own punched title reads “SPACEWAR 2B 2 APR 62”.',
       ev: [{ v: '2b', tab: 'tape', label: 'witness in the Tape view' }, { tape: 'bin-files/spacewar2B_2apr62.bin' }] },
-    { kind: 'Assembler', title: 'MACRO allotted overlined variables when a macro was defined',
+    { no: 'F2', kind: 'Assembler', title: 'MACRO allotted overlined variables when a macro was defined',
       text: 'The 3.1 source rebuilds newSpacewar_4-30-60.bin exactly only if variables are allotted as they first occur in macro definitions (\\ssn and \\scn in xincr and yincr come first). With macro1’s own rule 62 words differ, every one a variable address. The bench’s “1962–63” dialect follows the tapes.',
       ev: [{ v: '3.1', re: /^xincr\b/, label: 'the xincr macro' }, { tape: 'bin-files/newSpacewar_4-30-60.bin' }] },
-    { kind: 'Assembler', title: 'MACRO read a macro line whole, tab and all',
+    { no: 'F3', kind: 'Assembler', title: 'MACRO read a macro line whole, tab and all',
       text: 'The dispt macro writes “repeat 6<tab>B=B+B”. Cut at the tab, as macro1 does, the display instructions come out wrong in two words; read whole, as the dfw tapes show MACRO did, they match.',
       ev: [{ v: '4.1', re: /repeat 6\s+B=B\+B/, label: 'repeat 6 B=B+B' }] },
-    { kind: 'Rebuild', title: 'Russell’s punched 3.1 source tapes rebuild the 3.1 binary',
+    { no: 'F4', kind: 'Rebuild', title: 'Russell’s punched 3.1 source tapes rebuild the 3.1 binary',
       text: 'Decoded from FIO-DEC with every frame passing the parity check, the three 3.1 source tapes (program in two parts, star table) rebuild newSpacewar_4-30-60.bin exactly, with no transcription in between.',
       ev: [{ v: '3.1t', tab: 'tape', label: 'source tapes in the Tape view' }, { tape: 'SteveRussell_box1/spacewar3.1pt1_29sep62.bin' }] },
-    { kind: 'Tape', title: 'The 3.1 source tapes are titled 24 September, filed as 29 September',
+    { no: 'F5', kind: 'Tape', title: 'The 3.1 source tapes are titled 24 September, filed as 29 September',
       text: 'The tapes carry the title line “spacewar 3.1 24 sep 62” though the files are named 29sep62.',
       ev: [{ v: '3.1t', re: /spacewar 3\.1/i, label: 'the title line' }] },
-    { kind: 'Tape', title: 'A mis-punch on the 3.1 pt 1 tape',
+    { no: 'F6', kind: 'Tape', title: 'A mis-punch on the 3.1 pt 1 tape',
       text: 'In a comment, “calling s?quence” has code 035 where “e” (065) belongs, one hole short. Parity is still odd, so the fault is in the punching, not the reading.',
       ev: [{ v: '3.1t', re: /calling s.quence/, label: 'the line' }, { tape: 'SteveRussell_box1/spacewar3.1pt1_29sep62.bin' }] },
-    { kind: 'Difference', title: 'Russell’s 3.1 object tape carries a different star table',
+    { no: 'F7', kind: 'Difference', title: 'Russell’s 3.1 object tape carries a different star table',
       text: 'Against spacewar3.1_24-sep-62.bin the 3.1 source differs in 27 words, all in the star table, and the tape is four words shorter. The second word for 91 Aqar differs (652375 against 622377), 6 Pisc is absent so the following stars sit two words lower, and the table ends before 2 Ceti. The program code is identical.',
       ev: [{ v: '3.1', re: /\/\s*6 Pisc/, label: '6 Pisc' }, { v: '3.1', re: /\/91 Aqar/, label: '91 Aqar' }, { tape: 'SteveRussell_box1/spacewar3.1_24-sep-62.bin' }] },
-    { kind: 'Difference', title: 'The Expensive Planetarium makes its stars bright in two ways, and the versions switch between them',
+    { no: 'F8', kind: 'Difference', title: 'The Expensive Planetarium makes its stars bright in two ways, and the versions switch between them',
       text: 'Every version draws the star table the same way (dislis: the stored X less fpr, a window of 1,024 units, 45 degrees of sky square on the scope), but brightness and drift differ. 2B draws each group at one intensity and makes the bright ones bright by redrawing them: group 1 twice a pass (jsp 1m at the start and end of bck), group 2 once, group 3 every second pass, group 4 every fourth; the sky drifts one unit every 32 passes (law i 40), sense switch 3 holds it, switch 4 speeds it to every 5 passes. From 3.1 (and in 4.0, 4.1, 4.8 and 2015) the groups are drawn together every second pass with intensities 3, 2, 1, 0 set into the display instruction (dislis 1j,1q,3 … 4j,4q,0; dpy-i+B), drifting every 16 star frames, still 32 passes; sense switch 4 turns the stars off. 4.0TS draws only groups 1 to 3. The ddp line (the Morris listings of 4.2, 4.3 and 4.4, and the masswerk 4.4) returns to redrawing, but drifts every 8 passes (law i 10), four times as fast. The masswerk 4.3 (“spacewar 4.3f … mod. nl 2/28/2015”) carries the 3.1 intensity scheme instead of its Morris listing’s, in lines not marked N.L. 2015. The CHM 4.1 revisions keep intensities but change them to 3, 1, 7, 4 (“intensities 7,6,5,4 would be dimmer; 3,2,1,0 brighter”), with the timings moved into the constants bkf and bks. See it run in The sky’s star map, “On the scope”.',
       ev: [{ v: '2b', re: /^1m,\s*dislis/, label: '2B: 1m, dislis 1j,1q' }, { v: '3.1', re: /dislis 1j,\s*1q,\s*3/, label: '3.1: dislis 1j,1q,3' }, { v: '4.3', re: /isp bkc/, label: 'Morris 4.3: isp bkc, law i 10' }, { v: '4.3m', re: /dislis 1j,\s*1q,\s*3/, label: 'masswerk 4.3: dislis 1j,1q,3' }, { v: '4.1f', re: /dislis 3j,\s*3q,\s*7/, label: 'CHM 4.1f: dislis 3j,3q,7' }] },
-    { kind: 'Difference', title: 'The star capture radius grew a hundredfold between 3.1 and 4.0',
+    { no: 'F9', kind: 'Difference', title: 'The star capture radius grew a hundredfold between 3.1 and 4.0',
       text: 'The constant str (star capture radius) is 1 in 3.1 and 100 from 4.0 on.',
       ev: [{ v: '3.1', re: /^\s*str,/, label: 'str in 3.1' }, { v: '4.0', re: /^\s*str,/, label: 'str in 4.0' }] },
-    { kind: 'Rebuild', title: 'The dfw 4.1 source rebuilds two authentic binaries, once ioh is 760000',
+    { no: 'F10', kind: 'Rebuild', title: 'The dfw 4.1 source rebuilds two authentic binaries, once ioh is 760000',
       text: 'With “ioh” defined as 760000, the dfw transcription and Russell’s punched source tape both rebuild spacewar4.1_2-20-63_dfw.bin and spacewar4.2a_sa4.bin exactly (2,364 words). The February 1963 macro system therefore defined ioh differently from the June 1963 macro tape that survives.',
       ev: [{ v: '4.1', tab: 'tape', label: 'witnesses in the Tape view' }, { tape: 'SteveRussell_box1/spacewar4.1_2-20-63_dfw.bin' }, { tape: 'bin-files/spacewar4.2a_sa4.bin' }] },
-    { kind: 'Tape', title: 'The tape called sw4.2 is the 20 February 4.1, with one lost hole',
+    { no: 'F11', kind: 'Tape', title: 'The tape called sw4.2 is the 20 February 4.1, with one lost hole',
       text: 'SteveRussell_box1/sw4.2.bin differs from the 4.1 build in one word only (isp 3043 against 3042 at 2333, “count \\src,sq7”). Its own checksum shows why: the checksum punched after the block 2300 to 2400 is 7262, the same as on the dfw tape, but the block’s words sum to one less, so one hole (the lowest bit) was lost in punching or reading. It is the same assembly as the 20 February dfw tape, and its leader is punched “SPACEWAR 4.1 2/20/63 DFW”, the letters packed with no gaps, so the tape filed as 4.2 names itself as that 4.1.',
       ev: [{ v: '4.1', re: /count\s+[\\.~]src,\s*sq7/, label: 'count \\src,sq7' }, { tape: 'SteveRussell_box1/sw4.2.bin', from: 44 }] },
-    { kind: 'Tape', title: 'Every block checksum on the object tapes checks, except one',
+    { no: 'F12', kind: 'Tape', title: 'Every block checksum on the object tapes checks, except one',
       text: 'Read block by block (Tape view, Anatomy), the object tapes carry 39 to 56 checksummed blocks each after the same 21-word read-in loader, and every checksum agrees with its words except block 2300 to 2400 on sw4.2.bin, off by one: run through the tape’s own loader (Load tape), that block stops the machine at the loader’s hlt. The 2B tape ends without a closing jump to a start address, so the loader is left waiting for the reader; the dfw 4.1 tape’s program ends with jmp 7751, back into the loader, which reads on into a second part (below).',
       ev: [{ tape: 'SteveRussell_box1/sw4.2.bin', from: 4039 }, { tape: 'bin-files/spacewar2B_2apr62.bin' }, { tape: 'SteveRussell_box1/spacewar4.1_2-20-63_dfw.bin' }] },
-    { kind: 'Tape', title: 'The dfw object tape carries Spacewar! 4.1’s symbol table after “SPACEWAR SYMZ”',
+    { no: 'F13', kind: 'Tape', title: 'The dfw object tape carries Spacewar! 4.1’s symbol table after “SPACEWAR SYMZ”',
       text: 'The program’s blocks on spacewar4.1_2-20-63_dfw.bin end with jmp 7751, which sends the machine back into the loader. After the punched letters “SPACEWAR SYMZ” (frames 7963–8039) the loader reads on: 12 more blocks, every checksum good, 719 words at 6432–7750, then jmp 1411. They are 359 pairs of name and value, and one last word at 7750, 206432 (lac 6432, the address of the table’s first word). Each name is three six-bit FIO-DEC concise characters, bit 040 flipped: in the first character when bit 020 is clear, in the second and third when it is set (1j is 414100, acx 612367, clc 634323). Decoded, the names run in alphabetical order (0 sorting after the letters). All 235 symbols of the 4.1 build are there with the build’s values (1j 6077, 1q 6117, 1sc 3024, acx 3035, col 1463, …), with 124 permanent symbols of MACRO: the instructions (add, dac, jmp, law, …), the in-out codes (dpy 730007, cks 720033, …), i (10000) and the shift counts 1s to 9s (1, 3, 7, … 777). Names are cut to three characters, as MACRO’s symbols were. This is the symbol table of the assembly, punched after the program, which fits the title “SYMZ”. Loaded through to its end, the tape overwrites the star table at 6432–7750 in core. Found by running the tape through its own loader (Tape view, Tape Load Simulator).',
       ev: [{ tape: 'SteveRussell_box1/spacewar4.1_2-20-63_dfw.bin', from: 7963 }, { v: '4.1', re: /^1j,/, label: '1j, the star table’s first label' }] },
-    { kind: 'Transcription', title: 'The dfw transcription agrees with the punched tape in 1,135 of 1,138 lines',
+    { no: 'F14', kind: 'Transcription', title: 'The dfw transcription agrees with the punched tape in 1,135 of 1,138 lines',
       text: 'The three differences are the scan label “>>32<< 1”, a stray “_” at the end, and the tape’s overstruck “‾+” (±) in a comment, transcribed as “.+”.',
       ev: [{ v: '4.1t', label: 'the source tape, read' }, { v: '4.1', label: 'the transcription' }] },
-    { kind: 'Difference', title: 'Spacewar! 4.4 uses swp, a PDP-1D instruction that exchanges AC and IO',
+    { no: 'F15', kind: 'Difference', title: 'Spacewar! 4.4 uses swp, a PDP-1D instruction that exchanges AC and IO',
       text: 'Up to 4.3 the outline compiler (ocs) plants each exchange of AC and IO in the compiled ship code as two words, rcl 9s and rcl 9s. In 4.4 it plants one, swp, defined in the listing itself (“swp=opr 60”), and swp is used by hand elsewhere in 4.4. DEC’s PDP-1 Supplement (PDP-1D-45, 1964) lists 760060 swp (exchange AC and I/O) with 760020 lia (I/O from AC) and 760040 lai (AC from I/O). The 4.8 scorer uses lai after reading the control word (jsp cwg). The June 1963 macro tape defines none of the three. Until 1.14.9 the bench’s emulator did not implement them, and 4.4’s ships were drawn as flat lines.',
       ev: [{ v: '4.4', re: /swp=opr 60/, label: 'swp defined in 4.4' }, { v: '4.3', re: /lio \(rcl 9s/, label: 'rcl 9s in 4.3' }, { v: '4.8', re: /^\s*lai\s*$/, label: 'lai in the 4.8 scorer' }] },
-    { kind: 'Transcription', title: 'Russell’s 3.1 tapes read “skp” and “marc” where the 3.1 transcription has “skip” and “mark”',
+    { no: 'F16', kind: 'Transcription', title: 'Russell’s 3.1 tapes read “skp” and “marc” where the 3.1 transcription has “skip” and “mark”',
       text: 'In the integer square root (sqt) the pt 1 tape has “sma+sza-skp”; the 3.1 transcription has “sma+sza-skip”, as do the modern texts of 1 and 2B, while every text from 4.0 on has “skp”. On the tape’s evidence sqt is unchanged from 3.1 to 4.0. In the star table the pt 3 tape has “marc 1260, -283” (26 Erid), and so does stars.bin, where the transcription and the other star tables have “mark”. Neither changes the program: skip and skp are both 640000, and the assembler (as macro1 does) recognises a macro by its first three letters, so “marc” calls mark. The tapes rebuild the 3.1 binary exactly.',
       ev: [{ v: '3.1t', re: /sma\+sza-skp/, label: 'skp on the tape' }, { v: '3.1', re: /sma\+sza-skip/, label: 'skip in the transcription' }, { v: '3.1t', re: /marc 1260/, label: 'marc on the tape' }, { tape: 'SteveRussell_box1/spacewar3.1pt3_29sep62.bin' }, { tape: 'SteveRussell_box1/stars.bin' }] },
-    { kind: 'Transcription', title: 'The Morris 4.3 listing has a comment the masswerk text lacks, and masswerk has sixteen lines of 2015',
+    { no: 'F17', kind: 'Transcription', title: 'The Morris 4.3 listing has a comment the masswerk text lacks, and masswerk has sixteen lines of 2015',
       text: 'Line “/ the score-display digit encoder” in the Morris listing has no counterpart in the masswerk 4.3, which in turn has sixteen lines marked “N.L. 2015”, Norbert Landsteiner’s changes for simple input and scoring.',
       ev: [{ v: '4.3', re: /score-display digit encoder/, label: 'Morris' }, { v: '4.3m', re: /N\.L\. 2015/, label: 'first N.L. 2015 line' }] },
-    { kind: 'Anomaly', title: 'All three 4.4 texts execute a reserved opcode',
+    { no: 'F18', kind: 'Anomaly', title: 'All three 4.4 texts execute a reserved opcode',
       text: 'The line “4<tab>szf 4” assembles as a data word 000004 in the path of execution. Opcode 00 is reserved on the PDP-1; the bench’s emulator reports it rather than guessing what the machine did.',
       ev: [{ v: '4.4', re: /^4\tszf 4/, label: '4.4 Morris' }, { v: '4.4m', re: /^4\tszf 4/, label: 'masswerk' }, { v: '4.4f', re: /^4\tszf 4/, label: 'variant f' }] },
-    { kind: 'Difference', title: 'Angular acceleration quadrupled in 4.8',
+    { no: 'F19', kind: 'Difference', title: 'Angular acceleration quadrupled in 4.8',
       text: 'The constant maa (spaceship angular acceleration) is 40 in 4.8 and 10 in every other version.',
       ev: [{ v: '4.8', re: /^\s*maa,\s*13,\s*40/, label: 'maa in 4.8' }, { v: '4.1', re: /^\s*maa,/, label: 'maa in 4.1' }] },
-    { kind: 'Difference', title: 'The CHM 4.1 revisions have lost a star',
+    { no: 'F20', kind: 'Difference', title: 'The CHM 4.1 revisions have lost a star',
       text: 'The Computer History Museum’s 4.1d and 4.1f have 468 stars against the 469 of 4.1; “26 Erid” (mark 1260, −283) is missing.',
       ev: [{ v: '4.1', re: /26 Erid/, label: '26 Erid in 4.1' }, { tape: 'spacewar-4.1-chm-2008f.rim' }] },
-    { kind: 'Tape', title: 'Every object tape opens with the same read-in loader',
+    { no: 'F21', kind: 'Tape', title: 'Every object tape opens with the same read-in loader',
       text: 'The first 128 punched frames of the object tapes are one and the same RIM loader, the program the PDP-1 read in to load the blocks that follow. It is not part of Spacewar!, and differences between tapes begin after it.',
       ev: [{ tape: 'bin-files/newSpacewar_4-30-60.bin' }] }
   ];
-  var FIND = FINDINGS.map(function (f, i) { f.no = 'F' + (i + 1); return f; });
+  // Each finding's number is its own, written above and never changed: a new
+  // finding takes the next number, wherever it is placed in the list.
+  var FIND = FINDINGS;
 
   function vLabel(id) { var v = V.byId(id); return v ? v.label.replace(/^Spacewar! /, '') : id; }
 
@@ -285,7 +287,7 @@
       }
       var items = list.map(function (n, i) {
         var c = catOf(n.text, n.tags), lvl = levelOf(n.tags);
-        return { by: n.by, cat: c, lvl: lvl, order: i, text: n.text + ' ' + (n.tags || []).join(' ') + ' ' + n.by, vids: [n.vid], card: function () { return groupCard(n, i, c, lvl); } };
+        return { by: n.by, cat: c, lvl: lvl, order: i, text: refOf(n) + ' ' + n.text + ' ' + (n.tags || []).join(' ') + ' ' + n.by, vids: [n.vid], card: function () { return groupCard(n, i, c, lvl); } };
       });
       grouped(box, items, 'None.');
     });
@@ -319,6 +321,9 @@
     return mine.reduce(function (p, r) { return p.then(function () { return N.remove(r, true); }); }, Promise.resolve())
       .then(function () { return same ? null : N.create({ vid: n.vid, parent: n.id, kind: 'reaction', anchor: n.anchor, text: '★' + k, tags: [], quiet: true }); }).then(refreshThreads);
   }
+  // A crew finding's reference: from its annotation's id, so it is the same for
+  // everyone and never changes (a finding shared again is a new annotation, with a new one)
+  function refOf(n) { var h = 5381, id = String(n.id); for (var k = 0; k < id.length; k++) h = ((h * 33) ^ id.charCodeAt(k)) >>> 0; return 'C-' + h.toString(36).toUpperCase().slice(-5).padStart(5, '0'); }
   function threadOf(n) { return (live.threads || []).filter(function (t) { return t.note.id === n.id; })[0] || null; }
   function countReplies(t) { return t.replies.reduce(function (a, r) { return a + 1 + countReplies(r); }, 0); }
   // A finding in a large window: its whole text and figure, its tags, and
@@ -339,7 +344,7 @@
     }
     function paint() {
       var t = threadOf(n);
-      d.innerHTML = '<div class="tray-bighead"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) +
+      d.innerHTML = '<div class="tray-bighead"><span class="fd-no fd-ref mono">' + refOf(n) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) +
         ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
         (rest ? '<div class="fd-rtext">' + SW.esc(rest) + '</div>' : '') + '<div class="fd-bigfig"></div>' +
         (tags.length ? '<p>' + tags.map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') + '</p>' : '') +
@@ -373,8 +378,8 @@
         var where = vLabel(n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : ', the version');
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
         var th = threadOf(n), nrep = th ? countReplies(th) : 0, nrx = emojiOf(th).length, R0 = ratingOf(th);
-        li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no mono">G' + (i + 1) + '</span> <b class="fd-title">' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
-          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
+        li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no fd-ref mono" title="Its reference, which does not change">' + refOf(n) + '</span> <b class="fd-title">' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
+          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return /^note:/.test(g) ? '<span class="fd-tag fd-noteref mono" title="The note in its author’s My notes that this was shared from">from ' + SW.esc(g.slice(5)) + '</span>' : '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
         if (nrep || nrx || R0) SW.$('.fd-ev', li).insertAdjacentHTML('beforeend', ' <a href="#" class="fd-replies">' + [nrep ? nrep + (nrep === 1 ? ' reply' : ' replies') : '', nrx ? emojiOf(th).map(function (r) { return r.text; }).join('') : '', R0 ? 'crew ' + (Math.round(R0.avg * 10) / 10) + '★ (' + R0.n + ')' : ''].filter(Boolean).join(' · ') + '</a>');
         li.addEventListener('click', function (e) { if (e.target.closest('.fd-open, .fd-title, .fd-replies')) { e.preventDefault(); openFinding(n, i, title, fp, c, lvl, where); } });
         SW.$('.fd-go', li).onclick = function (e) {
@@ -422,8 +427,8 @@
     }
     if (live.notes && live.notes.length) {
       blocks.push({ type: 'h2', text: 'Findings from the group' });
-      blocks.push(SW.tableBlock('Annotations tagged “finding”', ['Date', 'By', 'Version', 'Where', 'Finding'], live.notes.map(function (n) {
-        return [SW.fmtDate(n.date), n.by, vLabel(n.vid), n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : 'version', SW.figpack.split(n.text).text + (SW.figpack.split(n.text).b64 ? ' [with a figure]' : '')];
+      blocks.push(SW.tableBlock('Annotations tagged “finding”', ['Ref', 'Date', 'By', 'Version', 'Where', 'Finding'], live.notes.map(function (n) {
+        return [refOf(n), SW.fmtDate(n.date), n.by, vLabel(n.vid), n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : 'version', SW.figpack.split(n.text).text + (SW.figpack.split(n.text).b64 ? ' [with a figure]' : '')];
       })));
     }
     return { title: 'Spacewar! findings', subtitle: 'What the source, the tapes and the assembler show',
