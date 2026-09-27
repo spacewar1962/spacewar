@@ -45,61 +45,103 @@
 
   // ---------- the player ----------
   // seq: [{x, y, s, col, frame, cap}] in plotting order. Drawn magnified, one
-  // point at a time; earlier frames dim when a new one begins.
+  // point at a time. Loop starts again at the end. Phosphor fade dims each
+  // point after it is plotted, at the pace the bench's own scope simulation
+  // uses (a time constant of 0.12 s against about 20 redraws a second, i.e.
+  // some 2.4 redraws), scaled to the slowed replay: with Loop, the redrawing
+  // keeps the image, as the program's redrawing kept it on the screen. Without
+  // fade, earlier frames dim when a new frame begins.
+  var FADE_REDRAWS = 0.12 * 20;
   function player(host, seq, o) {
     o = o || {};
     var wrap = SW.el('div', { class: 'dr-player' });
     var cv = SW.el('canvas', { class: 'dr-cv', width: 520, height: 520 }), g = cv.getContext('2d'), N = cv.width;
     var ctl = SW.el('div', { class: 'toolbar dr-ctl', style: 'position:static;padding:6px 0 0' });
     ctl.innerHTML = '<button class="btn" data-a="play">▶ Play</button><button class="btn ghost" data-a="step" title="The next point">Step ▸</button><button class="btn ghost" data-a="restart" title="From the start">↺</button>' +
-      '<label class="check">Speed <select data-a="speed"><option value="1">1 point a second</option><option value="4" selected>4 a second</option><option value="16">16 a second</option><option value="64">64 a second</option></select></label>';
+      '<label class="check">Speed <select data-a="speed"><option value="1">1 point a second</option><option value="4">4 a second</option><option value="16" selected>16 a second</option><option value="64">64 a second</option></select></label>' +
+      '<label class="check" title="Start again at the end"><input type="checkbox" data-a="loop"> Loop</label>' +
+      '<label class="check" title="Each point fades after it is plotted, as on the scope (the bench’s scope simulation: 0.12 s against about 20 redraws a second), scaled to this slowed replay; with Loop the redrawing keeps the image"><input type="checkbox" data-a="fade"> Phosphor fade</label>';
     var cap = SW.el('p', { class: 'dr-cap mono hint' });
     wrap.appendChild(cv); wrap.appendChild(ctl); wrap.appendChild(cap);
     host.appendChild(wrap);
     // one scale for x and y, the points' extent with a margin
-    var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-    seq.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); });
+    var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, frames = {};
+    seq.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); frames[p.frame == null ? 0 : p.frame] = 1; });
+    var perFrame = seq.length / Math.max(1, Object.keys(frames).length);
     var span = Math.max(8, x1 - x0, y1 - y0) * 1.18, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, k = N / span;
     function px(p) { return [N / 2 + (p.x - cx) * k, N / 2 - (p.y - cy) * k]; }
-    var i = 0, playing = false, speed = 4, acc = 0, last = null, raf = 0, frame = null;
-    function clear() { g.fillStyle = '#02050a'; g.fillRect(0, 0, N, N); }
-    function dot(p, ring) {
+    var i = 0, events = [], clock = 0, playing = false, speed = 16, loop = false, fade = false, acc = 0, last = null, dirty = true;
+    function tau() { return FADE_REDRAWS * perFrame / speed; }
+    function dot(p, alpha, ring) {
       var q = px(p), r = Math.max(2.5, Math.min(7, k * 0.45));
       g.fillStyle = p.col || 'rgb(200,236,255)';
-      g.globalAlpha = Math.max(0.35, Math.min(1, 0.62 + 0.13 * (p.s || 0)));
+      g.globalAlpha = alpha * Math.max(0.35, Math.min(1, 0.62 + 0.13 * (p.s || 0)));
       g.beginPath(); g.arc(q[0], q[1], r, 0, 6.2832); g.fill(); g.globalAlpha = 1;
       if (ring) { g.strokeStyle = '#ffce7a'; g.lineWidth = 2; g.beginPath(); g.arc(q[0], q[1], r + 5, 0, 6.2832); g.stroke(); }
     }
-    function redraw() {
-      clear();
-      var f = i > 0 ? seq[i - 1].frame : null;
-      for (var j = 0; j < i; j++) {
-        if (f != null && seq[j].frame !== f) { g.globalAlpha = 0.18; dot(seq[j]); g.globalAlpha = 1; continue; }
-        dot(seq[j], j === i - 1);
+    function plot() {
+      events.push({ j: i, t: clock });
+      i++;
+      if (i >= seq.length) {
+        if (loop) { i = 0; if (!fade) events = []; }
+        else { playing = false; SW.$('[data-a="play"]', ctl).textContent = '▶ Play'; }
       }
-      var p = seq[i - 1];
-      cap.textContent = p ? 'point ' + i + ' of ' + seq.length + (p.frame != null ? ' · frame ' + (p.frame + 1) : '') + ' · ' + p.cap : (o.intro || 'Press Play, or Step, to watch it drawn.');
+      dirty = true;
+    }
+    function render() {
+      g.fillStyle = '#02050a'; g.fillRect(0, 0, N, N);
+      var lastE = events[events.length - 1], f = lastE ? seq[lastE.j].frame : null, T = tau();
+      if (fade) events = events.filter(function (e) { return Math.exp(-(clock - e.t) / T) > 0.01; });
+      events.forEach(function (e, n) {
+        var p = seq[e.j], a = fade ? Math.exp(-(clock - e.t) / T) : (f != null && p.frame !== f ? 0.18 : 1);
+        dot(p, a, e === lastE);
+      });
+      // actual size: the same points at the scale of the whole screen, as if this
+      // drawing area were the scope's 1,024 points across
+      var IB = 118, ix = N - IB - 10, iy = 10, sc = N / 1024;
+      g.fillStyle = '#000'; g.fillRect(ix, iy, IB, IB);
+      g.strokeStyle = 'rgba(143,163,181,0.6)'; g.lineWidth = 1; g.strokeRect(ix + 0.5, iy + 0.5, IB - 1, IB - 1);
+      events.forEach(function (e) {
+        var p2 = seq[e.j], a2 = fade ? Math.exp(-(clock - e.t) / T) : (f != null && p2.frame !== f ? 0.18 : 1);
+        var qx = ix + IB / 2 + (p2.x - cx) * sc, qy = iy + IB / 2 - (p2.y - cy) * sc;
+        if (qx < ix || qx > ix + IB || qy < iy || qy > iy + IB) return;
+        g.globalAlpha = a2; g.fillStyle = p2.col || 'rgb(200,236,255)'; g.fillRect(qx - 0.6, qy - 0.6, 1.3, 1.3); g.globalAlpha = 1;
+      });
+      g.fillStyle = 'rgba(143,163,181,0.9)'; g.font = '11px Helvetica, Arial, sans-serif'; g.textAlign = 'center';
+      g.fillText('actual size', ix + IB / 2, iy + IB + 14); g.textAlign = 'left';
+      var p = lastE ? seq[lastE.j] : null;
+      cap.textContent = p ? 'point ' + (lastE.j + 1) + ' of ' + seq.length + (p.frame != null ? ' · frame ' + (p.frame + 1) : '') + ' · ' + p.cap : (o.intro || 'Press Play, or Step, to watch it drawn.');
+      dirty = false;
     }
     function tick(t) {
       if (!cv.isConnected) return;
-      if (last != null && playing && cv.offsetParent) {
-        acc += (t - last) / 1000 * speed;
-        var n = Math.floor(acc); acc -= n;
-        if (n) { i = Math.min(seq.length, i + n); redraw(); if (i >= seq.length) { playing = false; SW.$('[data-a="play"]', ctl).textContent = '▶ Play'; } }
+      if (last != null && cv.offsetParent) {
+        var dt = Math.min(0.2, (t - last) / 1000);
+        if (playing) { clock += dt; acc += dt * speed; while (acc >= 1 && playing) { acc -= 1; plot(); } }
+        else if (fade && events.length) clock += dt;   // the glow goes on fading while paused
+        if (dirty || (fade && events.length)) render();
       }
       last = t;
-      raf = requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
     }
     ctl.addEventListener('click', function (e) {
-      var b = e.target.closest('[data-a]'); if (!b) return;
-      if (b.dataset.a === 'play') { if (i >= seq.length) i = 0; playing = !playing; b.textContent = playing ? '❚❚ Pause' : '▶ Play'; }
-      if (b.dataset.a === 'step') { i = Math.min(seq.length, i + 1); redraw(); }
-      if (b.dataset.a === 'restart') { i = 0; redraw(); }
+      var b = e.target.closest('button[data-a]'); if (!b) return;
+      if (b.dataset.a === 'play') { if (i >= seq.length) { i = 0; events = []; } playing = !playing; b.textContent = playing ? '❚❚ Pause' : '▶ Play'; }
+      if (b.dataset.a === 'step') { if (i >= seq.length) { i = 0; events = []; } plot(); render(); }
+      if (b.dataset.a === 'restart') { i = 0; events = []; render(); }
     });
-    SW.$('[data-a="speed"]', ctl).onchange = function (e) { speed = +e.target.value; };
-    redraw();
-    raf = requestAnimationFrame(tick);
-    wrap.step = function (n) { i = Math.min(seq.length, i + (n || 1)); redraw(); return i; };
+    ctl.addEventListener('change', function (e) {
+      var a = e.target.dataset.a;
+      if (a === 'speed') speed = +e.target.value;
+      if (a === 'loop') loop = e.target.checked;
+      if (a === 'fade') { fade = e.target.checked; dirty = true; }
+    });
+    render();
+    requestAnimationFrame(tick);
+    // time passing, for testing without animation frames: sec of play (or of glow if paused)
+    wrap.advance = function (sec, play) { if (play) playing = true; clock += sec; if (playing) { acc += sec * speed; while (acc >= 1 && playing) { acc -= 1; plot(); } } render(); return { i: i, shown: events.length, playing: playing }; };
+    wrap.set = function (o2) { if ('loop' in o2) { loop = o2.loop; SW.$('[data-a="loop"]', ctl).checked = loop; } if ('fade' in o2) { fade = o2.fade; SW.$('[data-a="fade"]', ctl).checked = fade; } };
+    wrap.step = function (n) { for (var q = 0; q < (n || 1) && i < seq.length; q++) plot(); render(); return i; };
     return wrap;
   }
   function note(t) { return SW.el('p', { class: 'hint' }, t); }
