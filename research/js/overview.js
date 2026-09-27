@@ -28,9 +28,17 @@
   function opOf(md) { return md >> 13; }
   function isCall(md) { var op = opOf(md); return op === 0o31 || op === 0o07; }
 
-  O.analyse = function (b) {
+  O.analyse = function (b, phases) {
+    phases = phases || PHASES;
     var cpu = new C.PDP1({ mdv: b.v.mdv });
     cpu.load(b.asm.memory, b.asm.start);
+    // data flow: every read and write in the frames, by the routine running
+    var flow = {};
+    function who() { return stack.length ? stack[stack.length - 1].e : waitAt[cpu.curPC] ? 'wait' : 'main'; }
+    function tally(a, rw) { var f = flow[a] = flow[a] || { r: {}, w: {} }, k = who(); f[rw][k] = (f[rw][k] || 0) + 1; }
+    var rd0 = cpu.rd, wr0 = cpu.wr;
+    cpu.rd = function (a) { if (inFrames) tally(a, 'r'); return rd0.call(this, a); };
+    cpu.wr = function (a, v) { if (inFrames) tally(a, 'w'); return wr0.call(this, a, v); };
     var mem = cpu.mem, isSrc = function (a) { return !!b.asm.memory[a]; };
     var frameAt = b.sym.ml0 ? b.sym.ml0.val : (b.sym.bck ? b.sym.bck.val : -1);
     var R = {}, sites = {}, path = [], stack = [], inFrames = false, frames = 0;
@@ -50,7 +58,7 @@
     function span(e) { if (!cur) return null; var sp = { e: e, d: stack.length, t0: cpu.cycles - cur.t, t1: null }; cur.spans.push(sp); return sp; }
     function close(k) { for (var q = stack.length - 1; q >= k; q--) if (stack[q].span && stack[q].span.t1 == null) stack[q].span.t1 = cpu.cycles - cur.t; stack.length = k; }
     var phase = 0;
-    PHASES.forEach(function (P, pi) {
+    phases.forEach(function (P, pi) {
       phase = pi;
       cpu.tw = P.cw; cpu.control = P.cw;
       var end = cpu.cycles + P.cycles;
@@ -106,7 +114,7 @@
     });
     var total = frameList.reduce(function (a, f) { return a + f.len; }, 0);
     return { R: R, sites: sites, path: path, frames: frames, frameAt: frameAt, loopEnd: loopEnd, start: b.asm.start, cpu: cpu, halted: cpu.halted,
-             ex: ex, inc: inc, frameList: frameList, total: total, waitAt: waitAt };
+             ex: ex, inc: inc, frameList: frameList, total: total, waitAt: waitAt, flow: flow, phases: phases };
   };
 
   // ---------- reading the source ----------
@@ -170,7 +178,36 @@
     return { fields: out, nob: S.nob ? S.nob.val : null };
   }
 
+  // What an address is, for the data flow: an object table field (and which
+  // object), a variable, a constant, or a word of the program; a word the
+  // program both runs and writes is an instruction rewritten at run time.
+  function classify(b, A, T) {
+    var vars = {}, S = b.sym;
+    Object.keys(S).forEach(function (k) { var s0 = S[k]; if (s0 && s0.variable && typeof s0.val === 'number') vars[s0.val] = k; });
+    return function (a) {
+      if (T) for (var i = 0; i < T.fields.length; i++) { var f = T.fields[i]; if (f.base != null && f.size && a >= f.base && a < f.base + f.size) return { kind: 'field', key: f.field, obj: a - f.base, f: f }; }
+      if (vars[a]) return { kind: 'var', key: vars[a] };
+      var m = b.asm.memory[a];
+      if (m && m.kind === 'constant') return { kind: 'const' };
+      if (A.cpu.execCount[a] > 0) return { kind: 'code', key: a };
+      if (m || b.labelAt[a]) return { kind: 'data', key: name(b, a) };
+      return { kind: 'other', key: SW.oct(a, 4) };
+    };
+  }
+
   // ---------- the page ----------
+  // the controls held in a recording of one's own: ship bits as the source's
+  // comment gives them (high four bits: ccw, cw, rocket, torpedo; low four the
+  // same for the other ship)
+  var BITS = [['ccw', 0o400000, 0o10], ['cw', 0o200000, 0o4], ['rocket', 0o100000, 0o2], ['torpedo', 0o040000, 0o1]];
+  var mine = null;   // {cw, secs} when recording with one's own controls
+  function myPhases(m) {
+    var held = [];
+    [0, 1].forEach(function (s0) { var on = BITS.filter(function (bt) { return m.cw & bt[1 + s0]; }).map(function (bt) { return bt[0]; }); if (on.length) held.push((s0 ? 'second' : 'first') + ' ship: ' + on.join(', ')); });
+    return [{ cycles: 400000, cw: 0, what: 'no controls for two seconds' },
+            { cycles: m.secs * 200000, cw: m.cw, what: (held.join('; ') || 'no controls') + ' held for ' + m.secs + ' seconds' },
+            { cycles: 400000, cw: 0, what: 'released for two seconds' }];
+  }
   O.render = function (b, el) {
     el.innerHTML = '<p class="hint">Running ' + SW.esc(b.v.label) + ' on the emulator…</p>';
     setTimeout(function () { draw(b, el); }, 20);
@@ -182,15 +219,17 @@
 
   function draw(b, el) {
     var A;
-    try { A = O.analyse(b); } catch (e) { el.innerHTML = '<p class="hint">The emulator stopped: ' + SW.esc(e.message) + '</p>'; return; }
+    try { A = O.analyse(b, mine ? myPhases(mine) : PHASES); } catch (e) { el.innerHTML = '<p class="hint">The emulator stopped: ' + SW.esc(e.message) + '</p>'; return; }
     var F = Math.max(1, A.frames), FL = A.frameList, NF = Math.max(1, FL.length);
     var avgLen = A.total / NF;
     function nm(e) { return e === 'wait' ? 'waiting' : name(b, e); }
-    function link(e) {
+    function link(e, text) {
       if (e === 'startup') return '<span class="ov-nm">start-up</span>';
+      if (text) { var at0 = lineOf(b, e) || null; return '<a href="#" class="ov-nm mono" data-p="' + (at0 ? at0.p : '') + '" data-n="' + (at0 ? at0.n : '') + '" title="Open in Read">' + SW.esc(text) + '</a>'; }
       return '<a href="#" class="ov-nm mono" data-e="' + SW.esc(String(e)) + '" title="Inspect">' + SW.esc(nm(e)) + '</a>';
     }
     function per(n) { var v = n / F; return v >= 10 ? Math.round(v) + ' a frame' : v >= 0.95 ? (Math.round(v * 10) / 10) + ' a frame' : 'in ' + Math.round(100 * v) + '% of frames'; }
+    function rate(n) { var v = n / F; return v >= 1 ? String(Math.round(v)) : v >= 0.1 ? (Math.round(10 * v) / 10).toString() : '<0.1'; }
     function cyc(n) { return Math.round(n).toLocaleString('en-GB') + ' cycles (' + (n * US / 1000).toFixed(n * US < 10000 ? 2 : 1) + ' ms)'; }
     function callsOf(e, depth, seen) {
       var r = A.R[e]; if (!r) return '';
@@ -205,7 +244,12 @@
     }
     var h = [];
     h.push('<div class="ov-run hint">Recorded from ' + SW.esc(b.v.label) + ' on the emulator, ' + A.frames + ' frames of the main loop, with ' +
-      PHASES.map(function (P) { return P.what; }).join(', then ') + '. Click a routine to inspect it; the grey text is the program’s own comment. A memory cycle is 5 µs.' + (A.halted ? ' The machine halted during the run.' : '') + '</div>');
+      A.phases.map(function (P) { return P.what; }).join(', then ') + '. Click a routine to inspect it; the grey text is the program’s own comment. A memory cycle is 5 µs.' + (A.halted ? ' The machine halted during the run.' : '') + '</div>');
+    var mcw = mine ? mine.cw : 0;
+    h.push('<div class="toolbar ov-ctl" style="position:static;padding:0">' + [0, 1].map(function (s0) {
+      return '<span class="ov-ship">' + (s0 ? 'Second ship' : 'First ship') + BITS.map(function (bt) { return ' <label class="check"><input type="checkbox" data-bit="' + bt[1 + s0] + '"' + (mcw & bt[1 + s0] ? ' checked' : '') + '>' + bt[0] + '</label>'; }).join('') + '</span>';
+    }).join('') + '<label class="check">held for <select class="ov-secs">' + [1, 3, 5, 10].map(function (x) { return '<option' + ((mine ? mine.secs : 3) === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select> s</label>' +
+      '<button class="btn" data-rec="1" title="Run again with these controls held (both rotate bits of a ship mean hyperspace)">Record</button>' + (mine ? '<button class="btn ghost" data-rec="0">The standard sequence</button>' : '') + '</div>');
 
     // one frame against time
     h.push('<section class="ov-box"><h4>One frame, call by call</h4>' +
@@ -222,6 +266,37 @@
         return '<div class="ov-brow" data-e="' + SW.esc(String(r.e)) + '"><span class="ov-bnm mono">' + SW.esc(nm(r.e)) + '</span><span class="ov-bar"><i style="width:' + Math.max(0.3, pc).toFixed(2) + '%;background:' + colour(nm(r.e)) + '"></i></span>' +
           '<span class="ov-bv">' + pc.toFixed(1) + '%</span><span class="ov-bv faint">' + Math.round(r.ex / NF).toLocaleString('en-GB') + ' a frame' + (r.inc > r.ex * 1.05 && r.e !== 'main' ? ', ' + Math.round(r.inc / NF).toLocaleString('en-GB') + ' with its calls' : '') + '</span></div>';
       }).join('') + '</div><p class="hint">Cycles spent in each routine itself, per frame on average; “with its calls” adds the routines it calls.</p></section>');
+
+    // data flow
+    var T0 = tableFields(b), what = classify(b, A, T0), groups = { field: {}, var: {}, code: {}, data: {} };
+    Object.keys(A.flow).forEach(function (a) {
+      var c = what(+a); if (!groups[c.kind]) return;
+      var g = groups[c.kind][c.key] = groups[c.kind][c.key] || { key: c.key, c: c, r: {}, w: {}, objs: {} };
+      if (c.kind === 'field') g.objs[c.obj] = 1;
+      ['r', 'w'].forEach(function (rw) { var src = A.flow[a][rw]; Object.keys(src).forEach(function (k) { g[rw][k] = (g[rw][k] || 0) + src[k]; }); });
+    });
+    O.lastFlow = { groups: groups };
+    function whoList(m) {
+      return Object.keys(m).sort(function (x, y) { return m[y] - m[x]; }).map(function (k) { return link(k) + ' <span class="faint">' + rate(m[k]) + '</span>'; }).join(', ');
+    }
+    function flowRows(kind, label) {
+      var gs = Object.keys(groups[kind]).map(function (k) { return groups[kind][k]; });
+      if (kind === 'code') gs = gs.filter(function (g) { return Object.keys(g.w).length; });
+      gs.sort(function (x, y) { return kind === 'field' ? (x.c.f.base - y.c.f.base) : String(x.key).localeCompare(String(y.key)); });
+      return gs.map(function (g) {
+        var nmx, extra = '';
+        if (kind === 'field') { nmx = link(g.key === 'ml1' ? 'mtb' : 'n' + g.key.slice(1), g.key) ; extra = SW.esc(g.c.f.what || ''); }
+        else if (kind === 'code') { var at = lineAt(b, +g.key); nmx = '<span class="mono">' + SW.esc(name(b, +g.key)) + '</span>'; extra = at && at.L ? '<span class="mono">' + SW.esc(at.L.raw.replace(/\t/g, ' ').trim()) + '</span>' : ''; }
+        else { nmx = '<span class="mono">' + SW.esc(g.key) + '</span>'; extra = glossVar(g.key); }
+        return '<tr><td>' + nmx + '</td><td class="ov-g">' + extra + '</td><td>' + (whoList(g.w) || '<span class="faint">none</span>') + '</td>' + (kind === 'code' ? '' : '<td>' + (whoList(g.r) || '<span class="faint">none</span>') + '</td>') + '</tr>';
+      }).join('');
+    }
+    function glossVar(k) { var s0 = b.sym[k], d = s0 && ((s0.defs && s0.defs[0]) || (s0.refs && s0.refs[0])); if (!d || !b.lines[d.file]) return ''; return SW.esc(commentOf(b.lines[d.file][d.line - 1].raw)); }
+    h.push('<section class="ov-box"><h4>Data flow <span class="faint">(reads and writes a frame, by routine)</span></h4>' +
+      '<details open><summary>The object table, by field</summary><table class="ov-sub"><thead><tr><th>Field</th><th>The program’s comment</th><th>Written by</th><th>Read by</th></tr></thead><tbody>' + flowRows('field') + '</tbody></table></details>' +
+      '<details><summary>Variables</summary><table class="ov-sub"><thead><tr><th>Variable</th><th>A comment where it is used</th><th>Written by</th><th>Read by</th></tr></thead><tbody>' + flowRows('var') + '</tbody></table></details>' +
+      '<details><summary>Instructions rewritten while the program runs</summary><p class="hint">Words the program both runs and writes: return addresses set by dap, pointers stepped by idx, calls aimed at the next object.</p><table class="ov-sub"><thead><tr><th>Where</th><th>The line</th><th>Written by</th></tr></thead><tbody>' + flowRows('code') + '</tbody></table></details>' +
+      '<p class="hint">Numbers are reads or writes a frame, averaged over the run; literals (constants) are left out. Reading a pointer to reach the table counts as a read of the pointer as well.</p></section>');
 
     // start-up
     var su = A.R.startup;
@@ -325,6 +400,18 @@
       if (cs.length) hh.push('<p><b>Called from</b> ' + cs.map(link).join(', ') + '</p>');
       var ks = Object.keys(r.calls || {}).sort(function (x, y) { return r.calls[y] - r.calls[x]; });
       if (ks.length) hh.push('<p><b>Calls</b> ' + ks.map(function (k) { return link(k) + ' <span class="faint">×' + (r.n ? Math.round(10 * r.calls[k] / r.n) / 10 : r.calls[k]) + '</span>'; }).join(', ') + '</p>');
+      // what it reads and writes, a frame
+      var rs = {}, ws = {};
+      Object.keys(A.flow).forEach(function (a) {
+        var c = what(+a); if (c.kind === 'const' || c.kind === 'other') return;
+        var key = c.kind === 'field' ? c.key + ' (' + (c.f.what || 'table') + ')' : c.kind === 'code' ? 'the instruction at ' + name(b, +a) : c.key;
+        var fr0 = A.flow[a];
+        if (fr0.r[e]) rs[key] = (rs[key] || 0) + fr0.r[e];
+        if (fr0.w[e]) ws[key] = (ws[key] || 0) + fr0.w[e];
+      });
+      function rwList(m) { return Object.keys(m).sort(function (x, y) { return m[y] - m[x]; }).slice(0, 14).map(function (k) { return '<span class="mono">' + SW.esc(k) + '</span> <span class="faint">' + rate(m[k]) + '</span>'; }).join(', '); }
+      if (Object.keys(ws).length) hh.push('<p><b>Writes</b> ' + rwList(ws) + '</p>');
+      if (Object.keys(rs).length) hh.push('<p><b>Reads</b> ' + rwList(rs) + '</p>');
       var cd = e === 'rt' ? null : codeOf(e);
       if (e === 'rt') hh.push('<p class="hint">Code written by the outline compiler (oc) at start-up, so it has no source lines: in Read it shows as run-time code.</p>');
       if (cd) {
@@ -338,7 +425,14 @@
       SW.$$('.ov-brow', el).forEach(function (rw) { rw.classList.toggle('on', rw.dataset.e === String(e)); });
       if (window.innerWidth < 1000) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
-    el.addEventListener('click', function (ev) {
+    if (el._ovClick) el.removeEventListener('click', el._ovClick);
+    el.addEventListener('click', el._ovClick = function (ev) {
+      var rc = ev.target.closest('[data-rec]');
+      if (rc) {
+        if (rc.dataset.rec === '0') mine = null;
+        else { var cw = 0; SW.$$('.ov-ctl [data-bit]', el).forEach(function (x) { if (x.checked) cw |= +x.dataset.bit; }); mine = { cw: cw, secs: +SW.$('.ov-secs', el).value }; }
+        O.render(b, el); return;
+      }
       if (ev.target.closest('[data-x]')) { insp.hidden = true; SW.$('.ov-cols', el).classList.remove('insp-on'); SW.$$('.ov-sp.on, .ov-brow.on', el).forEach(function (x) { x.classList.remove('on'); }); return; }
       var rd = ev.target.closest('[data-read]');
       if (rd) { var pn = rd.dataset.read.split(':'); goRead(b, +pn[0], +pn[1]); return; }
