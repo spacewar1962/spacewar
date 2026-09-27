@@ -488,7 +488,7 @@
       var navh = '<div class="ov-hist"><button class="btn ghost" data-hnav="-1" title="' + (hpos > 0 ? 'Back to ' + SW.esc(nm(hist[hpos - 1])) : 'Back') + '"' + (hpos > 0 ? '' : ' disabled') + '>←</button><button class="btn ghost" data-hnav="1" title="' + (hpos < hist.length - 1 ? 'Forward to ' + SW.esc(nm(hist[hpos + 1])) : 'Forward') + '"' + (hpos < hist.length - 1 ? '' : ' disabled') + '>→</button>' +
         '</div>';
       var hh = ['<div class="ov-phead"><div><div class="ov-ptitle">' + navh + '<h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4></div>' +
-        '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + '<div class="ov-phact">' + icons('panel') + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div></div>'];
+        '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + '<div class="ov-phact">' + icons('panel', true) + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div></div>'];
       // values | code | relations
       hh.push('<div class="ov-pvals"><div class="ov-vals"></div></div>');
       hh.push('<div class="ov-pcode">');
@@ -566,6 +566,27 @@
       });
       return svgWrap(W, rows.length * RH + 4, pal, o.join(''));
     }
+    // the data panel as an image: header, then values | code | calls, writes and reads
+    function panelSVG(pal) {
+      var ink = pal.ink || '#dde', dim = pal.dim || '#8a9', acc = pal.accent || '#fc6', e = String(picked), o = [], W = 1200, y0 = 64;
+      function tx(x, y, t, sz, col, anchor, weight) { return '<text x="' + x + '" y="' + y + '" font-family="monospace" font-size="' + (sz || 12) + '" fill="' + (col || ink) + '"' + (anchor ? ' text-anchor="' + anchor + '"' : '') + (weight ? ' font-weight="' + weight + '"' : '') + ' xml:space="preserve">' + SW.esc(t) + '</text>'; }
+      o.push(tx(16, 26, nm(e) + (/^\d+$/.test(e) ? '  ' + SW.oct(+e, 4) : '') + '   ' + glossAt(b, e), 17, ink, null, 700));
+      o.push(tx(16, 46, vshort + ' · frame ' + (shownFrame + 1) + ' · ' + (SW.$('.ov-pstat', insp) ? SW.$('.ov-pstat', insp).textContent : ''), 11.5, dim));
+      var rows0 = SW.$$('.ov-vt tbody tr', insp).map(function (tr) { return SW.$$('td', tr).map(function (x) { return x.textContent.trim(); }).concat([tr.classList.contains('ch')]); });
+      o.push(tx(16, y0 + 12, 'Frame ' + (shownFrame + 1), 11, dim) + tx(250, y0 + 12, 'begins', 11, dim, 'end') + tx(330, y0 + 12, 'ends', 11, dim, 'end'));
+      rows0.forEach(function (r, n) { var yy = y0 + 32 + n * 18, c0 = r[3] ? acc : ink; o.push(tx(16, yy, r[0], 12, c0) + tx(250, yy, r[1], 12, c0, 'end') + tx(330, yy, r[2], 12, c0, 'end')); });
+      var cd = e === 'rt' ? null : codeOf(e), cl = cd ? b.lines[cd.p].slice(cd.n0 - 1, cd.n1) : [];
+      cl.slice(0, 40).forEach(function (L, n) { o.push(tx(360, y0 + 12 + n * 16, String(L.n).padStart(4) + '  ' + L.raw.replace(/\t/g, '        ').replace(/^(.{0,70}).*$/, '$1'), 11.5, n === 0 ? ink : ink)); });
+      var rl = SW.$$('.ov-rw', insp), xr = 900;
+      var calls = Object.keys((A.R[e] || {}).calls || {});
+      o.push(tx(xr, y0 + 12, 'Calls ' + calls.map(function (k) { return nm(k); }).join(' '), 11.5, ink));
+      rl.forEach(function (t, col) {
+        var x0 = xr + col * 150;
+        SW.$$('tr', t).slice(0, 14).forEach(function (tr, n) { var cs = SW.$$('th, td', tr).map(function (x) { return x.textContent.trim(); }); o.push(tx(x0, y0 + 36 + n * 16, cs[0] || '', 11.5, n ? ink : dim) + tx(x0 + 135, y0 + 36 + n * 16, cs[1] || '', 11.5, n ? ink : dim, 'end')); });
+      });
+      var H = y0 + 20 + Math.max(rows0.length * 18 + 20, Math.min(40, cl.length) * 16, 15 * 16 + 30);
+      return svgWrap(W, H, pal, o.join(''));
+    }
     function tableBlocks(box) {   // the tables in a panel, as the page shows them
       return SW.$$('table', box).map(function (t) {
         var head = SW.$$('thead th', t).map(function (x) { return x.textContent.trim(); });
@@ -573,7 +594,8 @@
       });
     }
     function boxOf(k) { return SW.$('[data-k="' + k + '"]', el).closest('section'); }
-    var FIG = { screen: { svg: screenSVG, name: function () { return fileBase + '-screen-frame-' + (shownFrame + 1); } },
+    var FIG = { panel: { svg: panelSVG, name: function () { return fileBase + '-' + SW.slug(nm(String(picked))) + '-frame-' + (shownFrame + 1); } },
+                screen: { svg: screenSVG, name: function () { return fileBase + '-screen-frame-' + (shownFrame + 1); } },
                 player: { svg: playerSVG, name: function () { return fileBase + '-frame-' + (shownFrame + 1) + '-calls'; } },
                 budget: { svg: budgetSVG, name: function () { return fileBase + '-frame-time'; } } };
     function docOf(k) {
@@ -598,7 +620,7 @@
         SW.toast('Rendering PNG…');
         SW.figures.svgToPNG(SW.exportSVG(F0.svg(SW.exportPalette())), 3, SW.figBgColour()).then(function (r) { root.SWExport.download(F0.name() + '.png', r.png, 'image/png'); }, function () { SW.toast('The PNG could not be made; try SVG.', 5000); });
       }
-      else if (act === 'note' && SW.tray) { if (F0) SW.tray.addFigure(F0.svg(SW.exportPalette()), F0.name()); else SW.tray.addDoc(docOf(k)); }
+      else if (act === 'note' && SW.tray) { if (F0 && k !== 'panel') SW.tray.addFigure(F0.svg(SW.exportPalette()), F0.name()); else SW.tray.addDoc(docOf(k)); }   // the panel goes in as text
     }
 
     // the snapshot's options in a dialog: the controls held, and for how long
