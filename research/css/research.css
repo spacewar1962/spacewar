@@ -1003,13 +1003,9 @@ a.ov-nm:hover { text-decoration: underline; }
 .ln.kcom .n { background: linear-gradient(to right, color-mix(in srgb, var(--text-faint) 80%, transparent) 0 2px, transparent 2px) no-repeat; }
 .kx.kcom { background: linear-gradient(to right, var(--text-faint) 0, var(--text-faint) 2px, transparent 2px); border: 1px solid var(--line); }
 /* functional overview: chart, budget, inspector */
-.ov-cols { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 14px; align-items: start; }
-.ov-side { position: sticky; top: calc(var(--bar-h, 60px) + 50px); display: grid; gap: 10px; max-height: calc(100vh - var(--bar-h, 60px) - 70px); overflow: auto; }
 .ov-scope canvas { width: 100%; max-width: 300px; aspect-ratio: 1; display: block; margin: 0 auto; }
 .ov-scap { text-align: center; font-size: 12px; margin: 4px 0 0; }
 .ov-x { float: right; }
-@media (max-width: 1000px) { .ov-cols { grid-template-columns: 1fr; } .ov-side { position: static; max-height: none; } }
-.ov-left { display: grid; gap: 12px; min-width: 0; }
 .ov-insp { border: 1px solid color-mix(in srgb, var(--beam) 40%, var(--line)); border-radius: 8px; padding: 10px 12px; background: var(--bg-2); font-size: 13px; }
 .ov-insp h4 { margin: 0 0 4px; font-size: 15px; }
 .ov-stats { margin: 6px 0; padding-left: 18px; }
@@ -1037,3 +1033,18 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-vt th:first-child, .ov-vt td:first-child { text-align: left; width: 44%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ov-vt td { text-align: right; padding: 0 4px; color: var(--text-dim); border-top: 1px solid var(--line-soft); }
 .ov-vt tr.ch td { color: var(--amber); }
+/* overview layout: screen and player, the data panel, then the rest */
+.ov-top { display: grid; grid-template-columns: minmax(240px, 340px) minmax(0, 1fr); gap: 14px; align-items: start; }
+.ov-top .ov-scope canvas { max-width: 340px; }
+@media (max-width: 860px) { .ov-top { grid-template-columns: 1fr; } }
+.ov-run { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; border-top: 1px solid var(--line-soft); padding-top: 8px; margin-top: 8px; }
+.ov-run p { margin: 0; font-size: 12.5px; }
+.ov-insp { border: none; padding: 0; background: none; display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 1.3fr); gap: 16px; }
+@media (max-width: 860px) { .ov-insp { grid-template-columns: 1fr; } }
+.ov-pcode .ov-code { margin-top: 0; max-height: 420px; overflow: auto; }
+.ov-rest { display: grid; gap: 12px; }
+.ov-snapdlg { max-width: 560px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); padding: 14px 18px; }
+.ov-snapdlg::backdrop { background: rgba(0,0,0,.5); }
+.ov-snapdlg h3 { margin: 0 0 6px; }
+.ov-snapdlg > label { display: flex; margin: 6px 0; }
+.ov-ships { display: grid; gap: 6px; margin: 4px 0 0 24px; }

@@ -247,20 +247,16 @@
       }).join('') + '</ul>';
     }
     var h = [];
-    h.push('<div class="ov-run hint">Snapshot of ' + SW.esc(b.v.label) + ' on the emulator: ' + A.frames + ' frames of the main loop, with ' +
-      A.phases.map(function (P) { return P.what; }).join(', then ') + '. Click a routine to inspect it; the grey text is the program’s own comment. A memory cycle is 5 µs.' + (A.halted ? ' The machine halted during the run.' : '') + '</div>');
-    var mcw = mine ? mine.cw : 0;
-    h.push('<div class="toolbar ov-ctl" style="position:static;padding:0">' + [0, 1].map(function (s0) {
-      return '<span class="ov-ship">' + (s0 ? 'Second ship' : 'First ship') + BITS.map(function (bt) { return ' <label class="check"><input type="checkbox" data-bit="' + bt[1 + s0] + '"' + (mcw & bt[1 + s0] ? ' checked' : '') + '>' + bt[0] + '</label>'; }).join('') + '</span>';
-    }).join('') + '<label class="check">held for <select class="ov-secs">' + [1, 3, 5, 10].map(function (x) { return '<option' + ((mine ? mine.secs : 3) === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select> s</label>' +
-      '<button class="btn" data-rec="1" title="Run again with these controls held (both rotate bits of a ship mean hyperspace)">Take a new snapshot</button>' + (mine ? '<button class="btn ghost" data-rec="0">The standard sequence</button>' : '') + '</div>');
+    var snapLine = '<div class="ov-run"><p class="hint"><b>Snapshot:</b> ' + SW.esc(b.v.label) + ' on the emulator, ' + A.frames + ' frames of the main loop, with ' +
+      A.phases.map(function (P) { return P.what; }).join(', then ') + '. A memory cycle is 5 µs.' + (A.halted ? ' The machine halted during the run.' : '') + '</p>' +
+      '<button class="btn" data-snap title="Choose the controls held, and take a new snapshot">New snapshot…</button></div>';
 
     // one frame against time
-    h.push('<section class="ov-box"><h4>One frame, call by call</h4>' +
+    var frameBox = ('<section class="ov-box ov-player"><h4>One frame, call by call</h4>' +
       '<div class="toolbar ov-fctl" style="position:static;padding:0 0 6px"><button class="btn ghost" data-f="prev" title="Previous frame">◀</button><button class="btn ghost" data-f="play">▶ Play</button><button class="btn ghost" data-f="next" title="Next frame">▶</button>' +
       '<select class="ov-speed" title="Frames a second when playing; real time plays each frame for as long as it took on the PDP-1">' + [['1', '1 a second'], ['2', '2 a second'], ['4', '4 a second'], ['8', '8 a second'], ['16', '16 a second'], ['rt', 'real time']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === speedPref() ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
       '<input type="range" class="ov-fr" min="0" max="' + (NF - 1) + '" value="' + Math.min(NF - 1, Math.round(NF * 0.1)) + '"><span class="hint ov-fcap"></span></div>' +
-      '<div class="ov-flame"></div><p class="hint">Each bar is a routine, from its call to its return, under the routine that called it; the scale is the same for every frame, and a line marks where this one ends. Grey is the main loop using up the rest of the frame’s time (count \\mtc); when the frame’s work takes longer, there is no wait and the frame runs long.</p></section>');
+      '<div class="ov-flame"></div><p class="hint">Each bar is a routine, from its call to its return, under the routine that called it; the scale is the same for every frame, and a line marks where this one ends. Grey is the main loop using up the rest of the frame’s time (count \\mtc); when the frame’s work takes longer, there is no wait and the frame runs long.</p>' + snapLine + '</section>');
 
     // where the time goes
     var rows = Object.keys(A.ex).map(function (e) { return { e: e, ex: A.ex[e], inc: e === 'main' ? A.total : e === 'wait' ? A.ex[e] : (A.inc[e] || A.ex[e]) }; })
@@ -341,8 +337,9 @@
     if (T) h.push('<section class="ov-box"><h4>The object table <span class="faint">(' + (T.nob != null ? T.nob + ' objects (nob, octal ' + T.nob.toString(8) + '), ' : '') + 'as the main loop sets its pointers; words in decimal)</span></h4><table class="ov-sub"><thead><tr><th>Field</th><th>Words</th><th>The program’s comment</th></tr></thead><tbody>' +
       T.fields.map(function (f) { return '<tr><td><a href="#" class="ov-nm mono" data-p="' + f.p + '" data-n="' + f.n + '">' + SW.esc(f.field) + '</a></td><td class="num">' + (f.size == null ? '' : f.size) + '</td><td class="ov-g">' + SW.esc(f.what) + '</td></tr>'; }).join('') + '</tbody></table></section>');
 
-    el.innerHTML = '<div class="ov-cols"><div class="ov-left">' + h.join('') + '</div><aside class="ov-side">' +
-      '<div class="ov-scope"><canvas width="520" height="520"></canvas><p class="hint ov-scap"></p></div><div class="ov-insp" hidden></div></aside></div>';
+    el.innerHTML = '<div class="ov-top"><div class="ov-scope"><canvas width="520" height="520"></canvas><p class="hint ov-scap"></p></div>' + frameBox + '</div>' +
+      '<section class="ov-box ov-panel"><div class="ov-insp"></div></section>' +
+      '<div class="ov-rest">' + h.join('') + '</div>';
     var insp = SW.$('.ov-insp', el), scv = SW.$('.ov-scope canvas', el), sg = scv.getContext('2d'), scap = SW.$('.ov-scap', el), picked = null, hovered = null, shownFrame = 0;
     // the screen in the frame shown: its points bright, the frame before faint
     // (the phosphor's glow), a chosen routine's points in its colour
@@ -429,7 +426,7 @@
     function signed(v) { return v & 0o400000 ? -((~v) & 0o377777) : v; }   // ones' complement
     function objName(n) { return n === 0 ? 'first ship' : n === 1 ? 'second ship' : 'object ' + (n + 1); }
     function values() {
-      var box = SW.$('.ov-vals', insp); if (!box || picked == null || insp.hidden) return;
+      var box = SW.$('.ov-vals', insp); if (!box || picked == null) return;
       var e = String(picked), i = shownFrame, s0 = A.snaps[i], s1 = A.snaps[i + 1];
       if (!s0 || !s1) { box.innerHTML = ''; return; }
       var rows = [];
@@ -446,7 +443,7 @@
         var lab = r.c.kind === 'field' ? (r.c.f.what && r.c.f.what.length < 14 ? r.c.f.what : r.c.key) + (r.c.obj < 2 ? '' : ' ' + (r.c.obj + 1)) : String(r.c.key);
         var a0 = xy ? signed(v0) >> 8 : signed(v0), a1 = xy ? signed(v1) >> 8 : signed(v1);
         var tip = (r.c.kind === 'field' ? r.c.key + ', ' + objName(r.c.obj) + ': ' : '') + SW.oct(v0, 6) + ' → ' + SW.oct(v1, 6) + (xy ? ' (screen position: the top ten bits)' : '');
-        return '<tr' + (v0 !== v1 ? ' class="ch"' : '') + ' title="' + SW.esc(tip) + '"><td>' + SW.esc(lab) + '</td><td>' + a0 + '</td><td>' + a1 + '</td></tr>';
+        return '<tr' + (a0 !== a1 ? ' class="ch"' : '') + ' title="' + SW.esc(tip) + '"><td>' + SW.esc(lab) + '</td><td>' + a0 + '</td><td>' + a1 + '</td></tr>';
       }).join('') + '</tbody></table>' : '';
     }
 
@@ -464,7 +461,7 @@
       if (e === 'startup') return;
       var r = A.R[e] || { n: 0, calls: {}, callers: {}, startup: 0 }, g = e === 'wait' ? 'use up rest of time of main loop' : e === 'main' ? glossAt(b, A.frameAt) : glossAt(b, e);
       var callsN = r.n - (r.startup || 0), exN = A.ex[e] || 0, incN = e === 'main' ? A.total : (A.inc[e] || exN);
-      var hh = ['<button class="icon-btn ov-x" data-x title="Close">✕</button><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + '</h4>'];
+      var hh = ['<div class="ov-pinfo"><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + '</h4>'];
       if (g) hh.push('<p class="ov-g">' + SW.esc(g) + '</p>');
       hh.push('<div class="ov-vals"></div>');
       var st = [];
@@ -490,6 +487,7 @@
       function rwList(m) { return Object.keys(m).sort(function (x, y) { return m[y] - m[x]; }).slice(0, 14).map(function (k) { return '<span class="mono">' + SW.esc(k) + '</span> <span class="faint">' + rate(m[k]) + '</span>'; }).join(', '); }
       if (Object.keys(ws).length) hh.push('<p><b>Writes</b> ' + rwList(ws) + '</p>');
       if (Object.keys(rs).length) hh.push('<p><b>Reads</b> ' + rwList(rs) + '</p>');
+      hh.push('</div><div class="ov-pcode">');
       var cd = e === 'rt' ? null : codeOf(e);
       if (e === 'rt') hh.push('<p class="hint">Code written by the outline compiler (oc) at start-up, so it has no source lines: in Read it shows as run-time code.</p>');
       if (cd) {
@@ -497,8 +495,9 @@
         hh.push('<div class="ov-code mono">' + ls.slice(cd.n0 - 1, cd.n1).map(function (L) { return '<div><span class="faint">' + String(L.n).padStart(4) + '</span>  ' + SW.esc(L.raw.replace(/\t/g, '    ')) + '</div>'; }).join('') + (cd.cut ? '<div class="faint">…</div>' : '') + '</div>' +
           '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>');
       }
+      hh.push('</div>');
       insp.innerHTML = hh.join('');
-      insp.hidden = false; picked = e;
+      picked = e;
       // to watch it, the chart goes to the nearest frame in which it runs
       var l = ranIn[String(e)];
       if (l && l.length && l.indexOf(shownFrame) < 0) {
@@ -507,17 +506,34 @@
       } else { scope(shownFrame); values(); }
       SW.$$('.ov-sp', fl).forEach(function (gg) { gg.classList.toggle('on', gg.dataset.e === String(e)); });
       SW.$$('.ov-brow', el).forEach(function (rw) { rw.classList.toggle('on', rw.dataset.e === String(e)); });
-      if (window.innerWidth < 1000) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      var pr = insp.getBoundingClientRect(); if (pr.bottom < 60 || pr.top > window.innerHeight - 60) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+    // the snapshot's options in a dialog: the controls held, and for how long
+    function snapDialog() {
+      var d = SW.el('dialog', { class: 'ov-snapdlg' }), mcw = mine ? mine.cw : 0;
+      d.innerHTML = '<h3>New snapshot</h3><p class="hint">The version runs on the emulator for two seconds with no controls, then with the controls chosen here held, then two seconds released. Both rotate bits of a ship mean hyperspace.</p>' +
+        '<label class="check"><input type="radio" name="ovs" value="std"' + (mine ? '' : ' checked') + '> The standard sequence <span class="faint">(' + PHASES.map(function (P) { return P.what; }).join(', then ') + ')</span></label>' +
+        '<label class="check"><input type="radio" name="ovs" value="mine"' + (mine ? ' checked' : '') + '> These controls:</label>' +
+        '<div class="ov-ships">' + [0, 1].map(function (s0) {
+          return '<div><b>' + (s0 ? 'Second ship' : 'First ship') + '</b>' + BITS.map(function (bt) { return ' <label class="check"><input type="checkbox" data-bit="' + bt[1 + s0] + '"' + (mcw & bt[1 + s0] ? ' checked' : '') + '>' + bt[0] + '</label>'; }).join('') + '</div>';
+        }).join('') + '<label class="check">held for <select class="ov-secs">' + [1, 3, 5, 10].map(function (x) { return '<option' + ((mine ? mine.secs : 3) === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select> seconds</label></div>' +
+        '<div class="toolbar" style="position:static;padding:10px 0 0;justify-content:flex-end"><button class="btn ghost" data-c>Cancel</button><button class="btn" data-t>Take snapshot</button></div>';
+      document.body.appendChild(d);
+      d.addEventListener('change', function (e2) { if (e2.target.dataset.bit || e2.target.classList.contains('ov-secs')) SW.$('input[value="mine"]', d).checked = true; });
+      d.addEventListener('click', function (e2) {
+        if (e2.target === d || e2.target.closest('[data-c]')) { d.close(); d.remove(); return; }
+        if (e2.target.closest('[data-t]')) {
+          if (SW.$('input[value="std"]', d).checked) mine = null;
+          else { var cw = 0; SW.$$('[data-bit]', d).forEach(function (x) { if (x.checked) cw |= +x.dataset.bit; }); mine = { cw: cw, secs: +SW.$('.ov-secs', d).value }; }
+          d.close(); d.remove(); O.render(b, el);
+        }
+      });
+      d.addEventListener('close', function () { d.remove(); });
+      d.showModal();
     }
     if (el._ovClick) el.removeEventListener('click', el._ovClick);
     el.addEventListener('click', el._ovClick = function (ev) {
-      var rc = ev.target.closest('[data-rec]');
-      if (rc) {
-        if (rc.dataset.rec === '0') mine = null;
-        else { var cw = 0; SW.$$('.ov-ctl [data-bit]', el).forEach(function (x) { if (x.checked) cw |= +x.dataset.bit; }); mine = { cw: cw, secs: +SW.$('.ov-secs', el).value }; }
-        O.render(b, el); return;
-      }
-      if (ev.target.closest('[data-x]')) { insp.hidden = true; picked = null; scope(shownFrame); SW.$$('.ov-sp.on, .ov-brow.on', el).forEach(function (x) { x.classList.remove('on'); }); return; }
+      if (ev.target.closest('[data-snap]')) { snapDialog(); return; }
       var rd = ev.target.closest('[data-read]');
       if (rd) { var pn = rd.dataset.read.split(':'); goRead(b, +pn[0], +pn[1]); return; }
       var x = ev.target.closest('[data-e]');
@@ -525,5 +541,9 @@
       var a = ev.target.closest('a.ov-nm[data-p]');
       if (a && a.dataset.p !== '') { ev.preventDefault(); goRead(b, +a.dataset.p, +a.dataset.n); }
     });
+    // the data panel starts on the first ship (ss1, or whichever entry is in it)
+    var first = Object.keys(A.R).filter(function (e) { return /^\d+$/.test(e) && /^ss1(\+\d+)?$/.test(name(b, e)); })[0];
+    if (first == null) { var objs = Object.keys(A.sites).map(function (k) { return A.sites[k]; }).filter(function (x) { return Object.keys(x.to).length > 1; })[0]; if (objs) first = Object.keys(objs.to).sort(function (x, y) { return +x - +y; })[0]; }
+    if (first != null) inspect(first);
   }
 })(this);
