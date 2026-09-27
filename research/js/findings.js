@@ -319,26 +319,13 @@
   }
 
   // ---------- view ----------
-  // Two parts: Findings (shared: the bench's and the group's) and My notes
-  // (private, this browser: what you gather for writing).
-  var done = false, part = SW.store.get('fd.part', 'shared');
+  // The shared findings: the bench's and the group's. (My notes has its own tab.)
+  var done = false;
   function render() {
     done = true;
     view.innerHTML = '';
     var pad = SW.el('div', { class: 'pad findings' });
-    var sw = SW.el('div', { class: 'toolbar fd-switch', style: 'position:static;padding-left:0' });
-    sw.innerHTML = '<span class="seg-btns"><button class="btn' + (part === 'shared' ? ' on' : '') + '" data-part="shared" title="What the bench and the group have established, with evidence; shared">Findings <span class="hint">shared</span></button>' +
-      '<button class="btn' + (part === 'mine' ? ' on' : '') + '" data-part="mine" title="What you have gathered for writing: figures, excerpts, findings, paragraphs; private, in this browser">My notes <span class="hint">private</span> <span class="news-n mine-n">' + (SW.tray.count() || '') + '</span></button></span>';
-    sw.addEventListener('click', function (e) { var b = e.target.closest('[data-part]'); if (b) { part = b.dataset.part; SW.store.set('fd.part', part); render(); } });
-    pad.appendChild(sw);
     view.appendChild(pad);
-    if (part === 'mine') {
-      pad.appendChild(SW.el('h2', {}, 'My notes'));
-      var m = SW.el('div', { class: 'fd-mine-box' });
-      pad.appendChild(m);
-      SW.tray.render(m);
-      return;
-    }
     var tb = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
     tb.appendChild(SW.el('button', { class: 'btn', title: 'A finding on the version open, shared with the group, tagged “finding”; the first line is its title. (For lines, select them in Read and use ★ Finding.)', onclick: function () {
       var v = SW.state.v && V.byId(SW.state.v);
@@ -395,8 +382,8 @@
     }
     run();
   }
-  SW.findings = { list: FIND, showMine: function () { part = 'mine'; SW.store.set('fd.part', part); done = false; SW.setTab('findings'); render(); } };
-  SW.on('notes', function () { if (done && part === 'shared' && SW.state.tab === 'findings') render(); });
+  SW.findings = { list: FIND, showMine: function () { SW.setTab('notes'); } };
+  SW.on('notes', function () { if (done && SW.state.tab === 'findings') render(); });
 
   SW.views.findings = { show: function () { if (!done) render(); }, reset: function () { done = false; } };
 })(this);

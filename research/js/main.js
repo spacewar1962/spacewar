@@ -5,7 +5,7 @@
   'use strict';
   var SW = root.SW, V = root.SWVersions;
 
-  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'graphics', 'about', 'findings'];
+  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'graphics', 'about', 'findings', 'notes'];
 
   function fillPicker() {
     var sel = SW.$('#pick-a');

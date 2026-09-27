@@ -2,7 +2,7 @@
  * tray.js - My notes (once "the tray"): figures, code excerpts, tables, findings
  * and your own paragraphs gathered from anywhere in the bench, put in order,
  * captioned, and exported together as one Word or Markdown file with numbered
- * figures. Private: kept in this browser. Shown in the Findings tab.
+ * figures. Private: kept in this browser. Shown in its own tab, My notes.
  * Each note carries the version open when it was added, its author's
  * initials, a chapter and tags; Share sends it to the group's Findings as an
  * annotation tagged "finding", signed with those initials.
@@ -20,7 +20,7 @@
   }
   function where() {
     var v = SW.state.v && root.SWVersions.byId(SW.state.v);
-    return (v ? v.label.replace(/^Spacewar! /, '') + ' · ' : '') + ({ read: 'Read', run: 'Run', analyse: SW.anLensName ? SW.anLensName() : 'Analyse', compare: 'Compare', genealogy: 'Genealogy', tape: 'Tape', graphics: 'Graphics', about: 'Versions', findings: 'Findings' }[SW.state.tab] || SW.state.tab);
+    return (v ? v.label.replace(/^Spacewar! /, '') + ' · ' : '') + ({ read: 'Read', run: 'Run', analyse: SW.anLensName ? SW.anLensName() : 'Analyse', compare: 'Compare', genealogy: 'Genealogy', tape: 'Tape', graphics: 'Graphics', about: 'Versions', notes: 'My notes', findings: 'Findings' }[SW.state.tab] || SW.state.tab);
   }
   // Undo: the whole of My notes as it was before each change, this session.
   var undoStack = [];
@@ -85,7 +85,7 @@
     add({ kind: 'text', caption: '', text: n.text, from: '' }, { vid: n.vid, by: n.by, tags: tags, chapter: ch, anchor: n.anchor || null, quote: n.quote || '' });
   };
   T.count = function () { return load().items.length; };
-  var host = null;   // where My notes are shown (the Findings tab)
+  var host = null;   // where My notes are shown (its tab)
   function paint() {
     SW.$$('.mine-n').forEach(function (n) { n.textContent = T.count() || ''; });
     if (host && host.isConnected) T.render(host);
@@ -119,7 +119,7 @@
     }).join('');
   }
 
-  // My notes, drawn into an element (the Findings tab); T.show goes there.
+  // My notes, drawn into an element (its own tab); T.show goes there.
   var CHAPTERS = ['Introduction', 'Chapter 1', 'Chapter 2', 'Chapter 3', 'Chapter 4', 'Chapter 5', 'Chapter 6', 'Chapter 7', 'Chapter 8', 'Conclusion', 'Appendix'];
   function vShort(id) { var v = id && root.SWVersions.byId(id); return v ? v.label.replace(/^Spacewar! /, '') : ''; }
   function uniq(a) { return a.filter(function (x, i) { return x && a.indexOf(x) === i; }); }
@@ -133,7 +133,16 @@
     });
     return out;
   }
-  T.show = function () { if (SW.findings && SW.findings.showMine) SW.findings.showMine(); };
+  T.show = function () { SW.setTab('notes'); };
+  // the My notes tab
+  SW.views.notes = { show: function () {
+    var v = SW.$('#view-notes'); v.innerHTML = '';
+    var pad = SW.el('div', { class: 'pad findings' });
+    pad.appendChild(SW.el('h2', {}, 'My notes'));
+    var m = SW.el('div', { class: 'fd-mine-box' });
+    pad.appendChild(m); v.appendChild(pad);
+    T.render(m);
+  } };
   T.render = function (el) {
     host = el;
     var t = load();
