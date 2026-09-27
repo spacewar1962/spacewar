@@ -1082,3 +1082,4 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-code .t .sym:hover { text-decoration: none; }
 .ov-code .t .sym.go { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
 .ov-code .t .sym.go:hover { text-decoration: underline; }
+.ov-scap { font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.4em; }

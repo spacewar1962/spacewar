@@ -360,12 +360,11 @@
         return n;
       }
       pass(FL[i - 1], 0.28, false);
-      var nHi = pass(FL[i], 1, true), nPrev = 0;
-      if (hi != null && FL[i - 1]) for (var q = 2; q < FL[i - 1].pts.length; q += 3) if (String(FL[i - 1].pts[q]) === hi) nPrev++;
+      var nHi = pass(FL[i], 1, true);
       sg.restore();
       sg.strokeStyle = '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
       var f = FL[i];
-      scap.textContent = f ? 'The screen in frame ' + (i + 1) + ': ' + (f.pts.length / 3) + ' points' + (hi != null ? '; ' + nm(hi) + (!runsIn(hi, i) ? ' did not run in this frame' : ' plotted ' + (nHi || 'none') + (!nHi && nPrev ? ' (' + nPrev + ' in the frame before, shown faint)' : '')) : '') : '';
+      scap.textContent = f ? 'Frame ' + (i + 1) + ' · ' + (f.pts.length / 3) + ' points' + (hi != null ? ' · ' + nm(hi) + (!runsIn(hi, i) ? ' not in this frame' : ' ' + nHi) : '') : '';
     }
 
     // ---------- the flame chart ----------
