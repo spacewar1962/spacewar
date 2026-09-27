@@ -147,6 +147,7 @@
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
         '<div><i class="kx kcall"></i>a macro called here (hover the word column for how many words it made; “+5” means five more)</div>' +
         '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
+        '<div><i class="kx kcom"></i>a line of comment only</div>' +
         '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
         '<div><i class="kx knoted"></i>covered by an annotation (initials at the right; click them)</div>' +
         '<div><span class="errs">lac x</span> an assembly error (hover for the message)</div>' +

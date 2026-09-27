@@ -561,8 +561,8 @@ body.drawer-open .notes-tab { display: none; }
 
 /* Kinds of line, in the syntax colours. */
 /* definitions marked by a thin rule at the left of the line number, not a ground (a ground was distracting) */
-.ln.kdef .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--violet) 70%, transparent); }
-.ln.keq .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--green) 70%, transparent); }
+
+
 /* Macro calls: a dotted cyan rule, unlike the solid violet of definitions and normalised lines. */
 .ln.kcall .t { background-image: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px); background-size: 2px 100%; background-repeat: no-repeat; padding-left: 5px; }
 .keylist div { margin: 3px 0; display: flex; align-items: center; gap: 8px; }
@@ -903,8 +903,8 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .mem-refs { display: grid; gap: 1px; margin: 4px 0 10px; max-height: 180px; overflow: auto; }
 .mem-refs a { font-size: 11.5px; text-decoration: none; }
 .mem-segs h4 { margin: 12px 0 4px; }
-.ln.kdef.norm .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--violet) 70%, transparent), inset -3px 0 0 var(--violet); }
-.ln.keq.norm .n { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--green) 70%, transparent), inset -3px 0 0 var(--violet); }
+
+
 
 /* Graphics: how it is drawn, slowed down */
 .dr-row { display: flex; flex-wrap: wrap; gap: 18px; }
@@ -996,3 +996,9 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-sub { border-collapse: collapse; width: 100%; font-size: 13px; }
 .ov-sub th, .ov-sub td { text-align: left; padding: 3px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
 .ov-sub td.num { text-align: right; white-space: nowrap; }
+/* line kinds: a vertical strip at the left of the number, drawn as a background so
+   consecutive lines join into one line (a shadow per cell could show seams) */
+.ln.kdef .n { background: linear-gradient(to right, color-mix(in srgb, var(--violet) 70%, transparent) 0 2px, transparent 2px) no-repeat; }
+.ln.keq .n { background: linear-gradient(to right, color-mix(in srgb, var(--green) 70%, transparent) 0 2px, transparent 2px) no-repeat; }
+.ln.kcom .n { background: linear-gradient(to right, color-mix(in srgb, var(--text-faint) 80%, transparent) 0 2px, transparent 2px) no-repeat; }
+.kx.kcom { background: linear-gradient(to right, var(--text-faint) 0, var(--text-faint) 2px, transparent 2px); border: 1px solid var(--line); }
