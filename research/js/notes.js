@@ -289,7 +289,7 @@
       saveDrafts(d);
       N.invalidate(note.vid);
       if (!note.quiet) SW.toast('Saved as a draft in this browser (no Hypothesis group set).');
-      return Promise.resolve();
+      return Promise.resolve(d[d.length - 1]);
     }
     var uri = SW.versionURI(note.vid);
     var body = {
@@ -309,6 +309,7 @@
       N.invalidate(note.vid);
       setTimeout(function () { N.invalidate(note.vid); }, 4000);
       if (!note.quiet) SW.toast('Annotation saved to the group.');
+      return n;
     });
   };
 
@@ -411,6 +412,7 @@
     holder.innerHTML = '<p class="hint">Opening the bin…</p>';
     N.binList().then(function (every) {
       var list = all ? every : every.filter(function (n) { return n.vid === vid; });
+      if (holder.binFilter) list = list.filter(holder.binFilter);
       var V = root.SWVersions, cur = vid && V.byId(vid);
       var h = (vid ? '<label class="check bin-scope"><input type="checkbox"' + (all ? ' checked' : '') + '> all versions' +
                (all ? '' : ' <span class="faint">(showing ' + SW.esc(cur ? cur.label.replace(/^Spacewar! /, '') : vid) + ' only; ' + every.length + ' in all)</span>') + '</label>' : '');

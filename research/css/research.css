@@ -964,5 +964,15 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .dr-opt { display: block; margin: 6px 0; }
 .reader-dlg .rd-mainside { min-width: 0; }
 .reader-dlg .rd-mainside .rd-ctl { margin-top: 8px; }
-.tray-filters .exp-menu > .menu-body { justify-items: stretch; min-width: 190px; }
-.tray-filters .exp-menu .menu-body .btn { text-align: left; }
+.toolbar .more-menu > .menu-body { justify-items: stretch; min-width: 190px; }
+.toolbar .more-menu .menu-body .btn { text-align: left; }
+.fd-own { display: inline-flex; gap: 4px; margin-right: 6px; }
+.fd-own .btn, .fd-mine { font-size: 12px; padding: 3px 8px; }
+.fd-edit { display: grid; gap: 6px; margin-top: 8px; }
+.fd-edit textarea, .fd-edit input { padding: 5px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: 13px; }
+.toast.act { pointer-events: auto; display: flex; align-items: center; gap: 10px; }
+.toast-act { padding: 2px 10px; font-size: 12.5px; }
+.tray-bin, .fd-bin { border: 1px dashed var(--line); border-radius: 6px; padding: 8px 12px; margin: 8px 0; }
+.tray-bin h3 { margin: 0 0 6px; font-size: 14px; }
+.tray-binned { font-size: 13px; padding: 3px 0; }
+.tray-binned .btn { font-size: 12px; padding: 2px 8px; }

@@ -204,10 +204,57 @@
   function mineButton(make, extra) {
     return SW.el('button', { class: 'btn ghost fd-mine', title: 'Put this finding in My notes (private)', onclick: function () { SW.tray.addDoc(make(), extra); } }, '＋ My notes');
   }
+  // On a finding of one's own: edit it, move it to the bin, or take it back
+  // into My notes (out of the group).
+  var undo = [];   // this session: how to reverse each change to the group's findings
+  function paintUndo() {
+    var b = SW.$('#view-findings .fd-undo'); if (!b) return;
+    b.hidden = !undo.length; b.title = undo.length ? 'Undo: ' + undo[undo.length - 1].label : '';
+  }
+  function did(label, fn) {
+    undo.push({ label: label, fn: fn });
+    paintUndo();
+    SW.toast(label, 0, { label: 'Undo', fn: undoLast });
+  }
+  function undoLast() {
+    var u = undo.pop(); paintUndo(); if (!u) return;
+    Promise.resolve(u.fn()).then(function () { SW.toast('Undone'); }, function (err) { SW.toast(err.message, 5000); });
+  }
+  function ownActions(n, li) {
+    var box = SW.el('span', { class: 'fd-own' });
+    box.appendChild(SW.el('button', { class: 'btn ghost', title: 'Edit the text and tags', onclick: function () {
+      if (SW.$('.fd-edit', li)) return;
+      var ed = SW.el('div', { class: 'fd-edit' });
+      var keep = (n.tags || []).filter(function (g) { return /^findings?$/i.test(g); });
+      ed.innerHTML = '<textarea rows="4"></textarea><input placeholder="Tags, separated by commas"><div class="toolbar" style="position:static;padding-left:0"><button class="btn" data-e="save">Save</button><button class="btn ghost" data-e="cancel">Cancel</button></div>';
+      SW.$('textarea', ed).value = n.text;
+      SW.$('input', ed).value = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g); }).join(', ');
+      ed.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-e]'); if (!b) return;
+        if (b.dataset.e === 'cancel') { ed.remove(); return; }
+        var text = SW.$('textarea', ed).value.trim(); if (!text) return;
+        var tags = keep.concat(SW.$('input', ed).value.split(',').map(function (g) { return g.trim(); }).filter(Boolean));
+        b.disabled = true;
+        var was = { text: n.text, tags: (n.tags || []).slice() };
+        N.update(n, text, tags).then(function () { did('Finding edited', function () { return N.update(n, was.text, was.tags); }); }, function (err) { b.disabled = false; SW.toast(err.message, 5000); });
+      });
+      li.appendChild(ed);
+      SW.$('textarea', ed).focus();
+    } }, '✎ Edit'));
+    box.appendChild(SW.el('button', { class: 'btn ghost', title: 'Take it out of the group’s Findings (to the bin, where it can be restored)', onclick: function () {
+      if (!confirm('Delete this finding from the group? It goes to the bin, where it can be restored.')) return;
+      N.bin(n).then(function () { did('Finding moved to the bin', function () { return N.restore(n); }); }, function (err) { SW.toast(err.message, 5000); });
+    } }, '🗑 Delete'));
+    box.appendChild(SW.el('button', { class: 'btn ghost', title: 'Take it out of the group and back into My notes, private', onclick: function () {
+      if (!confirm('Take this finding out of the group and back into My notes?')) return;
+      N.bin(n).then(function () { SW.tray.recall(n); did('Back in My notes', function () { SW.tray.undo(); return N.restore(n); }); }, function (err) { SW.toast(err.message, 5000); });
+    } }, '↩ Recall to My notes'));
+    return box;
+  }
   // Annotations tagged "finding": cards in their author's colour; the first line is the title.
   function checkNotes(box) {
     box.innerHTML = '<p class="hint">Gathering the group’s findings…</p>';
-    return N.listAll().then(function (all) {
+    return N.whoami().catch(function () {}).then(function () { return N.listAll(); }).then(function (all) {
       var list = all.filter(function (n) {
         return (n.tags || []).some(function (t) { return /^findings?$/i.test(t); });
       }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; });
@@ -232,6 +279,7 @@
           if (n.vid !== SW.state.v) SW.select(n.vid);
           SW.setTab(n.anchor ? 'read' : 'about');
         };
+        if (N.mine(n)) li.appendChild(ownActions(n, li));
         li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }, { by: n.by, vid: n.vid, shared: { date: n.date }, tags: (n.tags || []).filter(function (g) { return !/^findings?$|^chapter:/i.test(g); }) }));
         ol.appendChild(li);
       });
@@ -297,8 +345,26 @@
       if (!v) return;
       N.dialog({ vid: v.id, kind: 'version', anchor: null, tags: ['finding'], heading: 'Add a finding', anchorText: 'On ' + v.label + '. Shared with the group and listed under Findings; the first line is its title.' });
     } }, '✎ Add a finding'));
-    tb.appendChild(SW.exportButtons(doc, 'spacewar-findings'));
-    tb.appendChild(SW.el('button', { class: 'btn ghost', title: 'Read the tapes and compare the witnesses again, and fetch the group’s findings', onclick: function () { run(); } }, '↻ Check again'));
+    // export and the rest in one ⋯ menu, as in My notes
+    var more = SW.el('details', { class: 'menu exp-menu more-menu' });
+    more.innerHTML = '<summary class="btn ghost" title="Export, or check again">⋯</summary>';
+    var mb = SW.el('div', { class: 'menu-body' });
+    SW.$$('button', SW.exportButtons(doc, 'spacewar-findings')).forEach(function (x) { x.classList.add('ghost'); mb.appendChild(x); });
+    mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'Read the tapes and compare the witnesses again, and fetch the group’s findings', onclick: function () { run(); } }, '↻ Check again'));
+    mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'Findings you deleted, to restore or delete for good', onclick: function () {
+      var hb = SW.$('.fd-bin', pad);
+      if (hb) { hb.remove(); return; }
+      hb = SW.el('div', { class: 'fd-bin' }); hb.binFilter = function (n) { return (n.tags || []).some(function (g) { return /^findings?$/i.test(g); }); };
+      tb.after(hb); N.showBin(hb, { all: true });
+    } }, '🗑 Bin'));
+    var right = SW.el('span', { class: 'tb-right', style: 'display:inline-flex;gap:6px' });
+    var ub = SW.el('button', { class: 'btn ghost fd-undo', onclick: undoLast }, '↶ Undo');
+    ub.hidden = !undo.length; if (undo.length) ub.title = 'Undo: ' + undo[undo.length - 1].label;
+    right.appendChild(ub);
+    mb.addEventListener('click', function (e) { if (e.target.closest('button')) more.open = false; });
+    more.appendChild(mb);
+    right.appendChild(more);
+    tb.appendChild(right);
     pad.insertAdjacentHTML('beforeend', '<h2>Findings</h2><p class="prose">What the bench and the group have established about the Spacewar! sources, each with its evidence one click away, coloured by who added it. The witness tapes and punched titles are checked afresh against the tapes each time this page opens.</p><div class="fd-legend"></div>');
     pad.appendChild(tb);
     legend([]);

@@ -70,12 +70,19 @@
 
   // ---------- toast / status ----------
   var toastTimer;
-  SW.toast = function (msg, ms) {
+  // act: {label, fn}, a button in the toast (Undo)
+  SW.toast = function (msg, ms, act) {
     var t = SW.$('#toast');
     t.textContent = msg;
+    t.classList.toggle('act', !!act);
+    if (act) {
+      var b = SW.el('button', { class: 'btn ghost toast-act' }, SW.esc(act.label));
+      b.onclick = function () { t.classList.remove('on'); act.fn(); };
+      t.appendChild(b);
+    }
     t.classList.add('on');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.classList.remove('on'); }, ms || 2600);
+    toastTimer = setTimeout(function () { t.classList.remove('on'); }, ms || (act ? 6000 : 2600));
   };
   SW.status = function (msg) { SW.$('#status').textContent = msg || ''; };
 

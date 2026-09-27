@@ -22,7 +22,24 @@
     var v = SW.state.v && root.SWVersions.byId(SW.state.v);
     return (v ? v.label.replace(/^Spacewar! /, '') + ' · ' : '') + ({ read: 'Read', run: 'Run', analyse: SW.anLensName ? SW.anLensName() : 'Analyse', compare: 'Compare', genealogy: 'Genealogy', tape: 'Tape', graphics: 'Graphics', about: 'Versions', findings: 'Findings' }[SW.state.tab] || SW.state.tab);
   }
+  // Undo: the whole of My notes as it was before each change, this session.
+  var undoStack = [];
+  function snap() { try { undoStack.push(localStorage.getItem(KEY) || '{"title":"","items":[]}'); } catch (e) {} if (undoStack.length > 40) undoStack.shift(); }
+  T.undo = function () {
+    if (!undoStack.length) return false;
+    try { localStorage.setItem(KEY, undoStack.pop()); } catch (e) { return false; }
+    paint(); SW.toast('Undone');
+    return true;
+  };
+  var undoAct = { label: 'Undo', fn: function () { T.undo(); } };
+  // The bin: removed notes, kept with the date removed until restored or emptied.
+  function toBin(x, idx) {
+    var now = new Date().toISOString();
+    idx.slice().sort(function (a, b) { return b - a; }).forEach(function (i) { var g = x.items.splice(i, 1)[0]; g.binned = now; x.bin = (x.bin || []).concat([g]); });
+  }
+  var binOpen = false;
   function add(item, extra) {
+    snap();
     var t = load();
     Object.assign(item, extra || {});
     item.id = 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
@@ -49,6 +66,24 @@
   };
   T.addText = function () { add({ kind: 'text', caption: '', text: '' }); };
 
+  // A group finding of one's own, back into My notes: into the note it was
+  // shared from if that is still here (no longer marked shared), else as a new
+  // paragraph with its version, initials, tags and chapter.
+  T.recall = function (n) {
+    snap();
+    var t = load(), tags = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^chapter:/.test(g); });
+    var ch = (n.tags || []).filter(function (g) { return /^chapter:/.test(g); }).map(function (g) { return g.slice(8); })[0] || '';
+    var it = t.items.filter(function (z) { return z.shared && z.shared.id && z.shared.id === n.id; })[0];
+    if (it) {
+      delete it.shared;
+      if (it.kind === 'text') it.text = n.text;
+      it.tags = tags; it.chapter = ch;
+      save(t); paint();
+      SW.toast('Back in My notes');
+      return;
+    }
+    add({ kind: 'text', caption: '', text: n.text, from: '' }, { vid: n.vid, by: n.by, tags: tags, chapter: ch, anchor: n.anchor || null, quote: n.quote || '' });
+  };
   T.count = function () { return load().items.length; };
   var host = null;   // where My notes are shown (the Findings tab)
   function paint() {
@@ -101,17 +136,21 @@
     el.appendChild(head);
     var vis = shown(t), tb = SW.$('.tray-filters', head);
     tb.appendChild(SW.el('button', { class: 'btn ghost tb-right', onclick: function () { T.addText(); } }, '＋ Paragraph'));
-    var more = SW.el('details', { class: 'menu exp-menu' });
+    var more = SW.el('details', { class: 'menu exp-menu more-menu' });
     more.innerHTML = '<summary class="btn ghost" title="Export or remove the notes shown">⋯</summary>';
     var mb = SW.el('div', { class: 'menu-body' });
     mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'The notes shown, in order, as one Word document', onclick: function () { more.open = false; exportTray('docx'); } }, '⤓ Word'));
     mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'The notes shown as Markdown, with the figures saved beside it as PNG', onclick: function () { more.open = false; exportTray('md'); } }, '⤓ Markdown'));
-    mb.appendChild(SW.el('button', { class: 'btn ghost', onclick: function () {
+    mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'To the bin', onclick: function () {
       more.open = false;
-      if (!vis.length || !confirm('Remove ' + vis.length + ' note' + (vis.length === 1 ? '' : 's') + ' from My notes?')) return;
-      var x = load(); x.items = x.items.filter(function (it, i) { return vis.indexOf(i) < 0; }); save(x); paint();
+      if (!vis.length || !confirm('Move ' + vis.length + ' note' + (vis.length === 1 ? '' : 's') + ' to the bin?')) return;
+      snap(); var x = load(); toBin(x, vis); save(x); paint(); SW.toast('Moved to the bin', 0, undoAct);
     } }, 'Remove the notes shown'));
+    mb.appendChild(SW.el('button', { class: 'btn ghost', onclick: function () { more.open = false; binOpen = !binOpen; paint(); } }, (binOpen ? 'Close the bin' : '🗑 Bin') + ' (' + (t.bin || []).length + ')'));
     more.appendChild(mb);
+    var ub = SW.el('button', { class: 'btn ghost', title: 'Undo (⌘Z / Ctrl+Z)', onclick: function () { T.undo(); } }, '↶ Undo');
+    ub.disabled = !undoStack.length;
+    tb.appendChild(ub);
     tb.appendChild(more);
     head.addEventListener('change', function (e) {
       var f = e.target.dataset.f, x = load(), val = e.target.value;
@@ -120,6 +159,7 @@
       else x.filter[f] = val;
       save(x); paint();
     });
+    if (binOpen) el.appendChild(binView(t));
     if (!vis.length) { el.insertAdjacentHTML('beforeend', '<p class="hint">' + (t.items.length ? 'None with these filters.' : 'Nothing here yet. Add with ＋ My notes on any figure, export, finding, or selection in Read.') + '</p>'); return; }
     var fig = 0, list = SW.el('ol', { class: 'tray-list' });
     vis.forEach(function (i, k) {
@@ -145,13 +185,18 @@
       if (!b) return;
       var i = +b.closest('.tray-item').dataset.i, x = load();
       if (b.dataset.a === 'share') { share(i); return; }
-      if (b.dataset.a === 'del') x.items.splice(i, 1);
-      else { var k = vis.indexOf(i), j = vis[b.dataset.a === 'up' ? k - 1 : k + 1]; var tmp = x.items[i]; x.items[i] = x.items[j]; x.items[j] = tmp; }
+      snap();
+      if (b.dataset.a === 'del') { toBin(x, [i]); save(x); paint(); SW.toast('Moved to the bin', 0, undoAct); return; }
+      var k = vis.indexOf(i), j = vis[b.dataset.a === 'up' ? k - 1 : k + 1]; var tmp = x.items[i]; x.items[i] = x.items[j]; x.items[j] = tmp;
       save(x); paint();
     });
+    // one undo step for each stretch of typing in a field
+    var armed = false;
+    list.addEventListener('focusin', function () { armed = true; });
     list.addEventListener('input', function (e) {
       var li = e.target.closest('.tray-item');
       if (!li) return;
+      if (armed) { snap(); armed = false; }
       var x = load(), it = x.items[+li.dataset.i], c = e.target.classList;
       if (c.contains('tray-cap')) it.caption = e.target.value;
       if (c.contains('tray-text')) it.text = e.target.value;
@@ -163,6 +208,34 @@
     // chapter and tag changes redraw the filters once editing is done
     list.addEventListener('change', function (e) { if (e.target.matches('.tray-ch, .tray-tags')) paint(); });
   };
+
+  function binView(t) {
+    var box = SW.el('div', { class: 'tray-bin' }), bin = t.bin || [];
+    box.innerHTML = '<h3>Bin</h3>' + (bin.length ? '' : '<p class="hint">Empty.</p>');
+    bin.slice().reverse().forEach(function (it, r) {
+      var i = bin.length - 1 - r, txt = it.kind === 'text' ? it.text : (it.caption || it.kind);
+      box.insertAdjacentHTML('beforeend', '<div class="tray-binned" data-b="' + i + '"><span class="faint">' + SW.esc(SW.fmtDate(it.binned)) + '</span> ' + SW.esc(String(txt || '').split('\n')[0].slice(0, 90)) +
+        ' <button class="btn ghost" data-r="restore">Restore</button> <button class="btn ghost" data-r="kill">Delete for good</button></div>');
+    });
+    if (bin.length) box.insertAdjacentHTML('beforeend', '<p><button class="btn ghost" data-r="empty">Empty the bin (' + bin.length + ')</button></p>');
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-r]'); if (!b) return;
+      var x = load(); x.bin = x.bin || [];
+      if (b.dataset.r === 'empty') { if (!confirm('Delete everything in the bin for good?')) return; snap(); x.bin = []; }
+      else {
+        var i = +b.closest('[data-b]').dataset.b; snap();
+        var g = x.bin.splice(i, 1)[0];
+        if (b.dataset.r === 'restore') { delete g.binned; x.items.push(g); }
+      }
+      save(x); paint();
+    });
+    return box;
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!(e.metaKey || e.ctrlKey) || e.shiftKey || e.key.toLowerCase() !== 'z') return;
+    if (!host || !host.isConnected || !host.offsetParent || /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '')) return;
+    if (T.undo()) e.preventDefault();
+  });
 
   // A note as a finding: the first line its title, then the note, then an
   // excerpt of what it holds; tagged finding, its tags, and its chapter.
@@ -179,9 +252,9 @@
     if (!confirm('Share with the group’s Findings, signed ' + by + ', on ' + (vShort(vid) || 'the version open') + '?')) return;
     var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []);
     SW.notes.create({ vid: vid, kind: it.anchor ? 'line' : 'version', anchor: it.anchor || null, quote: it.quote || '', text: body, tags: tags, by: by })
-      .then(function () {
+      .then(function (made) {
         var y = load(), j = -1; y.items.forEach(function (z, n) { if (z.id === it.id) j = n; });
-        if (j >= 0) { y.items[j].shared = { date: new Date().toISOString(), draft: !SW.notes.configured() }; y.items[j].by = by; save(y); }
+        if (j >= 0) { y.items[j].shared = { date: new Date().toISOString(), draft: !SW.notes.configured(), id: made && made.id }; y.items[j].by = by; save(y); }
         paint();
       }, function (e) { if (e.message !== 'no initials') SW.toast(e.message, 5000); });
   }
