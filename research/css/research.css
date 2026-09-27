@@ -1028,3 +1028,5 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-bv { text-align: right; white-space: nowrap; }
 .ov-bv.faint { text-align: left; }
 @media (max-width: 700px) { .ov-brow { grid-template-columns: 6em 1fr 3.5em; } .ov-brow .ov-bv.faint { display: none; } }
+.ov-fcap { font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 100%; }
+.ov-fend { stroke: var(--text-dim); stroke-width: 1.5; stroke-dasharray: 3 3; }

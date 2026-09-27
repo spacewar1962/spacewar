@@ -255,7 +255,7 @@
     h.push('<section class="ov-box"><h4>One frame, call by call</h4>' +
       '<div class="toolbar ov-fctl" style="position:static;padding:0 0 6px"><button class="btn ghost" data-f="prev" title="Previous frame">◀</button><button class="btn ghost" data-f="play">▶ Play</button><button class="btn ghost" data-f="next" title="Next frame">▶</button>' +
       '<input type="range" class="ov-fr" min="0" max="' + (NF - 1) + '" value="' + Math.min(NF - 1, Math.round(NF * 0.1)) + '"><span class="hint ov-fcap"></span></div>' +
-      '<div class="ov-flame"></div><p class="hint">Each bar is a routine, from its call to its return, under the routine that called it. Grey is the main loop using up the rest of the frame’s time (count \\mtc); when the frame’s work takes longer, there is no wait and the frame runs long.</p></section>');
+      '<div class="ov-flame"></div><p class="hint">Each bar is a routine, from its call to its return, under the routine that called it; the scale is the same for every frame, and a line marks where this one ends. Grey is the main loop using up the rest of the frame’s time (count \\mtc); when the frame’s work takes longer, there is no wait and the frame runs long.</p></section>');
 
     // where the time goes
     var rows = Object.keys(A.ex).map(function (e) { return { e: e, ex: A.ex[e], inc: e === 'main' ? A.total : e === 'wait' ? A.ex[e] : (A.inc[e] || A.ex[e]) }; })
@@ -341,22 +341,29 @@
 
     // ---------- the flame chart ----------
     var fl = SW.$('.ov-flame', el), fr = SW.$('.ov-fr', el), fcap = SW.$('.ov-fcap', el), playT = null;
+    // one scale for every frame: the longest frame across, the deepest down, so
+    // frames can be compared and the chart keeps still as they change
+    var maxLen = 1, maxDepth = 0;
+    // (the first frame, which runs long as the game begins, is left out of the scale and may run off the edge)
+    FL.forEach(function (f, n) { if (n || FL.length === 1) maxLen = Math.max(maxLen, f.len); f.spans.forEach(function (sp) { maxDepth = Math.max(maxDepth, sp.d); }); });
     function chart(i) {
       var f = FL[i]; if (!f) { fl.innerHTML = '<p class="hint">No frames recorded.</p>'; return; }
-      var W = Math.max(300, fl.clientWidth || 700), RH = 20, depth = 0; f.spans.forEach(function (sp) { depth = Math.max(depth, sp.d); });
-      var H = (depth + 1) * RH + 26, len = f.len || 1;
+      var W = Math.max(300, fl.clientWidth || 700), RH = 20, depth = maxDepth;
+      var H = (depth + 1) * RH + 26, len = f.len || 1, sc = maxLen;
       var o = ['<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" class="ov-fsvg">'];
       f.spans.forEach(function (sp, n) {
-        var t1 = sp.t1 == null ? len : sp.t1, x = W * sp.t0 / len, w = Math.max(0.8, W * (t1 - sp.t0) / len), y = sp.d * RH, nmx = nm(sp.e);
+        var t1 = sp.t1 == null ? len : sp.t1, x = W * sp.t0 / sc, w = Math.max(0.8, W * (t1 - sp.t0) / sc), y = sp.d * RH, nmx = nm(sp.e);
         o.push('<g data-e="' + SW.esc(String(sp.e)) + '" class="ov-sp"><rect x="' + x.toFixed(1) + '" y="' + y + '" width="' + w.toFixed(1) + '" height="' + (RH - 2) + '" fill="' + colour(nmx) + '"><title>' + SW.esc(nmx + ': ' + cyc(t1 - sp.t0) + ', from cycle ' + sp.t0 + ' of the frame') + '</title></rect>' +
           (w > 34 ? '<text x="' + (x + 3).toFixed(1) + '" y="' + (y + RH - 7) + '" class="ov-spt">' + SW.esc(nmx) + '</text>' : '') + '</g>');
       });
-      for (var tk = 0; tk <= 4; tk++) { var tx = W * tk / 4; o.push('<text x="' + Math.min(W - 60, tx + 2) + '" y="' + (H - 6) + '" class="ov-tick">' + Math.round(len * tk / 4).toLocaleString('en-GB') + '</text><line x1="' + tx + '" x2="' + tx + '" y1="' + (H - 22) + '" y2="' + (H - 16) + '" class="ov-tl"/>'); }
+      for (var tk = 0; tk <= 4; tk++) { var tx = W * tk / 4; o.push('<text x="' + Math.min(W - 60, tx + 2) + '" y="' + (H - 6) + '" class="ov-tick">' + Math.round(sc * tk / 4).toLocaleString('en-GB') + '</text><line x1="' + tx + '" x2="' + tx + '" y1="' + (H - 22) + '" y2="' + (H - 16) + '" class="ov-tl"/>'); }
+      var ex0 = W * len / sc;   // where this frame ends
+      o.push('<line x1="' + ex0.toFixed(1) + '" x2="' + ex0.toFixed(1) + '" y1="0" y2="' + (H - 22) + '" class="ov-fend"/>');
       o.push('</svg>');
       fl.innerHTML = o.join('');
       var wait = f.spans.filter(function (sp) { return sp.e === 'wait'; }).reduce(function (a, sp) { return a + ((sp.t1 == null ? len : sp.t1) - sp.t0); }, 0);
       var objs = f.spans.filter(function (sp) { return sp.d === 0 && sp.e !== 'wait'; }).map(function (sp) { return nm(sp.e); });
-      fcap.textContent = 'frame ' + (i + 1) + ' of ' + NF + ' · ' + cyc(len) + ' · waiting ' + Math.round(100 * wait / len) + '% · ' + PHASES[f.phase].what;
+      fcap.textContent = 'frame ' + (i + 1) + ' of ' + NF + ' · ' + cyc(len) + ' · waiting ' + Math.round(100 * wait / len) + '% · ' + A.phases[f.phase].what;
       fcap.title = 'Called from the main loop, in order: ' + objs.join(', ');
     }
     fr.addEventListener('input', function () { chart(+fr.value); });
@@ -367,7 +374,7 @@
       if (t.dataset.f === 'play') {
         if (playT) { clearInterval(playT); playT = null; t.textContent = '▶ Play'; return; }
         t.textContent = '❚❚ Pause';
-        playT = setInterval(function () { if (!fl.isConnected) { clearInterval(playT); return; } fr.value = (+fr.value + 1) % NF; chart(+fr.value); }, 150);
+        playT = setInterval(function () { if (!fl.isConnected) { clearInterval(playT); return; } fr.value = (+fr.value + 1) % NF; chart(+fr.value); }, 250);
         return;
       }
       fr.value = Math.max(0, Math.min(NF - 1, +fr.value + (t.dataset.f === 'next' ? 1 : -1))); chart(+fr.value);
