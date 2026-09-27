@@ -51,7 +51,8 @@
   // Without fade, earlier frames dim when a new frame begins.
   // a coordinate as the display took it: 10 bits, ones' complement (−5 is 1772)
   function oc10(v) { return (v >= 0 ? v : (-v) ^ 0o1777).toString(8).padStart(4, '0'); }
-  var FADE_SECONDS = 1.2;   // shortened so it can be seen: on the scope the glow lasted about 2.4 redraws
+  var FADE_SECONDS = 1.2;
+  D.TYPE30 = 'Type 30 Precision CRT Display: a 16-inch cathode ray tube, random point plotting on a raster 9.25 by 9.25 inches; 1,024 by 1,024 addressable locations, origin fixed at the centre, ones’ complement coordinates; 20,000 points a second; 512 points discernible along each axis. One instruction, dpy (address 0007): X from bits 0–9 of the AC, Y from bits 0–9 of the In-Out register. (DEC, PDP-1 Handbook, 1963, pp. 33–34.)';   // shortened so it can be seen: on the scope the glow lasted about 2.4 redraws
   function player(host, seq, o) {
     o = o || {};
     var wrap = SW.el('div', { class: 'dr-player' });
@@ -64,6 +65,7 @@
       '<label class="check" title="Each point fades after it is plotted, as the phosphor did. Shortened so it can be seen here (a time constant of 1.2 s of replay); on the scope the glow lasted about two and a half redraws, which with Loop kept the image steady"><input type="checkbox" data-a="fade"> Phosphor fade</label>';
     var cap = SW.el('p', { class: 'dr-cap mono hint' });
     wrap.appendChild(cv); wrap.appendChild(ctl); wrap.appendChild(cap);
+    wrap.appendChild(SW.el('p', { class: 'dr-t30' }, SW.esc(D.TYPE30)));
     host.appendChild(wrap);
     // one scale for x and y, the points' extent with a margin
     var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, frames = {};
