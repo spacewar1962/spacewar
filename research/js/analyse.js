@@ -26,7 +26,8 @@
     [11, 'Macros', 'Macros and their use'],
     [12, 'The sky', 'The star table as a chart'],
     [13, 'The ships', 'The ship outlines'],
-    [14, 'Biographies', 'One name across the versions']
+    [14, 'Biographies', 'One name across the versions'],
+    [15, 'Functional overview', 'Start-up, the main loop, each object’s routine, the calls']
   ];
 
   function progLines(b) {
@@ -1549,7 +1550,7 @@
 
   // The lenses in a drop-down, grouped; exports in a menu of their own.
   // The lenses by menu in the tab row: Text, Program, and Absence under Versions.
-  var MENUS = { text: [['', [1, 2, 3, 14]]], program: [['The program', [4, 8, 9, 11]], ['The machine', [5, 6, 10]]], versions: [['', [7]]] };
+  var MENUS = { text: [['', [1, 2, 3, 14]]], program: [['The program', [15, 4, 8, 9, 11]], ['The machine', [5, 6, 10]]], versions: [['', [7]]] };
   function menuOf(n) { for (var m in MENUS) if (MENUS[m].some(function (gr) { return gr[1].indexOf(n) >= 0; })) return m; return 'text'; }
   function lensItems(groups, attr, cur) {
     return groups.map(function (gr) {
@@ -1589,6 +1590,13 @@
     pad.appendChild(cards);
     view.appendChild(pad);
     SW.markTabs();
+    if (lens === 15) {   // one version at a time: recorded on the emulator
+      SW.$$('[data-mode]', head).forEach(function (x) { x.style.display = 'none'; });
+      if (!b.asm) { cards.innerHTML = '<p class="hint">No source survives for this version.</p>'; return; }
+      var ov = SW.el('div', { class: 'ov', style: 'grid-column:1/-1' }); cards.appendChild(ov);
+      SW.overview.render(b, ov);
+      return;
+    }
     if (lens === 14) {
       // a biography is always across the versions; there is no single-version mode
       SW.$$('[data-mode]', head).forEach(function (x) { x.style.display = 'none'; });

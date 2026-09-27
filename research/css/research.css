@@ -976,3 +976,23 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .tray-bin h3 { margin: 0 0 6px; font-size: 14px; }
 .tray-binned { font-size: 13px; padding: 3px 0; }
 .tray-binned .btn { font-size: 12px; padding: 2px 8px; }
+/* functional overview */
+.ov { display: grid; gap: 12px; max-width: 1100px; }
+.ov-run { font-size: 12.5px; }
+.ov-box { border: 1px solid var(--line-soft); border-radius: 8px; padding: 10px 14px; background: color-mix(in srgb, var(--surface-2) 35%, transparent); }
+.ov-box h4 { margin: 0 0 8px; font-size: 14px; }
+.ov-main { border-color: color-mix(in srgb, var(--beam) 45%, var(--line)); }
+.ov-path { font-size: 12.5px; line-height: 1.8; margin: 0 0 6px; }
+.ov-steps { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.ov-steps > li { line-height: 1.5; }
+.ov-objs { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 8px; margin-top: 6px; }
+.ov-obj { border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; background: var(--bg-2); font-size: 13px; }
+.ov-g { color: var(--text-dim); font-style: italic; font-size: 12.5px; }
+.ov-nm { font-weight: 600; }
+a.ov-nm { color: var(--beam); text-decoration: none; }
+a.ov-nm:hover { text-decoration: underline; }
+.ov-calls { list-style: none; margin: 3px 0 0 4px; padding-left: 12px; border-left: 1px solid var(--line); font-size: 12.5px; }
+.ov-calls li { margin: 2px 0; }
+.ov-sub { border-collapse: collapse; width: 100%; font-size: 13px; }
+.ov-sub th, .ov-sub td { text-align: left; padding: 3px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+.ov-sub td.num { text-align: right; white-space: nowrap; }
