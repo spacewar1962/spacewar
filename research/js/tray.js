@@ -144,6 +144,8 @@
       if (t.chapter && t.chapter !== '*' && (it.chapter || '') !== (t.chapter === '-' ? '' : t.chapter)) return;
       if (f.v && it.vid !== f.v) return;
       if (f.tag && (it.tags || []).indexOf(f.tag) < 0) return;
+      if (f.lvl && (it.level || 'notable') !== f.lvl) return;
+      if (f.by && (it.by || '') !== f.by) return;
       out.push(i);
     });
     return out;
@@ -164,14 +166,16 @@
     t.chapter = t.chapter || '*'; t.filter = t.filter || {};
     el.innerHTML = '';
     var chs = uniq(CHAPTERS.concat(t.items.map(function (it) { return it.chapter; }))), used = uniq(t.items.map(function (it) { return it.chapter; }));
-    var vids = uniq(t.items.map(function (it) { return it.vid; })), tags = uniq([].concat.apply([], t.items.map(function (it) { return it.tags || []; }))).sort();
+    var vids = uniq(t.items.map(function (it) { return it.vid; })), tags = uniq([].concat.apply([], t.items.map(function (it) { return it.tags || []; }))).sort(), bys = uniq(t.items.map(function (it) { return it.by; })).sort();
     function opt(v, label, cur) { return '<option value="' + SW.esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + SW.esc(label) + '</option>'; }
     var head = SW.el('div', { class: 'tray-head' });
     head.innerHTML = '<datalist id="tray-chs">' + chs.map(function (c) { return '<option value="' + SW.esc(c) + '">'; }).join('') + '</datalist>' +
       '<div class="toolbar tray-filters" style="position:static;padding-left:0">' +
       '<label>Chapter <select data-f="chapter">' + opt('*', 'All', t.chapter) + chs.filter(function (c) { return used.indexOf(c) >= 0 || c === t.chapter; }).map(function (c) { return opt(c, c, t.chapter); }).join('') + opt('-', 'None given', t.chapter) + '<option value="+">New…</option></select></label>' +
       '<label>Version <select data-f="v">' + opt('', 'All', t.filter.v || '') + vids.map(function (v) { return opt(v, vShort(v), t.filter.v); }).join('') + '</select></label>' +
-      '<label>Tag <select data-f="tag">' + opt('', 'All', t.filter.tag || '') + tags.map(function (g) { return opt(g, g, t.filter.tag); }).join('') + '</select></label></div>' +
+      '<label>Tag <select data-f="tag">' + opt('', 'All', t.filter.tag || '') + tags.map(function (g) { return opt(g, g, t.filter.tag); }).join('') + '</select></label>' +
+      '<label>Importance <select data-f="lvl">' + opt('', 'All', t.filter.lvl || '') + opt('key', '★★★ Key', t.filter.lvl) + opt('notable', '★★ Notable', t.filter.lvl) + opt('minor', '★ Minor', t.filter.lvl) + '</select></label>' +
+      '<label>By <select data-f="by">' + opt('', 'Anyone', t.filter.by || '') + bys.map(function (x) { return opt(x, x, t.filter.by); }).join('') + '</select></label></div>' +
       '<p class="hint">Private, in this browser. A note takes the version open and the chapter chosen here; Share sends it to the group’s Findings, signed with its initials.</p>';
     el.appendChild(head);
     var vis = shown(t), tb = SW.$('.tray-filters', head);
@@ -186,11 +190,12 @@
       if (!vis.length || !confirm('Move ' + vis.length + ' note' + (vis.length === 1 ? '' : 's') + ' to the bin?')) return;
       snap(); var x = load(); toBin(x, vis); save(x); paint(); SW.toast('Moved to the bin', 0, undoAct);
     } }, 'Remove the notes shown'));
-    mb.appendChild(SW.el('button', { class: 'btn ghost', onclick: function () { more.open = false; binOpen = !binOpen; paint(); } }, (binOpen ? 'Close the bin' : '🗑 Bin') + ' (' + (t.bin || []).length + ')'));
     more.appendChild(mb);
     var ub = SW.el('button', { class: 'btn ghost', title: 'Undo (⌘Z / Ctrl+Z)', onclick: function () { T.undo(); } }, '↶ Undo');
     ub.disabled = !undoStack.length;
     tb.appendChild(ub);
+    var binB = SW.el('button', { class: 'btn ghost ov-binbtn' + (binOpen ? ' on' : ''), title: (binOpen ? 'Close the bin' : 'Open the bin') + ' (' + (t.bin || []).length + ')', onclick: function () { binOpen = !binOpen; paint(); } }, '🗑' + ((t.bin || []).length ? '<sup>' + t.bin.length + '</sup>' : ''));
+    tb.appendChild(binB);
     tb.appendChild(more);
     head.addEventListener('change', function (e) {
       var f = e.target.dataset.f, x = load(), val = e.target.value;
@@ -215,6 +220,7 @@
         (it.kind !== 'text' ? '<textarea class="tray-note" rows="2" placeholder="Your note">' + SW.esc(it.note || '') + '</textarea>' : '') +
         '<div class="tray-meta"><label>Chapter <input class="tray-ch" list="tray-chs" value="' + SW.esc(it.chapter || '') + '" placeholder="none"></label>' +
         '<label>Tags <input class="tray-tags" value="' + SW.esc((it.tags || []).join(', ')) + '" placeholder="comma separated"></label>' +
+        '<label title="Carried to Findings when shared">Importance <select class="tray-lvl">' + [['key', '★★★ Key'], ['notable', '★★ Notable'], ['minor', '★ Minor']].map(function (l) { return '<option value="' + l[0] + '"' + ((it.level || 'notable') === l[0] ? ' selected' : '') + '>' + l[1] + '</option>'; }).join('') + '</select></label>' +
         (it.shared ? '<span class="hint tray-shared">In Findings' + (it.shared.date ? ', ' + SW.esc(SW.fmtDate(it.shared.date)) : '') + (it.shared.draft ? ' (draft)' : '') + '</span>'
                    : '<button class="btn ghost" data-a="share" title="Send to the group’s Findings, signed ' + SW.esc(it.by || SW.me().initials || '') + '">↗ Share to Findings</button>') + '</div>';
       list.appendChild(li);
@@ -247,6 +253,7 @@
       if (c.contains('tray-note')) it.note = e.target.value;
       if (c.contains('tray-ch')) it.chapter = e.target.value.trim();
       if (c.contains('tray-tags')) it.tags = e.target.value.split(',').map(function (g) { return g.trim(); }).filter(Boolean);
+      if (c.contains('tray-lvl')) it.level = e.target.value;
       save(x);
     });
     // chapter and tag changes redraw the filters once editing is done
@@ -294,7 +301,7 @@
     if (code) body += '\n\n' + code.lines.slice(0, 12).map(function (l) { return (l.n != null ? l.n + '  ' : '') + l.text; }).join('\n');
     if (!body.trim()) { SW.toast('Write something first: the first line is the finding’s title.', 4000); return; }
     if (!confirm('Share with the group’s Findings, signed ' + by + ', on ' + (vShort(vid) || 'the version open') + '?')) return;
-    var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []);
+    var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []).concat(['level:' + (it.level || 'notable')]);
     SW.notes.create({ vid: vid, kind: it.anchor ? 'line' : 'version', anchor: it.anchor || null, quote: it.quote || '', text: body, tags: tags, by: by })
       .then(function (made) {
         var y = load(), j = -1; y.items.forEach(function (z, n) { if (z.id === it.id) j = n; });

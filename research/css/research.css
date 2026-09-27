@@ -1115,3 +1115,13 @@ a.ov-nm:hover { text-decoration: underline; }
 .tray-tbl td { padding: 2px 8px; border-top: 1px solid var(--line-soft); vertical-align: top; }
 .tray-code.tray-full { max-height: 360px; overflow: auto; }
 .tray-h { margin: 6px 0 0; }
+.fd-filters input[type=search] { min-width: 12em; }
+.fd-cgroup { margin: 10px 0 4px; }
+.fd-chead { margin: 12px 0 4px; font-size: 14px; border-bottom: 1px solid var(--line-soft); padding-bottom: 3px; }
+.fd-cat { display: inline-block; font-size: 11px; padding: 0 6px; border-radius: 9px; background: color-mix(in srgb, var(--beam) 16%, transparent); color: var(--text-dim); }
+.fd-lvl { font-size: 11px; letter-spacing: -1px; color: var(--amber); }
+.fd-lvl.fd-minor, .fd-lvl.fd-notable { opacity: 0.8; }
+.fd-minor > summary { cursor: pointer; font-size: 12.5px; color: var(--text-dim); margin: 2px 0 6px; }
+.ov-binbtn { padding: 2px 8px; font-size: 14px; line-height: 1; }
+.ov-binbtn sup { font-size: 10px; margin-left: 1px; color: var(--text-dim); }
+.ov-binbtn.on { border-color: var(--beam); background: color-mix(in srgb, var(--beam) 16%, transparent); }

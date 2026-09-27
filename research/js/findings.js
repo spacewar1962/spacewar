@@ -226,14 +226,20 @@
       if (SW.$('.fd-edit', li)) return;
       var ed = SW.el('div', { class: 'fd-edit' });
       var keep = (n.tags || []).filter(function (g) { return /^findings?$/i.test(g); });
-      ed.innerHTML = '<textarea rows="4"></textarea><input placeholder="Tags, separated by commas"><div class="toolbar" style="position:static;padding-left:0"><button class="btn" data-e="save">Save</button><button class="btn ghost" data-e="cancel">Cancel</button></div>';
+      var c0 = catOf(n.text, n.tags), l0 = levelOf(n.tags);
+      ed.innerHTML = '<textarea rows="4"></textarea><input placeholder="Tags, separated by commas">' +
+        '<div class="toolbar" style="position:static;padding-left:0"><label class="check">Importance <select data-e2="lvl">' + LEVELS.map(function (l) { return '<option value="' + l[0] + '"' + (l[0] === l0 ? ' selected' : '') + '>' + l[2] + ' ' + l[1] + '</option>'; }).join('') + '</select></label>' +
+        '<label class="check">Category <select data-e2="cat"><option value="">Found from the words (' + SW.esc(CATNAME[catOf(n.text, []).id]) + ')</option>' + CATS.concat([['other', 'Other']]).map(function (c) { return '<option value="' + c[0] + '"' + (!c0.auto && c0.id === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
+        '<button class="btn" data-e="save">Save</button><button class="btn ghost" data-e="cancel">Cancel</button></div>';
       SW.$('textarea', ed).value = n.text;
-      SW.$('input', ed).value = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g); }).join(', ');
+      SW.$('input', ed).value = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).join(', ');
       ed.addEventListener('click', function (e) {
         var b = e.target.closest('[data-e]'); if (!b) return;
         if (b.dataset.e === 'cancel') { ed.remove(); return; }
         var text = SW.$('textarea', ed).value.trim(); if (!text) return;
-        var tags = keep.concat(SW.$('input', ed).value.split(',').map(function (g) { return g.trim(); }).filter(Boolean));
+        var tags = keep.concat(SW.$('input', ed).value.split(',').map(function (g) { return g.trim(); }).filter(function (g) { return g && !/^(cat|level):/.test(g); }));
+        tags.push('level:' + SW.$('[data-e2="lvl"]', ed).value);
+        if (SW.$('[data-e2="cat"]', ed).value) tags.push('cat:' + SW.$('[data-e2="cat"]', ed).value);
         b.disabled = true;
         var was = { text: n.text, tags: (n.tags || []).slice() };
         N.update(n, text, tags).then(function () { did('Finding edited', function () { return N.update(n, was.text, was.tags); }); }, function (err) { b.disabled = false; SW.toast(err.message, 5000); });
@@ -252,27 +258,36 @@
     return box;
   }
   // Annotations tagged "finding": cards in their author's colour; the first line is the title.
-  function checkNotes(box) {
-    box.innerHTML = '<p class="hint">Gathering the group’s findings…</p>';
-    return N.whoami().catch(function () {}).then(function () { return N.listAll(); }).then(function (all) {
-      var list = all.filter(function (n) {
+  function checkNotes(box, cached) {
+    if (!cached || !live.notes) box.innerHTML = '<p class="hint">Gathering the group’s findings…</p>';
+    return (cached && live.notes ? Promise.resolve(null) : N.whoami().catch(function () {}).then(function () { return N.listAll(); })).then(function (all) {
+      var list = all ? all.filter(function (n) {
         return (n.tags || []).some(function (t) { return /^findings?$/i.test(t); });
-      }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; });
+      }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; }) : live.notes;
       live.notes = list;
       box.innerHTML = '';
       var people = []; list.forEach(function (n) { if (people.indexOf(n.by) < 0) people.push(n.by); });
       legend(people);
+      var bySel = SW.$('#view-findings .fd-by');
+      if (bySel) people.forEach(function (pp) { if (!SW.$$('option', bySel).some(function (o) { return o.value === pp; })) bySel.appendChild(SW.el('option', { value: pp }, SW.esc(pp))); });
       if (!list.length) {
         box.innerHTML = '<p class="hint">None from the group yet. Add one with ✎ Add a finding above, or ★ Finding on a selection in Read: it is shared with the group, signed and dated, and shown here in your colour.</p>';
         return;
       }
-      var ol = SW.el('ol', { class: 'fd-list fd-group' });
-      list.forEach(function (n, i) {
+      var items = list.map(function (n, i) {
+        var c = catOf(n.text, n.tags), lvl = levelOf(n.tags);
+        return { by: n.by, cat: c, lvl: lvl, order: i, text: n.text + ' ' + (n.tags || []).join(' ') + ' ' + n.by, vids: [n.vid], card: function () { return groupCard(n, i, c, lvl); } };
+      });
+      grouped(box, items, 'None.');
+    });
+  }
+  function groupCard(n, i, c, lvl) {
+      {
         var lines = String(n.text).split(/\n/), title = lines[0].replace(/^#+\s*/, ''), rest = lines.slice(1).join('\n').trim();
         var where = vLabel(n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : ', the version');
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
-        li.innerHTML = '<div class="fd-head"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span> <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
-          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g); }).map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
+        li.innerHTML = '<div class="fd-head"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
+          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
         SW.$('.fd-go', li).onclick = function (e) {
           e.preventDefault();
           if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
@@ -281,10 +296,8 @@
         };
         if (N.mine(n)) li.appendChild(ownActions(n, li));
         li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }, { by: n.by, vid: n.vid, shared: { date: n.date }, tags: (n.tags || []).filter(function (g) { return !/^findings?$|^chapter:/i.test(g); }) }));
-        ol.appendChild(li);
-      });
-      box.appendChild(ol);
-    });
+        return li;
+      }
   }
 
   // ---------- export ----------
@@ -319,6 +332,80 @@
   }
 
   // ---------- view ----------
+  // ---------- categories and importance ----------
+  // A category is found from the words of a finding (the one with most
+  // matches), unless a "cat:" tag sets it; importance from a "level:" tag, and
+  // for the bench's own findings Notable until set otherwise.
+  var CATS = [
+    ['tape', 'Tapes and loading', /\b(tapes?|loader|read-?in|checksums?|punched|frames?|rim|blocks?|fio-?dec|parity)\b/gi],
+    ['text', 'Transcription and text', /\b(transcriptions?|transcribed|typos?|scans?|overlin\w*|misread\w*|listings?|comments?|spellings?)\b/gi],
+    ['display', 'Display and graphics', /\b(dpy|display\w*|screen|stars?|sun|outlines?|scope|type 30|plotted|phosphor|constellations?|planetarium)\b/gi],
+    ['game', 'Game logic', /\b(hyperspace|torpedo(es)?|collisions?|gravity|controls?|scor(e|es|ing)|explo(de|des|sion)|fuel|thrust|rockets?)\b/gi],
+    ['machine', 'Machine and timing', /\b(instructions?|cycles?|emulator|opr|swp|lai|lia|mdv|multipl\w*|divide|timing|memory|core|sequence break|iot|pdp-1d)\b/gi],
+    ['versions', 'Versions and genealogy', /\b(versions?|forks?|dfw|ddp|masswerk|landsteiner|morris|russell|samson|preonas|genealogy|variants?|witness\w*)\b/gi]
+  ];
+  var CATNAME = { other: 'Other' }; CATS.forEach(function (c) { CATNAME[c[0]] = c[1]; });
+  var LEVELS = [['key', 'Key', '★★★'], ['notable', 'Notable', '★★'], ['minor', 'Minor', '★']];
+  function catOf(text, tags) {
+    var t = (tags || []).filter(function (g) { return /^cat:/.test(g); })[0];
+    if (t && CATNAME[t.slice(4)]) return { id: t.slice(4), auto: false };
+    var best = 'other', bn = 0;
+    CATS.forEach(function (c) { var m = (String(text).match(c[2]) || []).length; if (m > bn) { bn = m; best = c[0]; } });
+    return { id: best, auto: true };
+  }
+  function levelOf(tags, dflt) {
+    var t = (tags || []).filter(function (g) { return /^level:/.test(g); })[0], id = t ? t.slice(6) : '';
+    return LEVELS.some(function (l) { return l[0] === id; }) ? id : (dflt || 'notable');
+  }
+  function chips(c, lvl) {
+    var L = LEVELS.filter(function (l) { return l[0] === lvl; })[0];
+    return ' <span class="fd-cat" title="' + (c.auto ? 'Category found from the words of the finding; a cat: tag sets it' : 'Category set by a cat: tag') + '">' + SW.esc(CATNAME[c.id]) + (c.auto ? '' : ' ✓') + '</span>' +
+      ' <span class="fd-lvl fd-' + lvl + '" title="' + L[1] + '">' + L[2] + '</span>';
+  }
+  var FS = SW.store.get('fd.filt', {}) || {};
+  function passes(it) {
+    if (FS.cat && it.cat.id !== FS.cat) return false;
+    if (FS.lvl === 'key' && it.lvl !== 'key') return false;
+    if (FS.lvl === 'notable' && it.lvl === 'minor') return false;
+    if (FS.v && it.vids.indexOf(FS.v) < 0) return false;
+    if (FS.by && it.by !== FS.by) return false;
+    if (FS.q && it.text.toLowerCase().indexOf(FS.q.toLowerCase()) < 0) return false;
+    return true;
+  }
+  var LORD = { key: 0, notable: 1, minor: 2 };
+  // items {cat, lvl, text, vids, card()} under category headings, most important first, minor ones folded
+  function grouped(box, items, empty) {
+    var shown = items.filter(passes);
+    if (!shown.length) { box.appendChild(SW.el('p', { class: 'hint' }, items.length ? 'None with these filters.' : empty)); return; }
+    CATS.map(function (c) { return c[0]; }).concat(['other']).forEach(function (id) {
+      var g = shown.filter(function (it) { return it.cat.id === id; }); if (!g.length) return;
+      g.sort(function (a, b) { return LORD[a.lvl] - LORD[b.lvl] || a.order - b.order; });
+      var sec = SW.el('div', { class: 'fd-cgroup' });
+      sec.appendChild(SW.el('h4', { class: 'fd-chead' }, SW.esc(CATNAME[id]) + ' <span class="faint">' + g.length + '</span>'));
+      var ol = SW.el('ol', { class: 'fd-list' }), minor = g.filter(function (it) { return it.lvl === 'minor'; });
+      g.filter(function (it) { return it.lvl !== 'minor'; }).forEach(function (it) { ol.appendChild(it.card()); });
+      sec.appendChild(ol);
+      if (minor.length) {
+        var d = SW.el('details', { class: 'fd-minor' }, '<summary>' + minor.length + ' minor</summary>'), ol2 = SW.el('ol', { class: 'fd-list' });
+        minor.forEach(function (it) { ol2.appendChild(it.card()); }); d.appendChild(ol2); sec.appendChild(d);
+      }
+      box.appendChild(sec);
+    });
+  }
+  function filterBar(onChange) {
+    var vs = V.VERSIONS.filter(function (v) { return v.build && v.id !== 'stars'; }).sort(function (a, b) { return a.sort - b.sort; });
+    var bar = SW.el('div', { class: 'toolbar fd-filters', style: 'position:static;padding-left:0' });
+    bar.innerHTML = '<label class="check">Category <select data-f="cat"><option value="">All</option>' + CATS.concat([['other', 'Other']]).map(function (c) { return '<option value="' + c[0] + '"' + (FS.cat === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
+      '<label class="check">Importance <select data-f="lvl"><option value="">All</option><option value="notable"' + (FS.lvl === 'notable' ? ' selected' : '') + '>Key and notable</option><option value="key"' + (FS.lvl === 'key' ? ' selected' : '') + '>Key only</option></select></label>' +
+      '<label class="check">Version <select data-f="v"><option value="">All</option>' + vs.map(function (v) { return '<option value="' + v.id + '"' + (FS.v === v.id ? ' selected' : '') + '>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</option>'; }).join('') + '</select></label>' +
+      '<label class="check">By <select data-f="by" class="fd-by"><option value="">Anyone</option><option value="bench"' + (FS.by === 'bench' ? ' selected' : '') + '>the bench</option>' + (FS.by && FS.by !== 'bench' ? '<option value="' + SW.esc(FS.by) + '" selected>' + SW.esc(FS.by) + '</option>' : '') + '</select></label>' +
+      '<input type="search" data-f="q" placeholder="Find in findings" value="' + SW.esc(FS.q || '') + '">';
+    function set(e) { var f = e.target.dataset.f; if (!f) return; FS[f] = e.target.value; SW.store.set('fd.filt', FS); onChange(); }
+    bar.addEventListener('change', set);
+    bar.addEventListener('input', function (e) { if (e.target.dataset.f === 'q') { clearTimeout(bar._t); bar._t = setTimeout(function () { set(e); }, 250); } });
+    return bar;
+  }
+
   // The shared findings: the bench's and the group's. (My notes has its own tab.)
   var done = false;
   function render() {
@@ -338,16 +425,16 @@
     var mb = SW.el('div', { class: 'menu-body' });
     SW.$$('button', SW.exportButtons(doc, 'spacewar-findings')).forEach(function (x) { x.classList.add('ghost'); mb.appendChild(x); });
     mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'Read the tapes and compare the witnesses again, and fetch the group’s findings', onclick: function () { run(); } }, '↻ Check again'));
-    mb.appendChild(SW.el('button', { class: 'btn ghost', title: 'Findings you deleted, to restore or delete for good', onclick: function () {
-      var hb = SW.$('.fd-bin', pad);
-      if (hb) { hb.remove(); return; }
-      hb = SW.el('div', { class: 'fd-bin' }); hb.binFilter = function (n) { return (n.tags || []).some(function (g) { return /^findings?$/i.test(g); }); };
-      tb.after(hb); N.showBin(hb, { all: true });
-    } }, '🗑 Bin'));
     var right = SW.el('span', { class: 'tb-right', style: 'display:inline-flex;gap:6px' });
     var ub = SW.el('button', { class: 'btn ghost fd-undo', onclick: undoLast }, '↶ Undo');
     ub.hidden = !undo.length; if (undo.length) ub.title = 'Undo: ' + undo[undo.length - 1].label;
     right.appendChild(ub);
+    right.appendChild(SW.el('button', { class: 'btn ghost ov-binbtn', title: 'Open the bin: findings you deleted, to restore or delete for good', onclick: function (e) {
+      var btn = e.currentTarget, hb = SW.$('.fd-bin', pad);
+      if (hb) { hb.remove(); btn.classList.remove('on'); btn.title = 'Open the bin: findings you deleted, to restore or delete for good'; return; }
+      hb = SW.el('div', { class: 'fd-bin' }); hb.binFilter = function (n) { return (n.tags || []).some(function (g) { return /^findings?$/i.test(g); }); };
+      tb.after(hb); N.showBin(hb, { all: true }); btn.classList.add('on'); btn.title = 'Close the bin';
+    } }, '🗑'));
     mb.addEventListener('click', function (e) { if (e.target.closest('button')) more.open = false; });
     more.appendChild(mb);
     right.appendChild(more);
@@ -355,17 +442,28 @@
     pad.insertAdjacentHTML('beforeend', '<h2>Findings</h2><p class="prose">What the bench and the group have established about the Spacewar! sources, each with its evidence one click away, coloured by who added it. The witness tapes and punched titles are checked afresh against the tapes each time this page opens.</p><div class="fd-legend"></div>');
     pad.appendChild(tb);
     legend([]);
-    var list = SW.el('ol', { class: 'fd-list' });
-    FIND.forEach(function (f) {
+    var fbar = filterBar(function () { paintBench(); checkNotes(nBox, true); });
+    pad.appendChild(fbar);
+    var list = SW.el('div', { class: 'fd-bench' });
+    function benchCard(f, c, lvl) {
       var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf('bench') });
-      li.innerHTML = '<div class="fd-head"><span class="fd-no mono">' + f.no + '</span> <b>' + SW.esc(f.title) + '</b> <span class="badge">' + SW.esc(f.kind) + '</span></div><p>' + SW.esc(f.text) + '</p>';
+      li.innerHTML = '<div class="fd-head"><span class="fd-no mono">' + f.no + '</span> <b>' + SW.esc(f.title) + '</b> <span class="badge">' + SW.esc(f.kind) + '</span>' + chips(c, lvl) + '</div><p>' + SW.esc(f.text) + '</p>';
       evidenceHTML(f, li);
       li.appendChild(mineButton(function () {
         return { title: f.no + '. ' + f.title, subtitle: 'Finding (the bench), ' + f.kind, blocks: [{ type: 'p', text: f.text }, { type: 'p', text: 'Evidence. ' + f.ev.map(function (e) { return e.tape ? e.tape + (e.from ? ' (from frame ' + e.from + ')' : '') : e.cite || (vLabel(e.v) + (e.label ? ', ' + e.label : '')); }).join('; ') + '.' }] };
       }));
-      list.appendChild(li);
-    });
+      return li;
+    }
+    function paintBench() {
+      list.innerHTML = '';
+      grouped(list, FIND.map(function (f, n) {
+        var c = catOf(f.title + ' ' + f.text + ' ' + f.kind, f.cat ? ['cat:' + f.cat] : []), lvl = f.level || 'notable';
+        return { by: 'bench', cat: c, lvl: lvl, order: n, text: f.no + ' ' + f.title + ' ' + f.text + ' ' + f.kind, vids: f.ev.map(function (e) { return e.v; }).filter(Boolean), card: function () { return benchCard(f, c, lvl); } };
+      }), 'None.');
+    }
+    pad.appendChild(SW.el('h3', {}, 'Established by the bench'));
     pad.appendChild(list);
+    paintBench();
     pad.appendChild(SW.el('h3', {}, 'From the group'));
     var nBox = SW.el('div');
     pad.appendChild(nBox);
