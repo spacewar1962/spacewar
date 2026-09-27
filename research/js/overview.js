@@ -247,13 +247,13 @@
       }).join('') + '</ul>';
     }
     var h = [];
-    h.push('<div class="ov-run hint">Recorded from ' + SW.esc(b.v.label) + ' on the emulator, ' + A.frames + ' frames of the main loop, with ' +
+    h.push('<div class="ov-run hint">Snapshot of ' + SW.esc(b.v.label) + ' on the emulator: ' + A.frames + ' frames of the main loop, with ' +
       A.phases.map(function (P) { return P.what; }).join(', then ') + '. Click a routine to inspect it; the grey text is the program’s own comment. A memory cycle is 5 µs.' + (A.halted ? ' The machine halted during the run.' : '') + '</div>');
     var mcw = mine ? mine.cw : 0;
     h.push('<div class="toolbar ov-ctl" style="position:static;padding:0">' + [0, 1].map(function (s0) {
       return '<span class="ov-ship">' + (s0 ? 'Second ship' : 'First ship') + BITS.map(function (bt) { return ' <label class="check"><input type="checkbox" data-bit="' + bt[1 + s0] + '"' + (mcw & bt[1 + s0] ? ' checked' : '') + '>' + bt[0] + '</label>'; }).join('') + '</span>';
     }).join('') + '<label class="check">held for <select class="ov-secs">' + [1, 3, 5, 10].map(function (x) { return '<option' + ((mine ? mine.secs : 3) === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select> s</label>' +
-      '<button class="btn" data-rec="1" title="Run again with these controls held (both rotate bits of a ship mean hyperspace)">Record</button>' + (mine ? '<button class="btn ghost" data-rec="0">The standard sequence</button>' : '') + '</div>');
+      '<button class="btn" data-rec="1" title="Run again with these controls held (both rotate bits of a ship mean hyperspace)">Take a new snapshot</button>' + (mine ? '<button class="btn ghost" data-rec="0">The standard sequence</button>' : '') + '</div>');
 
     // one frame against time
     h.push('<section class="ov-box"><h4>One frame, call by call</h4>' +
@@ -382,7 +382,7 @@
     // (the first frame, which runs long as the game begins, is left out of the scale and may run off the edge)
     FL.forEach(function (f, n) { if (n || FL.length === 1) maxLen = Math.max(maxLen, f.len); f.spans.forEach(function (sp) { maxDepth = Math.max(maxDepth, sp.d); }); });
     function chart(i) {
-      var f = FL[i]; if (!f) { fl.innerHTML = '<p class="hint">No frames recorded.</p>'; return; }
+      var f = FL[i]; if (!f) { fl.innerHTML = '<p class="hint">No frames in this snapshot.</p>'; return; }
       var W = Math.max(300, fl.clientWidth || 700), RH = 20, depth = maxDepth;
       var H = (depth + 1) * RH + 26, len = f.len || 1, sc = maxLen;
       var o = ['<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" class="ov-fsvg">'];
