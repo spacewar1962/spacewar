@@ -829,3 +829,6 @@ dialog.sky-dlg { width: min(1480px, 98vw); max-height: 96vh; overflow: auto; pad
 .sky-chip i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
 .sky-chip b { font-weight: 400; color: var(--text-faint); }
 .sky-vers { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.sky-miss { background: color-mix(in srgb, var(--red) 22%, transparent); color: var(--text); padding: 0 4px; border-radius: 2px; }
+.sky-moved { background: color-mix(in srgb, var(--amber) 26%, transparent); padding: 0 4px; border-radius: 2px; }
+.sky-extra { background: color-mix(in srgb, var(--green) 24%, transparent); padding: 0 4px; border-radius: 2px; }

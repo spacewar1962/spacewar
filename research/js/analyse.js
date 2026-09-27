@@ -771,7 +771,7 @@
       if (cm) f.consts[cm[1]] = { val: cm[3].replace(/\s+/g, ' '), cm: (cm[4] || '').replace(/^\/\s*/, ''), loc: cm[2] };
     });
     allLines(b).forEach(function (L) {
-      var m = /^\s*(?:([0-9a-z]+),)?\s*mark\s+(-?\d+)\s*,\s*(-?\d+)\s*(\/.*)?$/i.exec(L.raw);
+      var m = /^\s*(?:([0-9a-z]+),)?\s*mar[kc]\s+(-?\d+)\s*,\s*(-?\d+)\s*(\/.*)?$/i.exec(L.raw);   // 'marc' as on the 3.1 tape
       if (!m) return;
       var name = (m[4] || '').replace(/^\/\s*/, '').replace(/\s+/g, ' ').trim() || ('mark ' + m[2] + ',' + m[3]);
       if (!f.stars[name]) f.starOrder.push(name);
@@ -1077,18 +1077,57 @@
   XFNS[12] = function (vs, bs, el, rerender) {
     var fs = bs.map(facts), all = [], seen = {};
     fs.forEach(function (f) { f.starOrder.forEach(function (s) { if (!seen[s]) { seen[s] = 1; all.push(s); } }); });
-    var sum = vs.map(function (v, i) { return [short(v), fs[i].starOrder.length]; });
-    var sc = matrixCard('Stars in each version', 'Entries in the star table carried by (or supplied to) each build. Click a version to open its star map, with the constellations marked.', ['Version', 'Stars'], sum, ['mono', 'num']);
+    var has = fs.map(function (f) { return f.starOrder.length > 0; });
+    // The usual entry for each star: what most versions with a star table give
+    // (absence counts). Only departures from it are marked, so a version is not
+    // marked for differing from an unusual neighbour.
+    var usual = {};
+    all.forEach(function (k) {
+      var cnt = {}, best = null;
+      fs.forEach(function (f, i) { if (!has[i]) return; var v = f.stars[k] || ''; cnt[v] = (cnt[v] || 0) + 1; });
+      Object.keys(cnt).forEach(function (v) { if (best === null || cnt[v] > cnt[best]) best = v; });
+      usual[k] = best || '';
+    });
+    // Samson's groups (1j-1q ... 4j-4q), read from the fullest table
+    var full = 0; fs.forEach(function (f, i) { if (f.starOrder.length > fs[full].starOrder.length) full = i; });
+    var group = {}, gm = 1;
+    starsOf(bs[full]).forEach(function (st) { var mm = /^(\d)j$/.exec(st.label); if (mm) gm = +mm[1]; var nm = st.name.replace(/\s+/g, ' ').trim() || ('mark ' + st.x + ',' + st.y); group[nm] = gm; });
+    var tally = vs.map(function () { return { missing: [], moved: 0, extra: 0 }; });
+    var rows = [];
+    all.forEach(function (k) {
+      var any = false, cells = vs.map(function (v, i) {
+        if (!has[i]) return { html: '<span class="faint">·</span>', text: '', sort: '' };
+        var x = fs[i].stars[k] || '', u = usual[k];
+        if (x === u) return { html: x ? SW.esc(x) : '<span class="faint">·</span>', text: x, sort: x };
+        any = true;
+        if (!x) { tally[i].missing.push(k); return { html: '<span class="sky-miss" title="Absent here; most versions have it at ' + SW.esc(u) + '">missing</span>', text: 'missing', sort: 'missing' }; }
+        if (!u) { tally[i].extra++; return { html: '<span class="sky-extra" title="Most versions do not have this star">' + SW.esc(x) + '</span>', text: x, sort: x }; }
+        tally[i].moved++;
+        return { html: '<span class="sky-moved" title="Most versions have ' + SW.esc(u) + '">' + SW.esc(x) + '</span>', text: x, sort: x };
+      });
+      if (!xst.onlyChanges || any) rows.push([k].concat(cells));
+    });
+    var sum = vs.map(function (v, i) {
+      var st = has[i] ? starsOf(bs[i]) : [], part = st.length ? bs[i].parts[st[0].L.p] : null;
+      var t = tally[i], note = '';
+      if (t.missing.length && t.missing.every(function (k) { return group[k] === 4; }) && t.missing.length >= Object.keys(group).filter(function (k) { return group[k] === 4; }).length * 0.9)
+        note = 'Samson’s fourth group (4j–4q) absent: groups 1–3 only';
+      return [short(v), fs[i].starOrder.length || '', !has[i] ? 'none' : part && part.role && part.role !== 'program' && !bs[i].parts.some(function (q) { return q.role === 'program' && q.src === part.src; }) ? 'supplied: ' + part.src : 'its own source',
+              { html: t.missing.length ? '<span class="sky-miss">' + t.missing.length + '</span>' : '', text: String(t.missing.length || ''), sort: t.missing.length },
+              { html: t.moved ? '<span class="sky-moved">' + t.moved + '</span>' : '', text: String(t.moved || ''), sort: t.moved },
+              { html: t.extra ? '<span class="sky-extra">' + t.extra + '</span>' : '', text: String(t.extra || ''), sort: t.extra }, note];
+    });
+    var SUMHEAD = ['Version', 'Stars', 'Star table', 'Missing', 'Moved', 'Extra', 'Note'];
+    var sc = matrixCard('Stars in each version', 'The star table each build carries, or is supplied with (a stand-in where the version’s own is not held), and how it departs from the usual: stars missing, at another position, or found in few versions. Click a version to open its star map, with the constellations marked.', SUMHEAD, sum, ['mono', 'num', 'mono', 'num', 'num', 'num', '']);
     var chips = SW.el('div', { class: 'sky-vers' });
-    vs.forEach(function (v, i) { if (fs[i].starOrder.length) chips.appendChild(SW.el('button', { class: 'btn', title: 'Open the star map of ' + v.label, onclick: function () { SW.skyMap(bs[i]); } }, '✦ ' + SW.esc(short(v)))); });
+    vs.forEach(function (v, i) { if (has[i]) chips.appendChild(SW.el('button', { class: 'btn', title: 'Open the star map of ' + v.label, onclick: function () { SW.skyMap(bs[i]); } }, '✦ ' + SW.esc(short(v)))); });
     sc.insertBefore(chips, sc.querySelector('.scroll'));
-    SW.$$('tbody tr', sc).forEach(function (tr, i) { if (fs[i] && fs[i].starOrder.length) { tr.style.cursor = 'pointer'; tr.title = 'Open the star map'; tr.addEventListener('click', function () { SW.skyMap(bs[i]); }); } });
+    SW.$$('tbody tr', sc).forEach(function (tr, i) { if (has[i]) { tr.style.cursor = 'pointer'; tr.title = 'Open the star map'; tr.addEventListener('click', function () { SW.skyMap(bs[i]); }); } });
     el.appendChild(sc);
-    var m = matrix(all, vs, function (s, v, i) { return fs[i].stars[s] || ''; }, { onlyChanges: xst.onlyChanges });
-    var c = matrixCard('The sky across versions', 'Each star by Samson\'s identification, with its “mark X, Y” position in each version. Shaded cells mark a star added, moved or removed.', ['Star'].concat(vs.map(short)), m, [''].concat(vs.map(function () { return 'mono'; })));
+    var c = matrixCard('The sky across versions', 'Each star by Samson’s identification, with its “mark X, Y” in each version. The usual entry is what most versions give; only departures from it are marked: <span class="sky-miss">missing</span>, <span class="sky-moved">at another position</span>, <span class="sky-extra">found in few versions</span>. A column of dots carries no star table.', ['Star'].concat(vs.map(short)), rows, [''].concat(vs.map(function () { return 'mono'; })));
     onlyToggle(c, rerender);
     el.appendChild(c);
-    return function () { return [SW.tableBlock('Stars by version', ['Version', 'Stars'], sum), SW.tableBlock('Star positions by version', ['Star'].concat(vs.map(short)), m)]; };
+    return function () { return [SW.tableBlock('Stars by version', SUMHEAD, sum), SW.tableBlock('Star positions by version (departures from the usual entry marked)', ['Star'].concat(vs.map(short)), rows)]; };
   };
 
   XFNS[13] = function (vs, bs, el) {
