@@ -1032,6 +1032,8 @@ a.ov-nm:hover { text-decoration: underline; }
 @media (max-width: 700px) { .ov-brow { grid-template-columns: 6em 1fr 3.5em; } .ov-brow .ov-bv.faint { display: none; } }
 .ov-fcap { font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1 1 100%; }
 .ov-fend { stroke: var(--text-dim); stroke-width: 1.5; stroke-dasharray: 3 3; }
-.ov-vline { font: 11.5px/1.7 var(--mono); margin: 6px 0; }
-.ov-v { white-space: nowrap; margin-right: 8px; color: var(--text-dim); }
-.ov-v.ch { color: var(--amber); }
+.ov-vt { width: 100%; table-layout: fixed; border-collapse: collapse; font: 11.5px/1.5 var(--mono); font-variant-numeric: tabular-nums; margin: 6px 0 8px; }
+.ov-vt th { font: 600 11px var(--sans, inherit); color: var(--text-faint); text-align: right; padding: 0 4px; }
+.ov-vt th:first-child, .ov-vt td:first-child { text-align: left; width: 44%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-vt td { text-align: right; padding: 0 4px; color: var(--text-dim); border-top: 1px solid var(--line-soft); }
+.ov-vt tr.ch td { color: var(--amber); }

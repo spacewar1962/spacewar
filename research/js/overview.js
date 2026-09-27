@@ -433,13 +433,13 @@
       // the key ones: the object table's fields first, then what it writes, then the most used
       rows.sort(function (x, y) { return (y.c.kind === 'field') - (x.c.kind === 'field') || y.w - x.w || y.n - x.n; });
       rows = rows.slice(0, 10);
-      box.innerHTML = rows.length ? '<p class="ov-vline"><span class="faint">In frame ' + (i + 1) + ':</span> ' + rows.map(function (r) {
+      box.innerHTML = rows.length ? '<table class="ov-vt"><thead><tr><th>Frame ' + (i + 1) + '</th><th>begins</th><th>ends</th></tr></thead><tbody>' + rows.map(function (r) {
         var v0 = s0[r.a], v1 = s1[r.a], xy = r.c.kind === 'field' && /^(x|y)$/.test(r.c.f.what || '');
         var lab = r.c.kind === 'field' ? (r.c.f.what && r.c.f.what.length < 14 ? r.c.f.what : r.c.key) + (r.c.obj < 2 ? '' : ' ' + (r.c.obj + 1)) : String(r.c.key);
         var a0 = xy ? signed(v0) >> 8 : signed(v0), a1 = xy ? signed(v1) >> 8 : signed(v1);
         var tip = (r.c.kind === 'field' ? r.c.key + ', ' + objName(r.c.obj) + ': ' : '') + SW.oct(v0, 6) + ' → ' + SW.oct(v1, 6) + (xy ? ' (screen position: the top ten bits)' : '');
-        return '<span class="ov-v' + (v0 !== v1 ? ' ch' : '') + '" title="' + SW.esc(tip) + '">' + SW.esc(lab) + ' ' + (a0 === a1 ? a0 : a0 + '→' + a1) + '</span>';
-      }).join(' ') + '</p>' : '';
+        return '<tr' + (v0 !== v1 ? ' class="ch"' : '') + ' title="' + SW.esc(tip) + '"><td>' + SW.esc(lab) + '</td><td>' + a0 + '</td><td>' + a1 + '</td></tr>';
+      }).join('') + '</tbody></table>' : '';
     }
 
     // ---------- the inspector ----------
@@ -458,6 +458,7 @@
       var callsN = r.n - (r.startup || 0), exN = A.ex[e] || 0, incN = e === 'main' ? A.total : (A.inc[e] || exN);
       var hh = ['<button class="icon-btn ov-x" data-x title="Close">✕</button><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + '</h4>'];
       if (g) hh.push('<p class="ov-g">' + SW.esc(g) + '</p>');
+      hh.push('<div class="ov-vals"></div>');
       var st = [];
       if (callsN) st.push(per(callsN));
       if (r.startup) st.push(r.startup + ' at start-up');
@@ -481,7 +482,6 @@
       function rwList(m) { return Object.keys(m).sort(function (x, y) { return m[y] - m[x]; }).slice(0, 14).map(function (k) { return '<span class="mono">' + SW.esc(k) + '</span> <span class="faint">' + rate(m[k]) + '</span>'; }).join(', '); }
       if (Object.keys(ws).length) hh.push('<p><b>Writes</b> ' + rwList(ws) + '</p>');
       if (Object.keys(rs).length) hh.push('<p><b>Reads</b> ' + rwList(rs) + '</p>');
-      hh.push('<div class="ov-vals"></div>');
       var cd = e === 'rt' ? null : codeOf(e);
       if (e === 'rt') hh.push('<p class="hint">Code written by the outline compiler (oc) at start-up, so it has no source lines: in Read it shows as run-time code.</p>');
       if (cd) {
