@@ -1002,3 +1002,27 @@ a.ov-nm:hover { text-decoration: underline; }
 .ln.keq .n { background: linear-gradient(to right, color-mix(in srgb, var(--green) 70%, transparent) 0 2px, transparent 2px) no-repeat; }
 .ln.kcom .n { background: linear-gradient(to right, color-mix(in srgb, var(--text-faint) 80%, transparent) 0 2px, transparent 2px) no-repeat; }
 .kx.kcom { background: linear-gradient(to right, var(--text-faint) 0, var(--text-faint) 2px, transparent 2px); border: 1px solid var(--line); }
+/* functional overview: chart, budget, inspector */
+.ov-cols { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 14px; align-items: start; }
+@media (max-width: 1000px) { .ov-cols { grid-template-columns: 1fr; } }
+.ov-left { display: grid; gap: 12px; min-width: 0; }
+.ov-insp { position: sticky; top: calc(var(--bar-h, 60px) + 50px); max-height: calc(100vh - var(--bar-h, 60px) - 70px); overflow: auto; border: 1px solid color-mix(in srgb, var(--beam) 40%, var(--line)); border-radius: 8px; padding: 10px 12px; background: var(--bg-2); font-size: 13px; }
+.ov-insp h4 { margin: 0 0 4px; font-size: 15px; }
+.ov-stats { margin: 6px 0; padding-left: 18px; }
+.ov-code { font-size: 11.5px; line-height: 1.45; background: var(--code-bg, var(--surface-2)); border-radius: 5px; padding: 6px 8px; margin: 8px 0; white-space: pre; overflow-x: auto; }
+.ov-fctl input[type=range] { flex: 1 1 200px; min-width: 120px; }
+.ov-fcap { font-size: 12px; }
+.ov-fsvg { width: 100%; height: auto; display: block; background: var(--bg-2); border-radius: 5px; }
+.ov-sp { cursor: pointer; }
+.ov-sp:hover rect, .ov-sp.on rect { stroke: var(--text); stroke-width: 1.5; }
+.ov-spt { font: 11px var(--mono); fill: #fff; pointer-events: none; }
+.ov-tick { font: 10px var(--mono); fill: var(--text-faint); }
+.ov-tl { stroke: var(--text-faint); }
+.ov-budget { display: grid; gap: 3px; }
+.ov-brow { display: grid; grid-template-columns: 8em minmax(80px, 1fr) 4em 16em; gap: 8px; align-items: center; font-size: 12.5px; cursor: pointer; padding: 1px 4px; border-radius: 4px; }
+.ov-brow:hover, .ov-brow.on { background: color-mix(in srgb, var(--beam) 16%, transparent); }
+.ov-bar { height: 10px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
+.ov-bar i { display: block; height: 100%; }
+.ov-bv { text-align: right; white-space: nowrap; }
+.ov-bv.faint { text-align: left; }
+@media (max-width: 700px) { .ov-brow { grid-template-columns: 6em 1fr 3.5em; } .ov-brow .ov-bv.faint { display: none; } }
