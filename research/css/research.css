@@ -1039,9 +1039,23 @@ a.ov-nm:hover { text-decoration: underline; }
 @media (max-width: 860px) { .ov-top { grid-template-columns: 1fr; } }
 .ov-run { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; border-top: 1px solid var(--line-soft); padding-top: 8px; margin-top: 8px; }
 .ov-run p { margin: 0; font-size: 12.5px; }
-.ov-insp { border: none; padding: 0; background: none; display: grid; grid-template-columns: minmax(260px, 1fr) minmax(0, 1.3fr); gap: 16px; }
-@media (max-width: 860px) { .ov-insp { grid-template-columns: 1fr; } }
-.ov-pcode .ov-code { margin-top: 0; max-height: 420px; overflow: auto; }
+.ov-insp { border: none; padding: 0; background: none; display: grid; grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.3fr) minmax(220px, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1100px) { .ov-insp { grid-template-columns: minmax(220px, 1fr) minmax(0, 1.3fr); } .ov-prel { grid-column: 1 / -1; } }
+@media (max-width: 700px) { .ov-insp { grid-template-columns: 1fr; } }
+.ov-phead { grid-column: 1 / -1; display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; border-bottom: 1px solid var(--line-soft); padding-bottom: 6px; }
+.ov-phead h4 { margin: 0; font-size: 16px; }
+.ov-phead h4 .ov-g { font-family: var(--serif, inherit); font-size: 13px; margin-left: 8px; font-weight: 400; }
+.ov-pstat { margin: 3px 0 0; font-size: 12.5px; color: var(--text-dim); }
+.ov-pcode .ov-code { margin: 0; max-height: 360px; overflow: auto; }
+.ov-prel { font-size: 13px; }
+.ov-prel p { margin: 0 0 8px; line-height: 1.7; }
+.ov-prel a.ov-nm { margin-right: 2px; }
+.ov-prel .faint { margin-right: 8px; }
+.ov-rwpair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.ov-rw { width: 100%; border-collapse: collapse; font: 11.5px/1.5 var(--mono); font-variant-numeric: tabular-nums; }
+.ov-rw th { font: 600 11px var(--sans, inherit); color: var(--text-faint); text-align: left; }
+.ov-rw th:last-child, .ov-rw td:last-child { text-align: right; }
+.ov-rw td { border-top: 1px solid var(--line-soft); color: var(--text-dim); padding: 0 2px; }
 .ov-rest { display: grid; gap: 12px; }
 .ov-snapdlg { max-width: 560px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); padding: 14px 18px; }
 .ov-snapdlg::backdrop { background: rgba(0,0,0,.5); }

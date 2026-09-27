@@ -424,6 +424,9 @@
     // ---------- values: what the chosen routine reads and writes, as the frame
     // shown begins and ends (memory kept at each frame boundary) ----------
     function signed(v) { return v & 0o400000 ? -((~v) & 0o377777) : v; }   // ones' complement
+    // short names for the object table's fields, by their pointers (the same in every version)
+    var FIELD = { ml1: 'routine', mx1: 'x', my1: 'y', mdx: 'dx', mdy: 'dy', mth: 'angle', mom: 'turn rate', mfu: 'fuel', mtr: 'torpedoes', ma1: 'count', mb1: 'time', mot: 'outline', mco: 'old control' };
+    function fieldName(c) { return FIELD[c.key] || (c.f.what && c.f.what.length < 14 ? c.f.what : c.key); }
     function objName(n) { return n === 0 ? 'first ship' : n === 1 ? 'second ship' : 'object ' + (n + 1); }
     function values() {
       var box = SW.$('.ov-vals', insp); if (!box || picked == null) return;
@@ -439,8 +442,8 @@
       rows.sort(function (x, y) { return (y.c.kind === 'field') - (x.c.kind === 'field') || y.w - x.w || y.n - x.n; });
       rows = rows.slice(0, 10);
       box.innerHTML = rows.length ? '<table class="ov-vt"><thead><tr><th>Frame ' + (i + 1) + '</th><th>begins</th><th>ends</th></tr></thead><tbody>' + rows.map(function (r) {
-        var v0 = s0[r.a], v1 = s1[r.a], xy = r.c.kind === 'field' && /^(x|y)$/.test(r.c.f.what || '');
-        var lab = r.c.kind === 'field' ? (r.c.f.what && r.c.f.what.length < 14 ? r.c.f.what : r.c.key) + (r.c.obj < 2 ? '' : ' ' + (r.c.obj + 1)) : String(r.c.key);
+        var v0 = s0[r.a], v1 = s1[r.a], xy = r.c.kind === 'field' && /^m[xy]1$/.test(r.c.key);
+        var lab = r.c.kind === 'field' ? fieldName(r.c) + (r.c.obj < 2 ? '' : ' ' + (r.c.obj + 1)) : String(r.c.key);
         var a0 = xy ? signed(v0) >> 8 : signed(v0), a1 = xy ? signed(v1) >> 8 : signed(v1);
         var tip = (r.c.kind === 'field' ? r.c.key + ', ' + objName(r.c.obj) + ': ' : '') + SW.oct(v0, 6) + ' → ' + SW.oct(v1, 6) + (xy ? ' (screen position: the top ten bits)' : '');
         return '<tr' + (a0 !== a1 ? ' class="ch"' : '') + ' title="' + SW.esc(tip) + '"><td>' + SW.esc(lab) + '</td><td>' + a0 + '</td><td>' + a1 + '</td></tr>';
@@ -461,41 +464,44 @@
       if (e === 'startup') return;
       var r = A.R[e] || { n: 0, calls: {}, callers: {}, startup: 0 }, g = e === 'wait' ? 'use up rest of time of main loop' : e === 'main' ? glossAt(b, A.frameAt) : glossAt(b, e);
       var callsN = r.n - (r.startup || 0), exN = A.ex[e] || 0, incN = e === 'main' ? A.total : (A.inc[e] || exN);
-      var hh = ['<div class="ov-pinfo"><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + '</h4>'];
-      if (g) hh.push('<p class="ov-g">' + SW.esc(g) + '</p>');
-      hh.push('<div class="ov-vals"></div>');
       var st = [];
       if (callsN) st.push(per(callsN));
       if (r.startup) st.push(r.startup + ' at start-up');
-      if (exN) st.push(Math.round(exN / NF).toLocaleString('en-GB') + ' cycles a frame in itself' + (incN > exN * 1.05 ? ', ' + Math.round(incN / NF).toLocaleString('en-GB') + ' with its calls' : '') + ' (' + (100 * incN / A.total).toFixed(1) + '% of the frame)');
-      if (callsN && incN) st.push(Math.round(incN / callsN).toLocaleString('en-GB') + ' cycles a call');
-      if (ranIn[e] && ranIn[e].length < NF) st.push('runs in frames ' + ranges(ranIn[e]) + ' of ' + NF);
-      hh.push('<ul class="ov-stats">' + st.map(function (x) { return '<li>' + SW.esc(x) + '</li>'; }).join('') + '</ul>');
+      if (exN) st.push(Math.round(exN / NF).toLocaleString('en-GB') + ' cycles a frame' + (incN > exN * 1.05 ? ' (' + Math.round(incN / NF).toLocaleString('en-GB') + ' with its calls)' : '') + ', ' + (100 * incN / A.total).toFixed(1) + '% of the frame');
+      if (callsN && incN) st.push(Math.round(incN / callsN).toLocaleString('en-GB') + ' a call');
+      if (ranIn[e] && ranIn[e].length < NF) st.push('frames ' + ranges(ranIn[e]));
+      var cd = e === 'rt' ? null : codeOf(e);
+      var hh = ['<div class="ov-phead"><div><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4>' +
+        '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div>'];
+      // values | code | relations
+      hh.push('<div class="ov-pvals"><div class="ov-vals"></div></div>');
+      hh.push('<div class="ov-pcode">');
+      if (e === 'rt') hh.push('<p class="hint">Code written by the outline compiler (oc) at start-up, so it has no source lines: in Read it shows as run-time code.</p>');
+      if (cd) {
+        var ls = b.lines[cd.p];
+        hh.push('<div class="ov-code mono">' + ls.slice(cd.n0 - 1, cd.n1).map(function (L) { return '<div><span class="faint">' + String(L.n).padStart(4) + '</span>  ' + SW.esc(L.raw.replace(/\t/g, '    ')) + '</div>'; }).join('') + (cd.cut ? '<div class="faint">…</div>' : '') + '</div>');
+      }
+      hh.push('</div><div class="ov-prel">');
       var cs = Object.keys(r.callers || {});
-      if (cs.length) hh.push('<p><b>Called from</b> ' + cs.map(link).join(', ') + '</p>');
+      if (cs.length) hh.push('<p><b>Called from</b> ' + cs.map(function (c0) { return link(c0); }).join(', ') + '</p>');
       var ks = Object.keys(r.calls || {}).sort(function (x, y) { return r.calls[y] - r.calls[x]; });
-      if (ks.length) hh.push('<p><b>Calls</b> ' + ks.map(function (k) { return link(k) + ' <span class="faint">×' + (r.n ? Math.round(10 * r.calls[k] / r.n) / 10 : r.calls[k]) + '</span>'; }).join(', ') + '</p>');
+      if (ks.length) hh.push('<p><b>Calls</b> ' + ks.map(function (k) { return link(k) + '<span class="faint">×' + (r.n ? Math.round(10 * r.calls[k] / r.n) / 10 : r.calls[k]) + '</span>'; }).join(' ') + '</p>');
       // what it reads and writes, a frame
       var rs = {}, ws = {};
       Object.keys(A.flow).forEach(function (a) {
         var c = what(+a); if (c.kind === 'const' || c.kind === 'other') return;
-        var key = c.kind === 'field' ? c.key + ' (' + (c.f.what || 'table') + ')' : c.kind === 'code' ? 'the instruction at ' + name(b, +a) : c.key;
+        var key = c.kind === 'field' ? fieldName(c) : c.kind === 'code' ? name(b, +a) + ' ⚙' : c.key;
         var fr0 = A.flow[a];
         if (fr0.r[e]) rs[key] = (rs[key] || 0) + fr0.r[e];
         if (fr0.w[e]) ws[key] = (ws[key] || 0) + fr0.w[e];
       });
-      function rwList(m) { return Object.keys(m).sort(function (x, y) { return m[y] - m[x]; }).slice(0, 14).map(function (k) { return '<span class="mono">' + SW.esc(k) + '</span> <span class="faint">' + rate(m[k]) + '</span>'; }).join(', '); }
-      if (Object.keys(ws).length) hh.push('<p><b>Writes</b> ' + rwList(ws) + '</p>');
-      if (Object.keys(rs).length) hh.push('<p><b>Reads</b> ' + rwList(rs) + '</p>');
-      hh.push('</div><div class="ov-pcode">');
-      var cd = e === 'rt' ? null : codeOf(e);
-      if (e === 'rt') hh.push('<p class="hint">Code written by the outline compiler (oc) at start-up, so it has no source lines: in Read it shows as run-time code.</p>');
-      if (cd) {
-        var ls = b.lines[cd.p];
-        hh.push('<div class="ov-code mono">' + ls.slice(cd.n0 - 1, cd.n1).map(function (L) { return '<div><span class="faint">' + String(L.n).padStart(4) + '</span>  ' + SW.esc(L.raw.replace(/\t/g, '    ')) + '</div>'; }).join('') + (cd.cut ? '<div class="faint">…</div>' : '') + '</div>' +
-          '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>');
+      function rwTable(m, title) {
+        var ks2 = Object.keys(m).sort(function (x, y) { return m[y] - m[x]; });
+        if (!ks2.length) return '';
+        return '<table class="ov-rw"><thead><tr><th>' + title + '</th><th>a frame</th></tr></thead><tbody>' + ks2.slice(0, 12).map(function (k) { return '<tr><td>' + SW.esc(k) + '</td><td>' + rate(m[k]) + '</td></tr>'; }).join('') +
+          (ks2.length > 12 ? '<tr><td class="faint" colspan="2">and ' + (ks2.length - 12) + ' more</td></tr>' : '') + '</tbody></table>';
       }
-      hh.push('</div>');
+      hh.push('<div class="ov-rwpair">' + rwTable(ws, 'Writes') + rwTable(rs, 'Reads') + '</div><p class="hint">⚙ an instruction the program rewrites.</p></div>');
       insp.innerHTML = hh.join('');
       picked = e;
       // to watch it, the chart goes to the nearest frame in which it runs
