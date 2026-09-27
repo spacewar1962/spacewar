@@ -261,7 +261,7 @@
     if (T) h.push('<section class="ov-box"><h4>The object table <span class="faint">(' + (T.nob != null ? T.nob + ' objects (nob, octal ' + T.nob.toString(8) + '), ' : '') + 'as the main loop sets its pointers; words in decimal)</span></h4><table class="ov-sub"><thead><tr><th>Field</th><th>Words</th><th>The program’s comment</th></tr></thead><tbody>' +
       T.fields.map(function (f) { return '<tr><td><a href="#" class="ov-nm mono" data-p="' + f.p + '" data-n="' + f.n + '">' + SW.esc(f.field) + '</a></td><td class="num">' + (f.size == null ? '' : f.size) + '</td><td class="ov-g">' + SW.esc(f.what) + '</td></tr>'; }).join('') + '</tbody></table></section>');
 
-    el.innerHTML = '<div class="ov-cols"><div class="ov-left">' + h.join('') + '</div><aside class="ov-insp"><p class="hint">Click a routine (in the chart, the list of where the time goes, or any name) to see its code, its calls and its time.</p></aside></div>';
+    el.innerHTML = '<div class="ov-cols"><div class="ov-left">' + h.join('') + '</div><aside class="ov-insp" hidden></aside></div>';
     var insp = SW.$('.ov-insp', el);
 
     // ---------- the flame chart ----------
@@ -313,7 +313,7 @@
       if (e === 'startup') return;
       var r = A.R[e] || { n: 0, calls: {}, callers: {}, startup: 0 }, g = e === 'wait' ? 'use up rest of time of main loop' : e === 'main' ? glossAt(b, A.frameAt) : glossAt(b, e);
       var callsN = r.n - (r.startup || 0), exN = A.ex[e] || 0, incN = e === 'main' ? A.total : (A.inc[e] || exN);
-      var hh = ['<h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + '</h4>'];
+      var hh = ['<button class="icon-btn ov-x" data-x title="Close">✕</button><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + '</h4>'];
       if (g) hh.push('<p class="ov-g">' + SW.esc(g) + '</p>');
       var st = [];
       if (callsN) st.push(per(callsN));
@@ -333,11 +333,13 @@
           '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>');
       }
       insp.innerHTML = hh.join('');
+      insp.hidden = false; SW.$('.ov-cols', el).classList.add('insp-on');
       SW.$$('.ov-sp', fl).forEach(function (gg) { gg.classList.toggle('on', gg.dataset.e === String(e)); });
       SW.$$('.ov-brow', el).forEach(function (rw) { rw.classList.toggle('on', rw.dataset.e === String(e)); });
       if (window.innerWidth < 1000) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
     el.addEventListener('click', function (ev) {
+      if (ev.target.closest('[data-x]')) { insp.hidden = true; SW.$('.ov-cols', el).classList.remove('insp-on'); SW.$$('.ov-sp.on, .ov-brow.on', el).forEach(function (x) { x.classList.remove('on'); }); return; }
       var rd = ev.target.closest('[data-read]');
       if (rd) { var pn = rd.dataset.read.split(':'); goRead(b, +pn[0], +pn[1]); return; }
       var x = ev.target.closest('[data-e]');
