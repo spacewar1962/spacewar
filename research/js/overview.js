@@ -39,6 +39,8 @@
     var rd0 = cpu.rd, wr0 = cpu.wr;
     cpu.rd = function (a) { if (inFrames) tally(a, 'r'); return rd0.call(this, a); };
     cpu.wr = function (a, v) { if (inFrames) tally(a, 'w'); return wr0.call(this, a, v); };
+    // what each frame puts on the screen: x, y and the routine plotting, in turn
+    cpu.onDisplay = function (x, y) { if (cur) cur.pts.push(x, y, who()); };
     var mem = cpu.mem, isSrc = function (a) { return !!b.asm.memory[a]; };
     var frameAt = b.sym.ml0 ? b.sym.ml0.val : (b.sym.bck ? b.sym.bck.val : -1);
     var R = {}, sites = {}, path = [], stack = [], inFrames = false, frames = 0;
@@ -73,7 +75,7 @@
         if (pc0 === frameAt) {
           close(0);
           if (cur) { cur.len = cpu.cycles - cur.t; frameList.push(cur); }
-          cur = { t: cpu.cycles, spans: [], len: 0, phase: phase };
+          cur = { t: cpu.cycles, spans: [], pts: [], len: 0, phase: phase };
           inFrames = true; frames++;
         }
         if (!inFrames && !stack.length && isSrc(pc0) && b.labelAt[pc0] && path.indexOf(pc0) < 0 && path.length < 40) path.push(pc0);
@@ -336,8 +338,35 @@
     if (T) h.push('<section class="ov-box"><h4>The object table <span class="faint">(' + (T.nob != null ? T.nob + ' objects (nob, octal ' + T.nob.toString(8) + '), ' : '') + 'as the main loop sets its pointers; words in decimal)</span></h4><table class="ov-sub"><thead><tr><th>Field</th><th>Words</th><th>The program’s comment</th></tr></thead><tbody>' +
       T.fields.map(function (f) { return '<tr><td><a href="#" class="ov-nm mono" data-p="' + f.p + '" data-n="' + f.n + '">' + SW.esc(f.field) + '</a></td><td class="num">' + (f.size == null ? '' : f.size) + '</td><td class="ov-g">' + SW.esc(f.what) + '</td></tr>'; }).join('') + '</tbody></table></section>');
 
-    el.innerHTML = '<div class="ov-cols"><div class="ov-left">' + h.join('') + '</div><aside class="ov-insp" hidden></aside></div>';
-    var insp = SW.$('.ov-insp', el);
+    el.innerHTML = '<div class="ov-cols"><div class="ov-left">' + h.join('') + '</div><aside class="ov-side">' +
+      '<div class="ov-scope"><canvas width="520" height="520"></canvas><p class="hint ov-scap"></p></div><div class="ov-insp" hidden></div></aside></div>';
+    var insp = SW.$('.ov-insp', el), scv = SW.$('.ov-scope canvas', el), sg = scv.getContext('2d'), scap = SW.$('.ov-scap', el), picked = null, hovered = null, shownFrame = 0;
+    // the screen in the frame shown: its points bright, the frame before faint
+    // (the phosphor's glow), a chosen routine's points in its colour
+    function scope(i) {
+      shownFrame = i;
+      var N = scv.width, R = N / 2, k = N / 1024, hi = hovered != null ? String(hovered) : picked != null ? String(picked) : null;
+      sg.fillStyle = '#000'; sg.fillRect(0, 0, N, N);
+      sg.save(); sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.fillStyle = '#02050a'; sg.fill(); sg.clip();
+      function pass(f, alpha, bright) {
+        if (!f) return 0;
+        var n = 0, P = f.pts;
+        for (var j = 0; j < P.length; j += 3) {
+          var own = hi != null && String(P[j + 2]) === hi, px = R + P[j] * k, py = R - P[j + 1] * k;
+          if (own && bright) { sg.fillStyle = colour(nm(P[j + 2])); sg.globalAlpha = 1; sg.beginPath(); sg.arc(px, py, 3.2, 0, 6.2832); sg.fill(); n++; }
+          else { sg.fillStyle = '#cfe6ff'; sg.globalAlpha = alpha * (hi != null && bright ? 0.55 : 1); sg.fillRect(px - 1.1, py - 1.1, 2.2, 2.2); }
+        }
+        sg.globalAlpha = 1;
+        return n;
+      }
+      pass(FL[i - 1], 0.28, false);
+      var nHi = pass(FL[i], 1, true), nPrev = 0;
+      if (hi != null && FL[i - 1]) for (var q = 2; q < FL[i - 1].pts.length; q += 3) if (String(FL[i - 1].pts[q]) === hi) nPrev++;
+      sg.restore();
+      sg.strokeStyle = '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
+      var f = FL[i];
+      scap.textContent = f ? 'The screen in frame ' + (i + 1) + ': ' + (f.pts.length / 3) + ' points' + (hi != null ? '; ' + nm(hi) + ' plotted ' + (nHi || 'none') + (!nHi && nPrev ? ' (' + nPrev + ' in the frame before, shown faint)' : '') : '') : '';
+    }
 
     // ---------- the flame chart ----------
     var fl = SW.$('.ov-flame', el), fr = SW.$('.ov-fr', el), fcap = SW.$('.ov-fcap', el), playT = null;
@@ -363,10 +392,12 @@
       fl.innerHTML = o.join('');
       var wait = f.spans.filter(function (sp) { return sp.e === 'wait'; }).reduce(function (a, sp) { return a + ((sp.t1 == null ? len : sp.t1) - sp.t0); }, 0);
       var objs = f.spans.filter(function (sp) { return sp.d === 0 && sp.e !== 'wait'; }).map(function (sp) { return nm(sp.e); });
+      scope(i);
       fcap.textContent = 'frame ' + (i + 1) + ' of ' + NF + ' · ' + cyc(len) + ' · waiting ' + Math.round(100 * wait / len) + '% · ' + A.phases[f.phase].what;
       fcap.title = 'Called from the main loop, in order: ' + objs.join(', ');
     }
     fr.addEventListener('input', function () { chart(+fr.value); });
+    el.addEventListener('mouseover', function (ev) { var x = ev.target.closest('.ov-sp, .ov-brow'); var e2 = x ? x.dataset.e : null; if (e2 !== hovered) { hovered = e2; scope(shownFrame); } });
     var rsz = new ResizeObserver(function () { if (!fl.isConnected) { rsz.disconnect(); return; } chart(+fr.value); });
     rsz.observe(fl);
     SW.$('.ov-fctl', el).addEventListener('click', function (e) {
@@ -427,7 +458,7 @@
           '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>');
       }
       insp.innerHTML = hh.join('');
-      insp.hidden = false; SW.$('.ov-cols', el).classList.add('insp-on');
+      insp.hidden = false; picked = e; scope(shownFrame);
       SW.$$('.ov-sp', fl).forEach(function (gg) { gg.classList.toggle('on', gg.dataset.e === String(e)); });
       SW.$$('.ov-brow', el).forEach(function (rw) { rw.classList.toggle('on', rw.dataset.e === String(e)); });
       if (window.innerWidth < 1000) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -440,7 +471,7 @@
         else { var cw = 0; SW.$$('.ov-ctl [data-bit]', el).forEach(function (x) { if (x.checked) cw |= +x.dataset.bit; }); mine = { cw: cw, secs: +SW.$('.ov-secs', el).value }; }
         O.render(b, el); return;
       }
-      if (ev.target.closest('[data-x]')) { insp.hidden = true; SW.$('.ov-cols', el).classList.remove('insp-on'); SW.$$('.ov-sp.on, .ov-brow.on', el).forEach(function (x) { x.classList.remove('on'); }); return; }
+      if (ev.target.closest('[data-x]')) { insp.hidden = true; picked = null; scope(shownFrame); SW.$$('.ov-sp.on, .ov-brow.on', el).forEach(function (x) { x.classList.remove('on'); }); return; }
       var rd = ev.target.closest('[data-read]');
       if (rd) { var pn = rd.dataset.read.split(':'); goRead(b, +pn[0], +pn[1]); return; }
       var x = ev.target.closest('[data-e]');
