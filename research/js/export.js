@@ -254,18 +254,31 @@
   }
 
   // '[DMB · 25 Sep 2026] ' in grey small capitals, then the note itself.
+  // Each person's colour, as in the bench's Findings (a hue from their
+  // initials), darkened to print; annotation text in a dark green.
+  var NOTE_INK = '1E6B3A';
+  function personColour(by) {
+    by = str(by); var h = 0; for (var i = 0; i < by.length; i++) h = (h * 31 + by.charCodeAt(i)) % 360; h = (h + 200) % 360;
+    var s0 = 0.62, l = 0.34, c = (1 - Math.abs(2 * l - 1)) * s0, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2, rgb;
+    rgb = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+    return rgb.map(function (v) { var t = Math.round((v + m) * 255).toString(16); return t.length < 2 ? '0' + t : t; }).join('').toUpperCase();
+  }
   function wNoteHead(n, reply) {
-    var head = (reply ? '↳ ' : '') + '[' + str(n.by) + (n.date ? ' · ' + fmtDate(n.date) : '') + '] ';
-    return wRun(head, '<w:smallCaps/><w:color w:val="' + GREY + '"/>');
+    return (reply ? wRun('↳ ', '<w:color w:val="' + GREY + '"/>') : '') +
+           wRun(str(n.by), '<w:b/><w:color w:val="' + personColour(n.by) + '"/>') +
+           wRun((n.date ? ' · ' + fmtDate(n.date) : '') + '  ', '<w:smallCaps/><w:color w:val="' + GREY + '"/>');
+  }
+  function notePPr(by, left) {
+    return pStyle('NoteBy') + '<w:pBdr><w:left w:val="single" w:sz="12" w:space="6" w:color="' + personColour(by) + '"/></w:pBdr><w:ind w:left="' + left + '"/>';
   }
 
   function wNote(n, indent, anchor) {
+    var ink = '<w:color w:val="' + NOTE_INK + '"/>';
     var out = wPara(wNoteHead(n, false) +
-                    (anchor ? wRun(anchor, '<w:i/>') + wRun(': ') : '') + wRun(n.text),
-                    pStyle('NoteBy') + '<w:ind w:left="' + indent + '"/>');
+                    (anchor ? wRun(anchor, '<w:i/>' + ink) + wRun(': ', ink) : '') + wRun(n.text, ink),
+                    notePPr(n.by, indent));
     (n.replies || []).forEach(function (r) {
-      out += wPara(wNoteHead(r, true) + wRun(r.text),
-                   pStyle('NoteBy') + '<w:ind w:left="' + (indent + REPLY_IND - NOTE_IND) + '"/>');
+      out += wPara(wNoteHead(r, true) + wRun(r.text, ink), notePPr(r.by, indent + REPLY_IND - NOTE_IND));
     });
     return out;
   }
