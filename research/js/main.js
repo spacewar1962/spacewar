@@ -23,13 +23,22 @@
     sel.onchange = function () { select(sel.value); };
   }
 
+  // A menu in the tab row is lit when the view open is one of its items
+  // (data-tabs; for the analyse view, data-lenses too).
+  SW.markTabs = function () {
+    var tab = SW.state.tab, lens = String(SW.anLens ? SW.anLens() : '');
+    SW.$$('#tabs button').forEach(function (b) {
+      var on = b.dataset.tabs ? b.dataset.tabs.split(' ').indexOf(tab) >= 0 && (tab !== 'analyse' || (b.dataset.lenses || '').split(' ').indexOf(lens) >= 0) : b.dataset.tab === tab;
+      b.classList.toggle('on', on);
+    });
+  };
   SW.setTab = function (tab) {
     if (tab === 'sky') tab = 'graphics';   // the Star map tab became Graphics
     if (ORDER.indexOf(tab) < 0) tab = 'read';
     var prev = SW.state.tab;
     if (prev !== tab && SW.views[prev] && SW.views[prev].hide) SW.views[prev].hide();
     SW.state.tab = tab;
-    SW.$$('#tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === tab); });
+    SW.markTabs();
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + tab); });
     SW.writeQuery();
     showCurrent();
@@ -210,7 +219,7 @@
     if (q.b) SW.state.b = q.b;
     if (q.tab === 'sky') q.tab = 'graphics';   // the Star map tab became Graphics
     SW.state.tab = ORDER.indexOf(q.tab) >= 0 ? q.tab : 'read';
-    SW.$$('#tabs button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === SW.state.tab); });
+    SW.markTabs();
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + SW.state.tab); });
     select(q.v || '3.1');
     if (!SW.store.get('initials', '')) setTimeout(function () { SW.toast('Welcome. Set your initials (⚙) so your annotations are signed.', 5000); }, 800);

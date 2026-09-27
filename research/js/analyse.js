@@ -8,6 +8,9 @@
   var SW = root.SW, C = root.PDP1CPU;
   var view = SW.$('#view-analyse');
   var build = null, lens = SW.store.get('an.lens', 1);
+  if (lens === 12 || lens === 13) lens = 1;   // the sky and the ships are under Graphics now
+  SW.anLens = function () { return lens; };
+  SW.anLensName = function () { return LENSES[lens - 1][1]; };
 
   var LENSES = [
     [1, 'Comments', 'Every comment, searchable'],
@@ -1545,7 +1548,17 @@
   }
 
   // The lenses in a drop-down, grouped; exports in a menu of their own.
-  var GROUPS = [['Reading the text', [1, 2, 3, 14]], ['The program', [4, 8, 9, 11]], ['The machine', [5, 6, 10]], ['The record', [7]], ['What it draws', [12, 13]]];
+  // The lenses by menu in the tab row: Text, Program, and Absence under Versions.
+  var MENUS = { text: [['', [1, 2, 3, 14]]], program: [['The program', [4, 8, 9, 11]], ['The machine', [5, 6, 10]]], versions: [['', [7]]] };
+  function menuOf(n) { for (var m in MENUS) if (MENUS[m].some(function (gr) { return gr[1].indexOf(n) >= 0; })) return m; return 'text'; }
+  function lensItems(groups, attr, cur) {
+    return groups.map(function (gr) {
+      return '<div class="lens-g">' + (gr[0] ? '<h5>' + SW.esc(gr[0]) + '</h5>' : '') + gr[1].map(function (n) {
+        var l = LENSES[n - 1];
+        return '<button ' + attr + '="' + n + '"' + (n === cur ? ' class="on"' : '') + '><b>' + SW.esc(l[1]) + '</b><span>' + SW.esc(l[2]) + '</span></button>';
+      }).join('') + '</div>';
+    }).join('');
+  }
   function expMenu(w) {
     var d = SW.el('details', { class: 'menu exp-menu tb-right' });
     d.innerHTML = '<summary class="btn" title="Export this lens">⤓ Export ▾</summary>';
@@ -1560,13 +1573,9 @@
     var pad = SW.el('div', { class: 'pad', style: 'max-width:none' });
     var L = LENSES[lens - 1];
     var head = SW.el('div', { class: 'toolbar an-head', style: 'position:static;padding:0 0 10px' });
-    head.innerHTML = '<details class="menu lens-menu"><summary class="btn" title="Choose a lens">' + L[0] + '. ' + SW.esc(L[1]) + ' ▾</summary><div class="menu-body lens-list">' +
-      GROUPS.map(function (gr) {
-        return '<div class="lens-g"><h5>' + SW.esc(gr[0]) + '</h5>' + gr[1].map(function (n) {
-          var l = LENSES[n - 1];
-          return '<button data-l="' + n + '"' + (n === lens ? ' class="on"' : '') + '><b>' + n + '. ' + SW.esc(l[1]) + '</b><span>' + SW.esc(l[2]) + '</span></button>';
-        }).join('') + '</div>';
-      }).join('') + '</div></details>' +
+    var mg = MENUS[menuOf(lens)];
+    head.innerHTML = (mg.length === 1 && mg[0][1].length === 1 ? '<b class="an-title">' + SW.esc(L[1]) + '</b>' :
+      '<details class="menu lens-menu"><summary class="btn" title="Choose">' + SW.esc(L[1]) + ' ▾</summary><div class="menu-body lens-list">' + lensItems(mg, 'data-l', lens) + '</div></details>') +
       '<span class="seg-btns"><button class="btn' + (mode === 'one' ? ' on' : '') + '" data-mode="one">This version</button>' +
       '<button class="btn' + (mode === 'across' ? ' on' : '') + '" data-mode="across">Across the variorum</button></span>' +
       '<span class="hint an-desc">' + SW.esc(L[2]) + '.</span>';
@@ -1579,6 +1588,7 @@
     var cards = SW.el('div', { class: 'cards' });
     pad.appendChild(cards);
     view.appendChild(pad);
+    SW.markTabs();
     if (lens === 14) {
       // a biography is always across the versions; there is no single-version mode
       SW.$$('[data-mode]', head).forEach(function (x) { x.style.display = 'none'; });
@@ -1600,14 +1610,14 @@
   SW.views.analyse = { show: function (b) { build = b; render(); } };
 
   // ---------- the Graphics tab ----------
-  // The bench's pictures of the program, gathered: the star map (with the
-  // scope), the ships, the memory map. Each is also a lens under Analyse.
+  // The bench's pictures of the program: the star map (with the scope and the
+  // star tables across the versions), the ships, the sun, hyperspace.
   var GFX = [['sky', 'Star map', 'The star table, its constellations, and the scope'],
              ['ships', 'The ships', 'The Needle and the Wedge, and how they are drawn'],
              ['sun', 'The sun', 'The central star, drawn slowly'],
-             ['hyper', 'Hyperspace', 'What hyperspace draws, slowed down'],
-             ['memory', 'Memory map', 'Core, word by word']];
-  var gfx = SW.store.get('gfx.item', 'sky'), gfxStop = null, gfxBuild = null;
+             ['hyper', 'Hyperspace', 'What hyperspace draws, slowed down']];
+  var gfx = SW.store.get('gfx.item', 'sky'); if (gfx === 'memory') gfx = 'sky';
+  var gfxStop = null, gfxBuild = null;
   function renderGfx() {
     var el = SW.$('#view-graphics'), b = gfxBuild;
     if (gfxStop) { gfxStop(); gfxStop = null; }
@@ -1622,7 +1632,13 @@
     pad.appendChild(head);
     el.appendChild(pad);
     if (!b.lines || !b.asm) { pad.appendChild(SW.el('p', { class: 'hint' }, 'No source survives for ' + SW.esc(b.v.label) + ', so there is nothing to draw.')); return; }
-    if (G[0] === 'sky') { var host = SW.el('div'); pad.appendChild(host); gfxStop = SW.skyMap(b, host); return; }
+    if (G[0] === 'sky') {
+      var host = SW.el('div'); pad.appendChild(host); gfxStop = SW.skyMap(b, host);
+      var sk = SW.el('div', { class: 'cards', style: 'margin-top:14px' }), svs = selected();
+      pad.appendChild(sk);
+      Promise.all(svs.map(function (v) { return SW.build(v.id); })).then(function (bs) { if (svs.length && sk.isConnected) XFNS[12](svs, bs, sk, renderGfx); });
+      return;
+    }
     var cards = SW.el('div', { class: 'cards' });
     pad.appendChild(cards);
     if (G[0] === 'sun' || G[0] === 'hyper') {
@@ -1631,7 +1647,7 @@
       setTimeout(function () { wait.remove(); SW.draws[G[0] === 'sun' ? 'sun' : 'hyperspace'](b, cards); }, 30);
       return;
     }
-    var blocks = FNS[G[0] === 'ships' ? 13 : 10](b, cards);
+    var blocks = FNS[13](b, cards);
     if (blocks) head.appendChild(expMenu(SW.exportButtons(function () {
       return { title: b.v.label + ': ' + G[1].toLowerCase(), subtitle: G[2], meta: SW.docMeta(b), blocks: blocks() };
     }, 'spacewar-' + b.v.id + '-' + G[0])));
@@ -1647,10 +1663,15 @@
   SW.views.graphics = { show: function (b) { gfxBuild = b; renderGfx(); } };
 
   // ---------- drop-downs in the tab row, as on the main site ----------
-  // Analyse ▾ and Graphics ▾ open a menu under the tab (click; a click outside
+  // Text ▾, Program ▾, Graphics ▾, Versions ▾ and Help ▾ open a menu under the tab (click; a click outside
   // or Esc closes it); choosing an item goes to that lens or graphic.
   var tabMenu = null;
   function closeTabMenu() { if (!tabMenu) return; tabMenu.el.remove(); tabMenu.btn.setAttribute('aria-expanded', 'false'); tabMenu = null; }
+  var VERS = [['about', 'This version', 'Its record, sources, build log and annotations'],
+              ['compare', 'Compare', 'Two versions side by side'],
+              ['genealogy', 'Genealogy', 'How the versions descend'],
+              ['tape', 'Tape', 'The paper tapes, frame by frame'],
+              ['absence', 'Absence', 'Gaps in the record, and what fills them']];
   function menuHTML(which) {
     if (which === 'help') {
       var dm = document.querySelector('meta[name="bench-date"]');
@@ -1662,12 +1683,11 @@
       }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
     }
     if (which === 'graphics') return GFX.map(function (g) { return '<button data-pick="' + g[0] + '"' + (SW.state.tab === 'graphics' && g[0] === gfx ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('');
-    return GROUPS.map(function (gr) {
-      return '<div class="lens-g"><h5>' + SW.esc(gr[0]) + '</h5>' + gr[1].map(function (n) {
-        var l = LENSES[n - 1];
-        return '<button data-pick="' + n + '"' + (SW.state.tab === 'analyse' && n === lens ? ' class="on"' : '') + '><b>' + n + '. ' + SW.esc(l[1]) + '</b><span>' + SW.esc(l[2]) + '</span></button>';
-      }).join('') + '</div>';
+    if (which === 'versions') return VERS.map(function (h) {
+      var on = h[0] === 'absence' ? SW.state.tab === 'analyse' && lens === 7 : SW.state.tab === h[0];
+      return '<button data-pick="' + h[0] + '"' + (on ? ' class="on"' : '') + '><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
     }).join('');
+    return lensItems(MENUS[which], 'data-pick', SW.state.tab === 'analyse' ? lens : 0);
   }
   SW.$$('#tabs [data-menu]').forEach(function (btn) {
     btn.addEventListener('click', function (e) {
@@ -1692,6 +1712,8 @@
           else window.open(p === 'code' ? 'https://github.com/spacewar1962/spacewar' : 'https://github.com/spacewar1962/spacewar/issues', '_blank', 'noopener');
           return;
         }
+        if (which === 'versions' && t.dataset.pick !== 'absence') { SW.setTab(t.dataset.pick); return; }
+        if (which === 'versions') { lens = 7; SW.store.set('an.lens', 7); SW.forget('analyse'); SW.setTab('analyse'); return; }
         if (which === 'graphics') { gfx = t.dataset.pick; SW.store.set('gfx.item', gfx); SW.forget('graphics'); SW.setTab('graphics'); }
         else { lens = +t.dataset.pick; SW.store.set('an.lens', lens); SW.forget('analyse'); SW.setTab('analyse'); }
       });

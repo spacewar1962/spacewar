@@ -17,7 +17,7 @@
   }
   function where() {
     var v = SW.state.v && root.SWVersions.byId(SW.state.v);
-    return (v ? v.label.replace(/^Spacewar! /, '') + ' · ' : '') + ({ read: 'Read', run: 'Run', analyse: 'Analyse', compare: 'Compare', genealogy: 'Genealogy', tape: 'Tape', graphics: 'Graphics', about: 'Versions', findings: 'Findings' }[SW.state.tab] || SW.state.tab);
+    return (v ? v.label.replace(/^Spacewar! /, '') + ' · ' : '') + ({ read: 'Read', run: 'Run', analyse: SW.anLensName ? SW.anLensName() : 'Analyse', compare: 'Compare', genealogy: 'Genealogy', tape: 'Tape', graphics: 'Graphics', about: 'Versions', findings: 'Findings' }[SW.state.tab] || SW.state.tab);
   }
   function add(item) {
     var t = load();
