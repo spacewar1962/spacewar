@@ -68,12 +68,13 @@
     var tx = o.source && root.SWFiodec ? textIndex(bytes) : null;
     var dlg = SW.el('dialog', { class: 'reader-dlg' });
     dlg.innerHTML = '<div class="rd-head"><h2>Tape Load Simulator: ' + SW.esc(o.name || 'the tape') + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
-      '<div class="rd-body"><canvas class="rd-machine"></canvas><div class="rd-coreside"><canvas class="rd-core"></canvas><button class="btn ghost rd-divebtn" data-a="dive" title="What each stretch of core holds and why, worked out from this tape and the version’s source">What is where in core ▸</button><p class="hint rd-corecap">Hover over core to see a word.</p></div></div>' +
-      (tx ? '<pre class="rd-print mono"></pre>' : '') +
+      '<div class="rd-body"><div class="rd-mainside"><canvas class="rd-machine"></canvas>' +
       '<div class="rd-ctl"><button class="btn" data-a="play">▶ Play</button><button class="btn ghost" data-a="restart" title="Back to the start of the tape">↺</button>' +
       '<label class="check">Speed <select data-a="speed"><option value="1" selected>400 lines a second, as the PDP-1 read</option><option value="4">× 4</option><option value="16">× 16</option><option value="64">× 64</option></select></label>' +
       '<button class="btn ghost" data-a="skip" title="Read the rest of the tape at once">Skip to end ⏭</button><span class="rd-run"></span></div>' +
-      '<p class="rd-status hint"></p><div class="rd-dive" hidden></div>' +
+      '<p class="rd-status hint"></p></div><div class="rd-coreside"><canvas class="rd-core"></canvas><button class="btn ghost rd-divebtn" data-a="dive" title="What each stretch of core holds and why, worked out from this tape and the version’s source">What is where in core ▸</button><p class="hint rd-corecap">Hover over core to see a word.</p></div></div>' +
+      (tx ? '<pre class="rd-print mono"></pre>' : '') +
+      '<div class="rd-dive" hidden></div>' +
       '<p class="hint rd-note">' + (tx ? 'A source tape is read by the assembler, which the bench does not emulate: the reader runs and the text is printed as it is read; the console stays dark.'
         : 'Read-In mode loads the loader punched at the head of the tape; the loader then runs on the bench’s PDP-1 emulator, taking each word as the reader delivers it and checking each block against its checksum. Reader speed and console lights as in DEC’s PDP-1 Manual (1961).') + '</p>';
     document.body.appendChild(dlg);

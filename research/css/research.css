@@ -962,3 +962,5 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .dr-gv button.on { background: var(--beam); border-color: var(--beam); color: var(--bg); font-weight: 600; }
 .dr-top .dr-g { padding: 6px 10px; background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
 .dr-opt { display: block; margin: 6px 0; }
+.reader-dlg .rd-mainside { min-width: 0; }
+.reader-dlg .rd-mainside .rd-ctl { margin-top: 8px; }

@@ -1615,7 +1615,8 @@
   var GFX = [['sky', 'Star map', 'The star table, its constellations, and the scope'],
              ['ships', 'The ships', 'The Needle and the Wedge, and how they are drawn'],
              ['sun', 'The sun', 'The central star, drawn slowly'],
-             ['hyper', 'Hyperspace', 'What hyperspace draws, slowed down']];
+             ['hyper', 'Hyperspace', 'What hyperspace draws, slowed down'],
+             ['tapesim', 'Tape Load Simulator', 'The tape read into core: Read-In, then the loader']];
   var gfx = SW.store.get('gfx.item', 'sky'); if (gfx === 'memory') gfx = 'sky';
   var gfxStop = null, gfxBuild = null;
   function renderGfx() {
@@ -1626,7 +1627,7 @@
     var pad = SW.el('div', { class: 'pad gfx-page', style: 'max-width:none' });
     var head = SW.el('div', { class: 'toolbar an-head', style: 'position:static;padding:0 0 10px' });
     head.innerHTML = '<details class="menu lens-menu"><summary class="btn" title="Choose a graphic">' + SW.esc(G[1]) + ' ▾</summary><div class="menu-body lens-list">' +
-      GFX.map(function (g) { return '<button data-g="' + g[0] + '"' + (g[0] === G[0] ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('') +
+      GFX.filter(function (g) { return g[0] !== 'tapesim'; }).map(function (g) { return '<button data-g="' + g[0] + '"' + (g[0] === G[0] ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('') +
       '</div></details><span class="hint an-desc">' + SW.esc(G[2]) + '.</span>';
     head.addEventListener('click', function (e) { var t = e.target.closest('[data-g]'); if (t) { gfx = t.dataset.g; SW.store.set('gfx.item', gfx); renderGfx(); } });
     pad.appendChild(head);
@@ -1714,6 +1715,12 @@
         }
         if (which === 'versions' && t.dataset.pick !== 'absence') { SW.setTab(t.dataset.pick); return; }
         if (which === 'versions') { lens = 7; SW.store.set('an.lens', 7); SW.forget('analyse'); SW.setTab('analyse'); return; }
+        if (which === 'graphics' && t.dataset.pick === 'tapesim') {   // opens over the Tape view, on its tape
+          SW.setTab('tape');
+          var tries = 0;
+          (function go() { if (SW.tape && SW.tape.openSim && SW.tape.simV === SW.state.v && SW.tape.openSim()) return; if (++tries < 50) setTimeout(go, 100); else SW.toast('No tape to load for this version.', 4000); })();
+          return;
+        }
         if (which === 'graphics') { gfx = t.dataset.pick; SW.store.set('gfx.item', gfx); SW.forget('graphics'); SW.setTab('graphics'); }
         else { lens = +t.dataset.pick; SW.store.set('an.lens', lens); SW.forget('analyse'); SW.setTab('analyse'); }
       });

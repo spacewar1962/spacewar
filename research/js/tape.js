@@ -543,10 +543,13 @@
           showAnatomy();
         }).catch(function (e) { info.textContent = e.message; });
       }
-      tb.appendChild(SW.el('button', { class: 'btn', title: 'Run this tape through the PDP-1’s photoelectric reader: Read-In mode, then the tape’s own loader on the emulator, with the console lights', onclick: function () {
-        if (!cur.bytes.length || !SW.reader) return;
+      function openSim() {
+        if (!cur.bytes.length || !SW.reader) return false;
         SW.reader.open(cur.bytes, { name: cur.name, source: cur.source, an: cur.an, buildMem: b.asm.memory, symAt: b.symAt, build: b, label: b.v.label.replace(/^Spacewar! /, ''), onRun: function () { SW.setTab('run'); } });
-      } }, 'Tape Load Simulator'));
+        return true;
+      }
+      T.openSim = openSim; T.simV = b.v.id;   // for Graphics ▾ Tape Load Simulator: the tape chosen here
+      tb.appendChild(SW.el('button', { class: 'btn', title: 'Run this tape through the PDP-1’s photoelectric reader: Read-In mode, then the tape’s own loader on the emulator, with the console lights', onclick: openSim }, 'Tape Load Simulator'));
       tb.appendChild(SW.el('button', { class: 'btn', onclick: function () {
         var from = +SW.$('#tp-from', tb).value, n = +SW.$('#tp-n', tb).value;
         root.SWExport.download(cur.name + '.svg', T.svg(cur.bytes, from, Math.min(n, cur.bytes.length - from), 10, 100), 'image/svg+xml');
