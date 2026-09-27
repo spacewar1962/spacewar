@@ -270,8 +270,13 @@
       box.innerHTML = '';
       var people = []; list.forEach(function (n) { if (people.indexOf(n.by) < 0) people.push(n.by); });
       legend(people);
-      var bySel = SW.$('#view-findings .fd-by');
-      if (bySel) people.forEach(function (pp) { if (!SW.$$('option', bySel).some(function (o) { return o.value === pp; })) bySel.appendChild(SW.el('option', { value: pp }, SW.esc(pp))); });
+      var mem = SW.$('#view-findings .fd-members');
+      if (mem) {
+        var cnt = {}; list.forEach(function (n) { cnt[n.by] = (cnt[n.by] || 0) + 1; });
+        mem.innerHTML = '<button class="btn ghost' + (!FS.by ? ' on' : '') + '" data-by="">All <span class="faint">' + list.length + '</span></button>' +
+          people.map(function (pp) { return '<button class="btn ghost' + (FS.by === pp ? ' on' : '') + '" data-by="' + SW.esc(pp) + '"><i class="fd-dot" style="background:' + colourOf(pp) + '"></i>' + SW.esc(pp) + ' <span class="faint">' + cnt[pp] + '</span></button>'; }).join('');
+        mem.onclick = function (e) { var b = e.target.closest('[data-by]'); if (!b) return; FS.by = b.dataset.by; SW.store.set('fd.filt', FS); checkNotes(box, true); };
+      }
       if (!list.length) {
         box.innerHTML = '<p class="hint">None from the group yet. Add one with ✎ Add a finding above, or ★ Finding on a selection in Read: it is shared with the group, signed and dated, and shown here in your colour.</p>';
         return;
@@ -381,7 +386,7 @@
     if (FS.lvl === 'key' && it.lvl !== 'key') return false;
     if (FS.lvl === 'notable' && it.lvl === 'minor') return false;
     if (FS.v && it.vids.indexOf(FS.v) < 0) return false;
-    if (FS.by && it.by !== FS.by) return false;
+    if (FS.by && it.by !== 'bench' && it.by !== FS.by) return false;
     if (FS.q && it.text.toLowerCase().indexOf(FS.q.toLowerCase()) < 0) return false;
     return true;
   }
@@ -411,7 +416,6 @@
     bar.innerHTML = '<label class="check">Category <select data-f="cat"><option value="">All</option>' + CATS.concat([['other', 'Other']]).map(function (c) { return '<option value="' + c[0] + '"' + (FS.cat === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
       '<label class="check">Importance <select data-f="lvl"><option value="">All</option><option value="notable"' + (FS.lvl === 'notable' ? ' selected' : '') + '>Key and notable</option><option value="key"' + (FS.lvl === 'key' ? ' selected' : '') + '>Key only</option></select></label>' +
       '<label class="check">Version <select data-f="v"><option value="">All</option>' + vs.map(function (v) { return '<option value="' + v.id + '"' + (FS.v === v.id ? ' selected' : '') + '>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</option>'; }).join('') + '</select></label>' +
-      '<label class="check">By <select data-f="by" class="fd-by"><option value="">Anyone</option><option value="bench"' + (FS.by === 'bench' ? ' selected' : '') + '>the bench</option>' + (FS.by && FS.by !== 'bench' ? '<option value="' + SW.esc(FS.by) + '" selected>' + SW.esc(FS.by) + '</option>' : '') + '</select></label>' +
       '<input type="search" data-f="q" placeholder="Find in findings" value="' + SW.esc(FS.q || '') + '">';
     function set(e) { var f = e.target.dataset.f; if (!f) return; FS[f] = e.target.value; SW.store.set('fd.filt', FS); onChange(); }
     bar.addEventListener('change', set);
@@ -452,10 +456,15 @@
     more.appendChild(mb);
     right.appendChild(more);
     tb.appendChild(right);
-    pad.insertAdjacentHTML('beforeend', '<h2>Findings</h2><p class="prose">What the bench and the group have established about the Spacewar! sources, each with its evidence one click away, coloured by who added it. The witness tapes and punched titles are checked afresh against the tapes each time this page opens.</p><div class="fd-legend"></div>');
+    pad.insertAdjacentHTML('beforeend', '<h2>Findings</h2><p class="prose">What the crew and the bench have established about the Spacewar! sources, each with its evidence one click away. Crew: the group’s findings, by member. Bench: the bench’s own, with the witness tapes and punched titles checked afresh.</p>');
     pad.appendChild(tb);
     legend([]);
-    var fbar = filterBar(function () { paintBench(); checkNotes(nBox, true); });
+    // Crew (the group's findings, by member) | Bench (the bench's own, and its checks)
+    var side = SW.store.get('fd.side', 'crew');
+    var seg = SW.el('div', { class: 'seg-btns fd-side' }, '<button class="btn' + (side === 'crew' ? ' on' : '') + '" data-side="crew" title="The group’s findings">Crew</button><button class="btn' + (side === 'bench' ? ' on' : '') + '" data-side="bench" title="What the bench has established, and its checks of the tapes">Bench</button>');
+    seg.addEventListener('click', function (e) { var b = e.target.closest('[data-side]'); if (b && b.dataset.side !== side) { SW.store.set('fd.side', b.dataset.side); render(); } });
+    pad.appendChild(seg);
+    var fbar = filterBar(function () { if (side === 'bench') paintBench(); else checkNotes(nBox, true); });
     pad.appendChild(fbar);
     var list = SW.el('div', { class: 'fd-bench' });
     function benchCard(f, c, lvl) {
@@ -474,22 +483,21 @@
         return { by: 'bench', cat: c, lvl: lvl, order: n, text: f.no + ' ' + f.title + ' ' + f.text + ' ' + f.kind, vids: f.ev.map(function (e) { return e.v; }).filter(Boolean), card: function () { return benchCard(f, c, lvl); } };
       }), 'None.');
     }
-    pad.appendChild(SW.el('h3', {}, 'Established by the bench'));
-    pad.appendChild(list);
-    paintBench();
-    pad.appendChild(SW.el('h3', {}, 'From the group'));
-    var nBox = SW.el('div');
-    pad.appendChild(nBox);
-    pad.appendChild(SW.el('h3', {}, 'Witness tapes, checked now'));
-    var wBox = SW.el('div');
-    pad.appendChild(wBox);
-    pad.appendChild(SW.el('h3', {}, 'Punched titles, read now'));
-    var tBox = SW.el('div');
-    pad.appendChild(tBox);
+    var nBox = SW.el('div'), wBox = SW.el('div'), tBox = SW.el('div');
+    if (side === 'bench') {
+      pad.appendChild(list);
+      paintBench();
+      pad.appendChild(SW.el('h3', {}, 'Witness tapes, checked now'));
+      pad.appendChild(wBox);
+      pad.appendChild(SW.el('h3', {}, 'Punched titles, read now'));
+      pad.appendChild(tBox);
+    } else {
+      pad.appendChild(SW.el('div', { class: 'toolbar fd-members', style: 'position:static;padding-left:0' }));
+      pad.appendChild(nBox);
+    }
     function run() {
-      checkTitles(tBox);
-      checkNotes(nBox);
-      checkWitnesses(wBox);
+      if (side === 'bench') { checkTitles(tBox); checkWitnesses(wBox); }
+      else checkNotes(nBox);
     }
     run();
   }
