@@ -1062,3 +1062,8 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-snapdlg h3 { margin: 0 0 6px; }
 .ov-snapdlg > label { display: flex; margin: 6px 0; }
 .ov-ships { display: grid; gap: 6px; margin: 4px 0 0 24px; }
+.ov-hist { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; margin-bottom: -6px; }
+.ov-hist .btn { padding: 2px 9px; }
+.ov-trail { font-size: 12px; margin-left: 6px; color: var(--text-faint); }
+.ov-trail a { color: var(--beam); text-decoration: none; }
+.ov-trail a:hover { text-decoration: underline; }

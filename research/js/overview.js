@@ -460,8 +460,12 @@
       for (var a = a0; a < Math.min(a1, a0 + 0o300); a++) { var q = b.srcOf(a); if (q && q.p === q0.p) { n0 = Math.min(n0, q.n); n1 = Math.max(n1, q.n); } }
       return { p: q0.p, n0: n0, n1: Math.min(n1, n0 + 79), cut: n1 > n0 + 79 };
     }
-    function inspect(e) {
+    // the routines visited in the panel, for back and forward
+    var hist = [], hpos = -1;
+    function inspect(e, nav) {
       if (e === 'startup') return;
+      e = String(e);
+      if (!nav) { if (hist[hpos] !== e) { hist = hist.slice(0, hpos + 1); hist.push(e); hpos = hist.length - 1; } }
       var r = A.R[e] || { n: 0, calls: {}, callers: {}, startup: 0 }, g = e === 'wait' ? 'use up rest of time of main loop' : e === 'main' ? glossAt(b, A.frameAt) : glossAt(b, e);
       var callsN = r.n - (r.startup || 0), exN = A.ex[e] || 0, incN = e === 'main' ? A.total : (A.inc[e] || exN);
       var st = [];
@@ -471,7 +475,10 @@
       if (callsN && incN) st.push(Math.round(incN / callsN).toLocaleString('en-GB') + ' a call');
       if (ranIn[e] && ranIn[e].length < NF) st.push('frames ' + ranges(ranIn[e]));
       var cd = e === 'rt' ? null : codeOf(e);
-      var hh = ['<div class="ov-phead"><div><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4>' +
+      var trail = hist.slice(Math.max(0, hpos - 4), hpos).map(function (h0, n0, arr) { var at = hpos - arr.length + n0; return '<a href="#" class="mono" data-hist="' + at + '">' + SW.esc(nm(h0)) + '</a>'; }).join(' › ');
+      var navh = '<div class="ov-hist"><button class="btn ghost" data-hnav="-1" title="Back"' + (hpos > 0 ? '' : ' disabled') + '>←</button><button class="btn ghost" data-hnav="1" title="Forward"' + (hpos < hist.length - 1 ? '' : ' disabled') + '>→</button>' +
+        (trail ? '<span class="ov-trail">' + trail + ' ›</span>' : '') + '</div>';
+      var hh = [navh + '<div class="ov-phead"><div><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4>' +
         '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div>'];
       // values | code | relations
       hh.push('<div class="ov-pvals"><div class="ov-vals"></div></div>');
@@ -540,6 +547,10 @@
     if (el._ovClick) el.removeEventListener('click', el._ovClick);
     el.addEventListener('click', el._ovClick = function (ev) {
       if (ev.target.closest('[data-snap]')) { snapDialog(); return; }
+      var hn = ev.target.closest('[data-hnav]');
+      if (hn) { var np = hpos + (+hn.dataset.hnav); if (np >= 0 && np < hist.length) { hpos = np; inspect(hist[hpos], true); } return; }
+      var ht = ev.target.closest('[data-hist]');
+      if (ht) { ev.preventDefault(); hpos = +ht.dataset.hist; inspect(hist[hpos], true); return; }
       var rd = ev.target.closest('[data-read]');
       if (rd) { var pn = rd.dataset.read.split(':'); goRead(b, +pn[0], +pn[1]); return; }
       var x = ev.target.closest('[data-e]');
