@@ -529,9 +529,9 @@
     // the snapshot's options in a dialog: the controls held, and for how long
     function snapDialog() {
       var d = SW.el('dialog', { class: 'ov-snapdlg' }), mcw = mine ? mine.cw : 0;
-      d.innerHTML = '<h3>New snapshot</h3><p class="hint">The version runs on the emulator for two seconds with no controls, then with the controls chosen here held, then two seconds released. Both rotate bits of a ship mean hyperspace.</p>' +
-        '<label class="check"><input type="radio" name="ovs" value="std"' + (mine ? '' : ' checked') + '> The standard sequence <span class="faint">(' + PHASES.map(function (P) { return P.what; }).join(', then ') + ')</span></label>' +
-        '<label class="check"><input type="radio" name="ovs" value="mine"' + (mine ? ' checked' : '') + '> These controls:</label>' +
+      d.innerHTML = '<h3>New snapshot</h3>' +
+        '<label class="ov-opt"><input type="radio" name="ovs" value="std"' + (mine ? '' : ' checked') + '><span><b>The standard sequence</b><span class="hint">' + SW.esc((function (t) { return t.charAt(0).toUpperCase() + t.slice(1); })(PHASES.map(function (P) { return P.what; }).join(', then '))) + '.</span></span></label>' +
+        '<label class="ov-opt"><input type="radio" name="ovs" value="mine"' + (mine ? ' checked' : '') + '><span><b>Use these controls instead</b><span class="hint">Two seconds with no controls, then these held, then two seconds released. Both rotate bits of a ship mean hyperspace.</span></span></label>' +
         '<div class="ov-ships">' + [0, 1].map(function (s0) {
           return '<div><b>' + (s0 ? 'Second ship' : 'First ship') + '</b>' + BITS.map(function (bt) { return ' <label class="check"><input type="checkbox" data-bit="' + bt[1 + s0] + '"' + (mcw & bt[1 + s0] ? ' checked' : '') + '>' + bt[0] + '</label>'; }).join('') + '</div>';
         }).join('') + '<label class="check">held for <select class="ov-secs">' + [1, 3, 5, 10].map(function (x) { return '<option' + ((mine ? mine.secs : 3) === x ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select> seconds</label></div>' +

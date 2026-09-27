@@ -1062,7 +1062,7 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-snapdlg { max-width: 560px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--text); padding: 14px 18px; }
 .ov-snapdlg::backdrop { background: rgba(0,0,0,.5); }
 .ov-snapdlg h3 { margin: 0 0 6px; }
-.ov-snapdlg > label { display: flex; margin: 6px 0; }
+
 .ov-ships { display: grid; gap: 6px; margin: 4px 0 0 24px; }
 .ov-ptitle { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .ov-hist { display: inline-flex; align-items: center; gap: 2px; }
@@ -1083,3 +1083,6 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-code .t .sym.go { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
 .ov-code .t .sym.go:hover { text-decoration: underline; }
 .ov-scap { font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.4em; }
+.ov-snapdlg .ov-opt { display: grid; grid-template-columns: auto 1fr; gap: 8px; align-items: start; margin: 8px 0; cursor: pointer; }
+.ov-opt input { margin-top: 3px; }
+.ov-opt .hint { display: block; font-size: 12.5px; margin-top: 2px; }
