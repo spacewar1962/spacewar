@@ -546,6 +546,7 @@
       SW.esc(who || '•') + (c.replies ? ' <b>+' + c.replies + '</b>' : '') + '</span>';
   };
 
+  N.myReaction = function (r) { return myReaction(r); };
   function myReaction(r) {
     if (r.source === 'draft') return r.by === SW.me().initials;
     return r.source === 'hypothesis' && !!N.me && r.user === N.me;

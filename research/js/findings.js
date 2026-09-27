@@ -261,10 +261,12 @@
   }
   // Annotations tagged "finding": cards in their author's colour; the first line is the title.
   function checkNotes(box, cached) {
+    live.box = box;
     if (!cached || !live.notes) box.innerHTML = '<p class="hint">Gathering the group’s findings…</p>';
-    return (cached && live.notes ? Promise.resolve(null) : N.whoami().catch(function () {}).then(function () { return N.listAll(); })).then(function (all) {
+    return (cached && live.notes ? Promise.resolve(null) : N.whoami().catch(function () {}).then(function () { return N.listAll({ reactions: true }); })).then(function (all) {
+      if (all) live.threads = N.threads(all.filter(function (x) { return x.source !== 'buildlog'; }));
       var list = all ? all.filter(function (n) {
-        return (n.tags || []).some(function (t) { return /^findings?$/i.test(t); });
+        return !n.parent && (n.tags || []).some(function (t) { return /^findings?$/i.test(t); });
       }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; }) : live.notes;
       live.notes = list;
       box.innerHTML = '';
@@ -288,14 +290,93 @@
       grouped(box, items, 'None.');
     });
   }
+  // Reactions and ratings on a finding: an emoji, or a rating of one to three
+  // stars (a reaction "★1".."★3", one per person), each signed and removable.
+  var RATE = /^★([123])$/;
+  function emojiOf(t) { return t ? t.reactions.filter(function (r) { return !RATE.test(r.text); }) : []; }
+  function ratingOf(t) {
+    var rs = t ? t.reactions.filter(function (r) { return RATE.test(r.text); }) : [];
+    if (!rs.length) return null;
+    var sum = rs.reduce(function (a, r) { return a + +RATE.exec(r.text)[1]; }, 0), mine = rs.filter(function (r) { return N.myReaction(r); })[0];
+    return { n: rs.length, avg: sum / rs.length, mine: mine ? +RATE.exec(mine.text)[1] : 0, who: rs.map(function (r) { return r.by + ' ' + r.text; }) };
+  }
+  function rxBar(t) {
+    var by = {}, mineE = {}; emojiOf(t).forEach(function (r) { (by[r.text] = by[r.text] || []).push(r.by); if (N.myReaction(r)) mineE[r.text] = 1; });
+    var R = ratingOf(t);
+    return '<div class="fd-rxbar"><span class="fd-rate" title="Your rating (one to three stars); the crew’s average beside it">' + [1, 2, 3].map(function (k) { return '<button data-rate="' + k + '" class="' + (R && R.mine >= k ? 'on' : '') + '">★</button>'; }).join('') +
+      (R ? ' <span class="hint" title="' + SW.esc(R.who.join('; ')) + '">' + (Math.round(R.avg * 10) / 10) + ' from ' + R.n + '</span>' : '') + '</span>' +
+      N.EMOJI.map(function (e) { return '<button class="fd-emo' + (mineE[e] ? ' on' : '') + '" data-emoji="' + e + '" title="' + SW.esc((by[e] || []).join(', ') || 'React') + '">' + e + (by[e] ? '<sup>' + by[e].length + '</sup>' : '') + '</button>'; }).join('') + '</div>';
+  }
+  function refreshThreads() {
+    return N.listAll({ reactions: true }).then(function (all) { live.threads = N.threads(all.filter(function (x) { return x.source !== 'buildlog'; })); if (live.box) checkNotes(live.box, true); });
+  }
+  function react(n, emoji) {
+    var t = threadOf(n), mine = t && t.reactions.filter(function (r) { return r.text === emoji && N.myReaction(r); })[0];
+    return (mine ? N.remove(mine, true) : N.create({ vid: n.vid, parent: n.id, kind: 'reaction', anchor: n.anchor, text: emoji, tags: [], quiet: true })).then(refreshThreads);
+  }
+  function rate(n, k) {
+    var t = threadOf(n), mine = t ? t.reactions.filter(function (r) { return RATE.test(r.text) && N.myReaction(r); }) : [], same = mine.some(function (r) { return r.text === '★' + k; });
+    return mine.reduce(function (p, r) { return p.then(function () { return N.remove(r, true); }); }, Promise.resolve())
+      .then(function () { return same ? null : N.create({ vid: n.vid, parent: n.id, kind: 'reaction', anchor: n.anchor, text: '★' + k, tags: [], quiet: true }); }).then(refreshThreads);
+  }
+  function threadOf(n) { return (live.threads || []).filter(function (t) { return t.note.id === n.id; })[0] || null; }
+  function countReplies(t) { return t.replies.reduce(function (a, r) { return a + 1 + countReplies(r); }, 0); }
+  // A finding in a large window: its whole text and figure, its tags, and
+  // what others have added (replies and reactions), with a reply box.
+  function openFinding(n, i, title, fp, c, lvl, where) {
+    var d = SW.el('dialog', { class: 'tray-big fd-big' });
+    var rest = fp.text.split('\n').slice(1).join('\n').trim();
+    var tags = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); });
+    function rx(t) {
+      var by = {}; t.reactions.forEach(function (r) { (by[r.text] = by[r.text] || []).push(r.by); });
+      return Object.keys(by).map(function (k) { return '<span class="fd-rx">' + SW.esc(k) + ' ' + SW.esc(by[k].join(', ')) + '</span>'; }).join(' ');
+    }
+    function replies(t, depth) {
+      return t.replies.map(function (r) {
+        return '<div class="fd-reply" style="margin-left:' + (depth * 16) + 'px;border-left-color:' + colourOf(r.note.by) + '"><div class="fd-rhead"><span class="badge" style="background:' + colourOf(r.note.by) + ';color:#000">' + SW.esc(r.note.by) + '</span> <span class="hint">' + SW.esc(SW.fmtDate(r.note.date)) + '</span></div>' +
+          '<div class="fd-rtext">' + SW.esc(r.note.text) + '</div>' + (r.reactions.length ? '<div>' + rx(r) + '</div>' : '') + '</div>' + replies(r, depth + 1);
+      }).join('');
+    }
+    function paint() {
+      var t = threadOf(n);
+      d.innerHTML = '<div class="tray-bighead"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) +
+        ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
+        (rest ? '<div class="fd-rtext">' + SW.esc(rest) + '</div>' : '') + '<div class="fd-bigfig"></div>' +
+        (tags.length ? '<p>' + tags.map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') + '</p>' : '') +
+        '<p class="hint">Evidence: ' + SW.esc(where) + '</p>' + rxBar(t) +
+        '<h4 class="fd-rh">Replies' + (t ? ' <span class="faint">' + countReplies(t) + '</span>' : '') + '</h4>' + (t && t.replies.length ? replies(t, 0) : '<p class="hint">None yet.</p>') +
+        '<div class="fd-replybox"><textarea rows="3" placeholder="Reply, signed with your initials"></textarea><button class="btn" data-reply>Reply</button></div>';
+      if (fp.b64) SW.figpack.unpack(fp.b64).then(function (svg) { var fb = SW.$('.fd-bigfig', d); if (fb) fb.innerHTML = '<div class="tray-fig">' + SW.figpack.img(svg, 'fig-full') + '</div>'; });
+    }
+    paint();
+    document.body.appendChild(d);
+    d.addEventListener('click', function (e) {
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); return; }
+      var eb = e.target.closest('[data-emoji], [data-rate]');
+      if (eb) { eb.disabled = true; (eb.dataset.emoji ? react(n, eb.dataset.emoji) : rate(n, +eb.dataset.rate)).then(paint, function (err) { eb.disabled = false; if (err.message !== 'no initials') SW.toast(err.message, 5000); }); return; }
+      var rb = e.target.closest('[data-reply]');
+      if (rb) {
+        var ta = SW.$('.fd-replybox textarea', d), text = ta.value.trim(); if (!text) return;
+        rb.disabled = true;
+        N.create({ vid: n.vid, parent: n.id, kind: n.kind, anchor: n.anchor, text: text, tags: [] }).then(function () {
+          return N.listAll({ reactions: true });
+        }).then(function (all) { live.threads = N.threads(all.filter(function (x) { return x.source !== 'buildlog'; })); paint(); }, function (err) { rb.disabled = false; if (err.message !== 'no initials') SW.toast(err.message, 5000); });
+      }
+    });
+    d.addEventListener('close', function () { d.remove(); });
+    d.showModal();
+  }
   function groupCard(n, i, c, lvl) {
       {
         var fp = SW.figpack.split(n.text);
         var lines = fp.text.split(/\n/), title = lines[0].replace(/^#+\s*/, ''), rest = lines.slice(1).join('\n').trim();
         var where = vLabel(n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : ', the version');
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
-        li.innerHTML = '<div class="fd-head"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
+        var th = threadOf(n), nrep = th ? countReplies(th) : 0, nrx = emojiOf(th).length, R0 = ratingOf(th);
+        li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no mono">G' + (i + 1) + '</span> <b class="fd-title">' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
           (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
+        if (nrep || nrx || R0) SW.$('.fd-ev', li).insertAdjacentHTML('beforeend', ' <a href="#" class="fd-replies">' + [nrep ? nrep + (nrep === 1 ? ' reply' : ' replies') : '', nrx ? emojiOf(th).map(function (r) { return r.text; }).join('') : '', R0 ? 'crew ' + (Math.round(R0.avg * 10) / 10) + '★ (' + R0.n + ')' : ''].filter(Boolean).join(' · ') + '</a>');
+        li.addEventListener('click', function (e) { if (e.target.closest('.fd-open, .fd-title, .fd-replies')) { e.preventDefault(); openFinding(n, i, title, fp, c, lvl, where); } });
         SW.$('.fd-go', li).onclick = function (e) {
           e.preventDefault();
           if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
