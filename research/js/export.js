@@ -269,7 +269,8 @@
            wRun((n.date ? ' · ' + fmtDate(n.date) : '') + '  ', '<w:smallCaps/><w:color w:val="' + GREY + '"/>');
   }
   function notePPr(by, left) {
-    return pStyle('NoteBy') + '<w:pBdr><w:left w:val="single" w:sz="12" w:space="6" w:color="' + personColour(by) + '"/></w:pBdr><w:ind w:left="' + left + '"/>';
+    // right-aligned beside the code, the rule on the right in the author's colour
+    return pStyle('NoteBy') + '<w:pBdr><w:right w:val="single" w:sz="12" w:space="6" w:color="' + personColour(by) + '"/></w:pBdr><w:ind w:left="' + left + '" w:right="120"/><w:jc w:val="right"/>';
   }
 
   function wNote(n, indent, anchor) {
