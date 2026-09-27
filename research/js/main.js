@@ -5,7 +5,7 @@
   'use strict';
   var SW = root.SW, V = root.SWVersions;
 
-  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'about', 'findings'];
+  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'sky', 'about', 'findings'];
 
   function fillPicker() {
     var sel = SW.$('#pick-a');
@@ -174,10 +174,6 @@
     });
     SW.$('#btn-settings').onclick = settings;
     SW.$('#btn-about').onclick = about;
-    SW.$('#btn-sky').onclick = function () {
-      if (!SW.state.v || !SW.skyMap) return;
-      SW.build(SW.state.v).then(function (b) { if (b && b.lines && b.asm) SW.skyMap(b); else SW.toast('No source survives for this version, so there is no star table to map.'); }, function () { SW.toast('No star table to map for this version.'); });
-    };
     SW.$('.brand').addEventListener('click', function (e) { e.preventDefault(); about(); });
     // The side panel opens below the top bar, so the bar's buttons stay in reach.
     function barH() { document.documentElement.style.setProperty('--bar-h', SW.$('header.bar').offsetHeight + 'px'); }

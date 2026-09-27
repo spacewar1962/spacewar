@@ -13,7 +13,7 @@
        below to the day of the release; the About box shows both. -->
   <meta name="bench-date" content="2026-09-26">
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css?v=1.10.3">
+  <link rel="stylesheet" href="css/research.css?v=1.11.0">
 </head>
 <body>
   <header class="bar">
@@ -30,7 +30,6 @@
     <div class="bar-right">
       <span class="status" id="status" role="status" aria-live="polite"></span>
       <span class="size-btns"><button class="icon-btn" id="btn-smaller" title="Smaller code text">A−</button><button class="icon-btn" id="btn-larger" title="Larger code text">A+</button></span>
-      <button class="icon-btn" id="btn-sky" title="Star map: the Expensive Planetarium of this version, with its constellations, and how it reaches the round screen">✦</button>
       <button class="icon-btn" id="btn-theme" title="Switch between your last light and dark colour themes (choose themes in ⚙ Settings)">◐</button>
       <button class="icon-btn news-btn" id="btn-tray" title="The tray">❐<span class="news-n" id="tray-n"></span></button>
       <button class="icon-btn news-btn" id="btn-news" title="What’s new in the group’s notes">✉<span class="news-n" id="news-n"></span></button>
@@ -46,6 +45,7 @@
     <button data-tab="compare">Compare</button>
     <button data-tab="genealogy">Genealogy</button>
     <button data-tab="tape">Tape</button>
+    <button data-tab="sky" title="The Expensive Planetarium: the star table as a map of the sky, and how it reaches the round screen">Star map</button>
     <button data-tab="about">Version &amp; notes</button>
     <button data-tab="findings" title="What the bench has established, with evidence, witness tapes and punched titles checked afresh">Findings</button>
   </nav>
@@ -57,6 +57,7 @@
     <section class="view" id="view-compare"></section>
     <section class="view" id="view-genealogy"></section>
     <section class="view" id="view-tape"></section>
+    <section class="view" id="view-sky"></section>
     <section class="view" id="view-about"></section>
     <section class="view" id="view-findings"></section>
   </main>
@@ -154,26 +155,26 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js?v=1.10.3"></script>
-  <script src="js/pdp1cpu.js?v=1.10.3"></script>
-  <script src="js/fiodec.js?v=1.10.3"></script>
-  <script src="js/versions.js?v=1.10.3"></script>
-  <script src="js/export.js?v=1.10.3"></script>
-  <script src="js/genealogy.js?v=1.10.3"></script>
-  <script src="js/core.js?v=1.10.3"></script>
-  <script src="js/notes.js?v=1.10.3"></script>
-  <script src="js/tray.js?v=1.10.3"></script>
-  <script src="js/figures.js?v=1.10.3"></script>
-  <script src="js/read.js?v=1.10.3"></script>
-  <script src="js/run.js?v=1.10.3"></script>
-  <script src="js/analyse.js?v=1.10.3"></script>
-  <script src="js/compare.js?v=1.10.3"></script>
-  <script src="js/stemma.js?v=1.10.3"></script>
-  <script src="js/tape.js?v=1.10.3"></script>
-  <script src="js/reader.js?v=1.10.3"></script>
-  <script src="js/about.js?v=1.10.3"></script>
-  <script src="js/edition.js?v=1.10.3"></script>
-  <script src="js/findings.js?v=1.10.3"></script>
-  <script src="js/main.js?v=1.10.3"></script>
+  <script src="js/pdp1asm.js?v=1.11.0"></script>
+  <script src="js/pdp1cpu.js?v=1.11.0"></script>
+  <script src="js/fiodec.js?v=1.11.0"></script>
+  <script src="js/versions.js?v=1.11.0"></script>
+  <script src="js/export.js?v=1.11.0"></script>
+  <script src="js/genealogy.js?v=1.11.0"></script>
+  <script src="js/core.js?v=1.11.0"></script>
+  <script src="js/notes.js?v=1.11.0"></script>
+  <script src="js/tray.js?v=1.11.0"></script>
+  <script src="js/figures.js?v=1.11.0"></script>
+  <script src="js/read.js?v=1.11.0"></script>
+  <script src="js/run.js?v=1.11.0"></script>
+  <script src="js/analyse.js?v=1.11.0"></script>
+  <script src="js/compare.js?v=1.11.0"></script>
+  <script src="js/stemma.js?v=1.11.0"></script>
+  <script src="js/tape.js?v=1.11.0"></script>
+  <script src="js/reader.js?v=1.11.0"></script>
+  <script src="js/about.js?v=1.11.0"></script>
+  <script src="js/edition.js?v=1.11.0"></script>
+  <script src="js/findings.js?v=1.11.0"></script>
+  <script src="js/main.js?v=1.11.0"></script>
 </body>
 </html>

@@ -844,3 +844,6 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .sky-scope-how ol { padding-left: 20px; }
 .sky-scope-how li { margin-bottom: 6px; }
 .sky-dlg .sky-box svg { cursor: crosshair; }
+.sky-scope-exp { margin: 8px 0 0; }
+.sky-page { padding: 12px 20px 40px; }
+.sky-page .rd-head h2 { font-size: 18px; }

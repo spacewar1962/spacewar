@@ -388,9 +388,10 @@
     pts.slice().reverse().forEach(function (p) { while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); });
     return lo.slice(0, -1).concat(up.slice(0, -1));
   }
-  SW.skyMap = function (b) {
+  // host: render into that element (the Star map tab) instead of a modal; returns a stop function
+  SW.skyMap = function (b, host) {
     var stars = starsOf(b);
-    if (!stars.length) { SW.toast('This version carries no star table.'); return; }
+    if (!stars.length) { if (host) host.innerHTML = '<div class="pad hint">' + SW.esc(b.v.label) + ' carries no star table.</div>'; else SW.toast('This version carries no star table.'); return function () {}; }
     var mag = 1;
     stars.forEach(function (st) {
       var mm = /^(\d)j$/.exec(st.label); if (mm) mag = +mm[1];
@@ -447,13 +448,13 @@
       if (!pal) o.push('<g class="sky-win"></g>');   // the scope's window, drawn live (not exported)
       return o.concat(['</svg>']).join('');
     }
-    var dlg = SW.el('dialog', { class: 'sky-dlg' });
+    var dlg = host ? SW.el('div', { class: 'sky-dlg sky-page' }) : SW.el('dialog', { class: 'sky-dlg' });
     dlg.innerHTML = '<div class="rd-head"><h2>Star map: ' + SW.esc(b.v.label) + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
       '<p class="hint">Peter Samson’s star table (“stars by prs”), ' + stars.length + ' stars from the line <span class="mono">' + SW.esc(stars[0].L.raw.trim()) + '</span> on. Each <span class="mono">mark X, Y</span> is drawn at X and Y in 8192ths of a circle: right ascension and declination. Dot sizes follow Samson’s four groups (labels 1j–1q, 2j–2q, 3j–3q, 4j–4q), the brightest largest. Constellations are his identifications, outlined round their stars' + (unnamed ? ' (' + unnamed + ' stars carry no identification in this table and belong to none)' : '') + '; hover a star for its entry.</p>' +
       '<div class="svgbox sky-box"></div><div class="sky-cons"></div><div class="sky-exp"></div>' +
       '<div class="sky-scope"><h3>On the scope</h3><div class="sky-scope-row"><div class="sky-crt-wrap"><canvas class="sky-crt" width="440" height="440"></canvas><canvas class="sky-over" width="880" height="880"></canvas></div>' +
-      '<div class="sky-scope-side"><div class="sky-scope-ctl"></div><p class="sky-scope-read mono"></p><div class="sky-scope-how"></div></div></div></div>';
-    document.body.appendChild(dlg);
+      '<div class="sky-scope-side"><div class="sky-scope-ctl"></div><div class="sky-scope-exp"></div><p class="sky-scope-read mono"></p><div class="sky-scope-how"></div></div></div></div>';
+    if (host) { host.innerHTML = ''; host.appendChild(dlg); SW.$('[data-a="close"]', dlg).remove(); } else document.body.appendChild(dlg);
     var box = SW.$('.sky-box', dlg);
     box.innerHTML = svg();
     SW.$('.sky-exp', dlg).appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-star-map'));
@@ -465,8 +466,9 @@
       SW.$$('.sky-con', box).forEach(function (p) { p.classList.toggle('lit', !!ch && p.getAttribute('data-c') === ch.dataset.c); });
     });
     SW.$('.sky-cons', dlg).addEventListener('mouseleave', function () { SW.$$('.sky-con', box).forEach(function (p) { p.classList.remove('lit'); }); });
-    SW.$('[data-a="close"]', dlg).onclick = function () { dlg.close(); };
     var stopScope = scopeDemo();
+    if (host) return stopScope;
+    SW.$('[data-a="close"]', dlg).onclick = function () { dlg.close(); };
     dlg.addEventListener('close', function () { stopScope(); dlg.remove(); });
     dlg.showModal();
 
@@ -588,6 +590,39 @@
         pts.forEach(function (p) { if (!p.st.proper) return; var a = scr(p.S, p.Y); if (a) og.fillText(p.st.proper, a[0] + 9, a[1] - 7); });
         og.restore();
       }
+      // The scope as a figure: the round screen, the stars in the window at their
+      // relative brightness (intensity 0.62 + 0.13 s as the Run view draws it; by
+      // redrawing, in the proportion 2 : 1 : 1/2 : 1/4), the chart if it is on.
+      function scopeSVG(pal) {
+        var Z = 880, o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + Z + '" height="' + (Z + 70) + '" viewBox="0 0 ' + Z + ' ' + (Z + 70) + '" font-family="Helvetica, Arial, sans-serif">'];
+        if (pal && pal.bg) o.push('<rect width="' + Z + '" height="' + (Z + 70) + '" fill="' + pal.bg + '"/>');
+        o.push('<defs><clipPath id="scope"><circle cx="' + Z / 2 + '" cy="' + Z / 2 + '" r="' + (Z / 2 - 6) + '"/></clipPath></defs>');
+        o.push('<circle cx="' + Z / 2 + '" cy="' + Z / 2 + '" r="' + (Z / 2 - 2) + '" fill="#000" stroke="#3a4650" stroke-width="8"/><g clip-path="url(#scope)">');
+        var off = twoB ? (sw3 && sw4) : sw4, RB = { 1: 1, 2: 0.82, 3: 0.62, 4: 0.45 };
+        if (chartOn) {
+          for (var h = 0; h < 24; h++) { var a = scr((8192 - Math.round(h * 8192 / 24)) & 8191, 0); if (a) o.push('<line x1="' + a[0].toFixed(1) + '" y1="0" x2="' + a[0].toFixed(1) + '" y2="' + Z + '" stroke="rgba(143,163,181,0.25)"/><text x="' + (a[0] + 4).toFixed(1) + '" y="' + (Z / 2 - 6) + '" font-size="18" fill="rgba(143,163,181,0.8)">' + h + 'h</text>'); }
+          for (var dd = -20; dd <= 20; dd += 10) { var yy = (511 - dd * 8192 / 360) * Z / 1024; o.push('<line x1="0" y1="' + yy.toFixed(1) + '" x2="' + Z + '" y2="' + yy.toFixed(1) + '" stroke="rgba(143,163,181,0.25)"' + (dd === 0 ? ' stroke-dasharray="6 6"' : '') + '/>' + (dd ? '<text x="' + (12 + Z * 0.12) + '" y="' + (yy - 4).toFixed(1) + '" font-size="18" fill="rgba(143,163,181,0.8)">' + (dd > 0 ? '+' : '−') + Math.abs(dd) + '°</text>' : '')); }
+          cons.forEach(function (c) {
+            var q = pts.filter(function (p) { return p.st.con === c; }).map(function (p) { return scr(p.S, p.Y); }).filter(Boolean);
+            if (!q.length) return;
+            var col = 'hsl(' + hue[c] + ',70%,66%)', cx = q.reduce(function (a2, p) { return a2 + p[0]; }, 0) / q.length, cy = q.reduce(function (a2, p) { return a2 + p[1]; }, 0) / q.length;
+            var pad = hull(q).map(function (p) { var dx = p[0] - cx, dy = p[1] - cy, l = Math.sqrt(dx * dx + dy * dy) || 1; return [p[0] + dx / l * 14, p[1] + dy / l * 14]; });
+            o.push(pad.length >= 3 ? '<path d="M' + pad.map(function (p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' L') + ' Z" fill="' + col + '" fill-opacity="0.07" stroke="' + col + '" stroke-width="2.4" stroke-dasharray="10 8"/>' : '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="18" fill="none" stroke="' + col + '" stroke-width="2.4" stroke-dasharray="10 8"/>');
+            o.push('<text x="' + cx.toFixed(1) + '" y="' + Math.min(Z - 30, Math.max.apply(null, q.map(function (p) { return p[1]; })) + 40).toFixed(1) + '" font-size="22" font-weight="bold" fill="' + col + '" text-anchor="middle">' + SW.esc((CONST[c] || c).toUpperCase()) + '</text>');
+          });
+        }
+        if (!off) pts.forEach(function (p) {
+          if (inView(p) === null) return;
+          var a = scr(p.S, p.Y), al = mode === 'intensity' ? Math.max(0.25, Math.min(1, 0.62 + 0.13 * sgn3(calls[p.g]))) : RB[p.g];
+          o.push('<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="3.2" fill="rgb(200,236,255)" fill-opacity="' + al.toFixed(2) + '"><title>' + SW.esc(p.st.name) + '</title></circle>');
+          if (chartOn && p.st.proper) o.push('<text x="' + (a[0] + 9).toFixed(1) + '" y="' + (a[1] - 7).toFixed(1) + '" font-size="20" fill="rgba(244,241,230,0.92)">' + SW.esc(p.st.proper) + '</text>');
+        });
+        o.push('</g>');
+        var ink = pal && pal.ink ? pal.ink : '#8fa3b5', ra0 = (8192 - fpr) * 360 / 8192;
+        o.push('<text x="' + Z / 2 + '" y="' + (Z + 28) + '" font-size="18" fill="' + ink + '" text-anchor="middle">' + SW.esc(b.v.label + ' on the Type 30 scope: fpr ' + SW.oct(fpr, 5) + ', window RA ' + hms(ra0) + '–' + hms(ra0 + 45)) + '</text>');
+        o.push('<text x="' + Z / 2 + '" y="' + (Z + 54) + '" font-size="15" fill="' + ink + '" text-anchor="middle">' + SW.esc(mode === 'intensity' ? 'Brightness by intensity: ' + groups.map(function (gr) { return 'group ' + gr + ' at ' + calls[gr]; }).join(', ') : 'Brightness by redrawing: groups 1–4 drawn 2, 1, ½, ¼ times a pass') + '</text>');
+        return o.concat(['</svg>']).join('');
+      }
       function fade(dt) { var keep = Math.exp(-dt / 0.12); g.fillStyle = 'rgba(0,2,4,' + (1 - keep).toFixed(4) + ')'; g.fillRect(0, 0, N, N); }
       function hms(deg) { deg = ((deg % 360) + 360) % 360; var h = deg / 15, hh = Math.floor(h), mm = Math.round((h - hh) * 60); if (mm === 60) { hh++; mm = 0; } return (hh % 24) + 'h' + (mm < 10 ? '0' : '') + mm + 'm'; }
       // the window on the map: stored X from fpr-1024 to fpr is mark X from 8192-fpr to 9216-fpr
@@ -612,6 +647,7 @@
         read.textContent = 'fpr ' + SW.oct(fpr, 5) + ' · window RA ' + hms(ra0) + '–' + hms(ra1) + ' · ' + n + ' stars in view · main loop ' + passes.toFixed(1) + ' passes a second (measured) · drift one unit every ' + perUnit + ' passes' + (twoB && sw4 && perFast ? ' (' + perFast + ' with sense switch 4)' : '') + ', a full turn of the sky in ' + (turn / 60).toFixed(0) + ' minutes' + (unread ? ' (the timing could not be read from this source; 3.1’s is assumed)' : '');
       }
       function tick(t) {
+        if (!cv.offsetParent) { last = null; raf = requestAnimationFrame(tick); return; }   // the tab is hidden: wait
         var dt = last == null ? 0 : Math.min(0.1, (t - last) / 1000);
         last = t;
         if (playing) {
@@ -653,6 +689,18 @@
         if (!playing) { for (var q = 0; q < 4; q++) onePass(); }
         winAt = fpr; drawWindow();
       });
+      var ex = SW.$('.sky-scope-exp', dlg), name = 'spacewar-' + b.v.id + '-scope';
+      var fb = SW.figureButtons(scopeSVG, name);
+      fb.appendChild(document.createTextNode(' '));
+      fb.appendChild(SW.el('button', { class: 'btn', title: 'Save the phosphor screen as it is now (with the chart, if it is on), as a PNG', onclick: function () {
+        var c = document.createElement('canvas'); c.width = ON; c.height = ON;
+        var x = c.getContext('2d');
+        x.save(); x.beginPath(); x.arc(ON / 2, ON / 2, ON / 2, 0, 6.2832); x.clip();
+        x.drawImage(cv, 0, 0, ON, ON); x.drawImage(over, 0, 0);
+        x.restore();
+        c.toBlob(function (blob) { blob.arrayBuffer().then(function (buf) { root.SWExport.download(name + '-screen.png', new Uint8Array(buf), 'image/png'); }); }, 'image/png');
+      } }, '▣ Screen PNG'));
+      ex.appendChild(fb);
       var how = SW.$('.sky-scope-how', dlg);
       how.innerHTML = '<p>How the stars reach the round screen, as this version’s code does it:</p><ol>' +
         '<li><b>Stored.</b> <span class="mono">mark X, Y</span> puts two words in core: <span class="mono">8192−X</span>, and <span class="mono">Y</span> shifted left 8 bits (<span class="mono">repeat 8, Y=Y+Y</span>), so Y is already in scope units.</li>' +
@@ -667,6 +715,17 @@
       raf = requestAnimationFrame(tick);
       dlg.stepScope = function (sec) { var n = Math.round(sec * passes * speed); for (var q = 0; q < n; q++) onePass(); drawWindow(); };
       return function () { cancelAnimationFrame(raf); };
+    }
+  };
+
+  // The Star map tab: the map and the scope for the version open.
+  var skyStop = null;
+  SW.views.sky = {
+    show: function (b) {
+      var el = SW.$('#view-sky');
+      if (skyStop) { skyStop(); skyStop = null; }
+      if (!b.lines || !b.asm) { el.innerHTML = '<div class="pad hint">No source survives for ' + SW.esc(b.v.label) + ', so there is no star table to map.</div>'; return; }
+      skyStop = SW.skyMap(b, el);
     }
   };
 
