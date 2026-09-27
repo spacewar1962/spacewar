@@ -9,8 +9,8 @@
  *     back to lower addresses within a ship is the mirror pass.
  *   - The sun: the points plotted from blp up to bck (the central star).
  *   - Hyperspace: a ship is sent into hyperspace through its control bits
- *     (both rotate bits); what is plotted then from code that never plots in
- *     the same run without it is what the version draws for hyperspace.
+ *     (both rotate bits); what the hyperspace routines then plot is what the
+ *     version draws for hyperspace.
  */
 (function (root) {
   'use strict';
@@ -76,8 +76,17 @@
     // one scale for x and y, the points' extent with a margin
     var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, frames = {};
     seq.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); frames[p.frame == null ? 0 : p.frame] = 1; });
-    var perFrame = seq.length / Math.max(1, Object.keys(frames).length);
-    var span = Math.max(8, x1 - x0, y1 - y0) * 1.18, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, k = N / span;
+    var span = Math.max(o.minSpan || 8, x1 - x0, y1 - y0) * 1.18, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    // follow: each frame centred on its own points, the zoom set by the largest
+    // frame (for what is drawn round a centre that moves, as on 4.4's two scopes)
+    var fc = {};
+    if (o.follow) {
+      var fb = {};
+      seq.forEach(function (p) { var q = fb[p.frame] = fb[p.frame] || { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity }; q.x0 = Math.min(q.x0, p.x); q.x1 = Math.max(q.x1, p.x); q.y0 = Math.min(q.y0, p.y); q.y1 = Math.max(q.y1, p.y); });
+      span = o.minSpan || 8;
+      Object.keys(fb).forEach(function (f) { var q = fb[f]; fc[f] = [(q.x0 + q.x1) / 2, (q.y0 + q.y1) / 2]; span = Math.max(span, (q.x1 - q.x0) * 1.25, (q.y1 - q.y0) * 1.25); });
+    }
+    var k = N / span;
     function px(p) { return [N / 2 + (p.x - cx) * k, N / 2 - (p.y - cy) * k]; }
     var pref = D.prefs(), i = 0, events = [], clock = 0, playing = false, speed = pref.speed, loop = pref.loop, fade = pref.fade, grid = pref.grid, acc = 0, last = null, dirty = true;
     SW.$('[data-a="speed"]', ctl).value = String(speed);
@@ -102,6 +111,8 @@
     }
     function render() {
       g.fillStyle = '#02050a'; g.fillRect(0, 0, N, N);
+      var lastE0 = events[events.length - 1];
+      if (o.follow && lastE0 && fc[seq[lastE0.j].frame]) { cx = fc[seq[lastE0.j].frame][0]; cy = fc[seq[lastE0.j].frame][1]; }
       if (grid) {   // the addressable positions in view (thinned when they would crowd)
         var st = Math.max(1, Math.ceil(5 / k)), gx0 = Math.ceil((cx - N / 2 / k) / st) * st, gy0 = Math.ceil((cy - N / 2 / k) / st) * st;
         g.fillStyle = 'rgba(160,180,200,0.7)';
@@ -300,15 +311,15 @@
           seq.push({ x: p.x, y: p.y, s: p.s, frame: n, col: 'rgb(255,236,190)', cap: 'PC ' + SW.oct(p.pc, 4) + ' ' + routineOf(b, labs, p.pc) + ' · ' + C.disasm(p.md, b.symAt) + ' · (' + p.x + ', ' + p.y + ')' });
         });
       });
-      player(c, seq, { intro: 'Press Play: each frame’s ray, point by point.' });
+      player(c, seq, { intro: 'Press Play: each frame’s ray, point by point.', follow: true, minSpan: 24 });
     }
-    across(c, b, 'sun', sunOf);
+    across(c, b, 'sun', sunOf, true);
   };
 
   // ---------- hyperspace ----------
   // Send a ship in (both rotate bits, through the test word and the control
-  // boxes; the other ship's bits if that does nothing) and keep what is plotted
-  // from addresses that never plot in the same run without it. A ship that
+  // boxes; the other ship's bits if that does nothing) and keep what the
+  // hyperspace routines plot that they never plot in the same run without it. A ship that
   // stays on screen means the version did not take the input.
   function hyperOf(b) {
     var src = [];
@@ -330,7 +341,10 @@
       r0 = { before: before, all: pts };
       var shipsBefore = before.filter(function (p) { return p.rt; }).length / Math.max(1, new Set(before.map(function (p) { return p.f; })).size);
       var shipsAfter = after.filter(function (p) { return p.rt; }).length / Math.max(1, new Set(after.map(function (p) { return p.f; })).size);
-      return { h: pts.filter(function (p) { return !bp[p.pc]; }), vanished: shipsAfter < shipsBefore * 0.8 };
+      // only the hyperspace routines (hp1-hp7; h1-h3 for the 2015 Minskytron):
+      // a triggered run can also draw an explosion, torpedoes or the exhaust
+      var labs0 = placedLabels(b);
+      return { h: pts.filter(function (p) { return !bp[p.pc] && b.asm.memory[p.pc] && /^hp?\d$/.test(routineOf(b, labs0, p.pc)); }), vanished: shipsAfter < shipsBefore * 0.8 };
     }
     var r = run(0o600000);
     if (!r.h.length && !r.vanished) r = run(0o000014);
@@ -343,11 +357,12 @@
     else if (!r.h.length && !r.vanished) { kind = 'untriggered'; say = 'The bench could not send a ship into hyperspace here: the ship stayed on screen, so the version did not take the emulator’s control input (4.2, for one, decodes its control boxes through its own routine, 8a).'; }
     else if (!r.h.length) { kind = 'nothing'; say = 'The ship vanished, but nothing was plotted from code of hyperspace’s own: it is invisible until it breaks out.'; }
     else if (nl) { kind = 'minskytron'; say = 'The Minskytron signature, added by Norbert Landsteiner in 2015 (n.l. 2015) after the 1962 hyperspace patch: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
+    else if (np === 2 && r.h.length <= nf * 2.2) { kind = 'dots'; say = 'Two dots, still, at two places: up to two points a frame for ' + nf + ' frames.'; }
     else if (np === 1) { kind = 'dot'; say = 'A single dot, still, at one place: one point a frame for ' + nf + ' frames, while the ship is away.'; }
     else if (r.h.length <= nf * 1.2) { kind = 'moving'; say = 'A single dot that moves: one point a frame at ' + np + ' positions over ' + nf + ' frames, while the ship is away.'; }
     else if (nf <= 8) { kind = 'burst'; say = 'A brief burst: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
     else { kind = 'pattern'; say = 'A pattern: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
-    var short = { none: 'no hyperspace', untriggered: 'could not be triggered', nothing: 'nothing drawn', minskytron: 'Minskytron (2015)', dot: 'a still dot, ' + nf + ' frames', moving: 'a moving dot, ' + np + ' positions', burst: 'a burst, ' + nf + ' frames', pattern: 'a pattern, ' + r.h.length + ' points' }[kind];
+    var short = { none: 'no hyperspace', untriggered: 'could not be triggered', nothing: 'nothing drawn', minskytron: 'Minskytron (2015)', dot: 'a still dot, ' + nf + ' frames', dots: 'two still dots, ' + nf + ' frames', moving: 'a moving dot, ' + np + ' positions', burst: 'a burst, ' + nf + ' frames', pattern: 'a pattern, ' + r.h.length + ' points' }[kind];
     return { h: r.h, frames: frames, np: np, byR: byR, kind: kind, say: say, short: short, labs: labs, before: r0 && r0.before, all: r0 && r0.all, vanished: r.vanished };
   }
   D.hyperOf = hyperOf;
@@ -360,36 +375,14 @@
     try { H = memo('hyper', b, hyperOf); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
     if (!H.h.length) c.appendChild(note(H.say));
     if (H.h.length) {
-      c.insertAdjacentHTML('beforeend', '<p class="lede">Recorded from this version running: a ship sent into hyperspace through its control bits (both rotate bits), and the points plotted then from code that plots nothing in the same run without it, frame by frame, magnified. ' +
-        Object.keys(H.byR).map(function (k) { return SW.esc(k) + ' ' + H.byR[k] + ' point' + (H.byR[k] === 1 ? '' : 's'); }).join(', ') + '. (Anything drawn for hyperspace by the same code that draws the ships normally would not be picked out this way.)</p>');
-      // with the ship: its last frames before the jump, then hyperspace, then the ship where it breaks out
-      function ships(list) {   // one frame's outline points, split into ships by jumps in position
-        var out = [[]];
-        list.forEach(function (p, j) { var q = j ? list[j - 1] : null; if (q && Math.abs(p.x - q.x) + Math.abs(p.y - q.y) > 120) out.push([]); out[out.length - 1].push(p); });
-        return out.filter(function (x) { return x.length; });
-      }
-      function centre(list) { return [list.reduce(function (a, p) { return a + p.x; }, 0) / list.length, list.reduce(function (a, p) { return a + p.y; }, 0) / list.length]; }
-      function byFrame(list) { var m = {}, order = []; list.forEach(function (p) { if (!m[p.f]) { m[p.f] = []; order.push(p.f); } m[p.f].push(p); }); return order.map(function (f) { return m[f]; }); }
-      var hf0 = H.frames[0], hf1 = H.frames[H.frames.length - 1];
-      // the other ship: what stays on screen while this one is away
-      var during = (H.all || []).filter(function (p) { return p.rt && p.f >= hf0 && p.f <= hf1; });
-      var other = during.length ? centre(during) : null;
-      function mine(framePts) {   // the ship in a frame that is not the other one
-        var sh = ships(framePts.filter(function (p) { return p.rt; }));
-        if (!other) return sh[0] || [];
-        sh.sort(function (a, c2) { var A = centre(a), B = centre(c2); return (Math.hypot(B[0] - other[0], B[1] - other[1])) - (Math.hypot(A[0] - other[0], A[1] - other[1])); });
-        return sh.length > 1 || (sh[0] && Math.hypot(centre(sh[0])[0] - other[0], centre(sh[0])[1] - other[1]) > 150) ? sh[0] : [];
-      }
-      var seq = [], fn = 0;
-      function cap(p, what) { var sq = b.srcOf(p.pc), L = sq && b.lines[sq.p][sq.n - 1]; return what + ' · PC ' + SW.oct(p.pc, 4) + ' ' + (b.asm.memory[p.pc] ? routineOf(b, H.labs, p.pc) : '(compiled outline)') + ' · ' + C.disasm(p.md, b.symAt) + (L ? ' · line ' + sq.n + ': ' + L.raw.trim().slice(0, 36) : '') + ' · (' + p.x + ', ' + p.y + ')'; }
-      byFrame(H.before || []).slice(-2).forEach(function (fp) { mine(fp).forEach(function (p) { seq.push({ x: p.x, y: p.y, s: p.s, frame: fn, col: '#dfeeff', cap: cap(p, 'the ship, before') }); }); fn++; });
-      byFrame(H.h).forEach(function (fp) { fp.forEach(function (p) { seq.push({ x: p.x, y: p.y, s: p.s, frame: fn, col: '#b8f0c8', cap: cap(p, 'in hyperspace') }); }); fn++; });
-      var afterF = byFrame((H.all || []).filter(function (p) { return p.f > hf1; })).slice(0, 12);
-      var back = 0;
-      afterF.forEach(function (fp) { if (back >= 2) return; var m = mine(fp); if (!m.length) return; m.forEach(function (p) { seq.push({ x: p.x, y: p.y, s: p.s, frame: fn, col: '#ffce7a', cap: cap(p, 'the ship, back') }); }); fn++; back++; });
-      c.insertAdjacentHTML('beforeend', '<p class="hint">Pale: the ship in its last frames before the jump; green: what hyperspace draws while it is away; amber: the ship where it breaks out.</p>');
-      player(c, seq, { intro: 'Press Play: the ship, hyperspace, and the ship again.' });
+      c.insertAdjacentHTML('beforeend', '<p class="lede">Recorded from this version running: a ship sent into hyperspace through its control bits (both rotate bits), and the points plotted then by the hyperspace routines (hp1 to hp7; h1 to h3 in the 2015 Minskytron), frame by frame, magnified: ' +
+        Object.keys(H.byR).map(function (k) { return SW.esc(k) + ' ' + H.byR[k] + ' point' + (H.byR[k] === 1 ? '' : 's'); }).join(', ') + '.</p>');
+      var seq = [];
+      function cap(p) { var sq = b.srcOf(p.pc), L = sq && b.lines[sq.p][sq.n - 1]; return 'PC ' + SW.oct(p.pc, 4) + ' ' + (b.asm.memory[p.pc] ? routineOf(b, H.labs, p.pc) : '(compiled outline)') + ' · ' + C.disasm(p.md, b.symAt) + (L ? ' · line ' + sq.n + ': ' + L.raw.trim().slice(0, 36) : '') + ' · (' + p.x + ', ' + p.y + ')'; }
+      var fn = -1, lastF = null;
+      H.h.forEach(function (p) { if (p.f !== lastF) { fn++; lastF = p.f; } seq.push({ x: p.x, y: p.y, s: p.s, frame: fn, col: '#b8f0c8', cap: cap(p) }); });
+      player(c, seq, { intro: 'Press Play: what hyperspace draws, frame by frame.', minSpan: 48 });
     }
-    across(c, b, 'hyper', hyperOf);
+    across(c, b, 'hyper', hyperOf, true);
   };
 })(this);
