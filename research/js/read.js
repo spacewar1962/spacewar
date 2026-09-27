@@ -443,6 +443,41 @@
     N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: s.p, n0: s.n0, n1: s.n1, src: build.parts[s.p].src }, tags: ['finding'],
                quote: quote(), heading: 'Add a finding', anchorText: SW.cite(build, s.p, s.n0, s.n1) + '. Shared with the group and listed under Findings; the first line is its title.' });
   }
+  // A text selection in the listing: a small bar by the mouse to copy the
+  // lines, put them in My notes, or make them Read's selection.
+  var selPop = null;
+  function hideSelPop() { if (selPop) { selPop.remove(); selPop = null; } }
+  document.addEventListener('mousedown', function (e) { if (selPop && !selPop.contains(e.target)) hideSelPop(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hideSelPop(); });
+  window.addEventListener('scroll', hideSelPop, true);
+  document.addEventListener('mouseup', function (e) {
+    if (selPop && selPop.contains(e.target)) return;
+    setTimeout(function () {
+      var sel = window.getSelection();
+      if (!build || !sel || sel.isCollapsed || !String(sel).trim()) return;
+      function lnOf(nd) { var el0 = nd && (nd.nodeType === 1 ? nd : nd.parentElement); return el0 && el0.closest('#view-read .listing .ln'); }
+      var la = lnOf(sel.anchorNode), lf = lnOf(sel.focusNode);
+      if (!la || !lf || la.dataset.p !== lf.dataset.p) return;
+      var p = +la.dataset.p, n0 = Math.min(+la.dataset.n, +lf.dataset.n), n1 = Math.max(+la.dataset.n, +lf.dataset.n);
+      var lines = build.lines[p].slice(n0 - 1, n1), text = lines.map(function (L) { return L.raw; }).join('\n'), cite = SW.cite(build, p, n0, n1);
+      hideSelPop();
+      selPop = SW.el('div', { class: 'selpop' });
+      selPop.appendChild(SW.el('span', { class: 'hint' }, 'l. ' + n0 + (n1 > n0 ? '–' + n1 : '')));
+      selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'Copy these lines of source (without numbers or addresses)', onclick: function () { copy(text, (n1 - n0 + 1) + ' line' + (n1 > n0 ? 's' : '') + ' copied'); hideSelPop(); } }, 'Copy'));
+      selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put these lines in My notes (private), with their citation', onclick: function () {
+        var s0 = { p: p, n0: n0, n1: n1 };
+        listingDoc(build, s0).then(function (d) { d.title = cite; SW.tray.addDoc(d, { anchor: { p: p, n0: n0, n1: n1, src: build.parts[p].src }, quote: text }); });
+        hideSelPop();
+      } }, '＋ My notes'));
+      selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'Make these lines Read’s selection, for the bar with Annotate, Finding, Cite and the rest', onclick: function () {
+        SW.state.sel = { p: p, n0: n0, n1: n1 }; window.getSelection().removeAllRanges(); paintSel(); SW.writeQuery(); hideSelPop();
+      } }, 'Select lines'));
+      document.body.appendChild(selPop);
+      var x = Math.min(window.innerWidth - selPop.offsetWidth - 8, Math.max(8, e.clientX - 20)), y = e.clientY + 14;
+      if (y + selPop.offsetHeight > window.innerHeight - 8) y = e.clientY - selPop.offsetHeight - 10;
+      selPop.style.left = x + 'px'; selPop.style.top = y + 'px';
+    }, 0);
+  });
   function copy(text, msg) {
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
       .then(function () { SW.toast(msg); }, function () { window.prompt('Copy:', text); });
