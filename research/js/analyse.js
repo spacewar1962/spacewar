@@ -451,7 +451,7 @@
     dlg.innerHTML = '<div class="rd-head"><h2>Star map: ' + SW.esc(b.v.label) + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
       '<p class="hint">Peter Samson’s star table (“stars by prs”), ' + stars.length + ' stars from the line <span class="mono">' + SW.esc(stars[0].L.raw.trim()) + '</span> on. Each <span class="mono">mark X, Y</span> is drawn at X and Y in 8192ths of a circle: right ascension and declination. Dot sizes follow Samson’s four groups (labels 1j–1q, 2j–2q, 3j–3q, 4j–4q), the brightest largest. Constellations are his identifications, outlined round their stars' + (unnamed ? ' (' + unnamed + ' stars carry no identification in this table and belong to none)' : '') + '; hover a star for its entry.</p>' +
       '<div class="svgbox sky-box"></div><div class="sky-cons"></div><div class="sky-exp"></div>' +
-      '<div class="sky-scope"><h3>On the scope</h3><div class="sky-scope-row"><canvas class="sky-crt" width="440" height="440"></canvas>' +
+      '<div class="sky-scope"><h3>On the scope</h3><div class="sky-scope-row"><div class="sky-crt-wrap"><canvas class="sky-crt" width="440" height="440"></canvas><canvas class="sky-over" width="880" height="880"></canvas></div>' +
       '<div class="sky-scope-side"><div class="sky-scope-ctl"></div><p class="sky-scope-read mono"></p><div class="sky-scope-how"></div></div></div></div>';
     document.body.appendChild(dlg);
     var box = SW.$('.sky-box', dlg);
@@ -542,6 +542,52 @@
         var still = twoB ? sw3 : false, every = twoB && sw4 && perFast ? perFast : perUnit;
         if (!still && pass % every === 0) { fpr = fpr - 1; if (fpr < 0) fpr += 8192; }
       }
+      // The chart laid over the screen: the map's constellation outlines and names,
+      // the named stars, and a faint grid of RA hours and declination, all where
+      // the window puts them. A layer of its own, so the phosphor fade leaves it.
+      var over = SW.$('canvas.sky-over', dlg), og = over.getContext('2d'), ON = over.width, chartOn = false;
+      function scr(S, Y) { var u = ((S - fpr) % 8192 + 8192) % 8192; if (u <= 7168) return null; return [(u - 7680 + 512) * ON / 1024, (511 - Y) * ON / 1024]; }
+      function drawOverlay() {
+        og.clearRect(0, 0, ON, ON);
+        if (!chartOn) return;
+        og.save();
+        og.beginPath(); og.arc(ON / 2, ON / 2, ON / 2, 0, 6.2832); og.clip();
+        og.font = '19px Helvetica, Arial, sans-serif'; og.lineWidth = 1.6;
+        // grid: RA every hour (mark X = h * 8192/24), declination every 10 degrees
+        og.strokeStyle = 'rgba(143,163,181,0.22)'; og.fillStyle = 'rgba(143,163,181,0.7)';
+        for (var h = 0; h < 24; h++) {
+          var S0 = (8192 - Math.round(h * 8192 / 24)) & 8191, a = scr(S0, 0);
+          if (!a) continue;
+          og.beginPath(); og.moveTo(a[0], 0); og.lineTo(a[0], ON); og.stroke();
+          og.fillText(h + 'h', a[0] + 4, ON / 2 - 6);
+        }
+        for (var d = -20; d <= 20; d += 10) {
+          var y = (511 - d * 8192 / 360) * ON / 1024;
+          og.setLineDash(d === 0 ? [6, 6] : []); og.beginPath(); og.moveTo(0, y); og.lineTo(ON, y); og.stroke(); og.setLineDash([]);
+          if (d) og.fillText((d > 0 ? '+' : '−') + Math.abs(d) + '°', 12 + ON * 0.12, y - 4);
+        }
+        // constellations in view: outline round their stars, and the name
+        cons.forEach(function (c) {
+          var q = pts.filter(function (p) { return p.st.con === c; }).map(function (p) { return scr(p.S, p.Y); }).filter(Boolean);
+          if (!q.length) return;
+          var col = 'hsl(' + hue[c] + ',70%,66%)';
+          var cx = q.reduce(function (a2, p) { return a2 + p[0]; }, 0) / q.length, cy = q.reduce(function (a2, p) { return a2 + p[1]; }, 0) / q.length;
+          var hp = hull(q), pad = hp.map(function (p) { var dx = p[0] - cx, dy = p[1] - cy, l = Math.sqrt(dx * dx + dy * dy) || 1; return [p[0] + dx / l * 14, p[1] + dy / l * 14]; });
+          og.strokeStyle = col; og.fillStyle = col; og.globalAlpha = 0.85; og.lineWidth = 2.4; og.setLineDash([10, 8]);
+          og.beginPath();
+          if (pad.length >= 3) { og.moveTo(pad[0][0], pad[0][1]); pad.slice(1).forEach(function (p) { og.lineTo(p[0], p[1]); }); og.closePath(); }
+          else og.arc(cx, cy, 18, 0, 6.2832);
+          og.stroke(); og.setLineDash([]);
+          og.globalAlpha = 0.07; og.fill(); og.globalAlpha = 0.95;
+          og.font = 'bold 22px Helvetica, Arial, sans-serif'; og.textAlign = 'center';
+          og.fillText((CONST[c] || c).toUpperCase(), cx, Math.min(ON - 30, Math.max.apply(null, q.map(function (p) { return p[1]; })) + 40));
+          og.textAlign = 'left'; og.globalAlpha = 1;
+        });
+        // named stars
+        og.fillStyle = 'rgba(244,241,230,0.92)'; og.font = '20px Helvetica, Arial, sans-serif';
+        pts.forEach(function (p) { if (!p.st.proper) return; var a = scr(p.S, p.Y); if (a) og.fillText(p.st.proper, a[0] + 9, a[1] - 7); });
+        og.restore();
+      }
       function fade(dt) { var keep = Math.exp(-dt / 0.12); g.fillStyle = 'rgba(0,2,4,' + (1 - keep).toFixed(4) + ')'; g.fillRect(0, 0, N, N); }
       function hms(deg) { deg = ((deg % 360) + 360) % 360; var h = deg / 15, hh = Math.floor(h), mm = Math.round((h - hh) * 60); if (mm === 60) { hh++; mm = 0; } return (hh % 24) + 'h' + (mm < 10 ? '0' : '') + mm + 'm'; }
       // the window on the map: stored X from fpr-1024 to fpr is mark X from 8192-fpr to 9216-fpr
@@ -560,6 +606,7 @@
           }
         });
         gw.innerHTML = h;
+        drawOverlay();
         var n = pts.filter(function (p) { return inView(p) !== null; }).length;
         var turn = 8192 * perUnit / passes;
         read.textContent = 'fpr ' + SW.oct(fpr, 5) + ' · window RA ' + hms(ra0) + '–' + hms(ra1) + ' · ' + n + ' stars in view · main loop ' + passes.toFixed(1) + ' passes a second (measured) · drift one unit every ' + perUnit + ' passes' + (twoB && sw4 && perFast ? ' (' + perFast + ' with sense switch 4)' : '') + ', a full turn of the sky in ' + (turn / 60).toFixed(0) + ' minutes' + (unread ? ' (the timing could not be read from this source; 3.1’s is assumed)' : '');
@@ -581,6 +628,7 @@
       ctl.innerHTML = '<button class="btn" data-s="play">▶ Run the sky</button> <label class="check">Speed <select data-s="speed"><option value="1">as the program ran</option><option value="16">× 16</option><option value="256">× 256</option><option value="2048">× 2048</option></select></label> ' +
         (twoB ? '<label class="check" title="2B: sense switch 3 holds the sky still (and with switch 4 turns the stars off)"><input type="checkbox" data-s="sw3"> Sense switch 3</label> <label class="check" title="2B: sense switch 4 makes the sky drift every ' + perFast + ' passes (and with switch 3 turns the stars off)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>'
               : '<label class="check" title="Sense switch 4 turns the stars off (szs 40, jmp bcx)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>') +
+        ' <label class="check" title="Lay the star map’s constellation outlines and names, the named stars and a grid of RA and declination over the screen"><input type="checkbox" data-s="chart"> Chart overlay</label>' +
         ' <span class="hint">Click the map to move the window.</span>';
       ctl.addEventListener('click', function (e) {
         var bt = e.target.closest('[data-s="play"]');
@@ -591,6 +639,7 @@
         if (d === 'speed') speed = +e.target.value;
         if (d === 'sw3') sw3 = e.target.checked;
         if (d === 'sw4') sw4 = e.target.checked;
+        if (d === 'chart') chartOn = e.target.checked;
         drawWindow();
       });
       box.addEventListener('click', function (e) {
