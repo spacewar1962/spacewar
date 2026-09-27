@@ -255,7 +255,7 @@
       '<button class="btn" data-snap title="Choose the controls held, and take a new snapshot">New snapshot…</button></div>';
 
     // one frame against time
-    var frameBox = ('<section class="ov-box ov-player"><h4>One frame, call by call</h4>' +
+    var frameBox = ('<section class="ov-box ov-player"><h4>Frame Player <span class="ov-ver">' + SW.esc(b.v.label.replace(/^Spacewar! /, '')) + '</span></h4>' +
       '<div class="toolbar ov-fctl" style="position:static;padding:0 0 6px"><button class="btn ghost" data-f="prev" title="Previous frame">◀</button><button class="btn ghost" data-f="play">▶ Play</button><button class="btn ghost" data-f="next" title="Next frame">▶</button>' +
       '<select class="ov-speed" title="Frames a second when playing; real time plays each frame for as long as it took on the PDP-1">' + [['1', '1 a second'], ['2', '2 a second'], ['4', '4 a second'], ['8', '8 a second'], ['16', '16 a second'], ['rt', 'real time']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === speedPref() ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
       '<input type="range" class="ov-fr" min="0" max="' + (NF - 1) + '" value="' + (keep.frame != null ? keep.frame : Math.min(NF - 1, Math.round(NF * 0.1))) + '"><span class="hint ov-fcap"></span></div>' +
