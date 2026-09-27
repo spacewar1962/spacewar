@@ -270,12 +270,12 @@
 
   // note: {vid, kind, anchor, quote, text, tags, parent}
   N.create = function (note) {
-    var me = SW.me();
-    if (!me.initials) {
+    var me = SW.me(), by = note.by || me.initials;   // a note from My notes keeps the initials it was signed with
+    if (!by) {
       SW.toast('Please set your initials first (⚙).', 4000);
       return Promise.reject(new Error('no initials'));
     }
-    var tags = ['sw:v:' + note.vid, 'sw:kind:' + (note.kind || 'line'), 'sw:by:' + me.initials]
+    var tags = ['sw:v:' + note.vid, 'sw:kind:' + (note.kind || 'line'), 'sw:by:' + by]
       .concat(note.anchor ? ['sw:lines:' + note.anchor.p + ':' + note.anchor.n0 +
                              (note.anchor.n1 !== note.anchor.n0 ? '-' + note.anchor.n1 : ''),
                              'sw:src:' + (note.anchor.src || '')] : [])
@@ -283,7 +283,7 @@
     if (!N.configured()) {
       var d = drafts();
       d.push({ id: 'draft-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6), vid: note.vid, kind: note.kind || 'line', anchor: note.anchor,
-               quote: note.quote || '', text: note.text, by: me.initials, name: me.name,
+               quote: note.quote || '', text: note.text, by: by, name: me.name,
                date: new Date().toISOString(), parent: note.parent || null, tags: note.tags || [],
                source: 'draft', hTags: tags });
       saveDrafts(d);

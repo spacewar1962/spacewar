@@ -3,6 +3,9 @@
  * and your own paragraphs gathered from anywhere in the bench, put in order,
  * captioned, and exported together as one Word or Markdown file with numbered
  * figures. Private: kept in this browser. Shown in the Findings tab.
+ * Each note carries the version open when it was added, its author's
+ * initials, a chapter and tags; Share sends it to the group's Findings as an
+ * annotation tagged "finding", signed with those initials.
  */
 (function (root) {
   'use strict';
@@ -19,11 +22,16 @@
     var v = SW.state.v && root.SWVersions.byId(SW.state.v);
     return (v ? v.label.replace(/^Spacewar! /, '') + ' · ' : '') + ({ read: 'Read', run: 'Run', analyse: SW.anLensName ? SW.anLensName() : 'Analyse', compare: 'Compare', genealogy: 'Genealogy', tape: 'Tape', graphics: 'Graphics', about: 'Versions', findings: 'Findings' }[SW.state.tab] || SW.state.tab);
   }
-  function add(item) {
+  function add(item, extra) {
     var t = load();
+    Object.assign(item, extra || {});
     item.id = 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     item.added = new Date().toISOString();
     item.from = item.from || where();
+    item.vid = item.vid || SW.state.v || '';
+    item.by = item.by || SW.me().initials || '';
+    item.tags = item.tags || [];
+    if (item.chapter == null) item.chapter = t.chapter && t.chapter !== '*' ? t.chapter : '';
     t.items.push(item);
     if (save(t)) { paint(); SW.toast('Added to My notes (' + t.items.length + ')'); }
   }
@@ -32,12 +40,12 @@
     add({ kind: 'figure', svg: svg.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, ''), caption: String(name || 'Figure').replace(/^spacewar-/, '').replace(/-/g, ' ') });
   };
   // Anything the bench exports as a document: its blocks, less embedded images.
-  T.addDoc = function (doc) {
+  T.addDoc = function (doc, extra) {
     var blocks = (doc.blocks || []).map(function (b) {
       if (b.type !== 'figure') return b;
       return { type: 'figure', caption: b.caption, svg: b.svg || null };
     });
-    add({ kind: 'doc', caption: doc.title || 'Excerpt', subtitle: doc.subtitle || '', blocks: blocks });
+    add({ kind: 'doc', caption: doc.title || 'Excerpt', subtitle: doc.subtitle || '', blocks: blocks }, extra);
   };
   T.addText = function () { add({ kind: 'text', caption: '', text: '' }); };
 
@@ -61,58 +69,122 @@
   }
 
   // My notes, drawn into an element (the Findings tab); T.show goes there.
+  var CHAPTERS = ['Introduction', 'Chapter 1', 'Chapter 2', 'Chapter 3', 'Chapter 4', 'Chapter 5', 'Chapter 6', 'Chapter 7', 'Chapter 8', 'Conclusion', 'Appendix'];
+  function vShort(id) { var v = id && root.SWVersions.byId(id); return v ? v.label.replace(/^Spacewar! /, '') : ''; }
+  function uniq(a) { return a.filter(function (x, i) { return x && a.indexOf(x) === i; }); }
+  function shown(t) {   // the items the filters let through, with their places in the list
+    var f = t.filter || {}, out = [];
+    t.items.forEach(function (it, i) {
+      if (t.chapter && t.chapter !== '*' && (it.chapter || '') !== (t.chapter === '-' ? '' : t.chapter)) return;
+      if (f.v && it.vid !== f.v) return;
+      if (f.tag && (it.tags || []).indexOf(f.tag) < 0) return;
+      out.push(i);
+    });
+    return out;
+  }
   T.show = function () { if (SW.findings && SW.findings.showMine) SW.findings.showMine(); };
   T.render = function (el) {
     host = el;
     var t = load();
+    t.chapter = t.chapter || '*'; t.filter = t.filter || {};
     el.innerHTML = '';
-    var body = el;
+    var chs = uniq(CHAPTERS.concat(t.items.map(function (it) { return it.chapter; }))), used = uniq(t.items.map(function (it) { return it.chapter; }));
+    var vids = uniq(t.items.map(function (it) { return it.vid; })), tags = uniq([].concat.apply([], t.items.map(function (it) { return it.tags || []; }))).sort();
+    function opt(v, label, cur) { return '<option value="' + SW.esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + SW.esc(label) + '</option>'; }
     var head = SW.el('div', { class: 'tray-head' });
-    head.innerHTML = '<label>Chapter or section <input id="tray-title" placeholder="e.g. Chapter 3: The Expensive Planetarium" value="' + SW.esc(t.title || '') + '"></label>' +
-      '<p class="hint">Private: kept in this browser, not shared. Figures are numbered in the order below; captions are yours to write, and the source is added after each. Add with ＋ My notes on any figure, export, finding, or selection in Read.</p>';
-    body.appendChild(head);
+    head.innerHTML = '<datalist id="tray-chs">' + chs.map(function (c) { return '<option value="' + SW.esc(c) + '">'; }).join('') + '</datalist>' +
+      '<div class="tray-filters">' +
+      '<label>Chapter <select data-f="chapter">' + opt('*', 'All', t.chapter) + chs.filter(function (c) { return used.indexOf(c) >= 0 || c === t.chapter; }).map(function (c) { return opt(c, c, t.chapter); }).join('') + opt('-', 'None given', t.chapter) + '<option value="+">New…</option></select></label>' +
+      '<label>Version <select data-f="v">' + opt('', 'All', t.filter.v || '') + vids.map(function (v) { return opt(v, vShort(v), t.filter.v); }).join('') + '</select></label>' +
+      '<label>Tag <select data-f="tag">' + opt('', 'All', t.filter.tag || '') + tags.map(function (g) { return opt(g, g, t.filter.tag); }).join('') + '</select></label></div>' +
+      '<p class="hint">Private, in this browser. A note takes the version open and the chapter chosen here; Share sends it to the group’s Findings, signed with its initials.</p>';
+    el.appendChild(head);
+    head.addEventListener('change', function (e) {
+      var f = e.target.dataset.f, x = load(), val = e.target.value;
+      x.filter = x.filter || {};
+      if (f === 'chapter') { if (val === '+') { val = (prompt('Chapter or section, e.g. Chapter 3: The Expensive Planetarium') || '').trim() || '*'; } x.chapter = val; }
+      else x.filter[f] = val;
+      save(x); paint();
+    });
+    var vis = shown(t);
     var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
-    bar.appendChild(SW.el('button', { class: 'btn', title: 'All items, in order, as one Word document', onclick: function () { exportTray('docx'); } }, '⤓ Word'));
-    bar.appendChild(SW.el('button', { class: 'btn', title: 'All items as Markdown, with the figures saved beside it as PNG', onclick: function () { exportTray('md'); } }, '⤓ Markdown'));
+    bar.appendChild(SW.el('button', { class: 'btn', title: 'The notes shown, in order, as one Word document', onclick: function () { exportTray('docx'); } }, '⤓ Word'));
+    bar.appendChild(SW.el('button', { class: 'btn', title: 'The notes shown as Markdown, with the figures saved beside it as PNG', onclick: function () { exportTray('md'); } }, '⤓ Markdown'));
     bar.appendChild(SW.el('button', { class: 'btn ghost', onclick: function () { T.addText(); } }, '＋ Paragraph'));
-    bar.appendChild(SW.el('button', { class: 'btn ghost tb-right', title: 'Remove everything from My notes', onclick: function () {
-      if (!t.items.length || !confirm('Empty My notes (' + t.items.length + ' items)?')) return;
-      t.items = []; save(t); paint();
+    bar.appendChild(SW.el('button', { class: 'btn ghost tb-right', title: 'Remove the notes shown', onclick: function () {
+      if (!vis.length || !confirm('Remove ' + vis.length + ' note' + (vis.length === 1 ? '' : 's') + ' from My notes?')) return;
+      var x = load(); x.items = x.items.filter(function (it, i) { return vis.indexOf(i) < 0; }); save(x); paint();
     } }, 'Empty'));
-    body.appendChild(bar);
-    SW.$('#tray-title', head).addEventListener('input', function (e) { var x = load(); x.title = e.target.value; save(x); });
-    if (!t.items.length) { body.insertAdjacentHTML('beforeend', '<p class="hint">Nothing here yet.</p>'); return; }
+    el.appendChild(bar);
+    if (!vis.length) { el.insertAdjacentHTML('beforeend', '<p class="hint">' + (t.items.length ? 'None with these filters.' : 'Nothing here yet. Add with ＋ My notes on any figure, export, finding, or selection in Read.') + '</p>'); return; }
     var fig = 0, list = SW.el('ol', { class: 'tray-list' });
-    t.items.forEach(function (it, i) {
+    vis.forEach(function (i, k) {
+      var it = t.items[i];
       var lab = it.kind === 'figure' ? 'Figure ' + (++fig) : it.kind === 'text' ? 'Paragraph' : 'Excerpt';
       var li = SW.el('li', { class: 'tray-item', 'data-i': i });
-      li.innerHTML = '<div class="tray-row"><b>' + lab + '</b> <span class="faint">' + SW.esc(it.from || '') + '</span>' +
-        '<span class="tray-acts"><button class="icon-btn" data-a="up" title="Move up"' + (i ? '' : ' disabled') + '>↑</button><button class="icon-btn" data-a="down" title="Move down"' + (i < t.items.length - 1 ? '' : ' disabled') + '>↓</button><button class="icon-btn" data-a="del" title="Remove">✕</button></span></div>' +
-        (it.kind !== 'text' ? '<input class="tray-cap" placeholder="Caption" value="' + SW.esc(it.caption || '') + '">' : '') + preview(it);
+      li.innerHTML = '<div class="tray-row"><b>' + lab + '</b>' +
+        (it.vid ? ' <span class="tray-v mono">' + SW.esc(vShort(it.vid)) + '</span>' : '') +
+        ' <span class="badge tray-by" title="Signed">' + SW.esc(it.by || '?') + '</span>' +
+        ' <span class="faint">' + SW.esc(String(it.from || '').replace(/^[^·]*·\s*/, '')) + '</span>' +
+        '<span class="tray-acts"><button class="icon-btn" data-a="up" title="Move up"' + (k ? '' : ' disabled') + '>↑</button><button class="icon-btn" data-a="down" title="Move down"' + (k < vis.length - 1 ? '' : ' disabled') + '>↓</button><button class="icon-btn" data-a="del" title="Remove">✕</button></span></div>' +
+        (it.kind !== 'text' ? '<input class="tray-cap" placeholder="Caption" value="' + SW.esc(it.caption || '') + '">' : '') + preview(it) +
+        (it.kind !== 'text' ? '<textarea class="tray-note" rows="2" placeholder="Your note">' + SW.esc(it.note || '') + '</textarea>' : '') +
+        '<div class="tray-meta"><label>Chapter <input class="tray-ch" list="tray-chs" value="' + SW.esc(it.chapter || '') + '" placeholder="none"></label>' +
+        '<label>Tags <input class="tray-tags" value="' + SW.esc((it.tags || []).join(', ')) + '" placeholder="comma separated"></label>' +
+        (it.shared ? '<span class="hint tray-shared">In Findings' + (it.shared.date ? ', ' + SW.esc(SW.fmtDate(it.shared.date)) : '') + (it.shared.draft ? ' (draft)' : '') + '</span>'
+                   : '<button class="btn ghost" data-a="share" title="Send to the group’s Findings, signed ' + SW.esc(it.by || SW.me().initials || '') + '">↗ Share to Findings</button>') + '</div>';
       list.appendChild(li);
     });
-    body.appendChild(list);
+    el.appendChild(list);
     list.addEventListener('click', function (e) {
       var b = e.target.closest('[data-a]');
       if (!b) return;
       var i = +b.closest('.tray-item').dataset.i, x = load();
+      if (b.dataset.a === 'share') { share(i); return; }
       if (b.dataset.a === 'del') x.items.splice(i, 1);
-      else { var j = b.dataset.a === 'up' ? i - 1 : i + 1; var tmp = x.items[i]; x.items[i] = x.items[j]; x.items[j] = tmp; }
+      else { var k = vis.indexOf(i), j = vis[b.dataset.a === 'up' ? k - 1 : k + 1]; var tmp = x.items[i]; x.items[i] = x.items[j]; x.items[j] = tmp; }
       save(x); paint();
     });
     list.addEventListener('input', function (e) {
       var li = e.target.closest('.tray-item');
       if (!li) return;
-      var x = load(), it = x.items[+li.dataset.i];
-      if (e.target.classList.contains('tray-cap')) it.caption = e.target.value;
-      if (e.target.classList.contains('tray-text')) it.text = e.target.value;
+      var x = load(), it = x.items[+li.dataset.i], c = e.target.classList;
+      if (c.contains('tray-cap')) it.caption = e.target.value;
+      if (c.contains('tray-text')) it.text = e.target.value;
+      if (c.contains('tray-note')) it.note = e.target.value;
+      if (c.contains('tray-ch')) it.chapter = e.target.value.trim();
+      if (c.contains('tray-tags')) it.tags = e.target.value.split(',').map(function (g) { return g.trim(); }).filter(Boolean);
       save(x);
     });
+    // chapter and tag changes redraw the filters once editing is done
+    list.addEventListener('change', function (e) { if (e.target.matches('.tray-ch, .tray-tags')) paint(); });
   };
 
+  // A note as a finding: the first line its title, then the note, then an
+  // excerpt of what it holds; tagged finding, its tags, and its chapter.
+  function share(i) {
+    var x = load(), it = x.items[i], me = SW.me();
+    var by = it.by || me.initials;
+    if (!by) { SW.toast('Please set your initials first (⚙).', 4000); return; }
+    var vid = it.vid || SW.state.v;
+    var title = it.kind === 'text' ? '' : (it.caption || 'Excerpt');
+    var body = [title, it.kind === 'text' ? it.text : it.note].filter(function (z) { return z && String(z).trim(); }).join('\n\n');
+    var code = (it.blocks || []).filter(function (b) { return b.type === 'code'; })[0];
+    if (code) body += '\n\n' + code.lines.slice(0, 12).map(function (l) { return (l.n != null ? l.n + '  ' : '') + l.text; }).join('\n');
+    if (!body.trim()) { SW.toast('Write something first: the first line is the finding’s title.', 4000); return; }
+    if (!confirm('Share with the group’s Findings, signed ' + by + ', on ' + (vShort(vid) || 'the version open') + '?')) return;
+    var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []);
+    SW.notes.create({ vid: vid, kind: it.anchor ? 'line' : 'version', anchor: it.anchor || null, quote: it.quote || '', text: body, tags: tags, by: by })
+      .then(function () {
+        var y = load(), j = -1; y.items.forEach(function (z, n) { if (z.id === it.id) j = n; });
+        if (j >= 0) { y.items[j].shared = { date: new Date().toISOString(), draft: !SW.notes.configured() }; y.items[j].by = by; save(y); }
+        paint();
+      }, function (e) { if (e.message !== 'no initials') SW.toast(e.message, 5000); });
+  }
+
   function exportTray(fmt) {
-    var t = load();
-    if (!t.items.length) { SW.toast('My notes are empty'); return; }
+    var t0 = load(), t = { title: t0.chapter && t0.chapter !== '*' && t0.chapter !== '-' ? t0.chapter : '', items: shown(t0).map(function (i) { return t0.items[i]; }) };
+    if (!t.items.length) { SW.toast('Nothing to export'); return; }
     SW.toast('Preparing ' + t.items.length + ' items…');
     var bg = SW.figBgColour();
     Promise.all(t.items.map(function (it) {
@@ -131,6 +203,7 @@
           blocks = blocks.concat(it.blocks || []);
           if (it.from) blocks.push({ type: 'p', text: 'Source: Spacewar! research bench, ' + it.from + '.' });
         }
+        if (it.kind !== 'text' && it.note) String(it.note).split(/\n{2,}/).forEach(function (p) { blocks.push({ type: 'p', text: p.trim() }); });
       });
       SW.exportDoc({ title: t.title || 'Spacewar! chapter materials', subtitle: t.items.length + ' items gathered on the research bench',
                      meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]], blocks: blocks },

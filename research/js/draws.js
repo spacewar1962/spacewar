@@ -74,19 +74,18 @@
     if (!o.noT30) wrap.appendChild(SW.el('p', { class: 'dr-t30' }, SW.esc(D.TYPE30)));
     host.appendChild(wrap);
     // one scale for x and y, the points' extent with a margin
+    // follow: every frame moved so that its centre (the mean of its points: a
+    // ray and its mirror are symmetric about the sun) is at the origin, so the
+    // frames line up though the centre moves (4.4 alternates two scopes)
+    if (o.follow) {
+      var sum = {};
+      seq.forEach(function (p) { var q = sum[p.frame] = sum[p.frame] || [0, 0, 0]; q[0] += p.x; q[1] += p.y; q[2]++; });
+      seq = seq.map(function (p) { var q = sum[p.frame]; return Object.assign({}, p, { x: p.x - Math.round(q[0] / q[2]), y: p.y - Math.round(q[1] / q[2]) }); });
+    }
     var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity, frames = {};
     seq.forEach(function (p) { x0 = Math.min(x0, p.x); x1 = Math.max(x1, p.x); y0 = Math.min(y0, p.y); y1 = Math.max(y1, p.y); frames[p.frame == null ? 0 : p.frame] = 1; });
-    var span = Math.max(o.minSpan || 8, x1 - x0, y1 - y0) * 1.18, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
-    // follow: each frame centred on its own points, the zoom set by the largest
-    // frame (for what is drawn round a centre that moves, as on 4.4's two scopes)
-    var fc = {};
-    if (o.follow) {
-      var fb = {};
-      seq.forEach(function (p) { var q = fb[p.frame] = fb[p.frame] || { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity }; q.x0 = Math.min(q.x0, p.x); q.x1 = Math.max(q.x1, p.x); q.y0 = Math.min(q.y0, p.y); q.y1 = Math.max(q.y1, p.y); });
-      span = o.minSpan || 8;
-      Object.keys(fb).forEach(function (f) { var q = fb[f]; fc[f] = [(q.x0 + q.x1) / 2, (q.y0 + q.y1) / 2]; span = Math.max(span, (q.x1 - q.x0) * 1.25, (q.y1 - q.y0) * 1.25); });
-    }
-    var k = N / span;
+    var cx = o.follow ? 0 : Math.round((x0 + x1) / 2), cy = o.follow ? 0 : Math.round((y0 + y1) / 2);
+    var span = Math.max(o.minSpan || 8, o.follow ? 2 * Math.max(-x0, x1, -y0, y1) : Math.max(x1 - x0, y1 - y0)) * 1.18, k = N / span;
     function px(p) { return [N / 2 + (p.x - cx) * k, N / 2 - (p.y - cy) * k]; }
     var pref = D.prefs(), i = 0, events = [], clock = 0, playing = false, speed = pref.speed, loop = pref.loop, fade = pref.fade, grid = pref.grid, acc = 0, last = null, dirty = true;
     SW.$('[data-a="speed"]', ctl).value = String(speed);
@@ -111,8 +110,6 @@
     }
     function render() {
       g.fillStyle = '#02050a'; g.fillRect(0, 0, N, N);
-      var lastE0 = events[events.length - 1];
-      if (o.follow && lastE0 && fc[seq[lastE0.j].frame]) { cx = fc[seq[lastE0.j].frame][0]; cy = fc[seq[lastE0.j].frame][1]; }
       if (grid) {   // the addressable positions in view (thinned when they would crowd)
         var st = Math.max(1, Math.ceil(5 / k)), gx0 = Math.ceil((cx - N / 2 / k) / st) * st, gy0 = Math.ceil((cy - N / 2 / k) / st) * st;
         g.fillStyle = 'rgba(160,180,200,0.7)';
@@ -176,11 +173,13 @@
     // time passing, for testing without animation frames: sec of play (or of glow if paused)
     wrap.advance = function (sec, play) { if (play) playing = true; clock += sec; if (playing) { acc += sec * speed; while (acc >= 1 && playing) { acc -= 1; plot(); } } render(); return { i: i, shown: events.length, playing: playing }; };
     wrap.set = function (o2) { if ('loop' in o2) { loop = o2.loop; SW.$('[data-a="loop"]', ctl).checked = loop; } if ('fade' in o2) { fade = o2.fade; SW.$('[data-a="fade"]', ctl).checked = fade; } };
+    wrap.isPlaying = function () { return playing; };
     wrap.step = function (n) { for (var q = 0; q < (n || 1) && i < seq.length; q++) plot(); render(); return i; };
     return wrap;
   }
   function note(t) { return SW.el('p', { class: 'hint' }, t); }
 
+  function anyPlaying() { return SW.$$('.dr-player').some(function (p) { return p.isPlaying && p.isPlaying(); }); }
   // Each version's recording, made once and kept for the session.
   function memo(key, b, fn) { var m = (D._res = D._res || {})[key] = (D._res[key] || {}); return m[b.v.id] || (m[b.v.id] = fn(b)); }
   // Beside a card's content: every version, grouped by what it does (its short
@@ -199,11 +198,12 @@
     function paint() {
       var groups = [], at = {};
       vs.forEach(function (v) { var k = shortOf[v.id]; if (k == null) return; if (!(k in at)) { at[k] = groups.length; groups.push({ k: k, vs: [] }); } groups[at[k]].vs.push(v); });
-      var waiting = vs.filter(function (v) { return shortOf[v.id] == null; }).length;
+      var waiting = vs.filter(function (v) { return shortOf[v.id] == null; });
+      if (waiting.length) groups.push({ k: 'not run yet' + (anyPlaying() ? ' (while playing)' : ''), vs: waiting, wait: true });
       box.innerHTML = groups.map(function (gp) {
-        return '<div class="dr-g' + (gp.vs.some(function (v) { return v.id === b.v.id; }) ? ' on' : '') + '"><div class="dr-gk">' + SW.esc(gp.k) + '</div><div class="dr-gv">' +
+        return '<div class="dr-g' + (gp.wait ? ' dr-wait' : '') + (gp.vs.some(function (v) { return v.id === b.v.id; }) ? ' on' : '') + '"><div class="dr-gk">' + SW.esc(gp.k) + '</div><div class="dr-gv">' +
           gp.vs.map(function (v) { return '<button data-v="' + v.id + '"' + (v.id === b.v.id ? ' class="on"' : '') + ' title="' + SW.esc(v.label) + '">' + SW.esc(name(v)) + '</button>'; }).join('') + '</div></div>';
-      }).join('') + (waiting ? '<p class="hint">' + waiting + ' still to run…</p>' : '');
+      }).join('');
     }
     box.addEventListener('click', function (e) { var t = e.target.closest('button[data-v]'); if (t && t.dataset.v !== b.v.id) SW.select(t.dataset.v); });
     paint();
@@ -215,8 +215,10 @@
       c.appendChild(row);
     }
     var todo = vs.filter(function (v) { return shortOf[v.id] == null; }), k = 0;
+    // one at a time, and only while nothing is playing, so the animation is not held up
     function next() {
       if (!side.isConnected || k >= todo.length) return;
+      if (anyPlaying()) { paint(); setTimeout(next, 500); return; }
       var v = todo[k++];
       SW.build(v.id).then(function (bv) {
         try { shortOf[v.id] = bv.asm && bv.sym.bck ? memo(key, bv, analyse).short : 'no source to run'; } catch (e) { shortOf[v.id] = 'emulator stopped'; }
@@ -344,7 +346,11 @@
       // only the hyperspace routines (hp1-hp7; h1-h3 for the 2015 Minskytron):
       // a triggered run can also draw an explosion, torpedoes or the exhaust
       var labs0 = placedLabels(b);
-      return { h: pts.filter(function (p) { return !bp[p.pc] && b.asm.memory[p.pc] && /^hp?\d$/.test(routineOf(b, labs0, p.pc)); }), vanished: shipsAfter < shipsBefore * 0.8 };
+      // breaking out can fail (the hyperspatial uncertainty, hur): po1, "now go
+      // bang", replaces the ship with the explosion (mex, before tcr)
+      var S = b.sym, bang = S.po1 && S.mex && S.tcr && S.mex.val < S.tcr.val && trig.execCount[S.po1.val] > 0
+        ? pts.filter(function (p) { return !bp[p.pc] && p.pc >= S.mex.val && p.pc < S.tcr.val; }) : [];
+      return { bang: bang, h: pts.filter(function (p) { return !bp[p.pc] && b.asm.memory[p.pc] && /^hp?\d$/.test(routineOf(b, labs0, p.pc)); }), vanished: shipsAfter < shipsBefore * 0.8 };
     }
     var r = run(0o600000);
     if (!r.h.length && !r.vanished) r = run(0o000014);
@@ -362,8 +368,10 @@
     else if (r.h.length <= nf * 1.2) { kind = 'moving'; say = 'A single dot that moves: one point a frame at ' + np + ' positions over ' + nf + ' frames, while the ship is away.'; }
     else if (nf <= 8) { kind = 'burst'; say = 'A brief burst: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
     else { kind = 'pattern'; say = 'A pattern: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
-    var short = { none: 'no hyperspace', untriggered: 'could not be triggered', nothing: 'nothing drawn', minskytron: 'Minskytron (2015)', dot: 'a still dot, ' + nf + ' frames', dots: 'two still dots, ' + nf + ' frames', moving: 'a moving dot, ' + np + ' positions', burst: 'a burst, ' + nf + ' frames', pattern: 'a pattern, ' + r.h.length + ' points' }[kind];
-    return { h: r.h, frames: frames, np: np, byR: byR, kind: kind, say: say, short: short, labs: labs, before: r0 && r0.before, all: r0 && r0.all, vanished: r.vanished };
+    if (r.bang && r.bang.length) say += ' In this run the ship then exploded on breaking out (po1, “now go bang”, after the hyperspatial uncertainty check): ' + r.bang.length + ' points from the explosion routine (mex).';
+    var short = { none: 'no hyperspace', untriggered: 'could not be triggered', nothing: 'nothing drawn', minskytron: 'Minskytron (2015)', dot: 'a still dot', dots: 'two still dots', moving: 'a moving dot', burst: 'a burst, ' + nf + ' frames', pattern: 'a pattern, ' + r.h.length + ' points' }[kind];
+    if (r.bang && r.bang.length) short += ', then exploded on breakout';
+    return { h: r.h, bang: r.bang || [], frames: frames, np: np, byR: byR, kind: kind, say: say, short: short, labs: labs, before: r0 && r0.before, all: r0 && r0.all, vanished: r.vanished };
   }
   D.hyperOf = hyperOf;
 
@@ -379,8 +387,34 @@
         Object.keys(H.byR).map(function (k) { return SW.esc(k) + ' ' + H.byR[k] + ' point' + (H.byR[k] === 1 ? '' : 's'); }).join(', ') + '.</p>');
       var seq = [];
       function cap(p) { var sq = b.srcOf(p.pc), L = sq && b.lines[sq.p][sq.n - 1]; return 'PC ' + SW.oct(p.pc, 4) + ' ' + (b.asm.memory[p.pc] ? routineOf(b, H.labs, p.pc) : '(compiled outline)') + ' · ' + C.disasm(p.md, b.symAt) + (L ? ' · line ' + sq.n + ': ' + L.raw.trim().slice(0, 36) : '') + ' · (' + p.x + ', ' + p.y + ')'; }
-      var fn = -1, lastF = null;
-      H.h.forEach(function (p) { if (p.f !== lastF) { fn++; lastF = p.f; } seq.push({ x: p.x, y: p.y, s: p.s, frame: fn, col: '#b8f0c8', cap: cap(p) }); });
+      // a point plotted again in the next frame or the one after (a still dot, or
+      // two alternating) is shown once, with the number of frames it was held
+      var fn = -1, lastF = null, raw = [];   // raw: the last two points recorded, each with the item that shows it
+      H.h.forEach(function (p) {
+        var back = raw.filter(function (r) { return r.x === p.x && r.y === p.y; })[0], it;
+        if (back) { it = back.it; it.held++; it.cap = it.cap0 + ' · plotted in ' + it.held + ' frames'; }
+        else {
+          if (p.f !== lastF) { fn++; lastF = p.f; }
+          it = { x: p.x, y: p.y, s: p.s, frame: fn, col: '#b8f0c8', cap0: cap(p), cap: cap(p), held: 1 };
+          seq.push(it);
+        }
+        raw = raw.concat([{ x: p.x, y: p.y, it: it }]).slice(-2);
+      });
+      var showBang = false; try { showBang = localStorage.getItem('swbench.hyperBang') === '1'; } catch (e) {}
+      if (H.bang.length) {
+        var opt = SW.el('label', { class: 'check dr-opt' }, '<input type="checkbox"' + (showBang ? ' checked' : '') + '> Show the breakout explosion (po1, “now go bang”)');
+        opt.querySelector('input').onchange = function (e) {
+          try { localStorage.setItem('swbench.hyperBang', e.target.checked ? '1' : '0'); } catch (x) {}
+          var nc = SW.el('div'); c.replaceWith(nc); D.hyperspace(b, nc); nc.replaceWith.apply(nc, [].slice.call(nc.childNodes));
+        };
+        c.appendChild(opt);
+      }
+      if (H.bang.length && showBang) {
+        var bf = null;
+        H.bang.forEach(function (p) { if (p.f !== bf) { fn++; bf = p.f; } seq.push({ x: p.x, y: p.y, s: p.s, frame: fn, col: '#ffb070', cap: 'the breakout explosion (po1, “now go bang”) · ' + cap(p) }); });
+        c.insertAdjacentHTML('beforeend', '<p class="hint">In this run the breakout failed the hyperspatial uncertainty check (hur) and po1 (“now go bang”) ran: amber, the explosion, ' + H.bang.length + ' points. This is chance: the check uses the random number, and each jump makes a failure more likely.</p>');
+      }
+      c.insertAdjacentHTML('beforeend', '<p class="hint">A point plotted again in the next frames is shown once, with the number of frames it was plotted in: ' + H.h.length + ' points recorded, ' + seq.length + ' shown.</p>');
       player(c, seq, { intro: 'Press Play: what hyperspace draws, frame by frame.', minSpan: 48 });
     }
     across(c, b, 'hyper', hyperOf, true);

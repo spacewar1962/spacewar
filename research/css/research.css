@@ -940,3 +940,25 @@ canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; borde
 .dr-top .dr-g { display: flex; align-items: center; gap: 8px; }
 .dr-top .dr-gk { margin: 0; white-space: nowrap; }
 .dr-row .dr-col { flex: 1 1 380px; }
+/* My notes: filters, signature, version, chapter and tags */
+.tray-filters { display: flex; flex-wrap: wrap; gap: 12px; }
+.tray-filters label { display: flex; align-items: center; gap: 6px; }
+.tray-filters select { padding: 4px 6px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
+.tray-v { font-size: 12px; color: var(--text-dim); }
+.tray-by { font-size: 11px; }
+.tray-note { width: 100%; margin: 4px 0; padding: 5px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; font-size: 13px; resize: vertical; }
+.tray-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; font-size: 12.5px; margin-top: 4px; }
+.tray-meta label { display: flex; align-items: center; gap: 6px; color: var(--text-dim); }
+.tray-meta input { padding: 3px 6px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; width: 14em; }
+.tray-meta .btn, .tray-shared { margin-left: auto; }
+.fd-tag { display: inline-block; font-size: 11px; padding: 0 6px; border: 1px solid var(--line); border-radius: 9px; color: var(--text-dim); margin: 2px 2px 4px 0; }
+.dr-g.dr-wait { border-style: dashed; }
+.dr-g.dr-wait .dr-gk { color: var(--text-dim); }
+/* the version buttons, clearer */
+.dr-gk { font-size: 13px; font-weight: 600; color: var(--text); }
+.dr-gv { gap: 5px; }
+.dr-gv button { font: 12.5px var(--mono); padding: 3px 9px; border-radius: 5px; border: 1px solid var(--line); background: var(--surface-2); color: var(--text); }
+.dr-gv button:hover { border-color: var(--beam); background: color-mix(in srgb, var(--beam) 18%, var(--surface-2)); }
+.dr-gv button.on { background: var(--beam); border-color: var(--beam); color: var(--bg); font-weight: 600; }
+.dr-top .dr-g { padding: 6px 10px; background: color-mix(in srgb, var(--surface-2) 45%, transparent); }
+.dr-opt { display: block; margin: 6px 0; }

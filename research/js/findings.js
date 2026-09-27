@@ -201,8 +201,8 @@
     el.innerHTML = '<span class="hint">Added by</span> <span class="fd-who"><i style="background:' + colourOf('bench') + '"></i>the bench (build logs)</span>' +
       people.map(function (p) { return ' <span class="fd-who"><i style="background:' + colourOf(p) + '"></i>' + SW.esc(p) + '</span>'; }).join('');
   }
-  function mineButton(make) {
-    return SW.el('button', { class: 'btn ghost fd-mine', title: 'Put this finding in My notes (private)', onclick: function () { SW.tray.addDoc(make()); } }, '＋ My notes');
+  function mineButton(make, extra) {
+    return SW.el('button', { class: 'btn ghost fd-mine', title: 'Put this finding in My notes (private)', onclick: function () { SW.tray.addDoc(make(), extra); } }, '＋ My notes');
   }
   // Annotations tagged "finding": cards in their author's colour; the first line is the title.
   function checkNotes(box) {
@@ -225,14 +225,14 @@
         var where = vLabel(n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : ', the version');
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
         li.innerHTML = '<div class="fd-head"><span class="fd-no mono">G' + (i + 1) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span> <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
-          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
+          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g); }).map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
         SW.$('.fd-go', li).onclick = function (e) {
           e.preventDefault();
           if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
           if (n.vid !== SW.state.v) SW.select(n.vid);
           SW.setTab(n.anchor ? 'read' : 'about');
         };
-        li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }));
+        li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }, { by: n.by, vid: n.vid, shared: { date: n.date }, tags: (n.tags || []).filter(function (g) { return !/^findings?$|^chapter:/i.test(g); }) }));
         ol.appendChild(li);
       });
       box.appendChild(ol);
