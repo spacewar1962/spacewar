@@ -1062,8 +1062,13 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-snapdlg h3 { margin: 0 0 6px; }
 .ov-snapdlg > label { display: flex; margin: 6px 0; }
 .ov-ships { display: grid; gap: 6px; margin: 4px 0 0 24px; }
-.ov-hist { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; margin-bottom: -6px; }
-.ov-hist .btn { padding: 2px 9px; }
+.ov-ptitle { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.ov-hist { display: inline-flex; align-items: center; gap: 2px; }
+.ov-hist .btn { padding: 0 7px; font-size: 13px; line-height: 20px; }
+.ov-phead { padding-bottom: 4px !important; }
+.ov-phead .btn { padding: 2px 9px; font-size: 12.5px; }
+.ov-phead h4 .ov-g { font-style: italic; }
+.ov-pstat { margin-top: 1px !important; }
 .ov-trail { font-size: 12px; margin-left: 6px; color: var(--text-faint); }
 .ov-trail a { color: var(--beam); text-decoration: none; }
 .ov-trail a:hover { text-decoration: underline; }

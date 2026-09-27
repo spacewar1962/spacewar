@@ -478,7 +478,7 @@
       var trail = hist.slice(Math.max(0, hpos - 4), hpos).map(function (h0, n0, arr) { var at = hpos - arr.length + n0; return '<a href="#" class="mono" data-hist="' + at + '">' + SW.esc(nm(h0)) + '</a>'; }).join(' › ');
       var navh = '<div class="ov-hist"><button class="btn ghost" data-hnav="-1" title="Back"' + (hpos > 0 ? '' : ' disabled') + '>←</button><button class="btn ghost" data-hnav="1" title="Forward"' + (hpos < hist.length - 1 ? '' : ' disabled') + '>→</button>' +
         (trail ? '<span class="ov-trail">' + trail + ' ›</span>' : '') + '</div>';
-      var hh = [navh + '<div class="ov-phead"><div><h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4>' +
+      var hh = ['<div class="ov-phead"><div><div class="ov-ptitle">' + navh + '<h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4></div>' +
         '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div>'];
       // values | code | relations
       hh.push('<div class="ov-pvals"><div class="ov-vals"></div></div>');
