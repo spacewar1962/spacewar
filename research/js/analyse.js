@@ -545,7 +545,7 @@
       // The chart laid over the screen: the map's constellation outlines and names,
       // the named stars, and a faint grid of RA hours and declination, all where
       // the window puts them. A layer of its own, so the phosphor fade leaves it.
-      var over = SW.$('canvas.sky-over', dlg), og = over.getContext('2d'), ON = over.width, chartOn = false;
+      var over = SW.$('canvas.sky-over', dlg), og = over.getContext('2d'), ON = over.width, chartOn = true;   // on by default
       function scr(S, Y) { var u = ((S - fpr) % 8192 + 8192) % 8192; if (u <= 7168) return null; return [(u - 7680 + 512) * ON / 1024, (511 - Y) * ON / 1024]; }
       function drawOverlay() {
         og.clearRect(0, 0, ON, ON);
@@ -625,10 +625,10 @@
         raf = requestAnimationFrame(tick);
       }
       var ctl = SW.$('.sky-scope-ctl', dlg), read = SW.$('.sky-scope-read', dlg);
-      ctl.innerHTML = '<button class="btn" data-s="play">▶ Run the sky</button> <label class="check">Speed <select data-s="speed"><option value="1">as the program ran</option><option value="16">× 16</option><option value="256">× 256</option><option value="2048">× 2048</option></select></label> ' +
+      ctl.innerHTML = '<button class="btn" data-s="play">▶ Run the sky</button> <label class="check">Speed <select data-s="speed"><option value="1">as the program ran</option><option value="16">× 16</option><option value="64">× 64</option><option value="512">× 512</option></select></label> ' +
         (twoB ? '<label class="check" title="2B: sense switch 3 holds the sky still (and with switch 4 turns the stars off)"><input type="checkbox" data-s="sw3"> Sense switch 3</label> <label class="check" title="2B: sense switch 4 makes the sky drift every ' + perFast + ' passes (and with switch 3 turns the stars off)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>'
               : '<label class="check" title="Sense switch 4 turns the stars off (szs 40, jmp bcx)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>') +
-        ' <label class="check" title="Lay the star map’s constellation outlines and names, the named stars and a grid of RA and declination over the screen"><input type="checkbox" data-s="chart"> Chart overlay</label>' +
+        ' <label class="check" title="Lay the star map’s constellation outlines and names, the named stars and a grid of RA and declination over the screen"><input type="checkbox" data-s="chart" checked> Chart overlay</label>' +
         ' <span class="hint">Click the map to move the window.</span>';
       ctl.addEventListener('click', function (e) {
         var bt = e.target.closest('[data-s="play"]');
