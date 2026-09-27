@@ -1077,3 +1077,8 @@ a.ov-nm:hover { text-decoration: underline; }
 /* very wide screens: the static boxes two to a row */
 @media (min-width: 1700px) { .ov-rest { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
 @media (max-width: 860px) { .ov-player .ov-fctl { flex-wrap: wrap; } .ov-run { flex-direction: column; } .ov-top .ov-scope canvas { max-width: 420px; } }
+.ov-code { tab-size: 8; }
+.ov-code .t .sym { cursor: text; }
+.ov-code .t .sym:hover { text-decoration: none; }
+.ov-code .t .sym.go { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+.ov-code .t .sym.go:hover { text-decoration: underline; }

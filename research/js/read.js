@@ -55,6 +55,7 @@
                  text: 1, decimal: 1, octal: 1, flexo: 1, 'char': 1, character: 1, noinput: 1, expunge: 1 };
 
   // ---------- highlighting ----------
+  SW.hlLine = function (raw, b) { return hl(raw, b); };   // also used by the Functional overview
   function hl(raw, b) {
     var p = SW.parseLine(raw), h = '';
     if (p.loc) h += '<span class="num">' + SW.esc(p.loc) + '</span>';

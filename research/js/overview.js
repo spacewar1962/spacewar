@@ -485,7 +485,7 @@
       if (e === 'rt') hh.push('<p class="hint">Code written by the outline compiler (oc) at start-up, so it has no source lines: in Read it shows as run-time code.</p>');
       if (cd) {
         var ls = b.lines[cd.p];
-        hh.push('<div class="ov-code mono">' + ls.slice(cd.n0 - 1, cd.n1).map(function (L) { return '<div><span class="faint">' + String(L.n).padStart(4) + '</span>  ' + SW.esc(L.raw.replace(/\t/g, '    ')) + '</div>'; }).join('') + (cd.cut ? '<div class="faint">…</div>' : '') + '</div>');
+        hh.push('<div class="ov-code mono">' + ls.slice(cd.n0 - 1, cd.n1).map(function (L) { return '<div><span class="faint">' + String(L.n).padStart(4) + '</span>  <span class="t">' + (SW.hlLine ? SW.hlLine(L.raw, b) : SW.esc(L.raw)) + '</span></div>'; }).join('') + (cd.cut ? '<div class="faint">…</div>' : '') + '</div>');
       }
       hh.push('</div><div class="ov-prel">');
       var cs = Object.keys(r.callers || {});
@@ -509,6 +509,8 @@
       }
       hh.push('<div class="ov-rwpair">' + rwTable(ws, 'Writes') + rwTable(rs, 'Reads') + '</div><p class="hint">⚙ an instruction the program rewrites.</p></div>');
       insp.innerHTML = hh.join('');
+      // symbols in the code that name a routine open it here
+      SW.$$('.ov-code .sym[data-s]', insp).forEach(function (sp) { var s0 = b.sym[sp.dataset.s]; if (s0 && A.R[String(s0.val)] && String(s0.val) !== e) { sp.classList.add('go'); sp.dataset.e = String(s0.val); } });
       picked = e;
       // to watch it, the chart goes to the nearest frame in which it runs
       var l = ranIn[String(e)];
