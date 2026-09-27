@@ -219,6 +219,7 @@
   function hue(nm) { var h = 0; for (var i = 0; i < nm.length; i++) h = (h * 31 + nm.charCodeAt(i)) % 360; return h; }
   function colour(nm) { return nm === 'waiting' ? 'rgba(143,163,181,0.28)' : 'hsl(' + hue(nm) + ',55%,52%)'; }
   var US = 5;   // a memory cycle is 5 µs
+  function speedPref(set) { try { if (set) localStorage.setItem('swbench.ovSpeed', set); return localStorage.getItem('swbench.ovSpeed') || '4'; } catch (e) { return set || '4'; } }
 
   function draw(b, el) {
     var A;
@@ -257,6 +258,7 @@
     // one frame against time
     h.push('<section class="ov-box"><h4>One frame, call by call</h4>' +
       '<div class="toolbar ov-fctl" style="position:static;padding:0 0 6px"><button class="btn ghost" data-f="prev" title="Previous frame">◀</button><button class="btn ghost" data-f="play">▶ Play</button><button class="btn ghost" data-f="next" title="Next frame">▶</button>' +
+      '<select class="ov-speed" title="Frames a second when playing; real time plays each frame for as long as it took on the PDP-1">' + [['1', '1 a second'], ['2', '2 a second'], ['4', '4 a second'], ['8', '8 a second'], ['16', '16 a second'], ['rt', 'real time']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === speedPref() ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
       '<input type="range" class="ov-fr" min="0" max="' + (NF - 1) + '" value="' + Math.min(NF - 1, Math.round(NF * 0.1)) + '"><span class="hint ov-fcap"></span></div>' +
       '<div class="ov-flame"></div><p class="hint">Each bar is a routine, from its call to its return, under the routine that called it; the scale is the same for every frame, and a line marks where this one ends. Grey is the main loop using up the rest of the frame’s time (count \\mtc); when the frame’s work takes longer, there is no wait and the frame runs long.</p></section>');
 
@@ -401,15 +403,21 @@
       fcap.title = 'Called from the main loop, in order: ' + objs.join(', ');
     }
     fr.addEventListener('input', function () { chart(+fr.value); });
+    SW.$('.ov-speed', el).addEventListener('change', function (e) { speedPref(e.target.value); });
     el.addEventListener('mouseover', function (ev) { var x = ev.target.closest('.ov-sp, .ov-brow'); var e2 = x ? x.dataset.e : null; if (e2 !== hovered) { hovered = e2; scope(shownFrame); } });
     var rsz = new ResizeObserver(function () { if (!fl.isConnected) { rsz.disconnect(); return; } chart(+fr.value); });
     rsz.observe(fl);
     SW.$('.ov-fctl', el).addEventListener('click', function (e) {
       var t = e.target.closest('[data-f]'); if (!t) return;
       if (t.dataset.f === 'play') {
-        if (playT) { clearInterval(playT); playT = null; t.textContent = '▶ Play'; return; }
+        if (playT) { clearTimeout(playT); playT = null; t.textContent = '▶ Play'; return; }
         t.textContent = '❚❚ Pause';
-        playT = setInterval(function () { if (!fl.isConnected) { clearInterval(playT); return; } fr.value = (+fr.value + 1) % NF; chart(+fr.value); }, 250);
+        (function step() {
+          if (!fl.isConnected) return;
+          fr.value = (+fr.value + 1) % NF; chart(+fr.value);
+          var sp = SW.$('.ov-speed', el).value, f = FL[+fr.value];
+          playT = setTimeout(step, sp === 'rt' ? Math.max(16, (f ? f.len : 10000) * US / 1000) : 1000 / +sp);
+        })();
         return;
       }
       fr.value = Math.max(0, Math.min(NF - 1, +fr.value + (t.dataset.f === 'next' ? 1 : -1))); chart(+fr.value);
