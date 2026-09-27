@@ -17,11 +17,11 @@
   // initials of whoever's notes these are (DMB-N12), so numbers from different
   // people stay distinct once shared. t.seq is the last given; notes from before
   // numbering get theirs once, in order.
-  function refFor(n) { var me = SW.me().initials; return (me ? me + '-' : '') + 'N' + n; }
+  function refFor(n) { return SW.me().initials + '-N' + n; }
   function load() {
     var t; try { t = JSON.parse(localStorage.getItem(KEY) || '{"title":"","items":[]}'); } catch (e) { t = { title: '', items: [] }; }
     var all = (t.items || []).concat(t.bin || []), need = all.filter(function (it) { return !it.ref; });
-    if (need.length) {
+    if (need.length && SW.me().initials) {   // numbered once initials are set
       need.sort(function (a, b) { return String(a.added) < String(b.added) ? -1 : 1; });
       t.seq = Math.max(t.seq || 0, all.reduce(function (m, it) { var mm = /N(\d+)$/.exec(String(it.ref || '')); return Math.max(m, mm ? +mm[1] : 0); }, 0));
       need.forEach(function (it) { it.ref = refFor(++t.seq); });
@@ -53,7 +53,16 @@
     idx.slice().sort(function (a, b) { return b - a; }).forEach(function (i) { var g = x.items.splice(i, 1)[0]; g.binned = now; x.bin = (x.bin || []).concat([g]); });
   }
   var binOpen = false;
+  // No note without initials: its number carries them, and it is signed with them.
+  function needInitials() {
+    if (SW.me().initials) return false;
+    SW.toast('Set your initials first (⚙): notes are numbered and signed with them.', 5000);
+    var st = SW.$('#btn-settings'); if (st) st.click();
+    return true;
+  }
+  T.needInitials = needInitials;
   function add(item, extra) {
+    if (needInitials()) return;
     snap();
     var t = load();
     Object.assign(item, extra || {});
