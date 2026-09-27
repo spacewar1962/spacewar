@@ -100,7 +100,10 @@
     var bl = it.blocks || [], n = function (t) { return bl.filter(function (b) { return b.type === t; }); };
     var parts = [], tabs = n('table'), codes = n('code'), paras = n('p').filter(function (b) { return b.text; }), figs = n('figure');
     if (tabs.length) parts.push(tabs.length === 1 ? 'a table (' + tabs[0].rows.length + ' rows)' : tabs.length + ' tables');
-    if (codes.length) parts.push('code (' + codes.reduce(function (a, c) { return a + c.lines.length; }, 0) + ' lines)');
+    if (codes.length) {
+      var nNotes = codes.reduce(function (a, c) { return a + c.lines.reduce(function (a2, l) { return a2 + (l.notes || []).length; }, 0); }, 0);
+      parts.push('code (' + codes.reduce(function (a, c) { return a + c.lines.length; }, 0) + ' lines)' + (nNotes ? ' with ' + nNotes + (nNotes === 1 ? ' annotation' : ' annotations') : ''));
+    }
     if (paras.length) parts.push(paras.length === 1 ? 'a paragraph' : paras.length + ' paragraphs');
     if (figs.length) parts.push(figs.length === 1 ? 'a figure' : figs.length + ' figures');
     return '<details class="tray-doc" data-doc="' + SW.esc(it.id) + '"' + (openDocs[it.id] ? ' open' : '') + '><summary>' + SW.esc(parts.join(' · ') || bl.length + ' blocks') + '</summary><div class="tray-body">' + blocksHTML(bl) + '</div></details>';
@@ -121,6 +124,13 @@
     d.addEventListener('close', function () { d.remove(); });
     d.showModal();
   }
+  // an annotation under its lines: the name in the person's colour, as in Findings
+  function personHue(by) { var h = 0; by = String(by || ''); for (var i = 0; i < by.length; i++) h = (h * 31 + by.charCodeAt(i)) % 360; return (h + 200) % 360; }
+  function noteHTML(n) {
+    var col = 'hsl(' + personHue(n.by) + ',62%,60%)';
+    return '<div class="tray-anno" style="border-right-color:' + col + '"><b style="color:' + col + '">' + SW.esc(n.by || '') + '</b> <span class="faint">' + SW.esc([n.date, n.ref].filter(Boolean).join(' · ')) + '</span><div>' + SW.esc(n.text || '') + '</div>' +
+      (n.replies || []).map(function (r) { return '<div class="tray-anno-r">↳ <b style="color:hsl(' + personHue(r.by) + ',62%,60%)">' + SW.esc(r.by || '') + '</b> ' + SW.esc(r.text || '') + '</div>'; }).join('') + '</div>';
+  }
   function cellText(c) { return c == null ? '' : typeof c === 'object' ? (c.text != null ? c.text : '') : String(c); }
   function blocksHTML(bl) {
     return bl.map(function (b) {
@@ -128,7 +138,9 @@
       if (b.type === 'p') return b.text ? '<p class="tray-para">' + SW.esc(b.text) + '</p>' : '';
       if (b.type === 'note') return '<p class="tray-para"><b>' + SW.esc(b.by || '') + '</b> ' + SW.esc(b.text || '') + '</p>';
       if (b.type === 'figure') return b.svg ? '<div class="tray-fig">' + SW.displaySVG(b.svg) + '</div>' : '<p class="hint">' + SW.esc(b.caption || 'Figure') + '</p>';
-      if (b.type === 'code') return (b.caption ? '<p class="hint">' + SW.esc(b.caption) + '</p>' : '') + '<pre class="mono tray-code tray-full">' + SW.esc(b.lines.map(function (l) { return (l.n != null ? String(l.n).padStart(4) + '  ' : '') + l.text; }).join('\n')) + '</pre>';
+      if (b.type === 'code') return (b.caption ? '<p class="hint">' + SW.esc(b.caption) + '</p>' : '') + '<div class="mono tray-code tray-full">' + b.lines.map(function (l) {
+        return '<div class="tl">' + SW.esc((l.n != null ? String(l.n).padStart(4) + '  ' : '') + l.text) + '</div>' + (l.notes || []).map(function (n) { return noteHTML(n); }).join('');
+      }).join('') + '</div>';
       if (b.type === 'table') return (b.caption ? '<p class="hint">' + SW.esc(b.caption) + '</p>' : '') + '<div class="tray-tblwrap"><table class="tray-tbl">' +
         (b.head && b.head.length ? '<thead><tr>' + b.head.map(function (h) { return '<th>' + SW.esc(cellText(h)) + '</th>'; }).join('') + '</tr></thead>' : '') +
         '<tbody>' + b.rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + SW.esc(cellText(c)) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';

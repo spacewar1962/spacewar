@@ -169,7 +169,22 @@
     } else if (!b.asm) tb.appendChild(SW.el('span', { class: 'hint' }, 'No source survives.'));
     tb.appendChild(SW.el('span', { class: 'sep' }));
     if (b.v.build && SW.edition) tb.appendChild(SW.edition.menu(function () { return build; }));
-    tb.appendChild(SW.exportButtons(function () { return listingDoc(b, null); }, function () { return 'spacewar-' + b.v.id + '-listing'; }));
+    // one Export menu: the listing (as shown, or the annotated lines only) to Word or
+    // Markdown, or the annotations with their lines into My notes
+    var exm = SW.el('details', { class: 'menu more-menu' });
+    exm.innerHTML = '<summary class="btn" title="Export this version’s listing, or put its annotations in My notes">⤓ Export ▾</summary><div class="menu-body">' +
+      '<p class="hint">The listing, as shown</p><button class="btn ghost" data-ex="all:docx">⤓ Word</button><button class="btn ghost" data-ex="all:md">⤓ Markdown</button>' +
+      '<p class="hint">The annotated lines only</p><button class="btn ghost" data-ex="noted:docx">⤓ Word</button><button class="btn ghost" data-ex="noted:md">⤓ Markdown</button>' +
+      '<p class="hint">Private</p><button class="btn ghost" data-ex="noted:tray" title="Each annotation with the lines it covers, as one excerpt in My notes">＋ My notes: the annotations</button></div>';
+    exm.addEventListener('click', function (e) {
+      var x = e.target.closest('[data-ex]'); if (!x) return;
+      exm.open = false;
+      var k = x.dataset.ex.split(':'), noted = k[0] === 'noted';
+      var dp = listingDoc(b, null, { onlyNoted: noted });
+      if (k[1] === 'tray') { dp.then(function (d) { if (!d.blocks.some(function (bl) { return bl.type === 'code'; })) { SW.toast('No annotations on this version yet.'); return; } SW.tray.addDoc(d); }); return; }
+      Promise.resolve(dp).then(function (d) { SW.exportDoc(d, 'spacewar-' + b.v.id + (noted ? '-annotations' : '-listing'), k[1]); });
+    });
+    tb.appendChild(exm);
     tb.appendChild(SW.el('button', { class: 'btn notes-mode', id: 'rd-notes-mode', onclick: function () {
       var i = MODES.indexOf(modeOf(opts.notes));
       setNotes(MODES[(i + 1) % MODES.length][0]);
@@ -514,7 +529,8 @@
   }
 
   // ---------- export model ----------
-  function listingDoc(b, s) {
+  function listingDoc(b, s, lopts) {
+    lopts = lopts || {};
     // the whole listing follows the Tape menu: every tape, or the one shown
     var lines = s ? b.lines[s.p].slice(s.n0 - 1, s.n1)
       : [].concat.apply([], b.lines.filter(function (x, pi) { return showsTape(pi); })).filter(function (L) { return !L.away; });
@@ -523,6 +539,12 @@
       var threads = N.threads(all);
       // each annotation goes after the last of its lines that is exported, so
       // one that begins above a selection is still included
+      // the annotated lines only: the lines each annotation covers
+      if (lopts.onlyNoted) {
+        var cov = {};
+        threads.forEach(function (t) { var a = t.note.anchor; if (!a) return; for (var n = a.n0; n <= (a.n1 || a.n0); n++) cov[a.p + ':' + n] = 1; });
+        lines = lines.filter(function (L) { return cov[L.p + ':' + L.n]; });
+      }
       var out = {}; lines.forEach(function (L) { out[L.p + ':' + L.n] = 1; });
       var byLine = {};
       threads.forEach(function (t) {
@@ -533,7 +555,7 @@
       if (!s) blocks.push({ type: 'p', text: b.v.summary });
       var cur = null;
       lines.forEach(function (L) {
-        if (!cur || cur.p !== L.p) {
+        if (!cur || cur.p !== L.p || (lopts.onlyNoted && cur.lines.length && cur.lines[cur.lines.length - 1].n !== L.n - 1)) {
           var ti0 = tapeInfo(b)[L.p];   // headed by its tape, as the Tape menu names it, then the file
           cur = { type: 'code', caption: (b.parts.length > 1 && ti0 ? 'Tape ' + (L.p + 1) + ' of ' + b.parts.length + ': ' + ti0.label + ' · ' : '') + b.parts[L.p].src, lines: [], p: L.p };
           blocks.push(cur);
@@ -558,7 +580,7 @@
         }) });
       }
       return {
-        title: s ? SW.cite(b, s.p, s.n0, s.n1) : b.v.label + ': annotated listing',
+        title: s ? SW.cite(b, s.p, s.n0, s.n1) : b.v.label + (lopts.onlyNoted ? ': the annotations' : ': annotated listing'),
         subtitle: s ? b.v.summary : b.v.date + ' · ' + b.v.authors,
         meta: SW.docMeta(b), blocks: blocks
       };
