@@ -1730,7 +1730,11 @@
           return;
         }
         if (which === 'graphics') { gfx = t.dataset.pick; SW.store.set('gfx.item', gfx); SW.forget('graphics'); SW.setTab('graphics'); }
-        else { lens = +t.dataset.pick; SW.store.set('an.lens', lens); SW.forget('analyse'); SW.setTab('analyse'); }
+        else {   // the lens already open is shown as it was left
+          var nl = +t.dataset.pick;
+          if (nl !== lens) { lens = nl; SW.store.set('an.lens', lens); SW.forget('analyse'); }
+          SW.setTab('analyse');
+        }
       });
     });
   });

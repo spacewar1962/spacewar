@@ -222,8 +222,11 @@
   function speedPref(set) { try { if (set) localStorage.setItem('swbench.ovSpeed', set); return localStorage.getItem('swbench.ovSpeed') || '4'; } catch (e) { return set || '4'; } }
 
   function draw(b, el) {
-    var A;
-    try { A = O.analyse(b, mine ? myPhases(mine) : PHASES); } catch (e) { el.innerHTML = '<p class="hint">The emulator stopped: ' + SW.esc(e.message) + '</p>'; return; }
+    // kept for the version and snapshot: the run, the frame shown, the routines visited
+    var key = b.v.id + '|' + JSON.stringify(mine), C0 = O._keep && O._keep.key === key ? O._keep : null, A;
+    if (C0) A = C0.A;
+    else try { A = O.analyse(b, mine ? myPhases(mine) : PHASES); } catch (e) { el.innerHTML = '<p class="hint">The emulator stopped: ' + SW.esc(e.message) + '</p>'; return; }
+    var keep = O._keep = C0 || { key: key, A: A, frame: null, hist: [], hpos: -1 };
     var F = Math.max(1, A.frames), FL = A.frameList, NF = Math.max(1, FL.length);
     var avgLen = A.total / NF;
     function nm(e) { return e === 'wait' ? 'waiting' : name(b, e); }
@@ -255,7 +258,7 @@
     var frameBox = ('<section class="ov-box ov-player"><h4>One frame, call by call</h4>' +
       '<div class="toolbar ov-fctl" style="position:static;padding:0 0 6px"><button class="btn ghost" data-f="prev" title="Previous frame">◀</button><button class="btn ghost" data-f="play">▶ Play</button><button class="btn ghost" data-f="next" title="Next frame">▶</button>' +
       '<select class="ov-speed" title="Frames a second when playing; real time plays each frame for as long as it took on the PDP-1">' + [['1', '1 a second'], ['2', '2 a second'], ['4', '4 a second'], ['8', '8 a second'], ['16', '16 a second'], ['rt', 'real time']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === speedPref() ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
-      '<input type="range" class="ov-fr" min="0" max="' + (NF - 1) + '" value="' + Math.min(NF - 1, Math.round(NF * 0.1)) + '"><span class="hint ov-fcap"></span></div>' +
+      '<input type="range" class="ov-fr" min="0" max="' + (NF - 1) + '" value="' + (keep.frame != null ? keep.frame : Math.min(NF - 1, Math.round(NF * 0.1))) + '"><span class="hint ov-fcap"></span></div>' +
       '<div class="ov-flame"></div><p class="hint">Each bar is a routine, from its call to its return, under the routine that called it; the scale is the same for every frame, and a line marks where this one ends. Grey is the main loop using up the rest of the frame’s time (count \\mtc); when the frame’s work takes longer, there is no wait and the frame runs long.</p>' + snapLine + '</section>');
 
     // where the time goes
@@ -394,7 +397,7 @@
       fl.innerHTML = o.join('');
       var wait = f.spans.filter(function (sp) { return sp.e === 'wait'; }).reduce(function (a, sp) { return a + ((sp.t1 == null ? len : sp.t1) - sp.t0); }, 0);
       var objs = f.spans.filter(function (sp) { return sp.d === 0 && sp.e !== 'wait'; }).map(function (sp) { return nm(sp.e); });
-      scope(i); values();
+      scope(i); values(); keep.frame = i;
       fcap.textContent = 'frame ' + (i + 1) + ' of ' + NF + ' · ' + cyc(len) + ' · waiting ' + Math.round(100 * wait / len) + '% · ' + A.phases[f.phase].what;
       fcap.title = 'Called from the main loop, in order: ' + objs.join(', ');
     }
@@ -410,6 +413,7 @@
         t.textContent = '❚❚ Pause';
         (function step() {
           if (!fl.isConnected) return;
+          if (!fl.offsetParent) { playT = null; t.textContent = '▶ Play'; return; }   // paused when the page is left
           fr.value = (+fr.value + 1) % NF; chart(+fr.value);
           var sp = SW.$('.ov-speed', el).value, f = FL[+fr.value];
           playT = setTimeout(step, sp === 'rt' ? Math.max(16, (f ? f.len : 10000) * US / 1000) : 1000 / +sp);
@@ -460,11 +464,12 @@
       return { p: q0.p, n0: n0, n1: Math.min(n1, n0 + 79), cut: n1 > n0 + 79 };
     }
     // the routines visited in the panel, for back and forward
-    var hist = [], hpos = -1;
+    var hist = keep.hist, hpos = keep.hpos;
     function inspect(e, nav) {
       if (e === 'startup') return;
       e = String(e);
       if (!nav) { if (hist[hpos] !== e) { hist = hist.slice(0, hpos + 1); hist.push(e); hpos = hist.length - 1; } }
+      keep.hist = hist; keep.hpos = hpos;
       var r = A.R[e] || { n: 0, calls: {}, callers: {}, startup: 0 }, g = e === 'wait' ? 'use up rest of time of main loop' : e === 'main' ? glossAt(b, A.frameAt) : glossAt(b, e);
       var callsN = r.n - (r.startup || 0), exN = A.ex[e] || 0, incN = e === 'main' ? A.total : (A.inc[e] || exN);
       var st = [];
@@ -548,7 +553,7 @@
     el.addEventListener('click', el._ovClick = function (ev) {
       if (ev.target.closest('[data-snap]')) { snapDialog(); return; }
       var hn = ev.target.closest('[data-hnav]');
-      if (hn) { var np = hpos + (+hn.dataset.hnav); if (np >= 0 && np < hist.length) { hpos = np; inspect(hist[hpos], true); } return; }
+      if (hn) { var np = hpos + (+hn.dataset.hnav); if (np >= 0 && np < hist.length) { hpos = np; keep.hpos = hpos; inspect(hist[hpos], true); } return; }
       var rd = ev.target.closest('[data-read]');
       if (rd) { var pn = rd.dataset.read.split(':'); goRead(b, +pn[0], +pn[1]); return; }
       var x = ev.target.closest('[data-e]');
@@ -559,6 +564,7 @@
     // the data panel starts on the first ship (ss1, or whichever entry is in it)
     var first = Object.keys(A.R).filter(function (e) { return /^\d+$/.test(e) && /^ss1(\+\d+)?$/.test(name(b, e)); })[0];
     if (first == null) { var objs = Object.keys(A.sites).map(function (k) { return A.sites[k]; }).filter(function (x) { return Object.keys(x.to).length > 1; })[0]; if (objs) first = Object.keys(objs.to).sort(function (x, y) { return +x - +y; })[0]; }
-    if (first != null) inspect(first);
+    if (hist.length && hist[hpos] != null) inspect(hist[hpos], true);
+    else if (first != null) inspect(first);
   }
 })(this);
