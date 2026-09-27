@@ -695,8 +695,8 @@ dialog.wire-dlg { width: min(560px, 94vw); }
 .tray-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
 .tray-acts { margin-left: auto; display: flex; gap: 2px; }
 .tray-cap, .tray-text { width: 100%; margin: 6px 0; padding: 5px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; }
-.tray-fig { max-height: 180px; overflow: hidden; background: var(--plate); border-radius: 4px; padding: 4px; }
-.tray-fig svg { max-width: 100%; height: auto; max-height: 170px; }
+.tray-fig { overflow: hidden; background: var(--plate); border-radius: 4px; padding: 4px; }
+.tray-fig svg { display: block; width: 100%; max-width: 100%; height: auto; max-height: 440px; }
 .tray-code { font-size: 11px; max-height: 150px; overflow: hidden; margin: 4px 0; }
 .pgbrk { color: var(--text-faint); font-size: 0.85em; margin-right: 2px; }
 .seg-btns { display: inline-flex; gap: 2px; }

@@ -620,7 +620,10 @@
         SW.toast('Rendering PNG…');
         SW.figures.svgToPNG(SW.exportSVG(F0.svg(SW.exportPalette())), 3, SW.figBgColour()).then(function (r) { root.SWExport.download(F0.name() + '.png', r.png, 'image/png'); }, function () { SW.toast('The PNG could not be made; try SVG.', 5000); });
       }
-      else if (act === 'note' && SW.tray) { if (F0 && k !== 'panel') SW.tray.addFigure(F0.svg(SW.exportPalette()), F0.name()); else SW.tray.addDoc(docOf(k)); }   // the panel goes in as text
+      else if (act === 'note' && SW.tray) {   // figures go in as images (the data panel too, whole); the tables as tables
+        if (F0) SW.tray.addFigure(F0.svg(SW.exportPalette()), k === 'panel' ? nm(String(picked)) + ', frame ' + (shownFrame + 1) + ' (' + vshort + ')' : F0.name());
+        else SW.tray.addDoc(docOf(k));
+      }
     }
 
     // the snapshot's options in a dialog: the controls held, and for how long
