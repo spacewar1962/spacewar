@@ -47,7 +47,7 @@
     // time: cycles in each routine itself (ex) and with what it calls (inc), in
     // frames; each frame's calls as spans against time; the main loop's wait
     // for the rest of the frame (the line "use up rest of time") kept apart
-    var ex = {}, inc = {}, frameList = [], cur = null, waitAt = {};
+    var ex = {}, inc = {}, frameList = [], cur = null, waitAt = {}, snaps = [];   // snaps: memory as each frame begins
     b.lines.forEach(function (ls, pi) { ls.forEach(function (L) {
       if (/use up rest of time/i.test(L.raw)) ((b.asm.byLine[pi] || [])[L.n] || []).forEach(function (w) { waitAt[w.loc] = 1; });
     }); });
@@ -75,6 +75,7 @@
         if (pc0 === frameAt) {
           close(0);
           if (cur) { cur.len = cpu.cycles - cur.t; frameList.push(cur); }
+          snaps.push(cpu.mem.slice());
           cur = { t: cpu.cycles, spans: [], pts: [], len: 0, phase: phase };
           inFrames = true; frames++;
         }
@@ -116,7 +117,7 @@
     });
     var total = frameList.reduce(function (a, f) { return a + f.len; }, 0);
     return { R: R, sites: sites, path: path, frames: frames, frameAt: frameAt, loopEnd: loopEnd, start: b.asm.start, cpu: cpu, halted: cpu.halted,
-             ex: ex, inc: inc, frameList: frameList, total: total, waitAt: waitAt, flow: flow, phases: phases };
+             ex: ex, inc: inc, frameList: frameList, total: total, waitAt: waitAt, flow: flow, phases: phases, snaps: snaps };
   };
 
   // ---------- reading the source ----------
@@ -392,7 +393,7 @@
       fl.innerHTML = o.join('');
       var wait = f.spans.filter(function (sp) { return sp.e === 'wait'; }).reduce(function (a, sp) { return a + ((sp.t1 == null ? len : sp.t1) - sp.t0); }, 0);
       var objs = f.spans.filter(function (sp) { return sp.d === 0 && sp.e !== 'wait'; }).map(function (sp) { return nm(sp.e); });
-      scope(i);
+      scope(i); values();
       fcap.textContent = 'frame ' + (i + 1) + ' of ' + NF + ' · ' + cyc(len) + ' · waiting ' + Math.round(100 * wait / len) + '% · ' + A.phases[f.phase].what;
       fcap.title = 'Called from the main loop, in order: ' + objs.join(', ');
     }
@@ -411,6 +412,32 @@
       fr.value = Math.max(0, Math.min(NF - 1, +fr.value + (t.dataset.f === 'next' ? 1 : -1))); chart(+fr.value);
     });
     chart(+fr.value);
+
+    // ---------- values: what the chosen routine reads and writes, as the frame
+    // shown begins and ends (memory kept at each frame boundary) ----------
+    function signed(v) { return v & 0o400000 ? -((~v) & 0o377777) : v; }   // ones' complement
+    function objName(n) { return n === 0 ? 'first ship' : n === 1 ? 'second ship' : 'object ' + (n + 1); }
+    function values() {
+      var box = SW.$('.ov-vals', insp); if (!box || picked == null || insp.hidden) return;
+      var e = String(picked), i = shownFrame, s0 = A.snaps[i], s1 = A.snaps[i + 1];
+      if (!s0 || !s1) { box.innerHTML = ''; return; }
+      var rows = [];
+      Object.keys(A.flow).forEach(function (a) {
+        var fl0 = A.flow[a], n = (fl0.r[e] || 0) + (fl0.w[e] || 0); if (!n) return;
+        var c = what(+a); if (c.kind !== 'var' && c.kind !== 'field' && c.kind !== 'data') return;
+        rows.push({ a: +a, c: c, n: n, w: !!fl0.w[e] });
+      });
+      // the key ones: the object table's fields first, then what it writes, then the most used
+      rows.sort(function (x, y) { return (y.c.kind === 'field') - (x.c.kind === 'field') || y.w - x.w || y.n - x.n; });
+      rows = rows.slice(0, 10);
+      box.innerHTML = rows.length ? '<p class="ov-vline"><span class="faint">In frame ' + (i + 1) + ':</span> ' + rows.map(function (r) {
+        var v0 = s0[r.a], v1 = s1[r.a], xy = r.c.kind === 'field' && /^(x|y)$/.test(r.c.f.what || '');
+        var lab = r.c.kind === 'field' ? (r.c.f.what && r.c.f.what.length < 14 ? r.c.f.what : r.c.key) + (r.c.obj < 2 ? '' : ' ' + (r.c.obj + 1)) : String(r.c.key);
+        var a0 = xy ? signed(v0) >> 8 : signed(v0), a1 = xy ? signed(v1) >> 8 : signed(v1);
+        var tip = (r.c.kind === 'field' ? r.c.key + ', ' + objName(r.c.obj) + ': ' : '') + SW.oct(v0, 6) + ' → ' + SW.oct(v1, 6) + (xy ? ' (screen position: the top ten bits)' : '');
+        return '<span class="ov-v' + (v0 !== v1 ? ' ch' : '') + '" title="' + SW.esc(tip) + '">' + SW.esc(lab) + ' ' + (a0 === a1 ? a0 : a0 + '→' + a1) + '</span>';
+      }).join(' ') + '</p>' : '';
+    }
 
     // ---------- the inspector ----------
     var entries = Object.keys(A.R).filter(function (e) { return /^\d+$/.test(e); }).map(Number).concat([A.frameAt, A.start]).sort(function (x, y) { return x - y; });
@@ -450,6 +477,7 @@
       function rwList(m) { return Object.keys(m).sort(function (x, y) { return m[y] - m[x]; }).slice(0, 14).map(function (k) { return '<span class="mono">' + SW.esc(k) + '</span> <span class="faint">' + rate(m[k]) + '</span>'; }).join(', '); }
       if (Object.keys(ws).length) hh.push('<p><b>Writes</b> ' + rwList(ws) + '</p>');
       if (Object.keys(rs).length) hh.push('<p><b>Reads</b> ' + rwList(rs) + '</p>');
+      hh.push('<div class="ov-vals"></div>');
       var cd = e === 'rt' ? null : codeOf(e);
       if (e === 'rt') hh.push('<p class="hint">Code written by the outline compiler (oc) at start-up, so it has no source lines: in Read it shows as run-time code.</p>');
       if (cd) {
@@ -458,7 +486,7 @@
           '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>');
       }
       insp.innerHTML = hh.join('');
-      insp.hidden = false; picked = e; scope(shownFrame);
+      insp.hidden = false; picked = e; scope(shownFrame); values();
       SW.$$('.ov-sp', fl).forEach(function (gg) { gg.classList.toggle('on', gg.dataset.e === String(e)); });
       SW.$$('.ov-brow', el).forEach(function (rw) { rw.classList.toggle('on', rw.dataset.e === String(e)); });
       if (window.innerWidth < 1000) insp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
