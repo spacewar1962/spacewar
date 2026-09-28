@@ -1228,3 +1228,6 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .tabs .tabs-map { margin-left: auto; align-self: center; font-size: 12px; color: var(--text-faint); text-decoration: none; padding: 0 6px; white-space: nowrap; }
 .tabs .tabs-map:hover { color: var(--text); text-decoration: underline; }
 .noscript { margin: 16px; padding: 12px 14px; border: 1px solid var(--line, #888); border-radius: 6px; background: var(--surface, #fff); color: var(--text, #111); font-size: 14px; }
+.well-plot { display: flex; justify-content: center; }
+.well-tube { border-radius: 50%; box-shadow: 0 0 0 6px #1d262e, 0 0 0 7px #3a4650; }
+.well .grav-ctl input[type=range] { width: 110px; vertical-align: middle; }
