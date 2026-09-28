@@ -295,9 +295,10 @@
   };
   document.addEventListener('click', function (e) {
     var c = e.target.closest('[data-copy]'); if (!c) return;
+    e.preventDefault(); e.stopPropagation();
     var t = c.dataset.copy;
     (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { SW.toast('Copied ' + t); }, function () { window.prompt('Copy:', t); });
-  });
+  }, true);
   SW.refOf = function (vid, p, n0, n1, nparts) {
     var r = SW.REF[vid] || ('SW' + vid);
     if (p == null) return r;
@@ -319,9 +320,9 @@
       '<p>A SWHID opens through Software Heritage’s resolver, <span class="mono">archive.softwareheritage.org/swh:1:cnt:…</span>, once the repository is archived there; the part after the first semicolon (origin, path, lines) qualifies it and is not a web address. For a link that works meanwhile, Copy citation also gives the file on GitHub at its last change, to the lines.</p>' +
       '<p>For the exact bytes of a file, cite its <a href="https://www.swhid.org/" target="_blank" rel="noopener">SWHID</a> (<a href="https://www.softwareheritage.org/software-hash-identifier-swhid/" target="_blank" rel="noopener">Software Heritage</a>, <a href="https://www.iso.org/standard/89985.html" target="_blank" rel="noopener">ISO/IEC 18670:2025</a>) alongside.</p>' +
       '<h4>Source code versions</h4><p class="hint">The version’s date is the program’s; the text we hold may be later: a transcription, a reassembly, a reconstruction. SWHIDs copy on a click.</p><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Version</th><th>Version dated</th><th>This text</th><th>SWHID of each file</th></tr></thead><tbody>' +
-      vs.map(function (v, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(SW.refOf(v.id)) + '</td><td>' + SW.esc(v.label) + '</td><td>' + SW.esc(v.date || '') + '</td><td>' + SW.esc(SW.MADE[v.id] || (v.medium || '')) + '</td><td>' + SW.swhidList(SW.filesOf(v)) + '</td></tr>'; }).join('') + '</tbody></table>' +
+      vs.map(function (v, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono"><span class="swref-c" data-copy="' + SW.esc(SW.refText(v.id)) + '" title="Click to copy">' + SW.esc(SW.refOf(v.id)) + '</span></td><td>' + SW.esc(v.label) + '</td><td>' + SW.esc(v.date || '') + '</td><td>' + SW.esc(SW.MADE[v.id] || (v.medium || '')) + '</td><td>' + SW.swhidList(SW.filesOf(v)) + '</td></tr>'; }).join('') + '</tbody></table>' +
       '<h4>Ports</h4><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Program</th><th>Machine</th><th>Where and by whom</th><th>Date</th><th>Held (SWHID of each file)</th></tr></thead><tbody>' +
-      SW.PORTS.map(function (r, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(r[0]) + '</td><td>' + SW.esc(r[1]) + '</td><td>' + SW.esc(r[2]) + '</td><td>' + SW.esc(r[3]) + '</td><td>' + SW.esc(r[4]) + '</td><td>' + (r[5] ? SW.swhidList(r[5].split(/,\s*/)) : r[6] ? '<span class="faint">no source; catalogue entry only:</span> <a href="../' + SW.esc(r[6][1]) + '" target="_blank" rel="noopener">' + SW.esc(r[6][0]) + ' ↗</a>' : '<span class="faint">none held</span>') + '</td></tr>'; }).join('') + '</tbody></table>' +
+      SW.PORTS.map(function (r, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono"><span class="swref-c" data-copy="[REF: ' + SW.esc(r[0]) + ']" title="Click to copy">' + SW.esc(r[0]) + '</span></td><td>' + SW.esc(r[1]) + '</td><td>' + SW.esc(r[2]) + '</td><td>' + SW.esc(r[3]) + '</td><td>' + SW.esc(r[4]) + '</td><td>' + (r[5] ? SW.swhidList(r[5].split(/,\s*/)) : r[6] ? '<span class="faint">no source; catalogue entry only:</span> <a href="../' + SW.esc(r[6][1]) + '" target="_blank" rel="noopener">' + SW.esc(r[6][0]) + ' ↗</a>' : '<span class="faint">none held</span>') + '</td></tr>'; }).join('') + '</tbody></table>' +
       '<p class="hint">Named whether or not a text is held, so that a port can be cited as a program. A port takes a witness letter only when it survives in more than one text, or when the text held is not its own (SWP-CDC3100-SPACEWAR66R, a reconstruction). BBN’s copy of the PDP-1 program is a copy, not a port: found, it would be a witness of a PDP-1 version.</p>';
     document.body.appendChild(d);
     d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
@@ -329,7 +330,7 @@
     d.showModal();
   };
   SW.refText = function (vid, p, n0, n1, nparts) { return '[REF: ' + SW.refOf(vid, p, n0, n1, nparts) + ']'; };
-  SW.refTag = function (vid, p, n0, n1, nparts) { return '<span class="swref" title="The bench’s reference to this source (Help ▸ Referencing and versions)">' + SW.esc(SW.refText(vid, p, n0, n1, nparts)) + '</span>'; };
+  SW.refTag = function (vid, p, n0, n1, nparts) { var t = SW.refText(vid, p, n0, n1, nparts); return '<span class="swref" data-copy="' + SW.esc(t) + '" title="Click to copy. The bench’s reference to this source (Help ▸ Referencing and versions)">' + SW.esc(t) + '</span>'; };
   SW.cite = function (b, p, n0, n1) {
     var part = b.parts[p];
     var range = n1 && n1 !== n0 ? 'll. ' + n0 + '–' + n1 : 'l. ' + n0;
