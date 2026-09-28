@@ -43,7 +43,7 @@
   function hashOf(it) { var js = JSON.stringify(strip(it)), h = 5381; for (var i = 0; i < js.length; i++) h = ((h * 33) ^ js.charCodeAt(i)) >>> 0; return h.toString(36) + ':' + js.length; }
   function setSync(state, msg) { sync.state = state; sync.msg = msg || ''; if (state === 'ok') sync.at = new Date(); var el = host && SW.$('.tray-sync', host); if (el) el.outerHTML = syncHTML(); }
   function syncHTML() {
-    var t = { off: 'In this browser only. Add a Hypothesis token (⚙) to keep a private copy there.', busy: 'Saving to Hypothesis…', ok: 'Kept privately on Hypothesis too' + (sync.at ? ', saved ' + sync.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : ''), err: 'Not saved to Hypothesis: ' + sync.msg }[sync.state];
+    var t = { off: 'In this browser only. Add a Hypothesis token (⚙) to keep a private copy there.', busy: 'Saving to Hypothesis…', ok: 'Synced to Hypothesis' + (sync.at ? ', saved ' + sync.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : ''), err: 'Not saved to Hypothesis: ' + sync.msg }[sync.state];
     return '<span class="tray-sync sync-' + sync.state + '" title="My notes are private whichever way they are kept">' + (sync.state === 'ok' ? '☁ ' : sync.state === 'err' ? '⚠ ' : '') + SW.esc(t) + '</span>';
   }
   function scheduleSync() { clearTimeout(syncT); syncT = setTimeout(runSync, 2500); }
