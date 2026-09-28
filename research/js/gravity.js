@@ -270,25 +270,25 @@
     if (!vs.some(function (v) { return v.id === st.v; })) st.v = '3.1';
     var card = SW.el('div', { class: 'card grav well', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>The well</h4>' +
-      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt.</p>' +
+      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well (or its row) to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt.</p>' +
       '<div class="grav-ctl"><label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
       '<label>Depth by <select data-w="scale"><option value="sqrt">the square root of the pull</option><option value="lin">the pull</option></select></label> ' +
       '<label>Tilt <input type="range" data-w="tilt" min="25" max="100" step="1"></label> ' +
       '<label>Rotate <input type="range" data-w="rot" min="-180" max="180" step="1"></label> ' +
       '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label> ' +
       '<label title="A small sun at the star’s place, on the sheet at rest"><input type="checkbox" data-w="star"> Mark the star</label> <span class="grav-exp"></span></div>' +
-      '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-legend"></div><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
+      '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
     host.appendChild(card);
     SW.$('[data-w=lines]', card).value = String(st.lines);
     SW.$('[data-w=tilt]', card).value = st.tilt; SW.$('[data-w=depth]', card).value = st.depth; SW.$('[data-w=scale]', card).value = st.scale; SW.$('[data-w=star]', card).checked = st.star; SW.$('[data-w=rot]', card).value = st.rot;
-    var plot = SW.$('.well-plot', card), note = SW.$('.well-note', card), thumbs = SW.$('.well-thumbs', card), legend = SW.$('.well-legend', card);
+    var plot = SW.$('.well-plot', card), note = SW.$('.well-note', card), thumbs = SW.$('.well-thumbs', card);
     var stopped = false, job = 0, groups = [];   // groups: {sig, vs, pts, ink}
     function alive(my) { return function () { return !stopped && my === job; }; }
     function groupOf(vid) { return groups.filter(function (g) { return g.vs.some(function (v) { return v.id === vid; }); })[0]; }
 
     // every version's well, in turn; the one shown first
     function sampleAll() {
-      var my = ++job; groups = []; thumbs.innerHTML = ''; legend.innerHTML = '';
+      var my = ++job; groups = []; thumbs.innerHTML = '';
       var order = [V.byId(st.v)].concat(vs.filter(function (v) { return v.id !== st.v; })), i = 0, seen = {};
       note.textContent = 'Running the gravity code over the screen…';
       (function next() {
@@ -322,7 +322,7 @@
     }
     var CYAN = '#39c5e0';
     // the small wells keep one view; the large one takes the controls
-    var FIXED = { tilt: 64, depth: 50, scale: 'sqrt', rot: 0, star: true };
+    var FIXED = { tilt: 64, depth: 50, scale: 'sqrt', rot: 0, star: false };
     function proj(N, w) {
       w = w || st;
       var h = N * 0.33, fore = w.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = w.depth / 50, floor = N * 0.42,
@@ -380,30 +380,41 @@
       var N = Math.max(320, Math.min(720, plot.clientWidth || 600));
       plot.innerHTML = '<div class="well-tube" style="width:' + N + 'px;height:' + N + 'px"><canvas></canvas></div>';
       drawTo(SW.$('canvas', plot), N, gs, 1);
-      legend.innerHTML = gs.length > 1 ? gs.map(function (gp) { return '<div><i style="background:' + gp.ink + '"></i>' + SW.esc(gp.vs.map(vname).join(', ')) + '</div>'; }).join('') : '';
       if (!/Working out/.test(note.textContent)) note.textContent = caption();
     }
     function paintThumbs() {
       var main = groupOf(st.v), shown = shownGroups();
       thumbs.innerHTML = '';
-      groups.forEach(function (gp) {
-        var on = gp === main, over = !on && shown.indexOf(gp) >= 0;
-        var t = SW.el('div', { class: 'well-thumb' + (on ? ' on' : '') });
-        var cv = SW.el('canvas', { title: 'Show this well: ' + gp.vs.map(vname).join(', ') });
+      var row = SW.el('div', { class: 'well-thumbrow' });
+      function pick(gp) { st.v = gp.vs[0].id; st.over = st.over.filter(function (id) { return groupOf(id) !== gp; }); keep(); paintThumbs(); paint(); }
+      function overlay(gp, on) {
+        var ids = gp.vs.map(function (v) { return v.id; });
+        st.over = st.over.filter(function (id) { return ids.indexOf(id) < 0; });
+        if (on) st.over.push(gp.vs[0].id);
+        keep(); paint(); paintThumbs();
+      }
+      groups.forEach(function (gp, n) {
+        var t = SW.el('div', { class: 'well-thumb' + (gp === main ? ' on' : '') });
+        var cv = SW.el('canvas', { title: 'Show well ' + String.fromCharCode(65 + n) + ': ' + gp.vs.map(vname).join(', ') });
         t.appendChild(cv);
-        t.appendChild(SW.el('div', { class: 'well-tn' }, '<i style="background:' + gp.ink + '"></i>' + SW.esc(gp.vs.map(vname).join(', '))));
-        var lab = SW.el('label', { class: 'well-ov' + (on ? ' dis' : '') }, '<input type="checkbox"' + (over ? ' checked' : '') + (on ? ' disabled' : '') + '> Overlay');
-        t.appendChild(lab);
-        cv.onclick = function () { st.v = gp.vs[0].id; st.over = st.over.filter(function (id) { return groupOf(id) !== gp; }); keep(); paintThumbs(); paint(); };
-        SW.$('input', lab).onchange = function (e) {
-          var ids = gp.vs.map(function (v) { return v.id; });
-          st.over = st.over.filter(function (id) { return ids.indexOf(id) < 0; });
-          if (e.target.checked) st.over.push(gp.vs[0].id);
-          keep(); paint(); paintThumbs();
-        };
-        thumbs.appendChild(t);
-        drawTo(cv, 132, [gp], 0.6, FIXED);
+        t.appendChild(SW.el('div', { class: 'well-tn' }, '<i style="background:' + gp.ink + '"></i>Well ' + String.fromCharCode(65 + n)));
+        cv.onclick = function () { pick(gp); };
+        row.appendChild(t);
+        drawTo(cv, 88, [gp], 0.5, FIXED);
       });
+      thumbs.appendChild(row);
+      // which versions each well stands for, and whether it is laid over the one shown
+      var tb = SW.el('table', { class: 'ov-sub well-t' });
+      tb.innerHTML = '<thead><tr><th>Well</th><th>Versions</th><th title="Lay this well over the one shown">Overlay</th></tr></thead><tbody>' +
+        groups.map(function (gp, n) {
+          var on = gp === main, over = !on && shown.indexOf(gp) >= 0;
+          return '<tr data-gi="' + n + '"' + (on ? ' class="on"' : '') + '><td class="well-tl"><i style="background:' + gp.ink + '"></i>' + String.fromCharCode(65 + n) + '</td><td>' +
+            gp.vs.map(function (v) { return '<span>' + SW.esc(vname(v)) + '</span>'; }).join(', ') + '</td><td class="num">' +
+            (on ? '<span class="faint" title="The well shown">shown</span>' : '<input type="checkbox"' + (over ? ' checked' : '') + '>') + '</td></tr>';
+        }).join('') + '</tbody>';
+      tb.addEventListener('change', function (e) { var tr = e.target.closest('[data-gi]'); if (tr) overlay(groups[+tr.dataset.gi], e.target.checked); });
+      tb.addEventListener('click', function (e) { var tr = e.target.closest('[data-gi]'); if (tr && e.target.tagName !== 'INPUT' && groups[+tr.dataset.gi] !== main) pick(groups[+tr.dataset.gi]); });
+      thumbs.appendChild(tb);
     }
     function svg(p) {
       var N = 600, gs = shownGroups(), o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + N + ' ' + N + '" width="' + N + '" height="' + N + '" font-family="IBM Plex Mono, monospace" font-size="9"><defs><clipPath id="tube"><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '"/></clipPath></defs><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '" fill="#000"/><g clip-path="url(#tube)" stroke-width="1" fill="none">'];

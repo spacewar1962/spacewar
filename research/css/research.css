@@ -1243,3 +1243,11 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .well-tn { font-size: 11.5px; margin: 6px 0 2px; line-height: 1.3; }
 .well-ov { font-size: 12px; cursor: pointer; } .well-ov.dis { opacity: .45; cursor: default; }
 .well-plot canvas { cursor: grab; touch-action: none; } .well-plot canvas:active { cursor: grabbing; }
+.well-thumbs { display: block; }
+.well-thumbrow { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+.well-thumbrow .well-thumb canvas { box-shadow: 0 0 0 3px #1d262e; }
+.well-thumbrow .well-thumb.on canvas { box-shadow: 0 0 0 3px var(--beam); }
+.well-t { font-size: 12px; width: 100%; }
+.well-t td { vertical-align: top; padding: 3px 6px; } .well-t tbody tr { cursor: pointer; } .well-t tbody tr.on { cursor: default; background: var(--surface-2); }
+.well-t td span { white-space: nowrap; }
+.well-tl { white-space: nowrap; font-weight: 600; } .well-tl i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: 3px; }
