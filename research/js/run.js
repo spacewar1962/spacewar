@@ -50,7 +50,7 @@
       (dual
         ? '<div class="scopes2"><figure><div class="scope-wrap" title="Scope 1. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 1: the Wedge’s console, centred on the Wedge</figcaption></figure>' +
           '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' +
-          '<p class="hint scopes2-note">4.4 sends alternate frames to two displays, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). Its second display is addressed by 720407 (dpy-i 400, in dj6), which DEC’s 1963 PDP-1 Handbook gives as dpp, display one point on a second CRT (Type 31), beside dpy 720007 for the Type 30. Which display MIT used as the second console is not recorded there (F31).' + (build.v.id === '4.4f' ? ' This is Landsteiner’s 2015 fixed version (F33).' : ' As assembled, the sun is misplaced on both consoles, and the Needle’s shows its stars, torpedoes and explosions at the wrong positions; 4.4f is Landsteiner’s 2015 fix (F33).') + '</p>'
+          '<p class="hint scopes2-note">4.4 sends alternate frames to two displays, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). Its second display is addressed by 720407 (dpy-i 400, in dj6), which DEC’s 1963 PDP-1 Handbook gives as dpp, display one point on a second CRT (Type 31), beside dpy 720007 for the Type 30. Which display MIT used as the second console is not recorded there (F31).' + (build.v.id === '4.4f' ? ' This is Landsteiner’s 2015 fixed version (F33).' : (fixedSyms ? ' Assembled with its symbol table preset, so the sun is placed as intended; the Needle’s console still shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).' : ' As assembled, the sun is misplaced on both consoles, and the Needle’s shows its stars, torpedoes and explosions at the wrong positions; 4.4f is Landsteiner’s 2015 fix (F33).')) + '</p>'
         : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>') +
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
@@ -59,8 +59,9 @@
       '<select id="r-speed" class="btn" title="Speed relative to the PDP-1 (5 µs memory cycle)">' +
       [0.01, 0.05, 0.25, 0.5, 1, 2, 4].map(function (s) { return '<option value="' + s + '"' + (s === speed ? ' selected' : '') + '>' + s + '×</option>'; }).join('') +
       '</select>' +
-      (dual ? '<button class="btn" id="r-fig" title="Save scope 1 at print resolution">▣ Scope 1</button><button class="btn" id="r-fig2" title="Save scope 2 at print resolution">▣ Scope 2</button></div>'
-            : '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button></div>') +
+      (dual ? '<button class="btn" id="r-fig" title="Save scope 1 at print resolution">▣ Scope 1</button><button class="btn" id="r-fig2" title="Save scope 2 at print resolution">▣ Scope 2</button>'
+            : '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button>') +
+      (build.v.symFix ? '<label class="check r-sym" title="As assembled, the sun routine uses nx1 and ny1 before the line that assigns them, so pass 2 takes pass 1’s values (30 and 60) and the sun is misplaced (F33). Ticked, the program is assembled again with its own symbol table preset, so those names have their final values from the start and the sun is placed where the code intends. Nothing shows that MIT assembled it this way. The kcb jump fault on the Needle’s console is not a symbol problem and stays; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Preset symbol table</label>' : '') + '</div>' +
       '<div class="keys">Controls: click the scope, then <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
     var right = SW.el('div', { class: 'run-right' });
@@ -96,6 +97,8 @@
     SW.$('#r-over', view).onclick = stepOver;
     SW.$('#r-reset', view).onclick = function () { pause(); load(); updateAll(); };
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
+    var sym = SW.$('#r-sym', view);
+    if (sym) sym.onchange = function () { SW.store.set('run.symtab', sym.checked); R.show(build); };
     SW.$('#r-fig', view).onclick = function () { SW.figures.scopeFigureDialog(dual ? pts.filter(function (p) { return p.sc !== 2; }) : pts, cpu.cycles, build); };
     if (dual) SW.$('#r-fig2', view).onclick = function () { SW.figures.scopeFigureDialog(pts.filter(function (p) { return p.sc === 2; }), cpu.cycles, build); };
     SW.$('#r-tabs', view).addEventListener('click', function (e) {
@@ -437,7 +440,13 @@
 
   function updateAll() { regs(); pane(); }
 
+  // for the texts that read symbols before assigning them (F33), Run can use the
+  // assembly made with the program's symbol table read in first
+  var fixedSyms = false;
   R.show = function (b) {
+    var want = b.v.symFix && SW.store.get('run.symtab', false) ? 'macro1963syms' : b.v.dialect;
+    if (b.dialect !== want) { SW.build(b.v.id, want).then(function (b2) { if (SW.state.v === b.v.id) R.show(b2); }); return; }
+    fixedSyms = b.dialect === 'macro1963syms';
     if (build !== b) {
       pause();
       build = b;

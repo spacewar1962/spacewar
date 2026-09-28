@@ -195,8 +195,14 @@
   // modern CHM and 2015 builds.
   var DIALECTS = {
     macro1963: { label: 'MACRO (1962-63 behaviour)', options: { defVars: true, wholeMacroLines: true } },
-    macro1: { label: 'macro1 (simh, 2003)', options: {} }
+    macro1: { label: 'macro1 (simh, 2003)', options: {} },
+    // for texts that use a symbol before its assignment (symFix): symbols preset
+    // from a first assembly, as a symbol table read in beforehand would (F33)
+    macro1963syms: { label: 'MACRO (1962-63 behaviour), with the program’s symbol table preset', options: { defVars: true, wholeMacroLines: true }, presetSyms: true }
   };
+  // The texts whose assembly changes when the symbol table is read in first
+  // (the sun routine's nx1 and ny1; checked across every version, 28 Sep 2026)
+  var SYMFIX = { '4.3': 1, '4.4': 1, '4.4m': 1 };
 
   // Programs that assume the automatic multiply/divide option (mul/div);
   // the 1962 programs use the step instructions mus/dis on the same opcodes.
@@ -205,6 +211,7 @@
   VERSIONS.forEach(function (v) {
     v.dialect = v.dialect || 'macro1963';
     if (v.mdv === undefined) v.mdv = !NO_MDV[v.id];
+    v.symFix = !!SYMFIX[v.id];
     v.buildNotes = (v.buildNotes || []).map(function (t) {
       // Signed 'log', not initials: 'CC' read as a team member's.
       return { by: 'log', who: 'Claude Code (build log)', date: '2026-09-25', text: t };

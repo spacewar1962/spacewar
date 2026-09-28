@@ -272,6 +272,7 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .btn.ghost { background: transparent; }
 .btn.on { border-color: var(--beam); color: var(--beam); }
 .btn[disabled] { opacity: 0.45; cursor: default; }
+.controls .r-sym { margin-left: 6px; white-space: nowrap; }
 .check { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
 .badge { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 9px; border: 1px solid var(--line); color: var(--text-dim); font-family: var(--mono); }
 .badge.ok { color: var(--green); border-color: currentColor; }

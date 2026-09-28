@@ -22,7 +22,9 @@
  *  - a macro definition may be written on one line with tab-separated
  *    parts, as the MACRO manual (F-36) permits;
  *  - options.defVars and options.wholeMacroLines give the 1962-63 MACRO
- *    behaviour where macro1 differs (see versions.js, DIALECTS).
+ *    behaviour where macro1 differs (see versions.js, DIALECTS);
+ *  - options.symbols presets symbols before pass 1, as a symbol table from an
+ *    earlier assembly would (the 'with symbol table' dialect; F33).
  */
 (function (root) {
   'use strict';
@@ -928,6 +930,9 @@
     pass = 0;
     PSEUDOS.forEach(function (p) { defineSymbol(p[1], p[2], p[0], 0); });
     PERMANENT.forEach(function (p) { defineSymbol(p[0], p[1], DEFFIX, 0); });
+    // a symbol table read in before assembling (options.symbols, name → value):
+    // every symbol starts pass 1 with the value it had at the end of an earlier assembly
+    if (options.symbols) Object.keys(options.symbols).forEach(function (k) { defineSymbol(k, options.symbols[k], DEFINED, 0); });
     pass = 1;
     onePass();
     var errorsPass1 = errors;
