@@ -72,6 +72,26 @@
   };
 
   function vname(v) { return v.label.replace(/^Spacewar! /, ''); }
+  // A panel that folds away under its heading, remembered; onFold(folded).
+  function foldable(card, key, onFold) {
+    var h = card.firstElementChild, body = SW.el('div', { class: 'grav-body' });
+    while (h.nextSibling) body.appendChild(h.nextSibling);
+    card.appendChild(body);
+    var btn = SW.el('button', { class: 'grav-fold', type: 'button' }, '▾');
+    h.insertBefore(btn, h.firstChild);
+    function set(f) {
+      card.classList.toggle('folded', f); btn.textContent = f ? '▸' : '▾';
+      btn.title = f ? 'Show this panel' : 'Fold this panel away'; btn.setAttribute('aria-expanded', String(!f));
+      if (onFold) onFold(f);
+    }
+    var F = SW.store.get('grav.fold', {}) || {};
+    set(!!F[key]);
+    h.addEventListener('click', function (e) {
+      if (e.target.closest('.swref')) return;
+      var f = !card.classList.contains('folded'); set(f);
+      var G2 = SW.store.get('grav.fold', {}) || {}; G2[key] = f; SW.store.set('grav.fold', G2);
+    });
+  }
 
   G.draw = function (b, host) {
     var P = SW.store.get('gravity2', {}) || {};
@@ -86,6 +106,7 @@
       '<div class="grav-plot"></div><div class="grav-read hint mono">&nbsp;</div><div class="grav-groups"><p class="hint">Running the gravity code of ' + vs.length + ' versions…</p></div>';
     host.appendChild(card);
     SW.$('[data-k=range]', card).value = String(st.range);
+    foldable(card, 'curves');
     SW.$('[data-k=along]', card).value = st.along;
     var plot = SW.$('.grav-plot', card), read = SW.$('.grav-read', card), gbox = SW.$('.grav-groups', card);
     var groups = [], stopped = false;
@@ -324,6 +345,7 @@
       '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
     host.appendChild(card);
     SW.$('[data-w=lines]', card).value = String(st.lines);
+    foldable(card, 'well', function (f) { if (f && fall && fall.playing) stopPlay(); });
     SW.$('[data-w=tilt]', card).value = st.tilt; SW.$('[data-w=depth]', card).value = st.depth; SW.$('[data-w=scale]', card).value = st.scale; SW.$('[data-w=star]', card).checked = st.star; SW.$('[data-w=rot]', card).value = st.rot;
     var plot = SW.$('.well-plot', card), note = SW.$('.well-note', card), thumbs = SW.$('.well-thumbs', card);
     var stopped = false, job = 0, groups = [];   // groups: {sig, vs, pts, ink}
