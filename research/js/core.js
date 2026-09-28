@@ -236,9 +236,50 @@
   // reassembly or edited source, R a reconstruction (B: an object tape, by
   // address only). Then the tape and lines: [REF: SW3.1T, 2.141–146]; the tape
   // is left out when the text has only one; @0402 cites by core address.
-  SW.REF = { '1': 'SW1R', 'stars': 'SWEPL', '2b-pre': 'SW2B-preR', '2b': 'SW2BR', '3.1': 'SW3.1L', '3.1t': 'SW3.1T',
+  SW.REF = { '1': 'SW1R', 'stars': 'SWEPL', '2b-pre': 'SW2B-preL', '2b': 'SW2BR', '3.1': 'SW3.1L', '3.1t': 'SW3.1T',
     '4.0': 'SW4.0L', '4.0ts': 'SW4.0TSL', '4.1': 'SW4.1L', '4.1t': 'SW4.1T', '4.1d': 'SW4.1Md', '4.1f': 'SW4.1Mf', '4.2': 'SW4.2L',
     '4.3': 'SW4.3L', '4.3m': 'SW4.3M', '4.4': 'SW4.4L', '4.4m': 'SW4.4M', '4.4f': 'SW4.4Mf', '4.8': 'SW4.8L', '2015': 'SW2015M' };
+  // Ports: programs for other machines, not texts of a PDP-1 version, so a
+  // namespace of their own: SWP, the machine, the program, and its own version
+  // number (or its year when it has none). Several files of one program are its parts.
+  SW.PORTS = [
+    ['SWP-PDP6-WAR44', 'WAR 44', 'PDP-6', 'MIT (Samson’s DECtape)', 'c. 1968', 'spacewar-pdp6-mit-war44-1968.txt'],
+    ['SWP-PDP8-SPACEWAR71', 'Space War', 'LAB-8 (PDP-8)', 'Evan Suits', '1971', 'spacewar-pdp8-labx8-suits-1971.txt'],
+    ['SWP-PDP10-SW71', 'SW (1: SW.MAC; 2: SHIPS.SAI)', 'PDP-10', 'Ralph E. Gorin, Stanford', '1971', 'spacewar-pdp10-sail-gorin-1971.txt, spacewar-pdp10-sail-gorin-1971-ships.txt'],
+    ['SWP-GT40-SPCWAR73', 'SPCWAR', 'GT40 (PDP-11)', 'Botond G. Eross, Stanford', '1973', 'spacewar-gt40-pdp11-stanford-eross-1973.txt'],
+    ['SWP-GT40-DECUS11-192', 'Spacewar (DECUS 11-192)', 'GT40 (PDP-11)', 'Larry Bryant and Bill Seiler', '1974', 'spacewar-gt40-pdp11-bryant-seiler-1974.pdf (scan)'],
+    ['SWP-PDP12-SPCWAR3', 'SPCWAR, version 3', 'LINC-8 / PDP-12', 'D. E. Wrege, Georgia Tech', '1974', 'spacewar-linc8-pdp12-gtech-wrege-1974.txt'],
+    ['SWP-ITS-SPCWAR76', 'SPCWAR (log to version 163)', 'PDP-6/10, ITS', 'MIT AI Lab', '1976', 'spacewar-pdp6-10-mit-its-spcwar.txt'],
+    ['SWP-ITS-NEWWAR76', 'NEWWAR (log to version 163)', 'PDP-6/10, ITS', 'MIT AI Lab', '1976', 'spacewar-pdp6-10-mit-its-newwar.txt'],
+    ['SWP-GT40-MIT76', 'Spacewar (object tape)', 'GT40 (PDP-11)', 'Richard C. Waters and Meyer A. Billmers, MIT', 'c. 1976', 'spacewar-gt40-pdp11-1976.pt'],
+    ['SWP-ITS-TVWAR', 'TVWAR', 'Knight TV, ITS', 'MIT AI Lab', '', 'spacewar-knighttv-mit-its-tvwar.txt']
+  ];
+  // When the text we hold was made, where it is not the version's own date.
+  SW.MADE = { '1': 'reconstructed by Norbert Landsteiner, April 2016 (revised 2021); not an authentic program',
+    '2b': 'reconstructed from the disassembled binary by Norbert Landsteiner, 2014',
+    '2b-pre': 'a transcription (masswerk); the build supplies the June 1963 macro tape and the 13 March 1962 star table, not held for this version',
+    '3.1': 'a transcription (masswerk) of the program as on Russell’s tapes',
+    '3.1t': 'read by the bench from Russell’s source tapes of 29 September 1962',
+    '4.1t': 'read by the bench from the dfw source tape',
+    '4.3m': 'reassembled by Norbert Landsteiner, modified 2015', '4.4m': 'reassembled by Norbert Landsteiner', '4.4f': 'reassembled by Norbert Landsteiner (variant f)',
+    '4.1d': 'reconstructed by Peter Samson, June 2005', '4.1f': 'reconstructed by Peter Samson, 2005 to 2008', '2015': 'written by Norbert Landsteiner, 2015' };
+  // A source file's SWHID (swh:1:cnt:, its git blob hash; js/swhid.js); with the
+  // repository as origin, its path, and lines where they are lines of the file.
+  SW.SWHID_ORIGIN = 'https://github.com/spacewar1962/spacewar';
+  SW.swhidOf = function (path) { var h = SW.SWHID && SW.SWHID[path]; return h ? 'swh:1:cnt:' + h : ''; };
+  SW.swhidCite = function (path, n0, n1) {
+    var id = SW.swhidOf(path); if (!id) return '';
+    return id + ';origin=' + SW.SWHID_ORIGIN + ';path=/sources/' + path + (n0 != null ? ';lines=' + n0 + (n1 && n1 !== n0 ? '-' + n1 : '') : '');
+  };
+  SW.filesOf = function (v) { var seen = {}, out = []; (v.build || []).forEach(function (b) { var f = b.src || b.tape; if (f && !seen[f]) { seen[f] = 1; out.push(f); } }); return out; };
+  SW.swhidList = function (files) {
+    return files.map(function (f) { var id = SW.swhidOf(f); return '<div class="swhid-row"><span class="mono">' + SW.esc(f.split('/').pop()) + '</span> ' + (id ? '<button class="swhid mono" title="Copy ' + SW.esc(id) + '" data-copy="' + SW.esc(id) + '">' + SW.esc(id.slice(0, 17)) + '…</button>' : '<span class="faint">no SWHID (not in the repository)</span>') + '</div>'; }).join('');
+  };
+  document.addEventListener('click', function (e) {
+    var c = e.target.closest('[data-copy]'); if (!c) return;
+    var t = c.dataset.copy;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { SW.toast('Copied ' + t); }, function () { window.prompt('Copy:', t); });
+  });
   SW.refOf = function (vid, p, n0, n1, nparts) {
     var r = SW.REF[vid] || ('SW' + vid);
     if (p == null) return r;
@@ -256,9 +297,12 @@
       '<table class="ov-sub"><thead><tr><th>Letter</th><th>The witness</th></tr></thead><tbody>' +
       [['T', 'machine-read from the punched source tape'], ['L', 'a transcription: typed text of a listing or a tape'], ['M', 'a modern reassembly or edited source'], ['R', 'a reconstruction'], ['B', 'an object tape (binary), cited by address only']].map(function (r) { return '<tr><td class="mono">' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('') + '</tbody></table>' +
       '<p>Shorter forms: the version and witness alone, <span class="mono">[REF: SW3.1T]</span>; a whole tape, <span class="mono">[REF: SW3.1T, 2]</span>. The tape is left out when a text has only one: <span class="mono">[REF: SW4.3M, 141]</span>. By core address, <span class="mono">[REF: SW3.1L, @0402–0407]</span>: an address holds across texts of a version that assemble to the same words, and is the only way to cite an object tape. Two texts of one version with the same letter take a lower-case qualifier: <span class="mono">SW4.4Mf</span>. A newly found text takes its version and the next letter or qualifier; a new version, its own number.</p>' +
+      '<p>A port, a program for another machine, is not a text of any PDP-1 version and has a namespace of its own: <b>SWP</b>, the machine, the program, and its own version number, or its year when it has none: <span class="mono">[REF: SWP-PDP6-WAR44, 76]</span>. Several files of one program are its parts: <span class="mono">[REF: SWP-PDP10-SW71, 2.14]</span> is line 14 of SHIPS.SAI. A port has no witness letter unless it survives in more than one text.</p>' +
       '<p>For the exact bytes of a file, cite its <a href="https://www.swhid.org/" target="_blank" rel="noopener">SWHID</a> (<a href="https://www.softwareheritage.org/software-hash-identifier-swhid/" target="_blank" rel="noopener">Software Heritage</a>, <a href="https://www.iso.org/standard/89985.html" target="_blank" rel="noopener">ISO/IEC 18670:2025</a>) alongside.</p>' +
-      '<h4>Source code versions</h4><table class="ov-sub"><thead><tr><th>No.</th><th>Reference</th><th>Version</th><th>Date</th><th>Text</th></tr></thead><tbody>' +
-      vs.map(function (v, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(SW.refOf(v.id)) + '</td><td>' + SW.esc(v.label) + '</td><td>' + SW.esc(v.date || '') + '</td><td>' + SW.esc(v.medium || '') + '</td></tr>'; }).join('') + '</tbody></table>';
+      '<h4>Source code versions</h4><p class="hint">The version’s date is the program’s; the text we hold may be later: a transcription, a reassembly, a reconstruction. SWHIDs copy on a click.</p><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Version</th><th>Version dated</th><th>This text</th><th>SWHID of each file</th></tr></thead><tbody>' +
+      vs.map(function (v, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(SW.refOf(v.id)) + '</td><td>' + SW.esc(v.label) + '</td><td>' + SW.esc(v.date || '') + '</td><td>' + SW.esc(SW.MADE[v.id] || (v.medium || '')) + '</td><td>' + SW.swhidList(SW.filesOf(v)) + '</td></tr>'; }).join('') + '</tbody></table>' +
+      '<h4>Ports</h4><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Program</th><th>Machine</th><th>By</th><th>Date</th><th>SWHID of each file</th></tr></thead><tbody>' +
+      SW.PORTS.map(function (r, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(r[0]) + '</td><td>' + SW.esc(r[1]) + '</td><td>' + SW.esc(r[2]) + '</td><td>' + SW.esc(r[3]) + '</td><td>' + SW.esc(r[4]) + '</td><td>' + SW.swhidList(r[5].replace(/ \(scan\)/, '').split(/,\s*/).map(function (f) { return 'ports/' + f; })) + '</td></tr>'; }).join('') + '</tbody></table>';
     document.body.appendChild(d);
     d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
     d.addEventListener('close', function () { d.remove(); });

@@ -499,7 +499,11 @@
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
       .then(function () { SW.toast(msg); }, function () { window.prompt('Copy:', text); });
   }
-  function copyCite() { var s = SW.state.sel; copy(SW.cite(build, s.p, s.n0, s.n1), 'Citation copied'); }
+  function copyCite() {
+    var s = SW.state.sel, part = build.parts[s.p];
+    var sw = SW.swhidCite(part.src, part.tape ? null : s.n0, part.tape ? null : s.n1);   // a decoded tape's lines are not the file's
+    copy(SW.cite(build, s.p, s.n0, s.n1) + (sw ? '\n' + sw : ''), 'Citation copied');
+  }
   function copyLink() {
     var s = SW.state.sel;
     copy(SW.permalink({ v: build.v.id, l: s.p + ':' + s.n0 + (s.n1 !== s.n0 ? '-' + s.n1 : '') }), 'Link copied');
