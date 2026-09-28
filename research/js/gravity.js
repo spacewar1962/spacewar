@@ -322,7 +322,7 @@
     }
     var CYAN = '#39c5e0';
     // the small wells keep one view; the large one takes the controls
-    var FIXED = { tilt: 64, depth: 50, scale: 'sqrt', rot: 0, star: false };
+    var FIXED = { tilt: 28, depth: 50, scale: 'sqrt', rot: -27, star: false };
     function proj(N, w) {
       w = w || st;
       var h = N * 0.33, fore = w.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = w.depth / 50, floor = N * 0.42,
