@@ -1324,9 +1324,19 @@ li.fd.folded { padding-bottom: 2px; }
 .gfx-grp { display: flex; flex-direction: column; min-width: 0; }
 .gfx-grp button { text-align: left; }
 @media (max-width: 640px) { .tab-menu[data-w="graphics"], .lens-menu .menu-body:has(.gfx-grp) { grid-template-columns: 1fr; } }
-/* group headings in the menus: a faint band, a little brighter, to lead the eye */
-.tab-menu .menu-group, .lens-menu .menu-body .menu-group, .lens-list .lens-g > h5 {
-  background: rgba(120, 200, 230, 0.10); background: color-mix(in srgb, var(--beam) 12%, transparent);
-  color: var(--text-dim); border-radius: 4px; padding: 4px 8px; margin: 6px 2px 4px; font-weight: 600;
-}
-.tab-menu .menu-group:first-child, .gfx-grp:nth-child(-n+2) > .menu-group, .lens-list .lens-g:first-child > h5 { margin-top: 2px; }
+/* Menus: a panel a little lighter than the page, so it reads as lifted above it;
+   groups separated by thin dividers, their headings plain and faint. */
+:root { --menu-bg: #1c2733; --menu-line: rgba(255, 255, 255, 0.12); }
+@supports (background: color-mix(in srgb, red, blue)) { :root { --menu-bg: color-mix(in srgb, var(--surface) 84%, #ffffff 16%); } }
+:root[data-theme="paper"], :root[data-theme="white"], :root[data-theme="sepia"] { --menu-bg: #ffffff; --menu-line: rgba(0, 0, 0, 0.12); }
+.tab-menu, .toolbar .menu-body, .lens-menu .menu-body { background: var(--menu-bg); border-color: var(--menu-line); box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 0, 0, 0.25); }
+:root[data-theme="paper"] .tab-menu, :root[data-theme="white"] .tab-menu, :root[data-theme="sepia"] .tab-menu,
+:root[data-theme="paper"] .toolbar .menu-body, :root[data-theme="white"] .toolbar .menu-body, :root[data-theme="sepia"] .toolbar .menu-body { box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.08); }
+.tab-menu .menu-group, .lens-menu .menu-body .menu-group, .lens-list .lens-g > h5 { background: none; color: var(--text-faint); font-weight: 400; padding: 6px 8px 2px; margin: 0; border-radius: 0; }
+.tab-menu .menu-rule, .lens-menu .menu-body .menu-rule { border: 0; border-top: 1px solid var(--menu-line); margin: 5px 4px; }
+/* the lens groups (Text, Program) */
+.lens-list .lens-g + .lens-g { border-top: 1px solid var(--menu-line); margin-top: 5px; padding-top: 3px; }
+/* the Graphics groups: two columns, a line between the columns and between the rows */
+.gfx-grp:nth-child(even) { border-left: 1px solid var(--menu-line); padding-left: 6px; }
+.gfx-grp:nth-child(n+3) { border-top: 1px solid var(--menu-line); margin-top: 5px; padding-top: 3px; }
+@media (max-width: 640px) { .gfx-grp:nth-child(even) { border-left: 0; padding-left: 0; } .gfx-grp:nth-child(n+2) { border-top: 1px solid var(--menu-line); margin-top: 5px; padding-top: 3px; } }
