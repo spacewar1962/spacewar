@@ -171,6 +171,43 @@
     });
   }
 
+  // ---------- My notes kept on Hypothesis ----------
+  // Each note of My notes is a private annotation ("Only me": read permission
+  // for its owner alone) in the group, at an address of its own, so it never
+  // shows among a version's annotations, in Findings or in what's new. The
+  // note travels whole, gzipped, on a closing line of the text; the first line
+  // says what it is, for anyone looking in Hypothesis's own sidebar.
+  var MYNOTES_URI = SW.BASE_URI + '?mynotes';
+  var NOTE_RE = /<!-- sw:note:gz ([A-Za-z0-9+\/=]+) -->\s*$/;
+  N.mynotes = {
+    ready: function () { return N.configured() ? N.whoami().then(function (me) { return !!me; }) : Promise.resolve(false); },
+    push: function (item) {
+      var body0 = Object.assign({}, item); delete body0.hid; delete body0.shash; delete body0.syncErr;
+      return SW.gz.pack(JSON.stringify(body0)).then(function (b64) {
+        var head = 'My notes (private) · ' + (item.ref || '') + ' · ' + String(item.caption || item.text || item.kind || '').split('\n')[0].slice(0, 120);
+        var body = { uri: MYNOTES_URI, group: cfg().group, text: head + '\n\n<!-- sw:note:gz ' + b64 + ' -->',
+          tags: ['sw:mynote', 'sw:ref:' + (item.ref || '')], permissions: { read: [N.me] }, document: { title: ['Spacewar! research bench: My notes'] }, target: [{ source: MYNOTES_URI }] };
+        var send = item.hid ? hx('PATCH', '/annotations/' + item.hid, { text: body.text, tags: body.tags })
+          .catch(function (e) { if (/^Hypothesis 404/.test(e.message)) return hx('POST', '/annotations', body); throw e; })
+          : hx('POST', '/annotations', body);
+        return send.then(function (r) { return r && r.id ? r.id : item.hid; });
+      });
+    },
+    remove: function (hid) { return hx('DELETE', '/annotations/' + hid).catch(function (e) { if (!/^Hypothesis 404/.test(e.message)) throw e; }); },
+    pull: function () {
+      function page(offset, acc) {
+        return hx('GET', '/search?limit=200&offset=' + offset + '&group=' + encodeURIComponent(cfg().group) + '&uri=' + encodeURIComponent(MYNOTES_URI) + '&user=' + encodeURIComponent(N.me))
+          .then(function (r) { acc = acc.concat(r.rows || []); return (r.rows || []).length === 200 && offset < 20000 ? page(offset + 200, acc) : acc; });
+      }
+      return page(0, []).then(function (rows) {
+        return Promise.all(rows.map(function (a) {
+          var m = NOTE_RE.exec(a.text || ''); if (!m) return null;
+          return SW.gz.unpack(m[1]).then(function (js) { var it = JSON.parse(js); it.hid = a.id; return it; }, function () { return null; });
+        })).then(function (xs) { return xs.filter(Boolean); });
+      });
+    }
+  };
+
   // Every note in the group, every draft, and every build log, all versions.
   N.listAll = function (opts) {
     opts = opts || {};

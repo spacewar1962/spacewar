@@ -1181,3 +1181,8 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 .refhelp-ports > summary h4 { display: inline-block; margin: 14px 0 6px; }
 .refhelp-ports > summary h4::before { content: '▸'; display: inline-block; margin-right: 6px; color: var(--text-dim); transition: transform .15s; }
 .refhelp-ports[open] > summary h4::before { transform: rotate(90deg); }
+.tray-sync { display: inline-block; font-size: 12px; margin-left: 4px; }
+.tray-sync.sync-ok { color: #3f9a62; }
+.tray-sync.sync-err { color: var(--amber); }
+.tray-sync.sync-off, .tray-sync.sync-busy { color: var(--text-faint); }
+.tray-local { font-size: 11px; color: var(--amber); }
