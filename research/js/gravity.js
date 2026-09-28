@@ -262,6 +262,48 @@
       });
     });
   }
+  // The fall: the version's own game run with no controls, the two ships'
+  // positions read at the start of every frame (at ml0) until both have
+  // exploded, and the pull under each (for its height on the sheet).
+  var FALLS = {};
+  G.fall = function (vid, alive, progress) {
+    if (FALLS[vid]) return Promise.resolve(FALLS[vid]);
+    return SW.build(vid).then(function (b) {
+      var S = b.sym, need = ['ml0', 'mtb', 'nx1', 'ny1', 'mex'];
+      if (!b.asm || need.some(function (n) { return !S[n]; })) return { why: 'the object table or the main loop is not where 3.1 has them' };
+      var P = G.probe(b);
+      var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv }); cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
+      var mem = cpu.mem, ml0 = S.ml0.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val, bang = 0o400000 | S.mex.val;
+      var frames = [], c0 = cpu.cycles, n = 0, after = -1, LIM = 60 * 200000;
+      function pos(v) { return s18(v) / 256; }
+      return new Promise(function (res) {
+        (function chunk() {
+          if (!alive()) return;
+          for (var k = 0; k < 150000 && !cpu.halted; k++) {
+            if (cpu.pc === ml0 && ++n > 2) {
+              var f = { t: (cpu.cycles - c0) / 200000, s: [] };
+              for (var i = 0; i < 2; i++) f.s.push({ x: pos(mem[nx + i]), y: pos(mem[ny + i]), boom: mem[mtb + i] === bang });
+              frames.push(f);
+              if (after < 0 && f.s[0].boom && f.s[1].boom) after = frames.length;
+            }
+            cpu.step();
+            if (after > 0 && frames.length > after + 40) break;
+            if (cpu.cycles - c0 > LIM) break;
+          }
+          if (progress) progress(Math.min(1, (cpu.cycles - c0) / LIM));
+          if (!(after > 0 && frames.length > after + 40) && cpu.cycles - c0 <= LIM && !cpu.halted) { setTimeout(chunk, 0); return; }
+          // once a ship has gone up it stays so; the pull under each ship while it flies
+          frames.forEach(function (f, j) { f.s.forEach(function (q, i) {
+            if (j && frames[j - 1].s[i].boom) q.boom = true;
+            q.g = P.ok && !q.boom ? P.at(Math.round(Math.max(-511.99, Math.min(511.99, q.x)) * 256), Math.round(Math.max(-511.99, Math.min(511.99, q.y)) * 256)) : 0;
+            if (q.g === null || isNaN(q.g)) q.g = 0;
+          }); });
+          res(FALLS[vid] = { frames: frames, fps: frames.length > 1 ? (frames.length - 1) / (frames[frames.length - 1].t - frames[0].t) : 30 });
+        })();
+      });
+    });
+  };
+
   G.well = function (b, host) {
     var P0 = SW.store.get('well', {}) || {};
     var st = { v: P0.v || b.v.id, lines: P0.lines || 24, tilt: P0.tilt || 64, depth: P0.depth || 50, scale: P0.scale || 'sqrt', over: P0.over || [], star: P0.star !== false, rot: P0.rot || 0 };
@@ -270,13 +312,15 @@
     if (!vs.some(function (v) { return v.id === st.v; })) st.v = '3.1';
     var card = SW.el('div', { class: 'card grav well', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>The well</h4>' +
-      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well (or its row) to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt.</p>' +
+      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well (or its row) to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt. Play the fall runs this version’s game with no controls and follows the Needle (white) and the Wedge (red) down the sheet from their starting corners until they explode.</p>' +
       '<div class="grav-ctl"><label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
       '<label>Depth by <select data-w="scale"><option value="sqrt">the square root of the pull</option><option value="lin">the pull</option></select></label> ' +
       '<label>Tilt <input type="range" data-w="tilt" min="25" max="100" step="1"></label> ' +
       '<label>Rotate <input type="range" data-w="rot" min="-180" max="180" step="1"></label> ' +
       '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label> ' +
       '<label title="A small sun at the star’s place, on the sheet at rest"><input type="checkbox" data-w="star"> Mark the star</label> <span class="grav-exp"></span></div>' +
+      '<div class="grav-ctl well-play"><button class="btn" data-w="play" title="The Needle and the Wedge left alone from their starting corners, as this version’s game runs them">▶ Play the fall</button> <button class="btn ghost" data-w="again" title="From the start">↺</button> ' +
+      '<label>Speed <select data-w="speed"><option value="0.5">half</option><option value="1">as played</option><option value="2">double</option><option value="4">four times</option></select></label> <span class="hint mono well-t0"></span></div>' +
       '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
     host.appendChild(card);
     SW.$('[data-w=lines]', card).value = String(st.lines);
@@ -377,16 +421,84 @@
     }
     function paint() {
       var gs = shownGroups(); if (!gs.length) return;
-      var N = Math.max(320, Math.min(720, plot.clientWidth || 600));
+      // small enough that the controls fit on the screen with it
+      var N = Math.round(Math.max(300, Math.min(560, plot.clientWidth || 560, (root.innerHeight || 900) - 300)));
       plot.innerHTML = '<div class="well-tube" style="width:' + N + 'px;height:' + N + 'px"><canvas></canvas></div>';
-      drawTo(SW.$('canvas', plot), N, gs, 1);
+      var cv = SW.$('canvas', plot);
+      drawTo(cv, N, gs, 1);
+      sheet = { N: N, img: document.createElement('canvas') };
+      sheet.img.width = cv.width; sheet.img.height = cv.height; sheet.img.getContext('2d').drawImage(cv, 0, 0);
+      if (fall.data && fall.i != null) ships(fall.i);
       if (!/Working out/.test(note.textContent)) note.textContent = caption();
+    }
+    // the ships over the sheet at frame i of the recorded fall
+    var sheet = null, fall = { data: null, i: null, playing: false, raf: 0, t0: 0, i0: 0 };
+    var NEEDLE = '#e6f4ff', WEDGE = '#ff7a6b';
+    function ships(i) {
+      var cv = SW.$('canvas', plot); if (!cv || !sheet || !fall.data) return;
+      var F = fall.data.frames, N = sheet.N, dpr = cv.width / N, g = cv.getContext('2d'), pr = proj(N);
+      i = Math.max(0, Math.min(F.length - 1, i));
+      g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.drawImage(sheet.img, 0, 0);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      g.save(); g.beginPath(); g.arc(N / 2, N / 2, N / 2, 0, 6.2832); g.clip();
+      [0, 1].forEach(function (k) {
+        var ink = k ? WEDGE : NEEDLE, at = function (j) { var q = F[j].s[k]; return pr.f(q.x, q.y, q.g); };
+        var bj = -1; for (var j = 0; j <= i; j++) if (F[j].s[k].boom) { bj = j; break; }
+        var last = bj >= 0 ? bj - 1 : i;
+        // the trail, faint, broken where the ship jumps (caught by the star and moved to the corner)
+        g.strokeStyle = ink; g.lineWidth = 1.2; g.globalAlpha = 0.45; g.beginPath();
+        for (var j2 = 0; j2 <= last; j2++) { var p = at(j2), q0 = j2 ? F[j2 - 1].s[k] : null, q1 = F[j2].s[k];
+          if (!j2 || Math.abs(q1.x - q0.x) + Math.abs(q1.y - q0.y) > 200) g.moveTo(p[0], p[1]); else g.lineTo(p[0], p[1]); }
+        g.stroke(); g.globalAlpha = 1;
+        if (bj >= 0 && i >= bj) {
+          // the explosion: rays that grow and fade
+          // (and after it, a small cross where it happened)
+          var c = at(Math.max(0, bj - 1)), age = i - bj, r = 4 + Math.min(age, 40) * 1.2, a = Math.max(0.35, 1 - age / 40);
+          if (age > 40) r = 5;
+          g.globalAlpha = a; g.strokeStyle = ink; g.lineWidth = 1.4;
+          for (var t = 0; t < 12; t++) { var an = t * Math.PI / 6 + k * 0.26; g.beginPath(); g.moveTo(c[0] + Math.cos(an) * r * 0.35, c[1] + Math.sin(an) * r * 0.35); g.lineTo(c[0] + Math.cos(an) * r, c[1] + Math.sin(an) * r); g.stroke(); }
+          g.globalAlpha = 1; return;
+        }
+        // the ship, pointing the way it is going
+        var p1 = at(last), p0 = at(Math.max(0, last - 3)), dx = p1[0] - p0[0], dy = p1[1] - p0[1], m = Math.hypot(dx, dy);
+        if (m < 0.01) { dx = N / 2 - p1[0]; dy = N * 0.44 - p1[1]; m = Math.hypot(dx, dy) || 1; }
+        dx /= m; dy /= m;
+        var L = Math.max(7, N / 60);
+        g.fillStyle = ink; g.strokeStyle = ink;
+        if (!k) { g.lineWidth = 2; g.beginPath(); g.moveTo(p1[0] - dx * L, p1[1] - dy * L); g.lineTo(p1[0] + dx * L * 0.6, p1[1] + dy * L * 0.6); g.stroke(); }
+        else { g.beginPath(); g.moveTo(p1[0] + dx * L * 0.7, p1[1] + dy * L * 0.7); g.lineTo(p1[0] - dx * L * 0.6 - dy * L * 0.45, p1[1] - dy * L * 0.6 + dx * L * 0.45); g.lineTo(p1[0] - dx * L * 0.6 + dy * L * 0.45, p1[1] - dy * L * 0.6 - dx * L * 0.45); g.closePath(); g.fill(); }
+      });
+      g.restore();
+      var f = F[i], ev = [];
+      [0, 1].forEach(function (k) { var nm = k ? 'Wedge' : 'Needle', q = f.s[k], pq = i ? F[i - 1].s[k] : q; if (q.boom) ev.push(nm + ' exploded'); else if (Math.abs(q.x) > 500 && Math.abs(q.y) > 500 && i && Math.abs(q.x - pq.x) > 200) ev.push(nm + ' caught by the star, moved to the corner'); });
+      SW.$('.well-t0', card).textContent = f.t.toFixed(1) + ' s' + (ev.length ? ' · ' + ev.join(' · ') : '');
+    }
+    function tick(now) {
+      if (!fall.playing) return;
+      var sp = +SW.$('[data-w=speed]', card).value || 1, i = fall.i0 + Math.floor((now - fall.t0) / 1000 * fall.data.fps * sp);
+      if (i >= fall.data.frames.length - 1) { i = fall.data.frames.length - 1; stopPlay(); }
+      fall.i = i; ships(i);
+      if (fall.playing) fall.raf = requestAnimationFrame(tick);
+    }
+    function stopPlay() { fall.playing = false; cancelAnimationFrame(fall.raf); SW.$('[data-w=play]', card).textContent = '▶ Play the fall'; }
+    function play(fromStart) {
+      if (fall.playing && !fromStart) { stopPlay(); return; }
+      var vid = st.v, btn = SW.$('[data-w=play]', card);
+      btn.textContent = 'Running the game…';
+      G.fall(vid, function () { return !stopped; }, function (f) { btn.textContent = 'Running the game… ' + Math.round(f * 100) + '%'; }).then(function (d) {
+        if (stopped || vid !== st.v) { stopPlay(); return; }
+        if (!d || d.why) { btn.textContent = '▶ Play the fall'; note.textContent = 'The fall: ' + (d ? d.why : 'no result') + '.'; return; }
+        fall.data = d;
+        if (fromStart || fall.i == null || fall.i >= d.frames.length - 1) fall.i = 0;
+        fall.i0 = fall.i; fall.t0 = performance.now(); fall.playing = true; btn.textContent = '⏸ Pause';
+        fall.raf = requestAnimationFrame(tick);
+      });
     }
     function paintThumbs() {
       var main = groupOf(st.v), shown = shownGroups();
       thumbs.innerHTML = '';
       var row = SW.el('div', { class: 'well-thumbrow' });
-      function pick(gp) { st.v = gp.vs[0].id; st.over = st.over.filter(function (id) { return groupOf(id) !== gp; }); keep(); paintThumbs(); paint(); }
+      function pick(gp) { if (fall.data) { stopPlay(); fall.data = null; fall.i = null; SW.$('.well-t0', card).textContent = ''; } st.v = gp.vs[0].id; st.over = st.over.filter(function (id) { return groupOf(id) !== gp; }); keep(); paintThumbs(); paint(); }
       function overlay(gp, on) {
         var ids = gp.vs.map(function (v) { return v.id; });
         st.over = st.over.filter(function (id) { return ids.indexOf(id) < 0; });
@@ -432,8 +544,13 @@
       });
       return o.join('') + '</svg>';
     }
+    card.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-w=play], [data-w=again]'); if (!t) return;
+      play(t.dataset.w === 'again');
+    });
     card.addEventListener('change', function (e) {
       var k = e.target.dataset && e.target.dataset.w; if (!k) return;
+      if (k === 'speed' && fall.playing) { fall.i0 = fall.i; fall.t0 = performance.now(); }
       if (k === 'lines') { st.lines = +e.target.value; keep(); sampleAll(); }
       if (k === 'scale') { st.scale = e.target.value; keep(); paint(); }
       if (k === 'star') { st.star = e.target.checked; keep(); paint(); }
@@ -460,6 +577,6 @@
     var lastW = 0;
     if (root.ResizeObserver) new ResizeObserver(function () { var w = plot.clientWidth; if (w && Math.abs(w - lastW) > 8) { lastW = w; paint(); } }).observe(plot);
     sampleAll();
-    return function () { stopped = true; };
+    return function () { stopped = true; stopPlay(); };
   };
 })(this);
