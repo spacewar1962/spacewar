@@ -1252,3 +1252,5 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .well-t tbody tr.on td { color: var(--text); }
 .well-t td span { white-space: nowrap; }
 .well-tl { white-space: nowrap; font-weight: 600; } .well-tl i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: 3px; }
+.well-t td:nth-child(2) { font-size: 10.5px; line-height: 1.35; color: var(--text-dim); }
+.well-t tbody tr.on td:nth-child(2) { color: var(--text); }
