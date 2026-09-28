@@ -1744,6 +1744,9 @@
   document.addEventListener('mousedown', function (e) { if (tabMenu && !tabMenu.el.contains(e.target) && !tabMenu.btn.contains(e.target)) closeTabMenu(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTabMenu(); });
   window.addEventListener('resize', closeTabMenu);
+  // Open a lens or a graphic from elsewhere (the welcome tour).
+  SW.openLens = function (n) { lens = n; SW.store.set('an.lens', n); SW.forget('analyse'); SW.setTab('analyse'); };
+  SW.openGraphic = function (g) { gfx = g; SW.store.set('gfx.item', g); SW.forget('graphics'); SW.setTab('graphics'); };
   // Open a biography from elsewhere (the symbol pop-up in Read).
   SW.biography = function (name) {
     bioName = name; SW.store.set('an.bio', name);

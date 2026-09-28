@@ -428,6 +428,8 @@
   var DEFAULT_SET = ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'];
   // line: which line of descent the flow follows (V.LINES), or 'chosen' for the
   // ticked versions in date order, which mixes the ddp and dfw forks.
+  // Open Genealogy on a given view (stemma, alluvial, matrix, lineage), from elsewhere (the welcome tour).
+  SW.genealogyShow = function (m) { gst.show = m; SW.forget('genealogy'); SW.setTab('genealogy'); };
   var gst = { line: SW.store.get('gen.line', 'dfw'), set: SW.store.get('gen.set', DEFAULT_SET), gran: 'routine', supplied: true, show: 'alluvial', boxes: SW.store.get('gen.boxes', 'change'), zoom: +SW.store.get('gen.zoom', 0) || 0 };
 
   function texts(ids) {
