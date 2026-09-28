@@ -630,6 +630,22 @@
   // A figure carried in an annotation's text: the SVG gzipped and base64'd on
   // one closing line, <!-- sw:fig:gz ... -->. Shown as an <img>, so markup
   // from someone else's finding is never run.
+  // A string gzipped and base64'd, and back (for My notes kept on Hypothesis).
+  SW.gz = {
+    pack: function (str) {
+      if (!root.CompressionStream) return Promise.reject(new Error('This browser cannot compress.'));
+      return new Response(new Blob([new TextEncoder().encode(str)]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer().then(function (buf) {
+        var b = new Uint8Array(buf), bin = '';
+        for (var i = 0; i < b.length; i += 0x8000) bin += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+        return btoa(bin);
+      });
+    },
+    unpack: function (b64) {
+      var bin = atob(b64), b = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i);
+      return new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+    }
+  };
   SW.figpack = {
     RE: /\n*<!-- sw:fig:gz ([A-Za-z0-9+\/=]+) -->\s*$/,
     pack: function (svg) {

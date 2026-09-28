@@ -1690,6 +1690,8 @@
               ['settings', 'Settings', 'Initials, group, theme, fonts'],
               ['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
               ['issue', 'Report a problem ↗', 'GitHub issues'],
+              ['backup', 'Back up everything', 'My notes, drafts, settings and the group’s findings, as one file'],
+              ['restore', 'Restore from a backup…', 'Brings back notes and drafts beside those here'],
               ['about', 'About the bench', 'Version, sources, citation']].map(function (h) {
         return '<button data-pick="' + h[0] + '"><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
       }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
@@ -1721,6 +1723,8 @@
           var p = t.dataset.pick;
           if (p === 'tour') { SW.tours.start('welcome'); return; }
           if (p === 'refs') { SW.refHelp(); return; }
+          if (p === 'backup') { SW.backup.save(); return; }
+          if (p === 'restore') { SW.backup.restore(); return; }
           if (p === 'about') SW.$('#btn-about').click();
           else if (p === 'settings') SW.$('#btn-settings').click();
           else window.open(p === 'code' ? 'https://github.com/spacewar1962/spacewar' : 'https://github.com/spacewar1962/spacewar/issues', '_blank', 'noopener');
