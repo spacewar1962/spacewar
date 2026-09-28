@@ -3,8 +3,8 @@
  * sequence of stops, each opening a version, a view and (where it helps) a
  * selection, with a line or two of commentary and a soft outline on the
  * control it is about. Played in a card in the bottom-left corner; Back and
- * Next (or the arrow keys), Esc to leave. Started from Settings, the About
- * box, a link ending ?tour=welcome, or the offer made on a first visit.
+ * Next (or the arrow keys), Esc to leave. Started from the Help menu,
+ * Settings or the About box, a link ending ?tour=welcome, or the offer made on a first visit.
  */
 (function (root) {
   'use strict';
@@ -40,7 +40,7 @@
       { title: 'Findings and My notes', v: '3.1', tab: 'findings', focus: '#tabs [data-tab="notes"]',
         text: 'Findings gathers what the group and the bench have established, each with its evidence a click away. Add one with ✎ Add a finding, or ★ Finding on a selection in Read. My notes is your own tray for writing: figures, excerpts and paragraphs, exported together to Word. Read’s Edition menu makes a printable edition of any version.' },
       { title: 'Help and settings', v: '3.1', tab: 'read', focus: '#tabs [data-menu="help"]',
-        text: 'Help holds referencing, Settings (initials, group, colour theme, code font) and About. You can take this tour again from Settings or About at any time. Welcome to the group.' }
+        text: 'Help holds this tour, referencing, Settings (initials, group, colour theme, code font) and About. You can take the tour again from Help at any time. Welcome to the group.' }
     ] }
   };
 
@@ -144,7 +144,7 @@
       card.remove();
       SW.store.set('tour.seen', true);
       if (b.dataset.o === 'yes') T.start('welcome');
-      else SW.toast('You can take the tour any time from Settings (⚙) or About.', 5000);
+      else SW.toast('You can take the tour any time from the Help menu.', 5000);
     });
   };
 })(this);

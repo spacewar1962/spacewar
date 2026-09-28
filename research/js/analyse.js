@@ -1685,7 +1685,8 @@
     if (which === 'help') {
       var dm = document.querySelector('meta[name="bench-date"]');
       // About the bench stays last
-      return [['refs', 'Referencing and versions', 'How the bench refers to a source: [REF: SW3.1T, 2.141–146]'],
+      return [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
+              ['refs', 'Referencing and versions', 'How the bench refers to a source: [REF: SW3.1T, 2.141–146]'],
               ['settings', 'Settings', 'Initials, group, theme, fonts'],
               ['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
               ['issue', 'Report a problem ↗', 'GitHub issues'],
@@ -1718,6 +1719,7 @@
         closeTabMenu();
         if (which === 'help') {
           var p = t.dataset.pick;
+          if (p === 'tour') { SW.tours.start('welcome'); return; }
           if (p === 'refs') { SW.refHelp(); return; }
           if (p === 'about') SW.$('#btn-about').click();
           else if (p === 'settings') SW.$('#btn-settings').click();
