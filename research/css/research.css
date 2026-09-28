@@ -1324,3 +1324,9 @@ li.fd.folded { padding-bottom: 2px; }
 .gfx-grp { display: flex; flex-direction: column; min-width: 0; }
 .gfx-grp button { text-align: left; }
 @media (max-width: 640px) { .tab-menu[data-w="graphics"], .lens-menu .menu-body:has(.gfx-grp) { grid-template-columns: 1fr; } }
+/* group headings in the menus: a faint band, a little brighter, to lead the eye */
+.tab-menu .menu-group, .lens-menu .menu-body .menu-group, .lens-list .lens-g > h5 {
+  background: rgba(120, 200, 230, 0.10); background: color-mix(in srgb, var(--beam) 12%, transparent);
+  color: var(--text-dim); border-radius: 4px; padding: 4px 8px; margin: 6px 2px 4px; font-weight: 600;
+}
+.tab-menu .menu-group:first-child, .gfx-grp:nth-child(-n+2) > .menu-group, .lens-list .lens-g:first-child > h5 { margin-top: 2px; }
