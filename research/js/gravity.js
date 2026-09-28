@@ -294,7 +294,11 @@
       if (!b.asm || need.some(function (n) { return !S[n]; })) return { why: 'the object table or the main loop is not where 3.1 has them' };
       var P = G.probe(b);
       var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv }); cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
-      var mem = cpu.mem, ml0 = S.ml0.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val, bang = 0o400000 | S.mex.val;
+      var mem = cpu.mem, ml0 = S.ml0.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val, bang = 0o400000 | S.mex.val,
+          own = [S.ss1 ? S.ss1.val : -1, S.ss2 ? S.ss2.val : -1];
+      // a ship has gone up once its object runs anything but its own routine
+      // (the explosion, or nothing when the explosion is over)
+      function gone(i) { var w = mem[mtb + i]; return own[i] >= 0 ? (w & 0o7777) !== own[i] : w === bang; }
       var frames = [], c0 = cpu.cycles, n = 0, after = -1, LIM = 60 * 200000;
       function pos(v) { return s18(v) / 256; }
       return new Promise(function (res) {
@@ -303,7 +307,7 @@
           for (var k = 0; k < 150000 && !cpu.halted; k++) {
             if (cpu.pc === ml0 && ++n > 2) {
               var f = { t: (cpu.cycles - c0) / 200000, s: [] };
-              for (var i = 0; i < 2; i++) f.s.push({ x: pos(mem[nx + i]), y: pos(mem[ny + i]), boom: mem[mtb + i] === bang });
+              for (var i = 0; i < 2; i++) f.s.push({ x: pos(mem[nx + i]), y: pos(mem[ny + i]), boom: gone(i) });
               frames.push(f);
               if (after < 0 && f.s[0].boom && f.s[1].boom) after = frames.length;
             }
@@ -333,14 +337,14 @@
     if (!vs.some(function (v) { return v.id === st.v; })) st.v = '3.1';
     var card = SW.el('div', { class: 'card grav well', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>The well</h4>' +
-      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well (or its row) to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt. Play the fall runs this version’s game with no controls and follows the Needle (white) and the Wedge (red) down the sheet from their starting corners until they explode.</p>' +
+      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well (or its row) to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt. Show the ships falling runs this version’s game with no controls and follows the Needle (white) and the Wedge (red) down the sheet from their starting corners until they explode.</p>' +
       '<div class="grav-ctl"><label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
       '<label>Depth by <select data-w="scale"><option value="sqrt">the square root of the pull</option><option value="lin">the pull</option></select></label> ' +
       '<label>Tilt <input type="range" data-w="tilt" min="25" max="100" step="1"></label> ' +
       '<label>Rotate <input type="range" data-w="rot" min="-180" max="180" step="1"></label> ' +
       '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label> ' +
       '<label title="A small sun at the star’s place, on the sheet at rest"><input type="checkbox" data-w="star"> Mark the star</label> <span class="grav-exp"></span></div>' +
-      '<div class="grav-ctl well-play"><button class="btn" data-w="play" title="The Needle and the Wedge left alone from their starting corners, as this version’s game runs them">▶ Play the fall</button> <button class="btn ghost" data-w="again" title="From the start">↺</button> ' +
+      '<div class="grav-ctl well-play"><button class="btn" data-w="play" title="The Needle and the Wedge left alone from their starting corners, as this version’s game runs them">▶ Show the ships falling</button> <button class="btn ghost" data-w="again" title="From the start">↺</button> ' +
       '<label>Speed <select data-w="speed"><option value="0.5">half</option><option value="1">as played</option><option value="2">double</option><option value="4">four times</option></select></label> <span class="hint mono well-t0"></span></div>' +
       '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
     host.appendChild(card);
@@ -393,11 +397,12 @@
       w = w || st;
       var h = N * 0.33, fore = w.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = w.depth / 50, floor = N * 0.42,
           ra = w.rot * Math.PI / 180, co = Math.cos(ra), si = Math.sin(ra);
-      return { floor: floor, f: function (x, y, g) {
-        var u0 = x / 512, v0 = y / 512, u = u0 * co - v0 * si, v = u0 * si + v0 * co,
-            d = g === null ? floor : isNaN(g) ? 0 : Math.min(floor, w.scale === 'lin' ? g / 256 * N * 0.02 * dk : Math.sqrt(g / 256) * N * 0.035 * dk);
+      function depth(g) { return g === null ? floor : isNaN(g) ? 0 : Math.min(floor, w.scale === 'lin' ? g / 256 * N * 0.02 * dk : Math.sqrt(g / 256) * N * 0.035 * dk); }
+      function at(x, y, d) {
+        var u0 = x / 512, v0 = y / 512, u = u0 * co - v0 * si, v = u0 * si + v0 * co;
         return [cx + u * h - v * h * shear, cy - v * h * fore + d, d];
-      } };
+      }
+      return { floor: floor, depth: depth, at: at, f: function (x, y, g) { return at(x, y, depth(g)); } };
     }
     function segs(N, pts, w) {
       var pr = proj(N, w), out = [];
@@ -458,13 +463,25 @@
     var NEEDLE = '#e6f4ff', WEDGE = '#ff7a6b';
     function ships(i) {
       var cv = SW.$('canvas', plot); if (!cv || !sheet || !fall.data) return;
-      var F = fall.data.frames, N = sheet.N, dpr = cv.width / N, g = cv.getContext('2d'), pr = proj(N);
+      var F = fall.data.frames, N = sheet.N, dpr = cv.width / N, g = cv.getContext('2d'), pr = proj(N), W = WELLS[st.v + '|' + st.lines];
+      // the sheet's height under a point, as drawn: from the two grid lines on
+      // either side in each direction, each read between its samples, the
+      // nearer lines counting for more
+      function sheetDepth(x, y) {
+        if (!W) return 0;
+        var n = st.lines, step = 1024 / n;
+        function along(line, t) { var k = (Math.max(-512, Math.min(512, t)) + 512) / 4, k0 = Math.floor(k), k1 = Math.min(line.length - 1, k0 + 1), f = k - k0; return pr.depth(line[k0][2]) * (1 - f) + pr.depth(line[k1][2]) * f; }
+        function pair(c, t, fam) { var q = (Math.max(-512, Math.min(512, c)) + 512) / step, i0 = Math.min(n - 1, Math.floor(q)), f = q - i0; return [along(W[2 * i0 + fam], t) * (1 - f) + along(W[2 * (i0 + 1) + fam], t) * f, Math.min(f, 1 - f)]; }
+        var a = pair(x, y, 0), b = pair(y, x, 1), wa = 1 - a[1] * 2 + 0.001, wb = 1 - b[1] * 2 + 0.001;
+        return (a[0] * wa + b[0] * wb) / (wa + wb);
+      }
       i = Math.max(0, Math.min(F.length - 1, i));
       g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.drawImage(sheet.img, 0, 0);
       g.setTransform(dpr, 0, 0, dpr, 0, 0);
       g.save(); g.beginPath(); g.arc(N / 2, N / 2, N / 2, 0, 6.2832); g.clip();
       [0, 1].forEach(function (k) {
-        var ink = k ? WEDGE : NEEDLE, at = function (j) { var q = F[j].s[k]; return pr.f(q.x, q.y, q.g); };
+        var ink = k ? WEDGE : NEEDLE, at = function (j) { var q = F[j].s[k]; return pr.at(q.x, q.y, sheetDepth(q.x, q.y)); },
+            flat = function (j) { var q = F[j].s[k]; return pr.at(q.x, q.y, 0); };
         var bj = -1; for (var j = 0; j <= i; j++) if (F[j].s[k].boom) { bj = j; break; }
         var last = bj >= 0 ? bj - 1 : i;
         // the trail, faint, broken where the ship jumps (caught by the star and moved to the corner)
@@ -482,8 +499,8 @@
           g.globalAlpha = 1; return;
         }
         // the ship, pointing the way it is going
-        var p1 = at(last), p0 = at(Math.max(0, last - 3)), dx = p1[0] - p0[0], dy = p1[1] - p0[1], m = Math.hypot(dx, dy);
-        if (m < 0.01) { dx = N / 2 - p1[0]; dy = N * 0.44 - p1[1]; m = Math.hypot(dx, dy) || 1; }
+        var p1 = at(last), f1 = flat(last), f0 = flat(Math.max(0, last - 3)), dx = f1[0] - f0[0], dy = f1[1] - f0[1], m = Math.hypot(dx, dy);
+        if (m < 0.01) { var c0 = pr.at(0, 0, 0); dx = c0[0] - f1[0]; dy = c0[1] - f1[1]; m = Math.hypot(dx, dy) || 1; }
         dx /= m; dy /= m;
         var L = Math.max(7, N / 60);
         g.fillStyle = ink; g.strokeStyle = ink;
@@ -502,14 +519,14 @@
       fall.i = i; ships(i);
       if (fall.playing) fall.raf = requestAnimationFrame(tick);
     }
-    function stopPlay() { fall.playing = false; cancelAnimationFrame(fall.raf); SW.$('[data-w=play]', card).textContent = '▶ Play the fall'; }
+    function stopPlay() { fall.playing = false; cancelAnimationFrame(fall.raf); SW.$('[data-w=play]', card).textContent = '▶ Show the ships falling'; }
     function play(fromStart) {
       if (fall.playing && !fromStart) { stopPlay(); return; }
       var vid = st.v, btn = SW.$('[data-w=play]', card);
       btn.textContent = 'Running the game…';
       G.fall(vid, function () { return !stopped; }, function (f) { btn.textContent = 'Running the game… ' + Math.round(f * 100) + '%'; }).then(function (d) {
         if (stopped || vid !== st.v) { stopPlay(); return; }
-        if (!d || d.why) { btn.textContent = '▶ Play the fall'; note.textContent = 'The fall: ' + (d ? d.why : 'no result') + '.'; return; }
+        if (!d || d.why) { btn.textContent = '▶ Show the ships falling'; note.textContent = 'The fall: ' + (d ? d.why : 'no result') + '.'; return; }
         fall.data = d;
         if (fromStart || fall.i == null || fall.i >= d.frames.length - 1) fall.i = 0;
         fall.i0 = fall.i; fall.t0 = performance.now(); fall.playing = true; btn.textContent = '⏸ Pause';
