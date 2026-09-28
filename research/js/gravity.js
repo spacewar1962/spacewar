@@ -59,15 +59,15 @@
   function vname(v) { return v.label.replace(/^Spacewar! /, ''); }
 
   G.draw = function (b, host) {
-    var P = SW.store.get('gravity', {}) || {};
-    var st = { range: P.range || 64, along: P.along || 'axis', off: P.off || {} };
-    function keep() { SW.store.set('gravity', { range: st.range, along: st.along, off: st.off }); }
+    var P = SW.store.get('gravity2', {}) || {};
+    var st = { range: P.range || 64, along: P.along || 'diag', off: P.off || {} };
+    function keep() { SW.store.set('gravity2', { range: st.range, along: st.along, off: st.off }); }
     var vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, c) { return a.sort - c.sort; });
     var card = SW.el('div', { class: 'card grav', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>Gravity ' + SW.refTag(b.v.id) + '</h4>' +
-      '<p class="hint">The pull of the central star on a ship at rest, by its distance from the star, worked out by each version’s own gravity code on the emulator. Versions whose code gives the same curve are drawn as one line. The dashed line is the capture radius: nearer than that the code jumps to pof. After Norbert Landsteiner’s plot of 3.1 against 4.0. The fall to zero just outside the capture radius in the 4.x curve is what the code computes, not a fault in the drawing: the left shift that undosft writes into xyt appears to overflow there.</p>' +
+      '<p class="hint">The pull of the central star on a ship at rest, by its distance from the star, worked out by each version’s own gravity code on the emulator. Versions whose code gives the same curve are drawn as one line. The dashed line is the capture radius: nearer than that the code jumps to pof. After Norbert Landsteiner’s plot of 3.1 against 4.0. The emulator reproduces Norbert Landsteiner’s table of bx and by for 3.1 and 4.x exactly. On the diagonal 3.1’s pull is zero nearer than about 22.5 points, where its f(x, y) rounds to zero. The dip just outside the capture radius in the 4.x curve is also what the code computes: the left shift that undosft writes into xyt appears to overflow there.</p>' +
       '<div class="grav-ctl"><label>Distance <select data-k="range"><option value="32">0 to 32</option><option value="64">0 to 64</option><option value="128">0 to 128</option><option value="256">0 to 256</option><option value="512">0 to 512</option></select> screen points</label> ' +
-      '<label>along <select data-k="along"><option value="axis">the x axis</option><option value="diag">the diagonal</option></select></label> <span class="grav-exp"></span></div>' +
+      '<label>along <select data-k="along"><option value="diag">the diagonal (a free fall)</option><option value="axis">the x axis</option></select></label> <span class="grav-exp"></span></div>' +
       '<div class="grav-plot"></div><div class="grav-read hint mono">&nbsp;</div><div class="grav-groups"><p class="hint">Running the gravity code of ' + vs.length + ' versions…</p></div>';
     host.appendChild(card);
     SW.$('[data-k=range]', card).value = String(st.range);
@@ -98,7 +98,7 @@
       groups = Object.keys(by).map(function (k) { return by[k]; });
       groups.forEach(function (gp, n) { gp.ink = INK[n % INK.length]; gp.key = gp.vs[0].id; });
       // shown unless turned off; at first only the group of this version and of 3.1 and 4.0
-      if (!P.seen) { groups.forEach(function (gp) { if (!gp.vs.some(function (v) { return v.id === b.v.id || v.id === '3.1' || v.id === '4.0'; })) st.off[gp.key] = 1; }); P.seen = 1; SW.store.set('gravity', { range: st.range, along: st.along, off: st.off, seen: 1 }); }
+      if (!P.seen) { groups.forEach(function (gp) { if (!gp.vs.some(function (v) { return v.id === b.v.id || v.id === '3.1' || v.id === '4.0'; })) st.off[gp.key] = 1; }); P.seen = 1; SW.store.set('gravity2', { range: st.range, along: st.along, off: st.off, seen: 1 }); }
       gbox.innerHTML = '<table class="ov-sub grav-t"><thead><tr><th></th><th>Versions with this curve</th><th>Captured nearer than</th><th>Pull at 20 points</th></tr></thead><tbody>' +
         groups.map(function (gp, n) {
           var i20 = Math.round(20 / STEP) - 1, g20 = gp.c.g[i20];
