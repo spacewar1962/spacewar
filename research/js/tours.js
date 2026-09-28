@@ -36,11 +36,11 @@
       { title: 'The paper tapes', v: '4.1', tab: 'tape', tape: { path: 'SteveRussell_box1/sw4.2.bin', mode: 'anatomy' },
         text: 'The surviving tapes are read frame by frame. Anatomy shows each tape’s leader and punched title, the loader, every block with its checksum, and the closing jump. This tape’s one failing checksum showed that it is the 20 February 4.1 with one lost hole, not a different build.' },
       { title: 'Graphics', v: '3.1', graphic: 'sky', focus: '#tabs [data-menu="graphics"]',
-        text: 'The Graphics menu draws what the program draws: Peter Samson’s star map and how each version shows it on the scope, the ships, the sun and hyperspace, slowed down so they can be studied.' },
+        text: 'The Graphics menu draws what the program draws and does, each worked out by the version’s own code on the emulator: Peter Samson’s star map and the scope, the ships, the sun and hyperspace slowed down, the pull of the star and its well, orbits, and plates of the ships’ movements.' },
       { title: 'Findings and My notes', v: '3.1', tab: 'findings', focus: '#tabs [data-tab="notes"]',
         text: 'Findings gathers what the group and the bench have established, each with its evidence a click away. Add one with ✎ Add a finding, or ★ Finding on a selection in Read. My notes is your own tray for writing: figures, excerpts and paragraphs, exported together to Word. Read’s Edition menu makes a printable edition of any version.' },
       { title: 'Help and settings', v: '3.1', tab: 'read', focus: '#tabs [data-menu="help"]',
-        text: 'Help holds this tour, referencing, Settings (initials, group, colour theme, code font) and About. You can take the tour again from Help at any time. Welcome to the group.' }
+        text: 'Help holds this tour, referencing, a site map with every view as a plain link, Settings (initials, group, colour theme, code font), a backup of your notes and findings, and About. You can take the tour again from Help at any time. Welcome to the group.' }
     ] }
   };
 
