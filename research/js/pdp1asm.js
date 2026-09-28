@@ -23,8 +23,9 @@
  *    parts, as the MACRO manual (F-36) permits;
  *  - options.defVars and options.wholeMacroLines give the 1962-63 MACRO
  *    behaviour where macro1 differs (see versions.js, DIALECTS);
- *  - options.symbols presets symbols before pass 1, as a symbol table from an
- *    earlier assembly would (the 'with symbol table' dialect; F33).
+ *  - a file marked pass1Only is read on pass 1 and passed over on pass 2, as
+ *    the short tapes of assignments fed in after pass 1 of 4.3 and 4.4 were
+ *    (their pass logs; F33).
  */
 (function (root) {
   'use strict';
@@ -139,7 +140,7 @@
     options = options || {};
     var inputs = files.map(function (f) {
       var ls = splitLines(f.text || '');
-      return { name: f.name, lines: ls, title: f.title || 1, end: Math.min(f.end || ls.length, ls.length) };
+      return { name: f.name, lines: ls, title: f.title || 1, end: Math.min(f.end || ls.length, ls.length), pass1Only: !!f.pass1Only };
     });
 
     // ---- global state (named as in macro1.c) ----
@@ -319,6 +320,7 @@
       lineno++;
       for (;;) {
         var inp = inputs[filix];
+        if (inp && inp.pass1Only && pass === 2) fline = inp.end;
         if (inp && fline < inp.title - 1) { fline = inp.title - 1; }
         if (inp && fline < inp.end) {
           srcFile = filix; srcLine = fline + 1;
@@ -930,9 +932,6 @@
     pass = 0;
     PSEUDOS.forEach(function (p) { defineSymbol(p[1], p[2], p[0], 0); });
     PERMANENT.forEach(function (p) { defineSymbol(p[0], p[1], DEFFIX, 0); });
-    // a symbol table read in before assembling (options.symbols, name → value):
-    // every symbol starts pass 1 with the value it had at the end of an earlier assembly
-    if (options.symbols) Object.keys(options.symbols).forEach(function (k) { defineSymbol(k, options.symbols[k], DEFINED, 0); });
     pass = 1;
     onePass();
     var errorsPass1 = errors;

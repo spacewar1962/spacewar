@@ -273,6 +273,15 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .btn.on { border-color: var(--beam); color: var(--beam); }
 .btn[disabled] { opacity: 0.45; cursor: default; }
 .controls .r-sym { margin-left: 6px; white-space: nowrap; }
+.controls .r-symhelp { font-size: 12px; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; }
+.sunhelp { width: min(96vw, 1100px); }
+.sunhelp-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; }
+.sunhelp-cols figure { margin: 0; min-width: 0; }
+.sunhelp-cols figcaption { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
+.sunhelp-log { margin: 0; padding: 8px 10px; background: var(--surface-2, rgba(127,127,127,.08)); border: 1px solid var(--line); border-radius: 6px; font-size: 12px; line-height: 1.5; white-space: pre; overflow-x: auto; }
+.sunhelp-log mark { background: rgba(230, 180, 80, .28); color: inherit; }
+.sunhelp-t td { white-space: nowrap; } .sunhelp-t td:nth-child(3) { white-space: pre; }
+@media (max-width: 760px) { .sunhelp-cols { grid-template-columns: minmax(0, 1fr); } }
 .check { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
 .badge { display: inline-block; font-size: 11px; padding: 1px 6px; border-radius: 9px; border: 1px solid var(--line); color: var(--text-dim); font-family: var(--mono); }
 .badge.ok { color: var(--green); border-color: currentColor; }

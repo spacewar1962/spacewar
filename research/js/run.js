@@ -50,7 +50,7 @@
       (dual
         ? '<div class="scopes2"><figure><div class="scope-wrap" title="Scope 1. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 1: the Wedge’s console, centred on the Wedge</figcaption></figure>' +
           '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' +
-          '<p class="hint scopes2-note">4.4 sends alternate frames to two displays, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). Its second display is addressed by 720407 (dpy-i 400, in dj6), which DEC’s 1963 PDP-1 Handbook gives as dpp, display one point on a second CRT (Type 31), beside dpy 720007 for the Type 30. Which display MIT used as the second console is not recorded there (F31).' + (build.v.id === '4.4f' ? ' This is Landsteiner’s 2015 fixed version (F33).' : (fixedSyms ? ' Assembled with its symbol table preset, so the sun is placed as intended; the Needle’s console still shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).' : ' As assembled, the sun is misplaced on both consoles, and the Needle’s shows its stars, torpedoes and explosions at the wrong positions; 4.4f is Landsteiner’s 2015 fix (F33).')) + '</p>'
+          '<p class="hint scopes2-note">4.4 sends alternate frames to two displays, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). Its second display is addressed by 720407 (dpy-i 400, in dj6), which DEC’s 1963 PDP-1 Handbook gives as dpp, display one point on a second CRT (Type 31), beside dpy 720007 for the Type 30. Which display MIT used as the second console is not recorded there (F31).' + (build.v.id === '4.4f' ? ' This is Landsteiner’s 2015 fixed version (F33).' : (fixedSyms ? ' Assembled with the tape “foo” fed in after pass 1, as the listing’s pass log records, so the sun is placed correctly. The Needle’s console still shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).' : ' Assembled without the tape “foo” that the pass log records after pass 1, so the sun is misplaced on both consoles; the Needle’s console also shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).')) + '</p>'
         : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>') +
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
@@ -61,7 +61,7 @@
       '</select>' +
       (dual ? '<button class="btn" id="r-fig" title="Save scope 1 at print resolution">▣ Scope 1</button><button class="btn" id="r-fig2" title="Save scope 2 at print resolution">▣ Scope 2</button>'
             : '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button>') +
-      (build.v.symFix ? '<label class="check r-sym" title="As assembled, the sun routine uses nx1 and ny1 before the line that assigns them, so pass 2 takes pass 1’s values (30 and 60) and the sun is misplaced (F33). Ticked, the program is assembled again with its own symbol table preset, so those names have their final values from the start and the sun is placed where the code intends. Nothing shows that MIT assembled it this way. The kcb jump fault on the Needle’s console is not a symbol problem and stays; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Preset symbol table</label>' : '') + '</div>' +
+      (build.v.pass1 ? '<label class="check r-sym" title="The sun routine uses nx1 and ny1 before the line that assigns them. The pass log at the end of the listing (scan p. 31) shows that after pass 1 a short tape, “' + build.v.pass1.name + '”, was fed in with nx1=mtb nob and ny1=nx1 nob, so pass 2 had their final values and the sun was placed correctly. Ticked, the bench assembles with that tape, as MIT did. Unticked, without it, the sun is misplaced (F33). The kcb jump fault on the Needle’s console is a separate coding error and stays either way; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Fix Sun Rendering Bug</label><button class="icon-btn r-symhelp" id="r-symhelp" title="What the fix is, with the pass log and the code">?</button>' : '') + '</div>' +
       '<div class="keys">Controls: click the scope, then <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
     var right = SW.el('div', { class: 'run-right' });
@@ -98,7 +98,8 @@
     SW.$('#r-reset', view).onclick = function () { pause(); load(); updateAll(); };
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
     var sym = SW.$('#r-sym', view);
-    if (sym) sym.onchange = function () { SW.store.set('run.symtab', sym.checked); R.show(build); };
+    if (sym) sym.onchange = function () { SW.store.set('run.sunfix', sym.checked); R.show(build); };
+    var symh = SW.$('#r-symhelp', view); if (symh) symh.onclick = function () { sunHelp(build); };
     SW.$('#r-fig', view).onclick = function () { SW.figures.scopeFigureDialog(dual ? pts.filter(function (p) { return p.sc !== 2; }) : pts, cpu.cycles, build); };
     if (dual) SW.$('#r-fig2', view).onclick = function () { SW.figures.scopeFigureDialog(pts.filter(function (p) { return p.sc === 2; }), cpu.cycles, build); };
     SW.$('#r-tabs', view).addEventListener('click', function (e) {
@@ -440,13 +441,47 @@
 
   function updateAll() { regs(); pane(); }
 
-  // for the texts that read symbols before assigning them (F33), Run can use the
-  // assembly made with the program's symbol table read in first
+  // The ? beside Fix Sun Rendering Bug: the pass log, and the lines the tape
+  // changes, with their words assembled without and with it (F33)
+  function sunHelp(b) {
+    var v = b.v, P = v.pass1;
+    Promise.all([SW.build(v.id), SW.build(v.id, 'macro1963bare')]).then(function (bb) {
+      var W = bb[0].asm.memory, O = bb[1].asm.memory, rows = [];
+      Object.keys(W).forEach(function (k) {
+        if (!O[k] || O[k].val === W[k].val) return;
+        var L = bb[0].lines[W[k].file] && bb[0].lines[W[k].file][W[k].line - 1];
+        rows.push({ p: W[k].file, n: W[k].line, loc: +k, src: L ? L.raw.replace(/\t/g, '  ').trim() : '', was: O[k].val, now: W[k].val });
+      });
+      rows.sort(function (a, c) { return a.loc - c.loc; });
+      var d = SW.el('dialog', { class: 'tray-big sunhelp' });
+      d.innerHTML = '<div class="tray-bighead"><b>The sun and the tape fed in after pass 1</b><span class="refhelp-acts">' +
+        (rows.length ? '<button class="btn ghost" data-go="read">Open in Read ▸</button>' : '') + '<button class="btn ghost" data-go="f33">Finding F33 ▸</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+        '<p>The sun routine subtracts the centred ship’s place, nx1 and ny1, before the program assigns them (nx1=mtb nob), and mtb, the object table, is defined only at the end. A two-pass assembly from the listing alone gives those instructions pass 1’s values on pass 2, and the sun is drawn in the wrong place. The pass log that ends the listing shows what was done at MIT: after pass 1, a short tape, “' + SW.esc(P.name) + '”, was read with the two assignments, on pass 1 only, so pass 2 had their final values.</p>' +
+        '<div class="sunhelp-cols"><figure><figcaption>The pass log, <a href="../sources/' + encodeURIComponent(P.scan) + '#page=' + P.page + '" target="_blank" rel="noopener">scan p. ' + P.page + ' ↗</a>' + (v.id === '4.4m' ? ' (the Morris 4.4 listing)' : '') + '</figcaption><pre class="mono sunhelp-log">' +
+        P.log.map(function (l) { var tape = /^(foo|f|nx1=mtb nob|ny1=nx1 nob|start|foo - pass 1|f - pass 1)$/.test(l); return tape ? '<mark>' + SW.esc(l) + '</mark>' : SW.esc(l); }).join('\n') + '</pre></figure>' +
+        '<figure><figcaption>What the tape changes: the words assembled without it and with it</figcaption><table class="ov-sub mono sunhelp-t"><thead><tr><th>Line</th><th>Address</th><th>Source</th><th>Without</th><th>With</th></tr></thead><tbody>' +
+        rows.map(function (r) { return '<tr><td class="num"><a href="#" data-line="' + r.p + ':' + r.n + '">' + r.n + '</a></td><td>' + SW.oct(r.loc, 4) + '</td><td>' + SW.esc(r.src) + '</td><td>' + SW.oct(r.was, 6) + '</td><td>' + SW.oct(r.now, 6) + '</td></tr>'; }).join('') +
+        '</tbody></table><p class="hint">Only these words differ. ' + (v.id === '4.3' ? 'In 4.3 the sun is recentred only in the subjective view (sense switch 2).' : 'Without the tape, the Wedge’s console subtracts locations 31 and 61 (ran, the random number, and tyi), so its sun jumps along one line; the Needle’s subtracts 30 and 60, a fixed offset.') + ' The kcb jump fault on the Needle’s console is separate and stays either way (4.4f fixes it).</p></figure></div>';
+      document.body.appendChild(d);
+      d.addEventListener('click', function (e) {
+        if (e.target === d || e.target.closest('[data-x]')) { d.close(); return; }
+        var ln = e.target.closest('[data-line]'), go = e.target.closest('[data-go]');
+        if (ln) { e.preventDefault(); var pn = ln.dataset.line.split(':'); d.close(); SW.openAt(v.id, { p: +pn[0], n0: +pn[1] }); }
+        else if (go && go.dataset.go === 'read' && rows.length) { d.close(); SW.openAt(v.id, { p: rows[0].p, n0: rows[0].n, n1: rows[rows.length - 1].n }); }
+        else if (go && go.dataset.go === 'f33') { d.close(); SW.setTab('findings'); }
+      });
+      d.addEventListener('close', function () { d.remove(); });
+      d.showModal();
+    });
+  }
+
+  // 4.3 and 4.4 are assembled with the tape fed in after pass 1, as their pass
+  // logs record (F33); Run can leave it out, to show the misplaced sun
   var fixedSyms = false;
   R.show = function (b) {
-    var want = b.v.symFix && SW.store.get('run.symtab', false) ? 'macro1963syms' : b.v.dialect;
+    var want = b.v.pass1 && !SW.store.get('run.sunfix', true) ? 'macro1963bare' : b.v.dialect;
     if (b.dialect !== want) { SW.build(b.v.id, want).then(function (b2) { if (SW.state.v === b.v.id) R.show(b2); }); return; }
-    fixedSyms = b.dialect === 'macro1963syms';
+    fixedSyms = b.dialect !== 'macro1963bare';
     if (build !== b) {
       pause();
       build = b;

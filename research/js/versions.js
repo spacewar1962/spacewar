@@ -196,13 +196,22 @@
   var DIALECTS = {
     macro1963: { label: 'MACRO (1962-63 behaviour)', options: { defVars: true, wholeMacroLines: true } },
     macro1: { label: 'macro1 (simh, 2003)', options: {} },
-    // for texts that use a symbol before its assignment (symFix): symbols preset
-    // from a first assembly, as a symbol table read in beforehand would (F33)
-    macro1963syms: { label: 'MACRO (1962-63 behaviour), with the program’s symbol table preset', options: { defVars: true, wholeMacroLines: true }, presetSyms: true }
+    // macro1963 without the short tape of assignments fed in after pass 1 (F33)
+    macro1963bare: { label: 'MACRO (1962-63 behaviour), without the pass-1 tape', options: { defVars: true, wholeMacroLines: true }, noPass1: true }
   };
-  // The texts whose assembly changes when the symbol table is read in first
-  // (the sun routine's nx1 and ny1; checked across every version, 28 Sep 2026)
-  var SYMFIX = { '4.3': 1, '4.4': 1, '4.4m': 1 };
+  // The tapes fed in after pass 1, as the pass logs record them (scan p. 31 of
+  // each Morris listing): they assign nx1 and ny1 once mtb is known, so that the
+  // sun routine, which uses them before their assignment, gets their final values
+  // on pass 2 (F33). The masswerk 4.4 text is the same program.
+  var LOG44 = ['spacewar 4.4  5/17/63  ddp  : pt 1 - pass 1', 'spacewar 4.4  5/21/63  ddp  : pt 2 - pass 1', 'stars by prs  for s/w 2b - pass 1', 'foo', 'nx1=mtb nob', 'ny1=nx1 nob', 'start', 'foo - pass 1',
+    'spacewar 4.4  5/17/63  ddp  : pt 1 - pass 2', 'spacewar 4.4  5/21/63  ddp  : pt 2 - pass 2', 'usw     1362    a+13     count     i1', 'stars by prs  for s/w 2b - pass 2', 'spacewar 4.4 syms   5/23/63   jcm', '', 'Constants area, inclusive', 'from     to', '2736     3063'];
+  var PASS1 = {
+    '4.3': { name: 'f', text: 'f\nnx1=mtb nob\nny1=nx1 nob\nstart\n', scan: 'spacewar-4.3-17may1963-(Morris).pdf', page: 31,
+      log: ['spacewar 4.3  5/17/63  ddp  . pt 1 - pass 1', 'spacewar 4.3  5/17/63  ddp  . pt 2 - pass 1', 'stars by prs  for s/w 2b - pass 1', 'f', 'nx1=mtb nob', 'f', '', 'nx1=mtb nob', 'ny1=nx1 nob', 'start', 'f - pass 1',
+            'spacewar 4.3  5/17/63  ddp  . pt 1 - pass 2', 'spacewar 4.3  5/17/63  ddp  . pt 2 - pass 2', 'stars by prs  for s/w 2b - pass 2', 'spacewar 4.3 syms   5/23/63   jcm', '', 'Constants area, inclusive', 'from     to', '2763     3111'] },
+    '4.4': { name: 'foo', text: 'foo\nnx1=mtb nob\nny1=nx1 nob\nstart\n', scan: 'spacewar-4.4-21may1963-(Morris).pdf', page: 31, log: LOG44 },
+    '4.4m': { name: 'foo', text: 'foo\nnx1=mtb nob\nny1=nx1 nob\nstart\n', scan: 'spacewar-4.4-21may1963-(Morris).pdf', page: 31, log: LOG44 }
+  };
 
   // Programs that assume the automatic multiply/divide option (mul/div);
   // the 1962 programs use the step instructions mus/dis on the same opcodes.
@@ -211,7 +220,8 @@
   VERSIONS.forEach(function (v) {
     v.dialect = v.dialect || 'macro1963';
     if (v.mdv === undefined) v.mdv = !NO_MDV[v.id];
-    v.symFix = !!SYMFIX[v.id];
+    v.pass1 = PASS1[v.id] || null;
+    if (v.pass1) (v.buildNotes = v.buildNotes || []).push("Assembled, as the pass log at the end of the " + (v.id === '4.4m' ? 'Morris 4.4 listing' : 'listing') + " records (scan p. 31), with a short tape '" + v.pass1.name + "' fed in after pass 1 and read on pass 1 only: 'nx1=mtb nob', 'ny1=nx1 nob', 'start'. The sun routine uses nx1 and ny1 before the program assigns them, and mtb is defined only at the end; the tape gives them their final values before pass 2. Without it the sun is misplaced (Run can leave it out; F33).");
     v.buildNotes = (v.buildNotes || []).map(function (t) {
       // Signed 'log', not initials: 'CC' read as a team member's.
       return { by: 'log', who: 'Claude Code (build log)', date: '2026-09-25', text: t };

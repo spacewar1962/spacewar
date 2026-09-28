@@ -214,16 +214,9 @@
     if (buildCache[key]) return buildCache[key];
     buildCache[key] = V.load(v, SW.fetchText, A.splitLines, SW.fetchBytes).then(function (L) {
       var t0 = performance.now();
-      var asm = v.build ? A.assemble(L.files, V.DIALECTS[dialect].options) : null;
-      // with a symbol table: assemble again with every symbol preset from the first
-      // assembly, so names used before their assignment take their final values (F33)
-      if (asm && V.DIALECTS[dialect].presetSyms) {
-        var syms = {}, first = asm;
-        asm.symbols.forEach(function (s) { if (s.defined && !s.variable) syms[s.name] = s.val; });
-        asm = A.assemble(L.files, Object.assign({}, V.DIALECTS[dialect].options, { symbols: syms }));
-        asm.symFix = Object.keys(first.memory).filter(function (k) { return asm.memory[k] && first.memory[k].val !== asm.memory[k].val; })
-          .map(function (k) { return { loc: +k, was: first.memory[k].val, now: asm.memory[k].val, file: asm.memory[k].file, line: asm.memory[k].line }; });
-      }
+      // the pass-1 tape (4.3, 4.4): read on pass 1 only, unless the dialect leaves it out
+      var files = L.files.concat(v.pass1 && !V.DIALECTS[dialect].noPass1 ? [{ name: v.pass1.name, text: v.pass1.text, pass1Only: true }] : []);
+      var asm = v.build ? A.assemble(files, V.DIALECTS[dialect].options) : null;
       var b = { v: v, dialect: dialect, parts: L.parts, asm: asm, ms: 0 };
       index(b);
       b.ms = Math.round(performance.now() - t0);
