@@ -1288,3 +1288,10 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .orb-chip input { margin: 0; } .orb-chip i { display: inline-block; width: 12px; height: 3px; border-radius: 2px; }
 .orb-charts { margin-top: 12px; display: grid; gap: 6px; }
 .orb .orb-side h5 { font-size: 11.5px; letter-spacing: .8px; text-transform: uppercase; color: var(--text-faint); margin: 0 0 6px; }
+.plates-ctl { justify-content: flex-start; margin: 4px 0 14px; }
+.plates-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(540px, 1fr)); gap: 22px 28px; }
+.plate h5 { font-size: 13px; margin: 0 0 3px; }
+.plate > .hint { font-size: 11.5px; margin: 0 0 8px; min-height: 2.6em; }
+.plate-pair { display: flex; gap: 12px; flex-wrap: wrap; }
+.plate-pair canvas { border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
+.plate-exp { margin-top: 6px; } .plate-exp .btn { font-size: 11px; padding: 2px 8px; }

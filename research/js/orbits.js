@@ -31,12 +31,13 @@
       var mem = cpu.mem, ml0 = S.ml0.val, ml1 = S.ml1.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val,
           own = [S.ss1 ? S.ss1.val : -1, S.ss2 ? S.ss2.val : -1];
       function gone(i) { return own[i] >= 0 && (mem[mtb + i] & 0o7777) !== own[i]; }
-      var frames = [], n = 0, started = false, c0 = 0, grab = null, after = -1;
-      // the points each ship's routine puts on the screen, in frames being kept
+      var frames = [], n = 0, started = false, c0 = 0, grab = null, after = -1, sun = [], sunFrames = 0;
+      // the points each ship's routine puts on the screen, in frames being kept;
+      // and, over a few frames, the star's own dots (drawn by the main loop near the centre)
       cpu.onDisplay = function (x, y) {
-        if (!grab) return;
         var k = (mem[ml1] & 0o7777) - mtb;
-        if (k === 0 || k === 1) grab[k].push(x, y);
+        if (grab && (k === 0 || k === 1)) grab[k].push(x, y);
+        else if (sunFrames && sunFrames < 6 && k !== 0 && k !== 1 && x * x + y * y < 1600) sun.push(x, y);
       };
       return new Promise(function (res) {
         (function chunk() {
@@ -52,7 +53,8 @@
                 for (var i = 0; i < 2; i++) f.s.push({ x: s18(mem[nx + i]) / 256, y: s18(mem[ny + i]) / 256, dx: s18(mem[S.ndx.val + i]), dy: s18(mem[S.ndy.val + i]), gone: gone(i) });
                 frames.push(f);
                 grab = sc.strobe && j % sc.strobe === 0 ? [[], []] : null;
-                if (sc.control) { var cw = sc.control(j); cpu.control = cw; cpu.tw = cw; }
+                if (sunFrames || j === 2) sunFrames++;
+                if (sc.control) { var cw = sc.control(j, f.t, mem, S, s18); cpu.control = cw; cpu.tw = cw; }
                 if (after < 0 && f.s[0].gone && f.s[1].gone) after = j;
                 if (j >= sc.frames || (after >= 0 && j > after + 20)) break;
               }
@@ -67,7 +69,7 @@
             s.g = g == null || isNaN(g) ? null : g; s.r = Math.hypot(s.x, s.y);
           }); });
           var T = frames[frames.length - 1].t;
-          res(RUNS[key] = { frames: frames, fps: T ? (frames.length - 1) / T : 20 });
+          res(RUNS[key] = { frames: frames, fps: T ? (frames.length - 1) / T : 20, sun: sun });
         })();
       });
     });
@@ -90,6 +92,140 @@
         mem[nx + 1] = u(-r * 256); mem[ny + 1] = 0; mem[dx + 1] = 0; mem[dy + 1] = u(-v);
       }
     }, alive, progress);
+  };
+
+  // ---------- Manoeuvres: the movements the well allows, as plates ----------
+  // Each is a scenario for O.run: from the game's own start, or with the ships
+  // set in place; flown, where it needs controls, by a small autopilot that
+  // turns a ship to an angle and fires for a time.
+  var BIT = [{ ccw: 0o400000, cw: 0o200000, rocket: 0o100000 }, { ccw: 0o10, cw: 0o4, rocket: 0o2 }];
+  function wrapA(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a <= -Math.PI) a += 2 * Math.PI; return a; }
+  // turn ship k to angle 'to' (radians; 0 points up, the thrust is (-sin, cos)), then fire for 'burn' seconds
+  function pilot(plan) {
+    var st = [{}, {}];
+    return function (j, t, mem, S, s18) {
+      var cw = 0;
+      plan.forEach(function (p, k) {
+        if (!p) return;
+        var a = s18(mem[S.nth.val + k]) / 16384, e = wrapA(p.to - a), q = st[k];
+        if (q.t0 == null) {
+          if (Math.abs(e) > 0.07) cw |= e > 0 ? BIT[k].ccw : BIT[k].cw;
+          else q.t0 = t;
+        }
+        if (q.t0 != null && t - q.t0 < p.burn) cw |= BIT[k].rocket;
+      });
+      return cw;
+    };
+  }
+  function placed(r0, v0) {   // both ships set: the Needle at r0 moving v0, the Wedge opposite
+    return function (mem, S, P, u) {
+      var nx = S.nx1.val, ny = S.ny1.val, dx = S.ndx.val, dy = S.ndy.val;
+      mem[nx] = u(r0[0] * 256); mem[ny] = u(r0[1] * 256); mem[dx] = u(v0[0]); mem[dy] = u(v0[1]);
+      mem[nx + 1] = u(-r0[0] * 256); mem[ny + 1] = u(-r0[1] * 256); mem[dx + 1] = u(-v0[0]); mem[dy + 1] = u(-v0[1]);
+    };
+  }
+  function vcirc(P, r) { var g = P.ok ? P.at(Math.round(r * 256), 0) : 0; return g ? Math.sqrt(8 * g * r * 256) : 0; }
+  O.MOVES = [
+    { id: 'fall', title: 'Left alone', secs: 24, E: 512,
+      text: 'The game’s own start, no controls: the ships fall from their corners along the diagonal. In 3.1 they meet near the centre; in 4.x the star catches them first (F22).' },
+    { id: 'cbs', title: 'The CBS opening', secs: 30, E: 512,
+      text: 'Each ship turned at right angles to the star and fired for 4 seconds, then left: the two orbits make the eye that named it (Graetz 1981). Accounts give 2 to 3 seconds (Landsteiner) and 3.5 to 4 (Russell). On the bench 3.1 needs about 4: with 3.5 or less its ships are caught by the star within 19 seconds, where 4.x holds the eye from 2.5.',
+      control: function () { return pilot([{ to: Math.PI / 4, burn: 4 }, { to: -3 * Math.PI / 4, burn: 4 }]); } },
+    { id: 'orbit', title: 'A circular orbit', secs: 30, E: 256,
+      text: 'Set at 128 points from the star at the speed its own pull there would hold in a circle.',
+      setup: function (mem, S, P, u) { placed([128, 0], [0, vcirc(P, 128)])(mem, S, P, u); } },
+    { id: 'ellipse', title: 'A close pass', secs: 30, E: 256,
+      text: 'The same, at three quarters of that speed: the ship swings in close to the star, where the versions’ pulls differ most.',
+      setup: function (mem, S, P, u) { placed([128, 0], [0, vcirc(P, 128) * 0.75])(mem, S, P, u); } },
+    { id: 'escape', title: 'Escape', secs: 20, E: 512,
+      text: 'At one and a half times circular speed: the ship climbs out of the well. The screen wraps at its edges, so it comes back from the other side.',
+      setup: function (mem, S, P, u) { placed([128, 0], [0, vcirc(P, 128) * 1.5])(mem, S, P, u); } },
+    { id: 'flyby', title: 'A fly-by', secs: 20, E: 512,
+      text: 'Coming in from the left, aimed 60 points above the star: the well bends the path round it.',
+      setup: function (mem, S, P, u) { placed([-420, 60], [vcirc(P, 128) * 1.1, 0])(mem, S, P, u); } }
+  ];
+  O.move = function (vid, m, alive) {
+    return O.run(vid, { key: 'move|' + m.id, frames: Math.round(m.secs * 22), strobe: 20, setup: m.setup, control: m.control ? m.control() : null }, alive);
+  };
+
+  // the page of plates: each movement for two versions side by side, the
+  // outlines once a second as on the documentation plates of the time
+  O.plates = function (b, host) {
+    var P0 = SW.store.get('plates', {}) || {};
+    var st = { a: P0.a || '3.1', b: P0.b || '4.0', paper: P0.paper !== false, path: P0.path !== false };
+    function keep() { SW.store.set('plates', st); }
+    var all = V.VERSIONS.filter(function (v) { return v.build && v.id !== '1' && v.id !== 'stars'; }).sort(function (a, c) { return a.sort - c.sort; });
+    var opts = all.map(function (v) { return '<option value="' + v.id + '">' + SW.esc(vname(v)) + '</option>'; }).join('');
+    var card = SW.el('div', { class: 'card grav plates', style: 'grid-column:1/-1' });
+    card.innerHTML = '<h4>Manoeuvres</h4>' +
+      '<p class="hint">What the shape of the well allows, movement by movement, each run in the version’s own game on the emulator: the ships as the program draws them, once a second, as on the stroboscopic plates of the time. Two versions side by side.</p>' +
+      '<div class="well-view plates-ctl"><label>Left <select data-p="a">' + opts + '</select></label><label>Right <select data-p="b">' + opts + '</select></label>' +
+      '<label><input type="checkbox" data-p="paper"> Paper</label><label><input type="checkbox" data-p="path"> Show the path</label><span class="hint">Timing between plots, 1 second.</span></div>' +
+      '<div class="plates-grid"></div>';
+    host.appendChild(card);
+    SW.$('[data-p=a]', card).value = st.a; SW.$('[data-p=b]', card).value = st.b;
+    SW.$('[data-p=paper]', card).checked = st.paper; SW.$('[data-p=path]', card).checked = st.path;
+    var grid = SW.$('.plates-grid', card), stopped = false, job = 0, got = {};
+    function alive(my) { return function () { return !stopped && my === job; }; }
+    function pal() { return st.paper ? { bg: '#dcd9d1', ink: '#262626', faint: 'rgba(38,38,38,0.28)', sun: '#262626' } : { bg: '#000', ink: '#cfe6ff', faint: 'rgba(207,230,255,0.28)', sun: '#ffce7a' }; }
+    function drawPlate(cv, d, m, label) {
+      var N = cv.width / (root.devicePixelRatio || 1), g = cv.getContext('2d'), c = pal(), E = m.E, k = N / (2 * E);
+      g.setTransform(root.devicePixelRatio || 1, 0, 0, root.devicePixelRatio || 1, 0, 0);
+      function X(x) { return N / 2 + x * k; } function Y(y) { return N / 2 - y * k; }
+      g.fillStyle = c.bg; g.fillRect(0, 0, N, N);
+      g.fillStyle = c.ink; g.font = '11px IBM Plex Mono, monospace'; g.fillText(label, 8, 16);
+      if (!d) { g.fillStyle = c.faint; g.fillText('running…', 8, 32); return; }
+      if (d.why) { g.fillStyle = c.faint; g.fillText(d.why.slice(0, 40), 8, 32); return; }
+      var r = Math.max(0.9, N / 360);
+      g.fillStyle = c.sun; for (var i = 0; i < d.sun.length; i += 2) { g.globalAlpha = 0.5; g.fillRect(X(d.sun[i]) - r * 0.6, Y(d.sun[i + 1]) - r * 0.6, r * 1.2, r * 1.2); }
+      g.globalAlpha = 1;
+      var F = d.frames;
+      if (st.path) [0, 1].forEach(function (s) {
+        g.strokeStyle = c.faint; g.lineWidth = 1; g.beginPath(); var pen = false;
+        F.forEach(function (f, j) { var q = f.s[s]; if (q.gone) { pen = false; return; } if (pen && Math.abs(q.x - F[j - 1].s[s].x) + Math.abs(q.y - F[j - 1].s[s].y) > 200) pen = false; if (pen) g.lineTo(X(q.x), Y(q.y)); else g.moveTo(X(q.x), Y(q.y)); pen = true; });
+        g.stroke();
+      });
+      g.fillStyle = c.ink;
+      F.forEach(function (f) { if (!f.pts) return; [0, 1].forEach(function (s) { var P = f.pts[s]; for (var i = 0; i < P.length; i += 2) g.fillRect(X(P[i]) - r / 2, Y(P[i + 1]) - r / 2, r, r); }); });
+      var end = F.findIndex(function (f) { return f.s[0].gone || f.s[1].gone; });
+      g.fillStyle = c.faint; g.fillText(end >= 0 ? 'exploded at ' + F[end].t.toFixed(1) + ' s' : F[F.length - 1].t.toFixed(0) + ' s', 8, N - 8);
+    }
+    function build() {
+      var my = ++job, list = [];
+      grid.innerHTML = '';
+      O.MOVES.forEach(function (m) {
+        var el = SW.el('div', { class: 'plate' });
+        el.innerHTML = '<h5>' + SW.esc(m.title) + '</h5><p class="hint">' + SW.esc(m.text) + '</p><div class="plate-pair"><canvas data-s="a"></canvas><canvas data-s="b"></canvas></div><div class="plate-exp"></div>';
+        grid.appendChild(el);
+        var cvs = SW.$$('canvas', el), N = 250, dpr = root.devicePixelRatio || 1;
+        cvs.forEach(function (cv) { cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px'; });
+        function paintPair() { [st.a, st.b].forEach(function (vid, i) { drawPlate(cvs[i], got[vid + '|' + m.id], m, vname(V.byId(vid))); }); }
+        paintPair();
+        list.push({ m: m, paint: paintPair });
+        // the pair as one figure: two plates side by side
+        SW.$('.plate-exp', el).appendChild(SW.figureButtons(function () {
+          var W = 2 * N + 12, o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + (N + 22) + '" width="' + W + '" height="' + (N + 22) + '" font-family="IBM Plex Mono, monospace" font-size="11">';
+          cvs.forEach(function (cv, i) { o += '<image href="' + cv.toDataURL('image/png') + '" x="' + (i * (N + 12)) + '" y="0" width="' + N + '" height="' + N + '"/>'; });
+          return o + '<text x="0" y="' + (N + 16) + '" fill="#888">' + SW.esc(m.title) + '. Timing between plots, 1 second. Spacewar! research bench.</text></svg>';
+        }, 'spacewar-' + m.id));
+      });
+      // run each movement for both versions in turn
+      var jobs = [];
+      list.forEach(function (x) { [st.a, st.b].forEach(function (vid) { jobs.push({ x: x, vid: vid }); }); });
+      (function next() {
+        if (!alive(my)() || !jobs.length) return;
+        var q = jobs.shift();
+        O.move(q.vid, q.x.m, alive(my)).then(function (d) { if (!alive(my)()) return; got[q.vid + '|' + q.x.m.id] = d; q.x.paint(); setTimeout(next, 0); });
+      })();
+      build.list = list;
+    }
+    card.addEventListener('change', function (e) {
+      var k = e.target.dataset.p; if (!k) return;
+      if (k === 'a' || k === 'b') { st[k] = e.target.value; keep(); build(); return; }
+      st[k] = e.target.checked; keep(); (build.list || []).forEach(function (x) { x.paint(); });
+    });
+    build();
+    return function () { stopped = true; };
   };
 
   // the colours: 3.1 and 4.0 as in the gravity views, the others after
