@@ -1213,3 +1213,11 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .refhelp-acts { display: inline-flex; gap: 6px; align-items: center; margin-left: auto; }
 .refhelp .tray-bighead { display: flex; align-items: center; gap: 8px; }
 .refhelp .tray-bighead > b { flex: 1; white-space: nowrap; }
+.grav-ctl { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 6px 0 8px; font-size: 13px; }
+.grav-ctl .grav-exp { margin-left: auto; }
+.grav-plot { min-height: 60px; }
+.grav-read { min-height: 1.4em; font-size: 12px; margin: 2px 0 8px; }
+.grav-t tr.off td { opacity: .5; }
+.grav-sw { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.grav-sw span { display: inline-block; width: 18px; height: 3px; border-radius: 2px; }
+.grav-t .linkish { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline dotted; cursor: pointer; font: inherit; }

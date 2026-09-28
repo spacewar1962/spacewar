@@ -1624,6 +1624,7 @@
              ['ships', 'The ships', 'The Needle and the Wedge, and how they are drawn'],
              ['sun', 'The sun', 'The central star, drawn slowly'],
              ['hyper', 'Hyperspace', 'What hyperspace draws, slowed down'],
+             ['gravity', 'Gravity', 'The pull of the star by distance, from each version’s code'],
              ['tapesim', 'Tape Load Simulator', 'The tape read into core: Read-In, then the loader']];
   var gfx = SW.store.get('gfx.item', 'sky'); if (gfx === 'memory') gfx = 'sky';
   var gfxStop = null, gfxBuild = null;
@@ -1650,6 +1651,7 @@
     }
     var cards = SW.el('div', { class: 'cards' });
     pad.appendChild(cards);
+    if (G[0] === 'gravity') { gfxStop = SW.gravity.draw(b, cards); return; }
     if (G[0] === 'sun' || G[0] === 'hyper') {
       var wait = SW.el('p', { class: 'hint' }, 'Running ' + b.v.label + ' on the emulator…');
       cards.appendChild(wait);
