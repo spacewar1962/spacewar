@@ -34,7 +34,33 @@
       var mem = cpu.mem, ml0 = S.ml0.val, ml1 = S.ml1.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val,
           own = [S.ss1 ? S.ss1.val : -1, S.ss2 ? S.ss2.val : -1];
       function gone(i) { return own[i] >= 0 && (mem[mtb + i] & 0o7777) !== own[i]; }
-      var frames = [], n = 0, started = false, c0 = 0, grab = null, after = -1, sun = [], sunFrames = 0,
+      function centroid(P) { var sx = 0, sy = 0; for (var i = 0; i < P.length; i += 2) { sx += P[i]; sy += P[i + 1]; } return [sx / (P.length / 2), sy / (P.length / 2)]; }
+      function settle() {
+        var base = cand[0].j;
+        // a frame drawn centred on ship c: that ship's outline sits at the middle of the
+        // screen while the ship itself is elsewhere; shift the frame by the ship's place
+        cand.forEach(function (c) {
+          var f = frames[c.j]; if (!f) return; c.t = [0, 0];
+          for (var k = 0; k < 2; k++) {
+            var P = c.g[k], q = f.s[k]; if (!P.length || q.gone) continue;
+            var m = centroid(P);
+            if (Math.hypot(m[0], m[1]) < 24 && Math.hypot(q.x, q.y) > 40) { c.t = [q.x, q.y]; break; }
+          }
+        });
+        var keep = [0, 1].map(function (k) {
+          var best = null, bd = Infinity, bt = [0, 0];
+          cand.forEach(function (c) {
+            var P = c.g[k], q = frames[c.j] && frames[c.j].s[k]; if (!P.length || !q) return;
+            var m = centroid(P), d = Math.hypot(m[0] + c.t[0] - q.x, m[1] + c.t[1] - q.y);
+            if (d < bd) { bd = d; best = P; bt = c.t; }
+          });
+          var P2 = best || cand[0].g[k], out = new Int16Array(P2.length);
+          for (var i = 0; i < P2.length; i += 2) { out[i] = Math.round(P2[i] + bt[0]); out[i + 1] = Math.round(P2[i + 1] + bt[1]); }
+          return out;
+        });
+        frames[base].pts = keep; cand = [];
+      }
+      var frames = [], n = 0, started = false, c0 = 0, grab = null, cand = [], after = -1, sun = [], sunFrames = 0,
           tcr = S.tcr ? S.tcr.val : -1, nob = S.nob ? S.nob.val : 24;
       // the points each ship's routine puts on the screen, in frames being kept;
       // and, over a few frames, the star's own dots (drawn by the main loop near the centre)
@@ -54,13 +80,18 @@
               if (n === 3 && !started) { started = true; if (sc.setup) sc.setup(mem, S, P, u18); c0 = cpu.cycles; }
               if (started) {
                 var j = frames.length;
-                if (grab && j) frames[j - 1].pts = [Int16Array.from(grab[0]), Int16Array.from(grab[1])];
+                // Outlines are taken on two frames running and, for each ship, the set that
+                // lies where the ship is kept. 4.4 draws each frame centred on one ship (its
+                // two consoles, alternately): such a frame is moved back by that ship's place.
+                if (grab && j) cand.push({ j: j - 1, g: grab });
+                var second = sc.strobe > 1 && cand.length === 1 && cand[0].j === j - 1 && (j - 1) % sc.strobe === 0;
+                if (cand.length && !second) settle();
                 var f = { t: (cpu.cycles - c0) / 200000, s: [] };
                 for (var i = 0; i < 2; i++) f.s.push({ x: s18(mem[nx + i]) / 256, y: s18(mem[ny + i]) / 256, dx: s18(mem[S.ndx.val + i]), dy: s18(mem[S.ndy.val + i]), gone: gone(i) });
                 // the torpedoes in flight: each object running the torpedo routine, by its slot
                 if (sc.torps) { var tp = []; for (var o = 2; o < nob; o++) if ((mem[mtb + o] & 0o7777) === tcr) tp.push(o, Math.round(s18(mem[nx + o]) / 256), Math.round(s18(mem[ny + o]) / 256)); f.tp = Int16Array.from(tp); }
                 frames.push(f);
-                grab = sc.strobe && j % sc.strobe === 0 ? [[], []] : null;
+                grab = (sc.strobe && j % sc.strobe === 0) || second ? [[], []] : null;
                 if (sunFrames || j === 2) sunFrames++;
                 if (sc.control) cpu.control = sc.control(j, f.t, mem, S, s18, ctl);
                 if (after < 0 && f.s[0].gone && f.s[1].gone) after = j;
@@ -92,7 +123,7 @@
   }
   O.orbit = function (vid, r, pct, secs, alive, progress) {
     return O.run(vid, {
-      key: 'orbit|' + r + '|' + pct + '|' + secs, frames: Math.round(secs * 20), strobe: 20,
+      key: 'orbit3|' + r + '|' + pct + '|' + secs, frames: Math.round(secs * 20), strobe: 20,
       setup: function (mem, S, P, u) {
         var v = circular(P, r) * pct / 100, nx = S.nx1.val, ny = S.ny1.val, dx = S.ndx.val, dy = S.ndy.val;
         // the Needle on the right going up, the Wedge on the left going down
@@ -197,7 +228,7 @@
   };
 
   O.move = function (vid, m, alive) {
-    return O.run(vid, { key: 'move|' + m.id, frames: Math.round(m.secs * 22), strobe: 20, setup: m.setup, control: m.control ? m.control() : null, torps: !!m.torps }, alive);
+    return O.run(vid, { key: 'move3|' + m.id, frames: Math.round(m.secs * 22), strobe: 20, setup: m.setup, control: m.control ? m.control() : null, torps: !!m.torps }, alive);
   };
 
   // the page of plates: each movement for two versions side by side, the
