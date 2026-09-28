@@ -1684,15 +1684,19 @@
   function menuHTML(which) {
     if (which === 'help') {
       var dm = document.querySelector('meta[name="bench-date"]');
-      // About the bench stays last
-      return [['refs', 'Referencing and versions', 'How the bench refers to a source: [REF: SW3.1T, 2.141–146]'],
-              ['settings', 'Settings', 'Initials, group, theme, fonts'],
-              ['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
-              ['issue', 'Report a problem ↗', 'GitHub issues'],
-              ['backup', 'Back up everything', 'My notes, drafts, settings and the group’s findings, as one file'],
-              ['restore', 'Restore from a backup…', 'Brings back notes and drafts beside those here'],
-              ['about', 'About the bench', 'Version, sources, citation']].map(function (h) {
-        return '<button data-pick="' + h[0] + '"><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
+      // Grouped, with a divider and a small heading between the groups; About the bench stays last.
+      var HELP = [['Getting started', [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
+                                       ['refs', 'Referencing and versions', 'How the bench cites a source, as [REF: SW3.1T, 2.141]']]],
+                  ['Your bench', [['settings', 'Settings', 'Initials, group, theme, fonts'],
+                                  ['backup', 'Back up everything', 'Notes, drafts, settings and findings in one file'],
+                                  ['restore', 'Restore from a backup…', 'Brings back notes and drafts beside those here']]],
+                  ['The project', [['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
+                                   ['issue', 'Report a problem ↗', 'GitHub issues'],
+                                   ['about', 'About the bench', 'Version, sources, citation']]]];
+      return HELP.map(function (g, i) {
+        return (i ? '<hr class="menu-rule">' : '') + '<div class="menu-group">' + SW.esc(g[0]) + '</div>' + g[1].map(function (h) {
+          return '<button data-pick="' + h[0] + '"><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
+        }).join('');
       }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
     }
     if (which === 'graphics') return GFX.map(function (g) { return '<button data-pick="' + g[0] + '"' + (SW.state.tab === 'graphics' && g[0] === gfx ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('');
@@ -1720,6 +1724,7 @@
         closeTabMenu();
         if (which === 'help') {
           var p = t.dataset.pick;
+          if (p === 'tour') { SW.tours.start('welcome'); return; }
           if (p === 'refs') { SW.refHelp(); return; }
           if (p === 'backup') { SW.backup.save(); return; }
           if (p === 'restore') { SW.backup.restore(); return; }
@@ -1748,6 +1753,9 @@
   document.addEventListener('mousedown', function (e) { if (tabMenu && !tabMenu.el.contains(e.target) && !tabMenu.btn.contains(e.target)) closeTabMenu(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTabMenu(); });
   window.addEventListener('resize', closeTabMenu);
+  // Open a lens or a graphic from elsewhere (the welcome tour).
+  SW.openLens = function (n) { lens = n; SW.store.set('an.lens', n); SW.forget('analyse'); SW.setTab('analyse'); };
+  SW.openGraphic = function (g) { gfx = g; SW.store.set('gfx.item', g); SW.forget('graphics'); SW.setTab('graphics'); };
   // Open a biography from elsewhere (the symbol pop-up in Read).
   SW.biography = function (name) {
     bioName = name; SW.store.set('an.bio', name);

@@ -1186,3 +1186,27 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 .tray-sync.sync-err { color: var(--amber); }
 .tray-sync.sync-off, .tray-sync.sync-busy { color: var(--text-faint); }
 .tray-local { font-size: 11px; color: var(--amber); }
+
+/* ---------- the welcome tour ---------- */
+.tour-card { position: fixed; left: 16px; bottom: 16px; z-index: 60; width: min(380px, calc(100vw - 32px)); background: var(--surface);
+  color: var(--text); border: 1px solid var(--line); border-left: 3px solid var(--beam); border-radius: 8px; padding: 12px 14px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35); font-size: 13.5px; line-height: 1.5; }
+.tour-card h3 { margin: 4px 0 6px; font-size: 15px; }
+.tour-card p { margin: 0 0 10px; }
+.tour-top { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--text-faint); }
+.tour-top .tour-name { flex: 1; }
+.tour-top .tour-x { width: 24px; height: 24px; font-size: 13px; color: var(--text-dim); }
+.tour-dots { display: flex; gap: 5px; margin: 0 0 10px; }
+.tour-dots i { width: 8px; height: 8px; border-radius: 50%; background: var(--line); cursor: pointer; }
+.tour-dots i.done { background: var(--text-faint); }
+.tour-dots i.on { background: var(--beam); }
+.tour-nav { display: flex; justify-content: flex-end; gap: 8px; }
+.tour-focus { outline: 2px solid var(--amber) !important; outline-offset: 3px; border-radius: 4px; animation: tour-pulse 1.6s ease-in-out 3; }
+@keyframes tour-pulse { 50% { outline-color: transparent; } }
+.tour-row { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; }
+.tour-row .hint { font-size: 12px; }
+/* the tour card sits above Read's selection bar when it shows */
+body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
+/* Help menu: groups under small headings, divided by a rule */
+.tab-menu .menu-group { font-size: 10.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-faint); padding: 6px 8px 2px; }
+.tab-menu .menu-rule { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; width: auto; }

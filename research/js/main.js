@@ -223,7 +223,12 @@
     SW.markTabs();
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + SW.state.tab); });
     select(q.v || '3.1');
-    if (!SW.store.get('initials', '')) setTimeout(function () { SW.toast('Welcome. Set your initials (⚙) so your annotations are signed.', 5000); }, 800);
+    // The welcome tour: from a link (?tour=welcome), from Settings or About, or offered on a first visit.
+    SW.$('#set-tour').onclick = function () { SW.$('#dlg-settings').close('cancel'); SW.tours.start('welcome'); };
+    SW.$('#about-tour').onclick = function () { SW.$('#dlg-about').close(); SW.tours.start('welcome'); };
+    if (q.tour) setTimeout(function () { SW.tours.start(q.tour); }, 900);
+    else if (!SW.store.get('tour.seen', false)) setTimeout(SW.tours.offer, 1200);
+    else if (!SW.store.get('initials', '')) setTimeout(function () { SW.toast('Welcome. Set your initials (⚙) so your annotations are signed.', 5000); }, 800);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })(this);
