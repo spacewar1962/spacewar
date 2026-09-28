@@ -143,6 +143,8 @@
     }
     function tick(t) {
       if (!cv.isConnected) return;
+      // the page left (not the version switched, which redraws): pause
+      if (!cv.offsetParent && playing) { playing = false; D.playing = false; var pb = SW.$('[data-a="play"]', ctl); if (pb) pb.textContent = '▶ Play'; }
       if (last != null && cv.offsetParent) {
         var dt = Math.min(0.2, (t - last) / 1000);
         if (playing) { clock += dt; acc += dt * speed; while (acc >= 1 && playing) { acc -= 1; plot(); } }

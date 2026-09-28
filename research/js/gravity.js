@@ -368,6 +368,8 @@
     // every version's well, in turn; the one shown first
     function sampleAll() {
       var my = ++job; groups = []; thumbs.innerHTML = '';
+      // only the wells for the number of lines shown are kept
+      Object.keys(WELLS).forEach(function (k) { if (!new RegExp('\\|' + st.lines + '$').test(k)) { delete WELLS[k]; delete WSIG[k]; } });
       var order = [V.byId(st.v)].concat(vs.filter(function (v) { return v.id !== st.v; })), i = 0, seen = {};
       note.textContent = 'Running the gravity code over the screen…';
       (function next() {
@@ -556,6 +558,7 @@
     }
     function tick(now) {
       if (!fall.playing) return;
+      if (!card.isConnected || card.offsetParent === null) { stopPlay(); return; }
       var sp = +SW.$('[data-w=speed]', card).value || 1, i = fall.i0 + Math.floor((now - fall.t0) / 1000 * fall.data.fps * sp);
       if (i >= fall.data.frames.length - 1) { i = fall.data.frames.length - 1; stopPlay(); }
       fall.i = i; ships(i);

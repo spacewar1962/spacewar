@@ -162,6 +162,8 @@
 
   function frame(t) {
     if (!running) return;
+    // left the Run view: pause, as every player on the bench does
+    var sc = SW.$('#scope', view); if (sc && sc.offsetParent === null) { pause(); return; }
     var dt = Math.min(0.1, (t - lastT) / 1000 || 0.016);
     lastT = t;
     var budget = Math.round(dt * CPS * speed);

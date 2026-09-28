@@ -1298,3 +1298,5 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .orb-play { justify-content: center; margin: 8px 0 2px; }
 .orb-charts { position: relative; }
 .orb-cursor { position: absolute; width: 1px; background: var(--beam); opacity: .7; pointer-events: none; }
+.plate-big { max-width: min(1340px, 96vw); }
+.plate-big .plate-pair { justify-content: center; gap: 16px; }

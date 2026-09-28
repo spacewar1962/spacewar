@@ -12,7 +12,9 @@
   'use strict';
   var SW = root.SW, V = root.SWVersions;
   var O = SW.orbits = {};
-  var RUNS = {};
+  // runs kept, the most recent few (each holds every frame of a game)
+  var RUNS = {}, ORDER = [];
+  function keepRun(key, d) { RUNS[key] = d; ORDER = ORDER.filter(function (k) { return k !== key; }); ORDER.push(key); while (ORDER.length > 12) delete RUNS[ORDER.shift()]; return d; }
   function s18(v) { return v & 0o400000 ? -(v ^ 0o777777) : v; }
   function u18(v) { v = Math.round(v); return v < 0 ? (-v) ^ 0o777777 : v & 0o777777; }
   function vname(v) { return v.label.replace(/^Spacewar! /, ''); }
@@ -22,7 +24,7 @@
   // sc.strobe (frames between the outlines kept). Resolves with {frames, fps} or {why}.
   O.run = function (vid, sc, alive, progress) {
     var key = vid + '|' + sc.key;
-    if (RUNS[key]) return Promise.resolve(RUNS[key]);
+    if (RUNS[key]) { keepRun(key, RUNS[key]); return Promise.resolve(RUNS[key]); }
     return SW.build(vid).then(function (b) {
       var S = b.sym, need = ['ml0', 'ml1', 'mtb', 'nx1', 'ny1', 'ndx', 'ndy'];
       if (!b.asm || need.some(function (n) { return !S[n]; })) return { why: 'the object table or the main loop is not where 3.1 has them' };
@@ -48,7 +50,7 @@
               if (n === 3 && !started) { started = true; if (sc.setup) sc.setup(mem, S, P, u18); c0 = cpu.cycles; }
               if (started) {
                 var j = frames.length;
-                if (grab && j) frames[j - 1].pts = grab;
+                if (grab && j) frames[j - 1].pts = [Int16Array.from(grab[0]), Int16Array.from(grab[1])];
                 var f = { t: (cpu.cycles - c0) / 200000, s: [] };
                 for (var i = 0; i < 2; i++) f.s.push({ x: s18(mem[nx + i]) / 256, y: s18(mem[ny + i]) / 256, dx: s18(mem[S.ndx.val + i]), dy: s18(mem[S.ndy.val + i]), gone: gone(i) });
                 frames.push(f);
@@ -69,7 +71,7 @@
             s.g = g == null || isNaN(g) ? null : g; s.r = Math.hypot(s.x, s.y);
           }); });
           var T = frames[frames.length - 1].t;
-          res(RUNS[key] = { frames: frames, fps: T ? (frames.length - 1) / T : 20, sun: sun });
+          res(keepRun(key, { frames: frames, fps: T ? (frames.length - 1) / T : 20, sun: sun }));
         })();
       });
     });
@@ -84,7 +86,7 @@
   }
   O.orbit = function (vid, r, pct, secs, alive, progress) {
     return O.run(vid, {
-      key: 'orbit|' + r + '|' + pct + '|' + secs + '|all', frames: Math.round(secs * 20), strobe: 1,
+      key: 'orbit|' + r + '|' + pct + '|' + secs, frames: Math.round(secs * 20), strobe: 20,
       setup: function (mem, S, P, u) {
         var v = circular(P, r) * pct / 100, nx = S.nx1.val, ny = S.ny1.val, dx = S.ndx.val, dy = S.ndy.val;
         // the Needle on the right going up, the Wedge on the left going down
@@ -190,6 +192,27 @@
       var end = F.findIndex(function (f) { return f.s[0].gone || f.s[1].gone; });
       g.fillStyle = c.faint; g.fillText(end >= 0 ? 'exploded at ' + F[end].t.toFixed(1) + ' s' : F[F.length - 1].t.toFixed(0) + ' s', 8, N - 8);
     }
+    // a pair of plates large, in a window of its own
+    function big(m) {
+      var d = SW.el('dialog', { class: 'tray-big plate-big' }), dpr = root.devicePixelRatio || 1,
+          N = Math.round(Math.max(260, Math.min(620, (root.innerWidth - 140) / 2, root.innerHeight - 230)));
+      d.innerHTML = '<div class="tray-bighead"><b>' + SW.esc(m.title) + '</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
+        '<p class="hint">' + SW.esc(m.text) + '</p><div class="plate-pair"><canvas></canvas><canvas></canvas></div><p class="hint">Timing between plots, 1 second.</p><div class="plate-exp"></div>';
+      document.body.appendChild(d);
+      var cvs = SW.$$('canvas', d);
+      cvs.forEach(function (cv, i) {
+        cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px';
+        var vid = i ? st.b : st.a; drawPlate(cv, got[vid + '|' + m.id], m, vname(V.byId(vid)));
+      });
+      SW.$('.plate-exp', d).appendChild(SW.figureButtons(function () {
+        var W = 2 * N + 16, o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + (N + 24) + '" width="' + W + '" height="' + (N + 24) + '" font-family="IBM Plex Mono, monospace" font-size="12">';
+        cvs.forEach(function (cv, i) { o += '<image href="' + cv.toDataURL('image/png') + '" x="' + (i * (N + 16)) + '" y="0" width="' + N + '" height="' + N + '"/>'; });
+        return o + '<text x="0" y="' + (N + 18) + '" fill="#888">' + SW.esc(m.title) + '. Timing between plots, 1 second. Spacewar! research bench.</text></svg>';
+      }, 'spacewar-' + m.id));
+      d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
+      d.addEventListener('close', function () { d.remove(); });
+      d.showModal();
+    }
     function build() {
       var my = ++job, list = [];
       grid.innerHTML = '';
@@ -200,6 +223,7 @@
         var cvs = SW.$$('canvas', el), N = 250, dpr = root.devicePixelRatio || 1;
         cvs.forEach(function (cv) { cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px'; });
         function paintPair() { [st.a, st.b].forEach(function (vid, i) { drawPlate(cvs[i], got[vid + '|' + m.id], m, vname(V.byId(vid))); }); }
+        cvs.forEach(function (cv) { cv.title = 'Click to see these plates large'; cv.style.cursor = 'zoom-in'; cv.onclick = function () { big(m); }; });
         paintPair();
         list.push({ m: m, paint: paintPair });
         // the pair as one figure: two plates side by side
@@ -265,6 +289,7 @@
     // the animation: time runs through the recorded frames; the ships drawn where they are, older outlines fading
     function tick(now) {
       if (!anim.playing) return;
+      if (!card.isConnected || card.offsetParent === null) { stopPlay(); return; }
       var T = anim.T0 + (now - anim.t0) / 1000 * st.speed, end = tEnd();
       if (T >= end) { if (st.loop) { anim.T0 = 0; anim.t0 = now; T = 0; } else { T = end; stopPlay(); } }
       anim.T = T; paintScene(); cursor();
@@ -331,13 +356,14 @@
             if (pen) g.lineTo(X(q.x), Y(q.y)); else g.moveTo(X(q.x), Y(q.y)); pen = true;
           });
           g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
-          function stamp(f, a, big) { if (!f.pts) return; var P = f.pts[s], w = big ? 2 : 1.6; g.globalAlpha = a; for (var i = 0; i < P.length; i += 2) g.fillRect(X(P[i]) - w / 2, Y(P[i + 1]) - w / 2, w, w); }
+          function stamp(f, a, big, ox, oy) { if (!f.pts) return; var P = f.pts[s], w = big ? 2 : 1.6; ox = ox || 0; oy = oy || 0; g.globalAlpha = a; for (var i = 0; i < P.length; i += 2) g.fillRect(X(P[i] + ox) - w / 2, Y(P[i + 1] + oy) - w / 2, w, w); }
           g.fillStyle = ink;
           if (st.strobe) F.forEach(function (f, j) {
             if (j % 20 || (live && j > cur)) return;
             stamp(f, live && st.fade ? Math.max(0.06, Math.exp(-(T - f.t) / 5)) : 1, false);
           });
-          if (live && cur >= 0 && !F[cur].s[s].gone) stamp(F[cur], 1, true);
+          // the ship now: the last outline kept (once a second), moved to where the ship is
+          if (live && cur >= 0 && !F[cur].s[s].gone) { var j1 = cur - cur % 20; if (F[j1] && F[j1].pts) stamp(F[j1], 1, true, F[cur].s[s].x - F[j1].s[s].x, F[cur].s[s].y - F[j1].s[s].y); }
           g.globalAlpha = 1;
         });
       });
