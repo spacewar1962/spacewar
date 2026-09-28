@@ -393,7 +393,7 @@
         sg.strokeStyle = live && s ? '#5c7c9c' : '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
       });
       var f = FL[i];
-      scap.textContent = f ? 'Frame ' + (i + 1) + (twinS ? ' · drawn on scope ' + sc : '') + ' · ' + (f.pts.length / 3) + ' points' + (hi != null ? ' · ' + nm(hi) + (!runsIn(hi, i) ? ' not in this frame' : ' ' + nHi) : '') : '';
+      scap.textContent = f && calm() && playing ? 'Frame ' + (i + 1) : f ? 'Frame ' + (i + 1) + (twinS ? ' · drawn on scope ' + sc : '') + ' · ' + (f.pts.length / 3) + ' points' + (hi != null ? ' · ' + nm(hi) + (!runsIn(hi, i) ? ' not in this frame' : ' ' + nHi) : '') : '';
     }
 
     // ---------- the flame chart ----------
@@ -436,7 +436,8 @@
       var wait = f.spans.filter(function (sp) { return sp.e === 'wait'; }).reduce(function (a, sp) { return a + ((sp.t1 == null ? len : sp.t1) - sp.t0); }, 0);
       var objs = f.spans.filter(function (sp) { return sp.d === 0 && sp.e !== 'wait'; }).map(function (sp) { return nm(sp.e); });
       scope(i); values(); keep.frame = i;
-      fcap.textContent = 'frame ' + (i + 1) + ' of ' + NF + ' · ' + cyc(len) + ' · waiting ' + Math.round(100 * wait / len) + '% · ' + A.phases[f.phase].what;
+      // playing fast, the caption keeps one short form, so it does not flicker between two
+      fcap.textContent = calm() && playing ? 'frame ' + (i + 1) + ' of ' + NF : 'frame ' + (i + 1) + ' of ' + NF + ' · ' + cyc(len) + ' · waiting ' + Math.round(100 * wait / len) + '% · ' + A.phases[f.phase].what;
       fcap.title = 'Called from the main loop, in order: ' + objs.join(', ');
     }
     fr.addEventListener('input', function () { chart(+fr.value); });
@@ -447,7 +448,7 @@
     SW.$('.ov-fctl', el).addEventListener('click', function (e) {
       var t = e.target.closest('[data-f]'); if (!t) return;
       if (t.dataset.f === 'play') {
-        if (playT) { clearTimeout(playT); playT = null; playing = false; t.textContent = '▶ Play'; scope(shownFrame); return; }
+        if (playT) { clearTimeout(playT); playT = null; playing = false; t.textContent = '▶ Play'; chart(+fr.value); return; }
         t.textContent = '❚❚ Pause'; playing = true;
         (function step() {
           if (!fl.isConnected) return;
