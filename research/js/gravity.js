@@ -235,7 +235,7 @@
     if (!vs.some(function (v) { return v.id === st.v; })) st.v = '3.1';
     var card = SW.el('div', { class: 'card grav well', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>The well</h4>' +
-      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region shows as a cross rather than a circle, with the flat, pull-free band on the diagonals around it.</p>' +
+      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5.</p>' +
       '<div class="grav-ctl"><label>Version <select data-w="v">' + vs.map(function (v) { return '<option value="' + v.id + '">' + SW.esc(vname(v)) + '</option>'; }).join('') + '</select></label> ' +
       '<label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
       '<label>Depth by <select data-w="scale"><option value="sqrt">the square root of the pull</option><option value="lin">the pull</option></select></label> ' +
