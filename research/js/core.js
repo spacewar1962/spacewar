@@ -242,7 +242,7 @@
   // Ports: programs for other machines, not texts of a PDP-1 version, so a
   // namespace of their own: SWP, the machine, the program, and its own version
   // number (or its year when it has none). Several files of one program are its parts.
-  SW.PORTS = [   // [reference, program, machine, where and by whom, date, files held (under sources/)]
+  SW.PORTS = [   // [reference, program, machine, where and by whom, date, files held (under sources/), a catalogue entry held (image)]
     ['SWP-PDP4-SPACEWAR63', 'Spacewar', 'PDP-4', 'University of Michigan', '1963', ''],
     ['SWP-DDP224-SPACEWAR64', 'Spacewar', 'DDP-224', 'University of Michigan', '1964', ''],
     ['SWP-PDP6-SPACEWAR64', 'Spacewar', 'PDP-6', 'Stanford (Steve Russell)', '1964', ''],
@@ -252,8 +252,8 @@
     ['SWP-PDP8-SPACEWAR71', 'Space War', 'LAB-8 (PDP-8)', 'Evan Suits (DECUS)', '1965–68; listing 1971', 'ports/spacewar-pdp8-labx8-suits-1971.txt'],
     ['SWP-PDP10-SW71', 'Space War (SW; part 1 SW.MAC, part 2 SHIPS.SAI)', 'PDP-10', 'Stanford AI Lab: Steve Russell, 1967; Ralph E. Gorin’s version with R. Taylor', '1971–72', 'ports/spacewar-pdp10-sail-gorin-1971.txt, ports/spacewar-pdp10-sail-gorin-1971-ships.txt'],
     ['SWP-PDP6-WAR44', 'WAR 44', 'PDP-6', 'MIT (Samson’s DECtape)', 'c. 1968', 'ports/spacewar-pdp6-mit-war44-1968.txt'],
-    ['SWP-PDP7-DUEL68', 'Duel', 'PDP-7', 'Cambridge Univ. Maths Lab (M. S. Peterson, J. C. Viner; DECUS 7-40)', 'June 1968', ''],
-    ['SWP-LINC8-SPCWAR68', 'SPCWAR', 'LINC-8', 'University of Pennsylvania (E. Duffin; DECUS L-39)', '12 Aug 1968', ''],
+    ['SWP-PDP7-DUEL68', 'Duel', 'PDP-7', 'Cambridge Univ. Maths Lab (M. S. Peterson, J. C. Viner; DECUS 7-40)', 'June 1968', '', ['DECUS 7-40', 'assets/images/Spacewar-cambridge-decus7-40-June1968.png']],
+    ['SWP-LINC8-SPCWAR68', 'SPCWAR', 'LINC-8', 'University of Pennsylvania (E. Duffin; DECUS L-39)', '12 Aug 1968', '', ['DECUS L-39', 'assets/images/SPCWAR-DECUS-L-39.png']],
     ['SWP-NOVA-SPACEWAR68', 'Spacewar', 'Data General NOVA', 'Fall Joint Computer Conference', '1968', ''],
     ['SWP-PLATO-SPACEWAR69', 'Spacewar', 'PLATO / ILLIAC', 'University of Illinois (Richard W. Blomme)', '1969', ''],
     ['SWP-IBM1620-SPACEWAR69', 'Spacewar', 'IBM 1620', 'Jim Burroughs', 'c. 1969', ''],
@@ -321,7 +321,7 @@
       '<h4>Source code versions</h4><p class="hint">The version’s date is the program’s; the text we hold may be later: a transcription, a reassembly, a reconstruction. SWHIDs copy on a click.</p><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Version</th><th>Version dated</th><th>This text</th><th>SWHID of each file</th></tr></thead><tbody>' +
       vs.map(function (v, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(SW.refOf(v.id)) + '</td><td>' + SW.esc(v.label) + '</td><td>' + SW.esc(v.date || '') + '</td><td>' + SW.esc(SW.MADE[v.id] || (v.medium || '')) + '</td><td>' + SW.swhidList(SW.filesOf(v)) + '</td></tr>'; }).join('') + '</tbody></table>' +
       '<h4>Ports</h4><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Program</th><th>Machine</th><th>Where and by whom</th><th>Date</th><th>Held (SWHID of each file)</th></tr></thead><tbody>' +
-      SW.PORTS.map(function (r, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(r[0]) + '</td><td>' + SW.esc(r[1]) + '</td><td>' + SW.esc(r[2]) + '</td><td>' + SW.esc(r[3]) + '</td><td>' + SW.esc(r[4]) + '</td><td>' + (r[5] ? SW.swhidList(r[5].split(/,\s*/)) : '<span class="faint">none held</span>') + '</td></tr>'; }).join('') + '</tbody></table>' +
+      SW.PORTS.map(function (r, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono">' + SW.esc(r[0]) + '</td><td>' + SW.esc(r[1]) + '</td><td>' + SW.esc(r[2]) + '</td><td>' + SW.esc(r[3]) + '</td><td>' + SW.esc(r[4]) + '</td><td>' + (r[5] ? SW.swhidList(r[5].split(/,\s*/)) : r[6] ? '<span class="faint">no source; catalogue entry only:</span> <a href="../' + SW.esc(r[6][1]) + '" target="_blank" rel="noopener">' + SW.esc(r[6][0]) + ' ↗</a>' : '<span class="faint">none held</span>') + '</td></tr>'; }).join('') + '</tbody></table>' +
       '<p class="hint">Named whether or not a text is held, so that a port can be cited as a program. A port takes a witness letter only when it survives in more than one text, or when the text held is not its own (SWP-CDC3100-SPACEWAR66R, a reconstruction). BBN’s copy of the PDP-1 program is a copy, not a port: found, it would be a witness of a PDP-1 version.</p>';
     document.body.appendChild(d);
     d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
