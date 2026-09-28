@@ -43,7 +43,7 @@
   function hashOf(it) { var js = JSON.stringify(strip(it)), h = 5381; for (var i = 0; i < js.length; i++) h = ((h * 33) ^ js.charCodeAt(i)) >>> 0; return h.toString(36) + ':' + js.length; }
   function setSync(state, msg) { sync.state = state; sync.msg = msg || ''; if (state === 'ok') sync.at = new Date(); var el = host && SW.$('.tray-sync', host); if (el) el.outerHTML = syncHTML(); }
   function syncHTML() {
-    var t = { off: 'In this browser only. Add a Hypothesis token (⚙) to keep a private copy there.', busy: 'Saving to Hypothesis…', ok: 'Kept privately on Hypothesis too' + (sync.at ? ', saved ' + sync.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : ''), err: 'Not saved to Hypothesis: ' + sync.msg }[sync.state];
+    var t = { off: 'In this browser only. Add a Hypothesis token (⚙) to keep a private copy there.', busy: 'Saving to Hypothesis…', ok: 'Synced to Hypothesis' + (sync.at ? ', saved ' + sync.at.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : ''), err: 'Not saved to Hypothesis: ' + sync.msg }[sync.state];
     return '<span class="tray-sync sync-' + sync.state + '" title="My notes are private whichever way they are kept">' + (sync.state === 'ok' ? '☁ ' : sync.state === 'err' ? '⚠ ' : '') + SW.esc(t) + '</span>';
   }
   function scheduleSync() { clearTimeout(syncT); syncT = setTimeout(runSync, 2500); }
@@ -305,7 +305,7 @@
       '<label>Importance <select data-f="lvl">' + opt('', 'All', t.filter.lvl || '') + opt('key', '★★★ Key', t.filter.lvl) + opt('notable', '★★ Notable', t.filter.lvl) + opt('minor', '★ Minor', t.filter.lvl) + '</select></label>' +
       '<label>By <select data-f="by">' + opt('', 'Anyone', t.filter.by || '') + bys.map(function (x) { return opt(x, x, t.filter.by); }).join('') + '</select></label>' +
       '<input type="search" data-f="q" class="tray-q" placeholder="Find (number or words)" value="' + SW.esc(t.filter.q || '') + '"></div>' +
-      '<p class="hint">Private. A note takes the version open and the chapter chosen here; Share sends it to the group’s Findings, signed with its initials. ' + syncHTML() + '</p>';
+      '<p class="hint">Private. Share sends it to the group’s Findings. ' + syncHTML() + '</p>';
     el.appendChild(head);
     var vis = shown(t), tb = SW.$('.tray-filters', head);
     tb.appendChild(SW.el('button', { class: 'btn ghost tb-right', onclick: function () { T.addText(); } }, '＋ Paragraph'));
