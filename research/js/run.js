@@ -325,7 +325,8 @@
     if (!el || !cpu) return;
     var f = { source: paneSource, trace: paneTrace, profile: paneProfile, writes: paneWrites,
               anomalies: paneAnomalies, breakpoints: paneBreaks }[paneTab];
-    el.innerHTML = '';
+    if (paneTab !== 'source' || el._tab !== 'source') { el.innerHTML = ''; el._key = null; el.onclick = null; }
+    el._tab = paneTab;
     f(el);
   }
 
@@ -346,29 +347,52 @@
       var last = cpu.lastSrcPc >= 0 ? build.srcOf(cpu.lastSrcPc) : null;
       note = '<p class="pad hint run-gen">PC ' + SW.oct(cpu.pc, 4) + ' is ' + (wpc >= 0 ? 'in code the program wrote into core as it ran (put there by the instruction at ' + SW.oct(wpc, 4) + (who ? ', ' + SW.esc(who) : '') + (said ? ', in ' + SW.esc(said) : '') + ')' : 'outside the assembled program') + ', which has no source line. ' +
         (last ? 'Shown: the last program line run before it, at ' + SW.oct(cpu.lastSrcPc, 4) + (build.symAt(cpu.lastSrcPc) ? ' (' + SW.esc(build.symAt(cpu.lastSrcPc)) + ')' : '') + '.' : ws ? 'Shown: the instruction that wrote it.' : '') + '</p>';
-      if (!last && !ws) { el.innerHTML = note; return; }
+      if (!last && !ws) { el.innerHTML = note; el._key = null; return; }
       s = last || ws;
     }
-    var lines = build.lines[s.p], from = Math.max(0, s.n - 18), to = Math.min(lines.length, s.n + 22);
-    var h = '<div class="listing" style="padding-top:6px">';
-    for (var i = from; i < to; i++) {
-      var L = lines[i], ws = (build.asm.byLine[L.p] || [])[L.n] || [];
-      var bp = ws.some(function (w) { return SW.breakpoints[w.loc]; });
-      var ex = ws.reduce(function (a, w) { return a + cpu.execCount[w.loc]; }, 0);
-      h += '<div class="ln' + (L.n === s.n ? ' cur' : '') + (bp ? ' bp' : '') + '" data-a="' + (ws[0] ? ws[0].loc : '') + '">' +
-        '<span class="n" title="Toggle breakpoint">' + L.n + '</span><span class="a">' + (ws[0] ? SW.oct(ws[0].loc, 4) : '') +
-        '</span><span class="w">' + (ex ? '×' + ex : '') + '</span><span class="t">' + SW.esc(L.raw) + '</span><span></span></div>';
+    // the whole text, scrolled to the line being run (not a window around it); drawn
+    // once per text, then only the current line, breakpoints and counts are updated
+    var lines = build.lines[s.p], key = build.v.id + '|' + build.dialect + '|' + s.p;
+    if (el._key !== key || !SW.$('.listing', el)) {
+      var h = '<div class="run-note"></div><p class="pad hint run-ref"></p><div class="listing" style="padding-top:6px">';
+      el._rows = [];
+      for (var i = 0; i < lines.length; i++) {
+        var L = lines[i], ws = (build.asm.byLine[L.p] || [])[L.n] || [];
+        h += '<div class="ln" data-a="' + (ws[0] ? ws[0].loc : '') + '" data-n="' + L.n + '">' +
+          '<span class="n" title="Toggle breakpoint">' + L.n + '</span><span class="a">' + (ws[0] ? SW.oct(ws[0].loc, 4) : '') +
+          '</span><span class="w"></span><span class="t">' + SW.esc(L.raw) + '</span><span></span></div>';
+      }
+      el.innerHTML = h + '</div><p class="pad hint">Click a line number to set or clear a breakpoint. Use “Run to here” in the Read view to run to any line.</p>';
+      el._key = key;
+      var rowsEls = SW.$$('.listing .ln', el);
+      lines.forEach(function (L, k) { el._rows.push({ el: rowsEls[k], w: rowsEls[k].querySelector('.w'), ws: (build.asm.byLine[L.p] || [])[L.n] || [], ex: -1 }); });
+      el.onclick = function (e) {
+        var row = e.target.closest('.ln');
+        if (!row || !row.dataset.a) return;
+        var a = +row.dataset.a;
+        if (e.target.closest('.n')) {
+          if (SW.breakpoints[a]) delete SW.breakpoints[a]; else SW.breakpoints[a] = true;
+          pane();
+        } else gotoRead(a);
+      };
     }
-    el.innerHTML = note + h + '</div><p class="pad hint">Click a line number to set or clear a breakpoint. Use “Run to here” in the Read view to run to any line.</p>';
-    el.onclick = function (e) {
-      var row = e.target.closest('.ln');
-      if (!row || !row.dataset.a) return;
-      var a = +row.dataset.a;
-      if (e.target.closest('.n')) {
-        if (SW.breakpoints[a]) delete SW.breakpoints[a]; else SW.breakpoints[a] = true;
-        pane();
-      } else gotoRead(a);
-    };
+    SW.$('.run-note', el).innerHTML = note;
+    SW.$('.run-ref', el).innerHTML = SW.esc(build.parts[s.p].src || '') + ' · ' + SW.refTag(build.v.id, s.p, s.n, s.n, build.parts.length);
+    var cur = null;
+    el._rows.forEach(function (R, k) {
+      var ex = R.ws.reduce(function (a, w) { return a + cpu.execCount[w.loc]; }, 0);
+      if (ex !== R.ex) { R.ex = ex; R.w.textContent = ex ? '×' + ex : ''; }
+      var isCur = k + 1 === s.n, bp = R.ws.some(function (w) { return SW.breakpoints[w.loc]; });
+      if (R.el.classList.contains('cur') !== isCur) R.el.classList.toggle('cur', isCur);
+      if (R.el.classList.contains('bp') !== bp) R.el.classList.toggle('bp', bp);
+      if (isCur) cur = R.el;
+    });
+    // keep the line being run in view, in the middle, without jumping when it already is
+    var sc = el.closest('.run-right') || el;
+    if (cur) {
+      var r = cur.getBoundingClientRect(), rs = sc.getBoundingClientRect();
+      if (r.top < rs.top + 60 || r.bottom > rs.bottom - 40) sc.scrollTop += (r.top - rs.top) - rs.height / 2;
+    }
   }
 
   function paneTrace(el) {
