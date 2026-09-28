@@ -1,8 +1,8 @@
 / Spacewar! 4.0TS - normalised source transcription
 / ----------------------------------------------------------------------
 / Transcribed from the scanned listing "spacewar 4.0ts  5/4/63  ddp"
-/ (spacewar-4.0ts-4may1963.pdf, 33 pp.), Monty Preonas's ("ddp") "Twin
-/ Star" variant of Spacewar! 4.0. Extracted by David M. Berry.
+/ (spacewar-4.0ts-4may1963.pdf, 33 pp.), Monty Preonas's ("ddp") "ts"
+/ variant of Spacewar! 4.0 ("ts" unexplained). Extracted by David M. Berry.
 /
 / Per the masswerk genealogy, 4.0TS is version 4.0 with a simplified
 / starfield (4th-magnitude stars removed) and minor hyperspace
@@ -1193,7 +1193,7 @@ mtb,			/ table of objects and their properties
 / ----------------------------------------------------------------------
 / Starfield source, appended in this scan (pp.31-33). Assembled
 / separately at 6077/ with its own "start 4". This is the SIMPLIFIED
-/ starfield of the Twin Star variant: only three magnitude groups
+/ starfield of the 4.0ts variant: only three magnitude groups
 / (1j/1q, 2j/2q, 3j/3q); the 4th-magnitude group present in the full 4.0
 / starfield is removed. Loaded by the three "dislis" calls in the
 / background routine above.

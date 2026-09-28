@@ -42,23 +42,23 @@ the original "ddp" listing as scanned.
 | Version | Date | File | Origin |
 |---------|------|------|--------|
 | 1 | early 1962 | `spacewar-1-1962-reconstructed.txt` | masswerk reconstruction (Landsteiner 2016/2021); not an authentic program |
-| 2B (pre-release) | 25 Mar 1962 | `spacewar-2b-25mar1962.txt` | masswerk; earliest dated pre-2B build |
+| 2B (25 Mar listing) | 25 Mar 1962 | `spacewar-2b-25mar1962.txt` | masswerk; transcription of a surviving 2B listing (from Graetz's papers, per Landsteiner); differs from the 2 Apr program only in the sense of six sense-switch tests (switches 2 to 5) |
 | 2B | 2 Apr 1962 | `spacewar-2b-2apr1962.txt` | masswerk; reconstructed from disassembly (Landsteiner 2014) |
 | - (Expensive Planetarium) | 13 Mar 1962 | `spacewar-2b-stars-prs-13mar1962.txt` | masswerk; Samson's ("prs") star-field data for 2B |
 | 3.1 | 24 Sep 1962 | `spacewar-3.1-24sep1962.txt` | masswerk; the standard, most-emulated version |
 | 4.0 | 2 Feb 1963 | `spacewar-4.0-2feb1963-(Morris).pdf` + `.txt` (normalised) | "spacewar 4.0 2/2/63 ddp"; Preonas's listing, extracted from the Morris scan. The only surviving source for 4.0. The `.txt` is a page-by-page verified transcription |
-| 4.0TS | 4 May 1963 | `spacewar-4.0ts-4may1963.pdf` + `.txt` | "spacewar 4.0ts 5/4/63 ddp"; a Twin Star variant of 4.0 (simplified starfield, random hyperspace spin), recovered by the CCS team. Verified transcription |
+| 4.0TS | 4 May 1963 | `spacewar-4.0ts-4may1963.pdf` + `.txt` | "spacewar 4.0ts 5/4/63 ddp"; a variant of 4.0 (simplified starfield, random hyperspace spin); what "ts" stands for is not recorded (Twin Star is 4.3's later mode, which 4.0TS lacks), recovered by the CCS team. Verified transcription |
 | 4.2 | 11 May 1963 | `spacewar-4.2-11may1963-(Morris).pdf` + `.txt` (normalised) | "spacewar 4.2 5/11/63 ddp"; extracted from the Morris scan. The only surviving source for Preonas's 4.2, the first with an on-screen score display. The `.txt` is a verified transcription (the score-display routine is on low-contrast pages, marked where uncertain) |
 | 4.1 / 4.2a (original dfw) | 20 / 22 Feb 1963 | `spacewar-4.1-4.2a-feb1963-dfw-(Russell).txt`; `SteveRussell_box1/` | **The clean original 1963 dfw source**, located by the CCS team in Steve Russell's tape box (bitsavers papertapeImages). pt 1 = 4.1 (2/20/63 dfw), pt 2 = 4.2a (2/22/63 dfw); no CHM modifications |
 | 4.1 (CHM, rev. d) | base 20 Feb 1963; mod. Jun 2005 | `spacewar-4.1-chm-2005d.txt` / `.rim` | bitsavers; Samson's Computer History Museum port, June 2005 checkpoint |
 | 4.1 (CHM, rev. f) | base 20 Feb 1963; mod. Nov 2005, Aug 2008 | `spacewar-4.1-chm-2008f.txt` / `.rim` | bitsavers (`from_peter_samson/sw41f`); the final CHM revision the restored PDP-1 runs |
-| 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` (masswerk) + `spacewar-4.3-17may1963-(Morris).pdf` | masswerk reassembly (what we had) + the original "spacewar 4.3 5/17/63 ddp" listing from the Morris scan, with `-(Morris).txt` the verified transcription. The masswerk reassembly is a later modified variant; the scan keeps the period code |
+| 4.3 | 17 May 1963 | `spacewar-4.3-17may1963.txt` (masswerk) + `spacewar-4.3-17may1963-(Morris).pdf` | masswerk: Landsteiner's fixed 4.3f ("mod. nl 2/28/2015", not authentic; its first 61 lines supply the June 1963 macro tape for several builds) + the original "spacewar 4.3 5/17/63 ddp" listing from the Morris scan, with `-(Morris).txt` the verified transcription. The scan keeps the period code |
 | 4.4 | 21 May 1963 | `spacewar-4.4-21may1963.txt` (masswerk) + `spacewar-4.4-21may1963-(Morris).pdf` + `.txt` | masswerk reassembly (what we had) + the original "spacewar 4.4 5/17/63 ddp" listing from the Morris scan (pt 1 dated 5/17, pt 2 5/21), with `-(Morris).txt` the verified transcription; dual-console subjective view |
-| 4.4 (variant f) | 21 May 1963 | `spacewar-4.4f-21may1963.txt` | masswerk; alternate reassembly of 4.4 |
+| 4.4f (fixed) | 21 May 1963; 12 May 2015 | `spacewar-4.4f-21may1963.txt` | masswerk; Landsteiner's fixed version of 4.4 ("spacewar 4.4f 5/12/2015 nl", not authentic): sun, kcb and star display repaired |
 | 4.8 part 1 | 24 Jul 1963 | `spacewar-4.8-pt1-24jul1963.txt` (+ `.pdf` scan) | bitsavers; the last MIT version, "dfw" |
 | 4.8 part 2 | 24 Jul 1963 | `spacewar-4.8-pt2-24jul1963.txt` (+ `.pdf` scan) | bitsavers; second half of the 4.8 listing |
 | 4.8 scorer | 24 Jul 1963 | `spacewar-4.8-scorer-24jul1963.txt` (+ `.pdf` scan) | bitsavers; the score-display routine (Preonas's, reworked by Samson) |
-| 2015 | 2015 | `spacewar-2015-landsteiner.txt` / `.rim` | masswerk; Landsteiner's new PDP-1 program reviving the Minskytron hyperspace and subjective view |
+| 2015 | 2015 | `spacewar-2015-landsteiner.txt` / `.rim` | masswerk; Landsteiner's own program (not authentic), based on the dfw 4.1/4.2 of Feb 1963, with the Minskytron hyperspace signature, 4.8's scorer and a fixed 4.3 subjective view |
 
 The full as-scanned compilation `spacewar-4.x-morris-listing.pdf` (bitsavers
 `spacewar_Ver4.X.pdf`, 156 pp.) is retained as the source artifact: it bundles the

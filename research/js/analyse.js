@@ -597,7 +597,7 @@
       var calls = {}, mode = 'refresh';
       src.forEach(function (t) { var m = /^dislis\s+([1-4])j\s*,\s*\1q\s*,\s*([0-7])/.exec(t); if (m) { calls[+m[1]] = +m[2]; mode = 'intensity'; } });
       var rate = { 1: 2, 2: 1, 3: 0.5, 4: 0.25 };   // 1m twice a pass, 2m once, 3m when bcc is odd, 4m when bcc & 3 is 0
-      var fpr0 = 0, scrollN = 0, fastN = 0, bccN = 0, twoB = false;
+      var fpr0 = 0, scrollN = 0, fastN = 0, bccN = 0, twoB = false, inv2B = false;
       // 'law i N', directly or through 'xct name' to a constant 'name, …, law i N' (the CHM builds)
       function lawOf(t) {
         var m = /^(?:\w+,\s*)?law i\s+([0-7]+)/.exec(t); if (m) return parseInt(m[1], 8);
@@ -613,7 +613,7 @@
           if (got.length) { scrollN = got[0]; if (got.length > 1) fastN = got[1]; }
         }
         if (/^bcx,\s*jmp \.$/.test(src[i])) bccN = lawOf(src[i + 1] || '') || bccN;
-        if (/^bck,/.test(src[i])) for (var j2 = i; j2 < i + 5 && j2 < src.length; j2++) if (/^szs\s+30/.test(src[j2])) twoB = true;   // 2B's switches, in bck itself
+        if (/^bck,/.test(src[i])) for (var j2 = i; j2 < i + 5 && j2 < src.length; j2++) { if (/^szs\s+30/.test(src[j2])) twoB = true; if (/^szs\s+i\s+30/.test(src[j2])) twoB = inv2B = true; }   // 2B's switches, in bck itself; the 25 March listing tests them the other way round
       }
       var unread = !scrollN || (mode === 'intensity' && !bccN);
       if (!scrollN) scrollN = 32;
@@ -638,6 +638,9 @@
       var cv = SW.$('canvas.sky-crt', dlg), g = cv.getContext('2d'), N = cv.width;
       g.fillStyle = '#000'; g.fillRect(0, 0, N, N);
       var fpr = fpr0, acc = 0, pass = 0, playing = false, speed = 1, sw3 = false, sw4 = false, last = null, raf = 0, winAt = -1;
+      // 2B's switches as the 2 April tape reads them (the 25 March listing's are the other way round)
+      function E3() { return inv2B ? !sw3 : sw3; }
+      function E4() { return inv2B ? !sw4 : sw4; }
       function inView(p) { var u = ((p.S - fpr) % 8192 + 8192) % 8192; return u > 7168 ? u - 7680 : null; }
       function plot(p, x, s) {
         var px = (x + 512) * N / 1024, py = (511 - p.Y) * N / 1024;
@@ -648,12 +651,12 @@
       function drawGroup(gr, s) { pts.forEach(function (p) { if (p.g !== gr) return; var x = inView(p); if (x !== null) plot(p, x, s); }); }
       function onePass() {
         pass++;
-        var starsOff = twoB ? (sw3 && sw4) : sw4;
+        var starsOff = twoB ? (E3() && E4()) : sw4;
         if (!starsOff) {
           if (mode === 'intensity') { if (pass % bccN === 0) groups.forEach(function (gr) { drawGroup(gr, sgn3(calls[gr])); }); }
           else { drawGroup(1, 0); drawGroup(2, 0); if (pass & 1) drawGroup(3, 0); if ((pass & 3) === 0) drawGroup(4, 0); drawGroup(1, 0); }
         }
-        var still = twoB ? sw3 : false, every = twoB && sw4 && perFast ? perFast : perUnit;
+        var still = twoB ? E3() : false, every = twoB && E4() && perFast ? perFast : perUnit;
         if (!still && pass % every === 0) { fpr = fpr - 1; if (fpr < 0) fpr += 8192; }
       }
       // The chart laid over the screen: the map's constellation outlines and names,
@@ -709,7 +712,7 @@
         if (pal && pal.bg) o.push('<rect width="' + Z + '" height="' + (Z + 70) + '" fill="' + pal.bg + '"/>');
         o.push('<defs><clipPath id="scope"><circle cx="' + Z / 2 + '" cy="' + Z / 2 + '" r="' + (Z / 2 - 6) + '"/></clipPath></defs>');
         o.push('<circle cx="' + Z / 2 + '" cy="' + Z / 2 + '" r="' + (Z / 2 - 2) + '" fill="#000" stroke="#3a4650" stroke-width="8"/><g clip-path="url(#scope)">');
-        var off = twoB ? (sw3 && sw4) : sw4, RB = { 1: 1, 2: 0.82, 3: 0.62, 4: 0.45 };
+        var off = twoB ? (E3() && E4()) : sw4, RB = { 1: 1, 2: 0.82, 3: 0.62, 4: 0.45 };
         if (chartOn) {
           for (var h = 0; h < 24; h++) { var a = scr((8192 - Math.round(h * 8192 / 24)) & 8191, 0); if (a) o.push('<line x1="' + a[0].toFixed(1) + '" y1="0" x2="' + a[0].toFixed(1) + '" y2="' + Z + '" stroke="rgba(143,163,181,0.25)"/><text x="' + (a[0] + 4).toFixed(1) + '" y="' + (Z / 2 - 6) + '" font-size="18" fill="rgba(143,163,181,0.8)">' + h + 'h</text>'); }
           for (var dd = -20; dd <= 20; dd += 10) { var yy = (511 - dd * 8192 / 360) * Z / 1024; o.push('<line x1="0" y1="' + yy.toFixed(1) + '" x2="' + Z + '" y2="' + yy.toFixed(1) + '" stroke="rgba(143,163,181,0.25)"' + (dd === 0 ? ' stroke-dasharray="6 6"' : '') + '/>' + (dd ? '<text x="' + (12 + Z * 0.12) + '" y="' + (yy - 4).toFixed(1) + '" font-size="18" fill="rgba(143,163,181,0.8)">' + (dd > 0 ? '+' : '−') + Math.abs(dd) + '°</text>' : '')); }
@@ -755,7 +758,7 @@
         drawOverlay();
         var n = pts.filter(function (p) { return inView(p) !== null; }).length;
         var turn = 8192 * perUnit / passes;
-        read.textContent = 'fpr ' + SW.oct(fpr, 5) + ' · window RA ' + hms(ra0) + '–' + hms(ra1) + ' · ' + n + ' stars in view · main loop ' + passes.toFixed(1) + ' passes a second (measured) · drift one unit every ' + perUnit + ' passes' + (twoB && sw4 && perFast ? ' (' + perFast + ' with sense switch 4)' : '') + ', a full turn of the sky in ' + (turn / 60).toFixed(0) + ' minutes' + (unread ? ' (the timing could not be read from this source; 3.1’s is assumed)' : '');
+        read.textContent = 'fpr ' + SW.oct(fpr, 5) + ' · window RA ' + hms(ra0) + '–' + hms(ra1) + ' · ' + n + ' stars in view · main loop ' + passes.toFixed(1) + ' passes a second (measured) · drift one unit every ' + perUnit + ' passes' + (twoB && perFast ? (inv2B ? ' with sense switch 4 on (' + perFast + ' with it off)' : ' (' + perFast + ' with sense switch 4)') : '') + ', a full turn of the sky in ' + (turn / 60).toFixed(0) + ' minutes' + (unread ? ' (the timing could not be read from this source; 3.1’s is assumed)' : '');
       }
       function tick(t) {
         if (!cv.offsetParent) { last = null; raf = requestAnimationFrame(tick); return; }   // the tab is hidden: wait
@@ -766,14 +769,15 @@
           var n = Math.floor(acc); acc -= n;
           fade(dt);
           var drawn = Math.min(n, 60);   // at speed, only the latest passes are drawn; the drift keeps count
-          for (var q = 0; q < n; q++) { if (q < n - drawn) { var sv = pass; pass++; var still = twoB ? sw3 : false, every = twoB && sw4 && perFast ? perFast : perUnit; if (!still && pass % every === 0) { fpr = (fpr + 8191) % 8192; } void sv; } else onePass(); }
+          for (var q = 0; q < n; q++) { if (q < n - drawn) { var sv = pass; pass++; var still = twoB ? E3() : false, every = twoB && E4() && perFast ? perFast : perUnit; if (!still && pass % every === 0) { fpr = (fpr + 8191) % 8192; } void sv; } else onePass(); }
           if (fpr !== winAt) { winAt = fpr; drawWindow(); }
         }
         raf = requestAnimationFrame(tick);
       }
       var ctl = SW.$('.sky-scope-ctl', dlg), read = SW.$('.sky-scope-read', dlg);
       ctl.innerHTML = '<button class="btn" data-s="play">▶ Run the sky</button> <label class="check">Speed <select data-s="speed"><option value="1">as the program ran</option><option value="16">× 16</option><option value="64">× 64</option><option value="512">× 512</option></select></label> ' +
-        (twoB ? '<label class="check" title="2B: sense switch 3 holds the sky still (and with switch 4 turns the stars off)"><input type="checkbox" data-s="sw3"> Sense switch 3</label> <label class="check" title="2B: sense switch 4 makes the sky drift every ' + perFast + ' passes (and with switch 3 turns the stars off)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>'
+        (twoB && inv2B ? '<label class="check" title="25 March 2B: the sky drifts only with sense switch 3 on; with switches 3 and 4 both off there are no stars"><input type="checkbox" data-s="sw3"> Sense switch 3</label> <label class="check" title="25 March 2B: the sky drifts every ' + perFast + ' passes unless sense switch 4 is on; with switches 3 and 4 both off there are no stars"><input type="checkbox" data-s="sw4"> Sense switch 4</label>'
+        : twoB ? '<label class="check" title="2B: sense switch 3 holds the sky still (and with switch 4 turns the stars off)"><input type="checkbox" data-s="sw3"> Sense switch 3</label> <label class="check" title="2B: sense switch 4 makes the sky drift every ' + perFast + ' passes (and with switch 3 turns the stars off)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>'
               : '<label class="check" title="Sense switch 4 turns the stars off (szs 40, jmp bcx)"><input type="checkbox" data-s="sw4"> Sense switch 4</label>') +
         ' <label class="check" title="Lay the star map’s constellation outlines and names, the named stars and a grid of RA and declination over the screen"><input type="checkbox" data-s="chart" checked> Chart overlay</label>' +
         ' <span class="hint">Click the map to move the window.</span>';
@@ -819,7 +823,7 @@
         '<li><b>Plotted.</b> <span class="mono">sub (1000</span> centres it, <span class="mono">sal 8s</span> moves it into the display’s X bits, <span class="mono">lio</span> Y, <span class="mono">dpy</span>.</li>' +
         (mode === 'intensity' ? '<li><b>Brightness by intensity.</b> Every ' + bccN + ' passes the groups are drawn with <span class="mono">dislis J, Q, B</span>, the intensity B set into the dpy instruction (<span class="mono">dpy-i+B</span>): ' + groups.map(function (gr) { return 'group ' + gr + ' at ' + calls[gr]; }).join(', ') + '.' + (groups.length < 4 ? ' Group ' + [1, 2, 3, 4].filter(function (gr) { return groups.indexOf(gr) < 0; }).join(', ') + ' is not drawn.' : '') + '</li>'
           : '<li><b>Brightness by redrawing.</b> Each pass draws group 1 twice (<span class="mono">jsp 1m</span> at the start and the end), group 2 once, group 3 every second pass (<span class="mono">and (1</span>) and group 4 every fourth (<span class="mono">and (3</span>), all at one intensity; the phosphor makes the more often drawn brighter.</li>') +
-        '<li><b>The drift.</b> Every ' + perUnit + ' passes of the main loop <span class="mono">fpr</span> falls by one (' + (mode === 'intensity' ? 'every ' + scrollN + ' star frames, ' + bccN + ' passes each' : '<span class="mono">law i ' + scrollN.toString(8) + '</span>') + '), so the stars move slowly across the screen. It starts at ' + SW.oct(fpr0, 5) + '.' + (twoB ? ' Sense switch 3 holds the sky still; switch 4 makes it drift every ' + perFast + ' passes; both together turn the stars off.' : ' Sense switch 4 turns the stars off.') + '</li></ol>' +
+        '<li><b>The drift.</b> Every ' + perUnit + ' passes of the main loop <span class="mono">fpr</span> falls by one (' + (mode === 'intensity' ? 'every ' + scrollN + ' star frames, ' + bccN + ' passes each' : '<span class="mono">law i ' + scrollN.toString(8) + '</span>') + '), so the stars move slowly across the screen. It starts at ' + SW.oct(fpr0, 5) + '.' + (twoB && inv2B ? ' This listing tests sense switches 3 and 4 the other way round from the 2 April tape: the sky drifts only with switch 3 on, drifts every ' + perFast + ' passes unless switch 4 is on, and with both off there are no stars.' : twoB ? ' Sense switch 3 holds the sky still; switch 4 makes it drift every ' + perFast + ' passes; both together turn the stars off.' : ' Sense switch 4 turns the stars off.') + '</li></ol>' +
         '<p class="hint">The main loop’s rate is measured by running this version on the bench’s emulator for two emulated seconds and counting its calls of <span class="mono">bck</span>.</p>' +
         (SW.draws && SW.draws.TYPE30 ? '<p class="dr-t30">' + SW.esc(SW.draws.TYPE30) + '</p>' : '');
       drawWindow();
