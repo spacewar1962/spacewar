@@ -41,6 +41,7 @@
     this.sense = [false, false, false, false, false, false, false];
     this.tw = 0;           // console test word
     this.control = 0;      // iot 11 control boxes
+    this.ctlLoad = !!opts.ctlLoad;   // control hardware that loads IO rather than ORing into it (Morris 4.2, 4.3)
     this.reset();
   }
 
@@ -324,7 +325,12 @@
       if (this.onDisplay) this.onDisplay(x, yy, s, this.cycles, this.curPC, md);   // md: the instruction (4.4 chooses its scope with the 400 bit)
       return 10;                             // ~50 us including the wait
     }
-    if (dev === 0o11) { this.io = this.control; return 1; }   // control boxes
+    // control boxes: the standard boxes' switches are ORed into IO, so every
+    // standard mg1 clears IO (cli) first (Landsteiner, Inside Spacewar! pt 5).
+    // The Morris 4.2 and 4.3 routines, for other control hardware (iot 11 and
+    // iot 111), do not clear IO; ORed, the bits left in IO would fire and turn
+    // the ships unasked, so for them the device loads IO (ctlLoad)
+    if (dev === 0o11) { this.io = this.ctlLoad ? this.control : this.io | this.control; return 1; }
     if (dev === 0o04) { this.io = 0; return 1; }              // tyi: nothing typed
     return 1;
   };

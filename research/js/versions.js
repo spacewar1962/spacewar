@@ -221,6 +221,9 @@
     v.dialect = v.dialect || 'macro1963';
     if (v.mdv === undefined) v.mdv = !NO_MDV[v.id];
     v.pass1 = PASS1[v.id] || null;
+    // Morris 4.2 and 4.3 read other control hardware (iot 11 and iot 111) without
+    // clearing IO first, so that hardware must have loaded IO (pdp1cpu.js)
+    if (v.ctlLoad === undefined) v.ctlLoad = v.id === '4.2' || v.id === '4.3';
     if (v.pass1) (v.buildNotes = v.buildNotes || []).push("Assembled, as the pass log at the end of the " + (v.id === '4.4m' ? 'Morris 4.4 listing' : 'listing') + " records (scan p. 31), with a short tape '" + v.pass1.name + "' fed in after pass 1 and read on pass 1 only: 'nx1=mtb nob', 'ny1=nx1 nob', 'start'. The sun routine uses nx1 and ny1 before the program assigns them, and mtb is defined only at the end; the tape gives them their final values before pass 2. Without it the sun is misplaced (Run can leave it out; F33).");
     v.buildNotes = (v.buildNotes || []).map(function (t) {
       // Signed 'log', not initials: 'CC' read as a team member's.

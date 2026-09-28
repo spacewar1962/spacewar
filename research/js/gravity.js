@@ -29,7 +29,7 @@
     var bsg = val(sym(b, 'bsg')), pof = val(sym(b, 'pof')), mx1 = val(sym(b, 'mx1')), my1 = val(sym(b, 'my1')),
         bx = val(sym(b, 'bx')), by = val(sym(b, 'by'));
     if (bsg == null || mx1 == null || bx == null) { P.why = 'no gravity section found'; return P; }
-    var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv });
+    var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad });
     cpu.load(b.asm.memory, b.asm.start);
     cpu.tw = 0; cpu.control = 0;
     var mem = cpu.mem, start = -1;
@@ -293,7 +293,7 @@
       var S = b.sym, need = ['ml0', 'mtb', 'nx1', 'ny1', 'mex'];
       if (!b.asm || need.some(function (n) { return !S[n]; })) return { why: 'the object table or the main loop is not where 3.1 has them' };
       var P = G.probe(b);
-      var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv }); cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
+      var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad }); cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
       var mem = cpu.mem, ml0 = S.ml0.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val, bang = 0o400000 | S.mex.val,
           own = [S.ss1 ? S.ss1.val : -1, S.ss2 ? S.ss2.val : -1];
       // a ship has gone up once its object runs anything but its own routine

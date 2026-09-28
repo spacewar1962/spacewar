@@ -180,7 +180,7 @@
 
   // ---------- execution ----------
   function load() {
-    cpu = new C.PDP1({ mdv: build.v.mdv });
+    cpu = new C.PDP1({ mdv: build.v.mdv, ctlLoad: build.v.ctlLoad });
     cpu.load(build.asm.memory, build.asm.start);
     cpu.srcMap = new Uint8Array(4096);
     for (var k in build.asm.memory) cpu.srcMap[+k] = 1;

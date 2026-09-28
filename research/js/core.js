@@ -80,7 +80,7 @@
       return new Promise(function (res) {
         (function next() {
           if (!pending.length) { SW.store.set(keyS, map); res(map); return; }
-          var bit = pending.shift(), cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv }), mem = cpu.mem, n = 0, a0, t0;
+          var bit = pending.shift(), cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad }), mem = cpu.mem, n = 0, a0, t0;
           cpu.load(b.asm.memory, b.asm.start);
           while (n < 32 && !cpu.halted && cpu.cycles < 2000000) {
             if (cpu.pc === S.ml0.val) {
