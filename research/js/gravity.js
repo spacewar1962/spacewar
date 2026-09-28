@@ -65,7 +65,7 @@
     var vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, c) { return a.sort - c.sort; });
     var card = SW.el('div', { class: 'card grav', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>Gravity ' + SW.refTag(b.v.id) + '</h4>' +
-      '<p class="hint">The pull of the central star on a ship at rest, by its distance from the star, worked out by each version’s own gravity code on the emulator. Versions whose code gives the same curve are drawn as one line. The dashed line is the capture radius: nearer than that the code jumps to pof. After Norbert Landsteiner’s plot of 3.1 against 4.0.</p>' +
+      '<p class="hint">The pull of the central star on a ship at rest, by its distance from the star, worked out by each version’s own gravity code on the emulator. Versions whose code gives the same curve are drawn as one line. The dashed line is the capture radius: nearer than that the code jumps to pof. After Norbert Landsteiner’s plot of 3.1 against 4.0. The fall to zero just outside the capture radius in the 4.x curve is what the code computes, not a fault in the drawing: the left shift that undosft writes into xyt appears to overflow there.</p>' +
       '<div class="grav-ctl"><label>Distance <select data-k="range"><option value="32">0 to 32</option><option value="64">0 to 64</option><option value="128">0 to 128</option><option value="256">0 to 256</option><option value="512">0 to 512</option></select> screen points</label> ' +
       '<label>along <select data-k="along"><option value="axis">the x axis</option><option value="diag">the diagonal</option></select></label> <span class="grav-exp"></span></div>' +
       '<div class="grav-plot"></div><div class="grav-read hint mono">&nbsp;</div><div class="grav-groups"><p class="hint">Running the gravity code of ' + vs.length + ' versions…</p></div>';
@@ -122,7 +122,7 @@
       if (k === 'along') { st.along = e.target.value; keep(); run(); }
     });
 
-    var W = 720, H = 420, L = 58, R = 16, T = 16, B = 44;
+    var W = 720, H = 420, L = 62, R = 16, T = 16, B = 44, CW = 6.6;   // CW: a character's width at 11px
     function shown() { return groups.filter(function (gp) { return !st.off[gp.key]; }); }
     function scaleY(gs) {
       // the height: the largest pull shown beyond a tenth of the range
@@ -132,8 +132,20 @@
       var e = Math.pow(10, Math.floor(Math.log10(m / 4))), f = m / 4 / e, step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * e;
       return { max: step * Math.ceil(m / step), step: step };
     }
+    // the legend under the chart, each curve's versions in full, wrapped
+    function legend(gs) {
+      var max = Math.max(20, Math.floor((W - L - R - 30) / CW));
+      return gs.map(function (gp) {
+        var words = gp.vs.map(vname), lines = [], cur = '';
+        words.forEach(function (w, i) { var t = w + (i < words.length - 1 ? ',' : ''); if (cur && (cur + ' ' + t).length > max) { lines.push(cur); cur = t; } else cur = cur ? cur + ' ' + t : t; });
+        if (cur) lines.push(cur);
+        return { gp: gp, lines: lines };
+      });
+    }
     function svg(p) {
-      var gs = shown(), sy = scaleY(gs), ym = sy.max, pw = W - L - R, ph = H - T - B;
+      var gs = shown(), sy = scaleY(gs), ym = sy.max, lg = legend(gs), nl = lg.reduce(function (n, x) { return n + x.lines.length; }, 0);
+      B = 50 + (nl ? 10 + nl * 16 : 0);
+      var pw = W - L - R, ph = H - T - B;
       function X(s) { return L + s / st.range * pw; }
       function Y(g) { return T + ph - Math.min(g, ym * 1.02) / ym * ph; }
       var o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" font-family="IBM Plex Mono, monospace" font-size="11">';
@@ -146,10 +158,13 @@
         var y = Y(gy);
         o += '<line x1="' + (L - 4) + '" y1="' + y + '" x2="' + L + '" y2="' + y + '" stroke="' + p.dim + '"/><text x="' + (L - 6) + '" y="' + (y + 4) + '" fill="' + p.dim + '" text-anchor="end">' + Math.round(gy) + '</text>';
       }
-      o += '<text x="' + (L + pw / 2) + '" y="' + (H - 8) + '" fill="' + p.ink + '" text-anchor="middle">distance from the star, screen points (' + (st.along === 'diag' ? 'along the diagonal' : 'along the x axis') + ')</text>';
+      o += '<text x="' + (L + pw / 2) + '" y="' + (T + ph + 36) + '" fill="' + p.ink + '" text-anchor="middle">distance from the star, screen points (' + (st.along === 'diag' ? 'along the diagonal' : 'along the x axis') + ')</text>';
       o += '<text transform="translate(14 ' + (T + ph / 2) + ') rotate(-90)" fill="' + p.ink + '" text-anchor="middle">pull: length of (bx, by)</text>';
       gs.forEach(function (gp) {
-        if (gp.c.capture && gp.c.capture <= st.range) o += '<line x1="' + X(gp.c.capture) + '" y1="' + T + '" x2="' + X(gp.c.capture) + '" y2="' + (T + ph) + '" stroke="' + gp.ink + '" stroke-width="1" stroke-dasharray="4 3"/>';
+        // the capture radius: the first distance the code does not capture;
+        // curves with the same radius share the line, their dashes interleaved
+        var cr = gp.c.capture ? gp.c.capture + STEP : 0, k = gs.indexOf(gp);
+        if (cr && cr <= st.range) o += '<line x1="' + X(cr) + '" y1="' + T + '" x2="' + X(cr) + '" y2="' + (T + ph) + '" stroke="' + gp.ink + '" stroke-width="1.2" stroke-dasharray="4 ' + (4 * gs.length - 4 + 3) + '" stroke-dashoffset="' + (-4 * k) + '"/>';
         var d = '', pen = false;
         for (var i = 0; i < gp.c.s.length && gp.c.s[i] <= st.range; i++) {
           var g = gp.c.g[i]; if (g == null) { pen = false; continue; }
@@ -157,19 +172,27 @@
         }
         o += '<path d="' + d + '" fill="none" stroke="' + gp.ink + '" stroke-width="1.4" stroke-linejoin="round"/>';
       });
-      var ly = T + 14;
-      gs.forEach(function (gp) {
-        o += '<line x1="' + (W - R - 190) + '" y1="' + (ly - 4) + '" x2="' + (W - R - 170) + '" y2="' + (ly - 4) + '" stroke="' + gp.ink + '" stroke-width="2"/><text x="' + (W - R - 164) + '" y="' + ly + '" fill="' + p.ink + '">' + SW.esc(gp.vs.map(vname).join(', ').slice(0, 26) + (gp.vs.map(vname).join(', ').length > 26 ? '…' : '')) + '</text>';
-        ly += 16;
+      var ly = T + ph + 62;
+      lg.forEach(function (x) {
+        o += '<line x1="' + L + '" y1="' + (ly - 4) + '" x2="' + (L + 20) + '" y2="' + (ly - 4) + '" stroke="' + x.gp.ink + '" stroke-width="2"/>';
+        x.lines.forEach(function (t) { o += '<text x="' + (L + 28) + '" y="' + ly + '" fill="' + p.ink + '">' + SW.esc(t) + '</text>'; ly += 16; });
       });
       return o + '</svg>';
     }
     var SCREEN = { bg: 'none', ink: 'var(--g-text)', dim: 'var(--g-muted)' };
     function paint() {
       if (!groups.length) return;
+      // drawn to the width available, at one screen pixel to one unit
+      W = Math.max(420, Math.round(plot.clientWidth || 720));
+      H = Math.round(Math.min(Math.max(W * 0.42, 340), 640)) + 60;
       plot.innerHTML = SW.displaySVG(svg(SCREEN));
-      var el = SW.$('svg', plot); el.removeAttribute('width'); el.removeAttribute('height'); el.style.width = '100%'; el.style.maxWidth = W + 'px'; el.style.height = 'auto';
+      var el = SW.$('svg', plot); el.removeAttribute('width'); el.removeAttribute('height'); el.style.width = '100%'; el.style.height = 'auto'; el.style.display = 'block';
     }
+    var lastW = 0, rsT = null;
+    if (root.ResizeObserver) new ResizeObserver(function () {
+      var w = plot.clientWidth; if (!w || Math.abs(w - lastW) < 8) return; lastW = w;
+      clearTimeout(rsT); rsT = setTimeout(paint, 80);
+    }).observe(plot);
     plot.addEventListener('mousemove', function (e) {
       var el = SW.$('svg', plot); if (!el) return;
       var r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * W;
