@@ -354,7 +354,7 @@
     '3.1': 'a text from bitsavers (SteveRussell_box1/_text), as compiled by masswerk',
     '3.1t': 'read by the bench from Russell’s source tapes of 29 September 1962',
     '4.1t': 'read by the bench from the dfw source tape',
-    '4.3m': 'reassembled by Norbert Landsteiner, modified 2015', '4.4m': 'reassembled by Norbert Landsteiner', '4.4f': 'reassembled by Norbert Landsteiner (variant f)',
+    '4.3m': 'reassembled by Norbert Landsteiner, modified 2015', '4.4m': 'reassembled by Norbert Landsteiner', '4.4f': 'fixed by Norbert Landsteiner, 2015',
     '4.1d': 'reconstructed by Peter Samson, June 2005', '4.1f': 'reconstructed by Peter Samson, 2005 to 2008', '2015': 'written by Norbert Landsteiner, 2015' };
   // A source file's SWHID (swh:1:cnt:, its git blob hash; js/swhid.js); with the
   // repository as origin, its path, and lines where they are lines of the file.
