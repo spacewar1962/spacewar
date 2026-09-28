@@ -1248,6 +1248,7 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .well-thumbrow .well-thumb canvas { box-shadow: 0 0 0 3px #1d262e; }
 .well-thumbrow .well-thumb.on canvas { box-shadow: 0 0 0 3px var(--beam); }
 .well-t { font-size: 12px; width: 100%; }
-.well-t td { vertical-align: top; padding: 3px 6px; } .well-t tbody tr { cursor: pointer; } .well-t tbody tr.on { cursor: default; background: var(--surface-2); }
+.well-t td { vertical-align: top; padding: 3px 6px; } .well-t tbody tr { cursor: pointer; } .well-t tbody tr.on { cursor: default; background: rgba(120, 200, 230, 0.16); background: color-mix(in srgb, var(--beam) 22%, transparent); }
+.well-t tbody tr.on td { color: var(--text); }
 .well-t td span { white-space: nowrap; }
 .well-tl { white-space: nowrap; font-weight: 600; } .well-tl i { display: inline-block; width: 14px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: 3px; }
