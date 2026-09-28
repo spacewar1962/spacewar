@@ -1207,3 +1207,6 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 .tour-row .hint { font-size: 12px; }
 /* the tour card sits above Read's selection bar when it shows */
 body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
+/* Help menu: groups under small headings, divided by a rule */
+.tab-menu .menu-group { font-size: 10.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-faint); padding: 6px 8px 2px; }
+.tab-menu .menu-rule { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; width: auto; }
