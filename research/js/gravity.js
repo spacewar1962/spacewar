@@ -321,17 +321,20 @@
       return out;
     }
     var CYAN = '#39c5e0';
-    function proj(N) {
-      var h = N * 0.33, fore = st.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = st.depth / 50, floor = N * 0.42,
-          ra = st.rot * Math.PI / 180, co = Math.cos(ra), si = Math.sin(ra);
+    // the small wells keep one view; the large one takes the controls
+    var FIXED = { tilt: 64, depth: 50, scale: 'sqrt', rot: 0, star: true };
+    function proj(N, w) {
+      w = w || st;
+      var h = N * 0.33, fore = w.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = w.depth / 50, floor = N * 0.42,
+          ra = w.rot * Math.PI / 180, co = Math.cos(ra), si = Math.sin(ra);
       return { floor: floor, f: function (x, y, g) {
         var u0 = x / 512, v0 = y / 512, u = u0 * co - v0 * si, v = u0 * si + v0 * co,
-            d = g === null ? floor : isNaN(g) ? 0 : Math.min(floor, st.scale === 'lin' ? g / 256 * N * 0.02 * dk : Math.sqrt(g / 256) * N * 0.035 * dk);
+            d = g === null ? floor : isNaN(g) ? 0 : Math.min(floor, w.scale === 'lin' ? g / 256 * N * 0.02 * dk : Math.sqrt(g / 256) * N * 0.035 * dk);
         return [cx + u * h - v * h * shear, cy - v * h * fore + d, d];
       } };
     }
-    function segs(N, pts) {
-      var pr = proj(N), out = [];
+    function segs(N, pts, w) {
+      var pr = proj(N, w), out = [];
       pts.forEach(function (L) {
         var prev = null;
         L.forEach(function (p) {
@@ -345,12 +348,13 @@
     function inkOf(g) { return g.ink || CYAN; }
     var SUN = '#ffce7a';
     // the star's mark: eight short rays round a point, at the sheet's level
-    function sunRays(N) {
-      var c = proj(N).f(0, 0, 0), r0 = Math.max(1.5, N / 200), r1 = Math.max(4, N / 55), out = [];
+    function sunRays(N, w) {
+      var c = proj(N, w).f(0, 0, 0), r0 = Math.max(1.5, N / 200), r1 = Math.max(4, N / 55), out = [];
       for (var a = 0; a < 8; a++) { var t = a * Math.PI / 4, k = a % 2 ? 0.6 : 1; out.push([c[0] + Math.cos(t) * r0, c[1] + Math.sin(t) * r0 * 0.7, c[0] + Math.cos(t) * r1 * k, c[1] + Math.sin(t) * r1 * k * 0.7]); }
       return out;
     }
-    function drawTo(canvas, N, gs, lw, own) {
+    function drawTo(canvas, N, gs, lw, w) {
+      w = w || st;
       var dpr = root.devicePixelRatio || 1, g = canvas.getContext('2d');
       canvas.width = Math.round(N * dpr); canvas.height = Math.round(N * dpr); canvas.style.width = N + 'px'; canvas.style.height = N + 'px';
       g.scale(dpr, dpr);
@@ -360,7 +364,7 @@
       gs.forEach(function (gp) {
         g.strokeStyle = inkOf(gp);
         var by = {};
-        segs(N, gp.pts).forEach(function (s) { var k = Math.round(s[4] * 10); (by[k] = by[k] || []).push(s); });
+        segs(N, gp.pts, w).forEach(function (s) { var k = Math.round(s[4] * 10); (by[k] = by[k] || []).push(s); });
         Object.keys(by).forEach(function (k) {
           g.globalAlpha = k / 10 * (gs.length > 1 ? 0.85 : 1); g.beginPath();
           by[k].forEach(function (s) { g.moveTo(s[0], s[1]); g.lineTo(s[2], s[3]); });
@@ -368,7 +372,7 @@
         });
       });
       g.globalAlpha = 1;
-      if (st.star) { g.strokeStyle = SUN; g.lineWidth = Math.max(1, N / 400); sunRays(N).forEach(function (r) { g.beginPath(); g.moveTo(r[0], r[1]); g.lineTo(r[2], r[3]); g.stroke(); }); }
+      if (w.star) { g.strokeStyle = SUN; g.lineWidth = Math.max(1, N / 400); sunRays(N, w).forEach(function (r) { g.beginPath(); g.moveTo(r[0], r[1]); g.lineTo(r[2], r[3]); g.stroke(); }); }
       g.restore();
     }
     function paint() {
@@ -398,7 +402,7 @@
           keep(); paint(); paintThumbs();
         };
         thumbs.appendChild(t);
-        drawTo(cv, 132, [gp], 0.6, true);
+        drawTo(cv, 132, [gp], 0.6, FIXED);
       });
     }
     function svg(p) {
@@ -420,13 +424,12 @@
     card.addEventListener('change', function (e) {
       var k = e.target.dataset && e.target.dataset.w; if (!k) return;
       if (k === 'lines') { st.lines = +e.target.value; keep(); sampleAll(); }
-      if (k === 'scale') { st.scale = e.target.value; keep(); paint(); paintThumbs(); }
-      if (k === 'star') { st.star = e.target.checked; keep(); paint(); paintThumbs(); }
+      if (k === 'scale') { st.scale = e.target.value; keep(); paint(); }
+      if (k === 'star') { st.star = e.target.checked; keep(); paint(); }
     });
     card.addEventListener('input', function (e) {
       var k = e.target.dataset && e.target.dataset.w; if (k !== 'tilt' && k !== 'depth' && k !== 'rot') return;
       st[k] = +e.target.value; keep(); paint();
-      clearTimeout(card._tt); card._tt = setTimeout(paintThumbs, 200);
     });
     SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return svg(p); }, 'spacewar-gravity-well'));
     var drag = null, raf = 0;
@@ -441,7 +444,7 @@
       SW.$('[data-w=rot]', card).value = st.rot; SW.$('[data-w=tilt]', card).value = st.tilt;
       if (!raf) raf = requestAnimationFrame(function () { raf = 0; paint(); });
     });
-    function endDrag() { if (!drag) return; drag = null; keep(); paintThumbs(); }
+    function endDrag() { if (!drag) return; drag = null; keep(); }
     plot.addEventListener('pointerup', endDrag); plot.addEventListener('pointercancel', endDrag);
     var lastW = 0;
     if (root.ResizeObserver) new ResizeObserver(function () { var w = plot.clientWidth; if (w && Math.abs(w - lastW) > 8) { lastW = w; paint(); } }).observe(plot);
