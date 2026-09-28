@@ -95,7 +95,13 @@
       ev: [{ v: '3.1', re: /^mg1,/, label: 'mg1 in 3.1' }, { v: '4.8', re: /^mg1,/, label: 'mg1 in 4.8' }, { v: '4.2', re: /^\s*iot 111/, label: 'iot 111 in 4.2' }] },
     { no: 'F28', kind: 'Anomaly', cat: 'display', title: 'Every ship plots a stray point at the centre of the screen, every frame',
       text: 'Just before a ship’s outline is drawn, the ship routine clears both registers and issues a display instruction: cla cli-opr, then dpy-4000, then the jump into the compiled outline (sp5), which returns to sq6, ioh. The point lands at (0, 0), the centre of the screen, once for each ship in every frame, in every version from 2B on (the 4.4 texts do it through xct db2, their two-scope display); the Spacewar! 1 reconstruction does not. It normally hides under the star. With sense switch 6 on, which turns the star off, the star’s points near the centre fall from 281 to 5 in ten frames on the emulator, and the stray point stays, twice a frame. Presumably it is there to start the display: the outline plots each point with dpy-4000 (no wait) and waits for the previous one with the next ioh, so the first ioh needs a plot before it. That reading is not documented. The bench’s Orbits animation showed it as dots flying out of the star when it moved the ship’s outline with the ship; the bench now leaves the point out of ship outlines.',
-      ev: [{ v: '3.1', re: /^sp5,/, label: 'sp5, with cla cli-opr and dpy-4000 just before it, 3.1' }, { v: '4.4', re: /^mot,\s*sp5,/, label: 'mot, sp5, with xct db2 just before it, 4.4' }] }
+      ev: [{ v: '3.1', re: /^sp5,/, label: 'sp5, with cla cli-opr and dpy-4000 just before it, 3.1' }, { v: '4.4', re: /^mot,\s*sp5,/, label: 'mot, sp5, with xct db2 just before it, 4.4' }] },
+    { no: 'F29', kind: 'Difference', cat: 'game', title: 'In 2B objects collide from further away: its collision area is 1.8 times 3.1’s',
+      text: 'The collision test (col) calls a hit when |dx| and |dy| are each under me1 and |dx| + |dy| is under me1 + me2: an octagon. Measured on the emulator, with the Wedge set at every offset up to 30 screen points from the Needle for one frame, 469 of 3,721 offsets collide in 3.1, 4.0 and 4.8 (me1 6000, me2 3000: 12 and 6 points), and 849 in 2B (me1 10000, me2 4000: 16 and 8 points). The measured shape fills the octagon the constants give. The same test serves torpedoes. See Graphics ▸ Collision shape.',
+      ev: [{ v: '2b', re: /^me1,/, label: 'me1 in 2B' }, { v: '3.1', re: /^me1,/, label: 'me1 in 3.1' }, { v: '3.1', re: /^me2,/, label: 'me2 in 3.1' }] },
+    { no: 'F30', kind: 'Difference', cat: 'game', title: 'Hyperspace is roulette: each breakout adds an eighth to the chance of exploding',
+      text: 'At each breakout (hp3) the ship’s uncertainty mh4 grows by hur (40000 octal, an eighth of the range of the random numbers); a random number with its sign bit set is added, and if the sum comes out positive the ship explodes. So the chance at the nth breakout is about n in 8, and mhs (law i 10) allows 8 jumps. In 120 trials on the emulator in 3.1 (and identically in 4.0) the measured chances were 10%, 24%, 41%, 58% at the first four breakouts, and every ship had exploded by its eighth. The bench cut the waits short and put the ship back after each jump; the odds are the program’s. See Graphics ▸ Hyperspace roulette.',
+      ev: [{ v: '3.1', re: /^hur,/, label: 'hur in 3.1' }, { v: '3.1', re: /^hp3,/, label: 'hp3, the breakout, 3.1' }, { v: '3.1', re: /^mhs,/, label: 'mhs in 3.1' }] }
   ];
   // Each finding's number is its own, written above and never changed: a new
   // finding takes the next number, wherever it is placed in the list.
@@ -308,7 +314,7 @@
       }
       var items = list.map(function (n, i) {
         var c = catOf(n.text, n.tags), lvl = levelOf(n.tags);
-        return { by: n.by, cat: c, lvl: lvl, order: i, text: refOf(n) + ' ' + n.text + ' ' + (n.tags || []).join(' ') + ' ' + n.by, vids: [n.vid], card: function () { return groupCard(n, i, c, lvl); } };
+        return { key: 'n:' + n.id, by: n.by, cat: c, lvl: lvl, order: i, text: refOf(n) + ' ' + n.text + ' ' + (n.tags || []).join(' ') + ' ' + n.by, vids: [n.vid], card: function () { return groupCard(n, i, c, lvl); } };
       });
       grouped(box, items, 'None.');
     });
@@ -499,20 +505,40 @@
   }
   var LORD = { key: 0, notable: 1, minor: 2 };
   // items {cat, lvl, text, vids, card()} under category headings, most important first, minor ones folded
+  // Folding: a category or a single finding folded down to its heading, remembered.
+  function folds() { return SW.store.get('fd.fold', {}) || {}; }
+  function setFold(k, on) { var F = folds(); if (on) F[k] = 1; else delete F[k]; SW.store.set('fd.fold', F); }
+  function chevron(el, k, on) {
+    var b = SW.el('button', { class: 'fd-fold', type: 'button', title: on ? 'Open' : 'Fold away', 'aria-expanded': String(!on) }, on ? '▸' : '▾');
+    b.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var f = !el.classList.contains('folded'); el.classList.toggle('folded', f); setFold(k, f);
+      b.textContent = f ? '▸' : '▾'; b.title = f ? 'Open' : 'Fold away'; b.setAttribute('aria-expanded', String(!f));
+    });
+    return b;
+  }
+  function foldCard(li, k) {
+    var head = SW.$('.fd-head', li); if (!head || !k) return li;
+    var on = !!folds()['f:' + k]; li.classList.toggle('folded', on);
+    head.insertBefore(chevron(li, 'f:' + k, on), head.firstChild);
+    return li;
+  }
   function grouped(box, items, empty) {
     var shown = items.filter(passes);
     if (!shown.length) { box.appendChild(SW.el('p', { class: 'hint' }, items.length ? 'None with these filters.' : empty)); return; }
     CATS.map(function (c) { return c[0]; }).concat(['other']).forEach(function (id) {
       var g = shown.filter(function (it) { return it.cat.id === id; }); if (!g.length) return;
       g.sort(function (a, b) { return LORD[a.lvl] - LORD[b.lvl] || a.order - b.order; });
-      var sec = SW.el('div', { class: 'fd-cgroup' });
-      sec.appendChild(SW.el('h4', { class: 'fd-chead' }, SW.esc(CATNAME[id]) + ' <span class="faint">' + g.length + '</span>'));
+      var sec = SW.el('div', { class: 'fd-cgroup' }), con = !!folds()['c:' + id], h = SW.el('h4', { class: 'fd-chead' }, SW.esc(CATNAME[id]) + ' <span class="faint">' + g.length + '</span>');
+      sec.classList.toggle('folded', con);
+      h.insertBefore(chevron(sec, 'c:' + id, con), h.firstChild);
+      sec.appendChild(h);
       var ol = SW.el('ol', { class: 'fd-list' }), minor = g.filter(function (it) { return it.lvl === 'minor'; });
-      g.filter(function (it) { return it.lvl !== 'minor'; }).forEach(function (it) { ol.appendChild(it.card()); });
+      g.filter(function (it) { return it.lvl !== 'minor'; }).forEach(function (it) { ol.appendChild(foldCard(it.card(), it.key)); });
       sec.appendChild(ol);
       if (minor.length) {
         var d = SW.el('details', { class: 'fd-minor' }, '<summary>' + minor.length + ' minor</summary>'), ol2 = SW.el('ol', { class: 'fd-list' });
-        minor.forEach(function (it) { ol2.appendChild(it.card()); }); d.appendChild(ol2); sec.appendChild(d);
+        minor.forEach(function (it) { ol2.appendChild(foldCard(it.card(), it.key)); }); d.appendChild(ol2); sec.appendChild(d);
       }
       box.appendChild(sec);
     });
@@ -523,8 +549,15 @@
     bar.innerHTML = '<label class="check">Category <select data-f="cat"><option value="">All</option>' + CATS.concat([['other', 'Other']]).map(function (c) { return '<option value="' + c[0] + '"' + (FS.cat === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
       '<label class="check">Importance <select data-f="lvl"><option value="">All</option><option value="notable"' + (FS.lvl === 'notable' ? ' selected' : '') + '>Key and notable</option><option value="key"' + (FS.lvl === 'key' ? ' selected' : '') + '>Key only</option></select></label>' +
       '<label class="check">Version <select data-f="v"><option value="">All</option>' + vs.map(function (v) { return '<option value="' + v.id + '"' + (FS.v === v.id ? ' selected' : '') + '>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</option>'; }).join('') + '</select></label>' +
-      '<input type="search" data-f="q" placeholder="Find in findings" value="' + SW.esc(FS.q || '') + '">';
+      '<input type="search" data-f="q" placeholder="Find in findings" value="' + SW.esc(FS.q || '') + '">' +
+      '<button class="btn ghost" type="button" data-fold="all" title="Fold every finding down to its heading">Fold all</button><button class="btn ghost" type="button" data-fold="none" title="Open every finding and category">Open all</button>';
     function set(e) { var f = e.target.dataset.f; if (!f) return; FS[f] = e.target.value; SW.store.set('fd.filt', FS); onChange(); }
+    bar.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-fold]'); if (!t) return;
+      var all = t.dataset.fold === 'all', box = bar.parentNode || document;
+      SW.$$('li.fd', box).forEach(function (li) { var b = SW.$('.fd-fold', li); if (b && li.classList.contains('folded') !== all) b.click(); });
+      if (!all) SW.$$('.fd-cgroup.folded', box).forEach(function (sec) { var b = SW.$('.fd-chead .fd-fold', sec); if (b) b.click(); });
+    });
     bar.addEventListener('change', set);
     bar.addEventListener('input', function (e) { if (e.target.dataset.f === 'q') { clearTimeout(bar._t); bar._t = setTimeout(function () { set(e); }, 250); } });
     return bar;
@@ -587,7 +620,7 @@
       list.innerHTML = '';
       grouped(list, FIND.map(function (f, n) {
         var c = catOf(f.title + ' ' + f.text + ' ' + f.kind, f.cat ? ['cat:' + f.cat] : []), lvl = f.level || 'notable';
-        return { by: 'bench', cat: c, lvl: lvl, order: n, text: f.no + ' ' + f.title + ' ' + f.text + ' ' + f.kind, vids: f.ev.map(function (e) { return e.v; }).filter(Boolean), card: function () { return benchCard(f, c, lvl); } };
+        return { key: 'b:' + f.no, by: 'bench', cat: c, lvl: lvl, order: n, text: f.no + ' ' + f.title + ' ' + f.text + ' ' + f.kind, vids: f.ev.map(function (e) { return e.v; }).filter(Boolean), card: function () { return benchCard(f, c, lvl); } };
       }), 'None.');
     }
     var nBox = SW.el('div'), wBox = SW.el('div'), tBox = SW.el('div');

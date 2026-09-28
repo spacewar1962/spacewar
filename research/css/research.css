@@ -1308,3 +1308,19 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .rnd-figs figure { margin: 0; } .rnd-figs figcaption { font-size: 11px; max-width: 300px; margin-top: 4px; }
 .rnd-figs canvas { border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
 .rnd-exp { margin-top: 8px; } .rnd-exp .btn { font-size: 11px; padding: 2px 8px; }
+.lab-cv { margin-top: 10px; border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
+.lab-t { font-size: 12px; margin-top: 8px; } .lab-t td { padding: 2px 8px; }
+.fd-fold { background: none; border: 0; color: var(--text-dim); font-size: 15px; line-height: 1; width: 22px; height: 22px; padding: 0; margin-right: 4px; cursor: pointer; border-radius: 4px; vertical-align: -1px; }
+.fd-fold:hover { color: var(--text); background: var(--surface-2); }
+.fd-cgroup.folded > :not(.fd-chead) { display: none; }
+li.fd.folded > :not(.fd-head) { display: none; }
+li.fd.folded { padding-bottom: 2px; }
+.lens-menu .menu-body .menu-group { font-size: 10.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-faint); padding: 6px 8px 2px; grid-column: 1 / -1; }
+.lens-menu .menu-body .menu-rule { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; width: auto; grid-column: 1 / -1; }
+.tab-menu .menu-group, .tab-menu .menu-rule { grid-column: 1 / -1; }
+/* the Graphics menu: its groups in two columns */
+.tab-menu[data-w="graphics"] { width: min(760px, 94vw); display: grid; grid-template-columns: 1fr 1fr; gap: 0 6px; }
+.lens-menu .menu-body:has(.gfx-grp) { width: min(760px, 94vw); display: grid; grid-template-columns: 1fr 1fr; gap: 0 6px; }
+.gfx-grp { display: flex; flex-direction: column; min-width: 0; }
+.gfx-grp button { text-align: left; }
+@media (max-width: 640px) { .tab-menu[data-w="graphics"], .lens-menu .menu-body:has(.gfx-grp) { grid-template-columns: 1fr; } }

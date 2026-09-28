@@ -1628,7 +1628,22 @@
              ['moves', 'Manoeuvres', 'What the well allows: falls, orbits, the CBS opening, escape, as plates'],
              ['torps', 'Torpedoes', 'Torpedo tracks as each version’s game fires them, and the warpage rule'],
              ['random', 'Random numbers', 'The five instructions of chance: the sequence, its cycles, where it is used'],
+             ['collision', 'Collision shape', 'Where two objects collide, measured in each version’s game'],
+             ['roulette', 'Hyperspace roulette', 'The odds of exploding at each breakout, and where the ship comes out'],
              ['tapesim', 'Tape Load Simulator', 'The tape read into core: Read-In, then the loader']];
+  // the Graphics menu in groups, with a small heading over each
+  var GFXG = [['What it draws', ['sky', 'ships', 'sun', 'hyper']], ['The pull of the star', ['gravity', 'orbits', 'moves']],
+              ['The rules at work', ['torps', 'collision', 'roulette', 'random']], ['The machine', ['tapesim']]];
+  function gfxList(attr, onId, skip) {
+    return GFXG.map(function (grp) {
+      var items = grp[1].filter(function (id) { return id !== skip; }).map(function (id) { return GFX.filter(function (g) { return g[0] === id; })[0]; }).filter(Boolean);
+      return items;
+    }).map(function (items, i) {
+      if (!items.length) return '';
+      return '<div class="gfx-grp"><div class="menu-group">' + SW.esc(GFXG[i][0]) + '</div>' +
+        items.map(function (g) { return '<button ' + attr + '="' + g[0] + '"' + (g[0] === onId ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('') + '</div>';
+    }).join('');
+  }
   var gfx = SW.store.get('gfx.item', 'sky'); if (gfx === 'memory') gfx = 'sky';
   var gfxStop = null, gfxBuild = null;
   function renderGfx() {
@@ -1639,7 +1654,7 @@
     var pad = SW.el('div', { class: 'pad gfx-page', style: 'max-width:none' });
     var head = SW.el('div', { class: 'toolbar an-head', style: 'position:static;padding:0 0 10px' });
     head.innerHTML = '<details class="menu lens-menu"><summary class="btn" title="Choose a graphic">' + SW.esc(G[1]) + ' ▾</summary><div class="menu-body lens-list">' +
-      GFX.filter(function (g) { return g[0] !== 'tapesim'; }).map(function (g) { return '<button data-g="' + g[0] + '"' + (g[0] === G[0] ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('') +
+      gfxList('data-g', G[0], 'tapesim') +
       '</div></details><span class="hint an-desc">' + SW.esc(G[2]) + '.</span>';
     head.addEventListener('click', function (e) { var t = e.target.closest('[data-g]'); if (t) { gfx = t.dataset.g; SW.store.set('gfx.item', gfx); SW.writeQuery(); renderGfx(); } });
     pad.appendChild(head);
@@ -1659,6 +1674,8 @@
     if (G[0] === 'moves') { gfxStop = SW.orbits.plates(b, cards); return; }
     if (G[0] === 'torps') { gfxStop = SW.orbits.torpedoes(b, cards); return; }
     if (G[0] === 'random') { gfxStop = SW.random.draw(b, cards); return; }
+    if (G[0] === 'collision') { gfxStop = SW.lab.drawCollision(b, cards); return; }
+    if (G[0] === 'roulette') { gfxStop = SW.lab.drawRoulette(b, cards); return; }
     if (G[0] === 'sun' || G[0] === 'hyper') {
       var wait = SW.el('p', { class: 'hint' }, 'Running ' + b.v.label + ' on the emulator…');
       cards.appendChild(wait);
@@ -1709,7 +1726,7 @@
         }).join('');
       }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
     }
-    if (which === 'graphics') return GFX.map(function (g) { return '<button data-pick="' + g[0] + '"' + (SW.state.tab === 'graphics' && g[0] === gfx ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('');
+    if (which === 'graphics') return gfxList('data-pick', SW.state.tab === 'graphics' ? gfx : null);
     if (which === 'versions') return VERS.map(function (h) {
       var on = h[0] === 'absence' ? SW.state.tab === 'analyse' && lens === 7 : SW.state.tab === h[0];
       return '<button data-pick="' + h[0] + '"' + (on ? ' class="on"' : '') + '><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
