@@ -258,7 +258,7 @@
   SW.MADE = { '1': 'reconstructed by Norbert Landsteiner, April 2016 (revised 2021); not an authentic program',
     '2b': 'reconstructed from the disassembled binary by Norbert Landsteiner, 2014',
     '2b-pre': 'a transcription (masswerk); the build supplies the June 1963 macro tape and the 13 March 1962 star table, not held for this version',
-    '3.1': 'a transcription (masswerk) of the program as on Russell’s tapes',
+    '3.1': 'a text from bitsavers (SteveRussell_box1/_text), as compiled by masswerk',
     '3.1t': 'read by the bench from Russell’s source tapes of 29 September 1962',
     '4.1t': 'read by the bench from the dfw source tape',
     '4.3m': 'reassembled by Norbert Landsteiner, modified 2015', '4.4m': 'reassembled by Norbert Landsteiner', '4.4f': 'reassembled by Norbert Landsteiner (variant f)',
