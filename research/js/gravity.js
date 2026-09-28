@@ -225,73 +225,111 @@
   // after Norbert Landsteiner's picture. A grid over the 1024 by 1024 raster,
   // each line sampled every 4 screen points; each point sinks by its pull,
   // to a floor, and a captured point sinks to the floor. Drawn in an oblique
-  // view inside the round tube.
-  var WELLS = {};
+  // view inside the round tube. Every version's well is worked out in turn;
+  // versions whose code gives the same well share one, shown small to pick,
+  // and any of them can be laid over the one shown, in its own colour.
+  var WELLS = {}, WSIG = {};
+  function wellData(vid, lines, alive, progress) {
+    var key = vid + '|' + lines;
+    if (WELLS[key]) return Promise.resolve(WELLS[key]);
+    return SW.build(vid).then(function (bv) {
+      var P = bv.asm ? G.probe(bv) : { ok: false, why: 'not assembled' };
+      if (!P.ok) return { why: P.why };
+      var n = lines, step = 1024 / n, pts = [], memo = {}, flat = [], q = 0;
+      for (var i = 0; i <= n; i++) {
+        var c = -512 + i * step, a = [], bL = [];
+        for (var t = -512; t <= 512; t += 4) { a.push([c, t]); bL.push([t, c]); }
+        pts.push(a, bL);
+      }
+      pts.forEach(function (L) { L.forEach(function (p) { flat.push(p); }); });
+      function clip(v) { return Math.round(Math.max(-511.99, Math.min(511.99, v)) * 256); }
+      return new Promise(function (res) {
+        (function chunk() {
+          if (!alive()) return;
+          var end = Math.min(flat.length, q + 1500);
+          for (; q < end; q++) {
+            var p = flat[q], k = p[0] + ',' + p[1];
+            if (!(k in memo)) memo[k] = P.at(clip(p[0]), clip(p[1]));
+            p[2] = memo[k];
+          }
+          if (progress) progress(q / flat.length);
+          if (q < flat.length) { setTimeout(chunk, 0); return; }
+          var h = 5381, keys = Object.keys(memo).sort();
+          keys.forEach(function (k2) { var v = memo[k2], t2 = v === null ? 'c' : isNaN(v) ? 'n' : v.toFixed(2); for (var z = 0; z < t2.length; z++) h = ((h * 33) ^ t2.charCodeAt(z)) >>> 0; });
+          WSIG[key] = h.toString(36);
+          res(WELLS[key] = pts);
+        })();
+      });
+    });
+  }
   G.well = function (b, host) {
     var P0 = SW.store.get('well', {}) || {};
-    var st = { v: P0.v || b.v.id, lines: P0.lines || 24, tilt: P0.tilt || 64, depth: P0.depth || 50, scale: P0.scale || 'sqrt' };
+    var st = { v: P0.v || b.v.id, lines: P0.lines || 24, tilt: P0.tilt || 64, depth: P0.depth || 50, scale: P0.scale || 'sqrt', over: P0.over || [], star: P0.star !== false };
     function keep() { SW.store.set('well', st); }
     var vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, c) { return a.sort - c.sort; });
     if (!vs.some(function (v) { return v.id === st.v; })) st.v = '3.1';
     var card = SW.el('div', { class: 'card grav well', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>The well</h4>' +
-      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5.</p>' +
-      '<div class="grav-ctl"><label>Version <select data-w="v">' + vs.map(function (v) { return '<option value="' + v.id + '">' + SW.esc(vname(v)) + '</option>'; }).join('') + '</select></label> ' +
-      '<label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
+      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well to show it; tick Overlay to lay it over the one shown, in its own colour.</p>' +
+      '<div class="grav-ctl"><label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
       '<label>Depth by <select data-w="scale"><option value="sqrt">the square root of the pull</option><option value="lin">the pull</option></select></label> ' +
       '<label>Tilt <input type="range" data-w="tilt" min="25" max="100" step="1"></label> ' +
-      '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label> <span class="grav-exp"></span></div>' +
-      '<div class="well-plot"></div><p class="well-note hint">&nbsp;</p>';
+      '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label> ' +
+      '<label title="A small sun at the star’s place, on the sheet at rest"><input type="checkbox" data-w="star"> Mark the star</label> <span class="grav-exp"></span></div>' +
+      '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-legend"></div><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
     host.appendChild(card);
-    SW.$('[data-w=v]', card).value = st.v; SW.$('[data-w=lines]', card).value = String(st.lines);
-    SW.$('[data-w=tilt]', card).value = st.tilt; SW.$('[data-w=scale]', card).value = st.scale; SW.$('[data-w=depth]', card).value = st.depth;
-    var plot = SW.$('.well-plot', card), note = SW.$('.well-note', card), data = null, stopped = false, job = 0;
+    SW.$('[data-w=lines]', card).value = String(st.lines);
+    SW.$('[data-w=tilt]', card).value = st.tilt; SW.$('[data-w=depth]', card).value = st.depth; SW.$('[data-w=scale]', card).value = st.scale; SW.$('[data-w=star]', card).checked = st.star;
+    var plot = SW.$('.well-plot', card), note = SW.$('.well-note', card), thumbs = SW.$('.well-thumbs', card), legend = SW.$('.well-legend', card);
+    var stopped = false, job = 0, groups = [];   // groups: {sig, vs, pts, ink}
+    function alive(my) { return function () { return !stopped && my === job; }; }
+    function groupOf(vid) { return groups.filter(function (g) { return g.vs.some(function (v) { return v.id === vid; }); })[0]; }
 
-    // the sampled grid: lines[k] = [[x, y, pull or null], ...] in screen points
-    function sample() {
-      var my = ++job;
-      data = null; plot.innerHTML = ''; note.textContent = 'Running the gravity code over the screen…';
-      SW.build(st.v).then(function (bv) {
-        var P = bv.asm ? G.probe(bv) : { ok: false, why: 'not assembled' };
-        if (!P.ok) { note.textContent = vname(bv.v) + ': ' + P.why + '.'; return; }
-        var key = st.v + '|' + st.lines, W = WELLS[key];
-        if (W) { data = W; paint(); return; }
-        var n = st.lines, step = 1024 / n, pts = [], memo = {};
-        for (var i = 0; i <= n; i++) {
-          var c = -512 + i * step, a = [], bL = [];
-          for (var t = -512; t <= 512; t += 4) { a.push([c, t]); bL.push([t, c]); }
-          pts.push(a, bL);
-        }
-        var flat = [], q = 0;
-        pts.forEach(function (L) { L.forEach(function (p) { flat.push(p); }); });
-        (function chunk() {
-          if (stopped || my !== job) return;
-          var end = Math.min(flat.length, q + 1500);
-          for (; q < end; q++) {
-            var p = flat[q], k = p[0] + ',' + p[1];
-            if (!(k in memo)) memo[k] = P.at(Math.round(Math.max(-511.99, Math.min(511.99, p[0])) * 256), Math.round(Math.max(-511.99, Math.min(511.99, p[1])) * 256));
-            p[2] = memo[k];
+    // every version's well, in turn; the one shown first
+    function sampleAll() {
+      var my = ++job; groups = []; thumbs.innerHTML = ''; legend.innerHTML = '';
+      var order = [V.byId(st.v)].concat(vs.filter(function (v) { return v.id !== st.v; })), i = 0, seen = {};
+      note.textContent = 'Running the gravity code over the screen…';
+      (function next() {
+        if (!alive(my)()) return;
+        if (i >= order.length) { note.textContent = caption(); return; }
+        var v = order[i++];
+        wellData(v.id, st.lines, alive(my), function (f) { note.textContent = 'Working out the wells: ' + vname(v) + ' ' + Math.round(f * 100) + '% (' + i + ' of ' + order.length + ')'; }).then(function (pts) {
+          if (!alive(my)()) return;
+          if (pts && !pts.why) {
+            var sig = WSIG[v.id + '|' + st.lines];
+            if (seen[sig]) { seen[sig].vs.push(v); seen[sig].vs.sort(function (a, c) { return a.sort - c.sort; }); }
+            else { seen[sig] = { sig: sig, vs: [v], pts: pts }; groups.push(seen[sig]); }
+            // colours in the order of the versions, as the curves above have them
+            groups.sort(function (a, c) { return a.vs[0].sort - c.vs[0].sort; });
+            groups.forEach(function (g, n) { g.ink = INK[n % INK.length]; });
+            paintThumbs(); paint();
           }
-          note.textContent = 'Running the gravity code over the screen… ' + Math.round(q / flat.length * 100) + '%';
-          if (q < flat.length) { setTimeout(chunk, 0); return; }
-          data = WELLS[key] = pts; paint();
-        })();
-      });
+          setTimeout(next, 0);
+        });
+      })();
     }
-    var INKW = '#39c5e0';
-    // screen position of a point of the sheet: oblique, far side up, with the
-    // depth straight down
+    function caption() {
+      var g = groupOf(st.v), ov = shownGroups().length - 1;
+      return (V.byId(st.v) ? V.byId(st.v).label : st.v) + (g && g.vs.length > 1 ? ' (the same well as ' + (g.vs.length - 1) + ' other' + (g.vs.length > 2 ? 's' : '') + ')' : '') + ' · ' + st.lines + ' lines each way · depth by ' + (st.scale === 'lin' ? 'the pull' : 'the square root of the pull') + ', to the floor where the ship is captured' + (ov > 0 ? ' · ' + ov + ' overlaid' : '');
+    }
+    // the wells drawn: the one shown, and those overlaid
+    function shownGroups() {
+      var main = groupOf(st.v), out = main ? [main] : [];
+      st.over.forEach(function (id) { var g = groupOf(id); if (g && out.indexOf(g) < 0) out.push(g); });
+      return out;
+    }
+    var CYAN = '#39c5e0';
     function proj(N) {
-      var h = N * 0.36, fore = st.tilt / 100, shear = 0.16, cx = N / 2 - h * shear * 0.0, cy = N * 0.44 - 0, dk = st.depth / 50, floor = N * 0.42;
+      var h = N * 0.36, fore = st.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = st.depth / 50, floor = N * 0.42;
       return { floor: floor, f: function (x, y, g) {
         var u = x / 512, v = y / 512, d = g === null ? floor : isNaN(g) ? 0 : Math.min(floor, st.scale === 'lin' ? g / 256 * N * 0.02 * dk : Math.sqrt(g / 256) * N * 0.035 * dk);
         return [cx + u * h - v * h * shear, cy - v * h * fore + d, d];
       } };
     }
-    function segs(N) {
-      // each line cut into short runs, each run with the opacity of its depth
+    function segs(N, pts) {
       var pr = proj(N), out = [];
-      data.forEach(function (L) {
+      pts.forEach(function (L) {
         var prev = null;
         L.forEach(function (p) {
           var q = pr.f(p[0], p[1], p[2]);
@@ -301,43 +339,85 @@
       });
       return out;
     }
-    function paint() {
-      if (!data) return;
-      var N = Math.max(320, Math.min(720, plot.clientWidth || 600)), dpr = root.devicePixelRatio || 1;
-      plot.innerHTML = '<div class="well-tube" style="width:' + N + 'px;height:' + N + 'px"><canvas width="' + Math.round(N * dpr) + '" height="' + Math.round(N * dpr) + '" style="width:' + N + 'px;height:' + N + 'px"></canvas></div>';
-      var g = SW.$('canvas', plot).getContext('2d');
+    function inkOf(g, many) { return many ? g.ink : CYAN; }
+    var SUN = '#ffce7a';
+    // the star's mark: eight short rays round a point, at the sheet's level
+    function sunRays(N) {
+      var c = proj(N).f(0, 0, 0), r0 = Math.max(1.5, N / 200), r1 = Math.max(4, N / 55), out = [];
+      for (var a = 0; a < 8; a++) { var t = a * Math.PI / 4, k = a % 2 ? 0.6 : 1; out.push([c[0] + Math.cos(t) * r0, c[1] + Math.sin(t) * r0 * 0.7, c[0] + Math.cos(t) * r1 * k, c[1] + Math.sin(t) * r1 * k * 0.7]); }
+      return out;
+    }
+    function drawTo(canvas, N, gs, lw, own) {
+      var dpr = root.devicePixelRatio || 1, g = canvas.getContext('2d');
+      canvas.width = Math.round(N * dpr); canvas.height = Math.round(N * dpr); canvas.style.width = N + 'px'; canvas.style.height = N + 'px';
       g.scale(dpr, dpr);
       g.fillStyle = '#000'; g.beginPath(); g.arc(N / 2, N / 2, N / 2, 0, 6.2832); g.fill(); g.save(); g.clip();
-      g.strokeStyle = INKW; g.lineWidth = 1;
-      segs(N).forEach(function (s) { g.globalAlpha = s[4]; g.beginPath(); g.moveTo(s[0], s[1]); g.lineTo(s[2], s[3]); g.stroke(); });
-      g.globalAlpha = 1; var c = proj(N).f(0, 0, 0); g.fillStyle = '#fff'; g.beginPath(); g.arc(c[0], c[1], 2.2, 0, 6.2832); g.fill();
+      g.lineWidth = lw;
+      gs.forEach(function (gp) {
+        g.strokeStyle = inkOf(gp, own || gs.length > 1);
+        segs(N, gp.pts).forEach(function (s) { g.globalAlpha = s[4] * (gs.length > 1 ? 0.85 : 1); g.beginPath(); g.moveTo(s[0], s[1]); g.lineTo(s[2], s[3]); g.stroke(); });
+      });
+      g.globalAlpha = 1;
+      if (st.star) { g.strokeStyle = SUN; g.lineWidth = Math.max(1, N / 400); sunRays(N).forEach(function (r) { g.beginPath(); g.moveTo(r[0], r[1]); g.lineTo(r[2], r[3]); g.stroke(); }); }
       g.restore();
-      var v = V.byId(st.v); note.textContent = (v ? v.label : st.v) + ' · ' + st.lines + ' lines each way · depth by ' + (st.scale === 'lin' ? 'the pull' : 'the square root of the pull') + ', to the floor where the ship is captured';
+    }
+    function paint() {
+      var gs = shownGroups(); if (!gs.length) return;
+      var N = Math.max(320, Math.min(720, plot.clientWidth || 600));
+      plot.innerHTML = '<div class="well-tube" style="width:' + N + 'px;height:' + N + 'px"><canvas></canvas></div>';
+      drawTo(SW.$('canvas', plot), N, gs, 1);
+      legend.innerHTML = gs.length > 1 ? gs.map(function (gp) { return '<div><i style="background:' + gp.ink + '"></i>' + SW.esc(gp.vs.map(vname).join(', ')) + '</div>'; }).join('') : '';
+      if (!/Working out/.test(note.textContent)) note.textContent = caption();
+    }
+    function paintThumbs() {
+      var main = groupOf(st.v), shown = shownGroups();
+      thumbs.innerHTML = '';
+      groups.forEach(function (gp) {
+        var on = gp === main, over = !on && shown.indexOf(gp) >= 0;
+        var t = SW.el('div', { class: 'well-thumb' + (on ? ' on' : '') });
+        var cv = SW.el('canvas', { title: 'Show this well: ' + gp.vs.map(vname).join(', ') });
+        t.appendChild(cv);
+        t.appendChild(SW.el('div', { class: 'well-tn' }, '<i style="background:' + gp.ink + '"></i>' + SW.esc(gp.vs.map(vname).join(', '))));
+        var lab = SW.el('label', { class: 'well-ov' + (on ? ' dis' : '') }, '<input type="checkbox"' + (over ? ' checked' : '') + (on ? ' disabled' : '') + '> Overlay');
+        t.appendChild(lab);
+        cv.onclick = function () { st.v = gp.vs[0].id; st.over = st.over.filter(function (id) { return groupOf(id) !== gp; }); keep(); paintThumbs(); paint(); };
+        SW.$('input', lab).onchange = function (e) {
+          var ids = gp.vs.map(function (v) { return v.id; });
+          st.over = st.over.filter(function (id) { return ids.indexOf(id) < 0; });
+          if (e.target.checked) st.over.push(gp.vs[0].id);
+          keep(); paint(); paintThumbs();
+        };
+        thumbs.appendChild(t);
+        drawTo(cv, 132, [gp], 0.6, true);
+      });
     }
     function svg(p) {
-      var N = 600, o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + N + ' ' + N + '" width="' + N + '" height="' + N + '"><defs><clipPath id="tube"><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '"/></clipPath></defs><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '" fill="#000"/><g clip-path="url(#tube)" stroke="' + INKW + '" stroke-width="1" fill="none">'];
-      // runs grouped by opacity, one path each
-      var by = {};
-      if (data) segs(N).forEach(function (s) { var k = (Math.round(s[4] * 10) / 10).toFixed(1); (by[k] = by[k] || []).push('M' + s[0].toFixed(1) + ' ' + s[1].toFixed(1) + 'L' + s[2].toFixed(1) + ' ' + s[3].toFixed(1)); });
-      Object.keys(by).forEach(function (k) { o.push('<path d="' + by[k].join('') + '" stroke-opacity="' + k + '"/>'); });
-      var c = proj(N).f(0, 0, 0);
-      o.push('</g><circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="2.2" fill="#fff"/></svg>');
-      return o.join('');
+      var N = 600, gs = shownGroups(), o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + N + ' ' + (N + (gs.length > 1 ? 18 * gs.length + 10 : 0)) + '" width="' + N + '" height="' + (N + (gs.length > 1 ? 18 * gs.length + 10 : 0)) + '" font-family="IBM Plex Mono, monospace" font-size="11"><defs><clipPath id="tube"><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '"/></clipPath></defs><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '" fill="#000"/><g clip-path="url(#tube)" stroke-width="1" fill="none">'];
+      gs.forEach(function (gp) {
+        var by = {};
+        segs(N, gp.pts).forEach(function (s) { var k = (Math.round(s[4] * 10) / 10).toFixed(1); (by[k] = by[k] || []).push('M' + s[0].toFixed(1) + ' ' + s[1].toFixed(1) + 'L' + s[2].toFixed(1) + ' ' + s[3].toFixed(1)); });
+        Object.keys(by).forEach(function (k) { o.push('<path d="' + by[k].join('') + '" stroke="' + inkOf(gp, gs.length > 1) + '" stroke-opacity="' + k + '"/>'); });
+      });
+      o.push('</g>');
+      if (st.star) o.push('<path d="' + sunRays(N).map(function (r) { return 'M' + r[0].toFixed(1) + ' ' + r[1].toFixed(1) + 'L' + r[2].toFixed(1) + ' ' + r[3].toFixed(1); }).join('') + '" stroke="' + SUN + '" stroke-width="1.5"/>');
+      if (gs.length > 1) gs.forEach(function (gp, n) { var y = N + 18 + n * 18; o.push('<line x1="10" y1="' + (y - 4) + '" x2="30" y2="' + (y - 4) + '" stroke="' + gp.ink + '" stroke-width="2"/><text x="36" y="' + y + '" fill="' + p.ink + '">' + SW.esc(gp.vs.map(vname).join(', ')) + '</text>'); });
+      return o.join('') + '</svg>';
     }
     card.addEventListener('change', function (e) {
       var k = e.target.dataset && e.target.dataset.w; if (!k) return;
-      if (k === 'v') { st.v = e.target.value; keep(); sample(); }
-      if (k === 'lines') { st.lines = +e.target.value; keep(); sample(); }
-      if (k === 'scale') { st.scale = e.target.value; keep(); paint(); }
+      if (k === 'lines') { st.lines = +e.target.value; keep(); sampleAll(); }
+      if (k === 'scale') { st.scale = e.target.value; keep(); paint(); paintThumbs(); }
+      if (k === 'star') { st.star = e.target.checked; keep(); paint(); paintThumbs(); }
     });
     card.addEventListener('input', function (e) {
       var k = e.target.dataset && e.target.dataset.w; if (k !== 'tilt' && k !== 'depth') return;
       st[k] = +e.target.value; keep(); paint();
+      clearTimeout(card._tt); card._tt = setTimeout(paintThumbs, 200);
     });
     SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return svg(p); }, 'spacewar-gravity-well'));
     var lastW = 0;
     if (root.ResizeObserver) new ResizeObserver(function () { var w = plot.clientWidth; if (w && Math.abs(w - lastW) > 8) { lastW = w; paint(); } }).observe(plot);
-    sample();
+    sampleAll();
     return function () { stopped = true; };
   };
 })(this);
