@@ -305,7 +305,7 @@
       '<label>Importance <select data-f="lvl">' + opt('', 'All', t.filter.lvl || '') + opt('key', '★★★ Key', t.filter.lvl) + opt('notable', '★★ Notable', t.filter.lvl) + opt('minor', '★ Minor', t.filter.lvl) + '</select></label>' +
       '<label>By <select data-f="by">' + opt('', 'Anyone', t.filter.by || '') + bys.map(function (x) { return opt(x, x, t.filter.by); }).join('') + '</select></label>' +
       '<input type="search" data-f="q" class="tray-q" placeholder="Find (number or words)" value="' + SW.esc(t.filter.q || '') + '"></div>' +
-      '<p class="hint">Private. A note takes the version open and the chapter chosen here; Share sends it to the group’s Findings. ' + syncHTML() + '</p>';
+      '<p class="hint">Private. Share sends it to the group’s Findings. ' + syncHTML() + '</p>';
     el.appendChild(head);
     var vis = shown(t), tb = SW.$('.tray-filters', head);
     tb.appendChild(SW.el('button', { class: 'btn ghost tb-right', onclick: function () { T.addText(); } }, '＋ Paragraph'));
