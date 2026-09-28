@@ -10,7 +10,7 @@
   var speed = SW.store.get('run.speed', 1);
   var CPS = 200000;                         // memory cycles per second (5 us)
   var pts = [], PTS_MAX = 80000;            // recent display points for figures
-  var ctx = null, scopeSize = 1024;
+  var ctx = null, ctx2 = null, dual = false, scopeSize = 1024;
   var decay = SW.store.get('run.decay', 0.12); // phosphor time constant (s)
   var tempBreak = null, stepOverTo = null;
   var paneTab = 'source';
@@ -40,10 +40,18 @@
         (build.v.build ? 'it is a data tape, loaded by the programs that use it.' : 'no source survives.') + '</p>'));
       return;
     }
-    var wrap = SW.el('div', { class: 'run' });
+    // 4.4 is the dual-console version: each frame goes to one of two scopes, centred
+    // on one ship, chosen by the 400 bit of the display instruction (dj5 / dj6)
+    dual = !!(build.sym && build.sym.dj6);
+    var wrap = SW.el('div', { class: 'run' + (dual ? ' dual' : '') });
     var left = SW.el('div', { class: 'run-left' });
+    var keysTip = 'Click, then fly the Needle with W A S D and the Wedge with I J K L: W and I fire, S and K the rocket, A and J turn left, D and L turn right.';
     left.innerHTML =
-      '<div class="scope-wrap" title="Type 30 display. Click, then fly the Needle with W A S D and the Wedge with I J K L: W and I fire, S and K the rocket, A and J turn left, D and L turn right."><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>' +
+      (dual
+        ? '<div class="scopes2"><figure><div class="scope-wrap" title="Scope 1. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 1: the Wedge’s console, centred on the Wedge</figcaption></figure>' +
+          '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' +
+          '<p class="hint scopes2-note">4.4 sends alternate frames to two scopes, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). The bench reads the 400 bit of the display instruction (dpy-i 400, in dj6) as the second scope, as the listing describes it.</p>'
+        : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>') +
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
       '<button class="btn" id="r-over" title="Step over a subroutine call (jsp, jda)">Step over</button>' +
@@ -51,7 +59,8 @@
       '<select id="r-speed" class="btn" title="Speed relative to the PDP-1 (5 µs memory cycle)">' +
       [0.01, 0.05, 0.25, 0.5, 1, 2, 4].map(function (s) { return '<option value="' + s + '"' + (s === speed ? ' selected' : '') + '>' + s + '×</option>'; }).join('') +
       '</select>' +
-      '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button></div>' +
+      (dual ? '<button class="btn" id="r-fig" title="Save scope 1 at print resolution">▣ Scope 1</button><button class="btn" id="r-fig2" title="Save scope 2 at print resolution">▣ Scope 2</button></div>'
+            : '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button></div>') +
       '<div class="keys">Controls: click the scope, then <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
     var right = SW.el('div', { class: 'run-right' });
@@ -63,13 +72,18 @@
     wrap.appendChild(right);
     view.appendChild(wrap);
 
-    var cv = SW.$('#scope', view);
+    var cv = SW.$('#scope', view), cv2 = SW.$('#scope2', view);
     ctx = cv.getContext('2d');
     ctx.fillStyle = '#000';
     ctx.fillRect(0, 0, scopeSize, scopeSize);
-    cv.addEventListener('keydown', function (e) { if (KEYS[e.code]) { cpu.control |= KEYS[e.code]; e.preventDefault(); } });
-    cv.addEventListener('keyup', function (e) { if (KEYS[e.code]) { cpu.control &= ~KEYS[e.code]; e.preventDefault(); } });
-    cv.addEventListener('blur', function () { cpu.control = 0; });
+    ctx2 = cv2 ? cv2.getContext('2d') : null;
+    if (ctx2) { ctx2.fillStyle = '#000'; ctx2.fillRect(0, 0, scopeSize, scopeSize); }
+    [cv, cv2].forEach(function (c) {
+      if (!c) return;
+      c.addEventListener('keydown', function (e) { if (KEYS[e.code]) { cpu.control |= KEYS[e.code]; e.preventDefault(); } });
+      c.addEventListener('keyup', function (e) { if (KEYS[e.code]) { cpu.control &= ~KEYS[e.code]; e.preventDefault(); } });
+      c.addEventListener('blur', function () { cpu.control = 0; });
+    });
 
     // Hand focus back to the scope, so the game keys work and a later Space or
     // Enter does not press this button again and resume the game.
@@ -78,7 +92,8 @@
     SW.$('#r-over', view).onclick = stepOver;
     SW.$('#r-reset', view).onclick = function () { pause(); load(); updateAll(); };
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
-    SW.$('#r-fig', view).onclick = function () { SW.figures.scopeFigureDialog(pts, cpu.cycles, build); };
+    SW.$('#r-fig', view).onclick = function () { SW.figures.scopeFigureDialog(dual ? pts.filter(function (p) { return p.sc !== 2; }) : pts, cpu.cycles, build); };
+    if (dual) SW.$('#r-fig2', view).onclick = function () { SW.figures.scopeFigureDialog(pts.filter(function (p) { return p.sc === 2; }), cpu.cycles, build); };
     SW.$('#r-tabs', view).addEventListener('click', function (e) {
       var t = e.target.closest('button[data-t]');
       if (!t) return;
@@ -136,20 +151,23 @@
   }
 
   // ---------- scope ----------
-  function plot(x, y, s, t) {
-    pts.push({ x: x, y: y, s: s, t: t });
+  function plot(x, y, s, t, pc, md) {
+    // on the dual-console version the 400 bit picks the scope, and is no part of the brightness
+    var sc = dual && md != null && (md & 0o400) ? 2 : 1;
+    if (dual && md != null) { var i2 = (md >> 6) & 3; s = i2; }
+    pts.push({ x: x, y: y, s: s, t: t, sc: sc });
     if (pts.length > PTS_MAX) pts.splice(0, pts.length - PTS_MAX);
-    if (!ctx) return;
+    var g = sc === 2 ? ctx2 : ctx;
+    if (!g) return;
     var px = (x + 512) * scopeSize / 1024, py = (511 - y) * scopeSize / 1024;
     var a = Math.max(0.25, Math.min(1, 0.62 + 0.13 * s));
-    ctx.fillStyle = 'rgba(200,236,255,' + a + ')';
-    ctx.fillRect(px - 1, py - 1, 2.4, 2.4);
+    g.fillStyle = 'rgba(200,236,255,' + a + ')';
+    g.fillRect(px - 1, py - 1, 2.4, 2.4);
   }
   function fade(dt) {
     if (!ctx) return;
     var keep = Math.exp(-dt / decay);
-    ctx.fillStyle = 'rgba(0,2,4,' + (1 - keep).toFixed(4) + ')';
-    ctx.fillRect(0, 0, scopeSize, scopeSize);
+    [ctx, ctx2].forEach(function (g) { if (!g) return; g.fillStyle = 'rgba(0,2,4,' + (1 - keep).toFixed(4) + ')'; g.fillRect(0, 0, scopeSize, scopeSize); });
   }
 
   // ---------- execution ----------
@@ -161,7 +179,7 @@
     cpu.lastSrcPc = -1;
     cpu.onDisplay = plot;
     pts = [];
-    if (ctx) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, scopeSize, scopeSize); }
+    [ctx, ctx2].forEach(function (g) { if (g) { g.fillStyle = '#000'; g.fillRect(0, 0, scopeSize, scopeSize); } });
     cpu.breakpoints = SW.breakpoints;
     publishProfile();
   }

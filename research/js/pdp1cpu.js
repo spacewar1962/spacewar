@@ -321,7 +321,7 @@
       if (yy & 0o1000) yy = -(yy ^ 0o1777);
       var inten = (md >> 6) & 7;
       var s = inten & 4 ? -(inten ^ 7) : inten;   // ones' complement 3 bits
-      if (this.onDisplay) this.onDisplay(x, yy, s, this.cycles, this.curPC);
+      if (this.onDisplay) this.onDisplay(x, yy, s, this.cycles, this.curPC, md);   // md: the instruction (4.4 chooses its scope with the 400 bit)
       return 10;                             // ~50 us including the wait
     }
     if (dev === 0o11) { this.io = this.control; return 1; }   // control boxes
