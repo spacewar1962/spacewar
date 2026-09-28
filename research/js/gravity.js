@@ -402,7 +402,7 @@
       });
     }
     function svg(p) {
-      var N = 600, gs = shownGroups(), o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + N + ' ' + (N + (gs.length > 1 ? 18 * gs.length + 10 : 0)) + '" width="' + N + '" height="' + (N + (gs.length > 1 ? 18 * gs.length + 10 : 0)) + '" font-family="IBM Plex Mono, monospace" font-size="11"><defs><clipPath id="tube"><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '"/></clipPath></defs><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '" fill="#000"/><g clip-path="url(#tube)" stroke-width="1" fill="none">'];
+      var N = 600, gs = shownGroups(), o = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + N + ' ' + N + '" width="' + N + '" height="' + N + '" font-family="IBM Plex Mono, monospace" font-size="9"><defs><clipPath id="tube"><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '"/></clipPath></defs><circle cx="' + N / 2 + '" cy="' + N / 2 + '" r="' + N / 2 + '" fill="#000"/><g clip-path="url(#tube)" stroke-width="1" fill="none">'];
       gs.forEach(function (gp) {
         var by = {};
         segs(N, gp.pts).forEach(function (s) { var k = (Math.round(s[4] * 10) / 10).toFixed(1); (by[k] = by[k] || []).push('M' + s[0].toFixed(1) + ' ' + s[1].toFixed(1) + 'L' + s[2].toFixed(1) + ' ' + s[3].toFixed(1)); });
@@ -410,7 +410,11 @@
       });
       o.push('</g>');
       if (st.star) o.push('<path d="' + sunRays(N).map(function (r) { return 'M' + r[0].toFixed(1) + ' ' + r[1].toFixed(1) + 'L' + r[2].toFixed(1) + ' ' + r[3].toFixed(1); }).join('') + '" stroke="' + SUN + '" stroke-width="1.5"/>');
-      if (gs.length > 1) gs.forEach(function (gp, n) { var y = N + 18 + n * 18; o.push('<line x1="10" y1="' + (y - 4) + '" x2="30" y2="' + (y - 4) + '" stroke="' + gp.ink + '" stroke-width="2"/><text x="36" y="' + y + '" fill="' + p.ink + '">' + SW.esc(gp.vs.map(vname).join(', ')) + '</text>'); });
+      // the versions drawn, small in the bottom right-hand corner, each with its colour
+      gs.slice().reverse().forEach(function (gp, n) {
+        var y = N - 6 - n * 12, names = gp.vs.map(vname), t = names.length > 3 ? names[0] + ', ' + names[1] + ' … ' + names[names.length - 1] + ' (' + names.length + ')' : names.join(', ');
+        o.push('<text x="' + (N - 4) + '" y="' + y + '" fill="' + p.ink + '" text-anchor="end">' + SW.esc(t) + '</text><line x1="' + (N - 10 - t.length * 5.45) + '" y1="' + (y - 3) + '" x2="' + (N - 20 - t.length * 5.45) + '" y2="' + (y - 3) + '" stroke="' + gp.ink + '" stroke-width="2"/>');
+      });
       return o.join('') + '</svg>';
     }
     card.addEventListener('change', function (e) {
