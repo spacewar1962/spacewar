@@ -350,37 +350,47 @@
     if (T) h.push('<section class="ov-box"><h4>The object table <span class="faint">(' + (T.nob != null ? T.nob + ' objects (nob, octal ' + T.nob.toString(8) + '), ' : '') + 'as the main loop sets its pointers; words in decimal)</span>' + icons('table') + '</h4><table class="ov-sub"><thead><tr><th>Field</th><th>Words</th><th>The program’s comment</th></tr></thead><tbody>' +
       T.fields.map(function (f) { return '<tr><td><a href="#" class="ov-nm mono" data-p="' + f.p + '" data-n="' + f.n + '">' + SW.esc(f.field) + '</a></td><td class="num">' + (f.size == null ? '' : f.size) + '</td><td class="ov-g">' + SW.esc(f.what) + '</td></tr>'; }).join('') + '</tbody></table></section>');
 
-    el.innerHTML = '<div class="ov-top"><div class="ov-scope"><canvas width="720" height="720"></canvas><div class="ov-scapline"><p class="hint ov-scap"></p>' + icons('screen', true) + '</div></div>' + frameBox + '</div>' +
+    var twinS = SW.scopeCount(b) === 2;
+    el.innerHTML = '<div class="ov-top' + (twinS ? ' twin' : '') + '"><div class="ov-scope">' +
+      (twinS ? '<div class="ov-scopes"><figure><canvas data-s="1" width="600" height="600"></canvas><figcaption>Scope 1: the Wedge’s console</figcaption></figure><figure><canvas data-s="2" width="600" height="600"></canvas><figcaption>Scope 2: the Needle’s console</figcaption></figure></div>'
+             : '<canvas width="720" height="720"></canvas>') +
+      '<div class="ov-scapline"><p class="hint ov-scap"></p>' + icons('screen', true) + '</div></div><div class="ov-split"></div>' + frameBox + '</div>' +
       '<section class="ov-box ov-panel"><div class="ov-insp"></div></section>' +
       '<div class="ov-rest">' + h.join('') + '</div>';
-    var insp = SW.$('.ov-insp', el), scv = SW.$('.ov-scope canvas', el), sg = scv.getContext('2d'), scap = SW.$('.ov-scap', el), picked = null, hovered = null, shownFrame = 0;
+    var insp = SW.$('.ov-insp', el), scvs = SW.$$('.ov-scope canvas', el), scap = SW.$('.ov-scap', el), picked = null, hovered = null, shownFrame = 0;
+    SW.dragSplit(SW.$('.ov-top', el), SW.$('.ov-split', el), 'ovSplit.' + (twinS ? 2 : 1), 220, 320);
+    // for 4.4, the frame on each scope at frame i: the latest drawn there (frames alternate between them)
+    function onScope(i, s) { for (var j = i; j >= 0; j--) if ((FL[j].sc || 1) === s) return j; return -1; }
     // the screen in the frame shown: its points bright, the frame before faint
     // (the phosphor's glow), a chosen routine's points in its colour
     function scope(i) {
       shownFrame = i;
-      var N = scv.width, R = N / 2, k = (N - 4) * Math.SQRT1_2 / 1024,   // the square raster inside the round tube
-         hi = hovered != null ? String(hovered) : picked != null ? String(picked) : null;
-      sg.fillStyle = '#000'; sg.fillRect(0, 0, N, N);
-      sg.save(); sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.fillStyle = '#02050a'; sg.fill(); sg.clip();
-      function pass(f, alpha, bright) {
-        if (!f) return 0;
-        var n = 0, P = f.pts;
-        for (var j = 0; j < P.length; j += 3) {
-          var own = hi != null && String(P[j + 2]) === hi, px = R + P[j] * k, py = R - P[j + 1] * k;
-          if (own && bright) { sg.fillStyle = colour(nm(P[j + 2])); sg.globalAlpha = 1; sg.beginPath(); sg.arc(px, py, 3.2, 0, 6.2832); sg.fill(); n++; }
-          else { sg.fillStyle = '#cfe6ff'; sg.globalAlpha = alpha * (hi != null && bright ? 0.55 : 1); sg.fillRect(px - 1.1, py - 1.1, 2.2, 2.2); }
+      var hi = hovered != null ? String(hovered) : picked != null ? String(picked) : null, sc = FL[i] && FL[i].sc || 1, nHi = 0;
+      scvs.forEach(function (scv) {
+        var s = +scv.dataset.s || 0, fi = s ? onScope(i, s) : i, sg = scv.getContext('2d');
+        var N = scv.width, R = N / 2, k = (N - 4) * Math.SQRT1_2 / 1024;   // the square raster inside the round tube
+        sg.fillStyle = '#000'; sg.fillRect(0, 0, N, N);
+        sg.save(); sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.fillStyle = '#02050a'; sg.fill(); sg.clip();
+        function pass(f, alpha, bright) {
+          if (!f) return 0;
+          var n = 0, P = f.pts;
+          for (var j = 0; j < P.length; j += 3) {
+            var own = hi != null && String(P[j + 2]) === hi, px = R + P[j] * k, py = R - P[j + 1] * k;
+            if (own && bright) { sg.fillStyle = colour(nm(P[j + 2])); sg.globalAlpha = 1; sg.beginPath(); sg.arc(px, py, 3.2, 0, 6.2832); sg.fill(); n++; }
+            else { sg.fillStyle = '#cfe6ff'; sg.globalAlpha = alpha * (hi != null && bright ? 0.55 : 1); sg.fillRect(px - 1.1, py - 1.1, 2.2, 2.2); }
+          }
+          sg.globalAlpha = 1;
+          return n;
         }
-        sg.globalAlpha = 1;
-        return n;
-      }
-      // the glow is of the frame before on the same scope (4.4 alternates its two scopes)
-      var sc = FL[i] && FL[i].sc || 1, prev = i - 1; if (SW.scopeCount(b) === 2) while (prev >= 0 && (FL[prev].sc || 1) !== sc) prev--;
-      pass(FL[prev], 0.28, false);
-      var nHi = pass(FL[i], 1, true);
-      sg.restore();
-      sg.strokeStyle = '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
+        // the glow is of the frame before on the same scope; on 4.4 the other
+        // scope shows its own last frame, drawn one frame earlier
+        var live = !s || s === sc, prev = s ? onScope(fi - 1, s) : fi - 1;
+        if (fi >= 0) { pass(FL[prev], 0.28, false); var n1 = pass(FL[fi], live ? 1 : 0.7, true); if (live) nHi = n1; }
+        sg.restore();
+        sg.strokeStyle = live && s ? '#5c7c9c' : '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
+      });
       var f = FL[i];
-      scap.textContent = f ? 'Frame ' + (i + 1) + (SW.scopeCount(b) === 2 ? ' · scope ' + sc + (sc === 2 ? ', the Needle’s console' : ', the Wedge’s console') : '') + ' · ' + (f.pts.length / 3) + ' points' + (hi != null ? ' · ' + nm(hi) + (!runsIn(hi, i) ? ' not in this frame' : ' ' + nHi) : '') : '';
+      scap.textContent = f ? 'Frame ' + (i + 1) + (twinS ? ' · drawn on scope ' + sc : '') + ' · ' + (f.pts.length / 3) + ' points' + (hi != null ? ' · ' + nm(hi) + (!runsIn(hi, i) ? ' not in this frame' : ' ' + nHi) : '') : '';
     }
 
     // ---------- the flame chart ----------
@@ -542,15 +552,21 @@
     // ---------- figures and notes from the panels ----------
     function svgWrap(W, H, pal, body) { return '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + (pal.bg ? '<rect width="' + W + '" height="' + H + '" fill="' + pal.bg + '"/>' : '') + body + '</svg>'; }
     function screenSVG(pal) {
-      var N = 520, R = N / 2, k = (N - 4) * Math.SQRT1_2 / 1024, hi = picked != null ? String(picked) : null, o = ['<circle cx="' + R + '" cy="' + R + '" r="' + (R - 2) + '" fill="#02050a" stroke="#3a5068" stroke-width="3"/>'];
-      [[FL[shownFrame - 1], 0.28], [FL[shownFrame], 1]].forEach(function (pr) {
-        var f = pr[0]; if (!f) return;
-        for (var j = 0; j < f.pts.length; j += 3) {
-          var own = pr[1] === 1 && hi != null && String(f.pts[j + 2]) === hi, x = R + f.pts[j] * k, y = R - f.pts[j + 1] * k;
-          o.push(own ? '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3" fill="' + colour(nm(f.pts[j + 2])) + '"/>' : '<rect x="' + (x - 1.1).toFixed(1) + '" y="' + (y - 1.1).toFixed(1) + '" width="2.2" height="2.2" fill="#cfe6ff" opacity="' + pr[1] + '"/>');
-        }
+      var N = 520, R = N / 2, k = (N - 4) * Math.SQRT1_2 / 1024, hi = picked != null ? String(picked) : null, o = [], sc = FL[shownFrame] && FL[shownFrame].sc || 1;
+      // one tube, or 4.4's two side by side, each with the frames last drawn on it
+      (twinS ? [1, 2] : [0]).forEach(function (s, t) {
+        var ox = t * (N + 24), fi = s ? onScope(shownFrame, s) : shownFrame, prev = s ? onScope(fi - 1, s) : fi - 1, live = !s || s === sc;
+        o.push('<circle cx="' + (ox + R) + '" cy="' + R + '" r="' + (R - 2) + '" fill="#02050a" stroke="#3a5068" stroke-width="3"/>');
+        if (s) o.push('<text x="' + (ox + R) + '" y="' + (N + 18) + '" fill="#8aa0b4" font-family="IBM Plex Sans, sans-serif" font-size="13" text-anchor="middle">' + (s === 1 ? 'Scope 1: the Wedge’s console' : 'Scope 2: the Needle’s console') + '</text>');
+        [[FL[prev], 0.28], [FL[fi], live ? 1 : 0.7]].forEach(function (pr) {
+          var f = fi >= 0 ? pr[0] : null; if (!f) return;
+          for (var j = 0; j < f.pts.length; j += 3) {
+            var own = pr[1] > 0.5 && hi != null && String(f.pts[j + 2]) === hi, x = ox + R + f.pts[j] * k, y = R - f.pts[j + 1] * k;
+            o.push(own ? '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3" fill="' + colour(nm(f.pts[j + 2])) + '"/>' : '<rect x="' + (x - 1.1).toFixed(1) + '" y="' + (y - 1.1).toFixed(1) + '" width="2.2" height="2.2" fill="#cfe6ff" opacity="' + pr[1] + '"/>');
+          }
+        });
       });
-      return svgWrap(N, N, { bg: '#000' }, o.join(''));
+      return svgWrap(twinS ? 2 * N + 24 : N, twinS ? N + 28 : N, { bg: '#000' }, o.join(''));
     }
     function playerSVG(pal) {
       var f = FL[shownFrame]; if (!f) return svgWrap(10, 10, pal, '');

@@ -122,7 +122,24 @@
   // (F-15D) gives 720407 as dpp, display one point on the second CRT (Type 31),
   // beside dpy 720007 for the Type 30. Each of its frames goes to one of the two.
   SW.scopeCount = function (b) { return b && b.sym && b.sym.dj6 ? 2 : 1; };
-  SW.scopeOf = function (b, md) { return SW.scopeCount(b) === 2 && md != null && (md & 0o7777) === 0o0407 ? 2 : 1; };
+  // A draggable divide between the first and last columns of a three-column
+  // grid (left, divide, right); the width is kept under key, double-click resets.
+  SW.dragSplit = function (wrap, split, key, minL, minR) {
+    minL = minL || 200; minR = minR || 240;
+    split.classList.add('split-v'); split.setAttribute('role', 'separator'); split.setAttribute('aria-orientation', 'vertical');
+    split.title = 'Drag to resize; double-click to reset';
+    function set(w) { wrap.style.gridTemplateColumns = w ? Math.round(w) + 'px 6px minmax(0, 1fr)' : ''; }
+    set(SW.store.get(key, 0));
+    split.addEventListener('pointerdown', function (e) {
+      e.preventDefault(); split.setPointerCapture(e.pointerId); split.classList.add('on');
+      var x0 = wrap.getBoundingClientRect().left, max = wrap.clientWidth - minR, w = 0;
+      function mv(ev) { w = Math.max(minL, Math.min(max, ev.clientX - x0)); set(w); window.dispatchEvent(new Event('resize')); }
+      function up() { split.removeEventListener('pointermove', mv); split.removeEventListener('pointerup', up); split.classList.remove('on'); if (w) SW.store.set(key, Math.round(w)); }
+      split.addEventListener('pointermove', mv); split.addEventListener('pointerup', up);
+    });
+    split.addEventListener('dblclick', function () { SW.store.set(key, 0); set(0); window.dispatchEvent(new Event('resize')); });
+  };
+  SW.scopeOf = function (b, md) { return SW.scopeCount(b) === 2 && md != null && (md & 0o777) === 0o407 ? 2 : 1; };
   SW.me = function () {
     return { initials: SW.store.get('initials', ''), name: SW.store.get('name', '') };
   };

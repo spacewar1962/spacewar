@@ -68,7 +68,11 @@
       ['source', 'trace', 'profile', 'writes', 'anomalies', 'breakpoints'].map(function (t) {
         return '<button class="btn' + (t === paneTab ? ' on' : '') + '" data-t="' + t + '">' + t.charAt(0).toUpperCase() + t.slice(1) + '</button>';
       }).join('') + '<span class="sep"></span><span class="hint" id="r-clock"></span></div><div id="r-pane"></div>';
+    // the divide between the scopes and the code drags; its place is kept per layout
+    var split = SW.el('div', { class: 'run-split' });
+    SW.dragSplit(wrap, split, 'runSplit.' + (dual ? 2 : 1), 220, 240);
     wrap.appendChild(left);
+    wrap.appendChild(split);
     wrap.appendChild(right);
     view.appendChild(wrap);
 

@@ -54,9 +54,13 @@
             var m = centroid(P), d = Math.hypot(m[0] + c.t[0] - q.x, m[1] + c.t[1] - q.y);
             if (d < bd) { bd = d; best = P; bt = c.t; }
           });
-          var P2 = best || cand[0].g[k], out = new Int16Array(P2.length);
-          for (var i = 0; i < P2.length; i += 2) { out[i] = Math.round(P2[i] + bt[0]); out[i + 1] = Math.round(P2[i + 1] + bt[1]); }
-          return out;
+          var P2 = best || cand[0].g[k], o2 = [];
+          for (var i = 0; i < P2.length; i += 2) {
+            var X = Math.round(P2[i] + bt[0]), Y = Math.round(P2[i + 1] + bt[1]);
+            if ((bt[0] || bt[1]) && Math.abs(X) <= 4 && Math.abs(Y) <= 4) continue;   // the stray centre point (F28), come back near the centre (the ship moved a little within the frame)
+            o2.push(X, Y);
+          }
+          return Int16Array.from(o2);
         });
         frames[base].pts = keep; cand = [];
       }
@@ -123,7 +127,7 @@
   }
   O.orbit = function (vid, r, pct, secs, alive, progress) {
     return O.run(vid, {
-      key: 'orbit3|' + r + '|' + pct + '|' + secs, frames: Math.round(secs * 20), strobe: 20,
+      key: 'orbit5|' + r + '|' + pct + '|' + secs, frames: Math.round(secs * 20), strobe: 20,
       setup: function (mem, S, P, u) {
         var v = circular(P, r) * pct / 100, nx = S.nx1.val, ny = S.ny1.val, dx = S.ndx.val, dy = S.ndy.val;
         // the Needle on the right going up, the Wedge on the left going down
@@ -228,7 +232,7 @@
   };
 
   O.move = function (vid, m, alive) {
-    return O.run(vid, { key: 'move3|' + m.id, frames: Math.round(m.secs * 22), strobe: 20, setup: m.setup, control: m.control ? m.control() : null, torps: !!m.torps }, alive);
+    return O.run(vid, { key: 'move5|' + m.id, frames: Math.round(m.secs * 22), strobe: 20, setup: m.setup, control: m.control ? m.control() : null, torps: !!m.torps }, alive);
   };
 
   // the page of plates: each movement for two versions side by side, the
@@ -351,7 +355,7 @@
         '<div class="well-play orb-play"><button class="btn" data-o="play">▶ Play</button> <button class="btn ghost" data-o="again" title="From the start">↺</button> ' +
         '<label>Speed <select data-o="speed"><option value="1">as played</option><option value="2">double</option><option value="4">four times</option><option value="8">eight times</option></select></label> ' +
         '<label><input type="checkbox" data-o="loop"> Loop</label> <label title="Older outlines fade as new ones are drawn"><input type="checkbox" data-o="fade"> Fade</label> <span class="hint mono orb-t">&nbsp;</span></div>' +
-        '<div class="hint mono orb-read">&nbsp;</div></div>' +
+        '<div class="hint mono orb-read">&nbsp;</div><div class="orb-duals" hidden></div></div>' +
       '<div class="orb-side">' +
         '<div class="well-view orb-ctl">' +
           '<label>Distance <select data-o="r"><option value="64">64</option><option value="96">96</option><option value="128">128</option><option value="192">192</option><option value="256">256</option></select> points</label>' +
@@ -389,7 +393,7 @@
     function chips() {
       vbox.innerHTML = all.map(function (v) {
         var on = st.vs.indexOf(v.id) >= 0;
-        return '<label class="orb-chip' + (on ? ' on' : '') + '"><input type="checkbox" data-v="' + v.id + '"' + (on ? ' checked' : '') + '><i style="background:' + inkOf(v.id, st.vs) + '"></i>' + SW.esc(vname(v)) + '</label>';
+        return '<label class="orb-chip' + (on ? ' on' : '') + '"><input type="checkbox" data-v="' + v.id + '"' + (on ? ' checked' : '') + '><i style="background:' + inkOf(v.id, st.vs) + '"></i>' + SW.esc(vname(v)) + ' <span class="orb-ref mono">' + SW.esc(SW.refOf(v.id)) + '</span></label>';
       }).join('');
     }
     function runAll() {
@@ -403,7 +407,7 @@
         stopPlay(); anim.T = null;
         O.orbit(vid, st.r, st.pct, st.secs, alive(my), function (f) { read.textContent = 'Running ' + vname(V.byId(vid)) + '… ' + Math.round(f * 100) + '%'; }).then(function (d) {
           if (!alive(my)()) return;
-          got[vid] = d; paint(); setTimeout(next, 0);
+          got[vid] = d; SW.build(vid).then(function (bv) { d.twin = SW.scopeCount(bv) === 2; paint(); }); paint(); setTimeout(next, 0);
         });
       })();
     }
@@ -457,6 +461,39 @@
       var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
       scene(g, N, { bg: '#000', dim: '#4a5a66' }, anim.T);
       SW.$('.orb-t', card).textContent = anim.T != null ? anim.T.toFixed(1) + ' s' : '';
+      duals(N);
+    }
+    // 4.4, the two-console version: what each pilot's scope showed, centred on
+    // their own ship, drawn from the same record (4.4's kcb subtracts the ship's
+    // place from everything it plots; see F31)
+    var dualBox = SW.$('.orb-duals', card);
+    function duals(N) {
+      var vid = st.vs.filter(function (v) { return got[v] && got[v].twin; })[0];
+      if (!vid) { dualBox.hidden = true; return; }
+      var d = got[vid], F = d.frames, M = Math.round(N / 2 - 8), dpr = root.devicePixelRatio || 1;
+      if (dualBox.hidden || dualBox.dataset.v !== vid || +dualBox.dataset.m !== M) {
+        dualBox.hidden = false; dualBox.dataset.v = vid; dualBox.dataset.m = M;
+        dualBox.innerHTML = '<p class="hint">' + SW.esc(vname(V.byId(vid))) + ' on its two scopes, each centred on one pilot’s ship (F31)</p>' +
+          [['Scope 1: the Wedge’s console', 1], ['Scope 2: the Needle’s console', 0]].map(function (s2) { return '<figure><canvas data-c="' + s2[1] + '" width="' + M * dpr + '" height="' + M * dpr + '" style="width:' + M + 'px;height:' + M + 'px"></canvas><figcaption>' + s2[0] + '</figcaption></figure>'; }).join('');
+      }
+      var T = anim.T == null ? F[F.length - 1].t : anim.T, cur = 0;
+      for (var j = 0; j < F.length && F[j].t <= T; j++) cur = j;
+      SW.$$('canvas', dualBox).forEach(function (cvs) {
+        var c = +cvs.dataset.c, g = cvs.getContext('2d'), k = M / 1024, q = F[cur].s[c];
+        g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, M, M);
+        function wrap(v) { return ((v + 512) % 1024 + 1024) % 1024 - 512; }
+        function X(x) { return M / 2 + wrap(x - q.x) * k; } function Y(y) { return M / 2 - wrap(y - q.y) * k; }
+        // the star, where it lies from this ship
+        g.strokeStyle = '#ffce7a'; g.lineWidth = 1; var sx = X(0), sy = Y(0);
+        for (var a = 0; a < 8; a++) { var t = a * Math.PI / 4; g.beginPath(); g.moveTo(sx + Math.cos(t) * 1.5, sy + Math.sin(t) * 1.5); g.lineTo(sx + Math.cos(t) * 4, sy + Math.sin(t) * 4); g.stroke(); }
+        // both ships now, each its last outline moved to where it is
+        g.fillStyle = inkOf(vid, st.vs);
+        [0, 1].forEach(function (s2) {
+          var j1 = cur - cur % 20, f0 = F[j1], fq = F[cur].s[s2]; if (!f0 || !f0.pts || fq.gone) return;
+          var P = f0.pts[s2], ox = fq.x - f0.s[s2].x, oy = fq.y - f0.s[s2].y;
+          for (var i = 0; i < P.length; i += 2) g.fillRect(X(P[i] + ox) - 0.8, Y(P[i + 1] + oy) - 0.8, 1.6, 1.6);
+        });
+      });
     }
     function paint() { paintScene(); paintCharts(); cursor(); }
     // the time on the charts
