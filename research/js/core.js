@@ -301,7 +301,7 @@
   }, true);
   SW.refOf = function (vid, p, n0, n1, nparts) {
     var r = SW.REF[vid] || ('SW' + vid);
-    if (p == null) return r;
+    if (p == null || (nparts <= 1 && n0 == null)) return r;   // a single tape, no lines: the text itself
     var tape = nparts > 1 ? (p + 1) + (n0 != null ? '.' : '') : '';
     return r + ', ' + tape + (n0 != null ? n0 + (n1 && n1 !== n0 ? '–' + n1 : '') : '');
   };
