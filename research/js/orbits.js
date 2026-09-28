@@ -84,7 +84,7 @@
   }
   O.orbit = function (vid, r, pct, secs, alive, progress) {
     return O.run(vid, {
-      key: 'orbit|' + r + '|' + pct + '|' + secs, frames: Math.round(secs * 20), strobe: 20,
+      key: 'orbit|' + r + '|' + pct + '|' + secs + '|all', frames: Math.round(secs * 20), strobe: 1,
       setup: function (mem, S, P, u) {
         var v = circular(P, r) * pct / 100, nx = S.nx1.val, ny = S.ny1.val, dx = S.ndx.val, dy = S.ndy.val;
         // the Needle on the right going up, the Wedge on the left going down
@@ -234,13 +234,17 @@
 
   O.draw = function (b, host) {
     var P0 = SW.store.get('orbits', {}) || {};
-    var st = { vs: P0.vs || ['3.1', '4.0'], r: P0.r || 128, pct: P0.pct || 100, secs: P0.secs || 60, strobe: P0.strobe !== false };
+    var st = { vs: P0.vs || ['3.1', '4.0'], r: P0.r || 128, pct: P0.pct || 100, secs: P0.secs || 60, strobe: P0.strobe !== false, loop: P0.loop !== false, fade: P0.fade !== false, speed: P0.speed || 2 };
     function keep() { SW.store.set('orbits', st); }
     var all = V.VERSIONS.filter(function (v) { return v.build && v.id !== '1' && v.id !== 'stars'; }).sort(function (a, c) { return a.sort - c.sort; });
     var card = SW.el('div', { class: 'card grav orb', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>Orbits ' + SW.refTag(b.v.id) + '</h4>' +
       '<p class="hint">Each version’s game run on the emulator with the two ships put on opposite sides of the star, moving at the speed its own pull there would hold in a circle, then left alone. The paths as the game computes them, the outlines as it draws them once a second, and below, the distance from the star and the pull on the ship, frame by frame.</p>' +
-      '<div class="orb-row"><div class="orb-main"><canvas class="orb-cv"></canvas><div class="hint mono orb-read">&nbsp;</div></div>' +
+      '<div class="orb-row"><div class="orb-main"><canvas class="orb-cv"></canvas>' +
+        '<div class="well-play orb-play"><button class="btn" data-o="play">▶ Play</button> <button class="btn ghost" data-o="again" title="From the start">↺</button> ' +
+        '<label>Speed <select data-o="speed"><option value="1">as played</option><option value="2">double</option><option value="4">four times</option><option value="8">eight times</option></select></label> ' +
+        '<label><input type="checkbox" data-o="loop"> Loop</label> <label title="Older outlines fade as new ones are drawn"><input type="checkbox" data-o="fade"> Fade</label> <span class="hint mono orb-t">&nbsp;</span></div>' +
+        '<div class="hint mono orb-read">&nbsp;</div></div>' +
       '<div class="orb-side">' +
         '<div class="well-view orb-ctl">' +
           '<label>Distance <select data-o="r"><option value="64">64</option><option value="96">96</option><option value="128">128</option><option value="192">192</option><option value="256">256</option></select> points</label>' +
@@ -253,10 +257,26 @@
       '<div class="orb-charts"></div>';
     host.appendChild(card);
     ['r', 'pct', 'secs'].forEach(function (k) { SW.$('[data-o=' + k + ']', card).value = String(st[k]); });
-    SW.$('[data-o=strobe]', card).checked = st.strobe;
+    SW.$('[data-o=strobe]', card).checked = st.strobe; SW.$('[data-o=loop]', card).checked = st.loop; SW.$('[data-o=fade]', card).checked = st.fade; SW.$('[data-o=speed]', card).value = String(st.speed);
     var cv = SW.$('.orb-cv', card), charts = SW.$('.orb-charts', card), vbox = SW.$('.orb-vs', card), read = SW.$('.orb-read', card);
-    var stopped = false, job = 0, got = {};
+    var stopped = false, job = 0, got = {}, anim = { T: null, playing: false, raf: 0, t0: 0, T0: 0 };
     function alive(my) { return function () { return !stopped && my === job; }; }
+    function tEnd() { var m = 0; st.vs.forEach(function (v) { var d = got[v]; if (d && d.frames) m = Math.max(m, d.frames[d.frames.length - 1].t); }); return m || st.secs; }
+    // the animation: time runs through the recorded frames; the ships drawn where they are, older outlines fading
+    function tick(now) {
+      if (!anim.playing) return;
+      var T = anim.T0 + (now - anim.t0) / 1000 * st.speed, end = tEnd();
+      if (T >= end) { if (st.loop) { anim.T0 = 0; anim.t0 = now; T = 0; } else { T = end; stopPlay(); } }
+      anim.T = T; paintScene(); cursor();
+      if (anim.playing) anim.raf = requestAnimationFrame(tick);
+    }
+    function stopPlay() { anim.playing = false; cancelAnimationFrame(anim.raf); SW.$('[data-o=play]', card).textContent = '▶ Play'; }
+    function play(fromStart) {
+      if (anim.playing && !fromStart) { stopPlay(); return; }
+      if (fromStart || anim.T == null || anim.T >= tEnd()) anim.T = 0;
+      anim.T0 = anim.T; anim.t0 = performance.now(); anim.playing = true; SW.$('[data-o=play]', card).textContent = '⏸ Pause';
+      anim.raf = requestAnimationFrame(tick);
+    }
 
     function chips() {
       vbox.innerHTML = all.map(function (v) {
@@ -272,6 +292,7 @@
         if (!alive(my)()) return;
         if (i >= list.length) { read.textContent = caption(); return; }
         var vid = list[i++];
+        stopPlay(); anim.T = null;
         O.orbit(vid, st.r, st.pct, st.secs, alive(my), function (f) { read.textContent = 'Running ' + vname(V.byId(vid)) + '… ' + Math.round(f * 100) + '%'; }).then(function (d) {
           if (!alive(my)()) return;
           got[vid] = d; paint(); setTimeout(next, 0);
@@ -287,7 +308,7 @@
       }).join(' · ');
     }
     // the screen: the paths of the Needle (solid) and the Wedge (dashed), the outlines kept, the star
-    function scene(g, N, pal) {
+    function scene(g, N, pal, T) {
       var E = Math.min(512, st.r * 1.7), k = N / (2 * E), c = N / 2;
       function X(x) { return c + x * k; } function Y(y) { return c - y * k; }
       g.fillStyle = pal.bg; g.fillRect(0, 0, N, N);
@@ -298,29 +319,47 @@
       for (var a = 0; a < 8; a++) { var t = a * Math.PI / 4, l = a % 2 ? 4 : 7; g.beginPath(); g.moveTo(c + Math.cos(t) * 2, c + Math.sin(t) * 2); g.lineTo(c + Math.cos(t) * l, c + Math.sin(t) * l); g.stroke(); }
       st.vs.forEach(function (vid) {
         var d = got[vid]; if (!d || d.why) return;
-        var ink = inkOf(vid, st.vs), F = d.frames;
+        var ink = inkOf(vid, st.vs), F = d.frames, live = T != null, cur = -1;
+        if (live) for (var j0 = 0; j0 < F.length && F[j0].t <= T; j0++) cur = j0;
         [0, 1].forEach(function (s) {
-          g.strokeStyle = ink; g.lineWidth = 1.3; g.globalAlpha = 0.9; g.setLineDash(s ? [5, 3] : []);
+          g.strokeStyle = ink; g.lineWidth = 1.3; g.globalAlpha = live ? 0.45 : 0.9; g.setLineDash(s ? [5, 3] : []);
           g.beginPath(); var pen = false;
           F.forEach(function (f, j) {
+            if (live && j > cur) return;
             var q = f.s[s]; if (q.gone) { pen = false; return; }
             if (pen && j && Math.abs(q.x - F[j - 1].s[s].x) > 200) pen = false;
             if (pen) g.lineTo(X(q.x), Y(q.y)); else g.moveTo(X(q.x), Y(q.y)); pen = true;
           });
           g.stroke(); g.setLineDash([]); g.globalAlpha = 1;
-          if (st.strobe) {
-            g.fillStyle = ink;
-            F.forEach(function (f) { if (!f.pts) return; var P = f.pts[s]; for (var i = 0; i < P.length; i += 2) g.fillRect(X(P[i]) - 0.8, Y(P[i + 1]) - 0.8, 1.6, 1.6); });
-          }
+          function stamp(f, a, big) { if (!f.pts) return; var P = f.pts[s], w = big ? 2 : 1.6; g.globalAlpha = a; for (var i = 0; i < P.length; i += 2) g.fillRect(X(P[i]) - w / 2, Y(P[i + 1]) - w / 2, w, w); }
+          g.fillStyle = ink;
+          if (st.strobe) F.forEach(function (f, j) {
+            if (j % 20 || (live && j > cur)) return;
+            stamp(f, live && st.fade ? Math.max(0.06, Math.exp(-(T - f.t) / 5)) : 1, false);
+          });
+          if (live && cur >= 0 && !F[cur].s[s].gone) stamp(F[cur], 1, true);
+          g.globalAlpha = 1;
         });
       });
     }
-    function paint() {
-      var N = Math.round(Math.max(300, Math.min(560, cv.parentNode.clientWidth || 560, (root.innerHeight || 900) - 280))), dpr = root.devicePixelRatio || 1;
-      cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px';
+    function paintScene() {
+      var N = Math.round(Math.max(300, Math.min(560, cv.parentNode.clientWidth || 560, (root.innerHeight || 900) - 320))), dpr = root.devicePixelRatio || 1;
+      if (cv.width !== N * dpr) { cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px'; }
       var g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
-      scene(g, N, { bg: '#000', dim: '#4a5a66' });
-      paintCharts();
+      scene(g, N, { bg: '#000', dim: '#4a5a66' }, anim.T);
+      SW.$('.orb-t', card).textContent = anim.T != null ? anim.T.toFixed(1) + ' s' : '';
+    }
+    function paint() { paintScene(); paintCharts(); cursor(); }
+    // the time on the charts
+    function cursor() {
+      SW.$$('.orb-cursor', charts).forEach(function (x) { x.remove(); });
+      if (anim.T == null || anim.T > st.secs) return;
+      SW.$$('svg', charts).forEach(function (el) {
+        // measured on screen: an inline SVG may report no clientWidth
+        var W = +el.getAttribute('viewBox').split(' ')[2], r = el.getBoundingClientRect(), rc = charts.getBoundingClientRect(), k = r.width / W, x = (58 + anim.T / st.secs * (W - 70)) * k;
+        var c = SW.el('div', { class: 'orb-cursor' }); c.style.left = (r.left - rc.left + x) + 'px'; c.style.top = (r.top - rc.top + 18 * k) + 'px'; c.style.height = (r.height - 44 * k) + 'px';
+        charts.appendChild(c);
+      });
     }
     // distance from the star and the pull on the Needle, frame by frame
     function chartSVG(pal, W) {
@@ -330,19 +369,19 @@
       var tmax = st.secs;
       function one(title, pick, fmt) {
         var mx = 0, mn = Infinity;
-        runs.forEach(function (v) { got[v].frames.forEach(function (f) { var y = pick(f.s[0]); if (y != null) { mx = Math.max(mx, y); mn = Math.min(mn, y); } }); });
+        runs.forEach(function (v) { got[v].frames.forEach(function (f) { f.s.forEach(function (q) { var y = pick(q); if (y != null) { mx = Math.max(mx, y); mn = Math.min(mn, y); } }); }); });
         if (!isFinite(mn)) return '';
         var lo = title === 'distance' ? Math.max(0, mn - (mx - mn) * 0.1 - 1) : 0, hi = mx + (mx - lo) * 0.08 + 1;
         var o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" font-family="IBM Plex Mono, monospace" font-size="10.5">';
         o += '<rect x="' + L + '" y="' + T + '" width="' + pw + '" height="' + ph + '" fill="none" stroke="' + pal.dim + '" stroke-width="0.6"/>';
-        o += '<text x="' + L + '" y="12" fill="' + pal.ink + '">' + (title === 'distance' ? 'Distance of the Needle from the star (screen points)' : 'Pull on the Needle (length of bx, by)') + '</text>';
+        o += '<text x="' + L + '" y="12" fill="' + pal.ink + '">' + (title === 'distance' ? 'Distance from the star (screen points): the Needle solid, the Wedge dashed' : 'Pull on each ship (length of bx, by): the Needle solid, the Wedge dashed') + '</text>';
         [lo, (lo + hi) / 2, hi].forEach(function (v) { var y = T + ph - (v - lo) / (hi - lo) * ph; o += '<text x="' + (L - 5) + '" y="' + (y + 3) + '" fill="' + pal.dim + '" text-anchor="end">' + fmt(v) + '</text>'; });
         for (var s = 0; s <= tmax; s += tmax / 6) { var x = L + s / tmax * pw; o += '<text x="' + x + '" y="' + (H - 8) + '" fill="' + pal.dim + '" text-anchor="middle">' + Math.round(s) + ' s</text>'; }
-        runs.forEach(function (v) {
+        runs.forEach(function (v) { [0, 1].forEach(function (s) {
           var d = '', pen = false;
-          got[v].frames.forEach(function (f) { var y = pick(f.s[0]); if (y == null || f.t > tmax) { pen = false; return; } d += (pen ? 'L' : 'M') + (L + f.t / tmax * pw).toFixed(1) + ' ' + (T + ph - (y - lo) / (hi - lo) * ph).toFixed(1); pen = true; });
-          o += '<path d="' + d + '" fill="none" stroke="' + inkOf(v, st.vs) + '" stroke-width="1.2"/>';
-        });
+          got[v].frames.forEach(function (f) { var y = pick(f.s[s]); if (y == null || f.t > tmax) { pen = false; return; } d += (pen ? 'L' : 'M') + (L + f.t / tmax * pw).toFixed(1) + ' ' + (T + ph - (y - lo) / (hi - lo) * ph).toFixed(1); pen = true; });
+          o += '<path d="' + d + '" fill="none" stroke="' + inkOf(v, st.vs) + '" stroke-width="1.2"' + (s ? ' stroke-dasharray="5 3" opacity="0.8"' : '') + '/>';
+        }); });
         return o + '</svg>';
       }
       return one('distance', function (s) { return s.gone ? null : s.r; }, function (v) { return v.toFixed(1); }) +
@@ -357,7 +396,7 @@
     // the figure: the screen as an image, the charts under it, the versions in the corner
     function figSVG(pal) {
       var N = 600, c = document.createElement('canvas'); c.width = N * 2; c.height = N * 2;
-      var g = c.getContext('2d'); g.scale(2, 2); scene(g, N, { bg: '#000', dim: '#4a5a66' });
+      var g = c.getContext('2d'); g.scale(2, 2); scene(g, N, { bg: '#000', dim: '#4a5a66' }, anim.playing ? null : anim.T);
       var ch = chartSVG(pal, N).replace(/<svg[^>]*>/g, '').split('</svg>');
       var o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + N + ' ' + (N + 310) + '" width="' + N + '" height="' + (N + 310) + '" font-family="IBM Plex Mono, monospace" font-size="10.5">' +
         '<image href="' + c.toDataURL('image/png') + '" x="0" y="0" width="' + N + '" height="' + N + '"/>' +
@@ -366,16 +405,18 @@
       return o + '</svg>';
     }
     SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return figSVG(p); }, 'spacewar-orbits'));
+    card.addEventListener('click', function (e) { var t = e.target.closest('[data-o=play], [data-o=again]'); if (t) play(t.dataset.o === 'again'); });
     card.addEventListener('change', function (e) {
       var t = e.target;
       if (t.dataset.v) { var id = t.dataset.v; st.vs = st.vs.filter(function (x) { return x !== id; }); if (t.checked) st.vs.push(id); st.vs.sort(function (a, c) { return V.byId(a).sort - V.byId(c).sort; }); keep(); chips(); runAll(); return; }
       var k = t.dataset.o; if (!k) return;
-      if (k === 'strobe') { st.strobe = t.checked; keep(); paint(); return; }
+      if (k === 'strobe' || k === 'loop' || k === 'fade') { st[k] = t.checked; keep(); paintScene(); return; }
+      if (k === 'speed') { st.speed = +t.value; keep(); if (anim.playing) { anim.T0 = anim.T; anim.t0 = performance.now(); } return; }
       st[k] = +t.value; keep(); runAll();
     });
     var lastW = 0;
     if (root.ResizeObserver) new ResizeObserver(function () { var w = card.clientWidth; if (w && Math.abs(w - lastW) > 8) { lastW = w; paint(); } }).observe(card);
     chips(); runAll();
-    return function () { stopped = true; };
+    return function () { stopped = true; stopPlay(); };
   };
 })(this);

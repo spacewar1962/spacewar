@@ -1295,3 +1295,6 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .plate-pair { display: flex; gap: 12px; flex-wrap: wrap; }
 .plate-pair canvas { border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
 .plate-exp { margin-top: 6px; } .plate-exp .btn { font-size: 11px; padding: 2px 8px; }
+.orb-play { justify-content: center; margin: 8px 0 2px; }
+.orb-charts { position: relative; }
+.orb-cursor { position: absolute; width: 1px; background: var(--beam); opacity: .7; pointer-events: none; }
