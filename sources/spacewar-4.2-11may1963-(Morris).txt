@@ -441,7 +441,7 @@ fou,	jmp fuu+R
 fie,	sub (1000
 	sal 8s
 fyn,	lio		/lio Y
-	dpy-1
+	dpy-i		/ scan p. 10 reads dpy-i (transcribed as dpy-1 until 28 Sep 2026)
 	stf 5
 fid,	idx fyn+R
 	sad (lio Q+2

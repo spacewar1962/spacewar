@@ -472,7 +472,7 @@ fie,	sub (1000
 fyn,	lio		/lio Y
 	szs 20
 	jda kcb
-	dpy-1
+	dpy-i		/ scan p. 10 reads dpy-i (transcribed as dpy-1 until 28 Sep 2026)
 	stf 5
 fid,	idx fyn+R
 	sad (lio Q+2
