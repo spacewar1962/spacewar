@@ -1210,3 +1210,6 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 /* Help menu: groups under small headings, divided by a rule */
 .tab-menu .menu-group { font-size: 10.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-faint); padding: 6px 8px 2px; }
 .tab-menu .menu-rule { border: 0; border-top: 1px solid var(--line-soft); margin: 4px 2px; width: auto; }
+.refhelp-acts { display: inline-flex; gap: 6px; align-items: center; margin-left: auto; }
+.refhelp .tray-bighead { display: flex; align-items: center; gap: 8px; }
+.refhelp .tray-bighead > b { flex: 1; white-space: nowrap; }
