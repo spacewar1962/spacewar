@@ -502,7 +502,8 @@
   function copyCite() {
     var s = SW.state.sel, part = build.parts[s.p];
     var sw = SW.swhidCite(part.src, part.tape ? null : s.n0, part.tape ? null : s.n1);   // a decoded tape's lines are not the file's
-    copy(SW.cite(build, s.p, s.n0, s.n1) + (sw ? '\n' + sw : ''), 'Citation copied');
+    var gh = SW.permalinkOf(part.src, part.tape ? null : s.n0, part.tape ? null : s.n1);
+    copy(SW.cite(build, s.p, s.n0, s.n1) + (sw ? '\n' + sw : '') + (gh ? '\n' + gh : ''), 'Citation copied');
   }
   function copyLink() {
     var s = SW.state.sel;
