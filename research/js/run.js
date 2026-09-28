@@ -16,7 +16,13 @@
   var paneTab = 'source';
   SW.breakpoints = SW.breakpoints || {};
 
-  var KEYS = { KeyW: 0o1, KeyS: 0o2, KeyA: 0o4, KeyD: 0o10, KeyI: 0o40000, KeyK: 0o100000, KeyJ: 0o200000, KeyL: 0o400000 };
+  // W A S D fly the Needle (ship 1) and I J K L the Wedge (ship 2): W/I fire, S/K rocket, A/J turn left, D/L turn right.
+  // The bits differ by version (4.4 and 4.8 rotate the control word), so they come from SW.controlMap.
+  var KEYS = { KeyW: 0o40000, KeyS: 0o100000, KeyA: 0o400000, KeyD: 0o200000, KeyI: 0o1, KeyK: 0o2, KeyJ: 0o10, KeyL: 0o4 };   // as 3.1 has them, until the version's own are found
+  function keysFor(m) {
+    var K = {}; [['KeyW', 0, 'torpedo'], ['KeyS', 0, 'rocket'], ['KeyA', 0, 'ccw'], ['KeyD', 0, 'cw'], ['KeyI', 1, 'torpedo'], ['KeyK', 1, 'rocket'], ['KeyJ', 1, 'ccw'], ['KeyL', 1, 'cw']].forEach(function (r) { if (m[r[1]][r[2]]) K[r[0]] = m[r[1]][r[2]]; });
+    return K;
+  }
 
   function lamps(n, bits, gapEvery) {
     var h = '<span class="lamps">';
@@ -37,7 +43,7 @@
     var wrap = SW.el('div', { class: 'run' });
     var left = SW.el('div', { class: 'run-left' });
     left.innerHTML =
-      '<div class="scope-wrap" title="Type 30 display. Click, then use W A S D (Needle) and I J K L (Wedge)."><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>' +
+      '<div class="scope-wrap" title="Type 30 display. Click, then fly the Needle with W A S D and the Wedge with I J K L: W and I fire, S and K the rocket, A and J turn left, D and L turn right."><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>' +
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
       '<button class="btn" id="r-over" title="Step over a subroutine call (jsp, jda)">Step over</button>' +
@@ -414,6 +420,7 @@
       pause();
       build = b;
       if (b.asm && b.v.runnable) load();
+      SW.controlMap(b.v.id).then(function (m) { if (build === b) { KEYS = keysFor(m); cpu && (cpu.control = 0); } });
     }
     render();
   };

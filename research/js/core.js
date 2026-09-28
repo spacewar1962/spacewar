@@ -59,6 +59,64 @@
       try { localStorage.setItem('swbench.' + k, JSON.stringify(v)); } catch (e) { /* ignore */ }
     }
   };
+  // Which bit of the control boxes (iot 11) does what, for which ship, in a
+  // version: found by trying each of the 18 bits alone for 25 frames on the
+  // emulator and seeing which ship turns (and which way), which speeds up,
+  // and whose torpedoes are counted down. The versions differ: 4.4 and 4.8
+  // rotate the word before reading it, and the Morris 4.2 and 4.3 parse it
+  // their own way. Resolves with [{ccw, cw, rocket, torpedo}, {...}] (a bit
+  // value, or 0 where none was found), kept for the session and in this browser.
+  var CTL = {};
+  SW.controlMap = function (vid) {
+    if (CTL[vid]) return CTL[vid];
+    var keyS = 'ctlmap.3.' + vid, kept = SW.store.get(keyS, null);
+    if (kept) return (CTL[vid] = Promise.resolve(kept));
+    return (CTL[vid] = SW.build(vid).then(function (b) {
+      var S = b.sym, map = [{ ccw: 0, cw: 0, rocket: 0, torpedo: 0 }, { ccw: 0, cw: 0, rocket: 0, torpedo: 0 }];
+      if (!b.asm || !S.ml0 || !S.nth || !S.ndx || !S.ndy) return map;
+      function s18(v) { return v & 0o400000 ? -(v ^ 0o777777) : v; }
+      var ntr = S.ntr ? S.ntr.val : null, pending = [];
+      for (var bit = 1; bit <= 0o400000; bit *= 2) pending.push(bit);
+      return new Promise(function (res) {
+        (function next() {
+          if (!pending.length) { SW.store.set(keyS, map); res(map); return; }
+          var bit = pending.shift(), cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv }), mem = cpu.mem, n = 0, a0, t0;
+          cpu.load(b.asm.memory, b.asm.start);
+          while (n < 32 && !cpu.halted && cpu.cycles < 2000000) {
+            if (cpu.pc === S.ml0.val) {
+              n++;
+              if (n === 4) { a0 = [s18(mem[S.nth.val]), s18(mem[S.nth.val + 1])]; t0 = ntr != null ? [s18(mem[ntr]), s18(mem[ntr + 1])] : null; }
+              cpu.control = n >= 4 && n < 30 ? bit : 0;
+              if (n === 30) {
+                for (var k = 0; k < 2; k++) {
+                  var da = s18(mem[S.nth.val + k]) - a0[k];
+                  if (da > 51472) da -= 102944; if (da < -51472) da += 102944;   // angles wrap at 2 pi (311040 octal)
+                  var sp = Math.hypot(s18(mem[S.ndx.val + k]), s18(mem[S.ndy.val + k]));
+                  if (da > 2000 && !map[k].ccw) map[k].ccw = bit;
+                  else if (da < -2000 && !map[k].cw) map[k].cw = bit;
+                  if (t0 && s18(mem[ntr + k]) !== t0[k] && !map[k].torpedo) map[k].torpedo = bit;
+                  if (!map[k].rocket && (map[k].sp0 == null)) map[k].sp0 = sp;
+                  map[k]['sp' + bit] = sp;
+                }
+              }
+            }
+            cpu.step();
+          }
+          setTimeout(next, 0);
+        })();
+      }).then(function (m) {
+        // the rocket: the bit after which a ship is going fastest, well above the rest
+        [0, 1].forEach(function (k) {
+          var best = 0, bv = 0, sum = 0, cnt = 0;
+          Object.keys(m[k]).forEach(function (key) { if (/^sp\d+$/.test(key) && key !== 'sp0') { var v = m[k][key]; sum += v; cnt++; if (v > bv) { bv = v; best = +key.slice(2); } } });
+          if (cnt && bv > (sum / cnt) * 1.5) m[k].rocket = best;
+          Object.keys(m[k]).forEach(function (key) { if (/^sp/.test(key)) delete m[k][key]; });
+        });
+        SW.store.set(keyS, m);
+        return m;
+      });
+    }));
+  };
   SW.me = function () {
     return { initials: SW.store.get('initials', ''), name: SW.store.get('name', '') };
   };

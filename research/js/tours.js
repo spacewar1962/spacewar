@@ -26,7 +26,7 @@
       { title: 'How annotations show', v: '3.1', tab: 'read', focus: '#rd-notes-mode',
         text: 'This button changes how annotations appear in the listing: under their lines, as cards in the margin, as initials only, or hidden. Replies, reactions, edits and deletions all work where the annotation is shown.' },
       { title: 'Run it', v: '3.1', tab: 'run', focus: '#view-run .scope-wrap',
-        text: 'Every version runs on the bench’s PDP-1 emulator, drawn on a model of the Type 30 display. Click the screen and play: W A S D for the Needle, I J K L for the Wedge. You can step, set breakpoints and profile where the time goes.' },
+        text: 'Every version runs on the bench’s PDP-1 emulator, drawn on a model of the Type 30 display. Click the screen and play: W A S D for the Needle, I J K L for the Wedge (W and I fire, S and K the rocket, A and J turn left, D and L turn right). You can step, set breakpoints and profile where the time goes.' },
       { title: 'Text and Program', v: '3.1', lens: 14, focus: '#tabs [data-menu="text"]',
         text: 'The Text and Program menus open lenses on the code: comments, hands and dates, names, calls, instructions, memory, timing. Symbol histories, shown here, follows one name through every version, when it appears, changes and goes.' },
       { title: 'Compare two versions', v: '3.1', tab: 'compare', b: '4.0', focus: '#tabs [data-menu="versions"]',

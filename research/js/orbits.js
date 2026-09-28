@@ -25,7 +25,8 @@
   O.run = function (vid, sc, alive, progress) {
     var key = vid + '|' + sc.key;
     if (RUNS[key]) { keepRun(key, RUNS[key]); return Promise.resolve(RUNS[key]); }
-    return SW.build(vid).then(function (b) {
+    var ctl = null;
+    return (sc.control ? SW.controlMap(vid).then(function (m) { ctl = m; return SW.build(vid); }) : SW.build(vid)).then(function (b) {
       var S = b.sym, need = ['ml0', 'ml1', 'mtb', 'nx1', 'ny1', 'ndx', 'ndy'];
       if (!b.asm || need.some(function (n) { return !S[n]; })) return { why: 'the object table or the main loop is not where 3.1 has them' };
       var P = SW.gravity.probe(b);
@@ -33,7 +34,8 @@
       var mem = cpu.mem, ml0 = S.ml0.val, ml1 = S.ml1.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val,
           own = [S.ss1 ? S.ss1.val : -1, S.ss2 ? S.ss2.val : -1];
       function gone(i) { return own[i] >= 0 && (mem[mtb + i] & 0o7777) !== own[i]; }
-      var frames = [], n = 0, started = false, c0 = 0, grab = null, after = -1, sun = [], sunFrames = 0;
+      var frames = [], n = 0, started = false, c0 = 0, grab = null, after = -1, sun = [], sunFrames = 0,
+          tcr = S.tcr ? S.tcr.val : -1, nob = S.nob ? S.nob.val : 24;
       // the points each ship's routine puts on the screen, in frames being kept;
       // and, over a few frames, the star's own dots (drawn by the main loop near the centre)
       cpu.onDisplay = function (x, y) {
@@ -53,10 +55,12 @@
                 if (grab && j) frames[j - 1].pts = [Int16Array.from(grab[0]), Int16Array.from(grab[1])];
                 var f = { t: (cpu.cycles - c0) / 200000, s: [] };
                 for (var i = 0; i < 2; i++) f.s.push({ x: s18(mem[nx + i]) / 256, y: s18(mem[ny + i]) / 256, dx: s18(mem[S.ndx.val + i]), dy: s18(mem[S.ndy.val + i]), gone: gone(i) });
+                // the torpedoes in flight: each object running the torpedo routine, by its slot
+                if (sc.torps) { var tp = []; for (var o = 2; o < nob; o++) if ((mem[mtb + o] & 0o7777) === tcr) tp.push(o, Math.round(s18(mem[nx + o]) / 256), Math.round(s18(mem[ny + o]) / 256)); f.tp = Int16Array.from(tp); }
                 frames.push(f);
                 grab = sc.strobe && j % sc.strobe === 0 ? [[], []] : null;
                 if (sunFrames || j === 2) sunFrames++;
-                if (sc.control) { var cw = sc.control(j, f.t, mem, S, s18); cpu.control = cw; cpu.tw = cw; }
+                if (sc.control) cpu.control = sc.control(j, f.t, mem, S, s18, ctl);
                 if (after < 0 && f.s[0].gone && f.s[1].gone) after = j;
                 if (j >= sc.frames || (after >= 0 && j > after + 20)) break;
               }
@@ -100,12 +104,11 @@
   // Each is a scenario for O.run: from the game's own start, or with the ships
   // set in place; flown, where it needs controls, by a small autopilot that
   // turns a ship to an angle and fires for a time.
-  var BIT = [{ ccw: 0o400000, cw: 0o200000, rocket: 0o100000 }, { ccw: 0o10, cw: 0o4, rocket: 0o2 }];
   function wrapA(a) { while (a > Math.PI) a -= 2 * Math.PI; while (a <= -Math.PI) a += 2 * Math.PI; return a; }
   // turn ship k to angle 'to' (radians; 0 points up, the thrust is (-sin, cos)), then fire for 'burn' seconds
   function pilot(plan) {
     var st = [{}, {}];
-    return function (j, t, mem, S, s18) {
+    return function (j, t, mem, S, s18, BIT) {
       var cw = 0;
       plan.forEach(function (p, k) {
         if (!p) return;
@@ -146,21 +149,67 @@
       text: 'Coming in from the left, aimed 60 points above the star: the well bends the path round it.',
       setup: function (mem, S, P, u) { placed([-420, 60], [vcirc(P, 128) * 1.1, 0])(mem, S, P, u); } }
   ];
+  // ---------- Torpedoes ----------
+  // A pilot that works through a list of headings for ship k: turn to each,
+  // fire (the button held for two frames), wait for the tube to reload, go on.
+  function gunner(k, heads, every) {
+    var i = 0, phase = 'turn', c = 0;
+    return function (j, t, mem, S, s18, BIT) {
+      var cw = 0, B = BIT[k];
+      if (i >= heads.length) return 0;
+      var h = heads[i];
+      if (phase === 'turn') {
+        if (h == null) phase = 'fire';
+        else { var e = wrapA(h - s18(mem[S.nth.val + k]) / 16384); if (Math.abs(e) > 0.07) cw |= e > 0 ? B.ccw : B.cw; else phase = 'fire'; }
+        c = 0;
+      }
+      if (phase === 'fire') { cw |= B.torpedo; if (++c >= 2) { phase = 'wait'; c = 0; } }
+      else if (phase === 'wait' && ++c >= (every || 20)) { phase = 'turn'; i++; }
+      return cw;
+    };
+  }
+  var FAN = [0, 1, 2, 3, 4, 5, 6, 7].map(function (n) { return n * Math.PI / 4; });
+  function atRest(x, y, x2, y2) {
+    return function (mem, S, P, u) {
+      var nx = S.nx1.val, ny = S.ny1.val;
+      mem[nx] = u(x * 256); mem[ny] = u(y * 256); mem[S.ndx.val] = 0; mem[S.ndy.val] = 0;
+      mem[nx + 1] = u(x2 * 256); mem[ny + 1] = u(y2 * 256); mem[S.ndx.val + 1] = 0; mem[S.ndy.val + 1] = 0;
+    };
+  }
+  O.TORPS = [
+    { id: 'tfan', title: 'A fan', secs: 16, E: 512, torps: true,
+      text: 'The Needle at rest turns through eight headings and fires at each. The torpedoes keep the ship’s motion and fly straight: the star does not pull them.',
+      setup: atRest(-220, -140, 420, 420), control: function () { return gunner(0, FAN); } },
+    { id: 'torbit', title: 'Fired while circling', secs: 16, E: 512, torps: true,
+      text: 'The Needle set circling the star at 160 points with its nose held up, firing once a second: each torpedo takes the ship’s velocity plus a push along its heading, and goes straight on.',
+      setup: function (mem, S, P, u) { var v = vcirc(P, 160); mem[S.nx1.val] = u(160 * 256); mem[S.ny1.val] = 0; mem[S.ndx.val] = 0; mem[S.ndy.val] = u(v); mem[S.nth.val] = 0;
+        mem[S.nx1.val + 1] = u(420 * 256); mem[S.ny1.val + 1] = u(-420 * 256); mem[S.ndx.val + 1] = 0; mem[S.ndy.val + 1] = 0; },
+      control: function () { return gunner(0, [null, null, null, null, null, null, null, null, null, null, null, null], 20); } },
+    { id: 'twarp', title: 'The same fan, with the warpage turned up', secs: 16, E: 512, torps: true,
+      text: 'The bench’s change, not the program’s: the warpage constant the set to sar 1s instead of sar 9s. Each frame a torpedo’s dy gains its x, and its dx its y, shifted right 9 places and then by the; at sar 9s that rounds to nothing.',
+      setup: function (mem, S, P, u) { atRest(-220, -140, 420, 420)(mem, S, P, u); if (S.the) mem[S.the.val] = 0o675001; }, control: function () { return gunner(0, FAN); } }
+  ];
+  O.torpedoes = function (b, host) {
+    return O.plates(b, host, { store: 'torps', title: 'Torpedoes', moves: O.TORPS,
+      intro: 'Torpedoes as each version’s game fires them, the tracks drawn every other frame. From 3.1 on the constants are the same: 32 torpedoes a ship (tno), each lasting 96 frames (tlf) at 16 frames’ reload (rlt), launched at the ship’s speed plus its heading shifted by tvl (sar 4s). The warpage term the (sar 9s) is written into the torpedo routine but, at that setting, adds nothing: the tracks are straight (F24). 2B has no warpage term.' });
+  };
+
   O.move = function (vid, m, alive) {
-    return O.run(vid, { key: 'move|' + m.id, frames: Math.round(m.secs * 22), strobe: 20, setup: m.setup, control: m.control ? m.control() : null }, alive);
+    return O.run(vid, { key: 'move|' + m.id, frames: Math.round(m.secs * 22), strobe: 20, setup: m.setup, control: m.control ? m.control() : null, torps: !!m.torps }, alive);
   };
 
   // the page of plates: each movement for two versions side by side, the
   // outlines once a second as on the documentation plates of the time
-  O.plates = function (b, host) {
-    var P0 = SW.store.get('plates', {}) || {};
+  O.plates = function (b, host, cfg) {
+    cfg = cfg || { store: 'plates', title: 'Manoeuvres', moves: O.MOVES, intro: 'What the shape of the well allows, movement by movement, each run in the version’s own game on the emulator: the ships as the program draws them, once a second, as on the stroboscopic plates of the time. Two versions side by side.' };
+    var P0 = SW.store.get(cfg.store, {}) || {};
     var st = { a: P0.a || '3.1', b: P0.b || '4.0', paper: P0.paper !== false, path: P0.path !== false };
-    function keep() { SW.store.set('plates', st); }
+    function keep() { SW.store.set(cfg.store, st); }
     var all = V.VERSIONS.filter(function (v) { return v.build && v.id !== '1' && v.id !== 'stars'; }).sort(function (a, c) { return a.sort - c.sort; });
     var opts = all.map(function (v) { return '<option value="' + v.id + '">' + SW.esc(vname(v)) + '</option>'; }).join('');
     var card = SW.el('div', { class: 'card grav plates', style: 'grid-column:1/-1' });
-    card.innerHTML = '<h4>Manoeuvres</h4>' +
-      '<p class="hint">What the shape of the well allows, movement by movement, each run in the version’s own game on the emulator: the ships as the program draws them, once a second, as on the stroboscopic plates of the time. Two versions side by side.</p>' +
+    card.innerHTML = '<h4>' + SW.esc(cfg.title) + '</h4>' +
+      '<p class="hint">' + SW.esc(cfg.intro) + '</p>' + (cfg.more ? cfg.more(b) : '') +
       '<div class="well-view plates-ctl"><label>Left <select data-p="a">' + opts + '</select></label><label>Right <select data-p="b">' + opts + '</select></label>' +
       '<label><input type="checkbox" data-p="paper"> Paper</label><label><input type="checkbox" data-p="path"> Show the path</label><span class="hint">Timing between plots, 1 second.</span></div>' +
       '<div class="plates-grid"></div>';
@@ -189,6 +238,7 @@
       });
       g.fillStyle = c.ink;
       F.forEach(function (f) { if (!f.pts) return; [0, 1].forEach(function (s) { var P = f.pts[s]; for (var i = 0; i < P.length; i += 2) g.fillRect(X(P[i]) - r / 2, Y(P[i + 1]) - r / 2, r, r); }); });
+      F.forEach(function (f, j) { if (!f.tp || j % 2) return; var T = f.tp; for (var i = 0; i < T.length; i += 3) g.fillRect(X(T[i + 1]) - r * 0.45, Y(T[i + 2]) - r * 0.45, r * 0.9, r * 0.9); });
       var end = F.findIndex(function (f) { return f.s[0].gone || f.s[1].gone; });
       g.fillStyle = c.faint; g.fillText(end >= 0 ? 'exploded at ' + F[end].t.toFixed(1) + ' s' : F[F.length - 1].t.toFixed(0) + ' s', 8, N - 8);
     }
@@ -216,7 +266,7 @@
     function build() {
       var my = ++job, list = [];
       grid.innerHTML = '';
-      O.MOVES.forEach(function (m) {
+      cfg.moves.forEach(function (m) {
         var el = SW.el('div', { class: 'plate' });
         el.innerHTML = '<h5>' + SW.esc(m.title) + '</h5><p class="hint">' + SW.esc(m.text) + '</p><div class="plate-pair"><canvas data-s="a"></canvas><canvas data-s="b"></canvas></div><div class="plate-exp"></div>';
         grid.appendChild(el);

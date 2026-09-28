@@ -62,7 +62,7 @@
     var phase = 0;
     phases.forEach(function (P, pi) {
       phase = pi;
-      cpu.tw = P.cw; cpu.control = P.cw;
+      cpu.control = P.cw;
       var end = cpu.cycles + P.cycles;
       while (cpu.cycles < end && !cpu.halted) {
         var pc0 = cpu.pc, md = mem[pc0], tgt = md;
@@ -202,7 +202,9 @@
   // the controls held in a recording of one's own: ship bits as the source's
   // comment gives them (high four bits: ccw, cw, rocket, torpedo; low four the
   // same for the other ship)
-  var BITS = [['ccw', 0o400000, 0o10], ['cw', 0o200000, 0o4], ['rocket', 0o100000, 0o2], ['torpedo', 0o040000, 0o1]];
+  // the control bits, as 3.1 has them; replaced by the version's own when found (SW.controlMap)
+  var BITS = [['ccw', 0o400000, 0o10], ['cw', 0o200000, 0o4], ['rocket', 0o100000, 0o2], ['torpedo', 0o040000, 0o1]], BITS0 = BITS;
+  function useMap(m) { BITS = m ? ['ccw', 'cw', 'rocket', 'torpedo'].map(function (r) { return [r, m[0][r], m[1][r]]; }).filter(function (bt) { return bt[1] || bt[2]; }) : BITS0; }
   var mine = null;   // {cw, secs} when recording with one's own controls
   function myPhases(m) {
     var held = [];
@@ -222,6 +224,7 @@
   function speedPref(set) { try { if (set) localStorage.setItem('swbench.ovSpeed', set); return localStorage.getItem('swbench.ovSpeed') || '4'; } catch (e) { return set || '4'; } }
 
   function draw(b, el) {
+    useMap(null); SW.controlMap(b.v.id).then(useMap);
     // kept for the version and snapshot: the run, the frame shown, the routines visited
     var key = b.v.id + '|' + JSON.stringify(mine), C0 = O._keep && O._keep.key === key ? O._keep : null, A;
     if (C0) A = C0.A;
