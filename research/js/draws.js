@@ -311,7 +311,7 @@
     var sh = null, bd = b.sym.bpt && b.sym.bpt.defs && b.sym.bpt.defs[0];
     if (bd) { var bl = b.lines[bd.file] || [], seen9 = false; for (var q = bd.line - 1; q < Math.min(bl.length, bd.line + 8); q++) { var m = /\bsar\s+(\d)s/.exec(bl[q].raw); if (m) { if (seen9) { sh = +m[1]; break; } if (m[1] === '9') seen9 = true; } } }
     return { frames: frames, pts: sun, ray: ray, short: sh ? (sh <= 5 ? 'every dot' : 'every second dot') + ' (bpt: sar ' + sh + 's)' : Math.round(sun.length / frames.length) + ' points a frame',
-             say: Math.round(sun.length / frames.length) + ' points a frame on average (' + Math.min.apply(null, per) + ' to ' + Math.max.apply(null, per) + ') over ' + frames.length + ' frames, from blp' + (ray ? '; a random ray of up to ten points (repeat 10, starp) and its mirror' : '') + '.' };
+             say: Math.round(sun.length / frames.length) + ' points a frame on average (' + Math.min.apply(null, per) + ' to ' + Math.max.apply(null, per) + ') over ' + frames.length + ' frames, from blp' + (ray ? '; a random ray of up to eight points (repeat 10, starp: 10 is octal) and its mirror' : '') + '.' };
   }
   D.sun = function (b, host) {
     var c = SW.el('div', { class: 'card', style: 'grid-column:1/-1' });
@@ -323,7 +323,7 @@
     if (U.pts.length) {
       var labs = placedLabels(b);
       c.insertAdjacentHTML('beforeend', '<p class="lede">Recorded from this version running: the points plotted by the star routine (from blp) in ' + U.frames.length + ' successive frames, point by point, magnified; each new frame dims the one before.' +
-        (U.ray ? ' Each frame the routine picks a random direction and length (random), then plots up to ten points outward along it (repeat 10, starp) and the same run again with the signs complemented (cma), so the ray is mirrored through the centre.' : '') + ' The sun is a new random ray every frame; on the phosphor the rays blur into a flickering star.</p>');
+        (U.ray ? ' Each frame the routine picks a random direction and length (random), then plots up to eight points outward along it (repeat 10, starp: the count is octal) and the same run again with the signs complemented (cma), so the ray is mirrored through the centre.' : '') + ' The sun is a new random ray every frame; on the phosphor the rays blur into a flickering star.</p>');
       var seq = [];
       U.frames.forEach(function (f, n) {
         U.pts.filter(function (p) { return p.f === f; }).forEach(function (p) {

@@ -1127,12 +1127,12 @@ pof,	dzm i ~mdx
 	lac i mb1
 	dac ~ssn
 	count ~ssn, .
-	jmp sr1
+	jmp srt		/ scan p. 27 reads srt (transcribed as sr1 until 29 Sep 2026)
 po1,	lac (mex 400000	/ now go bang
 	dac i ml1
 	law i 10
 	dac i ma1
-	jmp sr1
+	jmp srt		/ scan p. 27 reads srt (transcribed as sr1 until 29 Sep 2026)
 / outlines of spaceships
 ot1,	111131
 	111111

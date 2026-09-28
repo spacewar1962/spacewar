@@ -9,19 +9,19 @@ fi1,	law .	/last loc. of compiled putline
 fi2,	law .
 	sub (21
 	dac t2
-	lac ( jmpscc 1
+	lac (jmp scc 1
 	dac i t1
 	dac i t2	/ set return to scorekeeper
 	dzm ssn
+	dzm ssm	/ in the scan; missing from this transcription until 29 Sep 2026
 	jsp i cwg
 	dio t2
-
 s1,	clf 6	/ do large outlineof ss1
 	law not
 	dap scc
 	lio (240000
 	law 1
-	add isc
+	add 1sc
 scb,	cma
 	dac t1	/number of ships on this line
 	dio sy1	/ y pos
@@ -35,7 +35,7 @@ scb,	cma
 
 sch,	lac (30000
 	dac stx
-	rar is
+	rar 1s
 	szf 6
 	lac (17000
 	add sy1
@@ -58,13 +58,13 @@ scg,	dac ssc	/ set constants for display
 scf,	lac sx1
 	lio sy1
 	dpy 700-4000
-scc,	jmp 1 .
+scc,	jmp i .
 	lac sx1
 	add stx
 	dac sx1	 /x pos. of next ship
 	isp t1	/line done ?
 	jmp scd
-	jsp 1 cwg	/ yes
+	jsp i cwg	/ yes
 	lai
 	sas t2	/ return ?
 
@@ -93,7 +93,7 @@ scd,	add (11	/ are ther 10 or more ships left
 	law 1000	/ size for 10 wins
 	jmp sce
 
-jpt,	dac not 1	/ patch to get and loc. of outlines
+jpt,	dac not 1	/ patch to get end loc. of outlines
 	dap fi1
 	jda oc 
 	ot2

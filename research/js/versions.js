@@ -57,18 +57,18 @@
       summary: 'Samson\'s star table, "stars by prs for s/w 2b": the real night sky as data, loaded at 6077 by every version with the planetarium.',
       build: [{ src: 'spacewar-2b-stars-prs-13mar1962.txt' }],
       witnesses: [] },
-    { id: '2b-pre', label: 'Spacewar! 2B (pre-release)', date: '25 Mar 1962', sort: 19620325,
-      authors: 'Russell, Samson, Graetz, et al.', fork: 'early', status: 'reconstructed',
-      medium: 'Reconstruction',
+    { id: '2b-pre', label: 'Spacewar! 2B (25 Mar listing)', date: '25 Mar 1962', sort: 19620325,
+      authors: 'Russell, Samson, Graetz, et al.', fork: 'early', status: 'recovered',
+      medium: 'Source listing (transcription)',
       buildNotes: ["The file carries no macro definitions of its own (swap, count, setup, ioh are used but not defined), so the June 1963 'macro fio-dec system' from the masswerk 4.3 build is supplied in front, with Samson's 13 March 1962 star table after. Both are stand-ins for tapes that are not held.", "Its one-line macro definition 'define mult Z<tab>jda mpy<tab>lac Z<tab>term' is valid MACRO (F-36) but not accepted by macro1; the assembler here accepts it."],
-      summary: 'The earliest dated pre-2B build (masswerk).',
+      summary: 'A transcription of a surviving 2B listing dated 25 March 1962, with 1962 annotations for a multiply/divide port (from Graetz’s papers, by way of Brian Silverman to iMusée, according to Landsteiner, who published it in 2014). Its program differs from the 2 April tape’s only in six sense-switch tests, for switches 2 to 5, whose sense is reversed: with every switch off it draws no stars.',
       build: [MACROS, { src: 'spacewar-2b-25mar1962.txt' }, STARS],
       transforms: ['slashComments'] },
     { id: '2b', label: 'Spacewar! 2B', date: '2 Apr 1962', sort: 19620402,
       authors: 'Russell, Samson, Graetz, et al.', fork: 'early', status: 'recovered',
       medium: 'Paper tape',
       buildNotes: ["Assembled with the 1962-63 MACRO variable rule, Landsteiner's reconstruction (2014) rebuilds bin-files/spacewar2B_2apr62.bin exactly (2,297 words). With macro1's rule it differs in 174 words, all variable addresses.", "Normalised for assembly: the transcription's modern '//' editorial comments are read as MACRO comments (tab then '/'). The reader shows the file as held.", "The tape carries its own title, punched into the leader as letters of holes (frames 43 to 161): 'SPACEWAR 2B 2 APR 62', read by the bench in the Tape view."],
-      summary: 'First complete version, shown at MIT Parents\' Weekend: Expensive Planetarium, Minskytron hyperspace, single-shot torpedoes. Source reconstructed from disassembly of the tape (Landsteiner 2014).',
+      summary: 'The first complete version, the program announced for MIT’s Parents’ Weekend (The Tech, 25 April 1962): Expensive Planetarium, gravity, single-shot torpedoes. It has no hyperspace: Graetz’s Minskytron hyperspace was a separate patch tape (“Hyperspace VIci”, 2 May 1962: three jumps, without risk), later patched in turn to restart the game; neither is held. Source reconstructed by Landsteiner (2014) from the tape’s disassembly and the 25 March listing.',
       build: [{ src: 'spacewar-2b-2apr1962.txt' }],
       transforms: ['slashComments'],
       witnesses: ['bin-files/spacewar2B_2apr62.bin'] },
@@ -116,10 +116,10 @@
       witnesses: ['SteveRussell_box1/spacewar4.1_2-20-63_dfw.bin', 'bin-files/spacewar4.2a_sa4.bin', 'SteveRussell_box1/sw4.2.bin'] },
     { id: '4.0ts', label: 'Spacewar! 4.0TS', date: '4 May 1963', sort: 19630504,
       authors: 'Monty Preonas ("ddp")', fork: 'ddp', status: 'recovered', medium: 'Source listing',
-      buildNotes: ["Assembled as two tape segments from the one transcription: the program (title at line 53, to 'start 4' at line 1191) and the simplified Twin Star star tape (title at line 1202). Macro tape supplied as for 4.0. Assembles without error."],
-      summary: 'A "Twin Star" variant of 4.0: simplified starfield (4th-magnitude stars removed) and a random hyperspace spin. Recovered by the CCS team. The simplified star tape is transcribed in the same file.',
+      buildNotes: ["Assembled as two tape segments from the one transcription: the program (title at line 53, to 'start 4' at line 1191) and the simplified star tape (title at line 1202). Macro tape supplied as for 4.0. Assembles without error."],
+      summary: 'A variant of 4.0 titled “spacewar 4.0ts 5/4/63 ddp”: simplified starfield (4th-magnitude stars removed) and a random hyperspace spin. What “ts” stands for is not recorded: it has been read as Twin Star, but that is 4.3’s later subjective view, which 4.0TS does not have, and as time-sharing, which nothing in the code confirms. Recovered by the CCS team. The simplified star tape is transcribed in the same file.',
       build: [MACROS, { src: 'spacewar-4.0ts-4may1963.txt', title: 53, end: 1191 },
-              { src: 'spacewar-4.0ts-4may1963.txt', title: 1202, role: 'simplified star tape (Twin Star)' }],
+              { src: 'spacewar-4.0ts-4may1963.txt', title: 1202, role: 'simplified star tape' }],
       scans: ['spacewar-4.0ts-4may1963.pdf'] },
     { id: '4.2', label: 'Spacewar! 4.2 (ddp)', date: '11 May 1963', sort: 19630511,
       authors: 'Monty Preonas ("ddp")', fork: 'ddp', status: 'recovered', medium: 'Source listing',
@@ -131,10 +131,10 @@
       summary: '4.2 plus a Twin Star subjective view on sense switch 2: the display recentres on the Needle. The scanned original keeps the period code, including the active score-display encoder.',
       build: [MACROS, { src: 'spacewar-4.3-17may1963-(Morris).txt', titleMatch: true }, STARS],
       scans: ['spacewar-4.3-17may1963-(Morris).pdf'] },
-    { id: '4.3m', label: 'Spacewar! 4.3 (masswerk)', date: '17 May 1963; mod. 2015', sort: 19630518,
-      authors: 'Monty Preonas ("ddp"); reassembled by Landsteiner', fork: 'ddp', status: 'reconstructed',
+    { id: '4.3m', label: 'Spacewar! 4.3f (masswerk, fixed)', date: '17 May 1963; fixed 28 Feb 2015', sort: 19630518,
+      authors: 'Monty Preonas ("ddp"); fixed by Landsteiner', fork: 'ddp', status: 'reconstructed',
       medium: 'Reassembly',
-      summary: 'The masswerk reassembly: a later modified variant that swapped some 1963 code for 4.0-style code. Read it against the Morris listing.',
+      summary: 'Landsteiner’s fixed version of 4.3, titled “spacewar 4.3f 5/17/63 ddp; mod. nl 2/28/2015” and not an authentic program. The Needle’s subjective view on sense switch 2 is repaired (ddispt, ox1 and oy1, bpy, torpedo positions), 3.1’s star display replaces 4.3’s (whose loop is kept, commented out), and the scorer reads the controls more simply. With switch 2 on it shows the repaired view, not 1963’s twin star. His changes are marked with // comments; read it against the Morris listing.',
       build: [{ src: 'spacewar-4.3-17may1963.txt' }] },
     { id: '4.4', label: 'Spacewar! 4.4 (ddp, Morris listing)', date: '17 / 21 May 1963', sort: 19630521,
       authors: 'Monty Preonas ("ddp") & Joe Morris', fork: 'ddp', status: 'recovered', medium: 'Source listing',
@@ -156,9 +156,9 @@
       authors: 'unknown', fork: 'dfw', status: 'lost',
       summary: 'Lost. Three versions between the 4.4 experiment and the stable 4.8; a comment in 4.8 shows one carried dual thrust/velocity controls. No source survives.' },
     { id: '4.8', label: 'Spacewar! 4.8', date: '24 Jul 1963', sort: 19630724,
-      authors: '"dfw"; scorer reworked by Samson', fork: 'dfw', status: 'recovered', medium: 'Source listing',
-      buildNotes: ["Assembled from pt 1, pt 2 and the scorer, with the June 1963 macro tape and the star table supplied; '.' overbar marks read as '~' as for 4.1.", "Five errors remain, all in the scorer transcription: '( jmpscc 1' (line 12), and 'isc', 'is', 'lai', '2sc' undefined (lines 24, 38, 68, 79). 'lai' is the PDP-1D instruction 760040 (AC from I/O), which the June 1963 macro tape does not define; the others look like readings of overlined or damaged characters and should be checked against spacewar-4.8-scorer-24jul1963.pdf."],
-      summary: 'The last classic MIT version, with the score display reworked by Samson. The identity of "dfw" has never been established.',
+      authors: '"dfw"; scorer by Samson', fork: 'dfw', status: 'recovered', medium: 'Source listing',
+      buildNotes: ["Assembled from pt 1, pt 2 and the scorer, with the June 1963 macro tape and the star table supplied; '.' overbar marks read as '~' as for 4.1.", "Corrected against the scan on 29 September 2026: five misreadings in the scorer ('( jmpscc 1', 'isc', 'is', 'jmp 1 .', 'jsp 1 cwg' for (jmp scc 1, 1sc, 1s, jmp i ., jsp i cwg; also read so by Landsteiner) and a missing line, dzm ssm. 'lai' is the PDP-1D instruction 760040 (AC from I/O), which the June 1963 macro tape does not define."],
+      summary: 'The last classic MIT version, with a score display written by Peter Samson (“I remember writing it originally”, to Landsteiner); it uses lai, an instruction of the upgraded PDP-1. The identity of "dfw" has never been established.',
       build: [MACROS, { src: 'spacewar-4.8-pt1-24jul1963.txt', titleMatch: true },
               { src: 'spacewar-4.8-pt2-24jul1963.txt', titleMatch: true },
               { src: 'spacewar-4.8-scorer-24jul1963.txt' }, STARS],
@@ -183,7 +183,7 @@
     { id: '2015', label: 'Spacewar! 2015', date: '2015', sort: 20150101,
       authors: 'Norbert Landsteiner', fork: 'later', status: 'reconstructed', medium: 'Source + tape',
       buildNotes: ["Assembled in the macro1 dialect; rebuilds spacewar-2015-landsteiner.rim exactly."],
-      summary: 'Landsteiner\'s new PDP-1 program reviving the Minskytron hyperspace signature and a working subjective view.',
+      summary: 'Landsteiner’s own PDP-1 program (not an authentic game), based on the dfw 4.1 and 4.2 of February 1963, with the Minskytron hyperspace signature, 4.8’s score display (modified) and a fixed 4.3 subjective view on sense switch 2, in place of the low-gravity option.',
       build: [{ src: 'spacewar-2015-landsteiner.txt' }],
       dialect: 'macro1',
       witnesses: ['spacewar-2015-landsteiner.rim'] }
@@ -243,16 +243,19 @@
   // continues dfw 4.1, with the ddp versions (4.4, the lost 4.5) as influence, not
   // parent; the code agrees (4.1 to 4.8 is 83% similar by routine, 4.4 to 4.8 71%).
   // The CHM builds descend from 4.1 with 4.8's score display grafted on, and
-  // Landsteiner's 2015 from 4.1f. (Placements confirmed 26 Sep 2026.)
+  // Landsteiner's 2015 from dfw 4.1, drawing on 4.8 and his fixed 4.3 (its header;
+  // corrected 29 Sep 2026). His fixed 4.3f and 4.4f descend from 4.3 and 4.4.
   // parent: the version it was made from. witnessOf: another reading of the same
   // version (from other tapes, or a later reassembly), not a step of its own.
   // also: a second source it draws on.
   var PARENT = { '2b-pre': '1', '2b': '1', '3.1': '2b', '4.0': '3.1',
                  '4.0ts': '4.0', '4.2': '4.0ts', '4.3': '4.2', '4.4': '4.3',
-                 '4.1': '4.0', '4.8': '4.1', '4.1d': '4.1', '4.1f': '4.1d', '2015': '4.1f' };
-  var WITNESS = { '3.1t': '3.1', '4.1t': '4.1', '4.3m': '4.3', '4.4m': '4.4', '4.4f': '4.4' };
-  var ALSO = { '4.1f': ['4.8'] };
-  var INFLUENCE = { '4.8': ['4.4'] };
+                 '4.1': '4.0', '4.8': '4.1', '4.1d': '4.1', '4.1f': '4.1d', '2015': '4.1',
+                 '4.3m': '4.3', '4.4f': '4.4' };
+  var WITNESS = { '3.1t': '3.1', '4.1t': '4.1', '4.4m': '4.4' };
+  var ALSO = { '4.1f': ['4.8'], '2015': ['4.8', '4.3m'] };
+  // influence: code taken from another line (4.2's sun routine is dfw 4.1's, line for line)
+  var INFLUENCE = { '4.8': ['4.4'], '4.2': ['4.1'] };
   VERSIONS.forEach(function (v) {
     v.parent = PARENT[v.id] || null;
     v.witnessOf = WITNESS[v.id] || null;

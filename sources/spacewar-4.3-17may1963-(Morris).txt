@@ -33,7 +33,7 @@
 / Provenance: the assembler pass-log that closes the scan (p.31) records
 /   spacewar 4.3  5/17/63 ddp  pt 1   (pass 1 and 2)
 /   spacewar 4.3  5/17/63 ddp  pt 2   (pass 1 and 2)
-/   stars by prs  for s/w 2b          (pass 1 and 2)
+/   stars by prs  for s/w 2b          (pass 1 and 2); then "f" (pass 1 only)
 /   spacewar 4.3 syms  5/23/63  jcm   (Joe C. Morris assembled the symbols)
 / The star field ("stars by prs for s/w 2b", the 1j-4q "mark" tables) is a
 / SEPARATE assembly loaded at 6077 and is NOT part of pt 1 / pt 2 in this

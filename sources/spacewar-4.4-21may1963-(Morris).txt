@@ -25,7 +25,7 @@
 / Provenance: the assembler pass-log that closes the scan (p.31) records
 /   spacewar 4.4  5/17/63 ddp : pt 1   (pass 1 and 2)
 /   spacewar 4.4  5/21/63 ddp : pt 2   (pass 1 and 2)
-/   stars by prs  for s/w 2b           (pass 1 and 2)
+/   stars by prs  for s/w 2b           (pass 1 and 2); then "foo" (pass 1 only)
 /   spacewar 4.4 syms  5/23/63  jcm    (Joe C. Morris assembled the symbols)
 / The constants area runs 2736-3063. The background star data ("stars by
 / prs for s/w 2b") is a SEPARATE file in this assembly and is NOT printed in
@@ -34,7 +34,7 @@
 / Confidence note: both parts are reasonably clear typewriter scans. A few
 / low-contrast spots on the late symbol-table pages were not needed (the
 / symbol table is not reproduced). Spots in the source that could not be
-/ read with confidence are marked [?]; none were required in the end.
+/ read with confidence are marked [?]: three lines in bpx, at the pp. 9-10 break.
 / ----------------------------------------------------------------------
 
 	spacewar 4.4  5/17/63  ddp · pt 1
@@ -442,9 +442,9 @@ bpx,	jmp .
 	lac ~bx
 	cma
 	dac ~bx
-	lac ~by
-	cma
-	dac ~by
+	lac ~by		/ [?] this line and the next two are clipped at the page break (scan pp. 9-10); supplied as in 3.1, following Landsteiner 2015
+	cma		/ [?]
+	dac ~by		/ [?]
 	jmp bjl
 /background display · 3/13/62, prs.
 	define
@@ -1404,6 +1404,6 @@ start 4
 / (pp.32-37), which are not reproduced here. The pass-log records:
 /   spacewar 4.4  5/17/63 ddp : pt 1   (pass 1 and 2)
 /   spacewar 4.4  5/21/63 ddp : pt 2   (pass 1 and 2)
-/   stars by prs  for s/w 2b           (pass 1 and 2)
+/   stars by prs  for s/w 2b           (pass 1 and 2); then "foo" (pass 1 only)
 /   spacewar 4.4 syms  5/23/63  jcm
 / "usw 1362  a+13  count 11"; constants area inclusive from 2736 to 3063.)
