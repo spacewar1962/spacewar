@@ -42,7 +42,7 @@
     }
     // 4.4 is the dual-console version: each frame goes to one of two scopes, centred
     // on one ship, chosen by the 400 bit of the display instruction (dj5 / dj6)
-    dual = !!(build.sym && build.sym.dj6);
+    dual = SW.scopeCount(build) === 2;
     var wrap = SW.el('div', { class: 'run' + (dual ? ' dual' : '') });
     var left = SW.el('div', { class: 'run-left' });
     var keysTip = 'Click, then fly the Needle with W A S D and the Wedge with I J K L: W and I fire, S and K the rocket, A and J turn left, D and L turn right.';
@@ -50,7 +50,7 @@
       (dual
         ? '<div class="scopes2"><figure><div class="scope-wrap" title="Scope 1. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 1: the Wedge’s console, centred on the Wedge</figcaption></figure>' +
           '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' +
-          '<p class="hint scopes2-note">4.4 sends alternate frames to two scopes, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). The bench reads the 400 bit of the display instruction (dpy-i 400, in dj6) as the second scope, as the listing describes it.</p>'
+          '<p class="hint scopes2-note">4.4 sends alternate frames to two displays, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). Its second display is addressed by 720407 (dpy-i 400, in dj6), which DEC’s 1963 PDP-1 Handbook gives as dpp, display one point on a second CRT (Type 31), beside dpy 720007 for the Type 30. Which display MIT used as the second console is not recorded there (F31).</p>'
         : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>') +
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
@@ -153,7 +153,7 @@
   // ---------- scope ----------
   function plot(x, y, s, t, pc, md) {
     // on the dual-console version the 400 bit picks the scope, and is no part of the brightness
-    var sc = dual && md != null && (md & 0o400) ? 2 : 1;
+    var sc = dual ? SW.scopeOf(build, md) : 1;
     if (dual && md != null) { var i2 = (md >> 6) & 3; s = i2; }
     pts.push({ x: x, y: y, s: s, t: t, sc: sc });
     if (pts.length > PTS_MAX) pts.splice(0, pts.length - PTS_MAX);

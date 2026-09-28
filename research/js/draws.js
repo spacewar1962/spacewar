@@ -34,7 +34,10 @@
   // plotted it, the instruction there, the frame, and whether it is run-time code.
   function record(b, cpu, cycles, out) {
     var bck = b.sym.bck ? b.sym.bck.val : -1;
-    cpu.onDisplay = function (x, y, s, t, pc) {
+    // on a version with two displays (4.4) the players follow one: scope 1, the Wedge's console
+    var twin = SW.scopeCount(b) === 2;
+    cpu.onDisplay = function (x, y, s, t, pc, md) {
+      if (twin && SW.scopeOf(b, md) === 2) return;
       out.push({ x: x, y: y, s: s, pc: pc, md: cpu.mem[pc], f: bck >= 0 ? cpu.execCount[bck] : 0, rt: !b.asm.memory[pc], via: cpu.lastSrcPc, w: cpu.lastWriter[pc] });
     };
     cpu.run(cycles);

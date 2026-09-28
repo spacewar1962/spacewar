@@ -40,7 +40,8 @@
     cpu.rd = function (a) { if (inFrames) tally(a, 'r'); return rd0.call(this, a); };
     cpu.wr = function (a, v) { if (inFrames) tally(a, 'w'); return wr0.call(this, a, v); };
     // what each frame puts on the screen: x, y and the routine plotting, in turn
-    cpu.onDisplay = function (x, y) { if (cur) cur.pts.push(x, y, who()); };
+    var twin = SW.scopeCount(b) === 2;
+    cpu.onDisplay = function (x, y, s, c, pc, md) { if (cur) { cur.pts.push(x, y, who()); if (twin && SW.scopeOf(b, md) === 2) cur.sc = 2; } };
     var mem = cpu.mem, isSrc = function (a) { return !!b.asm.memory[a]; };
     var frameAt = b.sym.ml0 ? b.sym.ml0.val : (b.sym.bck ? b.sym.bck.val : -1);
     var R = {}, sites = {}, path = [], stack = [], inFrames = false, frames = 0;
@@ -372,12 +373,14 @@
         sg.globalAlpha = 1;
         return n;
       }
-      pass(FL[i - 1], 0.28, false);
+      // the glow is of the frame before on the same scope (4.4 alternates its two scopes)
+      var sc = FL[i] && FL[i].sc || 1, prev = i - 1; if (SW.scopeCount(b) === 2) while (prev >= 0 && (FL[prev].sc || 1) !== sc) prev--;
+      pass(FL[prev], 0.28, false);
       var nHi = pass(FL[i], 1, true);
       sg.restore();
       sg.strokeStyle = '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
       var f = FL[i];
-      scap.textContent = f ? 'Frame ' + (i + 1) + ' · ' + (f.pts.length / 3) + ' points' + (hi != null ? ' · ' + nm(hi) + (!runsIn(hi, i) ? ' not in this frame' : ' ' + nHi) : '') : '';
+      scap.textContent = f ? 'Frame ' + (i + 1) + (SW.scopeCount(b) === 2 ? ' · scope ' + sc + (sc === 2 ? ', the Needle’s console' : ', the Wedge’s console') : '') + ' · ' + (f.pts.length / 3) + ' points' + (hi != null ? ' · ' + nm(hi) + (!runsIn(hi, i) ? ' not in this frame' : ' ' + nHi) : '') : '';
     }
 
     // ---------- the flame chart ----------

@@ -117,6 +117,12 @@
       });
     }));
   };
+  // Displays a version draws on. 4.4 (the dual-console version) addresses a second
+  // display with the instruction 720407 (dpy-i 400 in dj6): DEC's 1963 handbook
+  // (F-15D) gives 720407 as dpp, display one point on the second CRT (Type 31),
+  // beside dpy 720007 for the Type 30. Each of its frames goes to one of the two.
+  SW.scopeCount = function (b) { return b && b.sym && b.sym.dj6 ? 2 : 1; };
+  SW.scopeOf = function (b, md) { return SW.scopeCount(b) === 2 && md != null && (md & 0o7777) === 0o0407 ? 2 : 1; };
   SW.me = function () {
     return { initials: SW.store.get('initials', ''), name: SW.store.get('name', '') };
   };
