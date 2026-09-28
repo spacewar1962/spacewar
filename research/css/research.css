@@ -1169,7 +1169,7 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 .refhelp { max-width: 860px; }
 .refhelp-ex { font-size: 18px; margin: 6px 0 10px; color: var(--beam); }
 .refhelp h4 { margin: 14px 0 6px; }
-.swhid { font-size: 10.5px; padding: 0 5px; border: 1px solid var(--line); border-radius: 3px; background: none; color: var(--text-dim); cursor: copy; }
+.swhid { font-size: 10.5px; padding: 0 5px; border: 1px solid var(--line); border-radius: 3px; background: none; color: var(--text-dim); cursor: pointer; }
 .swhid:hover { color: var(--text); border-color: var(--beam); }
 .swhid-row { white-space: nowrap; font-size: 11.5px; }
 .refhelp { max-width: 1180px; }
