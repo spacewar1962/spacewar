@@ -219,6 +219,9 @@
     }
     if (q.b) SW.state.b = q.b;
     if (q.tab === 'sky') q.tab = 'graphics';   // the Star map tab became Graphics
+    // a view named in the link (the site map links to each): its lens or graphic
+    if (q.lens) { SW.setLens(q.lens); if (!q.tab) q.tab = 'analyse'; }
+    if (q.g) { SW.setGraphic(q.g); if (!q.tab) q.tab = 'graphics'; }
     SW.state.tab = ORDER.indexOf(q.tab) >= 0 ? q.tab : 'read';
     SW.markTabs();
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + SW.state.tab); });
@@ -226,6 +229,9 @@
     // The welcome tour: from a link (?tour=welcome), from Settings or About, or offered on a first visit.
     SW.$('#set-tour').onclick = function () { SW.$('#dlg-settings').close('cancel'); SW.tours.start('welcome'); };
     SW.$('#about-tour').onclick = function () { SW.$('#dlg-about').close(); SW.tours.start('welcome'); };
+    // a Help item named in the link
+    var HELP = { refs: function () { SW.refHelp(); }, about: about, settings: settings };
+    if (HELP[q.help]) setTimeout(HELP[q.help], 700);
     if (q.tour) setTimeout(function () { SW.tours.start(q.tour); }, 900);
     else if (!SW.store.get('tour.seen', false)) setTimeout(SW.tours.offer, 1200);
     else if (!SW.store.get('initials', '')) setTimeout(function () { SW.toast('Welcome. Set your initials (⚙) so your annotations are signed.', 5000); }, 800);

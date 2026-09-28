@@ -1581,7 +1581,7 @@
       '<span class="hint an-desc">' + SW.esc(L[2]) + '.</span>';
     head.addEventListener('click', function (e) {
       var t = e.target.closest('[data-l]');
-      if (t) { lens = +t.dataset.l; SW.store.set('an.lens', lens); render(); return; }
+      if (t) { lens = +t.dataset.l; SW.store.set('an.lens', lens); SW.writeQuery(); render(); return; }
       var m = e.target.closest('[data-mode]'); if (m) { mode = m.dataset.mode; SW.store.set('an.mode', mode); render(); }
     });
     pad.appendChild(head);
@@ -1637,7 +1637,7 @@
     head.innerHTML = '<details class="menu lens-menu"><summary class="btn" title="Choose a graphic">' + SW.esc(G[1]) + ' ▾</summary><div class="menu-body lens-list">' +
       GFX.filter(function (g) { return g[0] !== 'tapesim'; }).map(function (g) { return '<button data-g="' + g[0] + '"' + (g[0] === G[0] ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('') +
       '</div></details><span class="hint an-desc">' + SW.esc(G[2]) + '.</span>';
-    head.addEventListener('click', function (e) { var t = e.target.closest('[data-g]'); if (t) { gfx = t.dataset.g; SW.store.set('gfx.item', gfx); renderGfx(); } });
+    head.addEventListener('click', function (e) { var t = e.target.closest('[data-g]'); if (t) { gfx = t.dataset.g; SW.store.set('gfx.item', gfx); SW.writeQuery(); renderGfx(); } });
     pad.appendChild(head);
     el.appendChild(pad);
     if (!b.lines || !b.asm) { pad.appendChild(SW.el('p', { class: 'hint' }, 'No source survives for ' + SW.esc(b.v.label) + ', so there is nothing to draw.')); return; }
@@ -1687,7 +1687,8 @@
       var dm = document.querySelector('meta[name="bench-date"]');
       // Grouped, with a divider and a small heading between the groups; About the bench stays last.
       var HELP = [['Getting started', [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
-                                       ['refs', 'Referencing and versions', 'How the bench cites a source, as [REF: SW3.1T, 2.141]']]],
+                                       ['refs', 'Referencing and versions', 'How the bench cites a source, as [REF: SW3.1T, 2.141]'],
+                                       ['sitemap', 'Site map', 'Every view and version as a plain link']]],
                   ['Your bench', [['settings', 'Settings', 'Initials, group, theme, fonts'],
                                   ['backup', 'Back up everything', 'Notes, drafts, settings and findings in one file'],
                                   ['restore', 'Restore from a backup…', 'Brings back notes and drafts beside those here']]],
@@ -1727,6 +1728,7 @@
           var p = t.dataset.pick;
           if (p === 'tour') { SW.tours.start('welcome'); return; }
           if (p === 'refs') { SW.refHelp(); return; }
+          if (p === 'sitemap') { location.href = 'sitemap.html'; return; }
           if (p === 'backup') { SW.backup.save(); return; }
           if (p === 'restore') { SW.backup.restore(); return; }
           if (p === 'about') SW.$('#btn-about').click();
@@ -1756,6 +1758,10 @@
   window.addEventListener('resize', closeTabMenu);
   // Open a lens or a graphic from elsewhere (the welcome tour).
   SW.openLens = function (n) { lens = n; SW.store.set('an.lens', n); SW.forget('analyse'); SW.setTab('analyse'); };
+  // From a link (?lens=14, ?g=gravity): set before the first view is drawn.
+  SW.setLens = function (n) { n = +n; if (LENSES[n - 1] && n !== 12 && n !== 13) { lens = n; SW.store.set('an.lens', n); } };
+  SW.setGraphic = function (g) { if (GFX.some(function (x) { return x[0] === g; }) && g !== 'tapesim') { gfx = g; SW.store.set('gfx.item', g); } };
+  SW.gfxItem = function () { return gfx; };
   SW.openGraphic = function (g) { gfx = g; SW.store.set('gfx.item', g); SW.forget('graphics'); SW.setTab('graphics'); };
   // Open a biography from elsewhere (the symbol pop-up in Read).
   SW.biography = function (name) {

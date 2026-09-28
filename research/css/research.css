@@ -1225,3 +1225,6 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .grav-sw { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
 .grav-sw span { display: inline-block; width: 18px; height: 3px; border-radius: 2px; }
 .grav-t .linkish { background: none; border: 0; padding: 0; color: inherit; text-decoration: underline dotted; cursor: pointer; font: inherit; }
+.tabs .tabs-map { margin-left: auto; align-self: center; font-size: 12px; color: var(--text-faint); text-decoration: none; padding: 0 6px; white-space: nowrap; }
+.tabs .tabs-map:hover { color: var(--text); text-decoration: underline; }
+.noscript { margin: 16px; padding: 12px 14px; border: 1px solid var(--line, #888); border-radius: 6px; background: var(--surface, #fff); color: var(--text, #111); font-size: 14px; }
