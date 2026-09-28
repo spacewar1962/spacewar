@@ -414,6 +414,7 @@ body.drawer-open .drawer { transform: none; }
   background: radial-gradient(circle at 50% 45%, #2a3944, #121a20 70%); box-shadow: inset 0 0 0 6px #0c1216, 0 2px 12px rgba(0,0,0,0.4); }
 .scope-wrap canvas { position: absolute; left: 50%; top: 50%; width: calc((100% - 28px) * 0.7071); height: calc((100% - 28px) * 0.7071); transform: translate(-50%, -50%); background: #000; display: block; }
 .scope-wrap canvas:focus { outline: none; }
+.scope-wrap canvas.flash { background: transparent; }
 .scope-wrap:focus-within { box-shadow: inset 0 0 0 6px #0c1216, 0 0 0 2px rgba(140,170,195,0.45); }
 /* the tube's face: the square raster sits inside it, so its corners show */
 .scope-wrap::before { content: ''; position: absolute; inset: 14px; border-radius: 50%; background: #000; }
@@ -1200,7 +1201,7 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 .swhid-row { white-space: nowrap; font-size: 11.5px; }
 .refhelp { max-width: 1180px; }
 .refhelp-t td { vertical-align: top; }
-.refhelp-t .ref-files { font-size: 10.5px; margin-top: 2px; line-height: 1.45; word-break: break-all; }
+.refhelp-t a.ref-more { font-size: 10.5px; white-space: nowrap; }
 .refhelp-t .swhid-row.tiny { font-size: 10px; white-space: nowrap; }
 .refhelp-t .swhid-row.tiny .swhid { font-size: 10px; padding: 0 3px; }
 .swref, .swref-c { cursor: pointer; }

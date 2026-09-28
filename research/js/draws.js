@@ -97,7 +97,7 @@
     function dot(p, alpha, ring) {
       var q = px(p), r = Math.max(2.5, Math.min(7, k * 0.45));
       g.fillStyle = p.col || 'rgb(200,236,255)';
-      g.globalAlpha = alpha * Math.max(0.35, Math.min(1, 0.62 + 0.13 * (p.s || 0)));
+      g.globalAlpha = alpha * SW.beam(p.s);
       g.beginPath(); g.arc(q[0], q[1], r, 0, 6.2832); g.fill(); g.globalAlpha = 1;
       if (ring) { g.strokeStyle = '#ffce7a'; g.lineWidth = 2; g.beginPath(); g.arc(q[0], q[1], r + 5, 0, 6.2832); g.stroke(); }
     }

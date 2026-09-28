@@ -58,6 +58,8 @@
     this.trace = [];
     this.anomalies = [];
     this.fault = null;
+    this.dpyDone = 0;       // the cycle at which the display finishes its point
+    this.dpyPulse = false;  // a completion pulse asked for (dpy-4000), which ioh waits for
   };
 
   PDP1.prototype.load = function (memory, start) {
@@ -125,6 +127,7 @@
   PDP1.prototype.dispatch = function (md, depth) {
     var op = md >> 13, ib = (md >> 12) & 1, y = md & 0o7777, t, v, i, sign;
     var cyc = 1;
+    this.eaExtra = 0;
     switch (op) {
       case 0o01: y = this.ea(y, ib); this.ac &= this.rd(y); cyc = 2; break;
       case 0o02: y = this.ea(y, ib); this.ac |= this.rd(y); cyc = 2; break;
@@ -132,7 +135,9 @@
       case 0o04:
         y = this.ea(y, ib);
         this.execCount[y]++;
-        cyc = 1 + (depth < 32 ? this.dispatch(this.rd(y), depth + 1) : 0);
+        t = this.eaExtra;
+        cyc = 1 + t + (depth < 32 ? this.dispatch(this.rd(y), depth + 1) : 0);
+        this.eaExtra = 0;   // counted above
         break;
       case 0o07: // cal / jda
         t = ib ? y : 0o100;
@@ -208,10 +213,12 @@
         y = this.ea(y, ib); v = this.rd(y);
         if (this.mdv) {
           sign = this.ac ^ v;
-          var signd = this.ac;
+          var signd = this.ac, io0 = this.io;
           if (this.ac & SIGN) { this.ac ^= M; this.io ^= M; }
           v = abs(v);
-          if (this.ac >= v) { cyc = 2; break; }       // overflow: no skip
+          // overflow: no skip, and the hardware leaves AC and IO as they were
+          // (Landsteiner, Inside Spacewar! pt 6)
+          if (this.ac >= v) { this.ac = signd; this.io = io0; cyc = 2; break; }
           for (i = t = 0; i < 18; i++) {
             if (t) this.ac = (this.ac + v) & M;
             else this.ac = (this.ac - v) & M;
@@ -289,6 +296,9 @@
           this.fault = 'reserved instruction ' + md.toString(8) + ' at ' + this.curPC.toString(8);
         }
     }
+    // a deferred (indirect) address costs a memory cycle a level, for every
+    // memory-reference instruction (jmp and jsp count theirs above)
+    if (op >= 0o01 && op <= 0o27) cyc += this.eaExtra;
     return cyc;
   };
 
@@ -320,10 +330,26 @@
       var x = this.ac >> 8, yy = this.io >> 8;
       if (x & 0o1000) x = -(x ^ 0o1777);    // ones' complement 10 bits
       if (yy & 0o1000) yy = -(yy ^ 0o1777);
+      // brightness: DEC's PDP-35-2 orders the three bits 4 5 6 7 0 1 2 3, dimmest
+      // to brightest (4 visible to a photomultiplier only, 7 barely visible, 0
+      // normal, 3 brightest), so s runs from -4 to 3
       var inten = (md >> 6) & 7;
-      var s = inten & 4 ? -(inten ^ 7) : inten;   // ones' complement 3 bits
+      var s = inten & 4 ? inten - 8 : inten;
       if (this.onDisplay) this.onDisplay(x, yy, s, this.cycles, this.curPC, md);   // md: the instruction (4.4 chooses its scope with the 400 bit)
-      return 10;                             // ~50 us including the wait
+      // timing (FP-25 Table I; Landsteiner, Inside Spacewar! pt 2): the display takes
+      // 50 us a point. With the i bit (dpy, 730007) the computer waits for it; without
+      // (dpy-i, 720007) it goes on at once; with 4000 as well (dpy-4000, 724007) it goes
+      // on and the display sends a completion pulse, which the next ioh waits for.
+      this.dpyDone = this.cycles + 10;
+      if (md & 0o10000) { this.dpyPulse = false; return 10; }
+      this.dpyPulse = !!(md & 0o4000);
+      return 1;
+    }
+    // ioh (iot i, device 0): wait for the display's completion pulse, if one is due
+    if (dev === 0 && (md & 0o10000)) {
+      if (!this.dpyPulse) return 1;
+      this.dpyPulse = false;
+      return Math.max(1, this.dpyDone - this.cycles);
     }
     // control boxes: the standard boxes' switches are ORed into IO, so every
     // standard mg1 clears IO (cli) first (Landsteiner, Inside Spacewar! pt 5).

@@ -125,7 +125,7 @@
     pts.forEach(function (p) {
       var age = now - p.t;
       if (age > persist * 5) return;
-      var a = Math.exp(-age / persist) * Math.max(0.25, Math.min(1, 0.62 + 0.13 * p.s));
+      var a = Math.exp(-age / persist) * SW.beam(p.s);
       if (a < 0.01) return;
       var x = (p.x + 512) * k, y = (511 - p.y) * k;
       if (opts.bg === '#fff') g.fillStyle = 'rgba(0,0,0,' + a.toFixed(3) + ')';
@@ -151,7 +151,7 @@
     pts.forEach(function (p) {
       var age = now - p.t;
       if (age > persist * 4) return;
-      var a = Math.exp(-age / persist) * Math.max(0.25, Math.min(1, 0.62 + 0.13 * p.s));
+      var a = Math.exp(-age / persist) * SW.beam(p.s);
       if (a < 0.02) return;
       o.push('<circle cx="' + (p.x + 512) + '" cy="' + (511 - p.y) + '" r="1.6" opacity="' + a.toFixed(2) + '"/>');
     });

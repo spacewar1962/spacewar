@@ -10,7 +10,8 @@
   var speed = SW.store.get('run.speed', 1);
   var CPS = 200000;                         // memory cycles per second (5 us)
   var pts = [], PTS_MAX = 80000;            // recent display points for figures
-  var ctx = null, ctx2 = null, dual = false, scopeSize = 1024;
+  var ctx = null, ctx2 = null, glow = null, glow2 = null, dual = false, scopeSize = 1024;
+  var GLOW_T = 1.2;   // the afterglow's time constant, seconds of machine time
   var decay = SW.store.get('run.decay', 0.12); // phosphor time constant (s)
   var tempBreak = null, stepOverTo = null;
   var paneTab = 'source';
@@ -48,10 +49,10 @@
     var keysTip = 'Click, then fly the Needle with W A S D and the Wedge with I J K L: W and I fire, S and K the rocket, A and J turn left, D and L turn right.';
     left.innerHTML =
       (dual
-        ? '<div class="scopes2"><figure><div class="scope-wrap" title="Scope 1. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 1: the Wedge’s console, centred on the Wedge</figcaption></figure>' +
-          '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' +
+        ? '<div class="scopes2"><figure><div class="scope-wrap" title="Scope 1. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 1: the Wedge’s console, centred on the Wedge</figcaption></figure>' +
+          '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' +
           '<p class="hint scopes2-note">4.4 sends alternate frames to two displays, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). Its second display is addressed by 720407 (dpy-i 400, in dj6), which DEC’s 1963 PDP-1 Handbook gives as dpp, display one point on a second CRT (Type 31), beside dpy 720007 for the Type 30. Which display MIT used as the second console is not recorded there (F31).' + (build.v.id === '4.4f' ? ' This is Landsteiner’s 2015 fixed version (F33).' : (fixedSyms ? ' Assembled with the tape “foo” fed in after pass 1, as the listing’s pass log records, so the sun is placed correctly. The Needle’s console still shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).' : ' Assembled without the tape “foo” that the pass log records after pass 1, so the sun is misplaced on both consoles; the Needle’s console also shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).')) + '</p>'
-        : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>') +
+        : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>') +
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
       '<button class="btn" id="r-over" title="Step over a subroutine call (jsp, jda)">Step over</button>' +
@@ -79,10 +80,11 @@
 
     var cv = SW.$('#scope', view), cv2 = SW.$('#scope2', view);
     ctx = cv.getContext('2d');
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, scopeSize, scopeSize);
     ctx2 = cv2 ? cv2.getContext('2d') : null;
-    if (ctx2) { ctx2.fillStyle = '#000'; ctx2.fillRect(0, 0, scopeSize, scopeSize); }
+    // the P7 phosphor's slow yellow-green afterglow, on a canvas under each scope
+    glow = cv.previousElementSibling.getContext('2d');
+    glow2 = cv2 ? cv2.previousElementSibling.getContext('2d') : null;
+    clearScopes();
     [cv, cv2].forEach(function (c) {
       if (!c) return;
       c.addEventListener('keydown', function (e) { if (KEYS[e.code]) { cpu.control |= KEYS[e.code]; e.preventDefault(); } });
@@ -95,7 +97,7 @@
     SW.$('#r-run', view).onclick = function () { if (running) { pause(); cv.focus(); } else go(); };
     SW.$('#r-step', view).onclick = function () { pause(); stepOnce(); };
     SW.$('#r-over', view).onclick = stepOver;
-    SW.$('#r-reset', view).onclick = function () { pause(); load(); updateAll(); };
+    SW.$('#r-reset', view).onclick = function () { pause(); load(true); updateAll(); };
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
     var sym = SW.$('#r-sym', view);
     if (sym) sym.onchange = function () { SW.store.set('run.sunfix', sym.checked); R.show(build); };
@@ -165,29 +167,49 @@
     if (dual && md != null) { var i2 = (md >> 6) & 3; s = i2; }
     pts.push({ x: x, y: y, s: s, t: t, sc: sc });
     if (pts.length > PTS_MAX) pts.splice(0, pts.length - PTS_MAX);
-    var g = sc === 2 ? ctx2 : ctx;
+    var g = sc === 2 ? ctx2 : ctx, gg = sc === 2 ? glow2 : glow;
     if (!g) return;
-    var px = (x + 512) * scopeSize / 1024, py = (511 - y) * scopeSize / 1024;
-    var a = Math.max(0.25, Math.min(1, 0.62 + 0.13 * s));
+    var a = SW.beam(s); if (a <= 0) return;   // intensity 4: for a photomultiplier only
+    var px = (x + 512) * scopeSize / 1024, py = (511 - y) * scopeSize / 1024, w = 1.8 + 0.8 * a;   // brighter points bleed wider
     g.fillStyle = 'rgba(200,236,255,' + a + ')';
-    g.fillRect(px - 1, py - 1, 2.4, 2.4);
+    g.fillRect(px - w / 2, py - w / 2, w, w);
+    if (gg) { gg.fillStyle = 'rgba(160,225,110,' + (0.06 * a).toFixed(3) + ')'; gg.fillRect(px - w / 2, py - w / 2, w, w); }
   }
+  // the phosphor fades in machine time, so a slowed run keeps its trace: the
+  // blue-white flash quickly (decay), the yellow-green afterglow slowly (GLOW_T)
+  // Fades are gathered into steps of an eighth of each time constant: a canvas keeps
+  // 8-bit colour, so a smaller step is rounded away and the trace never fades.
+  var flashDue = 0, glowDue = 0;
   function fade(dt) {
     if (!ctx) return;
-    var keep = Math.exp(-dt / decay);
-    [ctx, ctx2].forEach(function (g) { if (!g) return; g.fillStyle = 'rgba(0,2,4,' + (1 - keep).toFixed(4) + ')'; g.fillRect(0, 0, scopeSize, scopeSize); });
+    flashDue += dt; glowDue += dt;
+    if (flashDue >= decay / 8) {
+      var keep = Math.exp(-flashDue / decay); flashDue = 0;
+      [ctx, ctx2].forEach(function (g) { if (!g) return; g.save(); g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,' + (1 - keep).toFixed(4) + ')'; g.fillRect(0, 0, scopeSize, scopeSize); g.restore(); });
+    }
+    if (glowDue >= GLOW_T / 8) {
+      var keepG = Math.exp(-glowDue / GLOW_T); glowDue = 0;
+      [glow, glow2].forEach(function (g) { if (!g) return; g.fillStyle = 'rgba(0,2,4,' + (1 - keepG).toFixed(4) + ')'; g.fillRect(0, 0, scopeSize, scopeSize); });
+    }
+  }
+  function clearScopes() {
+    [ctx, ctx2].forEach(function (g) { if (g) g.clearRect(0, 0, scopeSize, scopeSize); });
+    [glow, glow2].forEach(function (g) { if (g) { g.fillStyle = '#000'; g.fillRect(0, 0, scopeSize, scopeSize); } });
   }
 
   // ---------- execution ----------
-  function load() {
+  function load(keepSwitches) {
+    // Reset keeps the console's switches where they are; a new version starts with them off
+    var sw0 = keepSwitches && cpu ? cpu.sense.slice() : null, tw0 = keepSwitches && cpu ? cpu.tw : 0;
     cpu = new C.PDP1({ mdv: build.v.mdv, ctlLoad: build.v.ctlLoad });
+    if (sw0) { cpu.sense = sw0; cpu.tw = tw0; }
     cpu.load(build.asm.memory, build.asm.start);
     cpu.srcMap = new Uint8Array(4096);
     for (var k in build.asm.memory) cpu.srcMap[+k] = 1;
     cpu.lastSrcPc = -1;
     cpu.onDisplay = plot;
     pts = [];
-    [ctx, ctx2].forEach(function (g) { if (g) { g.fillStyle = '#000'; g.fillRect(0, 0, scopeSize, scopeSize); } });
+    clearScopes();
     cpu.breakpoints = SW.breakpoints;
     publishProfile();
   }
@@ -198,15 +220,15 @@
     var sc = SW.$('#scope', view); if (sc && sc.offsetParent === null) { pause(); return; }
     var dt = Math.min(0.1, (t - lastT) / 1000 || 0.016);
     lastT = t;
-    var budget = Math.round(dt * CPS * speed);
+    var budget = Math.round(dt * CPS * speed), c0 = cpu.cycles;
     cpu.resumeFrom = cpu.pc;
     var res = runCycles(budget);
-    fade(dt);
+    fade((cpu.cycles - c0) / CPS);
     regs();
     if (res === 'break' || res === 'halt') {
       pause();
       if (res === 'break') SW.toast('Breakpoint at ' + SW.oct(cpu.pc, 4) + (build.symAt(cpu.pc) ? ' (' + build.symAt(cpu.pc) + ')' : ''));
-      if (res === 'halt') SW.toast(cpu.fault || 'The program halted (hlt).', 4000);
+      if (res === 'halt') SW.toast(cpu.fault || 'The program halted (hlt). The lights show AC and IO (the scores, at a game’s end). Run continues, as the console’s CONTINUE switch did; Reset starts again.', 6000);
       pane();
       return;
     }
@@ -230,7 +252,8 @@
   }
 
   function go() {
-    if (cpu.halted) { SW.toast('Halted. Reset to start again.'); return; }
+    // after a halt, Run continues from the next instruction, as the console's CONTINUE did
+    if (cpu.halted) { cpu.halted = false; cpu.fault = null; }
     running = true;
     lastT = performance.now();
     SW.$('#scope', view).focus();

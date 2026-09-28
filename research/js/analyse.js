@@ -644,10 +644,10 @@
       function inView(p) { var u = ((p.S - fpr) % 8192 + 8192) % 8192; return u > 7168 ? u - 7680 : null; }
       function plot(p, x, s) {
         var px = (x + 512) * N / 1024, py = (511 - p.Y) * N / 1024;
-        g.fillStyle = 'rgba(200,236,255,' + Math.max(0.25, Math.min(1, 0.62 + 0.13 * s)).toFixed(3) + ')';
+        g.fillStyle = 'rgba(200,236,255,' + SW.beam(s).toFixed(3) + ')';
         g.fillRect(px - 1.2, py - 1.2, 2.6, 2.6);
       }
-      function sgn3(v) { return v & 4 ? -(v ^ 7) : v; }   // intensity: 3 bits, ones' complement
+      function sgn3(v) { return v & 4 ? v - 8 : v; }   // intensity: 3 bits, 4 dimmest to 3 brightest (PDP-35-2)
       function drawGroup(gr, s) { pts.forEach(function (p) { if (p.g !== gr) return; var x = inView(p); if (x !== null) plot(p, x, s); }); }
       function onePass() {
         pass++;
@@ -705,7 +705,7 @@
         og.restore();
       }
       // The scope as a figure: the round screen, the stars in the window at their
-      // relative brightness (intensity 0.62 + 0.13 s as the Run view draws it; by
+      // relative brightness (intensity by SW.beam, as the Run view draws it; by
       // redrawing, in the proportion 2 : 1 : 1/2 : 1/4), the chart if it is on.
       function scopeSVG(pal) {
         var Z = 880, o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + Z + '" height="' + (Z + 70) + '" viewBox="0 0 ' + Z + ' ' + (Z + 70) + '" font-family="Helvetica, Arial, sans-serif">'];
@@ -727,7 +727,7 @@
         }
         if (!off) pts.forEach(function (p) {
           if (inView(p) === null) return;
-          var a = scr(p.S, p.Y), al = mode === 'intensity' ? Math.max(0.25, Math.min(1, 0.62 + 0.13 * sgn3(calls[p.g]))) : RB[p.g];
+          var a = scr(p.S, p.Y), al = mode === 'intensity' ? SW.beam(sgn3(calls[p.g])) : RB[p.g];
           o.push('<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="3.2" fill="rgb(200,236,255)" fill-opacity="' + al.toFixed(2) + '"><title>' + SW.esc(p.st.name) + '</title></circle>');
           if (chartOn && p.st.proper) o.push('<text x="' + (a[0] + 9).toFixed(1) + '" y="' + (a[1] - 7).toFixed(1) + '" font-size="20" fill="rgba(244,241,230,0.92)">' + SW.esc(p.st.proper) + '</text>');
         });
