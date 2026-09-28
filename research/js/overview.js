@@ -384,7 +384,10 @@
         }
         // the glow is of the frame before on the same scope; on 4.4 the other
         // scope shows its own last frame, drawn one frame earlier
-        var live = !s || s === sc, prev = s ? onScope(fi - 1, s) : fi - 1;
+        // playing faster than 2 frames a second (or with reduced motion asked for), the
+        // two scopes are drawn alike: marking the one just drawn would swap every frame,
+        // a flash of 2 to 30 a second (WCAG 2.3.1 allows at most 3)
+        var live = !s || s === sc || calm(), prev = s ? onScope(fi - 1, s) : fi - 1;
         if (fi >= 0) { pass(FL[prev], 0.28, false); var n1 = pass(FL[fi], live ? 1 : 0.7, true); if (live) nHi = n1; }
         sg.restore();
         sg.strokeStyle = live && s ? '#5c7c9c' : '#3a5068'; sg.lineWidth = 3; sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.stroke();
@@ -394,7 +397,11 @@
     }
 
     // ---------- the flame chart ----------
-    var fl = SW.$('.ov-flame', el), fr = SW.$('.ov-fr', el), fcap = SW.$('.ov-fcap', el), playT = null;
+    var fl = SW.$('.ov-flame', el), fr = SW.$('.ov-fr', el), fcap = SW.$('.ov-fcap', el), playT = null, playing = false;
+    function calm() {
+      var rm = false; try { rm = root.matchMedia && root.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { /* ignore */ }
+      return rm || (playing && ['1', '2'].indexOf(SW.$('.ov-speed', el).value) < 0);
+    }
     // one scale for every frame: the longest frame across, the deepest down, so
     // frames can be compared and the chart keeps still as they change
     var maxLen = 1, maxDepth = 0, ranIn = {};
@@ -403,8 +410,16 @@
     function ranges(l) { var out = [], a = null, p = null; l.forEach(function (n) { if (a === null) { a = p = n; } else if (n === p + 1) p = n; else { out.push(a === p ? String(a + 1) : (a + 1) + '–' + (p + 1)); a = p = n; } }); if (a !== null) out.push(a === p ? String(a + 1) : (a + 1) + '–' + (p + 1)); return out.join(', '); }
     // (the first frame, which runs long as the game begins, is left out of the scale and may run off the edge)
     FL.forEach(function (f, n) { if (n || FL.length === 1) maxLen = Math.max(maxLen, f.len); f.spans.forEach(function (sp) { maxDepth = Math.max(maxDepth, sp.d); }); });
+    var flameAt = 0;
     function chart(i) {
       var f = FL[i]; if (!f) { fl.innerHTML = '<p class="hint">No frames in this snapshot.</p>'; return; }
+      // playing fast, the flame chart's coloured bars are redrawn at most twice a
+      // second, so they cannot flash (WCAG 2.3.1: at most 3 a second); the scope moves on
+      if (calm() && playing) {
+        var now = Date.now();
+        if (now - flameAt < 500) { scope(i); keep.frame = i; fcap.textContent = 'frame ' + (i + 1) + ' of ' + NF; return; }
+        flameAt = now;
+      }
       var W = Math.max(300, fl.clientWidth || 700), RH = 20, depth = maxDepth;
       var H = (depth + 1) * RH + 26, len = f.len || 1, sc = maxLen;
       var o = ['<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '" class="ov-fsvg">'];
@@ -432,11 +447,11 @@
     SW.$('.ov-fctl', el).addEventListener('click', function (e) {
       var t = e.target.closest('[data-f]'); if (!t) return;
       if (t.dataset.f === 'play') {
-        if (playT) { clearTimeout(playT); playT = null; t.textContent = '▶ Play'; return; }
-        t.textContent = '❚❚ Pause';
+        if (playT) { clearTimeout(playT); playT = null; playing = false; t.textContent = '▶ Play'; scope(shownFrame); return; }
+        t.textContent = '❚❚ Pause'; playing = true;
         (function step() {
           if (!fl.isConnected) return;
-          if (!fl.offsetParent) { playT = null; t.textContent = '▶ Play'; return; }   // paused when the page is left
+          if (!fl.offsetParent) { playT = null; playing = false; t.textContent = '▶ Play'; return; }   // paused when the page is left
           fr.value = (+fr.value + 1) % NF; chart(+fr.value);
           var sp = SW.$('.ov-speed', el).value, f = FL[+fr.value];
           playT = setTimeout(step, sp === 'rt' ? Math.max(16, (f ? f.len : 10000) * US / 1000) : 1000 / +sp);
