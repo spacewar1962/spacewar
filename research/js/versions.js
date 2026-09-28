@@ -239,7 +239,11 @@
   }
 
   // ---------- descent ----------
-  // After 4.0 the program forks: ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8). 4.8
+  // After 4.0 the program forks: ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8). ddp's
+  // 4.2 is built on dfw's 4.1, not on his own 4.0TS (29 Sep 2026): its sun routine is
+  // 4.1's line for line, it has 4.1's mco store and 5000 frame budget, 225 of its
+  // 1,293 normalised lines are not in 4.1 against 346 not in 4.0TS, and it lacks
+  // 4.0TS's random hyperspace spin. So 4.0TS is a side branch. 4.8
   // continues dfw 4.1, with the ddp versions (4.4, the lost 4.5) as influence, not
   // parent; the code agrees (4.1 to 4.8 is 83% similar by routine, 4.4 to 4.8 71%).
   // The CHM builds descend from 4.1 with 4.8's score display grafted on, and
@@ -249,13 +253,12 @@
   // version (from other tapes, or a later reassembly), not a step of its own.
   // also: a second source it draws on.
   var PARENT = { '2b-pre': '1', '2b': '1', '3.1': '2b', '4.0': '3.1',
-                 '4.0ts': '4.0', '4.2': '4.0ts', '4.3': '4.2', '4.4': '4.3',
+                 '4.0ts': '4.0', '4.2': '4.1', '4.3': '4.2', '4.4': '4.3',
                  '4.1': '4.0', '4.8': '4.1', '4.1d': '4.1', '4.1f': '4.1d', '2015': '4.1',
                  '4.3m': '4.3', '4.4f': '4.4' };
   var WITNESS = { '3.1t': '3.1', '4.1t': '4.1', '4.4m': '4.4' };
   var ALSO = { '4.1f': ['4.8'], '2015': ['4.8', '4.3m'] };
-  // influence: code taken from another line (4.2's sun routine is dfw 4.1's, line for line)
-  var INFLUENCE = { '4.8': ['4.4'], '4.2': ['4.1'] };
+  var INFLUENCE = { '4.8': ['4.4'] };
   VERSIONS.forEach(function (v) {
     v.parent = PARENT[v.id] || null;
     v.witnessOf = WITNESS[v.id] || null;
@@ -274,7 +277,8 @@
   }
   // The lines of descent, each a straight chain the genealogy can follow.
   var LINES = [
-    { id: 'ddp', label: 'ddp line (4.0 → 4.0TS → 4.2 → 4.3 → 4.4)', tip: '4.4' },
+    { id: 'ddp', label: 'ddp line (4.0 → 4.1 → 4.2 → 4.3 → 4.4)', tip: '4.4' },
+    { id: 'ts', label: '4.0TS (4.0 → 4.0TS)', tip: '4.0ts' },
     { id: 'dfw', label: 'dfw line (4.0 → 4.1 → 4.8)', tip: '4.8' },
     { id: 'chm', label: 'CHM line (4.1 → 4.1d → 4.1f → 2015)', tip: '2015' }
   ];
