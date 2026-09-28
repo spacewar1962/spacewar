@@ -665,7 +665,6 @@
         og.clearRect(0, 0, ON, ON);
         if (!chartOn) return;
         og.save();
-        og.beginPath(); og.arc(ON / 2, ON / 2, ON / 2, 0, 6.2832); og.clip();
         og.font = '19px Helvetica, Arial, sans-serif'; og.lineWidth = 1.6;
         // grid: RA every hour (mark X = h * 8192/24), declination every 10 degrees
         og.strokeStyle = 'rgba(143,163,181,0.22)'; og.fillStyle = 'rgba(143,163,181,0.7)';
@@ -807,7 +806,7 @@
       fb.appendChild(SW.el('button', { class: 'btn', title: 'Save the phosphor screen as it is now (with the chart, if it is on), as a PNG', onclick: function () {
         var c = document.createElement('canvas'); c.width = ON; c.height = ON;
         var x = c.getContext('2d');
-        x.save(); x.beginPath(); x.arc(ON / 2, ON / 2, ON / 2, 0, 6.2832); x.clip();
+        x.save();
         x.drawImage(cv, 0, 0, ON, ON); x.drawImage(over, 0, 0);
         x.restore();
         c.toBlob(function (blob) { blob.arrayBuffer().then(function (buf) { root.SWExport.download(name + '-screen.png', new Uint8Array(buf), 'image/png'); }); }, 'image/png');

@@ -398,7 +398,9 @@ body.drawer-open .drawer { transform: none; }
 .run-right { overflow: auto; min-width: 0; }
 .scope-wrap { position: relative; aspect-ratio: 1; width: 100%; max-width: 540px; margin: 0 auto; border-radius: 50%; padding: 14px;
   background: radial-gradient(circle at 50% 45%, #2a3944, #121a20 70%); box-shadow: inset 0 0 0 6px #0c1216, 0 2px 12px rgba(0,0,0,0.4); }
-.scope-wrap canvas { width: 100%; height: 100%; border-radius: 50%; background: #020406; display: block; }
+.scope-wrap canvas { position: absolute; left: 50%; top: 50%; width: calc((100% - 28px) * 0.7071); height: calc((100% - 28px) * 0.7071); transform: translate(-50%, -50%); background: #000; display: block; }
+/* the tube's face: the square raster sits inside it, so its corners show */
+.scope-wrap::before { content: ''; position: absolute; inset: 14px; border-radius: 50%; background: #000; }
 .console {
   margin-top: 12px; background: linear-gradient(180deg, #7fb0c2, #5f93a8); color: #0d1a20; border-radius: 6px; padding: 10px 12px 12px;
   border: 1px solid #3f6878; font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px;
@@ -851,8 +853,10 @@ dialog.sky-dlg { width: min(1480px, 98vw); max-height: 96vh; overflow: auto; pad
 .sky-scope-row { display: grid; grid-template-columns: minmax(260px, 440px) 1fr; gap: 16px; align-items: start; }
 @media (max-width: 900px) { .sky-scope-row { grid-template-columns: 1fr; } }
 .sky-crt-wrap { position: relative; width: 100%; aspect-ratio: 1; }
-canvas.sky-crt { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; background: #000; box-shadow: 0 0 0 6px #1d262e, 0 0 0 7px #3a4650; }
-canvas.sky-over { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; }
+.sky-crt-wrap::before { content: ''; position: absolute; inset: 0; border-radius: 50%; background: #000; box-shadow: 0 0 0 6px #1d262e, 0 0 0 7px #3a4650; }
+canvas.sky-crt, canvas.sky-over { position: absolute; left: 14.645%; top: 14.645%; width: 70.71%; height: 70.71%; }
+canvas.sky-crt { background: #000; }
+canvas.sky-over { pointer-events: none; }
 .sky-scope-read { font-size: 11.5px; margin: 8px 0; color: var(--text-dim); }
 .sky-scope-how { font-size: 13px; line-height: 1.5; }
 .sky-scope-how ol { padding-left: 20px; }

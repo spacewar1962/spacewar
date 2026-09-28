@@ -354,7 +354,8 @@
     // (the phosphor's glow), a chosen routine's points in its colour
     function scope(i) {
       shownFrame = i;
-      var N = scv.width, R = N / 2, k = N / 1024, hi = hovered != null ? String(hovered) : picked != null ? String(picked) : null;
+      var N = scv.width, R = N / 2, k = (N - 4) * Math.SQRT1_2 / 1024,   // the square raster inside the round tube
+         hi = hovered != null ? String(hovered) : picked != null ? String(picked) : null;
       sg.fillStyle = '#000'; sg.fillRect(0, 0, N, N);
       sg.save(); sg.beginPath(); sg.arc(R, R, R - 2, 0, 6.2832); sg.fillStyle = '#02050a'; sg.fill(); sg.clip();
       function pass(f, alpha, bright) {
@@ -535,7 +536,7 @@
     // ---------- figures and notes from the panels ----------
     function svgWrap(W, H, pal, body) { return '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '">' + (pal.bg ? '<rect width="' + W + '" height="' + H + '" fill="' + pal.bg + '"/>' : '') + body + '</svg>'; }
     function screenSVG(pal) {
-      var N = 520, R = N / 2, k = N / 1024, hi = picked != null ? String(picked) : null, o = ['<circle cx="' + R + '" cy="' + R + '" r="' + (R - 2) + '" fill="#02050a" stroke="#3a5068" stroke-width="3"/>'];
+      var N = 520, R = N / 2, k = (N - 4) * Math.SQRT1_2 / 1024, hi = picked != null ? String(picked) : null, o = ['<circle cx="' + R + '" cy="' + R + '" r="' + (R - 2) + '" fill="#02050a" stroke="#3a5068" stroke-width="3"/>'];
       [[FL[shownFrame - 1], 0.28], [FL[shownFrame], 1]].forEach(function (pr) {
         var f = pr[0]; if (!f) return;
         for (var j = 0; j < f.pts.length; j += 3) {
