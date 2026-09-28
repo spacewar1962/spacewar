@@ -30,7 +30,7 @@
       var S = b.sym, need = ['ml0', 'ml1', 'mtb', 'nx1', 'ny1', 'ndx', 'ndy'];
       if (!b.asm || need.some(function (n) { return !S[n]; })) return { why: 'the object table or the main loop is not where 3.1 has them' };
       var P = SW.gravity.probe(b);
-      var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad }); cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
+      var cpu = new root.PDP1CPU.PDP1(SW.cpuOpts(b.v)); cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
       var mem = cpu.mem, ml0 = S.ml0.val, ml1 = S.ml1.val, mtb = S.mtb.val, nx = S.nx1.val, ny = S.ny1.val,
           own = [S.ss1 ? S.ss1.val : -1, S.ss2 ? S.ss2.val : -1];
       function gone(i) { return own[i] >= 0 && (mem[mtb + i] & 0o7777) !== own[i]; }

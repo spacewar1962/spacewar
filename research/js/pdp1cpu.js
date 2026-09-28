@@ -41,7 +41,8 @@
     this.sense = [false, false, false, false, false, false, false];
     this.tw = 0;           // console test word
     this.control = 0;      // iot 11 control boxes
-    this.ctlLoad = !!opts.ctlLoad;   // control hardware that loads IO rather than ORing into it (Morris 4.2, 4.3)
+    this.ctlLoad = !!opts.ctlLoad;
+    this.intenMap = opts.intenMap || null;   // a machine that draws the intensity codes otherwise (the CHM's PDP-1)   // control hardware that loads IO rather than ORing into it (Morris 4.2, 4.3)
     this.reset();
   }
 
@@ -334,6 +335,7 @@
       // to brightest (4 visible to a photomultiplier only, 7 barely visible, 0
       // normal, 3 brightest), so s runs from -4 to 3
       var inten = (md >> 6) & 7;
+      if (this.intenMap) inten = this.intenMap[inten];
       var s = inten & 4 ? inten - 8 : inten;
       if (this.onDisplay) this.onDisplay(x, yy, s, this.cycles, this.curPC, md);   // md: the instruction (4.4 chooses its scope with the 400 bit)
       // timing (FP-25 Table I; Landsteiner, Inside Spacewar! pt 2): the display takes

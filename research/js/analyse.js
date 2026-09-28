@@ -325,7 +325,7 @@
   // inspect it, a segment table like a linker map, and go to an address or name.
   function memRun(b) {
     if (b._memRun) return b._memRun;
-    var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad });
+    var cpu = new root.PDP1CPU.PDP1(SW.cpuOpts(b.v));
     cpu.load(b.asm.memory, b.asm.start);
     try { cpu.run(400000); } catch (e) { /* what ran is still counted */ }
     return (b._memRun = { mem: cpu.mem.slice(), exec: cpu.execCount.slice(), read: cpu.readCount.slice(), write: cpu.writeCount.slice(), writer: cpu.lastWriter.slice(), secs: cpu.cycles * 5e-6 });
@@ -625,7 +625,7 @@
       var passes = 0, bckAt = B_SYM('bck');
       function B_SYM(n) { return b.sym[n] && b.sym[n].defined !== false ? b.sym[n].val : -1; }
       try {
-        var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad });
+        var cpu = new root.PDP1CPU.PDP1(SW.cpuOpts(b.v));
         cpu.load(b.asm.memory, b.asm.start);
         cpu.run(400000);
         if (bckAt >= 0) passes = cpu.execCount[bckAt] / (cpu.cycles * 5e-6);
@@ -647,7 +647,8 @@
         g.fillStyle = 'rgba(200,236,255,' + SW.beam(s).toFixed(3) + ')';
         g.fillRect(px - 1.2, py - 1.2, 2.6, 2.6);
       }
-      function sgn3(v) { return v & 4 ? v - 8 : v; }   // intensity: 3 bits, 4 dimmest to 3 brightest (PDP-35-2)
+      var chmMap = SW.chmInten(b.v);
+      function sgn3(v) { if (chmMap) v = chmMap[v & 7]; return v & 4 ? v - 8 : v; }   // intensity: 3 bits, 4 dimmest to 3 brightest (PDP-35-2); the CHM's machine maps 4 to 7 otherwise
       function drawGroup(gr, s) { pts.forEach(function (p) { if (p.g !== gr) return; var x = inView(p); if (x !== null) plot(p, x, s); }); }
       function onePass() {
         pass++;
@@ -1312,7 +1313,7 @@
   function profileRun(b) {
     if (b._run) return b._run;
     if (!b.v.runnable || !b.asm) return null;
-    var cpu = new C.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad });
+    var cpu = new C.PDP1(SW.cpuOpts(b.v));
     cpu.load(b.asm.memory, b.asm.start);
     var dots = 0;
     cpu.onDisplay = function () { dots++; };

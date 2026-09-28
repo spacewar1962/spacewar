@@ -201,7 +201,7 @@
   function load(keepSwitches) {
     // Reset keeps the console's switches where they are; a new version starts with them off
     var sw0 = keepSwitches && cpu ? cpu.sense.slice() : null, tw0 = keepSwitches && cpu ? cpu.tw : 0;
-    cpu = new C.PDP1({ mdv: build.v.mdv, ctlLoad: build.v.ctlLoad });
+    cpu = new C.PDP1(SW.cpuOpts(build.v));
     if (sw0) { cpu.sense = sw0; cpu.tw = tw0; }
     cpu.load(build.asm.memory, build.asm.start);
     cpu.srcMap = new Uint8Array(4096);

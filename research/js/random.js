@@ -24,7 +24,7 @@
     return (CACHE[vid] = SW.build(vid).then(function (b) {
       var S = b.sym, ran = S.ran || S['\\ran'] || S['~ran'];
       if (!b.asm || !ran) return { why: 'no random-number word (ran)' };
-      var cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad }); cpu.load(b.asm.memory, b.asm.start);
+      var cpu = new root.PDP1CPU.PDP1(SW.cpuOpts(b.v)); cpu.load(b.asm.memory, b.asm.start);
       var mem = cpu.mem, a = ran.val, site = -1;
       // lac ran, rar 1s, xor (k, add (k, dac ran
       for (var i = 0; i < 0o7770; i++) {

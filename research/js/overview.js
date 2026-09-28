@@ -30,7 +30,7 @@
 
   O.analyse = function (b, phases) {
     phases = phases || PHASES;
-    var cpu = new C.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad });
+    var cpu = new C.PDP1(SW.cpuOpts(b.v));
     cpu.load(b.asm.memory, b.asm.start);
     // data flow: every read and write in the frames, by the routine running
     var flow = {};

@@ -80,7 +80,7 @@
       return new Promise(function (res) {
         (function next() {
           if (!pending.length) { SW.store.set(keyS, map); res(map); return; }
-          var bit = pending.shift(), cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad }), mem = cpu.mem, n = 0, a0, t0;
+          var bit = pending.shift(), cpu = new root.PDP1CPU.PDP1(SW.cpuOpts(b.v)), mem = cpu.mem, n = 0, a0, t0;
           cpu.load(b.asm.memory, b.asm.start);
           while (n < 32 && !cpu.halted && cpu.cycles < 2000000) {
             if (cpu.pc === S.ml0.val) {
@@ -374,6 +374,15 @@
     return id + ';origin=' + SW.SWHID_ORIGIN + ';path=/sources/' + path + (n0 != null ? ';lines=' + n0 + (n1 && n1 !== n0 ? '-' + n1 : '') : '');
   };
   SW.filesOf = function (v) { var seen = {}, out = []; (v.build || []).forEach(function (b) { var f = b.src || b.tape; if (f && !seen[f]) { seen[f] = 1; out.push(f); } }); return out; };
+  // The options for a version's emulated PDP-1. The CHM builds of 4.1 (2005 to 2008)
+  // were made for the Computer History Museum's PDP-1, which draws intensity codes 4
+  // to 7 otherwise than DEC's PDP-35-2 (as Landsteiner's emulator maps them: 4 as 7,
+  // 5 and 6 as 6, 7 as 0); shown so unless Settings says otherwise.
+  var CHM_INTEN = [0, 1, 2, 3, 7, 6, 6, 0];
+  SW.chmInten = function (v) { return (v.id === '4.1d' || v.id === '4.1f') && SW.store.get('chmBright', true) ? CHM_INTEN : null; };
+  SW.cpuOpts = function (v) {
+    return { mdv: v.mdv, ctlLoad: v.ctlLoad, intenMap: SW.chmInten(v) };
+  };
   // The beam's brightness for a display intensity s (-4 to 3: DEC's order 4 5 6 7 0 1 2 3,
   // PDP-35-2): 4 is seen by a photomultiplier only, 7 barely, 0 is normal, 3 brightest.
   // As an opacity, 0 for s = -4; 0.62 for s = 0, as the bench drew normal points before.

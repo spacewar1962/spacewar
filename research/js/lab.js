@@ -19,7 +19,7 @@
 
   // A machine brought to the third frame of a game, and a way back to it.
   function started(b) {
-    var S = b.sym, cpu = new root.PDP1CPU.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad }); cpu.load(b.asm.memory, b.asm.start);
+    var S = b.sym, cpu = new root.PDP1CPU.PDP1(SW.cpuOpts(b.v)); cpu.load(b.asm.memory, b.asm.start);
     var n = 0; while (n < 3 && !cpu.halted && cpu.cycles < 3000000) { if (cpu.pc === S.ml0.val) n++; if (n < 3) cpu.step(); }
     var snap = { mem: cpu.mem.slice(), ac: cpu.ac, io: cpu.io, ov: cpu.ov, flag: cpu.flag.slice(), pc: cpu.pc };
     return { cpu: cpu, back: function () { cpu.mem.set(snap.mem); cpu.ac = snap.ac; cpu.io = snap.io; cpu.ov = snap.ov; cpu.flag = snap.flag.slice(); cpu.pc = snap.pc; cpu.halted = false; cpu.control = 0; } };

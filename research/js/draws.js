@@ -24,7 +24,7 @@
   }
   function routineOf(b, labs, pc) { var r = ''; for (var i = 0; i < labs.length && labs[i] <= pc; i++) r = b.labelAt[labs[i]]; return r; }
   function machine(b) {
-    var cpu = new C.PDP1({ mdv: b.v.mdv, ctlLoad: b.v.ctlLoad });
+    var cpu = new C.PDP1(SW.cpuOpts(b.v));
     cpu.load(b.asm.memory, b.asm.start);
     cpu.srcMap = new Uint8Array(4096);
     for (var k in b.asm.memory) cpu.srcMap[+k] = 1;

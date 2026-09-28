@@ -123,6 +123,7 @@
     swatches();
     SW.$('#set-figbg').value = SW.figBg();
     SW.$('#set-noteshade').checked = SW.store.get('noteShade', true);
+    SW.$('#set-chmbright').checked = SW.store.get('chmBright', true);
     var fontSel = SW.$('#set-font'), size = SW.$('#set-size'), sizeOut = SW.$('#set-size-out');
     var was = { font: SW.codeFont(), size: SW.codeSize() };
     fontSel.value = was.font; size.value = was.size; sizeOut.textContent = was.size + ' px';
@@ -133,6 +134,7 @@
       if (dlg.returnValue !== 'save') { SW.store.set('codeFont', was.font); SW.store.set('codeSize', was.size); SW.applyCodeText(); if (SW.theme() !== wasTheme) theme(wasTheme); return; }
       SW.store.set('figbg', SW.$('#set-figbg').value);
       SW.store.set('noteShade', SW.$('#set-noteshade').checked);
+      if (SW.store.get('chmBright', true) !== SW.$('#set-chmbright').checked) { SW.store.set('chmBright', SW.$('#set-chmbright').checked); SW.forget('graphics'); if (SW.state.v === '4.1d' || SW.state.v === '4.1f') SW.toast('CHM brightness ' + (SW.$('#set-chmbright').checked ? 'on' : 'off') + ': Run shows it from the next Reset', 4000); }
       SW.applyNoteShade();
       SW.store.set('initials', SW.$('#set-initials').value.trim().toUpperCase());
       SW.store.set('name', SW.$('#set-name').value.trim());
