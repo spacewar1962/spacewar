@@ -1627,6 +1627,7 @@
              ['orbits', 'Orbits', 'The ships set circling the star, as each version’s game runs them'],
              ['moves', 'Manoeuvres', 'What the well allows: falls, orbits, the CBS opening, escape, as plates'],
              ['torps', 'Torpedoes', 'Torpedo tracks as each version’s game fires them, and the warpage rule'],
+             ['random', 'Random numbers', 'The five instructions of chance: the sequence, its cycles, where it is used'],
              ['tapesim', 'Tape Load Simulator', 'The tape read into core: Read-In, then the loader']];
   var gfx = SW.store.get('gfx.item', 'sky'); if (gfx === 'memory') gfx = 'sky';
   var gfxStop = null, gfxBuild = null;
@@ -1657,6 +1658,7 @@
     if (G[0] === 'orbits') { gfxStop = SW.orbits.draw(b, cards); return; }
     if (G[0] === 'moves') { gfxStop = SW.orbits.plates(b, cards); return; }
     if (G[0] === 'torps') { gfxStop = SW.orbits.torpedoes(b, cards); return; }
+    if (G[0] === 'random') { gfxStop = SW.random.draw(b, cards); return; }
     if (G[0] === 'sun' || G[0] === 'hyper') {
       var wait = SW.el('p', { class: 'hint' }, 'Running ' + b.v.label + ' on the emulator…');
       cards.appendChild(wait);

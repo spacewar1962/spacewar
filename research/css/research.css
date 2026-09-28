@@ -1300,3 +1300,10 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .orb-cursor { position: absolute; width: 1px; background: var(--beam); opacity: .7; pointer-events: none; }
 .plate-big { max-width: min(1340px, 96vw); }
 .plate-big .plate-pair { justify-content: center; gap: 16px; }
+.rnd-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; }
+.rnd-col h5 { font-size: 14px; margin: 4px 0 8px; }
+.rnd-t td { font-size: 12.5px; vertical-align: top; } .rnd-t td:first-child { white-space: nowrap; color: var(--text-dim); width: 1%; padding-right: 12px; }
+.rnd-seq { font-size: 11.5px; line-height: 1.6; }
+.rnd-figs { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; align-items: flex-start; }
+.rnd-figs figure { margin: 0; } .rnd-figs figcaption { font-size: 11px; max-width: 300px; margin-top: 4px; }
+.rnd-figs canvas { border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
