@@ -16,7 +16,7 @@
         .sort(function (a, b) { return a.sort - b.sort; });
       if (!vs.length) return '';
       return '<optgroup label="' + SW.esc(g[1]) + '">' + vs.map(function (v) {
-        return '<option value="' + SW.esc(v.id) + '">' + SW.esc(v.label + ' · ' + v.date) +
+        return '<option value="' + SW.esc(v.id) + '">' + SW.esc((v.build ? '[' + SW.refOf(v.id) + '] ' : '') + v.label + ' · ' + v.date) +
           (v.status === 'lost' ? ' (lost)' : v.status === 'reconstructed' ? ' (reconstruction)' : '') + '</option>';
       }).join('') + '</optgroup>';
     }).join('');
