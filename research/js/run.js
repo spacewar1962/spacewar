@@ -63,6 +63,7 @@
       (dual ? '<button class="btn" id="r-fig" title="Save scope 1 at print resolution">▣ Scope 1</button><button class="btn" id="r-fig2" title="Save scope 2 at print resolution">▣ Scope 2</button>'
             : '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button>') +
       (build.v.pass1 ? '<label class="check r-sym" title="The sun routine uses nx1 and ny1 before the line that assigns them. The pass log at the end of the listing (scan p. 31) shows that after pass 1 a short tape, “' + build.v.pass1.name + '”, was fed in with nx1=mtb nob and ny1=nx1 nob, so pass 2 had their final values and the sun was placed correctly. Ticked, the bench assembles with that tape, as MIT did. Unticked, without it, the sun is misplaced (F33). The kcb jump fault on the Needle’s console is a separate coding error and stays either way; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Fix Sun Rendering Bug</label><button class="icon-btn r-symhelp" id="r-symhelp" title="What the fix is, with the pass log and the code">?</button>' : '') + '</div>' +
+      (build.sym.ddd ? '<label class="check r-ddd" title="The constant ddd, “0 to save space for ddt”: at 0 the Needle’s outline is not compiled and both ships are drawn as Wedges (F47). Changing it resets the run."><input type="checkbox" id="r-ddd"' + (SW.store.get('run.ddd', false) ? ' checked' : '') + '> Both ships as Wedges (ddd = 0)</label>' : '') +
       '<div class="keys">Controls: click the scope, then <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
     var right = SW.el('div', { class: 'run-right' });
@@ -101,6 +102,7 @@
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
     var sym = SW.$('#r-sym', view);
     if (sym) sym.onchange = function () { SW.store.set('run.sunfix', sym.checked); R.show(build); };
+    var ddd = SW.$('#r-ddd', view); if (ddd) ddd.onchange = function () { SW.store.set('run.ddd', ddd.checked); pause(); load(true); updateAll(); };
     var symh = SW.$('#r-symhelp', view); if (symh) symh.onclick = function () { sunHelp(build); };
     SW.$('#r-fig', view).onclick = function () { SW.figures.scopeFigureDialog(dual ? pts.filter(function (p) { return p.sc !== 2; }) : pts, cpu.cycles, build); };
     if (dual) SW.$('#r-fig2', view).onclick = function () { SW.figures.scopeFigureDialog(pts.filter(function (p) { return p.sc === 2; }), cpu.cycles, build); };
@@ -204,6 +206,8 @@
     cpu = new C.PDP1(SW.cpuOpts(build.v));
     if (sw0) { cpu.sense = sw0; cpu.tw = tw0; }
     cpu.load(build.asm.memory, build.asm.start);
+    // ddd = 0 ("to save space for ddt"): both ships drawn as Wedges (F47)
+    if (build.sym.ddd && SW.store.get('run.ddd', false)) cpu.mem[build.sym.ddd.val] = 0;
     cpu.srcMap = new Uint8Array(4096);
     for (var k in build.asm.memory) cpu.srcMap[+k] = 1;
     cpu.lastSrcPc = -1;
