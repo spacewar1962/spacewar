@@ -264,22 +264,23 @@
   }
   G.well = function (b, host) {
     var P0 = SW.store.get('well', {}) || {};
-    var st = { v: P0.v || b.v.id, lines: P0.lines || 24, tilt: P0.tilt || 64, depth: P0.depth || 50, scale: P0.scale || 'sqrt', over: P0.over || [], star: P0.star !== false };
+    var st = { v: P0.v || b.v.id, lines: P0.lines || 24, tilt: P0.tilt || 64, depth: P0.depth || 50, scale: P0.scale || 'sqrt', over: P0.over || [], star: P0.star !== false, rot: P0.rot || 0 };
     function keep() { SW.store.set('well', st); }
     var vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, c) { return a.sort - c.sort; });
     if (!vs.some(function (v) { return v.id === st.v; })) st.v = '3.1';
     var card = SW.el('div', { class: 'card grav well', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>The well</h4>' +
-      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well to show it; tick Overlay to lay it over the one shown, in its own colour.</p>' +
+      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt.</p>' +
       '<div class="grav-ctl"><label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
       '<label>Depth by <select data-w="scale"><option value="sqrt">the square root of the pull</option><option value="lin">the pull</option></select></label> ' +
       '<label>Tilt <input type="range" data-w="tilt" min="25" max="100" step="1"></label> ' +
+      '<label>Rotate <input type="range" data-w="rot" min="-180" max="180" step="1"></label> ' +
       '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label> ' +
       '<label title="A small sun at the star’s place, on the sheet at rest"><input type="checkbox" data-w="star"> Mark the star</label> <span class="grav-exp"></span></div>' +
       '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-legend"></div><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
     host.appendChild(card);
     SW.$('[data-w=lines]', card).value = String(st.lines);
-    SW.$('[data-w=tilt]', card).value = st.tilt; SW.$('[data-w=depth]', card).value = st.depth; SW.$('[data-w=scale]', card).value = st.scale; SW.$('[data-w=star]', card).checked = st.star;
+    SW.$('[data-w=tilt]', card).value = st.tilt; SW.$('[data-w=depth]', card).value = st.depth; SW.$('[data-w=scale]', card).value = st.scale; SW.$('[data-w=star]', card).checked = st.star; SW.$('[data-w=rot]', card).value = st.rot;
     var plot = SW.$('.well-plot', card), note = SW.$('.well-note', card), thumbs = SW.$('.well-thumbs', card), legend = SW.$('.well-legend', card);
     var stopped = false, job = 0, groups = [];   // groups: {sig, vs, pts, ink}
     function alive(my) { return function () { return !stopped && my === job; }; }
@@ -321,9 +322,11 @@
     }
     var CYAN = '#39c5e0';
     function proj(N) {
-      var h = N * 0.36, fore = st.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = st.depth / 50, floor = N * 0.42;
+      var h = N * 0.33, fore = st.tilt / 100, shear = 0.16, cx = N / 2, cy = N * 0.44, dk = st.depth / 50, floor = N * 0.42,
+          ra = st.rot * Math.PI / 180, co = Math.cos(ra), si = Math.sin(ra);
       return { floor: floor, f: function (x, y, g) {
-        var u = x / 512, v = y / 512, d = g === null ? floor : isNaN(g) ? 0 : Math.min(floor, st.scale === 'lin' ? g / 256 * N * 0.02 * dk : Math.sqrt(g / 256) * N * 0.035 * dk);
+        var u0 = x / 512, v0 = y / 512, u = u0 * co - v0 * si, v = u0 * si + v0 * co,
+            d = g === null ? floor : isNaN(g) ? 0 : Math.min(floor, st.scale === 'lin' ? g / 256 * N * 0.02 * dk : Math.sqrt(g / 256) * N * 0.035 * dk);
         return [cx + u * h - v * h * shear, cy - v * h * fore + d, d];
       } };
     }
@@ -339,7 +342,7 @@
       });
       return out;
     }
-    function inkOf(g, many) { return many ? g.ink : CYAN; }
+    function inkOf(g) { return g.ink || CYAN; }
     var SUN = '#ffce7a';
     // the star's mark: eight short rays round a point, at the sheet's level
     function sunRays(N) {
@@ -353,9 +356,16 @@
       g.scale(dpr, dpr);
       g.fillStyle = '#000'; g.beginPath(); g.arc(N / 2, N / 2, N / 2, 0, 6.2832); g.fill(); g.save(); g.clip();
       g.lineWidth = lw;
+      // the runs of each well by opacity, one path each, so that turning it stays smooth
       gs.forEach(function (gp) {
-        g.strokeStyle = inkOf(gp, own || gs.length > 1);
-        segs(N, gp.pts).forEach(function (s) { g.globalAlpha = s[4] * (gs.length > 1 ? 0.85 : 1); g.beginPath(); g.moveTo(s[0], s[1]); g.lineTo(s[2], s[3]); g.stroke(); });
+        g.strokeStyle = inkOf(gp);
+        var by = {};
+        segs(N, gp.pts).forEach(function (s) { var k = Math.round(s[4] * 10); (by[k] = by[k] || []).push(s); });
+        Object.keys(by).forEach(function (k) {
+          g.globalAlpha = k / 10 * (gs.length > 1 ? 0.85 : 1); g.beginPath();
+          by[k].forEach(function (s) { g.moveTo(s[0], s[1]); g.lineTo(s[2], s[3]); });
+          g.stroke();
+        });
       });
       g.globalAlpha = 1;
       if (st.star) { g.strokeStyle = SUN; g.lineWidth = Math.max(1, N / 400); sunRays(N).forEach(function (r) { g.beginPath(); g.moveTo(r[0], r[1]); g.lineTo(r[2], r[3]); g.stroke(); }); }
@@ -396,7 +406,7 @@
       gs.forEach(function (gp) {
         var by = {};
         segs(N, gp.pts).forEach(function (s) { var k = (Math.round(s[4] * 10) / 10).toFixed(1); (by[k] = by[k] || []).push('M' + s[0].toFixed(1) + ' ' + s[1].toFixed(1) + 'L' + s[2].toFixed(1) + ' ' + s[3].toFixed(1)); });
-        Object.keys(by).forEach(function (k) { o.push('<path d="' + by[k].join('') + '" stroke="' + inkOf(gp, gs.length > 1) + '" stroke-opacity="' + k + '"/>'); });
+        Object.keys(by).forEach(function (k) { o.push('<path d="' + by[k].join('') + '" stroke="' + inkOf(gp) + '" stroke-opacity="' + k + '"/>'); });
       });
       o.push('</g>');
       if (st.star) o.push('<path d="' + sunRays(N).map(function (r) { return 'M' + r[0].toFixed(1) + ' ' + r[1].toFixed(1) + 'L' + r[2].toFixed(1) + ' ' + r[3].toFixed(1); }).join('') + '" stroke="' + SUN + '" stroke-width="1.5"/>');
@@ -410,11 +420,25 @@
       if (k === 'star') { st.star = e.target.checked; keep(); paint(); paintThumbs(); }
     });
     card.addEventListener('input', function (e) {
-      var k = e.target.dataset && e.target.dataset.w; if (k !== 'tilt' && k !== 'depth') return;
+      var k = e.target.dataset && e.target.dataset.w; if (k !== 'tilt' && k !== 'depth' && k !== 'rot') return;
       st[k] = +e.target.value; keep(); paint();
       clearTimeout(card._tt); card._tt = setTimeout(paintThumbs, 200);
     });
     SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return svg(p); }, 'spacewar-gravity-well'));
+    var drag = null, raf = 0;
+    plot.addEventListener('pointerdown', function (e) {
+      if (!SW.$('canvas', plot)) return;
+      drag = { x: e.clientX, y: e.clientY, rot: st.rot, tilt: st.tilt }; plot.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    plot.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      st.rot = Math.round(((drag.rot + (e.clientX - drag.x) * 0.5) % 360 + 540) % 360 - 180);
+      st.tilt = Math.max(25, Math.min(100, Math.round(drag.tilt - (e.clientY - drag.y) * 0.25)));
+      SW.$('[data-w=rot]', card).value = st.rot; SW.$('[data-w=tilt]', card).value = st.tilt;
+      if (!raf) raf = requestAnimationFrame(function () { raf = 0; paint(); });
+    });
+    function endDrag() { if (!drag) return; drag = null; keep(); paintThumbs(); }
+    plot.addEventListener('pointerup', endDrag); plot.addEventListener('pointercancel', endDrag);
     var lastW = 0;
     if (root.ResizeObserver) new ResizeObserver(function () { var w = plot.clientWidth; if (w && Math.abs(w - lastW) > 8) { lastW = w; paint(); } }).observe(plot);
     sampleAll();

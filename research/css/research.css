@@ -1242,3 +1242,4 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .well-thumb.on canvas { box-shadow: 0 0 0 3px var(--beam); }
 .well-tn { font-size: 11.5px; margin: 6px 0 2px; line-height: 1.3; }
 .well-ov { font-size: 12px; cursor: pointer; } .well-ov.dis { opacity: .45; cursor: default; }
+.well-plot canvas { cursor: grab; touch-action: none; } .well-plot canvas:active { cursor: grabbing; }
