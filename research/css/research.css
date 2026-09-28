@@ -1307,3 +1307,4 @@ body:has(#view-read.on #rd-selbar.on) .tour-card { bottom: 64px; }
 .rnd-figs { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; align-items: flex-start; }
 .rnd-figs figure { margin: 0; } .rnd-figs figcaption { font-size: 11px; max-width: 300px; margin-top: 4px; }
 .rnd-figs canvas { border-radius: 3px; box-shadow: 0 0 0 1px var(--line); }
+.rnd-exp { margin-top: 8px; } .rnd-exp .btn { font-size: 11px; padding: 2px 8px; }

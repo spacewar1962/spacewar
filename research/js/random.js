@@ -115,8 +115,20 @@
             '</tbody></table>' +
             '<div class="rnd-figs"><figure><canvas class="rnd-pairs"></canvas><figcaption class="hint">Each number against the next, over the cycle the program runs in (each word as a point: across, this number; up, the next).</figcaption></figure>' +
             '<figure><canvas class="rnd-bits"></canvas><figcaption class="hint">The first 192 numbers from the start, one to a row, the 18 bits across (a hole for a 1, as on paper tape).</figcaption></figure></div>';
-          pairs(SW.$('.rnd-pairs', el), d, o);
-          bits(SW.$('.rnd-bits', el), d);
+          var cp = SW.$('.rnd-pairs', el), cb = SW.$('.rnd-bits', el);
+          pairs(cp, d, o);
+          bits(cb, d);
+          // the two pictures as one figure, with what they are
+          var ex = SW.el('div', { class: 'rnd-exp' });
+          ex.appendChild(SW.figureButtons(function (pal) {
+            var wp = 300, wb = parseFloat(cb.style.width), hb = parseFloat(cb.style.height), W = wp + 24 + wb, H = Math.max(wp, hb) + 58;
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" font-family="IBM Plex Mono, monospace" font-size="11">' +
+              '<text x="0" y="13" fill="' + pal.ink + '">' + SW.esc(d.v.label) + ': ran rotated right, then xor and add ' + oct(d.k) + '</text>' +
+              '<image href="' + cp.toDataURL('image/png') + '" x="0" y="24" width="' + wp + '" height="' + wp + '"/>' +
+              '<image href="' + cb.toDataURL('image/png') + '" x="' + (wp + 24) + '" y="24" width="' + wb + '" height="' + hb + '"/>' +
+              '<text x="0" y="' + (wp + 42) + '" fill="' + pal.dim + '">Left: each number against the next over its cycle of ' + o.cycle.toLocaleString('en-GB') + '. Right: the first ' + 192 + ' numbers from ' + oct(d.seed) + ', bits across.</text></svg>';
+          }, 'spacewar-' + d.v.id + '-random'));
+          el.appendChild(ex);
         });
       }, 30);
     }

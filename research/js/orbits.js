@@ -40,7 +40,9 @@
       // and, over a few frames, the star's own dots (drawn by the main loop near the centre)
       cpu.onDisplay = function (x, y) {
         var k = (mem[ml1] & 0o7777) - mtb;
-        if (grab && (k === 0 || k === 1)) grab[k].push(x, y);
+        // (the ship routine also plots one point at the centre, under the star, every
+        // frame before its outline: cla cli, dpy-4000; it is no part of the ship)
+        if (grab && (k === 0 || k === 1)) { if (x || y) grab[k].push(x, y); }
         else if (sunFrames && sunFrames < 6 && k !== 0 && k !== 1 && x * x + y * y < 1600) sun.push(x, y);
       };
       return new Promise(function (res) {
