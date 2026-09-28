@@ -337,16 +337,25 @@
     if (!vs.some(function (v) { return v.id === st.v; })) st.v = '3.1';
     var card = SW.el('div', { class: 'card grav well', style: 'grid-column:1/-1' });
     card.innerHTML = '<h4>The well</h4>' +
-      '<p class="hint">The same pull over the whole screen, as a sheet pressed down by it: a grid over the raster, each line sampled every 4 screen points, each point sunk by the pull there, captured points to the floor. After Norbert Landsteiner’s picture. On 3.1 the capture region is not round: about 16 screen points along the axes, 11.5 on the diagonals, where the pull is also zero out to about 22.5. Click a small well (or its row) to show it; tick Overlay to lay it over the one shown, in its own colour. Drag the well to turn it: across to rotate, up and down to tilt. Show the ships falling runs this version’s game with no controls and follows the Needle (white) and the Wedge (red) down the sheet from their starting corners until they explode.</p>' +
-      '<div class="grav-ctl"><label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label> ' +
-      '<label>Depth by <select data-w="scale"><option value="sqrt">the square root of the pull</option><option value="lin">the pull</option></select></label> ' +
-      '<label>Tilt <input type="range" data-w="tilt" min="25" max="100" step="1"></label> ' +
-      '<label>Rotate <input type="range" data-w="rot" min="-180" max="180" step="1"></label> ' +
-      '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label> ' +
-      '<label title="A small sun at the star’s place, on the sheet at rest"><input type="checkbox" data-w="star"> Mark the star</label> <span class="grav-exp"></span></div>' +
-      '<div class="grav-ctl well-play"><button class="btn" data-w="play" title="The Needle and the Wedge left alone from their starting corners, as this version’s game runs them">▶ Show the ships falling</button> <button class="btn ghost" data-w="again" title="From the start">↺</button> ' +
-      '<label>Speed <select data-w="speed"><option value="0.5">half</option><option value="1">as played</option><option value="2">double</option><option value="4">four times</option></select></label> <span class="hint mono well-t0"></span></div>' +
-      '<div class="well-row"><div class="well-plot"></div><div class="well-side"><div class="well-thumbs"></div></div></div><p class="well-note hint">&nbsp;</p>';
+      '<p class="hint">The pull over the whole screen as a sheet, each point sunk by the pull there and captured points to the floor, worked out by each version’s own code. After Norbert Landsteiner’s picture. Drag the well to turn it.</p>' +
+      '<div class="well-row">' +
+        '<div class="well-main"><div class="well-plot"></div><p class="well-note hint">&nbsp;</p>' +
+          '<div class="well-view">' +
+            '<label>Tilt <input type="range" data-w="tilt" min="25" max="100" step="1"></label>' +
+            '<label>Rotate <input type="range" data-w="rot" min="-180" max="180" step="1"></label>' +
+            '<label>Depth <input type="range" data-w="depth" min="10" max="100" step="1"></label>' +
+            '<label>Lines <select data-w="lines"><option value="16">16</option><option value="24">24</option><option value="32">32</option><option value="48">48</option></select></label>' +
+            '<label>Depth by <select data-w="scale"><option value="sqrt">√ pull</option><option value="lin">pull</option></select></label>' +
+            '<label title="A small sun at the star’s place, on the sheet at rest"><input type="checkbox" data-w="star"> Mark the star</label>' +
+            '<span class="grav-exp"></span></div></div>' +
+        '<div class="well-side">' +
+          '<h5>Wells</h5><p class="hint">Versions whose code gives the same well share one. Click one to show it; tick Overlay to lay it over the one shown.</p><div class="well-thumbs"></div>' +
+          '<h5>The ships falling</h5><p class="hint">Each version’s game run with no controls: the Needle (white) and the Wedge (red) left alone at their starting corners.</p>' +
+          '<div class="well-play"><button class="btn" data-w="play" title="Follow the two ships down the sheet as this version’s game runs them">▶ Show the ships falling</button> <button class="btn ghost" data-w="again" title="From the start">↺</button> ' +
+            '<label>Speed <select data-w="speed"><option value="0.5">half</option><option value="1">as played</option><option value="2">double</option><option value="4">four times</option></select></label></div>' +
+          '<div class="hint mono well-t0">&nbsp;</div><div class="well-falls"></div>' +
+        '</div>' +
+      '</div>';
     host.appendChild(card);
     SW.$('[data-w=lines]', card).value = String(st.lines);
     foldable(card, 'well', function (f) { if (f && fall && fall.playing) stopPlay(); });
@@ -363,7 +372,7 @@
       note.textContent = 'Running the gravity code over the screen…';
       (function next() {
         if (!alive(my)()) return;
-        if (i >= order.length) { note.textContent = caption(); return; }
+        if (i >= order.length) { note.textContent = caption(); fallsAll(my); return; }
         var v = order[i++];
         wellData(v.id, st.lines, alive(my), function (f) { note.textContent = 'Working out the wells: ' + vname(v) + ' ' + Math.round(f * 100) + '% (' + i + ' of ' + order.length + ')'; }).then(function (pts) {
           if (!alive(my)()) return;
@@ -378,6 +387,39 @@
           }
           setTimeout(next, 0);
         });
+      })();
+    }
+    // when and where each version's ships go up, worked out after the wells
+    var fallsBox = SW.$('.well-falls', card);
+    function whereOf(q) { var r = Math.hypot(q.x, q.y); return r > 480 ? 'corner' : r < 40 ? 'centre' : Math.round(r) + ' points out'; }
+    function fallRow(v) {
+      var d = FALLS[v.id], gp = groupOf(v.id), n = groups.indexOf(gp), cell;
+      if (!d) cell = '<td colspan="2" class="faint">…</td>';
+      else if (d.why) cell = '<td colspan="2" class="faint">' + SW.esc(d.why) + '</td>';
+      else {
+        var F = d.frames, j = F.findIndex(function (f) { return f.s[0].boom || f.s[1].boom; });
+        if (j < 0) cell = '<td class="num faint">none</td><td class="faint">in ' + Math.round(F[F.length - 1].t) + ' s</td>';
+        else { var q = F[Math.max(0, j - 1)].s[F[j].s[0].boom ? 0 : 1], pre = F.slice(0, j).some(function (f, k) { return k && Math.abs(f.s[0].x - F[k - 1].s[0].x) > 200; });
+          cell = '<td class="num">' + F[j].t.toFixed(1) + ' s</td><td>' + whereOf(q) + (pre ? ' (captured)' : ' (collision)') + '</td>'; }
+      }
+      return '<tr data-v="' + v.id + '"' + (v.id === st.v ? ' class="on"' : '') + '><td class="well-tl">' + (gp ? '<i style="background:' + gp.ink + '"></i>' + String.fromCharCode(65 + n) : '') + '</td><td>' + SW.esc(vname(v)) + '</td>' + cell + '</tr>';
+    }
+    function paintFalls() {
+      var rows = vs.filter(function (v) { return groupOf(v.id); });
+      fallsBox.innerHTML = '<table class="ov-sub well-t well-ft"><thead><tr><th>Well</th><th>Version</th><th>Explode</th><th>Where</th></tr></thead><tbody>' + rows.map(fallRow).join('') + '</tbody></table>';
+    }
+    fallsBox.addEventListener('click', function (e) {
+      var tr = e.target.closest('tr[data-v]'); if (!tr) return;
+      if (fall.data) { stopPlay(); fall.data = null; fall.i = null; }
+      st.v = tr.dataset.v; keep(); paintThumbs(); paint(); paintFalls(); play(true);
+    });
+    function fallsAll(my) {
+      var rows = vs.filter(function (v) { return groupOf(v.id); }), i = 0;
+      paintFalls();
+      (function next() {
+        if (!alive(my)() || i >= rows.length) return;
+        var v = rows[i++];
+        G.fall(v.id, alive(my)).then(function () { if (!alive(my)()) return; paintFalls(); setTimeout(next, 0); });
       })();
     }
     function caption() {
@@ -537,7 +579,7 @@
       var main = groupOf(st.v), shown = shownGroups();
       thumbs.innerHTML = '';
       var row = SW.el('div', { class: 'well-thumbrow' });
-      function pick(gp) { if (fall.data) { stopPlay(); fall.data = null; fall.i = null; SW.$('.well-t0', card).textContent = ''; } st.v = gp.vs[0].id; st.over = st.over.filter(function (id) { return groupOf(id) !== gp; }); keep(); paintThumbs(); paint(); }
+      function pick(gp) { if (fall.data) { stopPlay(); fall.data = null; fall.i = null; SW.$('.well-t0', card).textContent = ''; } if (groupOf(st.v) !== gp) st.v = gp.vs[0].id; if (fallsBox.firstChild) paintFalls(); st.over = st.over.filter(function (id) { return groupOf(id) !== gp; }); keep(); paintThumbs(); paint(); }
       function overlay(gp, on) {
         var ids = gp.vs.map(function (v) { return v.id; });
         st.over = st.over.filter(function (id) { return ids.indexOf(id) < 0; });
