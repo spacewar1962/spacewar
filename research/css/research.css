@@ -275,6 +275,8 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .controls .r-sym { margin-left: 6px; white-space: nowrap; }
 .controls .r-symhelp { font-size: 12px; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; }
 .sunhelp { width: min(96vw, 1100px); }
+abbr.term, a.term { text-decoration: underline dotted; text-underline-offset: 2px; cursor: help; }
+a.term { color: inherit; } a.term-x { font-size: 11px; }
 .sunhelp-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 16px; }
 .sunhelp-cols figure { margin: 0; min-width: 0; }
 .sunhelp-cols figcaption { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
