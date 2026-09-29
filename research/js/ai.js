@@ -43,15 +43,17 @@
   // torpedoes were tried for hardcore and made it worse.
 
   A.LEVEL_NAMES = [['easy', 'easy'], ['medium', 'medium'], ['hard', 'hard'], ['hardcore', 'hardcore']];
+  A.LOOP = { p: 0.18, open: 0.8, r0: 80, r1: 120, top: 3, min: 45 };
   A.STYLE_NAMES = [['hunter', 'hunter'], ['duellist', 'duellist'], ['orbiter', 'orbiter']];
   // Styles, chosen on Run for each computer ship (all at the hard level): they
   // scale the level's chase distance and speed, shift how slow it lets its orbit
-  // get, and set how long it waits before its first move (frames, drawn at random
-  // within the range, so two pilots of one style do not fly alike).
+  // get, set how long it waits before its first move, and how long it circles at
+  // the start of a round before going in (frames, drawn at random within the
+  // range, so two pilots of one style do not fly alike).
   var TEMPER = [
-    { name: 'hunter', chase: 0.7, top: 1.2, orbit: -0.05, wait: [0, 15] },
-    { name: 'duellist', chase: 1, top: 1, orbit: 0, wait: [5, 30] },
-    { name: 'orbiter', chase: 1.4, top: 0.85, orbit: 0.08, wait: [10, 45] }
+    { name: 'hunter', chase: 0.7, top: 1.2, orbit: -0.05, wait: [0, 15], think: [60, 180] },
+    { name: 'duellist', chase: 1, top: 1, orbit: 0, wait: [5, 30], think: [100, 300] },
+    { name: 'orbiter', chase: 1.4, top: 0.85, orbit: 0.08, wait: [10, 45], think: [160, 400] }
   ];
 
   // The version's torpedoes, from its own constants: speed relative to the ship
@@ -82,11 +84,12 @@
     // that worked once is not repeated: which way round the star, how slow it lets
     // its orbit get, how far off it chases, how near a shot must pass before it
     // fires, a small bias in its aim, and now and then a short feint off its line.
-    var plan = null;
+    var plan = null, loop = null, fresh = true, seen = 0, spotted = 0;
+    var LOOP = A.LOOP;
     function rnd(a, b) { return a + Math.random() * (b - a); }
     function newPlan() {
       var p = { spin: Math.random() < 0.5 ? 1 : -1, vt: rnd(-0.12, 0.12), chase: rnd(0.6, 1.5), top: rnd(0.85, 1.2),
-                hit: rnd(0.8, 1.25), bias: rnd(-1, 1) * L.aim, until: frame + Math.floor(rnd(150, 450)), feint: null };
+                hit: rnd(0.8, 1.25), react: Math.floor(rnd(2, 7)), bias: rnd(-1, 1) * L.aim, until: frame + Math.floor(rnd(150, 450)), feint: null };
       if (Math.random() < 0.35) { var at = frame + Math.floor(rnd(20, 120)); p.feint = { at: at, to: at + Math.floor(rnd(20, 50)), turn: (Math.random() < 0.5 ? 1 : -1) * rnd(0.6, 1.3) }; }
       return p;
     }
@@ -109,6 +112,17 @@
     function track(him) {
       if (hv && him.alive) { hax += ((him.vx - hv.vx) - hax) * 0.4; hay += ((him.vy - hv.vy) - hay) * 0.4; }
       hv = him.alive ? { vx: him.vx, vy: him.vy } : null;
+    }
+    // The star's pull, measured on itself while coasting (no rocket last frame):
+    // the change in its velocity times r squared, for the speed of a circular orbit
+    var mv = null, gm = 0;
+    function pull(me) {
+      var r = Math.hypot(me.x, me.y);
+      if (mv && me.alive && !(prev & bits.rocket) && r > 40) {
+        var a = Math.hypot(me.vx - mv.vx, me.vy - mv.vy) * r * r;
+        if (a > 0) gm = gm ? gm + (a - gm) * 0.2 : a;
+      }
+      mv = me.alive ? { vx: me.vx, vy: me.vy } : null;
     }
     // A torpedo fired now along heading a: how near it passes the other ship (points),
     // the other ship followed along its bending path, a frame at a time
@@ -161,15 +175,29 @@
       wob += (wobTo - wob) * 0.1;
       if (frame % L.every) return last;
       var me = ship(mem, k), him = ship(mem, 1 - k), out = 0;
-      track(him);
-      if (!me.alive) { wait = M.wait[0] + Math.floor(Math.random() * (M.wait[1] - M.wait[0] + 30)); plan = null; return (last = 0); }
-      if (!plan || frame > plan.until) plan = newPlan();
+      track(him); pull(me);
+      if (!me.alive) { wait = M.wait[0] + Math.floor(Math.random() * (M.wait[1] - M.wait[0] + 30)); plan = null; loop = null; fresh = true; return (last = 0); }
+      if (!plan || frame > plan.until) {
+        plan = newPlan();
+        // At the start of a round, as people did, it usually circles a while to get
+        // its bearings, round the star at about its own distance, before going in
+        if (fresh && Math.random() < LOOP.open) {
+          var r0 = Math.hypot(me.x, me.y);
+          loop = { R: Math.max(110, Math.min(280, r0 * rnd(0.55, 0.85))), swept: 0, ang: null, laps: 9, go: true,
+                   to: frame + Math.floor(rnd(M.think[0], M.think[1])) };
+        }
+        fresh = false;
+        // now and then, a turn round the star before going in, as players did for show
+        if (!loop && Math.random() < LOOP.p) loop = { R: rnd(LOOP.r0, LOOP.r1), swept: 0, ang: null, to: frame + 700, laps: rnd(1, 1.4), go: false };
+      }
       if (wait > 0) { wait--; return (last = 0); }   // a moment's thought at the start of each game
 
       // Fire whenever a torpedo would pass close to the other ship, whatever else it
       // is doing; pressed and released in turn, so versions that fire once a press fire
       var dHim = him.alive ? Math.hypot(wrapD(him.x - me.x), wrapD(him.y - me.y)) : Infinity, mNow = him.alive ? missIf(me, him, me.a) : Infinity;
       var hit = L.hit * plan.hit, shoot = mNow < hit || (dHim < L.spray && mNow < hit * 2.5);
+      // a person's reaction time: a shot has to stay lined up a few frames before it fires
+      seen = shoot ? seen + 1 : 0; shoot = shoot && seen > plan.react;
       function trigger(o) { if (shoot) { if (!fired) o |= bits.torpedo; fired = !fired; } else fired = false; return o; }
 
       // 1. torpedoes coming: the nearest approach of each over the next second
@@ -182,11 +210,38 @@
         var miss = Math.hypot(rx + vx * tca, ry + vy * tca);
         if (miss < L.near && (!threat || tca < threat.tca)) threat = { tca: tca, vx: vx, vy: vy };
       }
+      // and a torpedo has to be seen a few frames before it is dodged
+      spotted = threat ? spotted + 1 : 0; if (spotted <= plan.react + 2) threat = null;
       if (threat) {
         if (L.hyper && canHyper && threat.tca < L.hyper && frame - hyperAt > 400) { hyperAt = frame; return (last = bits.ccw | bits.cw); }
         var s = steer(me, headingTo(-threat.vy, threat.vx), 0.5);
         out |= s.bits; if (s.on) out |= bits.rocket;
         return (last = trigger(out));
+      }
+
+      // A turn round the star, for show: in close, the heading along the orbit bent in
+      // or out toward the chosen radius, the rocket held to a swing; fire held unless
+      // the other ship is point blank. Ends after the laps, or if it takes too long.
+      var lr = Math.hypot(me.x, me.y);
+      if (loop && !loop.go && dHim > 300) loop.go = true;   // only with the other ship well away
+      if (loop && loop.go && dHim < 160) loop = null;       // and not with it closing in
+      if (loop && loop.go && lr > LOOP.min) {
+        var la = Math.atan2(me.y, me.x);
+        if (loop.ang !== null) loop.swept += Math.abs(wrapA(la - loop.ang));
+        loop.ang = la;
+        if (loop.swept >= loop.laps * 2 * Math.PI || frame > loop.to) { loop.done = true; loop = null; }
+        else {
+          var lox = me.x / lr, loy = me.y / lr, lh = me.x * me.vy - me.y * me.vx;
+          var ls = Math.abs(lh) / lr > 0.15 ? (lh > 0 ? 1 : -1) : plan.spin;
+          // the velocity of a circular orbit at radius R, drifting in or out toward it;
+          // thrust only to close the difference, and let the star do the turning
+          var vc = gm ? Math.min(LOOP.top, Math.sqrt(gm / lr)) : 1.2, vrT = Math.max(-0.6, Math.min(0.6, (loop.R - lr) * 0.02));
+          var ex = -loy * ls * vc + lox * vrT - me.vx, ey = lox * ls * vc + loy * vrT - me.vy;
+          var ll = steer(me, Math.hypot(ex, ey) > 0.12 ? headingTo(ex, ey) : headingTo(-loy * ls, lox * ls), 0.4);
+          out |= ll.bits; if (ll.on && Math.hypot(ex, ey) > 0.12) out |= bits.rocket;
+          shoot = dHim < 120 && mNow < hit * 0.5;
+          return (last = trigger(out));
+        }
       }
 
       // 2. the star: keep in orbit round it. Falling inward, or too slow across the
@@ -229,6 +284,7 @@
       return (last = trigger(out));
     };
     fly.temper = M.name; fly.level = level;
+    fly.state = function () { return { loop: loop, slip: slip && slip.kind, plan: plan, gm: gm }; };   // for inspection
     return fly;
   };
 })(this);
