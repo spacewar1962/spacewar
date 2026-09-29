@@ -1550,6 +1550,8 @@ body.dev-on .dev-only { display: revert !important; }
 .mcard > .mc-where, .ithread > .mc-where { line-height: 1.6; }
 /* between the header rule and the buttons: the annotation's content, on the page's own ground */
 .note:not(.reply) > .nbody { background: var(--bg); border-radius: 3px; padding: 5px 8px; margin: 0 -3px; }
+/* in dark themes, lighter than the card, not darker, so it reads as content (each theme sets color-scheme) */
+.note:not(.reply) > .nbody { background: light-dark(var(--bg), color-mix(in srgb, var(--text) 6%, var(--surface-2))); }
 .note.reply > .nbody { padding: 0; }
 /* an annotation's buttons: reply, reactions, copy, download on the left; link, My notes, edit, delete on the right */
 .note .acts { display: flex; flex-wrap: wrap; align-items: center; }
