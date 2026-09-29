@@ -952,7 +952,7 @@
   N.joinHelp = function () {
     function ext(url, text) { return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + text + ' ↗</a>'; }
     var d = SW.el('dialog', { class: 'tray-big annohelp joinhelp' });
-    d.innerHTML = '<div class="tray-bighead"><b>Joining the annotation group</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="ah">' +
+    d.innerHTML = '<div class="tray-bighead"><b>Joining the annotation group</b><span class="refhelp-acts"><button class="btn ghost" data-share title="Copy a link that opens the bench with this guide showing, to send to someone joining">🔗 Copy link to this guide</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div><div class="ah">' +
       '<p>Annotations on the bench are shared through a private group on <b>Hypothesis</b>, the open annotation service. To read and write them you need a Hypothesis account, membership of the group, and a personal key (an API token) that lets the bench write as you. Four steps, about five minutes. You need an email address, and the group’s invitation link from the project.</p>' +
 
       '<h3>1. Create a Hypothesis account</h3>' +
@@ -985,7 +985,15 @@
       '</div>';
     document.body.appendChild(d);
     d.showModal();
-    d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
+    d.addEventListener('click', function (e) {
+      if (e.target.closest('[data-share]')) {
+        var url = SW.permalink({ help: 'join' });   // opens the bench with this guide showing (main.js)
+        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+          .then(function () { SW.toast('Link copied: it opens the bench with this guide showing'); }, function () { window.prompt('Copy:', url); });
+        return;
+      }
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); }
+    });
     d.addEventListener('close', function () { d.remove(); });
   };
 
