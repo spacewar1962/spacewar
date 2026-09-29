@@ -1632,3 +1632,7 @@ body.dev-on .dev-only { display: revert !important; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 @media (max-width: 520px) { .joinhelp .js-step { grid-template-columns: 40px 1fr; gap: 10px; padding: 12px; } .joinhelp .js-num { font-size: 34px; } }
 .mem-legend span[title], .legend span[title] { cursor: help; }
+/* the collision shape in three steps */
+.col-step { margin: 10px 0 14px; }
+.col-step canvas { display: block; border: 1px solid var(--line-soft); border-radius: 3px; }
+.col-step figcaption { margin-top: 5px; max-width: 280px; font-size: 12px; line-height: 1.45; }
