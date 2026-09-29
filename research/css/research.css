@@ -1540,3 +1540,7 @@ body.dev-on .dev-only { display: revert !important; }
 @media (max-width: 860px) { .lncols .colfold { display: none !important; } }
 .toolbar .undo-pair { display: inline-flex; gap: 2px; margin-left: 4px; }
 .toolbar .undo-pair .btn { min-width: 30px; padding-left: 6px; padding-right: 6px; }
+/* room in an annotation: a rule under its header and above its buttons (replies stay compact) */
+.note:not(.reply) > .by { padding-bottom: 4px; margin-bottom: 6px; border-bottom: 1px solid var(--line-soft); }
+.note:not(.reply) > .acts { padding-top: 4px; margin-top: 7px; border-top: 1px solid var(--line-soft); }
+.mcard > .mc-where, .ithread > .mc-where { line-height: 1.6; }
