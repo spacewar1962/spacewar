@@ -582,15 +582,17 @@
           })
         });
       });
+      // each code block ends its caption with the reference to the lines it holds
+      blocks.forEach(function (bl) { if (bl.type === 'code' && bl.lines.length) bl.caption += ' ' + SW.refText(b.v.id, bl.p, bl.lines[0].n, bl.lines[bl.lines.length - 1].n, b.parts.length); });
       var errs = b.asm ? b.asm.errors.filter(function (e) { return !s || (e.file === s.p && e.line >= s.n0 && e.line <= s.n1); }) : [];
       if (errs.length) {
         blocks.push({ type: 'h2', text: 'Assembly errors' });
-        blocks.push({ type: 'table', head: ['File', 'Line', 'Message', 'Symbol'], rows: errs.map(function (e) {
-          return [b.parts[e.file].src, String(e.line), e.message, e.symbol || ''];
+        blocks.push({ type: 'table', head: ['Reference', 'File', 'Line', 'Message', 'Symbol'], rows: errs.map(function (e) {
+          return [SW.refText(b.v.id, e.file, e.line, e.line, b.parts.length), b.parts[e.file].src, String(e.line), e.message, e.symbol || ''];
         }) });
       }
       return {
-        title: s ? SW.cite(b, s.p, s.n0, s.n1) : b.v.label + (lopts.onlyNoted ? ': the annotations' : ': annotated listing'),
+        title: s ? SW.cite(b, s.p, s.n0, s.n1) : b.v.label + ' ' + SW.refText(b.v.id) + (lopts.onlyNoted ? ': the annotations' : ': annotated listing'),
         subtitle: s ? b.v.summary : b.v.date + ' · ' + b.v.authors,
         meta: SW.docMeta(b), blocks: blocks
       };
@@ -698,7 +700,7 @@
     if (b.macros[name]) {
       var m = b.macros[name];
       h += '<div>Macro, dummies: <span class="mono">' + SW.esc(m.args.join(', ') || '(none)') + '</span></div>' +
-        '<div class="refs"><a href="#" data-p="' + m.file + '" data-n="' + m.line + '">defined at ' + SW.esc(b.parts[m.file].src) + ':' + m.line + '</a></div>' +
+        '<div class="refs"><a href="#" data-p="' + m.file + '" data-n="' + m.line + '">defined at ' + SW.esc(b.parts[m.file].src) + ':' + m.line + '</a> ' + SW.refTag(b.v.id, m.file, m.line, m.line, b.parts.length) + '</div>' +
         '<pre class="mono" style="max-height:160px;overflow:auto;margin:6px 0 0">' + SW.esc(m.body) + '</pre>';
     }
     if (s) {

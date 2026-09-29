@@ -376,7 +376,7 @@
           if (r.a0 === 0 && r.a1 >= 2) {
             what = 'Not on the tape. A sequence break stores the Accumulator in 0000, the Program Counter in 0001 and the In-Out register in 0002, then restarts the program at 0003 (DEC, PDP-1 Handbook, 1963, pp. 25–26)' + (r.a1 > 2 ? '; the rest is left empty too' : '') + '.';
             var L3 = line(B && B.srcOf(3));
-            if (L3) from = code(L3.raw.trim()) + ' (line ' + B.srcOf(3).n + ', at 0003)';
+            if (L3) from = code(L3.raw.trim()) + ' (' + SW.refTag(B.v.id, B.srcOf(3).p, B.srcOf(3).n, B.srcOf(3).n, B.parts.length) + ', at 0003)';
           } else {
             what = 'Not on the tape' + (r.a1 === 4095 ? ', to the top of core' : '') + '.';
             var before = B && B.srcOf(r.a0 - 1), after = B && B.srcOf(r.a1 + 1), ls = linesBetween(before, after);
@@ -407,8 +407,8 @@
             var part = B.parts[fa.p], org = '';
             for (var k = fa.n - 1; k >= Math.max(1, fa.n - 6); k--) { var t = (B.lines[fa.p][k - 1].raw || '').trim(); if (/^[0-7]+\//.test(t)) { org = t; break; } }
             var only = fb.p === fa.p && fb.n === fa.n ? (B.lines[fa.p][fa.n - 1].raw || '').trim() : '';
-            if (/^constants\b/.test(only)) { from = 'The program’s literal constants, gathered and placed by ' + code(only) + ' (' + SW.esc(part.src.split('/').pop()) + ', line ' + fa.n + ').'; used[2] = 1; }
-            else from = (r.kind === 'twice' ? 'What the build has here (not what is here now): ' : '') + SW.esc(part.src.split('/').pop()) + ', lines ' + fa.n + (fb.p === fa.p ? '–' + fb.n : ' onwards') + (org ? '; the origin line ' + code(org) + ' puts it at ' + SW.oct(r.a0, 4) : '');
+            if (/^constants\b/.test(only)) { from = 'The program’s literal constants, gathered and placed by ' + code(only) + ' (' + SW.esc(part.src.split('/').pop()) + ', line ' + fa.n + ' ' + SW.refTag(B.v.id, fa.p, fa.n, fa.n, B.parts.length) + ').'; used[2] = 1; }
+            else from = (r.kind === 'twice' ? 'What the build has here (not what is here now): ' : '') + SW.esc(part.src.split('/').pop()) + ', lines ' + fa.n + (fb.p === fa.p ? '–' + fb.n : ' onwards') + ' ' + SW.refTag(B.v.id, fa.p, fa.n, fb.p === fa.p ? fb.n : fa.n, B.parts.length) + (org ? '; the origin line ' + code(org) + ' puts it at ' + SW.oct(r.a0, 4) : '');
           }
         }
         var fr = r.kind === 'empty' ? '' : Math.round(r.f0).toLocaleString('en-GB') + '–' + Math.round(r.f1).toLocaleString('en-GB');
@@ -433,7 +433,7 @@
       var gl = Object.keys(used).map(function (i) { return '<li>' + GLOSS[i][1] + '</li>'; }).join('');
       if (gl) box.appendChild(SW.el('ul', { class: 'hint rd-gloss' }, gl));
       box.appendChild(SW.exportButtons(function () {
-        return { title: 'What is where in core: ' + (o.name || 'tape'), meta: B ? SW.docMeta(B) : null, blocks: [SW.tableBlock('Core after loading ' + (o.name || 'the tape') + (order === 'tape' ? ', in the order read' : ', by address'), HEAD, ordered())] };
+        return { title: 'What is where in core: ' + (o.name || 'tape') + (B ? ' ' + SW.refText(B.v.id) : ''), meta: B ? SW.docMeta(B) : null, blocks: [SW.tableBlock('Core after loading ' + (o.name || 'the tape') + (order === 'tape' ? ', in the order read' : ', by address'), HEAD, ordered())] };
       }, (o.name || 'tape') + '-core'));
     }
 

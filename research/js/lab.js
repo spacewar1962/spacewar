@@ -161,7 +161,7 @@
             '<tr><td>Measured</td><td>' + n.toLocaleString('en-GB') + ' of 3,721 offsets collide</td></tr></tbody></table>' +
             '<canvas class="lab-cv"></canvas><div class="rnd-exp"></div>';
           var cv = SW.$('.lab-cv', el); drawCol(cv, d);
-          SW.$('.rnd-exp', el).appendChild(SW.figureButtons(function (pal) { return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 400" width="380" height="400" font-family="IBM Plex Mono, monospace" font-size="11"><text x="0" y="12" fill="' + pal.ink + '">' + SW.esc(V.byId(vid).label) + ': where the Wedge collides with the Needle</text><image href="' + cv.toDataURL('image/png') + '" x="0" y="20" width="380" height="380"/></svg>'; }, 'spacewar-' + vid + '-collision'));
+          SW.$('.rnd-exp', el).appendChild(SW.figureButtons(function (pal) { return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 400" width="380" height="400" font-family="IBM Plex Mono, monospace" font-size="11"><text x="0" y="12" fill="' + pal.ink + '">' + SW.esc(V.byId(vid).label) + ': where the Wedge collides with the Needle</text><image href="' + cv.toDataURL('image/png') + '" x="0" y="20" width="380" height="380"/></svg>'; }, 'spacewar-' + vid + '-collision', SW.refText(vid)));
         });
       });
   };
@@ -209,7 +209,7 @@
             '<div class="rnd-figs"><figure><canvas class="lab-bars"></canvas><figcaption class="hint">The chance of exploding at each breakout, measured (bars) against the jump number over eight (line).</figcaption></figure>' +
             '<figure><canvas class="lab-outs"></canvas><figcaption class="hint">Where the ship came out, relative to where it went in, over every jump (screen points; the full screen is 1,024 across).</figcaption></figure></div><div class="rnd-exp"></div>';
           var cb = SW.$('.lab-bars', el), co = SW.$('.lab-outs', el); bars(cb, d); outsPlot(co, d);
-          SW.$('.rnd-exp', el).appendChild(SW.figureButtons(function (pal) { return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 330" width="600" height="330" font-family="IBM Plex Mono, monospace" font-size="11"><text x="0" y="12" fill="' + pal.ink + '">' + SW.esc(V.byId(vid).label) + ': hyperspace, 120 trials</text><image href="' + cb.toDataURL('image/png') + '" x="0" y="24" width="280" height="280"/><image href="' + co.toDataURL('image/png') + '" x="300" y="24" width="280" height="280"/></svg>'; }, 'spacewar-' + vid + '-hyperspace'));
+          SW.$('.rnd-exp', el).appendChild(SW.figureButtons(function (pal) { return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 330" width="600" height="330" font-family="IBM Plex Mono, monospace" font-size="11"><text x="0" y="12" fill="' + pal.ink + '">' + SW.esc(V.byId(vid).label) + ': hyperspace, 120 trials</text><image href="' + cb.toDataURL('image/png') + '" x="0" y="24" width="280" height="280"/><image href="' + co.toDataURL('image/png') + '" x="300" y="24" width="280" height="280"/></svg>'; }, 'spacewar-' + vid + '-hyperspace', SW.refText(vid)));
         });
       });
   };

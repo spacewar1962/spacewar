@@ -302,7 +302,7 @@
       if (!b.asm) { view.innerHTML = '<div class="pad hint">No tape: no source survives for this version.</div>'; return; }
       var reals = T.realTapes(b);
       var pad = SW.el('div', { class: 'pad' });
-      pad.innerHTML = '<h2>' + SW.esc(b.v.label) + ': tapes</h2>' +
+      pad.innerHTML = '<h2>' + SW.esc(b.v.label) + ': tapes ' + SW.refTag(b.v.id) + '</h2>' +
         '<p class="prose">Two kinds of tape are shown here, and they should not be confused. <b>Real tapes</b> are the digitised images of the surviving paper tapes (for the 1962–63 versions, mostly from Steve Russell’s box, read for bitsavers in 2003–04): every frame as the tape reader saw it. <b>The reconstruction</b> is the tape the assembler here would punch from the source today, in macro1’s loader and block format, not the format MIT’s MACRO punched.</p>' +
         '<p class="prose">A <b>frame</b> is one column of holes across the tape: one character on a source tape, one six-bit part of a word on an object tape, at ten frames to the inch. Eight data channels run along the tape, with the small sprocket hole between the third and fourth. Show chooses what to draw: the whole tape, one of its stretches (leader, read-in loader, each checksummed block, the closing jump; on a source tape, each page between stop codes), a punched title, or a range of your own, counted in frames from the very beginning of the tape image, leader included. A version read from several physical tapes lists each one under Tape.</p>' +
         (reals.length ? '' : '<p class="prose"><b>No real tape survives for this version</b> in the project’s sources; only the reconstruction can be shown.</p>');
@@ -336,7 +336,7 @@
         var box = SW.el('div', { class: 'svgbox', style: 'margin:6px 0' }, SW.displaySVG(T.anatomySVG(an, cur.name, 1100)));
         anatBox.appendChild(box);
         var bar = SW.el('div', { class: 'toolbar', style: 'position:static;padding-left:0' });
-        bar.appendChild(SW.figureButtons(function () { return T.anatomySVG(an, cur.name, 1100); }, cur.name + '-anatomy'));
+        bar.appendChild(SW.figureButtons(function () { return T.anatomySVG(an, cur.name, 1100); }, cur.name + '-anatomy', SW.refText(b.v.id)));
         anatBox.appendChild(bar);
         anatBox.appendChild(SW.el('p', { class: 'hint' }, 'Click a stretch, or a row, to draw the holes from there.'));
         var rows = an.segs.map(function (sg) {
@@ -536,7 +536,9 @@
           cur = { bytes: bytes, name: r.path.split('/').pop().replace(/\.[a-z]+$/, ''), source: !!(d && d.isSource) };
           var kind = d && d.isSource ? 'a <b>source tape</b>: FIO-DEC text, every frame passing the odd-parity check (' + d.stops + ' stop codes)' :
             'an <b>object tape</b>: binary words for the loader' + (d ? ' (' + Math.round(100 * d.parityErrors / Math.max(1, d.frames)) + '% of frames fail the FIO-DEC parity test, as binary does)' : '');
-          info.innerHTML = '<b>Real tape.</b> <span class="mono">' + SW.sourceLink(r.path) + '</span>: ' + bytes.length.toLocaleString('en-GB') + ' frames (' + (bytes.length / 120).toFixed(1) + ' ft), ' + kind + '.';
+          // the reference of the text read from this tape, where the bench builds from it
+          var rp = b.parts.map(function (x) { return x.src; }).indexOf(r.path);
+          info.innerHTML = '<b>Real tape.</b> <span class="mono">' + SW.sourceLink(r.path) + '</span>' + (rp >= 0 ? ' ' + SW.refTag(b.v.id, rp, null, null, b.parts.length) : '') + ': ' + bytes.length.toLocaleString('en-GB') + ' frames (' + (bytes.length / 120).toFixed(1) + ' ft), ' + kind + '.';
           if (d && d.isSource) { decoded.style.display = 'block'; decoded.textContent = d.text.slice(0, 6000) + (d.text.length > 6000 ? '\n…' : ''); }
           firstShow(r.path);
           showTitles(bytes);
@@ -621,7 +623,7 @@
     Object.keys(addrs).map(Number).sort(function (x, y) { return x - y; }).forEach(function (a) {
       var w = b.asm.memory[a], t = r.mem[a], L = w ? b.lines[w.file][w.line - 1] : null;
       rows.push([SW.oct(a, 4), b.symAt(a) || '', w ? SW.oct(w.val) : '', w ? C.disasm(w.val, b.symAt) : '', t != null ? SW.oct(t) : '', t != null ? C.disasm(t, b.symAt) : '',
-                 L ? L.n + ': ' + L.raw.trim() : '']);
+                 L ? SW.refOf(b.v.id, w.file, w.line, w.line, b.parts.length) + ': ' + L.raw.trim() : '']);
     });
     var d = SW.el('details', { style: 'margin:10px 0' });
     d.innerHTML = '<summary><b>' + SW.esc(r.tape) + '</b> (' + SW.sourceLink(r.tape, 'open file') + '): ' + (rows.length ? rows.length + ' words differ' : 'identical to the build') + '</summary>';

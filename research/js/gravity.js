@@ -236,7 +236,7 @@
       var i = Math.max(0, Math.round(s / STEP) - 1);
       read.innerHTML = SW.esc((i + 1) * STEP + ' points: ') + shown().map(function (gp) { var g = gp.c.g[i]; return '<span style="color:' + gp.ink + '">' + SW.esc(vname(gp.vs[0])) + (gp.vs.length > 1 ? ' +' + (gp.vs.length - 1) : '') + ' ' + (g == null ? 'captured' : g.toFixed(0)) + '</span>'; }).join(' · ');
     });
-    SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return svg(p); }, 'spacewar-gravity'));
+    SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return svg(p); }, 'spacewar-gravity', function () { return SW.refsOf([].concat.apply([], shown().map(function (gp) { return gp.vs.map(function (v) { return v.id; }); }))); }));
     run();
     var stopWell = G.well(b, host);
     return function () { stopped = true; stopWell(); };
@@ -643,7 +643,7 @@
       var k = e.target.dataset && e.target.dataset.w; if (k !== 'tilt' && k !== 'depth' && k !== 'rot') return;
       st[k] = +e.target.value; keep(); paint();
     });
-    SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return svg(p); }, 'spacewar-gravity-well'));
+    SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return svg(p); }, 'spacewar-gravity-well', function () { return SW.refsOf([].concat.apply([], shownGroups().map(function (gp) { return gp.vs.map(function (v) { return v.id; }); }))); }));
     var drag = null, raf = 0;
     plot.addEventListener('pointerdown', function (e) {
       if (!SW.$('canvas', plot)) return;

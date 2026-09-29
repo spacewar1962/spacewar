@@ -208,7 +208,7 @@
     draw();
     similarities(L, gran).then(function (s) { sims = s; draw(); });
     var fig = function () { return svg(L, sims, { gran: gran }); };
-    exp.appendChild(SW.figureButtons(fig, 'spacewar-stemma'));
+    exp.appendChild(SW.figureButtons(fig, 'spacewar-stemma', 'Spacewar! Research Bench v' + SW.VERSION));
     exp.appendChild(SW.exportButtons(function () {
       var rows = [];
       L.main.forEach(function (v) {

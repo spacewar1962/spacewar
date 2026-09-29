@@ -109,7 +109,7 @@
     return function () {
       return [{ type: 'p', text: cs.length + ' comments in the program text' + (noStars ? ', leaving out the ' + stars + ' comments of the star table.' : '.') },
         SW.tableBlock('Most frequent words in comments', ['Word', 'Count'], top),
-        SW.tableBlock('All comments', ['Line', 'Comment'], cs.map(function (x) { return [String(x.L.n), x.c]; }))];
+        SW.tableBlock('All comments', ['Line', 'Comment', 'Reference'], cs.map(function (x) { return [String(x.L.n), x.c, SW.refOf(b.v.id, x.L.p, x.L.n, x.L.n, b.parts.length)]; }))];
     };
   }
 
@@ -122,9 +122,9 @@
       if (hs.length || dates) rows.push({ L: L, hands: hs, dates: dates || [], src: b.parts[L.p].src });
     });
     var c = card('Signatures and dates', 'Initials and dates as the programmers and later editors left them. Titles are the first line of each tape; later annotations (reconstruction notes, museum logs) are part of the text’s history too.');
-    var t = SW.table(['File', 'Line', 'Hand', 'Date', 'Text'], rows.map(function (r) {
-      return [r.src, r.L.n, r.hands.map(function (h) { return h + ' (' + SW.handOf(h).who + ')'; }).join(', '), r.dates.join(', '), r.L.raw.trim()];
-    }), { cls: ['mono', 'num', '', 'mono', 'mono'], onRow: function (r) { var x = rows.filter(function (y) { return y.L.n === r[1] && y.src === r[0]; })[0]; if (x) goto(x.L); } });
+    var t = SW.table(['File', 'Line', 'Hand', 'Date', 'Text', 'Reference'], rows.map(function (r) {
+      return [r.src, r.L.n, r.hands.map(function (h) { return h + ' (' + SW.handOf(h).who + ')'; }).join(', '), r.dates.join(', '), r.L.raw.trim(), SW.refOf(b.v.id, r.L.p, r.L.n, r.L.n, b.parts.length)];
+    }), { cls: ['mono', 'num', '', 'mono', 'mono', 'mono'], onRow: function (r) { var x = rows.filter(function (y) { return y.L.n === r[1] && y.src === r[0]; })[0]; if (x) goto(x.L); } });
     var s = SW.el('div', { class: 'scroll' }); s.appendChild(t); c.appendChild(s);
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
@@ -136,14 +136,14 @@
     if (!b.asm) return null;
     var rows = b.asm.symbols.filter(function (s) { return s.defs.length && b.parts[s.defs[0].file].role === 'program'; }).map(function (s) {
       var d = s.defs[0], L = b.lines[d.file][d.line - 1], cm = L ? SW.parseLine(L.raw).comment.replace(/^\/\s?/, '') : '';
-      return [s.name, s.variable ? 'variable' : s.label ? 'label' : 'defined', s.refs.length, d.line, cm];
+      return [s.name, s.variable ? 'variable' : s.label ? 'label' : 'defined', s.refs.length, d.line, cm, SW.refOf(b.v.id, d.file, d.line, d.line, b.parts.length)];
     }).sort(function (a, b) { return b[2] - a[2]; });
     var c = card(rows.length + ' names', 'Every symbol the program defines, with how often it is used and the comment beside its definition: a glossary written by the code itself. Three letters was the working length; the names are abbreviations of a world (ships, torpedoes, the star, the sky).');
     var s = SW.el('div', { class: 'scroll', style: 'max-height:520px' });
-    s.appendChild(SW.table(['Name', 'Kind', 'Uses', 'Defined at', 'Comment at definition'], rows, { cls: ['mono', '', 'num', 'num', ''], onRow: function (r) { goto(b.lines[b.sym[r[0]].defs[0].file][r[3] - 1]); } }));
+    s.appendChild(SW.table(['Name', 'Kind', 'Uses', 'Defined at', 'Comment at definition', 'Reference'], rows, { cls: ['mono', '', 'num', 'num', '', 'mono'], onRow: function (r) { goto(b.lines[b.sym[r[0]].defs[0].file][r[3] - 1]); } }));
     c.appendChild(s); c.style.gridColumn = '1 / -1';
     el.appendChild(c);
-    return function () { return [SW.tableBlock('Lexicon', ['Name', 'Kind', 'Uses', 'Defined at line', 'Comment at definition'], rows)]; };
+    return function () { return [SW.tableBlock('Lexicon', ['Name', 'Kind', 'Uses', 'Defined at line', 'Comment at definition', 'Reference'], rows)]; };
   }
 
   // ---------- 4 rules made adjustable ----------
@@ -203,9 +203,9 @@
     el.appendChild(c);
     var timing = progLines(b).filter(function (L) { return /time|delay|wait|count/i.test(SW.parseLine(L.raw).comment); });
     var c2 = card('Time in the comments', 'Lines whose comments speak of time, delay or counting: the program managing the machine’s pace.');
-    c2.appendChild(SW.table(['Line', 'Text'], timing.map(function (L) { return [L.n, L.raw.trim()]; }), { cls: ['num', 'mono'], onRow: function (r) { goto(timing.filter(function (L) { return L.n === r[0]; })[0]); } }));
+    c2.appendChild(SW.table(['Line', 'Text', 'Reference'], timing.map(function (L) { return [L.n, L.raw.trim(), SW.refOf(b.v.id, L.p, L.n, L.n, b.parts.length)]; }), { cls: ['num', 'mono', 'mono'], onRow: function (r) { goto(timing.filter(function (L) { return L.n === r[0]; })[0]); } }));
     el.appendChild(c2);
-    return function () { return [SW.tableBlock('Hardware in the instruction stream', ['Feature', 'Words', 'Executed'], rows), SW.tableBlock('Time in the comments', ['Line', 'Text'], timing.map(function (L) { return [L.n, L.raw.trim()]; }))]; };
+    return function () { return [SW.tableBlock('Hardware in the instruction stream', ['Feature', 'Words', 'Executed'], rows), SW.tableBlock('Time in the comments', ['Line', 'Text', 'Reference'], timing.map(function (L) { return [L.n, SW.refOf(b.v.id, L.p, L.n, L.n, b.parts.length) + '  ' + L.raw.trim()]; }))]; };
   }
 
   // ---------- 6 where the time goes ----------
@@ -233,8 +233,8 @@
     (b.v.transforms || []).forEach(function (k) { items.push(['Normalisation', V.TRANSFORMS[k].label]); });
     var norm = 0; b.lines.forEach(function (ls) { ls.forEach(function (L) { if (L.raw !== L.norm && !L.skipped) norm++; }); });
     if (norm) items.push(['Lines normalised', String(norm)]);
-    allLines(b).forEach(function (L) { if (/illegible|\[\?|uncertain|unclear/i.test(L.raw)) items.push(['Marked uncertain', b.parts[L.p].src + ':' + L.n + '  ' + L.raw.trim()]); });
-    if (b.asm) b.asm.errors.forEach(function (e) { items.push(['Assembly error', b.parts[e.file].src + ':' + e.line + '  ' + e.message + (e.symbol ? ' "' + e.symbol + '"' : '')]); });
+    allLines(b).forEach(function (L) { if (/illegible|\[\?|uncertain|unclear/i.test(L.raw)) items.push(['Marked uncertain', SW.refText(b.v.id, L.p, L.n, L.n, b.parts.length) + '  ' + L.raw.trim()]); });
+    if (b.asm) b.asm.errors.forEach(function (e) { items.push(['Assembly error', SW.refText(b.v.id, e.file, e.line, e.line, b.parts.length) + '  ' + e.message + (e.symbol ? ' "' + e.symbol + '"' : '')]); });
     V.VERSIONS.filter(function (v) { return v.status === 'lost'; }).forEach(function (v) { items.push(['Lost version', v.label + ' (' + v.date + '): ' + v.summary]); });
     var c = card('What the record does not hold', 'Every place where this build depends on something other than the text as held: supplied tapes, normalisations, uncertain readings, errors, and the versions that do not survive at all.');
     c.appendChild(SW.table(['Kind', 'Detail'], items, { cls: ['', 'mono'] }));
@@ -284,7 +284,7 @@
     };
     var c0 = card('The call structure', 'Routines along the line in memory order; each arc a call (blue: to a routine later in memory, amber: to one earlier), thicker for more call sites. Hover for names.');
     c0.appendChild(SW.el('div', { class: 'svgbox' }, SW.displaySVG(arcSVG())));
-    c0.appendChild(SW.figureButtons(arcSVG, 'spacewar-' + b.v.id + '-calls'));
+    c0.appendChild(SW.figureButtons(arcSVG, 'spacewar-' + b.v.id + '-calls', SW.refText(b.v.id)));
     c0.style.gridColumn = '1 / -1';
     el.appendChild(c0);
     var c1 = card('Most called', 'Subroutines by the number of call sites (jsp and jda).');
@@ -407,7 +407,7 @@
         (asmv == null || now !== asmv ? '<tr><td>after ' + run.secs.toFixed(1) + ' s</td><td class="mono">' + SW.oct(now) + '  ' + SW.esc(root.PDP1CPU.disasm(now, b.symAt)) + '</td></tr>' : '') +
         '<tr><td>routine</td><td class="mono">' + SW.esc(routine[a] || '·') + '</td></tr>' +
         '<tr><td>in ' + run.secs.toFixed(1) + ' s</td><td>executed ' + run.exec[a].toLocaleString('en-GB') + ' · read ' + run.read[a].toLocaleString('en-GB') + ' · written ' + run.write[a].toLocaleString('en-GB') + (run.writer[a] >= 0 ? ', last by ' + SW.oct(run.writer[a], 4) + (b.symAt(run.writer[a]) ? ' (' + SW.esc(b.symAt(run.writer[a])) + ')' : '') : '') + '</td></tr>' +
-        (sl ? '<tr><td>source</td><td><a href="#" data-go="' + a + '">' + SW.esc(b.parts[sl.sq.p].src.split('/').pop()) + ', line ' + sl.sq.n + '</a><div class="mono mem-src">' + SW.esc(sl.L.raw.trim()) + '</div></td></tr>' : '') + '</table>';
+        (sl ? '<tr><td>source</td><td><a href="#" data-go="' + a + '">' + SW.esc(b.parts[sl.sq.p].src.split('/').pop()) + ', line ' + sl.sq.n + '</a> ' + SW.refTag(b.v.id, sl.sq.p, sl.sq.n, sl.sq.n, b.parts.length) + '<div class="mono mem-src">' + SW.esc(sl.L.raw.trim()) + '</div></td></tr>' : '') + '</table>';
       if (sym && sym.refs && sym.refs.length) h += '<div class="hint">Used on ' + sym.refs.length + ' line' + (sym.refs.length > 1 ? 's' : '') + ':</div><div class="mem-refs">' + sym.refs.slice(0, 24).map(function (r) { var L = b.lines[r.file] && b.lines[r.file][r.line - 1]; return '<a href="#" data-ref="' + r.file + ':' + r.line + '" class="mono">' + r.line + '  ' + SW.esc(L ? L.raw.trim().slice(0, 40) : '') + '</a>'; }).join('') + (sym.refs.length > 24 ? '<span class="hint">and ' + (sym.refs.length - 24) + ' more</span>' : '') + '</div>';
       insp.innerHTML = h;
     }
@@ -446,7 +446,7 @@
       }
       return o.concat(['</svg>']).join('');
     };
-    c.appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-memory'));
+    c.appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-memory', SW.refText(b.v.id)));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
     var counts = {}; kind.forEach(function (k) { counts[k] = (counts[k] || 0) + 1; });
@@ -461,7 +461,7 @@
     var sites = {};
     b.asm.words.forEach(function (w) { if (w.macro) { sites[w.macro] = sites[w.macro] || {}; sites[w.macro][w.file + ':' + w.line] = 1; } });
     var rows = b.asm.macros.map(function (m) {
-      return [m.name, m.args.join(', '), sites[m.name] ? Object.keys(sites[m.name]).length : 0, uses[m.name] || 0, b.parts[m.file].src + ':' + m.line];
+      return [m.name, m.args.join(', '), sites[m.name] ? Object.keys(sites[m.name]).length : 0, uses[m.name] || 0, SW.refOf(b.v.id, m.file, m.line, m.line, b.parts.length)];
     }).sort(function (a, b) { return b[3] - a[3]; });
     var c = card(rows.length + ' macros', 'Macro instructions: abbreviations the programmers wrote for themselves. Call sites and the words they expanded into.');
     c.appendChild(SW.table(['Macro', 'Dummies', 'Call sites', 'Words generated', 'Defined'], rows, { cls: ['mono', 'mono', 'num', 'num', 'mono'], onRow: function (r) { var m = b.macros[r[0]]; if (m) goto(b.lines[m.file][m.line - 1]); } }));
@@ -556,20 +556,20 @@
         o.push('<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="' + (R[st.mag] || 1.6) + '" fill="' + ink + '"><title>' + SW.esc(st.name + ' · mark ' + st.x + ', ' + st.y + ' · RA ' + hms(st.ra) + ', Dec ' + sgn(st.dec) + ' · group ' + st.mag + ' · line ' + st.L.n) + '</title></circle>');
         if (st.proper) o.push('<text x="' + (p.x + 6).toFixed(1) + '" y="' + (p.y - 5).toFixed(1) + '" font-size="10" fill="' + ink + '" fill-opacity="0.85">' + SW.esc(st.proper) + '</text>');
       });
-      o.push('<text x="' + ML + '" y="18" font-size="12" fill="' + dim + '">' + SW.esc(b.v.label + ': the Expensive Planetarium, ' + stars.length + ' stars in ' + cons.length + ' constellations (right ascension increasing to the left; declination ' + '±' + maxDec + '°)') + '</text>');
+      o.push('<text x="' + ML + '" y="18" font-size="12" fill="' + dim + '">' + SW.esc(b.v.label + ' ' + SW.refText(b.v.id) + ': the Expensive Planetarium, ' + stars.length + ' stars in ' + cons.length + ' constellations (right ascension increasing to the left; declination ' + '±' + maxDec + '°)') + '</text>');
       if (!pal) o.push('<g class="sky-win"></g>');   // the scope's window, drawn live (not exported)
       return o.concat(['</svg>']).join('');
     }
     var dlg = host ? SW.el('div', { class: 'sky-dlg sky-page' }) : SW.el('dialog', { class: 'sky-dlg' });
-    dlg.innerHTML = '<div class="rd-head"><h2>Star map: ' + SW.esc(b.v.label) + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
-      '<p class="hint">Peter Samson’s star table (“stars by prs”), ' + stars.length + ' stars from the line <span class="mono">' + SW.esc(stars[0].L.raw.trim()) + '</span> on. Each <span class="mono">mark X, Y</span> is drawn at X and Y in 8192ths of a circle: right ascension and declination. Dot sizes follow Samson’s four groups (labels 1j–1q, 2j–2q, 3j–3q, 4j–4q), the brightest largest. Constellations are his identifications, outlined round their stars' + (unnamed ? ' (' + unnamed + ' stars carry no identification in this table and belong to none)' : '') + '; hover a star for its entry.</p>' +
+    dlg.innerHTML = '<div class="rd-head"><h2>Star map: ' + SW.esc(b.v.label) + ' ' + SW.refTag(b.v.id) + '</h2><button class="btn ghost" data-a="close" title="Close (Esc)">✕</button></div>' +
+      '<p class="hint">Peter Samson’s star table (“stars by prs”), ' + stars.length + ' stars from the line <span class="mono">' + SW.esc(stars[0].L.raw.trim()) + '</span> ' + SW.refTag(b.v.id, stars[0].L.p, stars[0].L.n, stars[0].L.n, b.parts.length) + ' on. Each <span class="mono">mark X, Y</span> is drawn at X and Y in 8192ths of a circle: right ascension and declination. Dot sizes follow Samson’s four groups (labels 1j–1q, 2j–2q, 3j–3q, 4j–4q), the brightest largest. Constellations are his identifications, outlined round their stars' + (unnamed ? ' (' + unnamed + ' stars carry no identification in this table and belong to none)' : '') + '; hover a star for its entry.</p>' +
       '<div class="svgbox sky-box"></div><div class="sky-cons"></div><div class="sky-exp"></div>' +
       '<div class="sky-scope"><h3>On the scope</h3><div class="sky-scope-row"><div class="sky-crt-wrap"><canvas class="sky-crt" width="440" height="440"></canvas><canvas class="sky-over" width="880" height="880"></canvas></div>' +
       '<div class="sky-scope-side"><div class="sky-scope-ctl"></div><div class="sky-scope-exp"></div><p class="sky-scope-read mono"></p><div class="sky-scope-how"></div></div></div></div>';
     if (host) { host.innerHTML = ''; host.appendChild(dlg); SW.$('[data-a="close"]', dlg).remove(); } else document.body.appendChild(dlg);
     var box = SW.$('.sky-box', dlg);
     box.innerHTML = svg();
-    SW.$('.sky-exp', dlg).appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-star-map'));
+    SW.$('.sky-exp', dlg).appendChild(SW.figureButtons(svg, 'spacewar-' + b.v.id + '-star-map', SW.refText(b.v.id)));
     SW.$('.sky-cons', dlg).innerHTML = cons.map(function (c) {
       return '<span class="sky-chip" data-c="' + c + '"><i style="background:hsl(' + hue[c] + ',65%,60%)"></i>' + SW.esc(CONST[c] || c) + ' <b>' + byCon[c].length + '</b></span>';
     }).join('');
@@ -806,7 +806,7 @@
         winAt = fpr; drawWindow();
       });
       var ex = SW.$('.sky-scope-exp', dlg), name = 'spacewar-' + b.v.id + '-scope';
-      var fb = SW.figureButtons(scopeSVG, name);
+      var fb = SW.figureButtons(scopeSVG, name, SW.refText(b.v.id));
       fb.appendChild(document.createTextNode(' '));
       fb.appendChild(SW.el('button', { class: 'btn', title: 'Save the phosphor screen as it is now (with the chart, if it is on), as a PNG', onclick: function () {
         var c = document.createElement('canvas'); c.width = ON; c.height = ON;
@@ -856,7 +856,7 @@
     var box = SW.el('div', { class: 'svgbox', style: 'cursor:zoom-in', title: 'Open the star map, with the constellations marked' }, svg());
     box.onclick = function () { SW.skyMap(b); };
     c.appendChild(box);
-    var fb = SW.figureButtons(svg, 'spacewar-' + b.v.id + '-sky');
+    var fb = SW.figureButtons(svg, 'spacewar-' + b.v.id + '-sky', SW.refText(b.v.id));
     fb.insertBefore(SW.el('button', { class: 'btn', onclick: function () { SW.skyMap(b); } }, '✦ Star map'), fb.firstChild);
     c.appendChild(fb);
     c.style.gridColumn = '1 / -1';
@@ -917,10 +917,11 @@
     if (!os.length) { el.appendChild(card('No outline tables', 'This build has no ot1/ot2 outline tables.')); return null; }
     os.forEach(function (o) {
       var label = o.name === 'ot1' ? 'ot1, the Needle' : 'ot2, the Wedge';
-      var c = card(label, 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. The table describes one side of the ship (pale points). At code 7 the compiled code complements its sideways terms and runs again, drawing the other side as a mirror image (blue points). The amber point is the start, the nose. ' + o.pts.length + ' points, each plotted every frame.');
+      var od = b.sym[o.name] && b.sym[o.name].defs && b.sym[o.name].defs[0];
+      var c = card(label, (od ? SW.refTag(b.v.id, od.file, od.line, od.line, b.parts.length) + ' ' : '') + 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. The table describes one side of the ship (pale points). At code 7 the compiled code complements its sideways terms and runs again, drawing the other side as a mirror image (blue points). The amber point is the start, the nose. ' + o.pts.length + ' points, each plotted every frame.');
       var svg = outlineSVG(o, 9);
       c.appendChild(SW.el('div', { class: 'svgbox', style: 'text-align:center' }, svg));
-      c.appendChild(SW.figureButtons(function (pal) { return outlineSVG(o, 12, b.v.label + ' ' + label, pal); }, 'spacewar-' + b.v.id + '-' + o.name));
+      c.appendChild(SW.figureButtons(function (pal) { return outlineSVG(o, 12, b.v.label + ' ' + label, pal); }, 'spacewar-' + b.v.id + '-' + o.name, (function () { var d = b.sym[o.name] && b.sym[o.name].defs && b.sym[o.name].defs[0]; return d ? SW.refText(b.v.id, d.file, d.line, d.line, b.parts.length) : SW.refText(b.v.id); })()));
       el.appendChild(c);
     });
     var c2 = card('How to read the codes', 'From the outline compiler in the source: 1 continue along the axis; 2 step outward; 3 outward and along; 4 step inward; 5 inward and along; 6 remember this point, and at the next 6 return to it; 7 end, then draw the other side as its mirror. The compiler turns these into display instructions when the game starts: Dan Edwards’s outline compiler, compiling data into code at run time.');
@@ -1068,10 +1069,10 @@
         var sc = card(name, SW.esc(bioSummary(name, rows)));
         var fig = SW.el('div', { class: 'svgbox', style: 'margin:8px 0' }, SW.displaySVG(bioSVG(name, rows)));
         sc.appendChild(fig);
-        sc.appendChild(SW.figureButtons(function () { return bioSVG(name, rows); }, 'spacewar-symbol-history-' + SW.slug(name)));
+        sc.appendChild(SW.figureButtons(function () { return bioSVG(name, rows); }, 'spacewar-symbol-history-' + SW.slug(name), SW.refsOf(rows.map(function (r) { return r.v.id; }))));
         out.appendChild(sc);
-        var t = SW.table(['Version', 'Date', 'Status', 'Kind', 'Definition', 'Comment', 'Value', 'Uses', 'Hand'], tableRows(rows),
-          { cls: ['', 'mono', '', '', 'mono', '', 'mono', 'num', 'mono'], onRow: function (r) {
+        var t = SW.table(['Version', 'Date', 'Status', 'Kind', 'Definition', 'Comment', 'Value', 'Uses', 'Hand', 'Reference'], tableRows(rows),
+          { cls: ['', 'mono', '', '', 'mono', '', 'mono', 'num', 'mono', 'mono'], onRow: function (r) {
             var hit = rows.filter(function (x) { return x.v.label.replace(/^Spacewar! /, '') === r[0]; })[0];
             if (!hit || !hit.e || !hit.e.L) return;
             SW.openAt(hit.v.id, { p: hit.e.L.p, n0: hit.e.L.n });
@@ -1084,7 +1085,7 @@
           var mc = card('The macro body, where it changes', '');
           rows.forEach(function (r) {
             if (r.st !== 'first' && r.st !== 'changed' && r.st !== 'returns') return;
-            mc.insertAdjacentHTML('beforeend', '<h4>' + SW.esc(short(r.v)) + ' · ' + SW.esc(r.st) + '</h4><pre class="mono" style="font-size:12px;overflow:auto">' + SW.esc(r.e.body) + '</pre>');
+            mc.insertAdjacentHTML('beforeend', '<h4>' + SW.esc(short(r.v)) + ' · ' + SW.esc(r.st) + ' ' + (r.e.L ? SW.refTag(r.v.id, r.e.L.p, r.e.L.n, r.e.L.n, SW.nparts(r.v.id)) : SW.refTag(r.v.id)) + '</h4><pre class="mono" style="font-size:12px;overflow:auto">' + SW.esc(r.e.body) + '</pre>');
           });
           out.appendChild(mc);
         }
@@ -1095,7 +1096,8 @@
         var e = r.e;
         return [short(r.v), r.v.date, { html: '<span style="color:' + BIO_COL[r.st] + '">●</span> ' + SW.esc(r.st), text: r.st, sort: r.st },
                 e ? e.kind + (e.supplied ? ' (supplied)' : '') : '', e ? e.def : '', e ? e.cm : '', e ? e.val : '', e ? e.uses : '',
-                e && e.hands && e.hands.length ? e.hands.join(', ') : ''];
+                e && e.hands && e.hands.length ? e.hands.join(', ') : '',
+                e && e.L ? SW.refOf(r.v.id, e.L.p, e.L.n, e.L.n, SW.nparts(r.v.id)) : SW.refOf(r.v.id)];
       });
     }
     go.onclick = follow;
@@ -1103,7 +1105,7 @@
     follow();
     return function () {
       return [{ type: 'p', text: bioSummary(cur.name, cur.rows) },
-              SW.tableBlock(cur.name + ' across the versions', ['Version', 'Date', 'Status', 'Kind', 'Definition', 'Comment', 'Value', 'Uses', 'Hand'], tableRows(cur.rows))];
+              SW.tableBlock(cur.name + ' across the versions', ['Version', 'Date', 'Status', 'Kind', 'Definition', 'Comment', 'Value', 'Uses', 'Hand', 'Reference'], tableRows(cur.rows))];
     };
   }
 
@@ -1232,17 +1234,17 @@
     vs.forEach(function (v, i) {
       if (!i) return;
       var a = fs[i - 1].comments, b = fs[i].comments;
-      Object.keys(b).forEach(function (k) { if (!(k in a)) changes.push([short(vs[i - 1]) + ' → ' + short(v), 'new', b[k].text]); });
-      Object.keys(a).forEach(function (k) { if (!(k in b)) changes.push([short(vs[i - 1]) + ' → ' + short(v), 'dropped', a[k].text]); });
+      Object.keys(b).forEach(function (k) { if (!(k in a)) changes.push([short(vs[i - 1]) + ' → ' + short(v), 'new', b[k].text, b[k].L ? SW.refOf(v.id, b[k].L.p, b[k].L.n, b[k].L.n, SW.nparts(v.id)) : '']); });
+      Object.keys(a).forEach(function (k) { if (!(k in b)) changes.push([short(vs[i - 1]) + ' → ' + short(v), 'dropped', a[k].text, a[k].L ? SW.refOf(vs[i - 1].id, a[k].L.p, a[k].L.n, a[k].L.n, SW.nparts(vs[i - 1].id)) : '']); });
     });
-    el.appendChild(matrixCard('What the comments say that changes', 'Every comment that appears or disappears between consecutive versions.', ['Step', 'Change', 'Comment'], changes, ['mono', '', '']));
+    el.appendChild(matrixCard('What the comments say that changes', 'Every comment that appears or disappears between consecutive versions.', ['Step', 'Change', 'Comment', 'Reference'], changes, ['mono', '', '', 'mono']));
     var c = card('Keyword in context, across versions', 'Search every selected version\'s comments at once.');
     var inp = SW.el('input', { type: 'search', placeholder: 'e.g. torpedo, gravity, score', class: 'btn', style: 'width:100%;margin-bottom:6px' });
     var out = SW.el('div', { class: 'kwic scroll' });
     inp.addEventListener('input', function () {
       var q = inp.value.trim().toLowerCase(), items = [];
       if (q) fs.forEach(function (f, i) {
-        Object.keys(f.comments).forEach(function (k) { items.push({ c: f.comments[k].text, tag: short(vs[i]) }); });
+        Object.keys(f.comments).forEach(function (k) { var L = f.comments[k].L; items.push({ c: f.comments[k].text, tag: short(vs[i]) + (L ? ' ' + SW.refOf(vs[i].id, L.p, L.n, L.n, SW.nparts(vs[i].id)) : '') }); });
       });
       var h = q ? kwicRows(items, q, 70) : [];
       out.innerHTML = h.slice(0, 800).join('') || '<div class="faint">' + (q ? 'No matches.' : 'Type to search.') + '</div>';
@@ -1423,7 +1425,7 @@
     var c = card('How each version fills the 4096 words', 'Words of memory by use.');
     c.insertAdjacentHTML('beforeend', '<div class="legend">' + kinds.map(function (k) { return '<span><i style="background:' + col[k] + '"></i>' + k + '</span>'; }).join('') + '</div>');
     c.appendChild(SW.el('div', { class: 'svgbox', style: 'margin-top:6px' }, SW.displaySVG(svg())));
-    c.appendChild(SW.figureButtons(svg, 'spacewar-memory-across-versions'));
+    c.appendChild(SW.figureButtons(svg, 'spacewar-memory-across-versions', function () { return SW.refsOf((typeof vs !== 'undefined' ? vs : []).map(function (v) { return v.v ? v.v.id : v.id; })); }));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
     var m = matrix(kinds, vs, function (k, v, i) { return fs[i].mem[k] || 0; });
@@ -1546,7 +1548,7 @@
       var blocks = XFNS[L[0]](vs, bs, cards, render);
       if (blocks) head.appendChild(expMenu(SW.exportButtons(function () {
         return { title: 'Spacewar! across the variorum: ' + L[1].toLowerCase(), subtitle: L[2],
-                 meta: [['Versions', vs.map(function (v) { return v.label + ' (' + v.date + ')'; }).join('; ')], ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]],
+                 meta: [['Versions', vs.map(function (v) { return v.label + ' ' + SW.refText(v.id) + ' (' + v.date + ')'; }).join('; ')], ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]],
                  blocks: blocks() };
       }, 'spacewar-variorum-lens-' + L[0])));
     }).catch(function (e) { wait.textContent = e.message; });
@@ -1589,6 +1591,8 @@
       if (t) { lens = +t.dataset.l; SW.store.set('an.lens', lens); SW.writeQuery(); render(); return; }
       var m = e.target.closest('[data-mode]'); if (m) { mode = m.dataset.mode; SW.store.set('an.mode', mode); render(); }
     });
+    // a lens on one version names it with its reference (the across-versions mode names each in its tables)
+    if (mode !== 'across' || lens === 15) head.insertAdjacentHTML('beforeend', ' <span class="an-ref">' + SW.refTag(b.v.id) + '</span>');
     pad.appendChild(head);
     var cards = SW.el('div', { class: 'cards' });
     pad.appendChild(cards);

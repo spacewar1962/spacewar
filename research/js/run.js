@@ -395,6 +395,8 @@
     }
   }
 
+  // a source line as its reference (version, tape, line)
+  function lineRef(L) { return SW.refOf(build.v.id, L.p, L.n, L.n, build.parts.length); }
   function paneTrace(el) {
     var tr = cpu.trace.slice(-600).reverse();
     var tb = SW.el('div', { class: 'toolbar' });
@@ -405,14 +407,14 @@
         { type: 'p', text: 'The last ' + tr.length + ' instructions executed, most recent first, at ' + (cpu.cycles / CPS).toFixed(4) + ' s of machine time.' },
         SW.tableBlock('Trace', ['PC', 'Symbol', 'Instruction', 'AC', 'IO', 'Source'], tr.map(function (t) {
           var L = lineOf(t.pc);
-          return [SW.oct(t.pc, 4), build.symAt(t.pc) || '', C.disasm(t.md, build.symAt), SW.oct(t.ac), SW.oct(t.io), L ? L.n + ': ' + L.raw.trim() : ''];
+          return [SW.oct(t.pc, 4), build.symAt(t.pc) || '', C.disasm(t.md, build.symAt), SW.oct(t.ac), SW.oct(t.io), L ? lineRef(L) + ': ' + L.raw.trim() : ''];
         }))] };
     }, 'spacewar-' + build.v.id + '-trace'));
     el.appendChild(tb);
-    el.appendChild(SW.table(['PC', 'Symbol', 'Instruction', 'AC', 'IO', 'Line', 'Source'], tr.map(function (t) {
+    el.appendChild(SW.table(['PC', 'Symbol', 'Instruction', 'AC', 'IO', 'Reference', 'Source'], tr.map(function (t) {
       var L = lineOf(t.pc);
-      return [SW.oct(t.pc, 4), build.symAt(t.pc) || '', C.disasm(t.md, build.symAt), SW.oct(t.ac), SW.oct(t.io), L ? L.n : '', L ? L.raw.trim() : ''];
-    }), { cls: ['mono', 'mono', 'mono', 'mono', 'mono', 'num', 'mono'], onRow: function (r) { gotoRead(parseInt(r[0], 8)); } }));
+      return [SW.oct(t.pc, 4), build.symAt(t.pc) || '', C.disasm(t.md, build.symAt), SW.oct(t.ac), SW.oct(t.io), L ? lineRef(L) : '', L ? L.raw.trim() : ''];
+    }), { cls: ['mono', 'mono', 'mono', 'mono', 'mono', 'mono', 'mono'], onRow: function (r) { gotoRead(parseInt(r[0], 8)); } }));
   }
 
   function paneProfile(el) {
@@ -449,7 +451,7 @@
       if (cpu.execCount[a] && cpu.writeCount[a]) {
         var L = lineOf(a), w = cpu.lastWriter[a], LW = w >= 0 ? lineOf(w) : null;
         rows.push([SW.oct(a, 4), build.symAt(a) || '', cpu.execCount[a], cpu.writeCount[a],
-                   w >= 0 ? SW.oct(w, 4) + ' ' + (build.symAt(w) || '') : '', L ? L.raw.trim() : '', LW ? LW.raw.trim() : '']);
+                   w >= 0 ? SW.oct(w, 4) + ' ' + (build.symAt(w) || '') : '', L ? lineRef(L) + ': ' + L.raw.trim() : '', LW ? lineRef(LW) + ': ' + LW.raw.trim() : '']);
       }
     }
     var tb = SW.el('div', { class: 'toolbar' });
@@ -470,7 +472,7 @@
     cpu.anomalies.forEach(function (a) { by[a.pc] = by[a.pc] || { n: 0, md: a.md }; by[a.pc].n++; });
     var rows = Object.keys(by).map(function (k) {
       var L = lineOf(+k);
-      return [SW.oct(+k, 4), SW.oct(by[k].md), by[k].n, L ? L.n + ': ' + L.raw.trim() : ''];
+      return [SW.oct(+k, 4), SW.oct(by[k].md), by[k].n, L ? lineRef(L) + ': ' + L.raw.trim() : ''];
     });
     el.innerHTML = '<p class="pad hint" style="padding-bottom:0">Words executed that the PDP-1 has no instruction for (reserved opcodes). ' +
       (cpu.strictOps ? 'The machine is set to halt on them.' : 'The machine is set to carry on past them, as some emulators do.') + '</p>';
@@ -481,7 +483,7 @@
   function paneBreaks(el) {
     var rows = Object.keys(SW.breakpoints).map(function (k) {
       var L = lineOf(+k);
-      return [SW.oct(+k, 4), build.symAt(+k) || '', L ? L.n + ': ' + L.raw.trim() : ''];
+      return [SW.oct(+k, 4), build.symAt(+k) || '', L ? lineRef(L) + ': ' + L.raw.trim() : ''];
     });
     el.innerHTML = '<p class="pad hint" style="padding-bottom:0">Set breakpoints from the Read view (select a line, ● Breakpoint) or by clicking line numbers in the Source tab.</p>';
     if (rows.length) {
@@ -519,7 +521,7 @@
         return tape ? '<mark>' + h + '</mark>' : h;
       }
       var d = SW.el('dialog', { class: 'tray-big sunhelp' });
-      d.innerHTML = '<div class="tray-bighead"><b>' + SW.esc(P.name.toUpperCase()) + ' TAPE: This tape fixes the sun problem</b><span class="refhelp-acts">' +
+      d.innerHTML = '<div class="tray-bighead"><b>' + SW.esc(P.name.toUpperCase()) + ' TAPE: This tape fixes the sun problem</b> ' + SW.refTag(v.id) + '<span class="refhelp-acts">' +
         (rows.length ? '<button class="btn ghost" data-go="read">Open in Read ▸</button>' : '') + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
         '<p><b>Two passes.</b> MACRO turned the source into a binary tape by reading the whole program twice. On pass 1 the operator fed every source tape through the reader (' + lk('part 1', 'pt1') + ', ' + lk('part 2', 'pt2') + ', ' + lk('the star tape', 'stars') + ') and MACRO punched nothing: it only worked out the value of every name, the addresses of labels such as ' + lk('bjl', 'bjl') + ', ' + lk('kcb', 'kcb') + ' and ' + lk('mtb', 'mtb') + ' and assignments such as ' + lk('nx1=mtb nob', 'nx1') + ', and kept them in its symbol table. On pass 2 the same tapes were fed through again from the start, and MACRO translated each line into a machine word, using those values, and punched the binary tape that was loaded to play. Two readings are needed because a line can use a name defined further on: jmp kcb needs ' + lk('kcb', 'kcb') + '’s address before the reader has reached it. The pass log below is MACRO’s typed record of this, one line for each tape as it went through, marked pass 1 or pass 2.</p>' +
         '<p><b>The problem.</b> Most names used before their definition are fine, since pass 1 has found them all before pass 2 begins. An assignment built from a name defined later is not. ' + lk('nx1=mtb nob', 'nx1') + ' is in part 1, but ' + lk('mtb', 'mtb') + ', the object table, is defined only at the end of part 2, so when pass 1 reaches the assignment mtb is not yet known and nx1 and ny1 are left unset. The ' + lk('sun routine', 'sun') + ', which subtracts the centred ship’s place, nx1 and ny1, then gets the wrong values on pass 2. Assembled from the listing alone, the sun is drawn in the wrong place.</p>' +
@@ -527,8 +529,8 @@
         '<p><b>Provenance.</b> It is recorded in the pass log that ends the listing: the lines MACRO typed as each tape was read, in order, pass by pass. The log is part of the same assembly as the listing, not a later addition. It ends with the symbol punch “spacewar ' + (v.id === '4.3' ? '4.3' : '4.4') + ' syms 5/23/63 jcm”, so the assembly was most likely run by Joe Morris (jcm) on or just before 23 May 1963, after ddp’s last change to the program (' + (v.id === '4.3' ? '17 May' : '21 May') + '). The log does not say who wrote the fix. It prints the input’s lines, which it does not do for the program’s tapes, so they may have been typed in at the console rather than punched.' + (v.id === '4.3' ? ' In 4.3 there are two tries: first nx1 alone, then both.' : ' The 4.3 log of the same day has the same fix, titled “f”, with a first try that assigned nx1 alone.') + ' So this is not a later repair: it is how the program was assembled at MIT in May 1963, and the 1963 binary would have placed the sun correctly. Reassemblies made from the listing alone, including Norbert Landsteiner’s of 2015, show the fault; his 4.4f changes the source to avoid it.</p>' +
         '<div class="sunhelp-cols"><figure><figcaption>The pass log, <a href="../sources/' + encodeURIComponent(P.scan) + '#page=' + P.page + '" target="_blank" rel="noopener">scan p. ' + P.page + ' ↗</a>' + (v.id === '4.4m' ? ' (the Morris 4.4 listing)' : '') + '</figcaption><pre class="mono sunhelp-log">' +
         P.log.map(logLine).join('\n') + '</pre></figure>' +
-        '<figure><figcaption>What the tape changes: the words assembled without it and with it</figcaption><table class="ov-sub mono sunhelp-t"><thead><tr><th>Line</th><th>Address</th><th>Source</th><th>Without</th><th>With</th></tr></thead><tbody>' +
-        rows.map(function (r) { return '<tr><td class="num"><a href="#" data-line="' + r.p + ':' + r.n + '">' + r.n + '</a></td><td>' + SW.oct(r.loc, 4) + '</td><td>' + SW.esc(r.src) + '</td><td>' + SW.oct(r.was, 6) + '</td><td>' + SW.oct(r.now, 6) + '</td></tr>'; }).join('') +
+        '<figure><figcaption>What the tape changes: the words assembled without it and with it</figcaption><table class="ov-sub mono sunhelp-t"><thead><tr><th>Reference</th><th>Address</th><th>Source</th><th>Without</th><th>With</th></tr></thead><tbody>' +
+        rows.map(function (r) { return '<tr><td class="num"><a href="#" data-line="' + r.p + ':' + r.n + '">' + SW.esc(SW.refOf(v.id, r.p, r.n, r.n, B.parts.length)) + '</a></td><td>' + SW.oct(r.loc, 4) + '</td><td>' + SW.esc(r.src) + '</td><td>' + SW.oct(r.was, 6) + '</td><td>' + SW.oct(r.now, 6) + '</td></tr>'; }).join('') +
         '</tbody></table><p class="hint">Only these words differ. ' + (v.id === '4.3' ? 'In 4.3 the sun is recentred only in the subjective view (sense switch 2).' : 'Without the tape, the Wedge’s console subtracts locations 31 and 61 (ran, the random number, and tyi), so its sun jumps along one line; the Needle’s subtracts 30 and 60, a fixed offset.') + ' The kcb jump fault on the Needle’s console is separate and stays either way (4.4f fixes it).</p></figure></div>';
       // MACRO, explained on hover, in the prose (not in the log or the table)
       // the first MACRO in the prose links to DEC's manual; every one explains itself on hover

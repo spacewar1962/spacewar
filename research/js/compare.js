@@ -19,7 +19,7 @@
     });
     return out;
   }
-  function svgActions(getSvg, name) { return SW.figureButtons(function () { return getSvg(); }, name); }
+  function svgActions(getSvg, name, ref) { return SW.figureButtons(function () { return getSvg(); }, name, ref || ('Spacewar! Research Bench v' + SW.VERSION)); }
 
 
   // ======================= Compare =======================
@@ -48,14 +48,17 @@
     return [ha, hb];
   }
 
+  // a version's name with its reference; a unit's lines as a reference
+  function vl(X) { return X.v.label + ' ' + SW.refText(X.v.id); }
+  function uref(X, t, u) { var L = t.lines[u.start]; return SW.refOf(X.v.id, L ? L.part : null, u.n0, u.n1, X.parts.length); }
   function textDiff(el, A, B) {
     var la = progLines(A, cst.supplied), lb = progLines(B, cst.supplied);
     var ops = G.editScript(la.map(keyOf), lb.map(keyOf));
     var st = { same: 0, change: 0, add: 0, del: 0 };
     ops.forEach(function (o) { st[o.op]++; });
     var head = SW.el('div', { class: 'pad', style: 'padding-bottom:4px' });
-    head.innerHTML = '<div class="legend"><span><i style="background:var(--del-bg)"></i>only in ' + SW.esc(A.v.label) + ' (' + st.del + ')</span>' +
-      '<span><i style="background:var(--add-bg)"></i>only in ' + SW.esc(B.v.label) + ' (' + st.add + ')</span>' +
+    head.innerHTML = '<div class="legend"><span><i style="background:var(--del-bg)"></i>only in ' + SW.esc(A.v.label) + ' ' + SW.refTag(A.v.id) + ' (' + st.del + ')</span>' +
+      '<span><i style="background:var(--add-bg)"></i>only in ' + SW.esc(B.v.label) + ' ' + SW.refTag(B.v.id) + ' (' + st.add + ')</span>' +
       '<span><i style="background:var(--hl)"></i>changed (' + st.change + ')</span><span>unchanged ' + st.same + '</span>' +
       '<span>' + Math.round(200 * st.same / (la.length + lb.length || 1)) + '% of lines shared</span></div>';
     el.appendChild(head);
@@ -111,11 +114,11 @@
       if (o.b != null) lines.push({ n: r.lb[o.b].n, text: r.lb[o.b].raw, mark: 'add' });
     });
     return { title: 'Spacewar! ' + A.v.label.replace('Spacewar! ', '') + ' against ' + B.v.label.replace('Spacewar! ', ''),
-             subtitle: 'Differences in the program text', meta: [['From', A.v.label + ' (' + A.v.date + ')'], ['To', B.v.label + ' (' + B.v.date + ')'],
+             subtitle: 'Differences in the program text', meta: [['From', vl(A) + ' (' + A.v.date + ')'], ['To', vl(B) + ' (' + B.v.date + ')'],
                ['Comparison', [cst.norm ? 'normalised text' : 'text as held', cst.noComments ? 'comments ignored' : 'comments compared', cst.ws ? 'spacing ignored' : '', cst.caseI ? 'case ignored' : ''].filter(Boolean).join('; ')],
                ['Summary', r.st.same + ' unchanged, ' + r.st.change + ' changed, ' + r.st.del + ' removed, ' + r.st.add + ' added lines']],
              blocks: [{ type: 'p', text: 'Removed lines (from ' + A.v.label + ') are struck through; added lines (in ' + B.v.label + ') are shaded green. Line numbers refer to each version\'s own source file.' },
-                      { type: 'code', caption: 'Changed lines', lines: lines }] };
+                      { type: 'code', caption: 'Changed lines: struck, from ' + SW.refText(A.v.id) + '; shaded, in ' + SW.refText(B.v.id), lines: lines }] };
   }
 
   // The "interesting and often changed constants": labelled, fixed-location
@@ -154,11 +157,11 @@
     void lab;
     var pad = SW.el('div', { class: 'pad' });
     pad.innerHTML = '<h3>The “interesting and often changed constants”</h3><p class="hint">The parameter block at the head of the program: the rules of the game made adjustable, and the place where versions most often differ by a single value.</p>';
-    pad.appendChild(SW.table(['Symbol', 'Loc', A.v.label, B.v.label, 'Change', 'Comment'], crow, { cls: ['mono', 'mono', 'mono', 'mono', '', ''] }));
+    pad.appendChild(SW.table(['Symbol', 'Loc', vl(A), vl(B), 'Change', 'Comment'], crow, { cls: ['mono', 'mono', 'mono', 'mono', '', ''] }));
     pad.insertAdjacentHTML('beforeend', '<h3 style="margin-top:20px">Macros</h3>');
     pad.appendChild(SW.table(['Macro', 'Dummies in A', 'Dummies in B', 'Status'], mrow, { cls: ['mono', 'mono', 'mono', ''] }));
     pad.insertAdjacentHTML('beforeend', '<h3 style="margin-top:20px">Defined symbols that differ</h3><p class="hint">Symbols set with “=”, not labels or variables (whose addresses shift whenever code moves).</p>');
-    pad.appendChild(SW.table(['Symbol', A.v.label, B.v.label, 'Status'], srow, { cls: ['mono', 'mono', 'mono', ''] }));
+    pad.appendChild(SW.table(['Symbol', vl(A), vl(B), 'Status'], srow, { cls: ['mono', 'mono', 'mono', ''] }));
     el.appendChild(pad);
     return { crow: crow, mrow: mrow, srow: srow };
   }
@@ -175,9 +178,9 @@
     pad.appendChild(routineMap(ta, tb, c, A, B));
     var rows = c.pairs.map(function (p) {
       var ua = p.a != null ? c.unitsA[p.a] : null, ub = p.b != null ? c.unitsB[p.b] : null;
-      return [ua ? ua.name : '', ua ? ua.n0 + '–' + ua.n1 : '', p.status, p.similarity != null ? Math.round(p.similarity * 100) : '', ub ? ub.name : '', ub ? ub.n0 + '–' + ub.n1 : ''];
+      return [ua ? ua.name : '', ua ? uref(A, ta, ua) : '', p.status, p.similarity != null ? Math.round(p.similarity * 100) : '', ub ? ub.name : '', ub ? uref(B, tb, ub) : ''];
     });
-    pad.appendChild(SW.table([A.v.label, 'Lines', 'Status', 'Sim %', B.v.label, 'Lines'], rows, { cls: ['mono', 'mono', '', 'num', 'mono', 'mono'] }));
+    pad.appendChild(SW.table([A.v.label, 'Reference', 'Status', 'Sim %', B.v.label, 'Reference'], rows, { cls: ['mono', 'mono', '', 'num', 'mono', 'mono'] }));
     el.appendChild(pad);
     return { c: c, rows: rows };
   }
@@ -253,11 +256,11 @@
     bar.appendChild(SW.el('span', { class: 'sep' }));
     bar.appendChild(SW.paletteSelect(function () { draw(); }));
     bar.appendChild(SW.el('span', { class: 'sep' }));
-    bar.appendChild(SW.figureButtons(function () { return svgOf(rmZoom); }, 'spacewar-' + A.v.id + '-' + B.v.id + '-routines'));
+    bar.appendChild(SW.figureButtons(function () { return svgOf(rmZoom); }, 'spacewar-' + A.v.id + '-' + B.v.id + '-routines', function () { return SW.refsOf([A.v.id, B.v.id]); }));
     wrap.appendChild(bar);
     wrap.appendChild(ov.el);
     function linesOf(us, t) { var n = 0; us.forEach(function (u) { n += u.end - u.start + 1; }); return n; }
-    function svgOf(z) { return routineMapSVG(ta, tb, c, z, A.v.label, B.v.label); }
+    function svgOf(z) { return routineMapSVG(ta, tb, c, z, A.v.label + ' [' + SW.refOf(A.v.id) + ']', B.v.label + ' [' + SW.refOf(B.v.id) + ']'); }
     function draw() {
       box.innerHTML = SW.displaySVG(svgOf(rmZoom));
       ov.refresh();
@@ -398,16 +401,16 @@
         r = symbolsDiff(body, A, B);
         exp.appendChild(SW.exportButtons(function () {
           return { title: A.v.label + ' and ' + B.v.label + ': constants, macros, symbols', blocks: [
-            SW.tableBlock('The interesting and often changed constants', ['Symbol', 'Loc', A.v.label, B.v.label, 'Change', 'Comment'], r.crow),
+            SW.tableBlock('The interesting and often changed constants', ['Symbol', 'Loc', vl(A), vl(B), 'Change', 'Comment'], r.crow),
             SW.tableBlock('Macros', ['Macro', 'Dummies in A', 'Dummies in B', 'Status'], r.mrow),
-            SW.tableBlock('Defined symbols that differ', ['Symbol', A.v.label, B.v.label, 'Status'], r.srow)] };
+            SW.tableBlock('Defined symbols that differ', ['Symbol', vl(A), vl(B), 'Status'], r.srow)] };
         }, 'spacewar-' + A.v.id + '-vs-' + B.v.id + '-constants'));
       } else {
         r = routineDiff(body, A, B);
         exp.appendChild(SW.exportButtons(function () {
           return { title: A.v.label + ' and ' + B.v.label + ': routines', blocks: [
             { type: 'p', text: 'Routine-level genealogy: retained ' + r.c.summary.retained + ', moved ' + r.c.summary.moved + ', edited ' + r.c.summary.edited + ', rewritten ' + r.c.summary.rewritten + ', added ' + r.c.summary.added + ', removed ' + r.c.summary.removed + '; overall similarity ' + Math.round(r.c.summary.similarity * 100) + '%.' },
-            SW.tableBlock('Routines matched', [A.v.label, 'Lines', 'Status', 'Similarity %', B.v.label, 'Lines'], r.rows)] };
+            SW.tableBlock('Routines matched', [A.v.label, 'Reference', 'Status', 'Similarity %', B.v.label, 'Reference'], r.rows)] };
         }, 'spacewar-' + A.v.id + '-vs-' + B.v.id + '-routines'));
       }
     }).catch(function (e) { body.innerHTML = '<p class="pad">' + SW.esc(e.message) + '</p>'; });
@@ -708,6 +711,7 @@
     var baseOpts = flowOpts;
     flowOpts = function () {
       var o = baseOpts();
+      o.labels = ts.map(function (t) { return t.label + ' [' + SW.refOf(t.id) + ']'; });   // each column with its reference
       if (gst.boxes === 'hand') { o.boxFill = handFill; o.boxTip = handTip; o.extraLegend = handLegend(); }
       return o;
     };
@@ -917,8 +921,11 @@
   }
   function openButton(t, u) {
     var L = t.lines[u.start];
-    return '<button class="btn" data-open="' + SW.esc(t.id) + '" data-p="' + L.part + '" data-n0="' + L.n + '" data-n1="' + t.lines[u.end].n + '">Open in Read ↗</button>';
+    return '<button class="btn" data-open="' + SW.esc(t.id) + '" data-p="' + L.part + '" data-n0="' + L.n + '" data-n1="' + t.lines[u.end].n + '">Open in Read ↗</button> ' + tref(t, u);
   }
+  // a unit's lines as a reference tag, from a prepared text (genealogy)
+  function tref(t, u) { var L = t.lines[u.start], L1 = t.lines[u.end]; return L ? SW.refTag(t.id, L.part, L.n, L1 ? L1.n : L.n, SW.nparts(t.id)) : SW.refTag(t.id); }
+  function trefText(t, u) { var L = t.lines[u.start], L1 = t.lines[u.end]; return L ? SW.refText(t.id, L.part, L.n, L1 ? L1.n : L.n, SW.nparts(t.id)) : SW.refText(t.id); }
   function wireOpen(el) {
     el.addEventListener('click', function (e) {
       var b = e.target.closest('[data-open]');
@@ -954,12 +961,12 @@
     var t = ts[col], u = fl.units[col][k];
     var prev = col > 0 ? fl.steps[col - 1].pairs.filter(function (p) { return p.b === k; })[0] : null;
     var next = col < fl.steps.length ? fl.steps[col].pairs.filter(function (p) { return p.a === k; })[0] : null;
-    var h = '<p class="mono" style="margin-top:0">' + SW.esc(u.file) + ', ll. ' + u.n0 + '–' + u.n1 + ' · ' + u.lines + ' lines</p>' +
+    var h = '<p class="mono" style="margin-top:0">' + SW.esc(u.file) + ' · ' + tref(t, u) + ' · ' + u.lines + ' lines</p>' +
       (hands ? '<p class="hint">' + SW.esc(handText(ts, fl, hands, col, k)) + '</p>' : '');
     if (prev) {
       var ua = prev.a != null ? fl.units[col - 1][prev.a] : null;
       h += '<h3>From ' + SW.esc(ts[col - 1].label) + ' ' + statusChip(prev.status, prev.similarity) + '</h3>' +
-        (ua ? '<p class="hint">Ancestor: <span class="mono">' + SW.esc(ua.name) + '</span> (ll. ' + ua.n0 + '–' + ua.n1 + '). Left: ' + SW.esc(ts[col - 1].label) + '; right: ' + SW.esc(t.label) + '.</p>' : '<p class="hint">New in this version: no ancestor in ' + SW.esc(ts[col - 1].label) + '.</p>') +
+        (ua ? '<p class="hint">Ancestor: <span class="mono">' + SW.esc(ua.name) + '</span> ' + tref(ts[col - 1], ua) + '. Left: ' + SW.esc(ts[col - 1].label) + '; right: ' + SW.esc(t.label) + '.</p>' : '<p class="hint">New in this version: no ancestor in ' + SW.esc(ts[col - 1].label) + '.</p>') +
         '<div class="diff">' + pairRows(ts[col - 1], ua, t, u) + '</div>';
     } else {
       h += '<div class="diff">' + pairRows(t, null, t, u).replace(/class="add"/g, 'class=""') + '</div>';
@@ -1023,10 +1030,10 @@
     }).join('');
     body.appendChild(bars);
     var rows = lin.rows.map(function (r) {
-      return [r.unit.name, { html: r.unit.n0 + '–' + r.unit.n1, sort: r.unit.n0 }, r.unit.codeLines, r.firstSeen || '(new)', r.status,
+      return [r.unit.name, { html: tref(ts[ti], r.unit), sort: r.unit.n0 }, r.unit.codeLines, r.firstSeen || '(new)', r.status,
               r.chain.map(function (c) { return c.versionId + (c.status && c.status !== 'retained' ? ' (' + c.status + (c.similarity != null && (c.status === 'edited' || c.status === 'rewritten') ? ' ' + Math.round(c.similarity * 100) + '%' : '') + ')' : '') + (c.gap ? '*' : ''); }).join(' ← ')];
     });
-    body.appendChild(SW.table(['Unit', 'Lines', 'Code lines', 'First seen', 'Status', 'Chain (newest first; * bridged)'], rows,
+    body.appendChild(SW.table(['Unit', 'Reference', 'Code lines', 'First seen', 'Status', 'Chain (newest first; * bridged)'], rows,
       { cls: ['mono', 'mono', 'num', 'mono', '', 'mono'], onRow: function (r) {
         var t = ts[ti], row = lin.rows.filter(function (x) { return x.unit.name === r[0] && x.unit.n0 === r[1].sort; })[0];
         var L = row && t.lines[row.unit.start];
@@ -1042,11 +1049,11 @@
     var blocks = [{ type: 'p', text: 'The complete program of ' + b.v.label + ', divided into ' + gst.gran + 's, each headed by the version in which it first appears among: ' + ts.map(function (t) { return t.label; }).join(', ') + '. Chains read newest first; an asterisk marks a bridged link (absent from the version immediately before).' }];
     lin.rows.forEach(function (r) {
       var t = ts[ti], u = r.unit;
-      blocks.push({ type: 'h3', text: u.name + ' (ll. ' + u.n0 + '–' + u.n1 + '): first seen in ' + (r.firstSeen || b.v.id + ' (new)') });
-      blocks.push({ type: 'p', runs: [{ text: 'Lineage: ', italic: true }, { text: r.chain.map(function (c) { return c.versionId + ' ' + (c.status || '') + (c.gap ? '*' : ''); }).join(' ← ') || 'none', code: true }] });
+      blocks.push({ type: 'h3', text: u.name + ' ' + trefText(t, u) + ': first seen in ' + (r.firstSeen || b.v.id + ' (new)') });
+      blocks.push({ type: 'p', runs: [{ text: 'Lineage: ', italic: true }, { text: r.chain.map(function (c) { return SW.refOf(c.versionId) + ' ' + (c.status || '') + (c.gap ? '*' : ''); }).join(' ← ') || 'none', code: true }] });
       var lines = [];
       for (var i = u.start; i <= u.end; i++) { var L = t.lines[i]; if (L) lines.push({ n: L.n, text: L.raw }); }
-      blocks.push({ type: 'code', lines: lines });
+      blocks.push({ type: 'code', caption: trefText(t, u), lines: lines });
     });
     return { title: b.v.label + ': lineage by ' + gst.gran, subtitle: 'A complete version annotated with its genealogy', meta: SW.docMeta(b), blocks: blocks };
   }

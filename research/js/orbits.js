@@ -295,7 +295,7 @@
         var W = 2 * N + 16, o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + (N + 24) + '" width="' + W + '" height="' + (N + 24) + '" font-family="IBM Plex Mono, monospace" font-size="12">';
         cvs.forEach(function (cv, i) { o += '<image href="' + cv.toDataURL('image/png') + '" x="' + (i * (N + 16)) + '" y="0" width="' + N + '" height="' + N + '"/>'; });
         return o + '<text x="0" y="' + (N + 18) + '" fill="#888">' + SW.esc(m.title) + '. Timing between plots, 1 second. Spacewar! research bench.</text></svg>';
-      }, 'spacewar-' + m.id));
+      }, 'spacewar-' + m.id, function () { return SW.refsOf([st.a, st.b]); }));
       d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
       d.addEventListener('close', function () { d.remove(); });
       d.showModal();
@@ -318,7 +318,7 @@
           var W = 2 * N + 12, o = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + ' ' + (N + 22) + '" width="' + W + '" height="' + (N + 22) + '" font-family="IBM Plex Mono, monospace" font-size="11">';
           cvs.forEach(function (cv, i) { o += '<image href="' + cv.toDataURL('image/png') + '" x="' + (i * (N + 12)) + '" y="0" width="' + N + '" height="' + N + '"/>'; });
           return o + '<text x="0" y="' + (N + 16) + '" fill="#888">' + SW.esc(m.title) + '. Timing between plots, 1 second. Spacewar! research bench.</text></svg>';
-        }, 'spacewar-' + m.id));
+        }, 'spacewar-' + m.id, function () { return SW.refsOf([st.a, st.b]); }));
       });
       // run each movement for both versions in turn
       var jobs = [];
@@ -550,7 +550,7 @@
       st.vs.slice().reverse().forEach(function (vid, n) { var y = N - 8 - n * 12; o += '<text x="' + (N - 6) + '" y="' + y + '" fill="#cfe6ff" text-anchor="end">' + SW.esc(vname(V.byId(vid))) + '</text><rect x="' + (N - 12 - vname(V.byId(vid)).length * 6.3 - 14) + '" y="' + (y - 5) + '" width="12" height="2.5" fill="' + inkOf(vid, st.vs) + '"/>'; });
       return o + '</svg>';
     }
-    SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return figSVG(p); }, 'spacewar-orbits'));
+    SW.$('.grav-exp', card).appendChild(SW.figureButtons(function (p) { return figSVG(p); }, 'spacewar-orbits', function () { return SW.refsOf(st.vs); }));
     card.addEventListener('click', function (e) { var t = e.target.closest('[data-o=play], [data-o=again]'); if (t) play(t.dataset.o === 'again'); });
     card.addEventListener('change', function (e) {
       var t = e.target;

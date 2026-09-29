@@ -265,7 +265,7 @@
   }
   D.ships = function (b, host) {
     var c = SW.el('div', { class: 'card', style: 'grid-column:1/-1' });
-    c.innerHTML = '<h3>How the PDP-1 draws them</h3>';
+    c.innerHTML = '<h3>How the PDP-1 draws them ' + SW.refTag(b.v.id) + '</h3>';
     host.appendChild(c);
     var S;
     try { S = memo('ships', b, shipsOf); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
@@ -315,7 +315,7 @@
   }
   D.sun = function (b, host) {
     var c = SW.el('div', { class: 'card', style: 'grid-column:1/-1' });
-    c.innerHTML = '<h3>The sun</h3>';
+    c.innerHTML = '<h3>The sun ' + SW.refTag(b.v.id) + '</h3>';
     host.appendChild(c);
     var U;
     try { U = memo('sun', b, sunOf); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
@@ -376,7 +376,7 @@
     var nl = r.h.some(function (p) { var sq = b.srcOf(p.pc); var L = sq && b.lines[sq.p][sq.n - 1]; return L && /n\.?\s?l\.?\s*2015|minskytron/i.test(L.raw); }) ||
              src.some(function (L) { return /minskytron hyperspace/i.test(L.raw) && /2015|n\.l/i.test(L.raw); });
     var np = Object.keys(pos).length, nf = frames.length, kind, say;
-    if (!r.h.length && noneLine) { kind = 'none'; say = 'No hyperspace: the source says so where it would go (line ' + noneLine.n + '): “' + noneLine.raw.trim().replace(/^\/\s*/, '') + '”.'; }
+    if (!r.h.length && noneLine) { kind = 'none'; say = 'No hyperspace: the source says so where it would go (' + SW.refText(b.v.id, noneLine.p, noneLine.n, noneLine.n, b.parts.length) + '): “' + noneLine.raw.trim().replace(/^\/\s*/, '') + '”.'; }
     else if (!r.h.length && !r.vanished) { kind = 'untriggered'; say = 'The bench could not send a ship into hyperspace here: the ship stayed on screen, so the version did not take the emulator’s control input (4.2, for one, decodes its control boxes through its own routine, 8a).'; }
     else if (!r.h.length) { kind = 'nothing'; say = 'The ship vanished, but nothing was plotted from code of hyperspace’s own: it is invisible until it breaks out.'; }
     else if (nl) { kind = 'minskytron'; say = 'The Minskytron signature, added by Norbert Landsteiner in 2015 (n.l. 2015) after the 1962 hyperspace patch: ' + r.h.length + ' points at ' + np + ' positions over ' + nf + ' frames.'; }
@@ -394,7 +394,7 @@
 
   D.hyperspace = function (b, host) {
     var c = SW.el('div', { class: 'card', style: 'grid-column:1/-1' });
-    c.innerHTML = '<h3>Hyperspace</h3>';
+    c.innerHTML = '<h3>Hyperspace ' + SW.refTag(b.v.id) + '</h3>';
     host.appendChild(c);
     var H;
     try { H = memo('hyper', b, hyperOf); } catch (e) { c.appendChild(note('The emulator stopped: ' + e.message)); return; }
@@ -403,7 +403,7 @@
       c.insertAdjacentHTML('beforeend', '<p class="lede">Recorded from this version running: a ship sent into hyperspace through its control bits (both rotate bits), and the points plotted then by the hyperspace routines (hp1 to hp7; h1 to h3 in the 2015 Minskytron), frame by frame, magnified: ' +
         Object.keys(H.byR).map(function (k) { return SW.esc(k) + ' ' + H.byR[k] + ' point' + (H.byR[k] === 1 ? '' : 's'); }).join(', ') + '.</p>');
       var seq = [];
-      function cap(p) { var sq = b.srcOf(p.pc), L = sq && b.lines[sq.p][sq.n - 1]; return 'PC ' + SW.oct(p.pc, 4) + ' ' + (b.asm.memory[p.pc] ? routineOf(b, H.labs, p.pc) : '(compiled outline)') + ' · ' + C.disasm(p.md, b.symAt) + (L ? ' · line ' + sq.n + ': ' + L.raw.trim().slice(0, 36) : '') + ' · (' + p.x + ', ' + p.y + ')'; }
+      function cap(p) { var sq = b.srcOf(p.pc), L = sq && b.lines[sq.p][sq.n - 1]; return 'PC ' + SW.oct(p.pc, 4) + ' ' + (b.asm.memory[p.pc] ? routineOf(b, H.labs, p.pc) : '(compiled outline)') + ' · ' + C.disasm(p.md, b.symAt) + (L ? ' · ' + SW.refOf(b.v.id, sq.p, sq.n, sq.n, b.parts.length) + ': ' + L.raw.trim().slice(0, 36) : '') + ' · (' + p.x + ', ' + p.y + ')'; }
       // a point plotted again in the next frame or the one after (a still dot, or
       // two alternating) is shown once, with the number of frames it was held
       var fn = -1, lastF = null, raw = [];   // raw: the last two points recorded, each with the item that shows it

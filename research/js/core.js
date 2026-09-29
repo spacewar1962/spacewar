@@ -535,6 +535,8 @@
         ] };
     }
   };
+  // the number of tapes (parts) a version's text is built from, without building it
+  SW.nparts = function (vid) { var v = root.SWVersions.byId(vid); return v && v.build ? v.build.length : 1; };
   SW.refText = function (vid, p, n0, n1, nparts) { return '[REF: ' + SW.refOf(vid, p, n0, n1, nparts) + ']'; };
   SW.refTag = function (vid, p, n0, n1, nparts) { var t = SW.refText(vid, p, n0, n1, nparts); return '<span class="swref" data-copy="' + SW.esc(t) + '" title="Click to copy. The bench’s reference to this source (Help ▸ Referencing and versions)">' + SW.esc(t) + '</span>'; };
   SW.cite = function (b, p, n0, n1) {
@@ -906,7 +908,21 @@
     return svg;
   };
   // SVG and PNG buttons for a figure. getSvg(palette) returns the markup.
-  SW.figureButtons = function (getSvg, name) {
+  // A figure's reference, in small type in its bottom right corner, so an exported
+  // figure carries the source it was drawn from (ref: a string, or a function giving one)
+  SW.refsOf = function (vids) { var seen = {}; return (vids || []).filter(function (v) { if (!v || seen[v]) return false; seen[v] = 1; return true; }).map(function (v) { return SW.refText(v); }).join(' '); };
+  SW.stampRef = function (svg, ref) {
+    if (typeof ref === 'function') ref = ref();
+    if (!ref) return svg;
+    var m = /<svg\b[^>]*>/.exec(svg); if (!m) return svg;
+    var vb = /viewBox="\s*([-\d.]+)[\s,]+([-\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)"/.exec(m[0]), wd = /\bwidth="([\d.]+)/.exec(m[0]), ht = /\bheight="([\d.]+)/.exec(m[0]);
+    var x0 = vb ? +vb[1] : 0, y0 = vb ? +vb[2] : 0, W = vb ? +vb[3] : wd ? +wd[1] : 0, H = vb ? +vb[4] : ht ? +ht[1] : 0;
+    if (!W || !H) return svg;
+    var t = '<text x="' + (x0 + W - 6) + '" y="' + (y0 + H - 5) + '" text-anchor="end" font-family="IBM Plex Mono, monospace" font-size="' + Math.max(8, Math.round(W / 110)) + '" fill="#8a96a3" opacity="0.9">' + SW.esc(ref) + '</text>';
+    return svg.replace(/<\/svg>\s*$/, t + '</svg>');
+  };
+  SW.figureButtons = function (getSvg0, name, ref) {
+    var getSvg = ref ? function (pal) { return SW.stampRef(getSvg0(pal), ref); } : getSvg0;
     var w = SW.el('span');
     w.appendChild(SW.el('button', { class: 'btn', title: 'Save as SVG (background: ' + SW.figBg() + '; change under ⚙)', onclick: function () {
       root.SWExport.download(name + '.svg', SW.exportSVG(getSvg(SW.exportPalette())), 'image/svg+xml');
@@ -959,7 +975,7 @@
 
   SW.docMeta = function (b) {
     return [
-      ['Version', b.v.label], ['Date', b.v.date], ['Authors', b.v.authors],
+      ['Version', b.v.label], ['Reference', SW.refText(b.v.id)], ['Date', b.v.date], ['Authors', b.v.authors],
       ['Sources', b.parts.map(function (p) { return p.src + (p.role !== 'program' ? ' (' + p.role + ')' : ''); }).join('; ')],
       ['Assembler', V.DIALECTS[b.dialect].label],
       ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]

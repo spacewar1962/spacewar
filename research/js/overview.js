@@ -300,7 +300,7 @@
       return gs.map(function (g) {
         var nmx, extra = '';
         if (kind === 'field') { nmx = link(g.key === 'ml1' ? 'mtb' : 'n' + g.key.slice(1), g.key) ; extra = SW.esc(g.c.f.what || ''); }
-        else if (kind === 'code') { var at = lineAt(b, +g.key); nmx = '<span class="mono">' + SW.esc(name(b, +g.key)) + '</span>'; extra = at && at.L ? '<span class="mono">' + SW.esc(at.L.raw.replace(/\t/g, ' ').trim()) + '</span>' : ''; }
+        else if (kind === 'code') { var at = lineAt(b, +g.key); nmx = '<span class="mono">' + SW.esc(name(b, +g.key)) + '</span>'; extra = at && at.L ? '<span class="mono">' + SW.esc(at.L.raw.replace(/\t/g, ' ').trim()) + '</span> ' + SW.refTag(b.v.id, at.L.p, at.L.n, at.L.n, b.parts.length) : ''; }
         else { nmx = '<span class="mono">' + SW.esc(g.key) + '</span>'; extra = glossVar(g.key); }
         return '<tr><td>' + nmx + '</td><td class="ov-g">' + extra + '</td><td>' + (whoList(g.w) || '<span class="faint">none</span>') + '</td>' + (kind === 'code' ? '' : '<td>' + (whoList(g.r) || '<span class="faint">none</span>') + '</td>') + '</tr>';
       }).join('');
@@ -521,7 +521,7 @@
       var navh = '<div class="ov-hist"><button class="btn ghost" data-hnav="-1" title="' + (hpos > 0 ? 'Back to ' + SW.esc(nm(hist[hpos - 1])) : 'Back') + '"' + (hpos > 0 ? '' : ' disabled') + '>←</button><button class="btn ghost" data-hnav="1" title="' + (hpos < hist.length - 1 ? 'Forward to ' + SW.esc(nm(hist[hpos + 1])) : 'Forward') + '"' + (hpos < hist.length - 1 ? '' : ' disabled') + '>→</button>' +
         '</div>';
       var hh = ['<div class="ov-phead"><div><div class="ov-ptitle">' + navh + '<h4 class="mono">' + SW.esc(nm(e)) + (/^\d+$/.test(e) ? ' <span class="faint">' + SW.oct(+e, 4) + '</span>' : '') + (g ? ' <span class="ov-g">' + SW.esc(g) + '</span>' : '') + '</h4></div>' +
-        '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + '<div class="ov-phact">' + icons('panel', true) + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button>' : '') + '</div></div>'];
+        '<p class="ov-pstat">' + st.map(SW.esc).join(' · ') + '</p></div>' + '<div class="ov-phact">' + icons('panel', true) + (cd ? '<button class="btn ghost" data-read="' + cd.p + ':' + cd.n0 + '">Open in Read ▸</button> ' + SW.refTag(b.v.id, cd.p, cd.n0, cd.n1, b.parts.length) : '') + '</div></div>'];
       // values | code | relations
       hh.push('<div class="ov-pvals"><div class="ov-vals"></div></div>');
       hh.push('<div class="ov-pcode">');
@@ -637,8 +637,16 @@
                 screen: { svg: screenSVG, name: function () { return fileBase + '-screen-frame-' + (shownFrame + 1); } },
                 player: { svg: playerSVG, name: function () { return fileBase + '-frame-' + (shownFrame + 1) + '-calls'; } },
                 budget: { svg: budgetSVG, name: function () { return fileBase + '-frame-time'; } } };
+    // every figure carries its source: the version, and the routine’s lines for the panel
+    Object.keys(FIG).forEach(function (k) {
+      var draw = FIG[k].svg;
+      FIG[k].svg = function (p) {
+        var e = String(picked), cd = k === 'panel' && e !== 'rt' ? codeOf(e) : null;
+        return SW.stampRef(draw(p), (cd ? SW.refText(b.v.id, cd.p, cd.n0, cd.n1, b.parts.length) : SW.refText(b.v.id)) + (k !== 'budget' ? ' · frame ' + (shownFrame + 1) : ''));
+      };
+    });
     function docOf(k) {
-      var base = { title: '', subtitle: vshort + ', functional overview; ' + A.phases.map(function (P) { return P.what; }).join(', then '), blocks: [] };
+      var base = { title: '', subtitle: vshort + ' ' + SW.refText(b.v.id) + ', functional overview; ' + A.phases.map(function (P) { return P.what; }).join(', then '), meta: SW.docMeta(b), blocks: [] };
       if (k === 'panel') {
         var e = String(picked), cd = e === 'rt' ? null : codeOf(e);
         base.title = nm(e) + ', frame ' + (shownFrame + 1) + ' (' + vshort + ')';

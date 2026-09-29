@@ -178,12 +178,21 @@
       var p = SW.$('#sf-prev'); p.innerHTML = ''; p.appendChild(c);
     }
     var name = 'spacewar-' + b.v.id + '-scope-' + (now / 200000).toFixed(2).replace('.', '_') + 's';
+    // the source and the moment, in small type in the corner of the picture
+    var refLine = SW.refText(b.v.id) + ' · ' + (now / 200000).toFixed(2) + ' s';
+    function stampCanvas(c) {
+      var g = c.getContext('2d'), fs = Math.max(10, Math.round(c.width / 90));
+      g.font = fs + 'px IBM Plex Mono, monospace'; g.textAlign = 'right'; g.textBaseline = 'bottom';
+      g.fillStyle = opts().ink === 'light' ? 'rgba(60,70,80,0.85)' : 'rgba(150,165,180,0.85)';
+      g.fillText(refLine, c.width - fs * 0.6, c.height - fs * 0.5);
+      return c;
+    }
     dialog('Scope screenshot', body, [
       ['▣ PNG', function () {
-        var c = F.scopeCanvas(pts, now, +SW.$('#sf-size').value, opts());
+        var c = stampCanvas(F.scopeCanvas(pts, now, +SW.$('#sf-size').value, opts()));
         c.toBlob(function (bl) { bl.arrayBuffer().then(function (a) { root.SWExport.download(name + '.png', new Uint8Array(a), 'image/png'); }); }, 'image/png');
       }],
-      ['▣ SVG', function () { root.SWExport.download(name + '.svg', F.scopeSVG(pts, now, opts()), 'image/svg+xml'); }]
+      ['▣ SVG', function () { root.SWExport.download(name + '.svg', SW.stampRef(F.scopeSVG(pts, now, opts()), refLine), 'image/svg+xml'); }]
     ]);
     body.addEventListener('change', prev);
     prev();

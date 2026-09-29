@@ -54,7 +54,9 @@
           if (/^(random|ranct)\b/i.test(body) && !seen[L.n]) { seen[L.n] = 1; calls.push({ p: p, n: L.n, routine: routine, raw: L.raw.trim() }); }
         });
       });
-      return { f: f, seed: seed, onTape: onTape, k: k, k2: k2, site: site, calls: calls, v: b.v };
+      var mdef = b.macros && b.macros.random, nparts = b.parts.length;
+      return { f: f, seed: seed, onTape: onTape, k: k, k2: k2, site: site, calls: calls, v: b.v, nparts: nparts,
+               defRef: mdef ? SW.refText(b.v.id, mdef.file, mdef.line, mdef.line, nparts) : SW.refText(b.v.id) };
     }));
   };
 
@@ -106,7 +108,7 @@
           var routines = {}; d.calls.forEach(function (c) { var w = WHAT[c.routine] || 'elsewhere'; (routines[w] = routines[w] || []).push(c.routine); });
           el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5>' +
             '<table class="ov-sub rnd-t"><tbody>' +
-            '<tr><td>The instructions</td><td class="mono">lac ran · rar 1s · xor (' + oct(d.k) + ' · add (' + oct(d.k2) + ' · dac ran</td></tr>' +
+            '<tr><td>The instructions</td><td class="mono">lac ran · rar 1s · xor (' + oct(d.k) + ' · add (' + oct(d.k2) + ' · dac ran <span class="swref">' + SW.esc(d.defRef) + '</span></td></tr>' +
             '<tr><td>Starting word</td><td class="mono">' + oct(d.seed) + (d.onTape ? ' (punched on the tape with the program)' : ' (not punched on the tape, which the bench rebuilds exactly: the program started from whatever the core held; the emulator’s core holds 0)') + '</td></tr>' +
             '<tr><td>From it</td><td>' + o.tail.toLocaleString('en-GB') + ' numbers before the sequence joins a cycle of ' + o.cycle.toLocaleString('en-GB') + ', which then repeats for ever</td></tr>' +
             '<tr><td>All 262,144 words</td><td>fall into ' + cy.count.toLocaleString('en-GB') + ' cycle' + (cy.count === 1 ? '' : 's') + ' (the longest ' + cy.lengths[0].toLocaleString('en-GB') + (cy.count > 1 ? '; then ' + cy.lengths.slice(1, 5).map(function (n) { return n.toLocaleString('en-GB'); }).join(', ') + (cy.count > 5 ? ' …' : '') : '') + '); ' + cy.onCycle.toLocaleString('en-GB') + ' words lie on a cycle, the rest lead into one</td></tr>' +
@@ -127,7 +129,7 @@
               '<image href="' + cp.toDataURL('image/png') + '" x="0" y="24" width="' + wp + '" height="' + wp + '"/>' +
               '<image href="' + cb.toDataURL('image/png') + '" x="' + (wp + 24) + '" y="24" width="' + wb + '" height="' + hb + '"/>' +
               '<text x="0" y="' + (wp + 42) + '" fill="' + pal.dim + '">Left: each number against the next over its cycle of ' + o.cycle.toLocaleString('en-GB') + '. Right: the first ' + 192 + ' numbers from ' + oct(d.seed) + ', bits across.</text></svg>';
-          }, 'spacewar-' + d.v.id + '-random'));
+          }, 'spacewar-' + d.v.id + '-random', SW.refText(d.v.id)));
           el.appendChild(ex);
         });
       }, 30);
