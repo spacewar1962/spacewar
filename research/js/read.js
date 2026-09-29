@@ -335,6 +335,8 @@
     });
     order.forEach(function (id) {
       var g = at[id], el = SW.el('div', { class: 'inote' }), after = g.row;
+      // cards ending on the same line: the narrower first, so a block's card comes last and closes it
+      g.ts.sort(function (x, y) { return (y.note.anchor.n0 - x.note.anchor.n0) || String(x.note.date).localeCompare(String(y.note.date)); });
       el.innerHTML = g.ts.map(function (t) { return threadBlock(t, 'ithread'); }).join('');
       while (after.nextElementSibling && after.nextElementSibling.classList.contains('expansion')) after = after.nextElementSibling;
       after.insertAdjacentElement('afterend', el);
