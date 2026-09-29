@@ -262,9 +262,10 @@
     var a = t.note.anchor, nrep = 0, open = !!openCards[t.note.id], h = '';
     (function walk(rs) { rs.forEach(function (r) { nrep++; walk(r.replies); }); })(t.replies);
     if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
-    var isBlock = a.n1 > a.n0 || a.c0 != null;
-    return '<div class="' + cls + (open ? ' open' : '') + (isBlock ? ' blockn' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
-      '<div class="mc-where">' + (N.hasCode(t.note) ? '<span class="cf-tog" title="Show or hide the code">' + (N.codeFolded(t.note.id) ? '▸' : '▾') + ' Code</span>' : 'Code') +
+    var isBlock = a.n1 > a.n0 || a.c0 != null, shut = !!cardFold()[t.note.id];
+    return '<div class="' + cls + (open ? ' open' : '') + (isBlock ? ' blockn' : '') + (shut ? ' nfold' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
+      '<button class="card-fold" title="' + (shut ? 'Unfold this annotation' : 'Fold this annotation away (for you; kept in this browser)') + '">' + (shut ? '▸' : '▾') + '</button>' +
+      '<div class="mc-where">' + (N.mine(t.note) ? '<span class="mc-grip" draggable="true" title="Drag onto another line to move this annotation there">⠿</span> ' : '') + (N.hasCode(t.note) ? '<span class="cf-tog" title="Show or hide the code">' + (N.codeFolded(t.note.id) ? '▸' : '▾') + ' Code</span>' : 'Code') +
         ' · <span class="cf-lines" title="Select the lines">' + (a.n1 !== a.n0 ? 'lines ' + a.n0 + '–' + a.n1 : 'line ' + a.n0) + '</span></div>' +
       N.renderNote(t.note, false, t.reactions) +
       (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
@@ -390,7 +391,20 @@
     SW.$$('mark.frag[data-tid="' + c.dataset.tid + '"]', view).forEach(function (m) { m.classList.toggle('lit', on); });
   }
   // A click on a thread's + or its line reference (inline or card); true if handled.
+  // cards folded away, by note, kept in this browser
+  function cardFold() { return SW.store.get('read.cardFold', {}); }
   function threadClick(e) {
+    var cfb = e.target.closest('.card-fold');
+    if (cfb) {
+      var card = cfb.closest('.mcard, .ithread'), f = cardFold(), id = card.dataset.tid;
+      if (f[id]) delete f[id]; else f[id] = true;
+      SW.store.set('read.cardFold', f);
+      card.classList.toggle('nfold', !!f[id]);
+      cfb.textContent = f[id] ? '▸' : '▾';
+      cfb.title = f[id] ? 'Unfold this annotation' : 'Fold this annotation away (for you; kept in this browser)';
+      if (marginOn()) layoutMargin();
+      return true;
+    }
     var tog = e.target.closest('.cf-tog');
     if (tog) { var tc = tog.closest('.mcard, .ithread'); tog.textContent = (N.toggleCode(tc.dataset.tid) ? '▸' : '▾') + ' Code'; if (marginOn()) layoutMargin(); return true; }
     var more = e.target.closest('[data-more]');
@@ -672,8 +686,42 @@
   R.listingDoc = listingDoc;
 
   // ---------- events ----------
+  // Moving an annotation: its card's ⠿ dragged onto a line; the same number of lines
+  var dragNote = null;
+  function clearDrop() { SW.$$('.ln.drop-at', view).forEach(function (r) { r.classList.remove('drop-at'); }); }
+  document.addEventListener('dragstart', function (e) {
+    var g = e.target.closest && e.target.closest('.mc-grip');
+    if (!g) return;
+    var card = g.closest('.mcard, .ithread');
+    dragNote = notes.filter(function (n) { return n.id === card.dataset.tid; })[0] || null;
+    if (!dragNote) return;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', SW.notes.linkOf ? SW.notes.linkOf(dragNote) : dragNote.id);
+    try { e.dataTransfer.setDragImage(card, 12, 12); } catch (x) { /* not everywhere */ }
+    document.body.classList.add('dragging-note');
+  });
+  document.addEventListener('dragend', function () { dragNote = null; clearDrop(); document.body.classList.remove('dragging-note'); });
   function wireBox(box) {
     wireLit(box, '.ithread');
+    box.addEventListener('dragover', function (e) {
+      if (!dragNote) return;
+      var row = e.target.closest('.ln'); if (!row) return;
+      e.preventDefault(); e.dataTransfer.dropEffect = 'move';
+      var p = +row.dataset.p, n = +row.dataset.n, len = dragNote.anchor.n1 - dragNote.anchor.n0;
+      clearDrop();
+      for (var k = n; k <= n + len; k++) { var r = SW.$('#L' + p + '-' + k, view); if (r) r.classList.add('drop-at'); }
+    });
+    box.addEventListener('drop', function (e) {
+      if (!dragNote) return;
+      var row = e.target.closest('.ln'); if (!row) return;
+      e.preventDefault();
+      var note = dragNote, p = +row.dataset.p, n = +row.dataset.n, a = note.anchor, len = a.n1 - a.n0;
+      dragNote = null; clearDrop();
+      if (p === a.p && n === a.n0) return;
+      N.reanchor(note, { p: p, n0: n, n1: n + len }).then(function (an) {
+        SW.toast('Moved to ' + (an.n1 !== an.n0 ? 'lines ' + an.n0 + '–' + an.n1 : 'line ' + an.n0) + '. ↶ Undo (⌘Z) puts it back.', 5000);
+      }, function (err) { SW.toast(err.message, 5000); });
+    });
     box.addEventListener('click', function (e) {
       var cf = e.target.closest('[data-cf]');
       if (cf) { setWords(cf.dataset.cf === '1'); return; }

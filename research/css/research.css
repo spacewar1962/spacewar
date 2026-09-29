@@ -1554,3 +1554,17 @@ body.dev-on .dev-only { display: revert !important; }
 /* an annotation's buttons: reply, reactions, copy, download on the left; link, My notes, edit, delete on the right */
 .note .acts { display: flex; flex-wrap: wrap; align-items: center; }
 .note .acts .acts-right { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; }
+/* folding a card away, and moving it */
+.ithread { position: relative; }   /* .mcard is placed absolutely already */
+.mcard, .ithread { padding-left: 22px !important; }
+.card-fold { position: absolute; left: 4px; top: 4px; width: 14px; height: 16px; padding: 0; font: 11px/1 var(--sans); color: var(--text-faint); background: none; border: 0; cursor: pointer; }
+.card-fold:hover { color: var(--text); }
+.nfold > .note > .nbody, .nfold > .note > .acts, .nfold > .mc-replies, .nfold > .mc-more { display: none !important; }
+.nfold > .note > .by { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
+.nfold { opacity: .75; }
+.mc-where .mc-grip { cursor: grab; color: var(--text-faint); padding: 0 2px; }
+.mc-where .mc-grip:hover { color: var(--text); }
+.mc-where .mc-grip:active { cursor: grabbing; }
+.ln.drop-at { background: color-mix(in srgb, var(--anno-block) 22%, transparent) !important; box-shadow: inset 3px 0 0 var(--anno-block); }
+.edit-lines { display: flex; align-items: center; gap: 4px; margin: 4px 0; font-size: 12px; flex-wrap: wrap; }
+.edit-lines input { width: 5em; }
