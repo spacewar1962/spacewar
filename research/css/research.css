@@ -1594,3 +1594,8 @@ body.dev-on .dev-only { display: revert !important; }
 .note .st { font: 600 10px/1 var(--sans); padding: 2px 5px; border-radius: 3px; letter-spacing: .02em; vertical-align: 1px; }
 .note .st-open { color: #000; background: var(--amber); }
 .note .st-res { color: var(--green); border: 1px solid color-mix(in srgb, var(--green) 50%, transparent); }
+/* earlier wordings */
+.note .by button.hist { font: inherit; font-style: italic; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
+.note .by button.hist:hover { color: var(--beam); }
+.hist-list { max-height: 50vh; overflow: auto; display: grid; gap: 8px; max-width: 420px; }
+.hist-item { border-left: 2px solid var(--line); padding-left: 8px; }

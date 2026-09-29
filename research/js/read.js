@@ -8,7 +8,7 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', false) };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true) };
   // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
   // cycled from the chevron on the Annotations heading.
   var SHOW = { all: '▾ All', mine: '▾ Mine', open: '▾ Open', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'open', open: 'none', none: 'all' };

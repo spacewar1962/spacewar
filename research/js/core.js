@@ -856,6 +856,26 @@
       return new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
     }
   };
+  // ---------- earlier wordings of an annotation ----------
+  // When a note is edited, the wording it replaces is kept in the note itself, on
+  // a closing line <!-- sw:was DATE BASE64 --> (before any figure), so the record
+  // travels with the note in Hypothesis. Hidden wherever the note is shown.
+  function b64(s) { return btoa(unescape(encodeURIComponent(s))); }
+  function unb64(s) { try { return decodeURIComponent(escape(atob(s))); } catch (e) { return ''; } }
+  var WAS = /\n*<!-- sw:was (\S+) ([A-Za-z0-9+\/=]+) -->/g;
+  SW.noteHistory = {
+    visible: function (t) { return String(t || '').replace(/\n*<!-- sw:[\s\S]*?-->/g, '').replace(/\s+$/, ''); },
+    list: function (t) { var out = [], m; WAS.lastIndex = 0; while ((m = WAS.exec(String(t || '')))) out.push({ date: m[1], text: unb64(m[2]) }); return out; },
+    wasLines: function (t) { return (String(t || '').match(WAS) || []).map(function (x) { return '\n\n' + x.replace(/^\n+/, ''); }).join(''); },
+    was: function (text, date) { return '\n\n<!-- sw:was ' + (date || new Date().toISOString()) + ' ' + b64(text) + ' -->'; },
+    fig: function (t) { var m = /\n*<!-- sw:fig:gz [A-Za-z0-9+\/=]+ -->\s*$/.exec(String(t || '')); return m ? '\n\n' + m[0].replace(/^\s+/, '') : ''; },
+    // the full text to store: the new wording, earlier ones (with the one replaced), a figure last
+    compose: function (newText, oldFull, oldDate) {
+      var H = SW.noteHistory, vNew = H.visible(newText), vOld = H.visible(oldFull);
+      return vNew + H.wasLines(oldFull) + (vOld && vNew !== vOld ? H.was(vOld, oldDate) : '') + (H.fig(newText) || H.fig(oldFull));
+    }
+  };
+
   // ---------- Developer mode (⚙) ----------
   // For the team: shows annotations marked Developer only, and features still
   // being built. A feature in progress checks SW.dev(), or its markup takes the
@@ -900,7 +920,7 @@
   }
   SW.md = function (text) {
     var fences = [];
-    var src = String(text == null ? '' : text).replace(/\r\n?/g, '\n')
+    var src = String(text == null ? '' : text).replace(/\n*<!-- sw:[\s\S]*?-->/g, '').replace(/\r\n?/g, '\n')
       .replace(/^```[^\n]*\n([\s\S]*?)\n?```[ \t]*$/gm, function (m, code) { fences.push(code); return '\n\u0001' + (fences.length - 1) + '\u0001\n'; });
     return mdBlocks(src.split('\n'), fences);
   };
@@ -924,7 +944,7 @@
   // The same text without its marks, for a line of news or a Word export:
   // links kept as "text (url)".
   SW.mdPlain = function (text) {
-    return String(text == null ? '' : text)
+    return String(text == null ? '' : text).replace(/\n*<!-- sw:[\s\S]*?-->/g, '')
       .replace(/^```[^\n]*\n?|```$/gm, '')
       .replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, '$1 ($2)')
       .replace(/\*\*([^*]+)\*\*|__([^_]+)__/g, '$1$2').replace(/~~([^~]+)~~/g, '$1')
@@ -1169,7 +1189,7 @@
         return '\n\n<!-- sw:fig:gz ' + btoa(bin) + ' -->';
       });
     },
-    split: function (text) { var m = SW.figpack.RE.exec(String(text || '')); return m ? { text: String(text).slice(0, m.index), b64: m[1] } : { text: String(text || ''), b64: null }; },
+    split: function (text) { var m = SW.figpack.RE.exec(String(text || '')); var H = SW.noteHistory; return m ? { text: H.visible(String(text).slice(0, m.index)), b64: m[1] } : { text: H.visible(text), b64: null }; },
     unpack: function (b64) {
       if (!root.DecompressionStream) return Promise.reject(new Error('This browser cannot open the figure.'));
       var bin = atob(b64), b = new Uint8Array(bin.length);

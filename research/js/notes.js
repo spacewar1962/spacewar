@@ -494,6 +494,7 @@
   // Edit a note of one's own: its text, and for a note (not a reply) its tags.
   // dev (true or false, or undefined to leave it): Developer only, the sw:dev tag
   N.update = function (note, text, tags, dev) {
+    text = SW.noteHistory.compose(text, note.text, note.updated || note.date);   // the wording replaced is kept
     function withDev(ts) { ts = ts.filter(function (t) { return t !== 'sw:dev'; }); return dev ? ts.concat(['sw:dev']) : ts; }
     var now = new Date().toISOString();
     if (note.source === 'draft') {
@@ -660,7 +661,9 @@
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
       (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (!isReply && N.statusOf(reactions).state ? ' ' + statusChip(N.statusOf(reactions)) : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
-      (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
+      ((n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16)) || SW.noteHistory.list(n.text).length ? ' · ' + (SW.noteHistory.list(n.text).length
+        ? '<button type="button" class="hist" data-act="history" title="See the earlier wordings">edited ' + SW.esc(SW.fmtDate(n.updated || n.date)) + ' · ' + SW.noteHistory.list(n.text).length + ' earlier</button>'
+        : '<i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>') : '') + '</div>' +
       '<div class="nbody">' +   // what the annotation holds, set on its own ground
       (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? codeQuote(n) : '') +
       (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
@@ -717,6 +720,13 @@
       }
       if (btn.dataset.act === 'dl') { downloadNote(note, all, 'md'); return; }
       if (btn.dataset.act === 'keep') { keepNote(note, all); return; }
+      if (btn.dataset.act === 'history') {
+        var hs = SW.noteHistory.list(note.text).reverse(), r = btn.getBoundingClientRect();
+        SW.pop(r.left, r.bottom + 4, '<h4>Earlier wordings</h4><div class="hist-list">' + hs.map(function (h) {
+          return '<div class="hist-item"><div class="faint">Written ' + SW.esc(SW.fmtDate(h.date)) + ' ' + SW.esc(new Date(h.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })) + '</div><div class="note-md">' + SW.md(h.text) + '</div></div>';
+        }).join('') + '</div>');
+        return;
+      }
       if (btn.dataset.act === 'status') {
         btn.disabled = true;
         N.create({ vid: vid, parent: note.id, kind: 'reaction', anchor: note.anchor, text: 'status:' + btn.dataset.to, tags: [], quiet: true, dev: note.dev })
@@ -1083,7 +1093,7 @@
       '<div class="reply-foot"><span class="hint">Editing your ' + (note.parent ? 'reply' : 'annotation') + '</span>' +
       '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Save</button></span></div>';
     var ta = box.querySelector('textarea'), tg = box.querySelector('.edit-tags');
-    ta.value = note.text;
+    ta.value = SW.noteHistory.visible(note.text);
     SW.mdTools(ta);
     if (tg) tg.value = (note.tags || []).join(', ');
     body.hidden = true;
