@@ -618,25 +618,35 @@
     return h;
   }
 
-  // The code a note is attached to, at its head; it folds from the chevron in
-  // the card's corner (read.js), the fold kept while the page is open.
-  var codeFold = {};
+  // The code a note is attached to, at its head, folded until asked for: from
+  // '▸ Code' in the card's corner in Read (read.js), or its own '▸ Code'
+  // elsewhere; what is opened stays open while the page is open.
+  var codeOpen = {};
   function codeQuote(n) {
-    return '<div class="frag-q' + (codeFold[n.id] ? ' folded' : '') + '" data-id="' + SW.esc(n.id) + '"><pre>' + SW.esc(n.quote) + '</pre></div>';
+    var shut = !codeOpen[n.id];
+    return '<div class="frag-q' + (shut ? ' folded' : '') + '" data-id="' + SW.esc(n.id) + '"><span class="cf-tog cf-own" title="Show or hide the code">' + (shut ? '▸' : '▾') + ' Code</span><pre>' + SW.esc(n.quote) + '</pre></div>';
   }
   N.hasCode = function (n) { return !!(n && n.anchor && n.anchor.c0 != null && n.quote && !n.parent); };
-  N.codeFolded = function (id) { return !!codeFold[id]; };
+  N.codeFolded = function (id) { return !codeOpen[id]; };
   N.toggleCode = function (id) {
-    codeFold[id] = !codeFold[id];
-    SW.$$('.frag-q[data-id="' + id + '"]').forEach(function (el) { el.classList.toggle('folded', codeFold[id]); });
-    return codeFold[id];
+    codeOpen[id] = !codeOpen[id];
+    var shut = !codeOpen[id];
+    SW.$$('.frag-q[data-id="' + id + '"]').forEach(function (el) { el.classList.toggle('folded', shut); var t = el.querySelector('.cf-own'); if (t) t.textContent = (shut ? '▸' : '▾') + ' Code'; });
+    return shut;
   };
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest && e.target.closest('.cf-own');
+    if (!t) return;
+    e.stopPropagation();
+    N.toggleCode(t.closest('.frag-q').dataset.id);
+  });
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
       (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
+      '<div class="nbody">' +   // what the annotation holds, set on its own ground
       (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? codeQuote(n) : '') +
       (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
@@ -644,6 +654,7 @@
         return '<a href="' + SW.esc(N.linkOf(b)) + '" class="swlink" title="' + SW.esc('Go to ' + N.labelOf(b)) + '">' + SW.esc(N.labelOf(b)) + '</a>';
       }).join(' · ') + '</div>' : '') +
       // one row: Reply | reactions | copy, download, edit, delete
+      '</div>' +
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
       '<button data-act="copy" class="ico" title="Copy the annotation as a quotation with its code and reference, ready for a book or chapter; with its replies">⧉</button>' +
       (n.source !== 'draft' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)">↪</button>' : '') +

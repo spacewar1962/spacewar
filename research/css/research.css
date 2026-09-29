@@ -1500,8 +1500,12 @@ a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-b
 mark.frag { background: none; color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--anno-block) 60%, transparent); text-underline-offset: 3px; }
 mark.frag.lit { background: color-mix(in srgb, var(--anno-block) 20%, transparent); text-decoration-color: var(--anno-block); }
 .note .frag-q { margin: 2px 0 4px; }
-.note .frag-q.folded { margin: 0; }
+.note .frag-q.folded { margin: 0 0 2px; }
 .note .frag-q.folded pre { display: none; }
+.note .frag-q .cf-own { display: inline-block; cursor: pointer; font: 10.5px/1.4 var(--sans); color: var(--text-faint); user-select: none; }
+.note .frag-q .cf-own:hover { color: var(--text-dim); }
+.mcard .frag-q .cf-own, .ithread .frag-q .cf-own { display: none; }   /* in Read, the card's corner does it */
+.mcard .note .frag-q.folded, .ithread .note .frag-q.folded { margin: 0; }
 .mc-where .cf-tog { cursor: pointer; }
 .mc-where .cf-tog:hover { color: var(--text); }
 .note .frag-q pre { margin: 1px 0 3px; padding: 0 0 0 7px; font: 11px/1.35 var(--code-font); color: var(--text-faint); background: none; border-left: 1px solid color-mix(in srgb, var(--anno-block) 40%, transparent); white-space: pre-wrap; max-height: 6.8em; overflow: auto; }
@@ -1544,3 +1548,6 @@ body.dev-on .dev-only { display: revert !important; }
 .note:not(.reply) > .by { padding-bottom: 4px; margin-bottom: 6px; border-bottom: 1px solid var(--line-soft); }
 .note:not(.reply) > .acts { padding-top: 4px; margin-top: 7px; border-top: 1px solid var(--line-soft); }
 .mcard > .mc-where, .ithread > .mc-where { line-height: 1.6; }
+/* between the header rule and the buttons: the annotation's content, on the page's own ground */
+.note:not(.reply) > .nbody { background: var(--bg); border-radius: 3px; padding: 5px 8px; margin: 0 -3px; }
+.note.reply > .nbody { padding: 0; }
