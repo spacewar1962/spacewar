@@ -981,6 +981,7 @@
       .map(function (b) { return '<button type="button" data-md="' + b[0] + '" title="' + b[2] + '">' + b[1] + '</button>'; }).join('') +
       '<span class="md-link" hidden><input type="url" placeholder="https://…" spellcheck="false"><button type="button" data-md="link-ok">Link</button></span>' +
       '<span class="md-sep"></span><button type="button" data-md="preview" class="md-prev" title="See it as it will be shown">Preview</button>' +
+      '<button type="button" data-md="help" class="md-help" title="How to format and link annotations (Help ▸ Advanced annotation)">?</button>' +
       '<span class="md-mode" role="group" aria-label="Edit as"><button type="button" data-mode="rich" title="Edit with the formatting shown">Rich text</button><button type="button" data-mode="md" title="Edit the Markdown itself">Markdown</button></span>';
     var rich = SW.el('div', { class: 'md-rich note-md', contenteditable: 'true', role: 'textbox', 'aria-multiline': 'true' });
     rich.style.minHeight = (Math.max(3, ta.rows || 3) * 1.5) + 'em';
@@ -1058,6 +1059,7 @@
     function act(k) {
       if (k === 'link-ok') return doneLink();
       if (k === 'ann') return annLink();
+      if (k === 'help') return SW.notes.help();
       if (k === 'preview') {
         var on = prev.hidden;
         prev.hidden = !on; ta.hidden = on;

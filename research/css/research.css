@@ -1439,3 +1439,40 @@ a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-b
 .link-pick .lp-item:hover, .link-pick .lp-item:focus { background: var(--sel); border-color: var(--line); }
 .link-pick .lp-where { font-size: 12px; color: var(--amber); }
 .link-pick .lp-text { font-size: 13px; color: var(--text-dim); }
+/* Help ▸ Advanced annotation */
+.annohelp { width: min(820px, 96vw); }
+.annohelp .ah { max-height: 78vh; overflow-y: auto; padding-right: 6px; font-size: 14px; line-height: 1.55; }
+.annohelp h3 { margin: 18px 0 6px; font-size: 15px; }
+.annohelp .ah-fig { margin: 10px 0 14px; padding: 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg-2); }
+.annohelp .ah-fig figcaption { margin-top: 8px; font-size: 12px; color: var(--text-dim); }
+.annohelp .ah-try { width: 100%; box-sizing: border-box; }
+.annohelp .ah-store { margin-top: 6px; font-size: 12px; overflow-wrap: anywhere; }
+.annohelp .ah-store code { font-family: var(--mono); background: none; }
+.annohelp .ah-static { user-select: none; }
+.annohelp .ah-static * { cursor: default; }
+.annohelp .ah-card { max-width: 460px; margin: 0; }
+.annohelp .ah-card .acts button { pointer-events: none; }
+.annohelp .ah-hot { box-shadow: 0 0 0 2px var(--amber); border-radius: 3px; }
+.annohelp .ah-pick { max-width: 520px; border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; background: var(--surface); }
+.annohelp .ah-pick .lp-item { display: grid; gap: 2px; padding: 6px 8px; border-radius: 4px; }
+.annohelp .ah-pick .lp-item.on { background: var(--sel); border: 1px solid var(--line); }
+.annohelp .ah-pick .lp-list { display: grid; gap: 2px; }
+.annohelp .ah-pick .lp-where { font-size: 12px; color: var(--amber); }
+.annohelp .ah-pick .lp-text { font-size: 13px; color: var(--text-dim); }
+.annohelp .ah-pick .lp-bar { display: flex; gap: 6px; margin: 8px 0; }
+.annohelp .ah-pick .lp-bar input { flex: 1; padding: 4px 8px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; }
+.ah-call { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: var(--amber); color: #000; font: 600 11px/1 var(--sans); margin: 0 4px; vertical-align: middle; text-decoration: none; }
+.annohelp .ah-steps { margin: 6px 0 10px; padding-left: 1.4em; }
+.annohelp .ah-steps li { margin: 3px 0; }
+.annohelp .ah-marks td:nth-child(2), .annohelp .ah-marks td:nth-child(3) { white-space: nowrap; }
+.annohelp kbd { font: 11px var(--mono); padding: 1px 4px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface-2); }
+.ah-svg { width: 100%; max-width: 560px; height: auto; display: block; }
+.ah-svg .ah-box { fill: var(--surface); stroke: var(--line); }
+.ah-svg .ah-t { fill: var(--text); font: 12px var(--sans); }
+.ah-svg .ah-b { font-weight: 600; }
+.ah-svg .ah-l { fill: var(--amber); }
+.ah-svg .ah-f, .ah-svg .ah-s { fill: var(--text-dim); font-size: 11px; }
+.ah-svg .ah-line { fill: none; stroke: var(--amber); stroke-width: 1.5; }
+.ah-svg .ah-dash { stroke-dasharray: 4 3; stroke: var(--text-dim); }
+.ah-svg .ah-arrhead { fill: var(--amber); }
+.md-tools .md-help { margin-left: 4px; }

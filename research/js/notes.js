@@ -824,6 +824,85 @@
     d.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
   };
 
+  // ---------- Help ▸ Advanced annotation ----------
+  // How to format annotations and link them, with figures drawn from the
+  // bench's own parts (so they follow the theme) and an editor to try.
+  N.help = function () {
+    var d = SW.el('dialog', { class: 'tray-big annohelp' });
+    function call(n) { return '<span class="ah-call" aria-hidden="true">' + n + '</span>'; }
+    function kbd(k) { return '<kbd>' + k + '</kbd>'; }
+    var ex = 'https://bitsavers.org/pdf/dec/pdp1/F36_MACRO_Nov62.pdf';
+    var card = '<div class="note ah-card"><div class="by"><b>AB</b> · 30 Sep 2026' + call(0) + '</div>' +
+      '<div class="body note-md"><p>The gravity calculation starts here; compare ' +
+      '<a class="swlink" href="#">CD, SW3.1L, 2.141–146</a>' + call(2) + ' and the <a href="#">MACRO manual</a>.</p></div>' +
+      '<div class="backl"><span class="faint">Linked from</span> <a class="swlink" href="#">EF, SW4.1L, 1.120–134</a>' + call(3) + '</div>' +
+      '<div class="acts"><button>Reply</button><span class="acts-sep"></span><button class="ico">⧉</button><button class="ico ah-hot">↪</button>' + call(1) + '<button class="ico">⤓</button><button>Edit</button></div></div>';
+    card = card.replace(call(0), '');
+    var picker = '<div class="ah-pick"><div class="tray-bighead"><b>Link to an annotation</b><span class="icon-btn">✕</span></div>' +
+      '<div class="lp-bar"><input type="search" value="gravity" tabindex="-1"><select tabindex="-1"><option>All versions</option></select></div>' +
+      '<div class="lp-list"><span class="lp-item"><span class="lp-where mono">CD, SW3.1L, 2.141–146</span><span class="lp-text">A note on the gravity calculation…</span></span>' +
+      '<span class="lp-item on"><span class="lp-where mono">EF, SW4.1L, 1.120–134</span><span class="lp-text">The same calculation in 4.1…</span></span></div></div>';
+    var diagram = '<svg class="ah-svg" viewBox="0 0 560 140" role="img" aria-label="An annotation on 4.1 links to one on 3.1; the 3.1 annotation lists it under Linked from">' +
+      '<defs><marker id="ah-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="ah-arrhead"/></marker></defs>' +
+      '<rect x="10" y="20" width="220" height="100" rx="6" class="ah-box"/><text x="24" y="44" class="ah-t ah-b">Version 4.1, lines 120–134</text>' +
+      '<text x="24" y="68" class="ah-t">EF: “…compare this with</text><text x="24" y="88" class="ah-t"><tspan class="ah-l">↪ CD, SW3.1L, 2.141–146</tspan>”</text>' +
+      '<rect x="330" y="20" width="220" height="100" rx="6" class="ah-box"/><text x="344" y="44" class="ah-t ah-b">Version 3.1, lines 141–146</text>' +
+      '<text x="344" y="68" class="ah-t">CD: “A note on the gravity…”</text><text x="344" y="98" class="ah-t ah-f">Linked from</text><text x="344" y="114" class="ah-t ah-l">↪ EF, SW4.1L, 1.120–134</text>' +
+      '<path d="M232,70 C280,70 280,62 328,62" class="ah-line" marker-end="url(#ah-arr)"/><text x="280" y="54" class="ah-t ah-s" text-anchor="middle">the link</text>' +
+      '<path d="M328,110 C290,110 270,106 232,106" class="ah-line ah-dash" marker-end="url(#ah-arr)"/><text x="280" y="132" class="ah-t ah-s" text-anchor="middle">shown back</text></svg>';
+    d.innerHTML = '<div class="tray-bighead"><b>Advanced annotation</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="ah">' +
+      '<p>Annotations can carry formatting and links: to other sites, to lines of code, and to other annotations, in this version or any other. A link between two annotations shows at both ends.</p>' +
+
+      '<h3>1. Writing: rich text or Markdown</h3>' +
+      '<p>Every annotation editor has a toolbar. The switch at its right chooses how you write: <b>Rich text</b> shows the formatting as you type; <b>Markdown</b> shows the marks themselves, with a Preview. The bench remembers the choice. Either way the annotation is saved as Markdown, which is what Hypothesis stores, so it reads the same in Hypothesis and in exports.</p>' +
+      '<figure class="ah-fig"><textarea class="ah-try" rows="4">The **sun** is placed from `nx1` and `ny1`; see [the MACRO manual](' + ex + ').</textarea>' +
+      '<div class="ah-store"><span class="faint">Saved as</span> <code class="ah-md"></code></div>' +
+      '<figcaption>Try it: switch between Rich text and Markdown, or format some words. Nothing here is saved.</figcaption></figure>' +
+      '<table class="ov-sub ah-marks"><thead><tr><th>For</th><th>Button</th><th>Keys</th><th>In Markdown</th></tr></thead><tbody>' +
+      [['Bold', '<b>B</b>', kbd('⌘B'), '**words**'], ['Italic', '<i>I</i>', kbd('⌘I'), '*words*'], ['Code', '`', '', '`lac nx1`'],
+       ['Code block', '` (over several lines)', '', '``` on the lines above and below'], ['Quotation', '❝', '', '&gt; at the start of the line'],
+       ['List', '•', '', '- at the start of each line'], ['Link to a site', '🔗', kbd('⌘K'), '[words](https://…)'], ['Link to an annotation', '↪', '', 'a bench link (below)']]
+        .map(function (r) { return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td class="mono">' + r[3] + '</td></tr>'; }).join('') + '</tbody></table>' +
+      '<p class="hint">' + kbd('⌘') + ' is ' + kbd('Ctrl') + ' on Windows and Linux. ' + kbd('⌘Enter') + ' saves; ' + kbd('Esc') + ' cancels.</p>' +
+
+      '<h3>2. Links to other sites</h3>' +
+      '<p>Select the words, click 🔗 (or ' + kbd('⌘K') + ') and give the address. Or paste an address over the selected words. A link to another site opens in a new tab.</p>' +
+
+      '<h3>3. Linking one annotation to another</h3>' +
+      '<figure class="ah-fig">' + diagram + '<figcaption>A link from an annotation on 4.1 to one on 3.1. The 3.1 annotation lists it under Linked from.</figcaption></figure>' +
+      '<ol class="ah-steps"><li>In the editor, select the words to be the link, or leave the cursor where the link should go.</li>' +
+      '<li>Click ↪ in the toolbar. A search opens over every annotation in the group, in every version.</li>' +
+      '<li>Type words, initials or a reference to narrow it, and choose All versions or one version.</li>' +
+      '<li>Click the annotation. The link goes in over the selected words, or under the annotation’s name if nothing was selected.</li></ol>' +
+      '<figure class="ah-fig ah-static">' + picker + '<figcaption>The search that ↪ opens.</figcaption></figure>' +
+      '<p>Or start from the annotation to be linked to: ↪ on its row of buttons copies its link. Paste it into the other annotation, over selected words or on its own. On its own it is shown by author and reference, such as <span class="mono">CD, SW3.1L, 2.141–146</span>.</p>' +
+      '<figure class="ah-fig ah-static">' + card + '<figcaption>' + call(1) + ' copies a link to this annotation. ' + call(2) + ' a link to another annotation, marked ↪. ' + call(3) + ' Linked from: the annotations that link to this one.</figcaption></figure>' +
+
+      '<h3>4. Following a link</h3>' +
+      '<p>Click a link marked ↪. The bench goes to that version and those lines, opens the annotation (with its thread, if it is a reply) and flashes it. Its Linked from leads back. ' + kbd('⌘') + '-click opens it in a new tab.</p>' +
+      '<p>The link is a web address for the bench, so it also works from Hypothesis, an email or a draft chapter: it opens the bench at that annotation.</p>' +
+
+      '<h3>5. Links to lines of code</h3>' +
+      '<p>Select lines in Read and click 🔗 Copy link at the foot of the window. Pasted into an annotation, the link is marked ↪ and goes to those lines.</p>' +
+
+      '<h3>Good to know</h3><ul class="ah-steps">' +
+      '<li>Drafts cannot be linked to: a draft is given a new identifier when it is shared with the group. Share it first (⚙ sets the group).</li>' +
+      '<li>A link to an annotation that has been deleted, or is not in your group, goes to its lines and says the annotation is not there.</li>' +
+      '<li>Links from other versions appear under Linked from once the group’s annotations have loaded, a moment after the bench opens.</li></ul></div>';
+    document.body.appendChild(d);
+    d.showModal();
+    var ta = SW.$('.ah-try', d), md = SW.$('.ah-md', d);
+    SW.mdTools(ta);
+    function show() { md.textContent = ta.value; }
+    ta.addEventListener('input', show); show();
+    SW.$$('.ah-static a, .ah-static button, .ah-static input, .ah-static select', d).forEach(function (x) { x.setAttribute('tabindex', '-1'); });
+    d.addEventListener('click', function (e) {
+      if (e.target.closest('.ah-static')) { e.preventDefault(); e.stopPropagation(); return; }
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); }
+    }, true);
+    d.addEventListener('close', function () { d.remove(); });
+  };
+
   // ---------- copying and downloading a single note ----------
   function rootOf(note, all) {
     var byId = {}, n = note, guard = 0;
