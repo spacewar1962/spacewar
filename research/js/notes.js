@@ -576,8 +576,8 @@
   N.isReaction = function (n) { return n.kind === 'reaction'; };
   // Open or resolved, from the reactions: 🔓 open, ✅ resolved (anyone in the group can
   // react; only an annotation's author can change its tags); the latest of them counts.
-  // ('status:open' and 'status:resolved', from 1.16.65, read the same.)
-  var OPEN = { '🔓': 1, 'status:open': 1 }, DONE = { '✅': 1, 'status:resolved': 1 };
+  // (The 'status:open' / 'status:resolved' marks left by 1.16.65's buttons are ignored.)
+  var OPEN = { '🔓': 1 }, DONE = { '✅': 1 };
   N.statusOf = function (reactions) {
     var s = (reactions || []).filter(function (r) { return OPEN[r.text] || DONE[r.text]; }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; }).pop();
     return s ? { state: OPEN[s.text] ? 'open' : 'resolved', by: s.by, date: s.date } : { state: '' };

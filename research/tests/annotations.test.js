@@ -90,7 +90,7 @@
   eq('🔓 opens', N.statusOf([{ text: '🔓', date: '2026-09-30T10:00' }]).state, 'open');
   eq('a later ✅ resolves', N.statusOf([{ text: '🔓', date: '2026-09-30T10:00' }, { text: '✅', date: '2026-09-30T11:00' }, { text: '👍', date: '2026-09-30T12:00' }]).state, 'resolved');
   eq('a later 🔓 opens again', N.statusOf([{ text: '✅', date: '2026-09-30T10:00' }, { text: '🔓', date: '2026-09-30T11:00' }]).state, 'open');
-  eq('the earlier marks still read', N.statusOf([{ text: 'status:open', date: '2026-09-30T10:00' }]).state, 'open');
+  eq('the old status marks are ignored', N.statusOf([{ text: 'status:open', date: '2026-09-30T10:00' }]).state, '');
 
   group = 'Mentions';
   yes('a mention of CL', N.mentions({ text: 'ask @CL here' }, 'CL'));
