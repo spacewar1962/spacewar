@@ -241,7 +241,8 @@
     var s = SW.store.get('notes.seen', '');
     return s || new Date(Date.now() - 7 * 864e5).toISOString();   // first visit: the last week
   }
-  function isMine(n) { var me = SW.me(); return N.mine(n) || (!!me.initials && n.by === me.initials); }
+  // yours, for news: by your initials where set (two people may share one Hypothesis account), else by account
+  function isMine(n) { var me = SW.me(); return me.initials ? n.by === me.initials : N.mine(n); }
   N.news = function () {
     if (!N.configured()) { newsItems = []; paintNews(); return Promise.resolve([]); }
     var since = newsSince();
