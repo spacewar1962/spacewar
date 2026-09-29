@@ -1621,3 +1621,13 @@ body.dev-on .dev-only { display: revert !important; }
 .linkbtn { font: inherit; color: var(--beam); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
 .linkbtn:hover { color: var(--text); }
 .join-hint { margin-top: 4px; }
+/* the join guide: a box for each step, with a big number */
+.joinhelp .js-steps { display: grid; gap: 12px; margin-top: 14px; }
+.joinhelp .js-step { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: start; padding: 14px 16px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; }
+.joinhelp .js-num { font: 800 48px/1 var(--sans); color: var(--beam); text-align: center; padding-top: 2px; text-shadow: 0 0 14px color-mix(in srgb, var(--beam) 35%, transparent); }
+.joinhelp .js-then .js-num { color: var(--green); text-shadow: none; font-size: 40px; }
+.joinhelp .js-body h3 { margin: 0 0 6px; }
+.joinhelp .js-body .ah-steps { margin-bottom: 4px; }
+.joinhelp .js-body p:last-child { margin-bottom: 0; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (max-width: 520px) { .joinhelp .js-step { grid-template-columns: 40px 1fr; gap: 10px; padding: 12px; } .joinhelp .js-num { font-size: 34px; } }
