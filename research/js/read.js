@@ -264,7 +264,8 @@
     if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
     var isBlock = a.n1 > a.n0 || a.c0 != null;
     return '<div class="' + cls + (open ? ' open' : '') + (isBlock ? ' blockn' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
-      '<div class="mc-where" title="Select the lines">' + (a.n1 !== a.n0 ? 'lines ' + a.n0 + '–' + a.n1 : 'line ' + a.n0) + '</div>' +
+      '<div class="mc-where">' + (N.hasCode(t.note) ? '<span class="cf-tog" title="Show or hide the code">' + (N.codeFolded(t.note.id) ? '▸' : '▾') + ' Code</span>' : 'Code') +
+        ' · <span class="cf-lines" title="Select the lines">' + (a.n1 !== a.n0 ? 'lines ' + a.n0 + '–' + a.n1 : 'line ' + a.n0) + '</span></div>' +
       N.renderNote(t.note, false, t.reactions) +
       (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
       (open ? '<div class="mc-replies">' + h + '</div>' : '') + '</div>';
@@ -390,6 +391,8 @@
   }
   // A click on a thread's + or its line reference (inline or card); true if handled.
   function threadClick(e) {
+    var tog = e.target.closest('.cf-tog');
+    if (tog) { var tc = tog.closest('.mcard, .ithread'); tog.textContent = (N.toggleCode(tc.dataset.tid) ? '▸' : '▾') + ' Code'; if (marginOn()) layoutMargin(); return true; }
     var more = e.target.closest('[data-more]');
     if (more) {
       var c = more.closest('.mcard, .ithread');

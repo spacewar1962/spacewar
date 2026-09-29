@@ -618,17 +618,19 @@
     return h;
   }
 
-  // The code a note is attached to, at its head, folding under a chevron; the
-  // fold is kept while the page is open.
+  // The code a note is attached to, at its head; it folds from the chevron in
+  // the card's corner (read.js), the fold kept while the page is open.
   var codeFold = {};
   function codeQuote(n) {
-    var q = n.quote, k = q.split('\n').length, a = n.anchor;
-    return '<details class="frag-q" data-id="' + SW.esc(n.id) + '"' + (codeFold[n.id] ? '' : ' open') + '><summary title="Fold or unfold the code this annotation is attached to">Code' + (k > 1 ? ' · ' + k + ' lines' : '') + '</summary><pre>' + SW.esc(q) + '</pre></details>';
+    return '<div class="frag-q' + (codeFold[n.id] ? ' folded' : '') + '" data-id="' + SW.esc(n.id) + '"><pre>' + SW.esc(n.quote) + '</pre></div>';
   }
-  document.addEventListener('toggle', function (e) {
-    var d = e.target;
-    if (d && d.matches && d.matches('details.frag-q')) codeFold[d.dataset.id] = !d.open;
-  }, true);
+  N.hasCode = function (n) { return !!(n && n.anchor && n.anchor.c0 != null && n.quote && !n.parent); };
+  N.codeFolded = function (id) { return !!codeFold[id]; };
+  N.toggleCode = function (id) {
+    codeFold[id] = !codeFold[id];
+    SW.$$('.frag-q[data-id="' + id + '"]').forEach(function (el) { el.classList.toggle('folded', codeFold[id]); });
+    return codeFold[id];
+  };
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
