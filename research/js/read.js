@@ -164,8 +164,10 @@
     // Only assembly errors are flagged here; the word count and start address
     // are on the Version & notes page.
     if (b.asm && b.asm.errorCount) {
-      tb.appendChild(SW.el('span', { class: 'badge err', title: b.asm.words.length + ' words; start ' + SW.oct(b.asm.start, 4) },
-        b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : '')));
+      var eb = SW.el('button', { class: 'badge err', title: 'What the error' + (b.asm.errorCount > 1 ? 's are' : ' is') + ', explained (' + b.asm.words.length + ' words; start ' + SW.oct(b.asm.start, 4) + ')' },
+        b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : ''));
+      eb.onclick = function () { SW.asmErrors(b); };
+      tb.appendChild(eb);
     } else if (!b.asm) tb.appendChild(SW.el('span', { class: 'hint' }, 'No source survives.'));
     tb.appendChild(SW.el('span', { class: 'sep' }));
     if (b.v.build && SW.edition) tb.appendChild(SW.edition.menu(function () { return build; }));
@@ -210,6 +212,7 @@
     var wrap = SW.el('div', { class: 'rd-body' + (marginOn() ? ' with-margin' : '') });
     var box = SW.el('div', { class: 'listing' + (opts.words ? '' : ' hide-words') });
     var margin = SW.el('div', { class: 'note-margin', 'aria-label': 'Annotations' });
+    wrap.addEventListener('click', function (e) { if (e.target.closest('[data-asmerrs]')) { e.stopPropagation(); SW.asmErrors(b); } });
     b.parts.forEach(function (part, pi) {
       if (!showsTape(pi)) return;
       var t = info[pi], sec = SW.el('div', { class: 'part' });
@@ -218,7 +221,7 @@
       sec.innerHTML = '<div class="part-head" data-p="' + pi + '">' +
         '<div class="ph-main">' + (b.parts.length > 1 ? '<span class="ph-num">Tape ' + (pi + 1) + ' of ' + b.parts.length + '</span>' : '') +
         '<span class="ph-title">' + SW.esc(t.label) + '</span> ' + SW.refTag(b.v.id, pi, null, null, b.parts.length) +
-        (errs ? '<span class="badge err">' + errs + ' error' + (errs > 1 ? 's' : '') + '</span>' : '') + '</div>' +
+        (errs ? '<button class="badge err" data-asmerrs title="What the error' + (errs > 1 ? 's are' : ' is') + ', explained">' + errs + ' error' + (errs > 1 ? 's' : '') + '</button>' : '') + '</div>' +
         '<div class="ph-sub">' + SW.sourceLink(part.src, part.src.split('/').pop()) +
         ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
         (t.title ? ' · <span title="The tape’s own title line">“' + SW.esc(t.title) + '”</span>' : '') + '</div>' +

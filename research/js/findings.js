@@ -152,7 +152,10 @@
       ev: [] },
     { no: 'F47', kind: 'Difference', cat: 'display', title: 'Set ddd to 0 and both ships are Wedges',
       text: 'The constant ddd (at 20, “0 to save space for ddt”) is −0 in every version from 3.1. At start-up the program tests it (lio ddd, spi i): at −0 it compiles the Needle’s outline and then the Wedge’s; at 0 it skips the Needle’s, and both ships are drawn from the Wedge’s compiled code, leaving the Needle’s space free for the debugger DDT. 2B has no such switch. Landsteiner describes it (Inside Spacewar! part 3). Run has a box to try it (“Both ships as Wedges”), for the versions that have ddd.',
-      ev: [{ v: '3.1', re: /^ddd,/, label: 'ddd, 3.1' }, { v: '3.1', re: /^\s*lio ddd/, label: 'lio ddd, spi i' }] }
+      ev: [{ v: '3.1', re: /^ddd,/, label: 'ddd, 3.1' }, { v: '3.1', re: /^\s*lio ddd/, label: 'lio ddd, spi i' }] },
+    { no: 'F48', kind: 'Transcription', cat: 'text', title: 'The 4.4 listing’s pass log records an assembly error, and the bench reproduces it at the same address',
+      text: 'The pass log at the end of the Morris 4.4 listing (scan p. 31) has one error line on pass 2: “usw 1362 a+13 count i1”. In MACRO’s error code (DEC manual F-36, 1962, pp. 26–28) that is an undefined symbol (us) in a word (w), at address 1362, a+13, the last pseudo-instruction count, the symbol i1. The scan (p. 15) reads law i1 there, without a space; the bench’s transcription read law i 1 until 29 September 2026. MACRO takes an undefined symbol as zero, so it punched law 0 and the game count gct starts at 0 rather than −1. Assembled from the corrected text, the bench reports the same undefined symbol and places the word at 1362, the address MACRO printed: the bench lays the program out as MIT’s assembly did. The masswerk 4.4 texts read law i 1. The log reports no error for law a4+ (line 1351), which macro1 rejects, so MACRO seems to have accepted that line. Read’s error badge explains both.',
+      ev: [{ v: '4.4', re: /^\s*law i1\b/, label: 'law i1, the error MACRO reported' }, { v: '4.4', re: /^\s*law a4\+/, label: 'law a4+, not reported' }] }
   ];
   // Each finding's number is its own, written above and never changed: a new
   // finding takes the next number, wherever it is placed in the list.

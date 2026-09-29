@@ -138,7 +138,7 @@
       build: [{ src: 'spacewar-4.3-17may1963.txt' }] },
     { id: '4.4', label: 'Spacewar! 4.4 (ddp, Morris listing)', date: '17 / 21 May 1963', sort: 19630521,
       authors: 'Monty Preonas ("ddp") & Joe Morris', fork: 'ddp', status: 'recovered', medium: 'Source listing',
-      buildNotes: ["One assembly error: 'law a4+' (line 1351) is incomplete in the transcription.", "All three 4.4 texts (Morris, masswerk, variant f) contain the line '4<tab>szf 4', which MACRO assembles as a data word 000004 in the path of execution. Opcode 00 is reserved on the PDP-1. The emulator carries on past it by default and logs each execution as an anomaly; set 'reserved opcodes halt' to stop instead."],
+      buildNotes: ["Two assembly errors, both as the scan has them: 'law i1' (line 666), an undefined symbol that MACRO also reported in 1963 (the pass log's 'usw 1362 a+13 count i1'; the bench assembles it at the same address, 1362), and 'law a4+' (line 1351), which the pass log does not report. Click the error badge in Read for both.", "All three 4.4 texts (Morris, masswerk, variant f) contain the line '4<tab>szf 4', which MACRO assembles as a data word 000004 in the path of execution. Opcode 00 is reserved on the PDP-1. The emulator carries on past it by default and logs each execution as an anomaly; set 'reserved opcodes halt' to stop instead."],
       summary: 'Dual-console version: alternate frames go to a second scope so each pilot\'s ship holds the centre. Preonas numbers it 4.3.',
       build: [MACROS, { src: 'spacewar-4.4-21may1963-(Morris).txt', titleMatch: true }, STARS],
       scans: ['spacewar-4.4-21may1963-(Morris).pdf'] },

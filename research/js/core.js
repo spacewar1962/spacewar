@@ -423,6 +423,49 @@
     var tape = nparts > 1 ? (p + 1) + (n0 != null ? '.' : '') : '';
     return r + ', ' + tape + (n0 != null ? n0 + (n1 && n1 !== n0 ? '–' + n1 : '') : '');
   };
+  // ---------- assembly errors, explained (the badges in Read open this) ----------
+  // MACRO's error codes, as DEC's manual gives them (F-36, 1962, pp. 26-28)
+  var MACRO_ERR = { us: 'an undefined symbol (its value taken as zero)', mdt: 'a tag defined twice, differently', mdd: 'a multiple definition in a dimension statement', mdm: 'a macro defined twice', zpa: 'an illegal parameter assignment', mdv: 'a variable defined twice', ilp: 'a parity error (the character ignored)', ipi: 'an illegal pseudo-instruction', ilr: 'an illegal repeat', ids: 'an illegal dummy symbol', sce: 'storage capacity exceeded', ilf: 'an illegal format', tmc: 'too many constants', tmv: 'too many variables', tmp: 'too many parameters' };
+  var MACRO_US = { a: 'in a pseudo-instruction argument', w: 'in a word', c: 'in a constant', p: 'in a parameter assignment', m: 'in a macro definition', l: 'in a location assignment', r: 'in a repeat count', s: 'in a start', d: 'in a dummy symbol assignment' };
+  // what is known about particular errors: version, a pattern for the line, the note
+  var ERR_NOTES = [
+    ['4.4', /^\s*law a4\+\s*$/, 'The scan reads law a4+ (p. 29, checked 29 September 2026): the line ends in a plus sign. macro1 calls the tab after it an illegal character and assembles law a4. The listing’s pass log records no error for this line, so MACRO seems to have accepted it, most likely as a4 plus nothing, the same word. The masswerk texts and the Morris 4.3 have law a4+1. As assembled, leaving the score display this way goes back to a4, which is jmp fi1, the score display again, rather than to a4+1, where the program reads the test word.'],
+    ['4.4', /^\s*law i1\b/, 'MACRO reported this one in 1963: the pass log at the end of the listing (scan p. 31) reads “usw 1362 a+13 count i1”, which in its error code is an undefined symbol (us) in a word (w), at 1362, a+13, after the pseudo-instruction count, the symbol i1. The line is law i1, without the space of law i 1. MACRO took the undefined i1 as zero and punched law 0, as the bench does, at the same address, 1362, which confirms that the bench lays the program out as MIT’s assembly did up to this point. The game count gct is set to 0 rather than −1. (The bench’s transcription read law i 1 until 29 September 2026.)'],
+    ['4.8', /^\s*lai\b/, 'lai (760040, AC from IO) is an operate instruction of the upgraded PDP-1 (the PDP-1D), which the June 1963 macro tape does not define. The scorer, by Peter Samson, uses it, so it was assembled where lai was defined; the emulator runs the word the bench assembles here only if it is defined.']
+  ];
+  function decodeMacroErr(line) {
+    var m = /^(us|mdt|mdd|mdm|zpa|mdv|ilp|ipi|ilr|ids|sce|ilf|tmc|tmv|tmp)([a-z]?)\s+([0-7]+)\s+(\S+)\s+(\S+)(?:\s+(\S+))?/.exec(line.trim());
+    if (!m) return null;
+    return (MACRO_ERR[m[1]] || m[1]) + (m[1] === 'us' && m[2] ? ' ' + (MACRO_US[m[2]] || m[2]) : '') + ', at ' + m[3] + ' (' + m[4] + '), after the pseudo-instruction ' + m[5] + (m[6] ? ', the symbol ' + m[6] : '');
+  }
+  SW.asmErrors = function (b) {
+    if (!b || !b.asm) return;
+    var V = root.SWVersions, errs = b.asm.errors || [], N = b.parts.length;
+    var rows = errs.map(function (e) {
+      var L = b.lines[e.file] && b.lines[e.file][e.line - 1], raw = L ? L.raw : '', w = e.loc != null ? b.asm.memory[e.loc] : null;
+      var note = ERR_NOTES.filter(function (n) { return n[0] === b.v.id && n[1].test(raw); })[0];
+      var col = Math.max(0, (e.col || 1) - 1), shown = raw.replace(/\t/g, '    ');
+      var pre = raw.slice(0, col).replace(/\t/g, '    ').length;
+      return '<section class="asmerr"><h4>' + SW.esc(e.message) + (e.symbol ? ': <span class="mono">' + SW.esc(e.symbol) + '</span>' : '') + ' ' + SW.refTag(b.v.id, e.file, e.line, e.line, N) + '</h4>' +
+        '<pre class="mono asmerr-line">' + SW.esc(shown) + '\n' + ' '.repeat(pre) + '^</pre>' +
+        '<p class="hint">' + (w ? 'Assembled at ' + SW.oct(e.loc, 4) + ' as ' + SW.oct(w.val, 6) + (root.PDP1CPU && root.PDP1CPU.disasm ? ' (' + SW.esc(root.PDP1CPU.disasm(w.val, b.symAt)) + ')' : '') + '. ' : '') +
+        '<a href="#" data-go="' + e.file + ':' + e.line + '">Open in Read ▸</a></p>' + (note ? '<p>' + SW.esc(note[2]) + '</p>' : '') + '</section>';
+    });
+    var P = b.v.pass1, logErrs = P && P.log ? P.log.filter(function (l) { return decodeMacroErr(l); }) : [];
+    var d = SW.el('dialog', { class: 'tray-big asmerrs' });
+    d.innerHTML = '<div class="tray-bighead"><b>Assembly errors: ' + SW.esc(b.v.label) + '</b> ' + SW.refTag(b.v.id) + '<span class="refhelp-acts"><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+      '<p>The bench assembles each text with its own port of macro1, the modern cross-assembler (2003), set to follow MACRO as it behaved in 1962-63 where the two differ. These are the lines it could not assemble cleanly, with what it made of them.</p>' +
+      rows.join('') +
+      (logErrs.length ? '<section class="asmerr"><h4>In the listing’s own pass log (scan p. ' + P.page + ')</h4>' + logErrs.map(function (l) { return '<p><span class="mono">' + SW.esc(l) + '</span>: ' + SW.esc(decodeMacroErr(l)) + ' (MACRO’s error code, DEC manual F-36, pp. 26-28).</p>'; }).join('') + '<p class="hint">These are the errors MACRO typed when the program was assembled at MIT in 1963; a line it did not report there, it accepted.</p></section>' : '');
+    document.body.appendChild(d);
+    d.addEventListener('click', function (ev) {
+      if (ev.target === d || ev.target.closest('[data-x]')) { d.close(); return; }
+      var g = ev.target.closest('[data-go]'); if (!g) return;
+      ev.preventDefault(); var pn = g.dataset.go.split(':'); d.close(); SW.openAt(b.v.id, { p: +pn[0], n0: +pn[1] });
+    });
+    d.addEventListener('close', function () { d.remove(); });
+    d.showModal();
+  };
   // Help ▸ Referencing and versions: the convention, and every source's reference
   SW.refHelp = function () {
     var V = root.SWVersions, vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; });

@@ -1378,3 +1378,11 @@ li.fd.folded { padding-bottom: 2px; }
 .orb-duals > p { flex-basis: 100%; text-align: center; margin: 0; font-size: 11.5px; }
 .orb-duals figure { margin: 0; } .orb-duals canvas { border-radius: 50%; box-shadow: 0 0 0 4px #1d262e; }
 .orb-duals figcaption { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* assembly errors, explained */
+button.badge.err { cursor: pointer; font: inherit; }
+button.badge.err:hover { filter: brightness(1.2); }
+.asmerrs { width: min(96vw, 900px); }
+.asmerr { border-top: 1px solid var(--line); padding: 8px 0 4px; }
+.asmerr h4 { margin: 0 0 6px; }
+.asmerr-line { margin: 0 0 4px; padding: 6px 10px; background: var(--code-bg, rgba(127,127,127,.08)); border-radius: 6px; font-size: 12.5px; white-space: pre; overflow-x: auto; }

@@ -663,7 +663,7 @@ a,	lac ~gct
 	lac fiu
 	sad (jmp 4
 	jmp a4
-	law i 1
+	law i1		/ scan p. 15 reads i1, no space (transcribed as law i 1 until 29 Sep 2026): the pass log's error, usw 1362 a+13 count i1
 	dac ~gct
 a5,	lat
 	and (40
