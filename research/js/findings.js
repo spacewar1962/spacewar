@@ -316,6 +316,7 @@
         '<button class="btn" data-e="save">Save</button><button class="btn ghost" data-e="cancel">Cancel</button></div>';
       var fpe = SW.figpack.split(n.text);
       SW.$('textarea', ed).value = fpe.text;
+      SW.mdTools(SW.$('textarea', ed));
       SW.$('input', ed).value = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).join(', ');
       ed.addEventListener('click', function (e) {
         var b = e.target.closest('[data-e]'); if (!b) return;
@@ -420,18 +421,19 @@
     function replies(t, depth) {
       return t.replies.map(function (r) {
         return '<div class="fd-reply" style="margin-left:' + (depth * 16) + 'px;border-left-color:' + colourOf(r.note.by) + '"><div class="fd-rhead"><span class="badge" style="background:' + colourOf(r.note.by) + ';color:#000">' + SW.esc(r.note.by) + '</span> <span class="hint">' + SW.esc(SW.fmtDate(r.note.date)) + '</span></div>' +
-          '<div class="fd-rtext">' + SW.esc(r.note.text) + '</div>' + (r.reactions.length ? '<div>' + rx(r) + '</div>' : '') + '</div>' + replies(r, depth + 1);
+          '<div class="fd-rtext note-md">' + SW.md(r.note.text) + '</div>' + (r.reactions.length ? '<div>' + rx(r) + '</div>' : '') + '</div>' + replies(r, depth + 1);
       }).join('');
     }
     function paint() {
       var t = threadOf(n);
       d.innerHTML = '<div class="tray-bighead"><span class="fd-no fd-ref mono">' + refOf(n) + '</span> <b>' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) +
         ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
-        (rest ? '<div class="fd-rtext">' + SW.esc(rest) + '</div>' : '') + '<div class="fd-bigfig"></div>' +
+        (rest ? '<div class="fd-rtext note-md">' + SW.md(rest) + '</div>' : '') + '<div class="fd-bigfig"></div>' +
         (tags.length ? '<p>' + tags.map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') + '</p>' : '') +
         '<p class="hint">Evidence: ' + SW.esc(where) + '</p>' + rxBar(t) +
         '<h4 class="fd-rh">Replies' + (t ? ' <span class="faint">' + countReplies(t) + '</span>' : '') + '</h4>' + (t && t.replies.length ? replies(t, 0) : '<p class="hint">None yet.</p>') +
         '<div class="fd-replybox"><textarea rows="3" placeholder="Reply, signed with your initials"></textarea><button class="btn" data-reply>Reply</button></div>';
+      SW.mdTools(SW.$('.fd-replybox textarea', d));
       if (fp.b64) SW.figpack.unpack(fp.b64).then(function (svg) { var fb = SW.$('.fd-bigfig', d); if (fb) fb.innerHTML = '<div class="tray-fig">' + SW.figpack.img(svg, 'fig-full') + '</div>'; });
     }
     paint();
@@ -460,7 +462,7 @@
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
         var th = threadOf(n), nrep = th ? countReplies(th) : 0, nrx = emojiOf(th).length, R0 = ratingOf(th);
         li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no fd-ref mono" title="Its reference, which does not change">' + refOf(n) + '</span> <b class="fd-title">' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
-          (rest ? '<p>' + SW.esc(rest) + '</p>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return /^note:/.test(g) ? '<span class="fd-tag fd-noteref mono" title="The note in its author’s My notes that this was shared from">from ' + SW.esc(g.slice(5)) + '</span>' : '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
+          (rest ? '<div class="note-md">' + SW.md(rest) + '</div>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return /^note:/.test(g) ? '<span class="fd-tag fd-noteref mono" title="The note in its author’s My notes that this was shared from">from ' + SW.esc(g.slice(5)) + '</span>' : '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
         if (nrep || nrx || R0) SW.$('.fd-ev', li).insertAdjacentHTML('beforeend', ' <a href="#" class="fd-replies">' + [nrep ? nrep + (nrep === 1 ? ' reply' : ' replies') : '', nrx ? emojiOf(th).map(function (r) { return r.text; }).join('') : '', R0 ? 'crew ' + (Math.round(R0.avg * 10) / 10) + '★ (' + R0.n + ')' : ''].filter(Boolean).join(' · ') + '</a>');
         li.addEventListener('click', function (e) { if (e.target.closest('.fd-open, .fd-title, .fd-replies')) { e.preventDefault(); openFinding(n, i, title, fp, c, lvl, where); } });
         SW.$('.fd-go', li).onclick = function (e) {

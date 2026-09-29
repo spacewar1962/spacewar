@@ -273,13 +273,16 @@
     return pStyle('NoteBy') + '<w:pBdr><w:right w:val="single" w:sz="12" w:space="6" w:color="' + personColour(by) + '"/></w:pBdr><w:ind w:left="' + left + '" w:right="120"/><w:jc w:val="right"/>';
   }
 
+  // Annotation text is Markdown (as Hypothesis stores it): in Word, its marks
+  // are taken out and links written as "text (url)"; in Markdown it is kept.
+  function notePlain(t) { return root.SW && root.SW.mdPlain ? root.SW.mdPlain(t) : str(t); }
   function wNote(n, indent, anchor) {
     var ink = '<w:color w:val="' + NOTE_INK + '"/>';
     var out = wPara(wNoteHead(n, false) +
-                    (anchor ? wRun(anchor, '<w:i/>' + ink) + wRun(': ', ink) : '') + wRun(n.text, ink),
+                    (anchor ? wRun(anchor, '<w:i/>' + ink) + wRun(': ', ink) : '') + wRun(notePlain(n.text), ink),
                     notePPr(n.by, indent));
     (n.replies || []).forEach(function (r) {
-      out += wPara(wNoteHead(r, true) + wRun(r.text, ink), notePPr(r.by, indent + REPLY_IND - NOTE_IND));
+      out += wPara(wNoteHead(r, true) + wRun(notePlain(r.text), ink), notePPr(r.by, indent + REPLY_IND - NOTE_IND));
     });
     return out;
   }
@@ -579,10 +582,10 @@
   // A note as a blockquote paragraph, with its replies nested below it.
   function mdNote(n, ref) {
     var head = '**' + mdEsc(n.by) + '**' + (n.date ? ', ' + fmtDate(n.date) : '') + (ref ? ' (' + ref + ')' : '');
-    var out = ['> ' + head + ': ' + mdEsc(n.text).replace(/\r?\n/g, '\n> ')];
+    var out = ['> ' + head + ': ' + str(n.text).replace(ILLEGAL_XML, '').replace(/\r?\n/g, '\n> ')];
     (n.replies || []).forEach(function (r) {
       out.push('>', '> > ↳ **' + mdEsc(r.by) + '**' + (r.date ? ', ' + fmtDate(r.date) : '') + ': ' +
-               mdEsc(r.text).replace(/\r?\n/g, '\n> > '));
+               str(r.text).replace(ILLEGAL_XML, '').replace(/\r?\n/g, '\n> > '));
     });
     return out.join('\n');
   }

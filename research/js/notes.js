@@ -265,7 +265,7 @@
     var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + ' ' + (anchor ? SW.refText(n.vid, anchor.p, anchor.n0, anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid));
     return { n: n, anchor: anchor, html: '<div class="news-item" data-id="' + SW.esc(n.id) + '"><div class="news-meta"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(what) +
       ' · <span class="mono">' + SW.esc(where) + '</span> · <span class="faint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
-      (N.isReaction(n) ? '' : '<div class="news-text">' + SW.esc(String(n.text).slice(0, 280)) + (String(n.text).length > 280 ? '…' : '') + '</div>') + '</div>' };
+      (N.isReaction(n) ? '' : '<div class="news-text">' + SW.esc(SW.mdPlain(SW.figpack.split(n.text).text).slice(0, 280)) + (SW.mdPlain(SW.figpack.split(n.text).text).length > 280 ? '…' : '') + '</div>') + '</div>' };
   }
   N.showNews = function () {
     var body = SW.drawer('What’s new', '<p class="hint">Looking…</p>');
@@ -459,7 +459,7 @@
         return '<div class="note binned" data-i="' + i + '"><div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
           (all ? ' · ' + SW.esc(v ? v.label.replace(/^Spacewar! /, '') : n.vid) : '') + (n.anchor ? ' · l. ' + n.anchor.n0 : ' · on the version') +
           (n.parent ? ' · reply' : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + ' · deleted ' + SW.esc(SW.fmtDate(n.binnedAt)) + '</div>' +
-          '<div class="body">' + SW.esc(n.text) + '</div>' +
+          '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>' +
           '<div class="acts"><button data-r="restore">Restore</button></div></div>';
       }).join('') +
         '<p style="margin-top:10px"><button class="btn" data-r="empty">' + (all ? 'Empty the bin' : 'Delete these for good') + ' (' + list.length + ')</button></p>';
@@ -612,7 +612,7 @@
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
       (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') +
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
-      '<div class="body">' + SW.esc(n.text) + '</div>' +
+      (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
       // one row: Reply | reactions | copy, download, edit, delete
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
@@ -733,6 +733,7 @@
       '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Save</button></span></div>';
     var ta = box.querySelector('textarea'), tg = box.querySelector('.edit-tags');
     ta.value = note.text;
+    SW.mdTools(ta);
     if (tg) tg.value = (note.tags || []).join(', ');
     body.hidden = true;
     body.insertAdjacentElement('afterend', box);
@@ -768,6 +769,7 @@
       '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Reply</button></span></div>';
     noteEl.insertAdjacentElement('afterend', box);
     var ta = box.querySelector('textarea');
+    SW.mdTools(ta);
     ta.focus();
     function save() {
       var text = ta.value.trim();
@@ -797,6 +799,8 @@
     SW.$('#note-title').textContent = opts.heading || 'Annotate';
     SW.$('#note-anchor').textContent = opts.anchorText || '';
     SW.$('#note-text').value = '';
+    SW.mdTools(SW.$('#note-text'));
+    SW.$('#note-text')._mdReset();
     SW.$('#note-tags').value = (opts.tags || []).join(', ');
     SW.$('#note-who').innerHTML = me.initials
       ? 'Signed <b>' + SW.esc(me.initials) + '</b> · ' + SW.fmtDate(SW.today()) +

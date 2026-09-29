@@ -1391,3 +1391,24 @@ button.badge.err:hover { filter: brightness(1.2); }
 .asmerr { border-top: 1px solid var(--line); padding: 8px 0 4px; }
 .asmerr h4 { margin: 0 0 6px; }
 .asmerr-line { margin: 0 0 4px; padding: 6px 10px; background: var(--code-bg, rgba(127,127,127,.08)); border-radius: 6px; font-size: 12.5px; white-space: pre; overflow-x: auto; }
+
+/* rich text in annotations (Markdown, as Hypothesis stores it) */
+.note-md, .note .body.note-md, .mcard .note .body.note-md { white-space: normal; overflow-wrap: anywhere; }
+.note-md p { margin: 0 0 .5em; }
+.note-md p:last-child, .note-md ul:last-child, .note-md ol:last-child, .note-md blockquote:last-child, .note-md pre:last-child { margin-bottom: 0; }
+.note-md ul, .note-md ol { margin: 0 0 .5em; padding-left: 1.3em; }
+.note-md li { margin: .1em 0; }
+.note-md blockquote { margin: 0 0 .5em; padding: 0 0 0 .7em; border-left: 3px solid var(--line); color: var(--text-dim); }
+.note-md code { font-family: var(--mono, ui-monospace, monospace); font-size: .88em; background: var(--code-bg); border: 1px solid var(--line-soft); border-radius: 3px; padding: 0 .25em; }
+.note-md pre.md-pre { margin: 0 0 .5em; padding: 6px 8px; background: var(--code-bg); border: 1px solid var(--line-soft); border-radius: 4px; overflow-x: auto; white-space: pre; }
+.note-md pre.md-pre code { background: none; border: 0; padding: 0; font-size: 12px; }
+.note-md a { color: var(--beam); text-decoration: underline; text-underline-offset: 2px; }
+.note-md .md-h { display: inline-block; margin-top: .2em; }
+.md-tools { display: flex; align-items: center; gap: 2px; margin: 0 0 3px; flex-wrap: wrap; }
+.md-tools button { font: 12px/1 var(--sans, inherit); min-width: 26px; height: 24px; padding: 0 6px; background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--line); border-radius: 3px; cursor: pointer; }
+.md-tools button:hover { color: var(--text); border-color: var(--text-faint); }
+.md-tools button.on { color: var(--beam); border-color: var(--beam); }
+.md-tools code { background: none; border: 0; font-size: 12px; }
+.md-tools .md-sep { width: 8px; }
+.md-tools .md-hint { margin-left: auto; font-size: 11px; }
+.md-preview { min-height: 5.5em; padding: 6px 8px; border: 1px dashed var(--line); border-radius: 4px; font-family: var(--serif); font-size: 15px; line-height: 1.5; }

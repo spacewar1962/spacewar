@@ -856,6 +856,131 @@
       return new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
     }
   };
+  // ---------- rich text in annotations ----------
+  // Notes are Markdown, as Hypothesis stores and shows them, so a note written
+  // here reads the same in Hypothesis's own client and the other way round.
+  // SW.md renders the subset people use in a note: paragraphs and line breaks,
+  // **bold**, *italic*, ~~struck~~, `code`, ``` code blocks ```, > quotations,
+  // - and 1. lists, # headings, [links](https://…) and bare URLs. Everything is
+  // escaped first, and a link must be http, https or mailto; links open in a new tab.
+  var MD_URL = /^(https?:\/\/|mailto:)/i;
+  function mdLink(href, label) {
+    return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+  }
+  function mdInline(s) {
+    var keep = [];
+    function stash(h) { keep.push(h); return '\u0000' + (keep.length - 1) + '\u0000'; }
+    function emph(t) {
+      return t.replace(/\*\*(?=\S)([\s\S]*?\S)\*\*/g, '<b>$1</b>').replace(/__(?=\S)([\s\S]*?\S)__/g, '<b>$1</b>')
+        .replace(/~~(?=\S)([\s\S]*?\S)~~/g, '<s>$1</s>')
+        .replace(/(^|[^\w*])\*(?=\S)([^*\n]*?\S)\*(?!\w)/g, '$1<i>$2</i>')
+        .replace(/(^|[^\w])_(?=\S)([^_\n]*?\S)_(?!\w)/g, '$1<i>$2</i>');
+    }
+    s = s.replace(/`([^`\n]+)`/g, function (m, c) { return stash('<code>' + c + '</code>'); });
+    s = s.replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, function (m, t, u) {
+      var raw = u.replace(/&amp;/g, '&');
+      return MD_URL.test(raw) ? stash(mdLink(u, emph(t))) : m;
+    });
+    s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { return pre + stash(mdLink(u, u)); });
+    s = emph(s);
+    return s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return keep[+i]; });
+  }
+  SW.md = function (text) {
+    var fences = [];
+    var src = String(text == null ? '' : text).replace(/\r\n?/g, '\n')
+      .replace(/^```[^\n]*\n([\s\S]*?)\n?```[ \t]*$/gm, function (m, code) { fences.push(code); return '\n\u0001' + (fences.length - 1) + '\u0001\n'; });
+    return mdBlocks(src.split('\n'), fences);
+  };
+  function mdBlocks(lines, fences) {
+    var out = [], para = [], i = 0, m, items;
+    function line(l) { var h = /^#{1,4}\s+(.*)$/.exec(l); return h ? '<b class="md-h">' + mdInline(SW.esc(h[1])) + '</b>' : mdInline(SW.esc(l)); }
+    function flush() { if (para.length) out.push('<p>' + para.map(line).join('<br>') + '</p>'); para = []; }
+    function run(re) { items = []; while (i < lines.length && re.test(lines[i])) items.push(lines[i++].replace(re, '')); return items; }
+    while (i < lines.length) {
+      var l = lines[i];
+      if (!l.trim()) { flush(); i++; }
+      else if ((m = /^\u0001(\d+)\u0001$/.exec(l.trim()))) { flush(); out.push('<pre class="md-pre"><code>' + SW.esc(fences[+m[1]]) + '</code></pre>'); i++; }
+      else if (/^\s*>/.test(l)) { flush(); out.push('<blockquote>' + mdBlocks(run(/^\s*>\s?/), fences) + '</blockquote>'); }
+      else if (/^\s*[-*+]\s+/.test(l)) { flush(); out.push('<ul>' + run(/^\s*[-*+]\s+/).map(function (t) { return '<li>' + line(t) + '</li>'; }).join('') + '</ul>'); }
+      else if (/^\s*\d+[.)]\s+/.test(l)) { flush(); out.push('<ol>' + run(/^\s*\d+[.)]\s+/).map(function (t) { return '<li>' + line(t) + '</li>'; }).join('') + '</ol>'); }
+      else { para.push(l); i++; }
+    }
+    flush();
+    return out.join('');
+  }
+  // The same text without its marks, for a line of news or a Word export:
+  // links kept as "text (url)".
+  SW.mdPlain = function (text) {
+    return String(text == null ? '' : text)
+      .replace(/^```[^\n]*\n?|```$/gm, '')
+      .replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, '$1 ($2)')
+      .replace(/\*\*([^*]+)\*\*|__([^_]+)__/g, '$1$2').replace(/~~([^~]+)~~/g, '$1')
+      .replace(/(^|[^\w*])\*([^*\n]+)\*(?!\w)/g, '$1$2').replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, '$1$2')
+      .replace(/`([^`\n]+)`/g, '$1').replace(/^\s*>\s?/gm, '').replace(/^#{1,4}\s+/gm, '');
+  };
+
+  // A small toolbar over a note's text box: bold, italic, code, link, quotation,
+  // list, and a preview. Cmd/Ctrl+B, I and K do the same; pasting a URL over
+  // selected text makes it a link.
+  SW.mdTools = function (ta) {
+    if (!ta || ta._mdTools) return;
+    ta._mdTools = true;
+    var bar = SW.el('div', { class: 'md-tools' });
+    bar.innerHTML = [['b', '<b>B</b>', 'Bold (⌘B)'], ['i', '<i>I</i>', 'Italic (⌘I)'], ['code', '<code>`</code>', 'Code'],
+      ['link', '🔗', 'Link (⌘K): select the words, then paste or type the URL'], ['quote', '❝', 'Quotation'], ['list', '•', 'List']]
+      .map(function (b) { return '<button type="button" data-md="' + b[0] + '" title="' + b[2] + '">' + b[1] + '</button>'; }).join('') +
+      '<span class="md-sep"></span><button type="button" data-md="preview" class="md-prev" title="See it as it will be shown">Preview</button>' +
+      '<span class="hint md-hint">Markdown</span>';
+    var prev = SW.el('div', { class: 'md-preview note-md', hidden: '' });
+    ta.parentNode.insertBefore(bar, ta);
+    ta.insertAdjacentElement('afterend', prev);
+    function sel() { return { a: ta.selectionStart, b: ta.selectionEnd, t: ta.value.slice(ta.selectionStart, ta.selectionEnd) }; }
+    function put(a, b, text, s0, s1) {
+      ta.focus(); ta.setSelectionRange(a, b);
+      if (!document.execCommand || !document.execCommand('insertText', false, text)) { ta.setRangeText(text, a, b, 'end'); }
+      ta.setSelectionRange(a + s0, a + s1);
+      ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    function wrap(m, ph) { var s = sel(), t = s.t || ph; put(s.a, s.b, m + t + m, m.length, m.length + t.length); }
+    function lines(fn) {
+      var v = ta.value, a = v.lastIndexOf('\n', ta.selectionStart - 1) + 1, e = v.indexOf('\n', ta.selectionEnd); if (e < 0) e = v.length;
+      var t = v.slice(a, e).split('\n').map(fn).join('\n'); put(a, e, t, 0, t.length);
+    }
+    function link(url) {
+      var s = sel(), t = s.t || 'link';
+      if (url) put(s.a, s.b, '[' + t + '](' + url + ')', 1, 1 + t.length);
+      else put(s.a, s.b, '[' + t + '](https://)', t.length + 3, t.length + 11);
+    }
+    function act(k) {
+      if (k === 'b') wrap('**', 'bold');
+      else if (k === 'i') wrap('*', 'italic');
+      else if (k === 'code') { var s = sel(); if (s.t.indexOf('\n') >= 0) put(s.a, s.b, '```\n' + s.t + '\n```', 4, 4 + s.t.length); else wrap('`', 'code'); }
+      else if (k === 'link') link();
+      else if (k === 'quote') lines(function (l) { return '> ' + l; });
+      else if (k === 'list') lines(function (l) { return '- ' + l; });
+      else if (k === 'preview') {
+        var on = prev.hidden;
+        prev.hidden = !on; ta.hidden = on;
+        bar.querySelector('.md-prev').classList.toggle('on', on);
+        bar.querySelector('.md-prev').textContent = on ? 'Write' : 'Preview';
+        if (on) prev.innerHTML = SW.md(ta.value) || '<p class="hint">Nothing yet.</p>'; else ta.focus();
+      }
+    }
+    bar.addEventListener('mousedown', function (e) { if (e.target.closest('[data-md]')) e.preventDefault(); });   // keep the selection
+    bar.addEventListener('click', function (e) { var b = e.target.closest('[data-md]'); if (b) { e.preventDefault(); e.stopPropagation(); act(b.dataset.md); } });
+    ta.addEventListener('keydown', function (e) {
+      if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
+      var k = { b: 'b', i: 'i', k: 'link' }[e.key.toLowerCase()];
+      if (k) { e.preventDefault(); act(k); }
+    });
+    ta.addEventListener('paste', function (e) {
+      var s = sel(), u = (e.clipboardData && e.clipboardData.getData('text/plain') || '').trim();
+      if (s.t && !/\n/.test(s.t) && MD_URL.test(u) && !/\s/.test(u)) { e.preventDefault(); link(u); }
+    });
+    // a fresh note: back to writing
+    ta._mdReset = function () { if (!prev.hidden) act('preview'); };
+  };
+
   SW.figpack = {
     RE: /\n*<!-- sw:fig:gz ([A-Za-z0-9+\/=]+) -->\s*$/,
     pack: function (svg) {

@@ -227,7 +227,7 @@
     if (!it) return;
     var d = SW.el('dialog', { class: 'tray-big' });
     var body = it.kind === 'figure' ? '<div class="tray-fig">' + SW.displaySVG(it.svg) + '</div>'
-      : it.kind === 'text' ? '<p class="tray-para">' + SW.esc(it.text || '').replace(/\n/g, '<br>') + '</p>'
+      : it.kind === 'text' ? '<div class="tray-para note-md">' + SW.md(it.text || '') + '</div>'
       : (it.subtitle ? '<p class="hint">' + SW.esc(it.subtitle) + '</p>' : '') + '<div class="tray-body">' + blocksHTML(it.blocks || []) + '</div>';
     d.innerHTML = '<div class="tray-bighead"><b>' + SW.esc(it.caption || (it.kind === 'text' ? 'Paragraph' : 'Note')) + '</b> <span class="faint">' + SW.esc([it.by, it.from || vShort(it.vid)].filter(Boolean).join(' · ')) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
       body + (it.note ? '<p class="tray-para"><i>' + SW.esc(it.note) + '</i></p>' : '');
@@ -241,8 +241,8 @@
   function personHue(by) { var h = 0; by = String(by || ''); for (var i = 0; i < by.length; i++) h = (h * 31 + by.charCodeAt(i)) % 360; return (h + 200) % 360; }
   function noteHTML(n) {
     var col = 'hsl(' + personHue(n.by) + ',62%,60%)';
-    return '<div class="tray-anno" style="border-right-color:' + col + '"><b style="color:' + col + '">' + SW.esc(n.by || '') + '</b> <span class="faint">' + SW.esc([n.date, n.ref].filter(Boolean).join(' · ')) + '</span><div>' + SW.esc(n.text || '') + '</div>' +
-      (n.replies || []).map(function (r) { return '<div class="tray-anno-r">↳ <b style="color:hsl(' + personHue(r.by) + ',62%,60%)">' + SW.esc(r.by || '') + '</b> ' + SW.esc(r.text || '') + '</div>'; }).join('') + '</div>';
+    return '<div class="tray-anno" style="border-right-color:' + col + '"><b style="color:' + col + '">' + SW.esc(n.by || '') + '</b> <span class="faint">' + SW.esc([n.date, n.ref].filter(Boolean).join(' · ')) + '</span><div class="note-md">' + SW.md(n.text || '') + '</div>' +
+      (n.replies || []).map(function (r) { return '<div class="tray-anno-r">↳ <b style="color:hsl(' + personHue(r.by) + ',62%,60%)">' + SW.esc(r.by || '') + '</b><div class="note-md">' + SW.md(r.text || '') + '</div></div>'; }).join('') + '</div>';
   }
   function cellText(c) { return c == null ? '' : typeof c === 'object' ? (c.text != null ? c.text : '') : String(c); }
   function blocksHTML(bl) {
