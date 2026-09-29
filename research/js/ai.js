@@ -43,10 +43,11 @@
   // torpedoes were tried for hardcore and made it worse.
 
   A.LEVEL_NAMES = [['easy', 'easy'], ['medium', 'medium'], ['hard', 'hard'], ['hardcore', 'hardcore']];
-  // Temperaments, one drawn at random for each pilot each game, so two pilots of
-  // one level do not fly alike: they scale the level's chase distance and speed,
-  // shift how slow it lets its orbit get, and set how long it waits before its
-  // first move (frames).
+  A.STYLE_NAMES = [['hunter', 'hunter'], ['duellist', 'duellist'], ['orbiter', 'orbiter']];
+  // Styles, chosen on Run for each computer ship (all at the hard level): they
+  // scale the level's chase distance and speed, shift how slow it lets its orbit
+  // get, and set how long it waits before its first move (frames, drawn at random
+  // within the range, so two pilots of one style do not fly alike).
   var TEMPER = [
     { name: 'hunter', chase: 0.7, top: 1.2, orbit: -0.05, wait: [0, 15] },
     { name: 'duellist', chase: 1, top: 1, orbit: 0, wait: [5, 30] },
@@ -65,9 +66,11 @@
   }
 
   // A pilot for ship k of build b, with that ship's control bits (from SW.controlMap).
-  A.pilot = function (b, k, bits, level) {
-    var S = b.sym, L = A.LEVELS[level === 'fair' ? 'medium' : level] || A.LEVELS.medium, T = torpedoes(b);
-    var M = TEMPER[Math.floor(Math.random() * TEMPER.length)], wait = M.wait[0] + Math.floor(Math.random() * (M.wait[1] - M.wait[0]));
+  // style: hunter, duellist or orbiter (at random if not given); level: hard if not given.
+  A.pilot = function (b, k, bits, style, level) {
+    level = level || 'hard';
+    var S = b.sym, L = A.LEVELS[level] || A.LEVELS.hard, T = torpedoes(b);
+    var M = TEMPER.filter(function (t) { return t.name === style; })[0] || TEMPER[Math.floor(Math.random() * TEMPER.length)], wait = M.wait[0] + Math.floor(Math.random() * (M.wait[1] - M.wait[0]));
     var mtb = S.mtb.val, nob = S.nob.val, nx = S.nx1.val, ny = S.ny1.val, dx = S.ndx.val, dy = S.ndy.val, th = S.nth.val;
     var mex = S.mex ? S.mex.val : -1, tcr = S.tcr ? S.tcr.val : -1;
     var hyp = {}; ['hp1', 'hp3', 'hp7'].forEach(function (n) { if (S[n]) hyp[S[n].val] = 1; });

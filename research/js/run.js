@@ -23,8 +23,8 @@
   // computer the Wedge), 'ai0' (you the Wedge, it the Needle), 'aiai' (it flies both).
   var players = SW.store.get('run.players', 'keys');
   var follow = SW.store.get('run.follow', true), paneAt = 0;
-  // each computer pilot its own level (the Needle's, the Wedge's)
-  var aiLevels = [0, 1].map(function (j) { var l = SW.store.get('run.ailevel' + j, SW.store.get('run.ailevel', 'medium')); return l === 'fair' ? 'medium' : l; });
+  // each computer pilot its own style (the Needle's, the Wedge's)
+  var aiStyles = [0, 1].map(function (j) { var l = SW.store.get('run.aistyle' + j, 'duellist'); return SW.ai.STYLE_NAMES.some(function (o) { return o[0] === l; }) ? l : 'duellist'; });
   var ctlMap = null, keyBits = 0, aiBits = 0, pilots = [null, null], ml0At = -1;
   function shipMask(j) { var m = ctlMap && ctlMap[j]; return m ? (m.ccw | m.cw | m.rocket | m.torpedo) : 0; }
   function aiShips() { return players === 'ai1' ? [1] : players === 'ai0' ? [0] : players === 'aiai' ? [0, 1] : []; }
@@ -32,7 +32,7 @@
   function setPilots() {
     pilots = [null, null];
     if (!aiUsable()) return;
-    aiShips().forEach(function (j) { pilots[j] = SW.ai.pilot(build, j, ctlMap[j], aiLevels[j]); });
+    aiShips().forEach(function (j) { pilots[j] = SW.ai.pilot(build, j, ctlMap[j], aiStyles[j]); });
   }
   // the control word: your keys for the ships you fly, the computer's bits for its own
   function compose() {
@@ -469,11 +469,10 @@
     var ok = aiUsable();
     var NAME = ['the Needle', 'the Wedge'];
     function lvlSel(jj) {
-      return '<label class="check" title="How well the computer flies ' + NAME[jj] + ': easy aims loosely and never dodges; medium dodges torpedoes; hard also chases and, where the version has it, jumps into hyperspace at the last moment; hardcore jumps in good time and aims finest.">' + (jj ? 'Wedge' : 'Needle') + ' <select data-al="' + jj + '"' + (ok ? '' : ' disabled') + '>' +
-        SW.ai.LEVEL_NAMES.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === aiLevels[jj] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
-        (pilots[jj] && pilots[jj].temper ? ' <span class="hint" title="Drawn at random for each game: a hunter chases hard, an orbiter keeps its distance and snipes, a duellist is between">' + pilots[jj].temper + '</span>' : '') + '</label>';
+      return '<label class="check" title="How the computer flies ' + NAME[jj] + ': a hunter chases hard and closes in; an orbiter keeps its distance and fires from its orbit; a duellist is between.">' + (jj ? 'Wedge' : 'Needle') + ' <select data-al="' + jj + '"' + (ok ? '' : ' disabled') + '>' +
+        SW.ai.STYLE_NAMES.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === aiStyles[jj] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>';
     }
-    el.innerHTML = '<label class="check" title="Who flies the ships. The computer flies by the same control bits as a player: it keeps in orbit round the star, turns to meet the other ship, fires whenever a torpedo would pass close to it, and at the higher levels dodges torpedoes and jumps into hyperspace. Press Run to start.">Players <select id="r-pl"' + (ok ? '' : ' disabled') + '>' +
+    el.innerHTML = '<label class="check" title="Who flies the ships. The computer flies by the same control bits as a player: it keeps in orbit round the star, turns to meet the other ship, fires whenever a torpedo would pass close to it, dodges torpedoes and, where the version has it, jumps into hyperspace. Press Run to start.">Players <select id="r-pl"' + (ok ? '' : ' disabled') + '>' +
       [['keys', 'Two people (keys)'], ['ai1', 'You (Needle) against the computer'], ['ai0', 'You (Wedge) against the computer'], ['aiai', 'The computer against itself']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === players ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
       '</select></label> ' + aiShips().map(lvlSel).join(' ') +
       (build && build.v.ctlLoad ? ' <span class="hint">Not for this version: its two control boxes read the same word on the bench (F27).</span>' : !ctlMap && build && build.asm ? ' <span class="hint">Finding the controls…</span>' : '');
@@ -481,7 +480,7 @@
     // choosing who flies does not start the game: Run does
     if (pl) pl.onchange = function () { players = pl.value; SW.store.set('run.players', players); setPilots(); compose(); renderPlayers(); clearScore(); };
     showScore();
-    SW.$$('[data-al]', el).forEach(function (sel) { sel.onchange = function () { var jj = +sel.dataset.al; aiLevels[jj] = sel.value; SW.store.set('run.ailevel' + jj, sel.value); setPilots(); compose(); renderPlayers(); }; });
+    SW.$$('[data-al]', el).forEach(function (sel) { sel.onchange = function () { var jj = +sel.dataset.al; aiStyles[jj] = sel.value; SW.store.set('run.aistyle' + jj, sel.value); setPilots(); compose(); renderPlayers(); }; });
   }
   // a source line as its reference (version, tape, line)
   function lineRef(L) { return SW.refOf(build.v.id, L.p, L.n, L.n, build.parts.length); }
