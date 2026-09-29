@@ -124,6 +124,7 @@
     SW.$('#set-figbg').value = SW.figBg();
     SW.$('#set-noteshade').checked = SW.store.get('noteShade', true);
     SW.$('#set-chmbright').checked = SW.store.get('chmBright', true);
+    SW.$('#set-dev').checked = SW.dev();
     var fontSel = SW.$('#set-font'), size = SW.$('#set-size'), sizeOut = SW.$('#set-size-out');
     var was = { font: SW.codeFont(), size: SW.codeSize() };
     fontSel.value = was.font; size.value = was.size; sizeOut.textContent = was.size + ' px';
@@ -136,6 +137,7 @@
       SW.store.set('noteShade', SW.$('#set-noteshade').checked);
       if (SW.store.get('chmBright', true) !== SW.$('#set-chmbright').checked) { SW.store.set('chmBright', SW.$('#set-chmbright').checked); SW.forget('graphics'); if (SW.state.v === '4.1d' || SW.state.v === '4.1f') SW.toast('CHM brightness ' + (SW.$('#set-chmbright').checked ? 'on' : 'off') + ': Run shows it from the next Reset', 4000); }
       SW.applyNoteShade();
+      if (SW.dev() !== SW.$('#set-dev').checked) { SW.store.set('dev', SW.$('#set-dev').checked); SW.applyDev(); SW.toast('Developer mode ' + (SW.dev() ? 'on' : 'off'), 3000); }
       SW.store.set('initials', SW.$('#set-initials').value.trim().toUpperCase());
       SW.store.set('name', SW.$('#set-name').value.trim());
       SW.store.set('group', SW.notes.groupId(grp.value));

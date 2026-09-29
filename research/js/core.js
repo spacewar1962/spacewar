@@ -856,6 +856,14 @@
       return new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
     }
   };
+  // ---------- Developer mode (⚙) ----------
+  // For the team: shows annotations marked Developer only, and features still
+  // being built. A feature in progress checks SW.dev(), or its markup takes the
+  // class dev-only, shown only while body has dev-on.
+  SW.dev = function () { return !!SW.store.get('dev', false); };
+  SW.applyDev = function () { document.body.classList.toggle('dev-on', SW.dev()); };
+  if (document.body) SW.applyDev(); else document.addEventListener('DOMContentLoaded', SW.applyDev);
+
   // ---------- rich text in annotations ----------
   // Notes are Markdown, as Hypothesis stores and shows them, so a note written
   // here reads the same in Hypothesis's own client and the other way round.

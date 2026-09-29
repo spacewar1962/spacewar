@@ -109,7 +109,7 @@
       anchor: anchor, text: a.text || '', by: by, name: (a.user_info && a.user_info.display_name) || '',
       date: a.created, updated: a.updated, parent: (a.references || []).slice(-1)[0] || null,
       tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis', user: a.user || '', rawTags: tags,
-      binned: tags.indexOf('sw:deleted') >= 0, binnedAt: tagVal(tags, 'sw:deleted-at:'),
+      binned: tags.indexOf('sw:deleted') >= 0, dev: tags.indexOf('sw:dev') >= 0, binnedAt: tagVal(tags, 'sw:deleted-at:'),
       link: a.links && (a.links.incontext || a.links.html), quote: qsel ? qsel.exact : ''
     };
   }
@@ -321,13 +321,14 @@
                              'sw:src:' + (note.anchor.src || '')] : [])
       // a span within the lines: from character c0 of the first to c1 of the last
       .concat(note.anchor && note.anchor.c0 != null ? ['sw:chars:' + note.anchor.c0 + '-' + note.anchor.c1] : [])
+      .concat(note.dev ? ['sw:dev'] : [])
       .concat(note.tags || []);
     if (!N.configured()) {
       var d = drafts();
       d.push({ id: 'draft-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6), vid: note.vid, kind: note.kind || 'line', anchor: note.anchor,
                quote: note.quote || '', text: note.text, by: by, name: me.name,
                date: new Date().toISOString(), parent: note.parent || null, tags: note.tags || [],
-               source: 'draft', hTags: tags });
+               source: 'draft', hTags: tags, dev: !!note.dev });
       saveDrafts(d);
       N.invalidate(note.vid);
       if (!note.quiet) SW.toast('Saved as a draft in this browser (no Hypothesis group set).');
@@ -491,13 +492,16 @@
   };
 
   // Edit a note of one's own: its text, and for a note (not a reply) its tags.
-  N.update = function (note, text, tags) {
+  // dev (true or false, or undefined to leave it): Developer only, the sw:dev tag
+  N.update = function (note, text, tags, dev) {
+    function withDev(ts) { ts = ts.filter(function (t) { return t !== 'sw:dev'; }); return dev ? ts.concat(['sw:dev']) : ts; }
     var now = new Date().toISOString();
     if (note.source === 'draft') {
       saveDrafts(drafts().map(function (d) {
         if (d.id !== note.id) return d;
         d.text = text; d.updated = now;
         if (tags) { d.tags = tags; d.hTags = (d.hTags || []).filter(function (t) { return t.indexOf('sw:') === 0; }).concat(tags); }
+        if (dev !== undefined) { d.dev = !!dev; d.hTags = withDev((d.hTags || []).filter(function (t) { return t.indexOf('sw:') === 0; })).concat(d.tags || []); }
         return d;
       }));
       N.invalidate(note.vid);
@@ -505,7 +509,10 @@
     }
     if (note.source !== 'hypothesis') return Promise.resolve();
     var body = { text: text };
-    if (tags) body.tags = (note.rawTags || []).filter(function (t) { return t.indexOf('sw:') === 0; }).concat(tags);
+    if (tags || dev !== undefined) {
+      var sw = (note.rawTags || []).filter(function (t) { return t.indexOf('sw:') === 0; });
+      body.tags = (dev !== undefined ? withDev(sw) : sw).concat(tags || note.tags || []);
+    }
     return hx('PATCH', '/annotations/' + note.id, body).then(function (r) {
       edits[note.id] = { text: text, tags: tags || note.tags, updated: (r && r.updated) || now };
       (pending[note.vid] || []).forEach(function (p) { if (p.id === note.id) { p.text = text; if (tags) p.tags = tags; p.updated = now; } });
@@ -615,7 +622,7 @@
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
-      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') +
+      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
       (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? '<pre class="frag-q" title="The code this annotation is attached to">' + SW.esc(n.quote) + '</pre>' : '') +
       (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
@@ -625,7 +632,7 @@
       }).join(' · ') + '</div>' : '') +
       // one row: Reply | reactions | copy, download, edit, delete
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
-      '<button data-act="copy" class="ico" title="Copy the annotation as a quotation with its reference ([REF: …], version and lines), ready for a book or chapter; with its replies and link">⧉</button>' +
+      '<button data-act="copy" class="ico" title="Copy the annotation as a quotation with its code and reference, ready for a book or chapter; with its replies">⧉</button>' +
       (n.source !== 'draft' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)">↪</button>' : '') +
       '<button data-act="dl" class="ico" title="Download the annotation with its code and replies (Markdown)">⤓</button>' +
       (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
@@ -675,7 +682,7 @@
         var emoji = btn.dataset.emoji;
         var mineR = all.filter(function (x) { return N.isReaction(x) && x.parent === note.id && x.text === emoji && myReaction(x); })[0];
         btn.disabled = true;
-        (mineR ? N.remove(mineR, true) : N.create({ vid: vid, parent: note.id, kind: 'reaction', anchor: note.anchor, text: emoji, tags: [], quiet: true }))
+        (mineR ? N.remove(mineR, true) : N.create({ vid: vid, parent: note.id, kind: 'reaction', anchor: note.anchor, text: emoji, tags: [], quiet: true, dev: note.dev }))
           .catch(function (err) { btn.disabled = false; if (err.message !== 'no initials') SW.toast(err.message, 5000); });
         return;
       }
@@ -710,9 +717,18 @@
     idx.sig = sig;
     return ns;
   }
+  // Developer only notes (sw:dev), and anything under one, are left out unless
+  // Developer mode is on (⚙). Hypothesis's own site still shows them to the group.
+  function devFilter(ns) {
+    if (SW.dev()) return ns;
+    var byId = {};
+    ns.forEach(function (n) { byId[n.id] = n; });
+    function dev(n, g) { return !!n && (n.dev || (g < 50 && !!n.parent && dev(byId[n.parent], g + 1))); }
+    return ns.filter(function (n) { return !dev(n, 0); });
+  }
   var list0 = N.list, listAll0 = N.listAll;
-  N.list = function (vid, force) { return list0(vid, force).then(reindex); };
-  N.listAll = function (opts) { return listAll0(opts).then(reindex); };
+  N.list = function (vid, force) { return list0(vid, force).then(devFilter).then(reindex); };
+  N.listAll = function (opts) { return listAll0(opts).then(devFilter).then(reindex); };
   N.byId = function (id) { return idx.byId[id] || null; };
   N.backlinks = function (id) { return (idx.back[id] || []).map(function (x) { return idx.byId[x]; }).filter(Boolean); };
 
@@ -737,14 +753,25 @@
     return q.v ? q : null;
   };
   // How SW.md draws a bench link: in place, marked ↪, a bare one named for what it points to.
-  SW.internalLink = function (href, label, bare) {
-    var q = N.parseLink(href);
-    if (!q) return null;
+  function nameOfLink(q) {
     var n = q.a && idx.byId[q.a], name;
     if (n) name = N.labelOf(n);
     else if (q.l) { var m = /^(\d+):(\d+)(?:-(\d+))?$/.exec(q.l); name = m ? SW.refOf(q.v, +m[1], +m[2], +(m[3] || m[2]), SW.nparts(q.v)) : SW.refOf(q.v); }
     else name = SW.refOf(q.v);
-    if (q.a && !n) name = 'annotation, ' + name;
+    return q.a && !n ? 'annotation, ' + name : name;
+  }
+  // A note's text with its bench links as names, for print (Copy).
+  N.linksAsNames = function (text) {
+    return String(text || '').replace(/\[([^\]\n]+)\]\((\S+?)\)/g, function (m, t, u) { return N.parseLink(u) ? t : m; })
+      .replace(/https?:\/\/[^\s<>]+/g, function (u) {
+        var tail = /[.,;:!?)]+$/.exec(u), core = tail ? u.slice(0, -tail[0].length) : u, q = N.parseLink(core);
+        return q ? nameOfLink(q) + (tail ? tail[0] : '') : u;
+      });
+  };
+  SW.internalLink = function (href, label, bare) {
+    var q = N.parseLink(href);
+    if (!q) return null;
+    var name = nameOfLink(q);
     return '<a href="' + href + '" class="swlink" title="' + SW.esc('Go to ' + name) + '">' + (bare ? SW.esc(name) : label) + '</a>';
   };
 
@@ -928,26 +955,22 @@
       ' ' + (note.anchor ? SW.refText(note.vid, note.anchor.p, note.anchor.n0, note.anchor.n1, SW.nparts(note.vid)) : SW.refText(note.vid));
   }
   // Copy: the annotation as a quotation with its reference, ready for a book or
-  // chapter, e.g. “…” (David M. Berry, annotation on Spacewar! 3.1 (24 Sep 1962),
-  // ll. 32–34 [REF: SW3.1L, 1.32–34], 30 Sep 2026), then its replies and its link.
-  function whereOf(n) {
-    var v = root.SWVersions.byId(n.vid), a = n.anchor;
-    return (v ? v.label + (v.date ? ' (' + v.date + ')' : '') : n.vid) +
-      (a ? ', ' + (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) : '') + ' ' +
-      (a ? SW.refText(n.vid, a.p, a.n0, a.n1, SW.nparts(n.vid)) : SW.refText(n.vid));
+  // chapter: Code: “rcl 9s …”, “Text of the annotation” (David M. Berry,
+  // annotation on SW3.1L, 1.32–34, 30 Sep 2026); its replies after it, alike.
+  function refOfNote(n) { var a = n.anchor; return a ? SW.refOf(n.vid, a.p, a.n0, a.n1, SW.nparts(n.vid)) : SW.refOf(n.vid); }
+  function plainOf(n) { return SW.mdPlain(N.linksAsNames(SW.figpack.split(n.text).text)).replace(/\s*\n\s*/g, ' ').trim(); }
+  function codeOf(r) {
+    var c = r.quote || '', b = SW.views.read && SW.views.read.build, a = r.anchor;
+    if (!c && a && b && b.v.id === r.vid && b.lines[a.p]) c = b.lines[a.p].slice(a.n0 - 1, a.n1).map(function (L) { return L.raw; }).join(' ');
+    c = c.replace(/\s+/g, ' ').trim();
+    return c.length > 60 ? c.slice(0, 60).trim() + ' …' : c;
   }
-  function plainOf(n) { return SW.mdPlain(SW.figpack.split(n.text).text).trim(); }
   function copyNote(note, all) {
-    var t = threadOf(note, all), r = t.note, lines = [];
-    var span = r.anchor && r.anchor.c0 != null && r.quote ? r.quote.replace(/\s+/g, ' ').trim() : '';
-    if (span.length > 60) span = span.slice(0, 60) + '…';
+    var t = threadOf(note, all), r = t.note, lines = [], code = codeOf(r);
     function who(n) { return n.name || n.by; }
-    lines.push('“' + plainOf(note) + '” (' + who(note) + ', ' + (note.parent ? 'reply to ' + who(r) + '’s annotation' : 'annotation') + ' on ' +
-      whereOf(r) + (span ? ', on the code “' + span + '”' : '') + ', ' + SW.fmtDate(note.date) + ')');
-    if (note.id === r.id) (function walk(rs) { rs.forEach(function (x) {
-      lines.push('Reply, ' + who(x.note) + ', ' + SW.fmtDate(x.note.date) + ': “' + plainOf(x.note) + '”'); walk(x.replies);
-    }); })(t.replies);
-    if (note.source !== 'draft' && note.source !== 'buildlog') lines.push(N.linkOf(note));
+    function one(n, what) { return '“' + plainOf(n) + '” (' + who(n) + ', ' + what + ' on ' + refOfNote(r) + ', ' + SW.fmtDate(n.date) + ')'; }
+    lines.push((code ? 'Code: “' + code + '”, ' : '') + one(note, note.parent ? 'reply' : 'annotation'));
+    if (note.id === r.id) (function walk(rs) { rs.forEach(function (x) { lines.push('Reply: ' + one(x.note, 'reply')); walk(x.replies); }); })(t.replies);
     var text = lines.join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
       .then(function () { SW.toast('Annotation copied, with its reference'); }, function () { window.prompt('Copy:', text); });
@@ -978,6 +1001,7 @@
     var box = SW.el('div', { class: 'reply-box edit-box' });
     box.innerHTML = '<textarea rows="4"></textarea>' +
       (note.parent ? '' : '<input class="edit-tags" placeholder="Tags, separated by commas">') +
+      (note.parent || !SW.dev() ? '' : '<label class="check dev-check"><input type="checkbox" class="edit-dev"' + (note.dev ? ' checked' : '') + '> Developer only</label>') +
       '<div class="reply-foot"><span class="hint">Editing your ' + (note.parent ? 'reply' : 'annotation') + '</span>' +
       '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Save</button></span></div>';
     var ta = box.querySelector('textarea'), tg = box.querySelector('.edit-tags');
@@ -993,7 +1017,8 @@
       if (!text) { ta.focus(); return; }
       var tags = tg ? tg.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean) : null;
       box.querySelector('[data-r="save"]').disabled = true;
-      N.update(note, text, tags).then(close, function (e) { box.querySelector('[data-r="save"]').disabled = false; SW.toast(e.message, 5000); });
+      var dv = box.querySelector('.edit-dev');
+      N.update(note, text, tags, dv && dv.checked !== !!note.dev ? dv.checked : undefined).then(close, function (e) { box.querySelector('[data-r="save"]').disabled = false; SW.toast(e.message, 5000); });
     }
     box.addEventListener('click', function (e) {
       e.stopPropagation();
@@ -1024,7 +1049,7 @@
       var text = ta.value.trim();
       if (!text) { ta.focus(); return; }
       box.querySelector('[data-r="save"]').disabled = true;
-      N.create({ vid: vid, parent: note.id, kind: note.kind, anchor: note.anchor, text: text, tags: [] })
+      N.create({ vid: vid, parent: note.id, kind: note.kind, anchor: note.anchor, text: text, tags: [], dev: note.dev })
         .then(function () { box.remove(); }, function (e) {
           box.querySelector('[data-r="save"]').disabled = false;
           if (e.message !== 'no initials') SW.toast(e.message, 5000);
@@ -1051,6 +1076,9 @@
     SW.mdTools(SW.$('#note-text'));
     SW.$('#note-text')._mdReset();
     SW.$('#note-tags').value = (opts.tags || []).join(', ');
+    var devBox = SW.$('#note-dev');
+    devBox.hidden = !SW.dev() || !!opts.parent;
+    SW.$('input', devBox).checked = SW.store.get('devNote', true);
     SW.$('#note-who').innerHTML = me.initials
       ? 'Signed <b>' + SW.esc(me.initials) + '</b> · ' + SW.fmtDate(SW.today()) +
         (N.configured() ? ' · shared with the group' : ' · kept as a draft (no group set)')
@@ -1064,8 +1092,10 @@
       var text = SW.$('#note-text').value.trim();
       if (!text) return;
       var tags = SW.$('#note-tags').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      var dev = !devBox.hidden && SW.$('input', devBox).checked;
+      if (!devBox.hidden) SW.store.set('devNote', dev);
       N.create({ vid: opts.vid, kind: opts.kind || (opts.anchor ? 'line' : 'version'), anchor: opts.anchor,
-                 quote: opts.quote, text: text, tags: tags, parent: opts.parent })
+                 quote: opts.quote, text: text, tags: tags, parent: opts.parent, dev: dev })
         .catch(function (e) { if (e.message !== 'no initials') SW.toast(e.message, 5000); });
     };
   };

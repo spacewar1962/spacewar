@@ -1424,9 +1424,9 @@ button.badge.err:hover { filter: brightness(1.2); }
 .md-tools .md-link[hidden] { display: none; }
 .md-tools .md-link input { width: 220px; height: 24px; font: 12px var(--mono); padding: 0 6px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); border-radius: 3px; }
 /* links between annotations */
-a.swlink { color: var(--amber); text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; }
+a.swlink { color: var(--amber); text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; font: 11px/1.3 var(--sans); letter-spacing: .01em; }
 a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-block; }
-.note .backl { margin-top: 4px; font-size: 12px; line-height: 1.5; }
+.note .backl { margin-top: 3px; font-size: 11px; line-height: 1.4; }
 .note.note-flash { animation: note-flash 1.6s ease-out; }
 @keyframes note-flash { 0%, 30% { box-shadow: 0 0 0 2px var(--amber); background: var(--hl); } 100% { box-shadow: 0 0 0 0 transparent; } }
 @media (prefers-reduced-motion: reduce) { .note.note-flash { animation: none; box-shadow: 0 0 0 2px var(--amber); } }
@@ -1488,3 +1488,9 @@ a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-b
 mark.frag { background: none; color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--amber) 55%, transparent); text-underline-offset: 3px; }
 mark.frag.lit { background: color-mix(in srgb, var(--amber) 20%, transparent); text-decoration-color: var(--amber); }
 .note .frag-q { margin: 2px 0 4px; padding: 3px 6px; font: 12px/1.4 var(--code-font); color: var(--text-dim); background: var(--code-bg); border-left: 2px solid color-mix(in srgb, var(--amber) 45%, transparent); border-radius: 2px; white-space: pre-wrap; max-height: 7.5em; overflow: auto; }
+/* Developer mode */
+.dev-only { display: none !important; }
+body.dev-on .dev-only { display: revert !important; }
+.dev-badge { font: 600 10px/1 var(--sans); padding: 1px 4px; border-radius: 3px; color: #000; background: var(--violet); letter-spacing: .03em; }
+.note .dev-check { font-size: 12px; margin: 4px 0; }
+#note-dev[hidden] { display: none; }
