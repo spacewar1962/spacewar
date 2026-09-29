@@ -277,7 +277,44 @@
       return !!SW.$('#L' + a.p + '-' + a.n0, view);
     });
   }
-  function paintNotes() { paintInline(); paintMargin(); }
+  function paintNotes() { paintInline(); paintMargin(); paintBlocks(); }
+
+  // ---------- the code an annotation is attached to ----------
+  // Its lines bracketed in the listing (a bar down the side, from the first line
+  // to the last), and a span within them marked; both brighten while the pointer
+  // is on the annotation. A span is not marked in the normalised view on lines
+  // that normalising changed.
+  function wrapSpan(t, s, e, tid) {
+    var nodes = [], w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT), x, pos = 0;
+    while ((x = w.nextNode())) nodes.push(x);
+    nodes.forEach(function (nd) {
+      var len = nd.nodeValue.length, a = Math.max(s, pos), b = Math.min(e, pos + len);
+      if (a < b) {
+        var piece = nd;
+        if (a > pos) piece = piece.splitText(a - pos);
+        if (b - a < piece.nodeValue.length) piece.splitText(b - a);
+        var mk = SW.el('mark', { class: 'frag', 'data-tid': tid });
+        piece.parentNode.insertBefore(mk, piece); mk.appendChild(piece);
+      }
+      pos += len;
+    });
+  }
+  function paintBlocks() {
+    SW.$$('mark.frag', view).forEach(function (m) { var pa = m.parentNode; while (m.firstChild) pa.insertBefore(m.firstChild, m); m.remove(); pa.normalize(); });
+    SW.$$('.ln.blk', view).forEach(function (r) { r.classList.remove('blk', 'blk-top', 'blk-end'); });
+    if (opts.notes === 'hide') return;
+    shownThreads().forEach(function (th) {
+      var a = th.note.anchor;
+      for (var n = a.n0; n <= a.n1; n++) {
+        var row = SW.$('#L' + a.p + '-' + n, view); if (!row) continue;
+        row.classList.add('blk'); if (n === a.n0) row.classList.add('blk-top'); if (n === a.n1) row.classList.add('blk-end');
+        var L = build.lines[a.p][n - 1];
+        if (a.c0 == null || !L || (opts.norm && L.norm !== L.raw)) continue;
+        var s = n === a.n0 ? a.c0 : 0, e = n === a.n1 ? a.c1 : L.raw.length;
+        if (e > s && (s > 0 || e < L.raw.length)) wrapSpan(row.querySelector('.t'), s, e, th.note.id);
+      }
+    });
+  }
 
   // ---------- notes inline ----------
   // Each thread under the last line it covers, in the listing itself.
@@ -345,6 +382,7 @@
       var r = SW.$('#L' + c.dataset.p + '-' + n, view);
       if (r) r.classList.toggle('mlit', on);
     }
+    SW.$$('mark.frag[data-tid="' + c.dataset.tid + '"]', view).forEach(function (m) { m.classList.toggle('lit', on); });
   }
   // A click on a thread's + or its line reference (inline or card); true if handled.
   function threadClick(e) {
@@ -476,13 +514,40 @@
       var sel = window.getSelection();
       if (!build || !sel || sel.isCollapsed || !String(sel).trim()) return;
       function lnOf(nd) { var el0 = nd && (nd.nodeType === 1 ? nd : nd.parentElement); return el0 && el0.closest('#view-read .listing .ln'); }
-      var la = lnOf(sel.anchorNode), lf = lnOf(sel.focusNode);
+      var rg = sel.getRangeAt(0), la = lnOf(rg.startContainer), lf = lnOf(rg.endContainer);
       if (!la || !lf || la.dataset.p !== lf.dataset.p) return;
-      var p = +la.dataset.p, n0 = Math.min(+la.dataset.n, +lf.dataset.n), n1 = Math.max(+la.dataset.n, +lf.dataset.n);
+      var p = +la.dataset.p, n0 = +la.dataset.n, n1 = +lf.dataset.n;
+      if (n1 < n0) { var sw0 = n0; n0 = n1; n1 = sw0; }
       var lines = build.lines[p].slice(n0 - 1, n1), text = lines.map(function (L) { return L.raw; }).join('\n'), cite = SW.cite(build, p, n0, n1);
+      // where in the lines the selection starts and ends (characters of the source text)
+      function charIn(row, nd, off, end) {
+        var t = row.querySelector('.t'), len = (build.lines[p][+row.dataset.n - 1] || { raw: '' }).raw.length;
+        if (!t) return end ? len : 0;
+        if (t.contains(nd)) { var r = document.createRange(); r.setStart(t, 0); r.setEnd(nd, off); return Math.min(len, r.toString().length); }
+        return t.compareDocumentPosition(nd) & Node.DOCUMENT_POSITION_PRECEDING ? 0 : len;
+      }
+      var c0 = charIn(la, rg.startContainer, rg.startOffset, false), c1 = charIn(lf, rg.endContainer, rg.endOffset, true);
+      if (n1 > n0 && c0 >= lines[0].raw.length) { n0++; c0 = 0; lines = lines.slice(1); }
+      if (n1 > n0 && c1 === 0) { n1--; lines = lines.slice(0, -1); c1 = lines[lines.length - 1].raw.length; }
+      var normed = opts.norm && lines.some(function (L) { return L.norm !== L.raw; });
+      var span = !normed && (c0 > 0 || c1 < lines[lines.length - 1].raw.length) && (n1 > n0 || c1 > c0);
+      var exact = span ? (n0 === n1 ? lines[0].raw.slice(c0, c1) : [lines[0].raw.slice(c0)].concat(lines.slice(1, -1).map(function (L) { return L.raw; }), [lines[lines.length - 1].raw.slice(0, c1)]).join('\n')) : lines.map(function (L) { return L.raw; }).join('\n');
+      cite = SW.cite(build, p, n0, n1);
+      function annotateHere(finding) {
+        var an = { p: p, n0: n0, n1: n1, src: build.parts[p].src };
+        if (span) { an.c0 = c0; an.c1 = c1; }
+        window.getSelection().removeAllRanges(); hideSelPop();
+        SW.state.sel = { p: p, n0: n0, n1: n1 }; paintSel(); SW.writeQuery();
+        var q1 = exact.replace(/\s+/g, ' ').trim();
+        N.dialog({ vid: build.v.id, kind: 'line', anchor: an, quote: exact, tags: finding ? ['finding'] : [],
+                   heading: finding ? 'Add a finding' : 'Annotate',
+                   anchorText: cite + (span ? ': “' + (q1.length > 70 ? q1.slice(0, 70) + '…' : q1) + '”' : '') + (finding ? '. Shared with the group and listed under Findings; the first line is its title.' : '') });
+      }
       hideSelPop();
       selPop = SW.el('div', { class: 'selpop' });
       selPop.appendChild(SW.el('span', { class: 'hint' }, 'l. ' + n0 + (n1 > n0 ? '–' + n1 : '') + ' ' + SW.refTag(build.v.id, p, n0, n1, build.parts.length)));
+      selPop.appendChild(SW.el('button', { class: 'btn', title: span ? 'Annotate the selected code: the annotation is attached to exactly this, and it is marked in the listing' : 'Annotate these lines', onclick: function () { annotateHere(false); } }, '✎ Annotate'));
+      selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'A finding on the selected code, shared with the group and listed under Findings', onclick: function () { annotateHere(true); } }, '★ Finding'));
       selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'Copy these lines of source (without numbers or addresses)', onclick: function () { copy(text, (n1 - n0 + 1) + ' line' + (n1 > n0 ? 's' : '') + ' copied'); hideSelPop(); } }, 'Copy'));
       selPop.appendChild(SW.el('button', { class: 'btn ghost', title: 'Put these lines in My notes (private), with their citation', onclick: function () {
         var s0 = { p: p, n0: n0, n1: n1 };

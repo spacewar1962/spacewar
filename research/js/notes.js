@@ -98,7 +98,10 @@
     if (lines) {
       var m = /^(\d+):(\d+)(?:-(\d+))?$/.exec(lines);
       if (m) anchor = { p: +m[1], n0: +m[2], n1: +(m[3] || m[2]), src: tagVal(tags, 'sw:src:') };
+      var ch = anchor && /^(\d+)-(\d+)$/.exec(tagVal(tags, 'sw:chars:') || '');
+      if (ch) { anchor.c0 = +ch[1]; anchor.c1 = +ch[2]; }
     }
+    var qsel = ((a.target && a.target[0] && a.target[0].selector) || []).filter(function (x) { return x.type === 'TextQuoteSelector'; })[0];
     var by = tagVal(tags, 'sw:by:') || (a.user_info && a.user_info.display_name) ||
              String(a.user || '').replace(/^acct:|@.*$/g, '');
     return {
@@ -107,7 +110,7 @@
       date: a.created, updated: a.updated, parent: (a.references || []).slice(-1)[0] || null,
       tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis', user: a.user || '', rawTags: tags,
       binned: tags.indexOf('sw:deleted') >= 0, binnedAt: tagVal(tags, 'sw:deleted-at:'),
-      link: a.links && (a.links.incontext || a.links.html)
+      link: a.links && (a.links.incontext || a.links.html), quote: qsel ? qsel.exact : ''
     };
   }
 
@@ -316,6 +319,8 @@
       .concat(note.anchor ? ['sw:lines:' + note.anchor.p + ':' + note.anchor.n0 +
                              (note.anchor.n1 !== note.anchor.n0 ? '-' + note.anchor.n1 : ''),
                              'sw:src:' + (note.anchor.src || '')] : [])
+      // a span within the lines: from character c0 of the first to c1 of the last
+      .concat(note.anchor && note.anchor.c0 != null ? ['sw:chars:' + note.anchor.c0 + '-' + note.anchor.c1] : [])
       .concat(note.tags || []);
     if (!N.configured()) {
       var d = drafts();
@@ -612,6 +617,7 @@
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
       (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') +
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
+      (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? '<pre class="frag-q" title="The code this annotation is attached to">' + SW.esc(n.quote) + '</pre>' : '') +
       (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
       (N.backlinks(n.id).length ? '<div class="backl"><span class="faint">Linked from</span> ' + N.backlinks(n.id).map(function (b) {
@@ -619,7 +625,7 @@
       }).join(' · ') + '</div>' : '') +
       // one row: Reply | reactions | copy, download, edit, delete
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
-      '<button data-act="copy" class="ico" title="Copy the annotation, with its citation and replies">⧉</button>' +
+      '<button data-act="copy" class="ico" title="Copy the annotation as a quotation with its reference ([REF: …], version and lines), ready for a book or chapter; with its replies and link">⧉</button>' +
       (n.source !== 'draft' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)">↪</button>' : '') +
       '<button data-act="dl" class="ico" title="Download the annotation with its code and replies (Markdown)">⤓</button>' +
       (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
@@ -921,16 +927,30 @@
     return (v ? v.label + ' (' + v.date + ')' : note.vid) + (note.anchor ? ', ' + (note.anchor.src || '') + ', ll. ' + note.anchor.n0 + '–' + note.anchor.n1 : '') +
       ' ' + (note.anchor ? SW.refText(note.vid, note.anchor.p, note.anchor.n0, note.anchor.n1, SW.nparts(note.vid)) : SW.refText(note.vid));
   }
+  // Copy: the annotation as a quotation with its reference, ready for a book or
+  // chapter, e.g. “…” (David M. Berry, annotation on Spacewar! 3.1 (24 Sep 1962),
+  // ll. 32–34 [REF: SW3.1L, 1.32–34], 30 Sep 2026), then its replies and its link.
+  function whereOf(n) {
+    var v = root.SWVersions.byId(n.vid), a = n.anchor;
+    return (v ? v.label + (v.date ? ' (' + v.date + ')' : '') : n.vid) +
+      (a ? ', ' + (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) : '') + ' ' +
+      (a ? SW.refText(n.vid, a.p, a.n0, a.n1, SW.nparts(n.vid)) : SW.refText(n.vid));
+  }
+  function plainOf(n) { return SW.mdPlain(SW.figpack.split(n.text).text).trim(); }
   function copyNote(note, all) {
-    var t = threadOf(note, all), lines = [];
-    var head = note.id === t.note.id ? t : null;
-    lines.push('“' + note.text + '” (' + note.by + ', ' + SW.fmtDate(note.date) + '; ' + citeOf(t.note) + ')');
-    if (head) (function walk(rs, d) { rs.forEach(function (r) {
-      lines.push(new Array(d + 1).join('  ') + '↳ ' + r.note.by + ', ' + SW.fmtDate(r.note.date) + ': ' + r.note.text); walk(r.replies, d + 1);
-    }); })(t.replies, 1);
+    var t = threadOf(note, all), r = t.note, lines = [];
+    var span = r.anchor && r.anchor.c0 != null && r.quote ? r.quote.replace(/\s+/g, ' ').trim() : '';
+    if (span.length > 60) span = span.slice(0, 60) + '…';
+    function who(n) { return n.name || n.by; }
+    lines.push('“' + plainOf(note) + '” (' + who(note) + ', ' + (note.parent ? 'reply to ' + who(r) + '’s annotation' : 'annotation') + ' on ' +
+      whereOf(r) + (span ? ', on the code “' + span + '”' : '') + ', ' + SW.fmtDate(note.date) + ')');
+    if (note.id === r.id) (function walk(rs) { rs.forEach(function (x) {
+      lines.push('Reply, ' + who(x.note) + ', ' + SW.fmtDate(x.note.date) + ': “' + plainOf(x.note) + '”'); walk(x.replies);
+    }); })(t.replies);
+    if (note.source !== 'draft' && note.source !== 'buildlog') lines.push(N.linkOf(note));
     var text = lines.join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
-      .then(function () { SW.toast('Annotation copied'); }, function () { window.prompt('Copy:', text); });
+      .then(function () { SW.toast('Annotation copied, with its reference'); }, function () { window.prompt('Copy:', text); });
   }
   function downloadNote(note, all, fmt) {
     var t = threadOf(note, all), a = t.note.anchor;
