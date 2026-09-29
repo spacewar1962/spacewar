@@ -87,7 +87,10 @@
 
   group = 'Open and resolved';
   eq('none', N.statusOf([]).state, '');
-  eq('the latest mark counts', N.statusOf([{ text: 'status:open', date: '2026-09-30T10:00' }, { text: 'status:resolved', date: '2026-09-30T11:00' }, { text: '👍', date: '2026-09-30T12:00' }]).state, 'resolved');
+  eq('🔓 opens', N.statusOf([{ text: '🔓', date: '2026-09-30T10:00' }]).state, 'open');
+  eq('a later ✅ resolves', N.statusOf([{ text: '🔓', date: '2026-09-30T10:00' }, { text: '✅', date: '2026-09-30T11:00' }, { text: '👍', date: '2026-09-30T12:00' }]).state, 'resolved');
+  eq('a later 🔓 opens again', N.statusOf([{ text: '✅', date: '2026-09-30T10:00' }, { text: '🔓', date: '2026-09-30T11:00' }]).state, 'open');
+  eq('the earlier marks still read', N.statusOf([{ text: 'status:open', date: '2026-09-30T10:00' }]).state, 'open');
 
   group = 'Mentions';
   yes('a mention of CL', N.mentions({ text: 'ask @CL here' }, 'CL'));

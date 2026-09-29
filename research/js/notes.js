@@ -263,7 +263,7 @@
   }
   function newsLine(n, byId) {
     var V = root.SWVersions, v = V.byId(n.vid), par = n.parent && byId[n.parent];
-    var what = N.isReaction(n) && /^status:/.test(n.text) ? (n.text === 'status:resolved' ? 'resolved ' : 'marked open ') + (par ? par.by + '’s annotation' : 'an annotation') : N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
+    var what = N.isReaction(n) && (OPEN[n.text] || DONE[n.text]) ? (DONE[n.text] ? 'resolved ' : 'marked open ') + (par ? par.by + '’s annotation' : 'an annotation') : N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
     var toYou = !N.isReaction(n) && N.mentions(n, SW.me().initials);
     var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
     var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
@@ -571,13 +571,15 @@
   // Group notes into threads (roots with replies), in date order.
   // Reactions: an emoji left on a note, stored as a tiny reply marked
   // sw:kind:reaction, so it is shared, signed and dated like any note.
-  N.EMOJI = ['👍', '👎', '✅', '😊', '❓', '💡', '❗', '👀'];
+  N.EMOJI = ['👍', '👎', '✅', '🔓', '😊', '❓', '💡', '❗', '👀'];
   N.isReaction = function (n) { return n.kind === 'reaction'; };
-  // Open or resolved: a reaction 'status:open' or 'status:resolved' by anyone in the
-  // group (only an annotation's author can change its tags); the latest counts.
+  // Open or resolved, from the reactions: 🔓 open, ✅ resolved (anyone in the group can
+  // react; only an annotation's author can change its tags); the latest of them counts.
+  // ('status:open' and 'status:resolved', from 1.16.65, read the same.)
+  var OPEN = { '🔓': 1, 'status:open': 1 }, DONE = { '✅': 1, 'status:resolved': 1 };
   N.statusOf = function (reactions) {
-    var s = (reactions || []).filter(function (r) { return /^status:/.test(r.text); }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; }).pop();
-    return s ? { state: s.text.slice(7), by: s.by, date: s.date } : { state: '' };
+    var s = (reactions || []).filter(function (r) { return OPEN[r.text] || DONE[r.text]; }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; }).pop();
+    return s ? { state: OPEN[s.text] ? 'open' : 'resolved', by: s.by, date: s.date } : { state: '' };
   };
   N.threads = function (notes) {
     var byId = {}, roots = [];
@@ -665,19 +667,13 @@
     N.toggleCode(t.closest('.frag-q').dataset.id);
   });
   function statusChip(s) {
-    return s.state === 'open' ? '<span class="st st-open" title="An open question: marked by ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '">Open</span>'
-      : s.state === 'resolved' ? '<span class="st st-res" title="Resolved: marked by ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '">✓ Resolved</span>' : '';
-  }
-  function statusButton(state) {
-    return state === 'open' ? '<button data-act="status" data-to="resolved" title="Mark this as answered">✓ Resolve</button>'
-      : state === 'resolved' ? '<button data-act="status" data-to="open" title="Open it again">Reopen</button>'
-      : '<button data-act="status" data-to="open" title="Mark this as an open question, still to be answered (Read can show only these)">? Open</button>';
+    return '<span class="st st-open" title="Open: a question still to be answered (🔓 from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '; ✅ resolves it)">OPEN</span>';
   }
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
-      '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
-      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (!isReply && N.statusOf(reactions).state ? ' ' + statusChip(N.statusOf(reactions)) : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
+      '<div class="by">' + (!isReply && N.statusOf(reactions).state === 'open' ? statusChip(N.statusOf(reactions)) + ' ' : '') + '<b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
+      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
       ((n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16)) || SW.noteHistory.list(n.text).length ? ' · ' + (SW.noteHistory.list(n.text).length
         ? '<button type="button" class="hist" data-act="history" title="See the earlier wordings">edited ' + SW.esc(SW.fmtDate(n.updated || n.date)) + ' · ' + SW.noteHistory.list(n.text).length + ' earlier</button>'
         : '<i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>') : '') + '</div>' +
@@ -691,7 +687,6 @@
       // one row: Reply | reactions | copy, download, edit, delete
       '</div>' +
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
-      (!isReply && n.source !== 'buildlog' ? statusButton(N.statusOf(reactions).state) : '') +
       '<button data-act="copy" class="ico" title="Copy the annotation as a quotation with its code and reference, ready for a book or chapter; with its replies">⧉</button>' +
       '<button data-act="dl" class="ico" title="Download the annotation as a text file: the same as Copy">⤓</button>' +
       // on the right: link, keep, edit, delete
@@ -1009,7 +1004,7 @@
 
       '<h3>6. More</h3><ul class="ah-steps">' +
       '<li><b>Search</b>: the box at the top of the Annotations panel (▴ Annotations) searches every annotation and reply, all versions, by words, initials, tags or reference; tick Open questions only for what still needs answering.</li>' +
-      '<li><b>Open and resolved</b>: <i>? Open</i> on an annotation marks it a question still to be answered; <i>✓ Resolve</i> marks it answered, <i>Reopen</i> opens it again. Anyone in the group can mark any annotation. The chevron on Read’s Annotations heading cycles All, Mine, Open, None.</li>' +
+      '<li><b>Open and resolved</b>: react 🔓 to mark an annotation a question still to be answered (a small OPEN shows before its initials); react ✅ to mark it answered. Anyone in the group can; the later of the two counts. The chevron on Read’s Annotations heading cycles All, Mine, Open, None.</li>' +
       '<li><b>@mentions</b>: type @ and initials to mention someone; they are offered as you type. What’s new lists a mention of you first.</li>' +
       '<li><b>Earlier wordings</b>: editing an annotation keeps what it said before; <i>edited … · 2 earlier</i> on the annotation shows them, with when each was written.</li>' +
       '<li><b>Ghosts</b>: annotations made on other versions, shown faintly on the lines here whose code matches theirs (the Ghosts switch on the Annotations heading). <i>Open in …</i> goes to the original; <i>＋ Keep here</i> copies it into this version, with a link back.</li>' +
@@ -1274,7 +1269,7 @@
         }).sort(function (x, y) { return (order[x.vid] - order[y.vid]) || ((x.anchor ? x.anchor.n0 : 0) - (y.anchor ? y.anchor.n0 : 0)) || String(x.date).localeCompare(String(y.date)); });
         out.innerHTML = '<p class="hint">' + hits.length + ' found' + (hits.length > 150 ? ', the first 150 shown' : '') + '</p>' + hits.slice(0, 150).map(function (n) {
           var r = rootOf[n.id] || n, st = status[r.id];
-          return '<button type="button" class="as-hit" data-id="' + SW.esc(n.id) + '"><span class="as-where">' + SW.esc(N.labelOf(n)) + (st === 'open' ? ' <span class="st st-open">Open</span>' : st === 'resolved' ? ' <span class="st st-res">✓ Resolved</span>' : '') + '</span>' +
+          return '<button type="button" class="as-hit" data-id="' + SW.esc(n.id) + '"><span class="as-where">' + SW.esc(N.labelOf(n)) + (st === 'open' ? ' <span class="st st-open">OPEN</span>' : st === 'resolved' ? ' ✅' : '') + '</span>' +
             '<span class="as-text">' + snippet(SW.mdPlain(N.linksAsNames(n.text)), terms) + '</span></button>';
         }).join('');
         out.onclick = function (e) {
