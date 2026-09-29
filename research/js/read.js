@@ -264,7 +264,7 @@
     if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
     var isBlock = a.n1 > a.n0 || a.c0 != null;
     return '<div class="' + cls + (open ? ' open' : '') + (isBlock ? ' blockn' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
-      '<div class="mc-where" title="Select the lines">l. ' + a.n0 + (a.n1 !== a.n0 ? '–' + a.n1 : '') + '</div>' +
+      '<div class="mc-where" title="Select the lines">' + (a.n1 !== a.n0 ? 'lines ' + a.n0 + '–' + a.n1 : 'line ' + a.n0) + '</div>' +
       N.renderNote(t.note, false, t.reactions) +
       (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
       (open ? '<div class="mc-replies">' + h + '</div>' : '') + '</div>';

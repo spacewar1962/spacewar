@@ -623,8 +623,7 @@
   var codeFold = {};
   function codeQuote(n) {
     var q = n.quote, k = q.split('\n').length, a = n.anchor;
-    return '<details class="frag-q" data-id="' + SW.esc(n.id) + '"' + (codeFold[n.id] ? '' : ' open') + '><summary title="Fold or unfold the code this annotation is attached to">Code · ' +
-      (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + (k > 1 ? ', ' + k + ' lines' : '') + '</summary><pre>' + SW.esc(q) + '</pre></details>';
+    return '<details class="frag-q" data-id="' + SW.esc(n.id) + '"' + (codeFold[n.id] ? '' : ' open') + '><summary title="Fold or unfold the code this annotation is attached to">Code' + (k > 1 ? ' · ' + k + ' lines' : '') + '</summary><pre>' + SW.esc(q) + '</pre></details>';
   }
   document.addEventListener('toggle', function (e) {
     var d = e.target;
