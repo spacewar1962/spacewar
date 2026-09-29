@@ -970,7 +970,7 @@
       '<li>Click <b>Generate your API token</b>, then copy the token it shows (a long string beginning <span class="mono">6879-</span>).</li></ol>' +
       '<p class="hint">The token lets the bench write annotations in your name: keep it to yourself, like a password. If it is ever seen by someone else, generate a new one on the same page; the old one stops working.</p>' +
 
-      '</div></section><section class="js-step"><div class="js-num" aria-hidden="true">4</div><div class="js-body"><h3><span class="vh">Step 4: </span>Enter them in the bench</h3>' +
+      '</div></section><section class="js-step"><div class="js-num" aria-hidden="true">4</div><div class="js-body"><h3><span class="vh">Step 4: </span>Enter the group URL and the API key in the bench</h3>' +
       '<ol class="ah-steps"><li>Open <b>⚙ Settings</b> (top right).</li>' +
       '<li>Under <b>Your details</b>, give your <b>initials</b> and <b>name</b>: every annotation you write is signed with them.</li>' +
       '<li>Under <b>Shared annotations</b>, paste the group’s invitation link (or just its ID, the part after <span class="mono">/groups/</span>) and your API token.</li>' +

@@ -147,7 +147,7 @@
 
   L.drawCollision = function (b, host) {
     return pair(host, 'Collision shape',
-      'Where two objects collide, as each version’s game decides it: the Wedge set at every offset from the Needle, up to 30 screen points each way, both at rest far from the star, and one frame run. Shaded, the offsets at which the game declared a collision; outlined, the shape its constants give (|dx| and |dy| under me1, and |dx| + |dy| under me1 + me2); drawn to the same scale, the Needle (black) at the centre and the Wedge (blue, its centre ringed) at the furthest offsets to the left and right at which the two collide. The same test serves torpedoes, which collide with ships and each other.',
+      'Where two objects collide, as each version’s game decides it: the Wedge set at every offset from the Needle, up to 30 screen points each way, both at rest far from the star, and one frame run. The game compares the two centres: a collision when |dx| and |dy| are under me1 and |dx| + |dy| is under me1 + me2. Drawn the other way round, each ship carries a zone half that size, and two ships collide when their zones overlap: the Needle’s zone in red, the Wedge’s in blue, with the Wedge at the furthest offsets left and right at which the game declared a collision, so the zones just meet. Dashed, where the Wedge’s centre must come; faint beneath, every offset measured as a collision. Each version’s zones follow its own constants, so they can be set side by side. The same test serves torpedoes, which collide with ships and each other.',
       'labcol', function (el, vid, alive) {
         el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5><p class="hint lab-prog">Running 3,721 frames…</p>';
         L.collision(vid, alive, function (f) { var p = SW.$('.lab-prog', el); if (p) p.textContent = 'Running 3,721 frames… ' + Math.round(f * 100) + '%'; }).then(function (d) {
@@ -165,42 +165,46 @@
         });
       });
   };
+  // The game's test compares the two centres (|dx| and |dy| under me1, |dx| + |dy| under
+  // me1 + me2). The same thing, drawn as a zone around each ship half that size: two
+  // ships collide when their zones overlap. Faint beneath, the offsets measured.
   function drawCol(cv, d) {
     var N = 380, dpr = root.devicePixelRatio || 1; cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px';
     var g = cv.getContext('2d'); g.scale(dpr, dpr); g.fillStyle = '#dcd9d1'; g.fillRect(0, 0, N, N);
     var k = N / (2 * R + 1), c = N / 2;
     function X(x) { return c + x * k; } function Y(y) { return c - y * k; }
-    g.fillStyle = 'rgba(200, 90, 60, 0.45)';
+    // the octagon |x - cx| < a, |y - cy| < a, |x - cx| + |y - cy| < s
+    function octagon(cx, cy, a, s) {
+      var ring = [[a, s - a], [s - a, a], [-(s - a), a], [-a, s - a], [-a, -(s - a)], [-(s - a), -a], [s - a, -a], [a, -(s - a)]].map(function (p) { return [Math.max(-a, Math.min(a, p[0])), Math.max(-a, Math.min(a, p[1]))]; });
+      g.beginPath(); ring.forEach(function (p, j) { if (j) g.lineTo(X(cx + p[0]), Y(cy + p[1])); else g.moveTo(X(cx + p[0]), Y(cy + p[1])); }); g.closePath();
+    }
+    var zones = d.me1 != null && d.me2 != null, a = zones ? d.me1 / 256 : 0, s = zones ? (d.me1 + d.me2) / 256 : 0;
+    g.fillStyle = zones ? 'rgba(38, 38, 38, 0.07)' : 'rgba(200, 90, 60, 0.45)';   // the measured offsets
     for (var i = 0; i < d.hit.length; i++) if (d.hit[i]) { var dx = i % d.W - R, dy = Math.floor(i / d.W) - R; g.fillRect(X(dx) - k / 2, Y(dy) - k / 2, k, k); }
     g.strokeStyle = 'rgba(38,38,38,0.25)'; g.lineWidth = 1;
     for (var t = -R; t <= R; t += 10) { g.beginPath(); g.moveTo(X(t), 0); g.lineTo(X(t), N); g.stroke(); g.beginPath(); g.moveTo(0, Y(t)); g.lineTo(N, Y(t)); g.stroke(); }
-    if (d.me1 != null && d.me2 != null) {
-      var a = d.me1 / 256, s = (d.me1 + d.me2) / 256;
-      // the octagon: |x| < a, |y| < a, |x| + |y| < s
-      var P = [];
-      [[1, 1], [-1, 1], [-1, -1], [1, -1]].forEach(function (q) {
-        var x1 = Math.min(a, s), y1 = Math.max(0, s - a); P.push([q[0] * x1, q[1] * (q[0] * q[1] > 0 ? y1 : a)]);
-      });
-      g.strokeStyle = '#262626'; g.lineWidth = 1.4; g.beginPath();
-      var ring = [];
-      [[a, s - a], [s - a, a], [-(s - a), a], [-a, s - a], [-a, -(s - a)], [-(s - a), -a], [s - a, -a], [a, -(s - a)]].forEach(function (p) { ring.push([Math.max(-a, Math.min(a, p[0])), Math.max(-a, Math.min(a, p[1]))]); });
-      ring.forEach(function (p, j) { if (j) g.lineTo(X(p[0]), Y(p[1])); else g.moveTo(X(p[0]), Y(p[1])); }); g.closePath(); g.stroke();
-    }
-    g.fillStyle = '#262626';
-    d.out[0].forEach(function (v, j, A) { if (j % 2) return; g.fillRect(X(A[j]) - 1, Y(A[j + 1]) - 1, 2, 2); });
-    // the Wedge where it first collides on each side of the Needle: the furthest shaded offsets on the middle row
+    // the Wedge where it first collides on each side of the Needle: the furthest collision offsets on the middle row
     var right = 0, left = 0, ex;
     for (ex = R; ex >= 0; ex--) if (d.hit[R * d.W + ex + R]) { right = ex; break; }
     for (ex = -R; ex <= 0; ex++) if (d.hit[R * d.W + ex + R]) { left = ex; break; }
+    if (zones) {
+      g.setLineDash([4, 3]); g.strokeStyle = 'rgba(38,38,38,0.55)'; g.lineWidth = 1; octagon(0, 0, a, s); g.stroke(); g.setLineDash([]);   // where the Wedge's centre must come
+      g.fillStyle = 'rgba(200, 90, 60, 0.30)'; g.strokeStyle = '#8a3322'; g.lineWidth = 1.4; octagon(0, 0, a / 2, s / 2); g.fill(); g.stroke();   // the Needle's zone
+      [left, right].forEach(function (e) { g.fillStyle = 'rgba(31, 95, 158, 0.22)'; g.strokeStyle = '#1f5f9e'; octagon(e, 0, a / 2, s / 2); g.fill(); g.stroke(); });   // the Wedge's
+    }
+    g.fillStyle = '#262626';
+    d.out[0].forEach(function (v, j, A) { if (j % 2) return; g.fillRect(X(A[j]) - 1, Y(A[j + 1]) - 1, 2, 2); });
     [left, right].forEach(function (edge) {
       g.fillStyle = '#1f5f9e';
       d.out[1].forEach(function (v, j, A) { if (j % 2) return; g.fillRect(X(A[j] + edge) - 1, Y(A[j + 1]) - 1, 2, 2); });
-      g.strokeStyle = '#1f5f9e'; g.lineWidth = 1; g.beginPath(); g.arc(X(edge), Y(0), 3, 0, 2 * Math.PI); g.stroke();
+      g.strokeStyle = '#1f5f9e'; g.lineWidth = 1; g.beginPath(); g.arc(X(edge), Y(0), 2.5, 0, 2 * Math.PI); g.stroke();
     });
     g.fillStyle = '#555'; g.font = '11px IBM Plex Mono, monospace';
-    g.fillText('Needle (black) at the centre; the Wedge (blue)', 8, N - 36);
-    g.fillText('where it first collides: ' + (-left) + ' points left, ' + right + ' right', 8, N - 22); g.fillText('grid every 10 screen points', 8, N - 8);
+    if (zones) g.fillText('each ship’s zone: me1/2 = ' + (a / 2) + ', (me1+me2)/2 = ' + (s / 2) + ' points', 8, 14);
+    g.fillText('Needle (black, red zone); Wedge (blue) where', 8, N - 36);
+    g.fillText('the zones first meet: ' + (-left) + ' points left, ' + right + ' right', 8, N - 22); g.fillText('dashed: where the Wedge’s centre collides', 8, N - 8);
   }
+
 
   L.drawRoulette = function (b, host) {
     return pair(host, 'Hyperspace roulette',
