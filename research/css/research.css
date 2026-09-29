@@ -1500,12 +1500,12 @@ a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-b
 mark.frag { background: none; color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--anno-block) 60%, transparent); text-underline-offset: 3px; }
 mark.frag.lit { background: color-mix(in srgb, var(--anno-block) 20%, transparent); text-decoration-color: var(--anno-block); }
 .note .frag-q { margin: 2px 0 4px; }
-.note .frag-q summary { cursor: pointer; font: 11px/1.4 var(--sans); color: var(--text-faint); list-style: none; user-select: none; }
+.note .frag-q summary { cursor: pointer; font: 10.5px/1.4 var(--sans); color: var(--text-faint); list-style: none; user-select: none; }
 .note .frag-q summary::-webkit-details-marker { display: none; }
 .note .frag-q summary::before { content: '▸'; display: inline-block; width: 1em; }
 .note .frag-q[open] summary::before { content: '▾'; }
 .note .frag-q summary:hover { color: var(--text-dim); }
-.note .frag-q pre { margin: 2px 0 0; padding: 3px 6px; font: 12px/1.4 var(--code-font); color: var(--text-dim); background: var(--code-bg); border-left: 2px solid color-mix(in srgb, var(--anno-block) 50%, transparent); border-radius: 2px; white-space: pre-wrap; max-height: 12em; overflow: auto; }
+.note .frag-q pre { margin: 1px 0 3px; padding: 0 0 0 7px; font: 11px/1.35 var(--code-font); color: var(--text-faint); background: none; border-left: 1px solid color-mix(in srgb, var(--anno-block) 40%, transparent); white-space: pre-wrap; max-height: 6.8em; overflow: auto; }
 /* Developer mode */
 .dev-only { display: none !important; }
 body.dev-on .dev-only { display: revert !important; }
