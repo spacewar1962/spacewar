@@ -264,7 +264,7 @@
   }
   function newsLine(n, byId) {
     var V = root.SWVersions, v = V.byId(n.vid), par = n.parent && byId[n.parent];
-    var what = N.isReaction(n) && (OPEN[n.text] || DONE[n.text]) ? (DONE[n.text] ? 'resolved ' : 'marked open ') + (par ? par.by + '’s annotation' : 'an annotation') : N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
+    var what = N.isReaction(n) && (OPEN[n.text] || DONE[n.text]) ? (DONE[n.text] ? 'resolved ' : OPEN[n.text] === 'help' ? 'asked for help on ' : 'marked open ') + (par ? par.by + '’s annotation' : 'an annotation') : N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
     var toYou = !N.isReaction(n) && N.mentions(n, SW.me().initials);
     var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
     var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
@@ -574,14 +574,16 @@
   // sw:kind:reaction, so it is shared, signed and dated like any note.
   N.EMOJI = ['👍', '👎', '✅', '🔓', '😊', '❓', '💡', '❗', '👀'];
   N.isReaction = function (n) { return n.kind === 'reaction'; };
-  // Open or resolved, from the reactions: 🔓 open, ✅ resolved (anyone in the group can
-  // react; only an annotation's author can change its tags); the latest of them counts.
+  // Open, help wanted or resolved, from the reactions: 🔓 open, 💡 help wanted, ✅
+  // resolved (anyone in the group can react; only an annotation's author can change
+  // its tags); the latest of them counts. 'Open' in filters takes in help wanted.
   // (The 'status:open' / 'status:resolved' marks left by 1.16.65's buttons are ignored.)
-  var OPEN = { '🔓': 1 }, DONE = { '✅': 1 };
+  var OPEN = { '🔓': 'open', '💡': 'help' }, DONE = { '✅': 1 };
   N.statusOf = function (reactions) {
     var s = (reactions || []).filter(function (r) { return OPEN[r.text] || DONE[r.text]; }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; }).pop();
-    return s ? { state: OPEN[s.text] ? 'open' : 'resolved', by: s.by, date: s.date } : { state: '' };
+    return s ? { state: OPEN[s.text] || 'resolved', by: s.by, date: s.date } : { state: '' };
   };
+  N.isOpen = function (state) { return state === 'open' || state === 'help'; };
   N.threads = function (notes) {
     var byId = {}, roots = [];
     notes.forEach(function (n) { if (!N.isReaction(n)) byId[n.id] = { note: n, replies: [], reactions: [] }; });
@@ -668,12 +670,14 @@
     N.toggleCode(t.closest('.frag-q').dataset.id);
   });
   function statusChip(s) {
-    return '<span class="st st-open" title="Open: a question still to be answered (🔓 from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '; ✅ resolves it)">OPEN</span>';
+    return s.state === 'help'
+      ? '<span class="st st-help" title="Help wanted (💡 from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '; ✅ resolves it)">HELP!</span>'
+      : '<span class="st st-open" title="Open: a question still to be answered (🔓 from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '; ✅ resolves it)">OPEN</span>';
   }
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
-      '<div class="by">' + (!isReply && N.statusOf(reactions).state === 'open' ? statusChip(N.statusOf(reactions)) + ' ' : '') + '<b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
+      '<div class="by">' + (!isReply && N.isOpen(N.statusOf(reactions).state) ? statusChip(N.statusOf(reactions)) + ' ' : '') + '<b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
       (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
       ((n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16)) || SW.noteHistory.list(n.text).length ? ' · ' + (SW.noteHistory.list(n.text).length
         ? '<button type="button" class="hist" data-act="history" title="See the earlier wordings">edited ' + SW.esc(SW.fmtDate(n.updated || n.date)) + ' · ' + SW.noteHistory.list(n.text).length + ' earlier</button>'
@@ -1005,7 +1009,7 @@
 
       '<h3>6. More</h3><ul class="ah-steps">' +
       '<li><b>Search</b>: the box at the top of the Annotations panel (▴ Annotations) searches every annotation and reply, all versions, by words, initials, tags or reference; tick Open questions only for what still needs answering.</li>' +
-      '<li><b>Open and resolved</b>: react 🔓 to mark an annotation a question still to be answered (a small OPEN shows before its initials); react ✅ to mark it answered. Anyone in the group can; the later of the two counts. The chevron on Read’s Annotations heading cycles All, Mine, Open, None.</li>' +
+      '<li><b>Open and resolved</b>: react 🔓 to mark an annotation a question still to be answered (a small OPEN shows before its initials); react 💡 to ask for help (HELP!); react ✅ to mark it answered. Anyone in the group can; the latest of these counts. The chevron on Read’s Annotations heading cycles All, Mine, Open, None.</li>' +
       '<li><b>@mentions</b>: type @ and initials to mention someone; they are offered as you type. What’s new lists a mention of you first.</li>' +
       '<li><b>Earlier wordings</b>: editing an annotation keeps what it said before; <i>edited … · 2 earlier</i> on the annotation shows them, with when each was written.</li>' +
       '<li><b>Ghosts</b>: annotations made on other versions, shown faintly on the lines here whose code matches theirs (the Ghosts switch on the Annotations heading). <i>Open in …</i> goes to the original; <i>＋ Keep here</i> copies it into this version, with a link back.</li>' +
@@ -1264,13 +1268,13 @@
         var hits = all.filter(function (n) {
           if (N.isReaction(n) || n.source === 'buildlog') return false;
           var r = rootOf[n.id] || n;
-          if (only && status[r.id] !== 'open') return false;
+          if (only && !N.isOpen(status[r.id])) return false;
           var hay = [SW.mdPlain(N.linksAsNames(n.text)), n.by, n.name, (n.tags || []).join(' '), N.labelOf(n), SW.refOf(n.vid)].join(' ').toLowerCase();
           return terms.every(function (w) { return hay.indexOf(w) >= 0; });
         }).sort(function (x, y) { return (order[x.vid] - order[y.vid]) || ((x.anchor ? x.anchor.n0 : 0) - (y.anchor ? y.anchor.n0 : 0)) || String(x.date).localeCompare(String(y.date)); });
         out.innerHTML = '<p class="hint">' + hits.length + ' found' + (hits.length > 150 ? ', the first 150 shown' : '') + '</p>' + hits.slice(0, 150).map(function (n) {
           var r = rootOf[n.id] || n, st = status[r.id];
-          return '<button type="button" class="as-hit" data-id="' + SW.esc(n.id) + '"><span class="as-where">' + SW.esc(N.labelOf(n)) + (st === 'open' ? ' <span class="st st-open">OPEN</span>' : st === 'resolved' ? ' ✅' : '') + '</span>' +
+          return '<button type="button" class="as-hit" data-id="' + SW.esc(n.id) + '"><span class="as-where">' + SW.esc(N.labelOf(n)) + (st === 'open' ? ' <span class="st st-open">OPEN</span>' : st === 'help' ? ' <span class="st st-help">HELP!</span>' : st === 'resolved' ? ' ✅' : '') + '</span>' +
             '<span class="as-text">' + snippet(SW.mdPlain(N.linksAsNames(n.text)), terms) + '</span></button>';
         }).join('');
         out.onclick = function (e) {

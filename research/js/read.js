@@ -285,7 +285,7 @@
       var a = t.note.anchor;
       if (!a || !showsTape(a.p)) return false;
       if (opts.show === 'mine' && !isMine(t.ghost ? t.note.ghostOf : t.note)) return false;
-      if (opts.show === 'open' && (t.ghost || N.statusOf(t.reactions).state !== 'open')) return false;
+      if (opts.show === 'open' && (t.ghost || !N.isOpen(N.statusOf(t.reactions).state))) return false;
       if (keep && !keep[a.p + ':' + a.n0]) return false;
       return !!SW.$('#L' + a.p + '-' + a.n0, view);
     });

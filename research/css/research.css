@@ -1591,8 +1591,8 @@ body.dev-on .dev-only { display: revert !important; }
 .mc-where button.cf-lines:hover, .mc-where button.cf-tog:hover { color: var(--beam); }
 .mc-where button:focus-visible, .frag-q button:focus-visible, .card-fold:focus-visible, .lncols .ann-cyc:focus-visible, .lncols .colfold:focus-visible { outline: 2px solid var(--beam); outline-offset: 1px; border-radius: 2px; }
 /* open / resolved */
-.note .st { font: 700 8.5px/1 var(--sans); padding: 2px 4px; letter-spacing: .06em; border-radius: 3px; vertical-align: 1px; }
-.note .st-open { color: #000; background: var(--amber); }
+.note .st, .ann-results .st { font: 700 8.5px/1 var(--sans); padding: 2px 4px; letter-spacing: .06em; border-radius: 3px; vertical-align: 1px; }
+.note .st-open, .ann-results .st-open { color: #000; background: var(--amber); }
 .note .st-res { color: var(--green); border: 1px solid color-mix(in srgb, var(--green) 50%, transparent); }
 /* earlier wordings */
 .note .by button.hist { font: inherit; font-style: italic; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
@@ -1616,3 +1616,4 @@ body.dev-on .dev-only { display: revert !important; }
 .md-mention button { text-align: left; font: 12px var(--sans); color: var(--text); background: none; border: 0; padding: 3px 6px; border-radius: 3px; cursor: pointer; }
 .md-mention button:hover, .md-mention button:first-child { background: var(--sel); }
 .mention-you { color: var(--amber); }
+.note .st-help, .ann-results .st-help { color: var(--bg); background: var(--red); }
