@@ -19,6 +19,29 @@
 
   // W A S D fly the Needle (ship 1) and I J K L the Wedge (ship 2): W/I fire, S/K rocket, A/J turn left, D/L turn right.
   // The bits differ by version (4.4 and 4.8 rotate the control word), so they come from SW.controlMap.
+  // Players: 'keys' (two people at the keyboard), 'ai1' (you fly the Needle, the
+  // computer the Wedge), 'ai0' (you the Wedge, it the Needle), 'aiai' (it flies both).
+  var players = SW.store.get('run.players', 'keys'), aiLevel = SW.store.get('run.ailevel', 'fair');
+  var ctlMap = null, keyBits = 0, aiBits = 0, pilots = [null, null], ml0At = -1;
+  function shipMask(j) { var m = ctlMap && ctlMap[j]; return m ? (m.ccw | m.cw | m.rocket | m.torpedo) : 0; }
+  function aiShips() { return players === 'ai1' ? [1] : players === 'ai0' ? [0] : players === 'aiai' ? [0, 1] : []; }
+  function aiUsable() { return !!(ctlMap && build && !build.v.ctlLoad && build.sym.nth && build.sym.ndx); }
+  function setPilots() {
+    pilots = [null, null];
+    if (!aiUsable()) return;
+    aiShips().forEach(function (j) { pilots[j] = SW.ai.pilot(build, j, ctlMap[j], aiLevel); });
+  }
+  // the control word: your keys for the ships you fly, the computer's bits for its own
+  function compose() {
+    var mine = 0xffffffff;
+    aiShips().forEach(function (j) { if (pilots[j]) mine &= ~shipMask(j); });
+    if (cpu) cpu.control = (keyBits & mine) | aiBits;
+  }
+  function aiFrame() {
+    aiBits = 0;
+    pilots.forEach(function (p) { if (p) aiBits |= p(cpu.mem); });
+    compose();
+  }
   var KEYS = { KeyW: 0o40000, KeyS: 0o100000, KeyA: 0o400000, KeyD: 0o200000, KeyI: 0o1, KeyK: 0o2, KeyJ: 0o10, KeyL: 0o4 };   // as 3.1 has them, until the version's own are found
   function keysFor(m) {
     var K = {}; [['KeyW', 0, 'torpedo'], ['KeyS', 0, 'rocket'], ['KeyA', 0, 'ccw'], ['KeyD', 0, 'cw'], ['KeyI', 1, 'torpedo'], ['KeyK', 1, 'rocket'], ['KeyJ', 1, 'ccw'], ['KeyL', 1, 'cw']].forEach(function (r) { if (m[r[1]][r[2]]) K[r[0]] = m[r[1]][r[2]]; });
@@ -63,6 +86,7 @@
       (dual ? '<button class="btn" id="r-fig" title="Save scope 1 at print resolution">▣ Scope 1</button><button class="btn" id="r-fig2" title="Save scope 2 at print resolution">▣ Scope 2</button>'
             : '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button>') +
       (build.v.pass1 ? '<label class="check r-sym" title="The sun routine uses nx1 and ny1 before the line that assigns them. The pass log at the end of the listing (scan p. 31) shows that after pass 1 a short tape, “' + build.v.pass1.name + '”, was fed in with nx1=mtb nob and ny1=nx1 nob, so pass 2 had their final values and the sun was placed correctly. Ticked, the bench assembles with that tape, as MIT did. Unticked, without it, the sun is misplaced (F33). The kcb jump fault on the Needle’s console is a separate coding error and stays either way; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Fix Sun Rendering Bug</label><button class="icon-btn r-symhelp" id="r-symhelp" title="What the fix is, with the pass log and the code">?</button>' : '') + '</div>' +
+      '<div class="r-players" id="r-players"></div>' +
       (build.sym.ddd ? '<label class="check r-ddd" title="The constant ddd, “0 to save space for ddt”: at 0 the Needle’s outline is not compiled and both ships are drawn as Wedges (F47). Changing it resets the run."><input type="checkbox" id="r-ddd"' + (SW.store.get('run.ddd', false) ? ' checked' : '') + '> Both ships as Wedges (ddd = 0)</label>' : '') +
       '<div class="keys">Controls: click the scope, then <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
@@ -88,9 +112,9 @@
     clearScopes();
     [cv, cv2].forEach(function (c) {
       if (!c) return;
-      c.addEventListener('keydown', function (e) { if (KEYS[e.code]) { cpu.control |= KEYS[e.code]; e.preventDefault(); } });
-      c.addEventListener('keyup', function (e) { if (KEYS[e.code]) { cpu.control &= ~KEYS[e.code]; e.preventDefault(); } });
-      c.addEventListener('blur', function () { cpu.control = 0; });
+      c.addEventListener('keydown', function (e) { if (KEYS[e.code]) { keyBits |= KEYS[e.code]; compose(); e.preventDefault(); } });
+      c.addEventListener('keyup', function (e) { if (KEYS[e.code]) { keyBits &= ~KEYS[e.code]; compose(); e.preventDefault(); } });
+      c.addEventListener('blur', function () { keyBits = 0; compose(); });
     });
 
     // Hand focus back to the scope, so the game keys work and a later Space or
@@ -102,6 +126,7 @@
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
     var sym = SW.$('#r-sym', view);
     if (sym) sym.onchange = function () { SW.store.set('run.sunfix', sym.checked); R.show(build); };
+    renderPlayers();
     var ddd = SW.$('#r-ddd', view); if (ddd) ddd.onchange = function () { SW.store.set('run.ddd', ddd.checked); pause(); load(true); updateAll(); };
     var symh = SW.$('#r-symhelp', view); if (symh) symh.onclick = function () { sunHelp(build); };
     SW.$('#r-fig', view).onclick = function () { SW.figures.scopeFigureDialog(dual ? pts.filter(function (p) { return p.sc !== 2; }) : pts, cpu.cycles, build); };
@@ -212,6 +237,8 @@
     for (var k in build.asm.memory) cpu.srcMap[+k] = 1;
     cpu.lastSrcPc = -1;
     cpu.onDisplay = plot;
+    ml0At = build.sym.ml0 ? build.sym.ml0.val : -1;
+    aiBits = 0; setPilots(); compose();   // a fresh computer pilot for a fresh game
     pts = [];
     clearScopes();
     cpu.breakpoints = SW.breakpoints;
@@ -250,6 +277,7 @@
         return 'break';
       }
       cpu.resumeFrom = -1;
+      if (pc === ml0At && (pilots[0] || pilots[1])) aiFrame();   // each frame of the game, the computer's move
       cpu.step();
     }
     return cpu.halted ? 'halt' : 'ok';
@@ -395,6 +423,18 @@
     }
   }
 
+  // Who flies: two people, you against the computer, or the computer against itself
+  function renderPlayers() {
+    var el = view && SW.$('#r-players', view); if (!el) return;
+    var ok = aiUsable();
+    el.innerHTML = '<label class="check" title="Who flies the ships. The computer flies by the same control bits as a player: it points at the other ship and fires, climbs away from the star, and at the higher levels dodges torpedoes and, where the version has it, jumps into hyperspace.">Players <select id="r-pl"' + (ok ? '' : ' disabled') + '>' +
+      [['keys', 'Two people (keys)'], ['ai1', 'You (Needle) against the computer'], ['ai0', 'You (Wedge) against the computer'], ['aiai', 'The computer against itself']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === players ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
+      '</select></label> <label class="check">Level <select id="r-al"' + (ok ? '' : ' disabled') + '>' + [['easy', 'easy'], ['fair', 'fair'], ['hard', 'hard']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === aiLevel ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
+      (build && build.v.ctlLoad ? ' <span class="hint">Not for this version: its two control boxes read the same word on the bench (F27).</span>' : !ctlMap && build && build.asm ? ' <span class="hint">Finding the controls…</span>' : '');
+    var pl = SW.$('#r-pl', el), al = SW.$('#r-al', el);
+    if (pl) pl.onchange = function () { players = pl.value; SW.store.set('run.players', players); setPilots(); compose(); if (players !== 'keys' && !running) go(); };
+    if (al) al.onchange = function () { aiLevel = al.value; SW.store.set('run.ailevel', aiLevel); setPilots(); compose(); };
+  }
   // a source line as its reference (version, tape, line)
   function lineRef(L) { return SW.refOf(build.v.id, L.p, L.n, L.n, build.parts.length); }
   function paneTrace(el) {
@@ -564,7 +604,7 @@
       pause();
       build = b;
       if (b.asm && b.v.runnable) load();
-      SW.controlMap(b.v.id).then(function (m) { if (build === b) { KEYS = keysFor(m); cpu && (cpu.control = 0); } });
+      SW.controlMap(b.v.id).then(function (m) { if (build === b) { KEYS = keysFor(m); ctlMap = m; keyBits = 0; aiBits = 0; setPilots(); compose(); renderPlayers(); } });
     }
     render();
   };
