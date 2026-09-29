@@ -1599,3 +1599,13 @@ body.dev-on .dev-only { display: revert !important; }
 .note .by button.hist:hover { color: var(--beam); }
 .hist-list { max-height: 50vh; overflow: auto; display: grid; gap: 8px; max-width: 420px; }
 .hist-item { border-left: 2px solid var(--line); padding-left: 8px; }
+/* search every annotation */
+.ann-search { display: grid; gap: 4px; margin: 0 0 10px; }
+.ann-search input[type="search"] { width: 100%; box-sizing: border-box; padding: 6px 8px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; }
+.ann-search .check { font-size: 12px; }
+.ann-results { display: grid; gap: 2px; }
+.ann-results .as-hit { display: grid; gap: 2px; text-align: left; padding: 6px 8px; background: none; color: var(--text); border: 1px solid transparent; border-radius: 4px; cursor: pointer; font: inherit; }
+.ann-results .as-hit:hover, .ann-results .as-hit:focus { background: var(--sel); border-color: var(--line); }
+.ann-results .as-where { font: 11.5px var(--mono); color: var(--text-dim); }
+.ann-results .as-text { font-size: 13px; color: var(--text); }
+.ann-results mark { background: color-mix(in srgb, var(--amber) 35%, transparent); color: inherit; border-radius: 2px; }

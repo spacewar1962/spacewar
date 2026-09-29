@@ -1210,6 +1210,52 @@
   // A tab at the foot of the window, there whenever the side panel is closed:
   // it reopens the notes last open, or else every note on this version.
   var binInVersionPanel = false;
+  // Search: every annotation and reply in the group, all versions, by its words
+  // (Markdown taken out), initials, name, tags or reference; each term must match.
+  function wireSearch(body) {
+    var qIn = body.querySelector('.ann-search input'), openOnly = body.querySelector('.as-open'), out = body.querySelector('.ann-results'), here = body.querySelector('.ann-here');
+    var pool = null, timer = null, order = {};
+    root.SWVersions.VERSIONS.forEach(function (v, i) { order[v.id] = i; });
+    function load() { return pool || (pool = N.listAll({ reactions: true })); }
+    function snippet(t, terms) {
+      var i = -1; terms.forEach(function (w) { var k = t.toLowerCase().indexOf(w); if (k >= 0 && (i < 0 || k < i)) i = k; });
+      var s = Math.max(0, i - 50), piece = (s ? '…' : '') + t.slice(s, s + 180) + (t.length > s + 180 ? '…' : '');
+      var h = SW.esc(piece);
+      terms.forEach(function (w) { if (w) h = h.replace(new RegExp('(' + SW.esc(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'ig'), '<mark>$1</mark>'); });
+      return h;
+    }
+    function run() {
+      var q = qIn.value.trim().toLowerCase(), only = openOnly.checked;
+      if (!q && !only) { out.hidden = true; here.hidden = false; return; }
+      out.hidden = false; here.hidden = true; out.innerHTML = '<p class="hint">Searching…</p>';
+      load().then(function (all) {
+        var threads = N.threads(all), status = {};
+        (function walk(ts) { ts.forEach(function (t) { status[t.note.id] = N.statusOf(t.reactions).state; walk(t.replies); }); })(threads);
+        var rootOf = {}; (function walk(ts, r) { ts.forEach(function (t) { rootOf[t.note.id] = r || t.note; walk(t.replies, r || t.note); }); })(threads, null);
+        var terms = q.split(/\s+/).filter(Boolean);
+        var hits = all.filter(function (n) {
+          if (N.isReaction(n) || n.source === 'buildlog') return false;
+          var r = rootOf[n.id] || n;
+          if (only && status[r.id] !== 'open') return false;
+          var hay = [SW.mdPlain(N.linksAsNames(n.text)), n.by, n.name, (n.tags || []).join(' '), N.labelOf(n), SW.refOf(n.vid)].join(' ').toLowerCase();
+          return terms.every(function (w) { return hay.indexOf(w) >= 0; });
+        }).sort(function (x, y) { return (order[x.vid] - order[y.vid]) || ((x.anchor ? x.anchor.n0 : 0) - (y.anchor ? y.anchor.n0 : 0)) || String(x.date).localeCompare(String(y.date)); });
+        out.innerHTML = '<p class="hint">' + hits.length + ' found' + (hits.length > 150 ? ', the first 150 shown' : '') + '</p>' + hits.slice(0, 150).map(function (n) {
+          var r = rootOf[n.id] || n, st = status[r.id];
+          return '<button type="button" class="as-hit" data-id="' + SW.esc(n.id) + '"><span class="as-where">' + SW.esc(N.labelOf(n)) + (st === 'open' ? ' <span class="st st-open">Open</span>' : st === 'resolved' ? ' <span class="st st-res">✓ Resolved</span>' : '') + '</span>' +
+            '<span class="as-text">' + snippet(SW.mdPlain(N.linksAsNames(n.text)), terms) + '</span></button>';
+        }).join('');
+        out.onclick = function (e) {
+          var h = e.target.closest('.as-hit'); if (!h) return;
+          var n = all.filter(function (x) { return x.id === h.dataset.id; })[0]; if (!n) return;
+          var a = n.anchor || (rootOf[n.id] || {}).anchor;
+          N.follow({ v: n.vid, l: a ? a.p + ':' + a.n0 + (a.n1 !== a.n0 ? '-' + a.n1 : '') : '', a: n.id });
+        };
+      });
+    }
+    qIn.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(run, 200); });
+    openOnly.addEventListener('change', run);
+  }
   N.openPanel = function (vid) {
     return Promise.all([N.list(vid), SW.build(vid)]).then(function (r) {
       var all = r[0], b = r[1];
@@ -1218,12 +1264,15 @@
         return a ? '<div class="anchor" data-p="' + a.p + '" data-n="' + a.n0 + '">' + (b.parts.length > 1 ? 'tape ' + (a.p + 1) + ', ' : '') +
           (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + ' ' + SW.refTag(b.v.id, a.p, a.n0, a.n1, b.parts.length) + '</div>' : '<div class="anchor-none">on the version ' + SW.refTag(b.v.id) + '</div>';
       }
-      var html = '<p class="hint" style="margin-top:0">Every annotation on ' + SW.esc(b.v.label) + '. Click a line reference to go to it.</p>' +
+      var html = '<div class="ann-search"><input type="search" placeholder="Search every annotation, all versions: words, initials, tags" spellcheck="false">' +
+        '<label class="check"><input type="checkbox" class="as-open"> Open questions only</label></div><div class="ann-results" hidden></div><div class="ann-here">' +
+        '<p class="hint" style="margin-top:0">Every annotation on ' + SW.esc(b.v.label) + '. Click a line reference to go to it.</p>' +
         '<p><button class="btn" data-act="vnote">✎ Annotate the version</button> ' +
         '<button class="btn' + (binInVersionPanel ? ' on' : '') + '" data-act="bin" title="Deleted annotations on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
         (ts.map(function (t) { return where(t.note.anchor) + N.renderThread(t, null); }).join('') || '<p class="hint">No annotations on this version yet.</p>') +
-        '<div class="panel-bin"' + (binInVersionPanel ? '' : ' hidden') + '><h4>Deleted annotations</h4><div></div></div>';
+        '<div class="panel-bin"' + (binInVersionPanel ? '' : ' hidden') + '><h4>Deleted annotations</h4><div></div></div></div>';
       var body = SW.drawer('Annotations', html);
+      wireSearch(body);
       body.dataset.panel = 'version';
       body.dataset.vid = vid;
       N.wire(body, vid, all);
