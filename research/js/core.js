@@ -876,6 +876,7 @@
         .replace(/(^|[^\w*])\*(?=\S)([^*\n]*?\S)\*(?!\w)/g, '$1<i>$2</i>')
         .replace(/(^|[^\w])_(?=\S)([^_\n]*?\S)_(?!\w)/g, '$1<i>$2</i>');
     }
+    s = s.replace(/\\(&gt;|&lt;|&amp;|[\\`*_\[\]~#+\-.!()])/g, function (m, c) { return stash(c); });   // \* is a plain *
     s = s.replace(/`([^`\n]+)`/g, function (m, c) { return stash('<code>' + c + '</code>'); });
     s = s.replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, function (m, t, u) {
       var raw = u.replace(/&amp;/g, '&');
@@ -916,28 +917,85 @@
       .replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, '$1 ($2)')
       .replace(/\*\*([^*]+)\*\*|__([^_]+)__/g, '$1$2').replace(/~~([^~]+)~~/g, '$1')
       .replace(/(^|[^\w*])\*([^*\n]+)\*(?!\w)/g, '$1$2').replace(/(^|[^\w])_([^_\n]+)_(?!\w)/g, '$1$2')
-      .replace(/`([^`\n]+)`/g, '$1').replace(/^\s*>\s?/gm, '').replace(/^#{1,4}\s+/gm, '');
+      .replace(/`([^`\n]+)`/g, '$1').replace(/^\s*>\s?/gm, '').replace(/^#{1,4}\s+/gm, '')
+      .replace(/\\([\\`*_\[\]~#>+\-.!()])/g, '$1');
   };
 
-  // A small toolbar over a note's text box: bold, italic, code, link, quotation,
-  // list, and a preview. Cmd/Ctrl+B, I and K do the same; pasting a URL over
-  // selected text makes it a link.
+  // Rich text back to Markdown, for the rich editor: what is stored and shared
+  // stays Markdown. Marks typed as text are escaped, so they stay text.
+  function mdText(s) {
+    return s.replace(/ /g, ' ').replace(/([\\`*\[\]~])/g, '\\$1')
+      .replace(/_/g, function (m, i, all) { return /\w/.test(all.charAt(i - 1)) && /\w/.test(all.charAt(i + 1)) ? '_' : '\\_'; });
+  }
+  function mdWrap(mark, inner) {
+    var m = /^(\s*)([\s\S]*?)(\s*)$/.exec(inner);
+    return m[2] ? m[1] + mark + m[2] + mark + m[3] : inner;
+  }
+  SW.htmlToMd = function (root) {
+    function kids(n) { var s = ''; for (var c = n.firstChild; c; c = c.nextSibling) s += ser(c); return s; }
+    function ser(n) {
+      if (n.nodeType === 3) return mdText(n.nodeValue);
+      if (n.nodeType !== 1) return '';
+      var t = n.tagName, st = n.style || {};
+      if (t === 'BR') return '\n';
+      if (/^H[1-6]$/.test(t) || (t === 'B' && n.classList.contains('md-h'))) return '\n\n# ' + kids(n).trim() + '\n\n';
+      if (t === 'B' || t === 'STRONG') return mdWrap('**', kids(n));
+      if (t === 'I' || t === 'EM') return mdWrap('*', kids(n));
+      if (t === 'S' || t === 'STRIKE' || t === 'DEL') return mdWrap('~~', kids(n));
+      if (t === 'CODE') return n.textContent ? '`' + n.textContent.replace(/`/g, '') + '`' : '';
+      if (t === 'A') { var h = n.getAttribute('href') || '', k = kids(n); return MD_URL.test(h) && k.trim() ? '[' + k.replace(/\n/g, ' ') + '](' + h.replace(/[()\s]/g, encodeURIComponent) + ')' : k; }
+      if (t === 'PRE') return '\n\n```\n' + n.textContent.replace(/\n$/, '') + '\n```\n\n';
+      if (t === 'UL' || t === 'OL') {
+        var i = 0;
+        return '\n\n' + Array.prototype.filter.call(n.children, function (c) { return c.tagName === 'LI'; }).map(function (li) {
+          return (t === 'OL' ? (++i) + '. ' : '- ') + kids(li).trim().replace(/\n+/g, ' ');
+        }).join('\n') + '\n\n';
+      }
+      if (t === 'BLOCKQUOTE') return '\n\n' + tidy(kids(n)).split('\n').map(function (l) { return l ? '> ' + l : '>'; }).join('\n') + '\n\n';
+      if (t === 'P' || t === 'DIV') return '\n\n' + kids(n) + '\n\n';
+      var s = kids(n);
+      if (t === 'SPAN') {
+        if (/bold|[6-9]00/.test(st.fontWeight || '')) s = mdWrap('**', s);
+        if (st.fontStyle === 'italic') s = mdWrap('*', s);
+      }
+      return s;
+    }
+    function tidy(s) { return s.replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').replace(/^\n+|\s+$/g, ''); }
+    return tidy(kids(root));
+  };
+
+  // The editor over a note's text box, in two modes, chosen with the switch at
+  // the right of its toolbar and kept for next time: rich text (formatting shown
+  // as it will look) or Markdown (the marks typed, with a preview). The text box
+  // underneath always holds the Markdown, so saving works the same either way.
+  // Cmd/Ctrl+B, I and K; pasting a URL over selected words makes a link.
   SW.mdTools = function (ta) {
     if (!ta || ta._mdTools) return;
     ta._mdTools = true;
+    var mode = SW.store.get('noteMode', 'rich');
     var bar = SW.el('div', { class: 'md-tools' });
     bar.innerHTML = [['b', '<b>B</b>', 'Bold (⌘B)'], ['i', '<i>I</i>', 'Italic (⌘I)'], ['code', '<code>`</code>', 'Code'],
-      ['link', '🔗', 'Link (⌘K): select the words, then paste or type the URL'], ['quote', '❝', 'Quotation'], ['list', '•', 'List']]
+      ['link', '🔗', 'Link (⌘K): select the words first'], ['quote', '❝', 'Quotation'], ['list', '•', 'List']]
       .map(function (b) { return '<button type="button" data-md="' + b[0] + '" title="' + b[2] + '">' + b[1] + '</button>'; }).join('') +
+      '<span class="md-link" hidden><input type="url" placeholder="https://…" spellcheck="false"><button type="button" data-md="link-ok">Link</button></span>' +
       '<span class="md-sep"></span><button type="button" data-md="preview" class="md-prev" title="See it as it will be shown">Preview</button>' +
-      '<span class="hint md-hint">Markdown</span>';
+      '<span class="md-mode" role="group" aria-label="Edit as"><button type="button" data-mode="rich" title="Edit with the formatting shown">Rich text</button><button type="button" data-mode="md" title="Edit the Markdown itself">Markdown</button></span>';
+    var rich = SW.el('div', { class: 'md-rich note-md', contenteditable: 'true', role: 'textbox', 'aria-multiline': 'true' });
+    rich.style.minHeight = (Math.max(3, ta.rows || 3) * 1.5) + 'em';
+    if (ta.placeholder) rich.dataset.placeholder = ta.placeholder;
     var prev = SW.el('div', { class: 'md-preview note-md', hidden: '' });
     ta.parentNode.insertBefore(bar, ta);
-    ta.insertAdjacentElement('afterend', prev);
+    ta.insertAdjacentElement('afterend', rich);
+    rich.insertAdjacentElement('afterend', prev);
+    var linkBox = bar.querySelector('.md-link'), linkIn = linkBox.querySelector('input'), saved = null;
+    var taFocus = HTMLTextAreaElement.prototype.focus;
+    ta.focus = function () { if (mode === 'rich') rich.focus(); else taFocus.call(ta); };
+
+    // ---- Markdown mode: marks inserted into the text box
     function sel() { return { a: ta.selectionStart, b: ta.selectionEnd, t: ta.value.slice(ta.selectionStart, ta.selectionEnd) }; }
     function put(a, b, text, s0, s1) {
-      ta.focus(); ta.setSelectionRange(a, b);
-      if (!document.execCommand || !document.execCommand('insertText', false, text)) { ta.setRangeText(text, a, b, 'end'); }
+      taFocus.call(ta); ta.setSelectionRange(a, b);
+      if (!document.execCommand || !document.execCommand('insertText', false, text)) ta.setRangeText(text, a, b, 'end');
       ta.setSelectionRange(a + s0, a + s1);
       ta.dispatchEvent(new Event('input', { bubbles: true }));
     }
@@ -946,39 +1004,122 @@
       var v = ta.value, a = v.lastIndexOf('\n', ta.selectionStart - 1) + 1, e = v.indexOf('\n', ta.selectionEnd); if (e < 0) e = v.length;
       var t = v.slice(a, e).split('\n').map(fn).join('\n'); put(a, e, t, 0, t.length);
     }
-    function link(url) {
+    function mdLinkIn(url) {
       var s = sel(), t = s.t || 'link';
       if (url) put(s.a, s.b, '[' + t + '](' + url + ')', 1, 1 + t.length);
       else put(s.a, s.b, '[' + t + '](https://)', t.length + 3, t.length + 11);
     }
+
+    // ---- rich mode: the browser's own editing commands, kept in step with the text box
+    function sync() { ta.value = SW.htmlToMd(rich); ta.dispatchEvent(new Event('input', { bubbles: true })); }
+    function cmd(c, v) { rich.focus(); document.execCommand(c, false, v); sync(); }
+    function within(tag) { var s = window.getSelection(); var n = s.rangeCount ? s.getRangeAt(0).commonAncestorContainer : null; for (; n && n !== rich; n = n.parentNode) if (n.nodeType === 1 && n.tagName === tag) return n; return null; }
+    function fixUrl(u) { u = String(u || '').trim(); if (!u) return ''; if (!MD_URL.test(u) && /^[\w-]+(\.[\w-]+)+/.test(u)) u = 'https://' + u; return MD_URL.test(u) ? u : ''; }
+    function richLink(url) {
+      var s = window.getSelection();
+      if (saved) { rich.focus(); s.removeAllRanges(); s.addRange(saved); }
+      if (s.isCollapsed) cmd('insertHTML', '<a href="' + SW.esc(url) + '">' + SW.esc(url) + '</a>&nbsp;');
+      else cmd('createLink', url);
+    }
+    function askLink() {
+      var s = window.getSelection();
+      saved = s.rangeCount && rich.contains(s.anchorNode) ? s.getRangeAt(0).cloneRange() : null;
+      var a = within('A'); linkIn.value = a ? a.getAttribute('href') : '';
+      linkBox.hidden = false; linkIn.focus(); linkIn.select();
+    }
+    function doneLink() {
+      var u = fixUrl(linkIn.value); linkBox.hidden = true;
+      if (u) richLink(u); else if (linkIn.value.trim() === '' && saved) { rich.focus(); var s = window.getSelection(); s.removeAllRanges(); s.addRange(saved); cmd('unlink'); }
+      else rich.focus();
+    }
+    linkIn.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); doneLink(); }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); linkBox.hidden = true; rich.focus(); }
+    });
+
     function act(k) {
-      if (k === 'b') wrap('**', 'bold');
-      else if (k === 'i') wrap('*', 'italic');
-      else if (k === 'code') { var s = sel(); if (s.t.indexOf('\n') >= 0) put(s.a, s.b, '```\n' + s.t + '\n```', 4, 4 + s.t.length); else wrap('`', 'code'); }
-      else if (k === 'link') link();
-      else if (k === 'quote') lines(function (l) { return '> ' + l; });
-      else if (k === 'list') lines(function (l) { return '- ' + l; });
-      else if (k === 'preview') {
+      if (k === 'link-ok') return doneLink();
+      if (k === 'preview') {
         var on = prev.hidden;
         prev.hidden = !on; ta.hidden = on;
         bar.querySelector('.md-prev').classList.toggle('on', on);
         bar.querySelector('.md-prev').textContent = on ? 'Write' : 'Preview';
-        if (on) prev.innerHTML = SW.md(ta.value) || '<p class="hint">Nothing yet.</p>'; else ta.focus();
+        if (on) prev.innerHTML = SW.md(ta.value) || '<p class="hint">Nothing yet.</p>'; else taFocus.call(ta);
+        return;
+      }
+      if (mode === 'rich') {
+        if (k === 'b') cmd('bold');
+        else if (k === 'i') cmd('italic');
+        else if (k === 'code') {
+          var s = window.getSelection(), t = s.toString();
+          var c = within('CODE');
+          if (c) { c.replaceWith(document.createTextNode(c.textContent)); sync(); }
+          else if (t.indexOf('\n') >= 0) cmd('insertHTML', '<pre>' + SW.esc(t) + '</pre><p><br></p>');
+          else cmd('insertHTML', '<code>' + SW.esc(t || 'code') + '</code>&nbsp;');
+        }
+        else if (k === 'link') askLink();
+        else if (k === 'quote') cmd('formatBlock', within('BLOCKQUOTE') ? 'P' : 'BLOCKQUOTE');
+        else if (k === 'list') cmd('insertUnorderedList');
+      } else {
+        if (k === 'b') wrap('**', 'bold');
+        else if (k === 'i') wrap('*', 'italic');
+        else if (k === 'code') { var m = sel(); if (m.t.indexOf('\n') >= 0) put(m.a, m.b, '```\n' + m.t + '\n```', 4, 4 + m.t.length); else wrap('`', 'code'); }
+        else if (k === 'link') mdLinkIn();
+        else if (k === 'quote') lines(function (l) { return '> ' + l; });
+        else if (k === 'list') lines(function (l) { return '- ' + l; });
       }
     }
-    bar.addEventListener('mousedown', function (e) { if (e.target.closest('[data-md]')) e.preventDefault(); });   // keep the selection
-    bar.addEventListener('click', function (e) { var b = e.target.closest('[data-md]'); if (b) { e.preventDefault(); e.stopPropagation(); act(b.dataset.md); } });
-    ta.addEventListener('keydown', function (e) {
+    function setMode(m, keep) {
+      if (m === 'rich' && mode !== 'rich') rich.innerHTML = SW.md(ta.value);
+      mode = m;
+      if (!keep) SW.store.set('noteMode', m);
+      if (!prev.hidden) { prev.hidden = true; bar.querySelector('.md-prev').classList.remove('on'); bar.querySelector('.md-prev').textContent = 'Preview'; }
+      rich.hidden = m !== 'rich'; ta.hidden = m === 'rich';
+      bar.querySelector('.md-prev').hidden = m === 'rich';
+      linkBox.hidden = true;
+      SW.$$('[data-mode]', bar).forEach(function (b) { b.classList.toggle('on', b.dataset.mode === m); b.setAttribute('aria-pressed', b.dataset.mode === m); });
+    }
+    bar.addEventListener('mousedown', function (e) { if (e.target.closest('[data-md], [data-mode]')) e.preventDefault(); });   // keep the selection
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-md]'), md = e.target.closest('[data-mode]');
+      if (b) { e.preventDefault(); e.stopPropagation(); act(b.dataset.md); }
+      else if (md) { e.preventDefault(); e.stopPropagation(); setMode(md.dataset.mode); ta.focus(); }
+    });
+    function keys(e) {
       if (!(e.metaKey || e.ctrlKey) || e.altKey || e.shiftKey) return;
       var k = { b: 'b', i: 'i', k: 'link' }[e.key.toLowerCase()];
       if (k) { e.preventDefault(); act(k); }
+    }
+    ta.addEventListener('keydown', keys);
+    rich.addEventListener('keydown', function (e) {
+      // Cmd/Ctrl+Enter (save) and Escape (cancel) go to whatever listens on the text box
+      if ((e.key === 'Enter' && (e.metaKey || e.ctrlKey)) || e.key === 'Escape') {
+        e.preventDefault();
+        ta.dispatchEvent(new KeyboardEvent('keydown', { key: e.key, metaKey: e.metaKey, ctrlKey: e.ctrlKey, bubbles: true, cancelable: true }));
+        return;
+      }
+      keys(e);
     });
+    rich.addEventListener('input', sync);
     ta.addEventListener('paste', function (e) {
       var s = sel(), u = (e.clipboardData && e.clipboardData.getData('text/plain') || '').trim();
-      if (s.t && !/\n/.test(s.t) && MD_URL.test(u) && !/\s/.test(u)) { e.preventDefault(); link(u); }
+      if (s.t && !/\n/.test(s.t) && MD_URL.test(u) && !/\s/.test(u)) { e.preventDefault(); mdLinkIn(u); }
     });
-    // a fresh note: back to writing
-    ta._mdReset = function () { if (!prev.hidden) act('preview'); };
+    // pasted or dropped into the rich editor: plain text, or a link over selected words
+    function plainIn(e, dt) {
+      if (!dt) return;
+      e.preventDefault();
+      var t = dt.getData('text/plain') || '', s = window.getSelection();
+      if (!s.isCollapsed && MD_URL.test(t.trim()) && !/\s/.test(t.trim())) { saved = null; cmd('createLink', t.trim()); return; }
+      cmd('insertText', t);
+    }
+    rich.addEventListener('paste', function (e) { plainIn(e, e.clipboardData); });
+    rich.addEventListener('drop', function (e) { plainIn(e, e.dataTransfer); });
+    try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (x) { /* older browsers */ }
+    // reopened for a fresh note, or the text set from outside: show it again
+    ta._mdReset = function () { rich.innerHTML = SW.md(ta.value); setMode(SW.store.get('noteMode', 'rich'), true); };
+    rich.innerHTML = SW.md(ta.value);
+    setMode(mode, true);
   };
 
   SW.figpack = {

@@ -1410,5 +1410,16 @@ button.badge.err:hover { filter: brightness(1.2); }
 .md-tools button.on { color: var(--beam); border-color: var(--beam); }
 .md-tools code { background: none; border: 0; font-size: 12px; }
 .md-tools .md-sep { width: 8px; }
-.md-tools .md-hint { margin-left: auto; font-size: 11px; }
+
 .md-preview { min-height: 5.5em; padding: 6px 8px; border: 1px dashed var(--line); border-radius: 4px; font-family: var(--serif); font-size: 15px; line-height: 1.5; }
+.md-rich { padding: 6px 8px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font-family: var(--serif); font-size: 15px; line-height: 1.5; overflow-y: auto; max-height: 50vh; outline: none; }
+.md-rich:focus { border-color: var(--text-faint); }
+.md-rich:empty::before { content: attr(data-placeholder); color: var(--text-faint); }
+.md-rich[hidden] { display: none; }
+.md-tools .md-mode { margin-left: auto; display: inline-flex; }
+.md-tools .md-mode button { border-radius: 0; }
+.md-tools .md-mode button:first-child { border-radius: 3px 0 0 3px; }
+.md-tools .md-mode button:last-child { border-radius: 0 3px 3px 0; border-left: 0; }
+.md-tools .md-link { display: inline-flex; gap: 2px; margin-left: 4px; }
+.md-tools .md-link[hidden] { display: none; }
+.md-tools .md-link input { width: 220px; height: 24px; font: 12px var(--mono); padding: 0 6px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); border-radius: 3px; }
