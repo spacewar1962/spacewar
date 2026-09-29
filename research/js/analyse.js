@@ -330,6 +330,17 @@
     try { cpu.run(400000); } catch (e) { /* what ran is still counted */ }
     return (b._memRun = { mem: cpu.mem.slice(), exec: cpu.execCount.slice(), read: cpu.readCount.slice(), write: cpu.writeCount.slice(), writer: cpu.lastWriter.slice(), secs: cpu.cycles * 5e-6 });
   }
+  // what each kind of word is, for the legends' hover text
+  var MEMWHAT = {
+    code: 'Assembled from this version’s own program text: instructions and the data written among them.',
+    constant: 'The constants block: values written in parentheses in the source, such as (B, which the assembler gathers into one table at the end.',
+    variable: 'The variables block: storage the assembler sets aside for names marked as variables, with no value until the program runs.',
+    supplied: 'Assembled from a tape this version’s own surviving text does not include, added so that it can be built: in 4.1 and 4.8, Samson’s Expensive Planetarium star table (13 March 1962) from the 2B sources. Real core, but not attested for this version.',
+    text: 'Character data from the text pseudo-instruction: three FIO-DEC characters to a word.',
+    'run-time code': 'Not assembled: written while the program runs, then executed, such as the ship outlines compiled into instructions at start-up.',
+    'run-time data': 'Not assembled: written while the program runs but never executed, such as the object table.',
+    unused: 'Neither assembled nor written in two emulated seconds of running.'
+  };
   var MEMCOL = { code: 'var(--beam)', constant: 'var(--amber)', variable: 'var(--violet)', supplied: 'var(--green)', text: 'var(--red)', 'run-time code': '#e8a0ff', 'run-time data': '#8fa3b5', unused: 'var(--line-soft)' };
   function memmap(b, el) {
     if (!b.asm) return null;
@@ -387,7 +398,7 @@
       g.globalAlpha = 1;
       if (sel >= 0) { g.strokeStyle = SW.cssVar('--text') || '#fff'; g.lineWidth = 2; g.strokeRect(LX + (sel & 63) * CELL - 1, (sel >> 6) * CELL - 1, CELL + 1, CELL + 1); }
       var leg = SW.$('.mem-legend', tb);
-      if (mode === 'kind') leg.innerHTML = Object.keys(MEMCOL).map(function (k) { var n = kind.filter(function (x) { return x === k; }).length; return n ? '<span><i style="background:' + colOf(k) + '"></i>' + k + ' ' + n + '</span>' : ''; }).join('');
+      if (mode === 'kind') leg.innerHTML = Object.keys(MEMCOL).map(function (k) { var n = kind.filter(function (x) { return x === k; }).length; return n ? '<span title="' + SW.esc(MEMWHAT[k] || '') + '"><i style="background:' + colOf(k) + '"></i>' + k + ' ' + n + '</span>' : ''; }).join('');
       else if (mode === 'routine') leg.innerHTML = '<span class="hint">each routine (from its label) in its own colour; code bright, its data darker</span>';
       else { var tot = 0, used = 0; run[mode].forEach(function (v) { tot += v; if (v) used++; }); leg.innerHTML = '<span class="hint">' + used + ' words ' + ({ exec: 'executed', read: 'read', write: 'written' })[mode] + ', ' + tot.toLocaleString('en-GB') + ' times in ' + run.secs.toFixed(1) + ' s; brighter is more</span>'; }
     }
@@ -1423,7 +1434,7 @@
       return o.concat(['</svg>']).join('');
     };
     var c = card('How each version fills the 4096 words', 'Words of memory by use.');
-    c.insertAdjacentHTML('beforeend', '<div class="legend">' + kinds.map(function (k) { return '<span><i style="background:' + col[k] + '"></i>' + k + '</span>'; }).join('') + '</div>');
+    c.insertAdjacentHTML('beforeend', '<div class="legend">' + kinds.map(function (k) { return '<span title="' + SW.esc(MEMWHAT[k] || '') + '"><i style="background:' + col[k] + '"></i>' + k + '</span>'; }).join('') + '</div>');
     c.appendChild(SW.el('div', { class: 'svgbox', style: 'margin-top:6px' }, SW.displaySVG(svg())));
     c.appendChild(SW.figureButtons(svg, 'spacewar-memory-across-versions', function () { return SW.refsOf((typeof vs !== 'undefined' ? vs : []).map(function (v) { return v.v ? v.v.id : v.id; })); }));
     c.style.gridColumn = '1 / -1';
