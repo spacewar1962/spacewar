@@ -443,7 +443,7 @@
     var ok = aiUsable();
     var NAME = ['the Needle', 'the Wedge'];
     function lvlSel(jj) {
-      return '<label class="check" title="How well the computer flies ' + NAME[jj] + ': easy aims loosely and never dodges; medium dodges torpedoes; hard dodges earlier and, where the version has it, jumps into hyperspace; hardcore watches furthest and aims finest.">' + (jj ? 'Wedge' : 'Needle') + ' <select data-al="' + jj + '"' + (ok ? '' : ' disabled') + '>' +
+      return '<label class="check" title="How well the computer flies ' + NAME[jj] + ': easy aims loosely and never dodges; medium dodges torpedoes; hard also chases and, where the version has it, jumps into hyperspace at the last moment; hardcore jumps in good time and aims finest.">' + (jj ? 'Wedge' : 'Needle') + ' <select data-al="' + jj + '"' + (ok ? '' : ' disabled') + '>' +
         SW.ai.LEVEL_NAMES.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === aiLevels[jj] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
         (pilots[jj] && pilots[jj].temper ? ' <span class="hint" title="Drawn at random for each game: a hunter chases hard, an orbiter keeps its distance and snipes, a duellist is between">' + pilots[jj].temper + '</span>' : '') + '</label>';
     }
