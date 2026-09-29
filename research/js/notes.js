@@ -1342,12 +1342,15 @@
       var html = '<div class="ann-search"><input type="search" placeholder="Search every annotation, all versions: words, initials, tags" spellcheck="false">' +
         '<label class="check"><input type="checkbox" class="as-open"> Open questions only</label></div><div class="ann-results" hidden></div><div class="ann-here">' +
         '<p class="hint" style="margin-top:0">Every annotation on ' + SW.esc(b.v.label) + '. Click a line reference to go to it.</p>' +
+        '<p class="hint join-hint">' + (N.configured() ? 'Bringing someone in? ' : '<b>Not connected to the group:</b> your annotations are kept as drafts in this browser. ') +
+        '<button type="button" class="linkbtn" data-act="join">How to join the annotation group</button></p>' +
         '<p><button class="btn" data-act="vnote">✎ Annotate the version</button> ' +
         '<button class="btn' + (binInVersionPanel ? ' on' : '') + '" data-act="bin" title="Deleted annotations on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
         (ts.map(function (t) { return where(t.note.anchor) + N.renderThread(t, null); }).join('') || '<p class="hint">No annotations on this version yet.</p>') +
         '<div class="panel-bin"' + (binInVersionPanel ? '' : ' hidden') + '><h4>Deleted annotations</h4><div></div></div></div>';
       var body = SW.drawer('Annotations', html);
       wireSearch(body);
+      body.querySelector('[data-act="join"]').onclick = function (e) { e.stopPropagation(); N.joinHelp(); };
       body.dataset.panel = 'version';
       body.dataset.vid = vid;
       N.wire(body, vid, all);
