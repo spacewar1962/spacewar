@@ -147,7 +147,7 @@
 
   L.drawCollision = function (b, host) {
     return pair(host, 'Collision shape',
-      'How the game decides that two objects collide, in three steps, measured in each version’s own game: the Wedge set at every offset from the Needle, up to 30 screen points each way, both at rest far from the star, and one frame run. The same test serves torpedoes, which collide with ships and each other.',
+      'How the game decides that two objects collide, in four steps, measured in each version’s own game: the Wedge set at every offset from the Needle, up to 30 screen points each way, both at rest far from the star, and one frame run. The same test serves torpedoes, which collide with ships and each other.',
       'labcol', function (el, vid, alive) {
         el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5><p class="hint lab-prog">Running 3,721 frames…</p>';
         L.collision(vid, alive, function (f) { var p = SW.$('.lab-prog', el); if (p) p.textContent = 'Running 3,721 frames… ' + Math.round(f * 100) + '%'; }).then(function (d) {
@@ -157,21 +157,22 @@
           var pts = d.me1 != null ? (d.me1 / 256) : null, pts2 = d.me2 != null ? d.me2 / 256 : null, zones = pts != null && pts2 != null;
           var ed = edges(d);
           var caps = [
-            '<b>1 · The test.</b> The game compares the two centres: a collision when |dx| and |dy| are each under me1 and |dx| + |dy| is under me1 + me2. Shaded, every place the Wedge’s centre was measured to collide; dashed, the octagon the constants give.',
-            zones ? '<b>2 · A zone round each ship.</b> The same test, drawn as a zone half that size round each ship: ' + (pts / 2) + ' points to each flat side, ' + ((pts + pts2) / 2) + ' along a diagonal. The ships here are apart.' : '<b>2 · A zone round each ship</b> needs me1 and me2, not found in this version.',
-            '<b>3 · A collision.</b> The Wedge moved in until the zones meet: ' + (-ed.left) + ' points to the left, ' + ed.right + ' to the right, the furthest offsets at which the game declared a collision.'
+            '<b>1 · The test.</b> The game compares the two centres: a collision when |dx| and |dy| are each under me1 and |dx| + |dy| is under me1 + me2. Shaded, every place the Wedge’s centre was measured to collide; dashed, the octagon the constants give. This area is a distance between the two ships, not the size of either.',
+            zones ? '<b>2 · A zone round each ship.</b> The same distance split between the two ships: each carries half of it, ' + (pts / 2) + ' points to each flat side and ' + ((pts + pts2) / 2) + ' along a diagonal, and the two halves touch exactly when the centres are the full distance apart, as two coins of radius 1 cm touch when their centres are 2 cm apart. The ships here are apart.' : '<b>2 · A zone round each ship</b> needs me1 and me2, not found in this version.',
+            '<b>3 · A collision.</b> The Wedge moved in until the zones meet: ' + (-ed.left) + ' points to the left, ' + ed.right + ' to the right, the furthest offsets at which the game declared a collision.',
+            '<b>4 · A torpedo.</b> The same loop compares every pair of objects in the table with the same me1 and me2, ships and torpedoes alike, so a torpedo, a single point, carries a zone as large as a ship’s and hits the Needle at the same distance: ' + ed.right + ' points (from the code; not measured separately).'
           ];
           el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5>' +
             '<table class="ov-sub rnd-t"><tbody>' +
             '<tr><td>Constants</td><td class="mono">me1 ' + (d.me1 != null ? oct(d.me1) + ' (' + pts + ' points)' : '—') + ' · me2 ' + (d.me2 != null ? oct(d.me2) + ' (' + pts2 + ' points)' : '—') + '</td></tr>' +
             '<tr><td>Measured</td><td>' + n.toLocaleString('en-GB') + ' of 3,721 offsets collide</td></tr></tbody></table>' +
-            [1, 2, 3].map(function (st) { return '<figure class="col-step"><canvas class="lab-cv" data-step="' + st + '"></canvas><figcaption class="hint">' + caps[st - 1] + '</figcaption></figure>'; }).join('') +
+            [1, 2, 3, 4].map(function (st) { return '<figure class="col-step"><canvas class="lab-cv" data-step="' + st + '"></canvas><figcaption class="hint">' + caps[st - 1] + '</figcaption></figure>'; }).join('') +
             '<div class="rnd-exp"></div>';
           var cvs = SW.$$('.lab-cv', el);
           cvs.forEach(function (cv) { drawCol(cv, d, +cv.dataset.step); });
           SW.$('.rnd-exp', el).appendChild(SW.figureButtons(function (pal) {
             var plain = caps.map(function (c) { return c.replace(/<[^>]+>/g, ''); });
-            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 900" width="280" height="900" font-family="IBM Plex Mono, monospace" font-size="10"><text x="0" y="12" fill="' + pal.ink + '">' + SW.esc(V.byId(vid).label) + ': how a collision is decided</text>' +
+            return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 1200" width="280" height="1200" font-family="IBM Plex Mono, monospace" font-size="10"><text x="0" y="12" fill="' + pal.ink + '">' + SW.esc(V.byId(vid).label) + ': how a collision is decided</text>' +
               cvs.map(function (cv, k) { return '<image href="' + cv.toDataURL('image/png') + '" x="0" y="' + (22 + k * 292) + '" width="260" height="260"/><text x="0" y="' + (22 + k * 292 + 276) + '" fill="' + pal.ink + '">' + SW.esc(plain[k].split(':')[0].split('.')[0] + '.' + (plain[k].split('.')[1] || '')) + '</text>'; }).join('') + '</svg>';
           }, 'spacewar-' + vid + '-collision', SW.refText(vid)));
         });
@@ -187,7 +188,8 @@
   // One of the three steps. The game's test compares the two centres (|dx| and |dy|
   // under me1, |dx| + |dy| under me1 + me2): 1, where the Wedge's centre must come;
   // 2, the same as a zone half that size round each ship, the ships apart; 3, the
-  // Wedge moved in until the zones meet.
+  // Wedge moved in until the zones meet; 4, a torpedo, whose zone is the same (one test
+  // for every pair of objects: ml1 onward in 3.1).
   function drawCol(cv, d, step) {
     var N = 260, dpr = root.devicePixelRatio || 1; cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px';
     var g = cv.getContext('2d'); g.scale(dpr, dpr); g.fillStyle = '#dcd9d1'; g.fillRect(0, 0, N, N);
@@ -213,6 +215,12 @@
       if (zones) { g.fillStyle = 'rgba(200, 90, 60, 0.30)'; g.strokeStyle = RED; g.lineWidth = 1.4; octagon(0, 0, a / 2, s / 2); g.fill(); g.stroke();
                    g.fillStyle = 'rgba(31, 95, 158, 0.22)'; g.strokeStyle = BLUE; octagon(apart, 0, a / 2, s / 2); g.fill(); g.stroke(); }
       ship(0, 0, '#262626'); ship(1, apart, BLUE); centre(0, '#262626'); centre(apart, BLUE);
+    } else if (step === 4) {
+      var AMB = '#a8660a';
+      if (zones) { g.fillStyle = 'rgba(200, 90, 60, 0.30)'; g.strokeStyle = RED; g.lineWidth = 1.4; octagon(0, 0, a / 2, s / 2); g.fill(); g.stroke();
+                   g.fillStyle = 'rgba(200, 140, 30, 0.25)'; g.strokeStyle = AMB; octagon(ed.right, 0, a / 2, s / 2); g.fill(); g.stroke(); }
+      ship(0, 0, '#262626'); centre(0, '#262626');
+      g.fillStyle = AMB; g.beginPath(); g.arc(X(ed.right), Y(0), 3, 0, 2 * Math.PI); g.fill();   // the torpedo: one point
     } else {
       if (zones) { g.fillStyle = 'rgba(200, 90, 60, 0.30)'; g.strokeStyle = RED; g.lineWidth = 1.4; octagon(0, 0, a / 2, s / 2); g.fill(); g.stroke();
                    [ed.left, ed.right].forEach(function (e) { g.fillStyle = 'rgba(31, 95, 158, 0.22)'; g.strokeStyle = BLUE; octagon(e, 0, a / 2, s / 2); g.fill(); g.stroke(); }); }
