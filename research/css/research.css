@@ -332,6 +332,12 @@ a.term { color: inherit; } a.term-x { font-size: 11px; }
 .ln { display: grid; grid-template-columns: 4.8em 3.6em 5.2em 1fr minmax(2.2em, max-content); column-gap: 10px; padding: 0 14px 0 6px; white-space: pre; min-height: 1.5em; }
 .ln:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
 .ln .n { color: var(--text-faint); text-align: right; cursor: pointer; user-select: none; padding-right: 9px; }
+/* +A: a quick annotation, shown by the line number on hover */
+.ln .n { position: relative; }
+.ln .n .qa { position: absolute; right: calc(9px + var(--d, 3) * 1ch + 3px); top: 50%; transform: translateY(-50%); visibility: hidden; padding: 0 3px; font: 600 10px/1.5 var(--sans); color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; cursor: pointer; }
+.ln:hover .n .qa { visibility: visible; }
+.ln .n .qa:hover { color: var(--amber); border-color: var(--amber); }
+@media (hover: none) { .ln.sel .n .qa { visibility: visible; } }
 .ln .a { color: var(--amber); opacity: 0.85; }
 .ln .w { color: var(--text-dim); }
 .ln .t { overflow: hidden; text-overflow: ellipsis; }
@@ -1479,22 +1485,27 @@ a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-b
 .md-tools .md-help { margin-left: 4px; }
 /* the code an annotation is attached to: a thin bracket at the right of the word
    column, and a span within the lines dotted underneath; both stronger on hover */
-.ln.blk { --blk: color-mix(in srgb, var(--amber) 32%, transparent); }
-.ln.blk.mlit { --blk: color-mix(in srgb, var(--amber) 85%, transparent); }
+:root { --anno-line: var(--amber); --anno-block: color-mix(in srgb, var(--amber) 60%, var(--red)); }   /* two shades: a line, a block */
+.ln.blk { --blk: color-mix(in srgb, var(--anno-line) 32%, transparent); }
+.ln.blk.mlit { --blk: color-mix(in srgb, var(--anno-line) 85%, transparent); }
+.ln.blk.blk-b { --blk: color-mix(in srgb, var(--anno-block) 38%, transparent); }
+.ln.blk.blk-b.mlit { --blk: color-mix(in srgb, var(--anno-block) 90%, transparent); }
+.mcard.blockn, .ithread.blockn { border-left-color: var(--anno-block); }
+.mcard.blockn.draft, .ithread.blockn.draft { border-left-color: var(--text-faint); }
 .ln.blk .w { box-shadow: inset -2px 0 0 var(--blk); }
 .ln.blk-top .w { background: linear-gradient(var(--blk), var(--blk)) right top / 7px 1px no-repeat; }
 .ln.blk-end .w { background: linear-gradient(var(--blk), var(--blk)) right bottom / 7px 1px no-repeat; }
 .ln.blk-top.blk-end .w { background: linear-gradient(var(--blk), var(--blk)) right top / 7px 1px no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 7px 1px no-repeat; }
 .rd-body.notes-hidden .ln.blk .w { box-shadow: none; background: none; }
-mark.frag { background: none; color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--amber) 55%, transparent); text-underline-offset: 3px; }
-mark.frag.lit { background: color-mix(in srgb, var(--amber) 20%, transparent); text-decoration-color: var(--amber); }
+mark.frag { background: none; color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--anno-block) 60%, transparent); text-underline-offset: 3px; }
+mark.frag.lit { background: color-mix(in srgb, var(--anno-block) 20%, transparent); text-decoration-color: var(--anno-block); }
 .note .frag-q { margin: 2px 0 4px; }
 .note .frag-q summary { cursor: pointer; font: 11px/1.4 var(--sans); color: var(--text-faint); list-style: none; user-select: none; }
 .note .frag-q summary::-webkit-details-marker { display: none; }
 .note .frag-q summary::before { content: '▸'; display: inline-block; width: 1em; }
 .note .frag-q[open] summary::before { content: '▾'; }
 .note .frag-q summary:hover { color: var(--text-dim); }
-.note .frag-q pre { margin: 2px 0 0; padding: 3px 6px; font: 12px/1.4 var(--code-font); color: var(--text-dim); background: var(--code-bg); border-left: 2px solid color-mix(in srgb, var(--amber) 45%, transparent); border-radius: 2px; white-space: pre-wrap; max-height: 12em; overflow: auto; }
+.note .frag-q pre { margin: 2px 0 0; padding: 3px 6px; font: 12px/1.4 var(--code-font); color: var(--text-dim); background: var(--code-bg); border-left: 2px solid color-mix(in srgb, var(--anno-block) 50%, transparent); border-radius: 2px; white-space: pre-wrap; max-height: 12em; overflow: auto; }
 /* Developer mode */
 .dev-only { display: none !important; }
 body.dev-on .dev-only { display: revert !important; }

@@ -115,7 +115,7 @@
     if (opts.heat && SW.profile && SW.profile.build === b && words) {
       var ex = 0;
       words.forEach(function (x) { ex += SW.profile.exec[x.loc] || 0; });
-      if (ex) heat = ' style="background:color-mix(in srgb, var(--amber) ' + (100 * Math.min(0.5, 0.06 + Math.log10(1 + ex) / 12)).toFixed(1) + '%, transparent)"';
+      if (ex) heat = 'background:color-mix(in srgb, var(--amber) ' + (100 * Math.min(0.5, 0.06 + Math.log10(1 + ex) / 12)).toFixed(1) + '%, transparent)';
     }
     var title = '';
     if (b.errorsAt[k]) title = b.errorsAt[k].map(function (e) { return e.message + (e.symbol ? ' "' + e.symbol + '"' : ''); }).join('; ');
@@ -123,7 +123,7 @@
     else if (L.skipped) title = 'Not assembled (transcription header or outside this tape segment)';
     return '<div class="' + cls + '" id="L' + L.p + '-' + L.n + '" data-p="' + L.p + '" data-n="' + L.n + '"' +
       (title ? ' title="' + SW.esc(title) + '"' : '') + '>' +
-      '<span class="n"' + heat + '>' + L.n + '</span><span class="a"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + a + '</span>' +
+      '<span class="n" style="--d:' + String(L.n).length + ';' + heat + '"><button class="qa" tabindex="-1" title="Annotate this line (or the lines selected, if it is one of them)">+A</button>' + L.n + '</span><span class="a"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + a + '</span>' +
       '<span class="w"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + w + '</span>' +
       '<span class="t">' + (text ? hl(text, b).replace(/\f/g, '<span class="pgbrk" title="Page break: a stop code on the tape, or a form feed in the listing">↡</span>') : ' ') + '</span><span class="mk">' + mk + '</span></div>';
   }
@@ -261,7 +261,8 @@
     var a = t.note.anchor, nrep = 0, open = !!openCards[t.note.id], h = '';
     (function walk(rs) { rs.forEach(function (r) { nrep++; walk(r.replies); }); })(t.replies);
     if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
-    return '<div class="' + cls + (open ? ' open' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
+    var isBlock = a.n1 > a.n0 || a.c0 != null;
+    return '<div class="' + cls + (open ? ' open' : '') + (isBlock ? ' blockn' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
       '<div class="mc-where" title="Select the lines">l. ' + a.n0 + (a.n1 !== a.n0 ? '–' + a.n1 : '') + '</div>' +
       N.renderNote(t.note, false, t.reactions) +
       (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
@@ -301,13 +302,13 @@
   }
   function paintBlocks() {
     SW.$$('mark.frag', view).forEach(function (m) { var pa = m.parentNode; while (m.firstChild) pa.insertBefore(m.firstChild, m); m.remove(); pa.normalize(); });
-    SW.$$('.ln.blk', view).forEach(function (r) { r.classList.remove('blk', 'blk-top', 'blk-end'); });
+    SW.$$('.ln.blk', view).forEach(function (r) { r.classList.remove('blk', 'blk-top', 'blk-end', 'blk-b'); });
     if (opts.notes === 'hide') return;
     shownThreads().forEach(function (th) {
-      var a = th.note.anchor;
+      var a = th.note.anchor, isBlock = a.n1 > a.n0 || a.c0 != null;
       for (var n = a.n0; n <= a.n1; n++) {
         var row = SW.$('#L' + a.p + '-' + n, view); if (!row) continue;
-        row.classList.add('blk'); if (n === a.n0) row.classList.add('blk-top'); if (n === a.n1) row.classList.add('blk-end');
+        row.classList.add('blk'); if (isBlock) row.classList.add('blk-b'); if (n === a.n0) row.classList.add('blk-top'); if (n === a.n1) row.classList.add('blk-end');
         var L = build.lines[a.p][n - 1];
         if (a.c0 == null || !L || (opts.norm && L.norm !== L.raw)) continue;
         var s = n === a.n0 ? a.c0 : 0, e = n === a.n1 ? a.c1 : L.raw.length;
@@ -672,6 +673,15 @@
     box.addEventListener('click', function (e) {
       if (e.target.closest('.part-head')) return;   // tape headers only label (their source link opens GitHub)
       if (e.target.closest('.inote')) { threadClick(e); return; }   // note buttons are wired by N.wire
+      // +A by a line number: a quick annotation on that line, or on the selection it is in
+      var qa = e.target.closest('.qa');
+      if (qa) {
+        var qr = qa.closest('.ln'), qp = +qr.dataset.p, qn = +qr.dataset.n, s0 = SW.state.sel;
+        var r0 = s0 && s0.p === qp && qn >= s0.n0 && qn <= s0.n1 ? s0 : { p: qp, n0: qn, n1: qn };
+        SW.state.sel = r0; paintSel(); SW.writeQuery();
+        annotateSel();
+        return;
+      }
       var dot = e.target.closest('.note-dot');
       if (dot) { showNotesFor(dot.dataset.k); return; }
       var sym = e.target.closest('.sym');
