@@ -125,6 +125,7 @@
     SW.$('#set-noteshade').checked = SW.store.get('noteShade', true);
     SW.$('#set-chmbright').checked = SW.store.get('chmBright', true);
     SW.$('#set-dev').checked = SW.dev();
+    SW.$('#set-dev-box').open = SW.dev();   // folded away unless it is on
     var fontSel = SW.$('#set-font'), size = SW.$('#set-size'), sizeOut = SW.$('#set-size-out');
     var was = { font: SW.codeFont(), size: SW.codeSize() };
     fontSel.value = was.font; size.value = was.size; sizeOut.textContent = was.size + ' px';

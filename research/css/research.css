@@ -1495,3 +1495,10 @@ body.dev-on .dev-only { display: revert !important; }
 .dev-badge { font: 600 10px/1 var(--sans); padding: 1px 4px; border-radius: 3px; color: #000; background: var(--violet); letter-spacing: .03em; }
 .note .dev-check { font-size: 12px; margin: 4px 0; }
 #note-dev[hidden] { display: none; }
+.settings .dev-set { margin-top: 14px; }
+.settings .dev-set summary { cursor: pointer; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; list-style: none; }
+.settings .dev-set summary::-webkit-details-marker { display: none; }
+.settings .dev-set summary::before { content: '▸'; color: var(--text-faint); font-size: 12px; }
+.settings .dev-set[open] summary::before { content: '▾'; }
+.settings .dev-set summary h2 { display: inline; margin: 0; }
+.settings .dev-set .dev-warn { color: var(--red); font-size: 12px; font-weight: 600; }
