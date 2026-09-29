@@ -274,6 +274,8 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .btn[disabled] { opacity: 0.45; cursor: default; }
 .controls .r-sym { margin-left: 6px; white-space: nowrap; }
 .run-left .r-ddd { display: inline-flex; margin: 2px 0 4px; font-size: 12px; }
+.run-left .r-score { margin: 2px 0 0; font-size: 11px; color: var(--text-dim); text-align: center; font-variant-numeric: tabular-nums; letter-spacing: .02em; cursor: pointer; }
+.run-left .r-score b { font-weight: 600; color: var(--text); }
 .run-left .r-players { margin: 4px 0 2px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
 .run-left .r-players select { font-size: 12px; }
 #r-tabs .r-follow { margin-left: 8px; font-size: 12px; }

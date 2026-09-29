@@ -40,6 +40,36 @@
     aiShips().forEach(function (j) { if (pilots[j]) mine &= ~shipMask(j); });
     if (cpu) cpu.control = (keyBits & mine) | aiBits;
   }
+  // The game keys work anywhere on Run except in a menu or text box, so that
+  // choosing who flies, or clicking a button, does not take the ships away from you.
+  function gameKey(e) {
+    if (!KEYS[e.code] || !view.classList.contains('on') || !cpu || e.metaKey || e.ctrlKey || e.altKey) return false;
+    var t = e.target, tag = t && t.tagName;
+    return !(tag === 'INPUT' || tag === 'SELECT' || tag === 'TEXTAREA' || (t && t.isContentEditable));
+  }
+  document.addEventListener('keydown', function (e) { if (gameKey(e)) { keyBits |= KEYS[e.code]; compose(); e.preventDefault(); } });
+  document.addEventListener('keyup', function (e) { if (KEYS[e.code]) { keyBits &= ~KEYS[e.code]; compose(); } });
+  window.addEventListener('blur', function () { keyBits = 0; compose(); });
+
+  // The score, when the computer flies: a ship that explodes gives the other a point,
+  // unless both explode in the same frame (a collision). Kept from Reset to Reset.
+  var score = [0, 0], wasX = [false, false];
+  function tally() {
+    var S = build.sym; if (!S.mtb || !S.mex) return;
+    var x = [0, 1].map(function (j) { var w = cpu.mem[S.mtb.val + j]; return w !== 0 && (w & 0o7777) === S.mex.val; });
+    var n0 = x[0] && !wasX[0], n1 = x[1] && !wasX[1];
+    if (n0 && !n1) score[1]++;
+    if (n1 && !n0) score[0]++;
+    wasX = x;
+    if (n0 || n1) showScore();
+  }
+  function clearScore() { score = [0, 0]; wasX = [false, false]; showScore(); }
+  function showScore() {
+    var el = view && SW.$('#r-score', view); if (!el) return;
+    var ai = aiShips(), who = function (j) { return ai.indexOf(j) < 0 ? ' (you)' : ai.length === 1 ? ' (computer)' : ''; };
+    el.hidden = !ai.length || !aiUsable();
+    el.innerHTML = 'Needle' + who(0) + ' <b>' + score[0] + '</b> · Wedge' + who(1) + ' <b>' + score[1] + '</b>';
+  }
   function aiFrame() {
     aiBits = 0;
     pilots.forEach(function (p) { if (p) aiBits |= p(cpu.mem); });
@@ -72,13 +102,14 @@
     dual = SW.scopeCount(build) === 2;
     var wrap = SW.el('div', { class: 'run' + (dual ? ' dual' : '') });
     var left = SW.el('div', { class: 'run-left' });
-    var keysTip = 'Click, then fly the Needle with W A S D and the Wedge with I J K L: W and I fire, S and K the rocket, A and J turn left, D and L turn right.';
+    var scoreDiv = '<div class="r-score" id="r-score" hidden title="Ships destroyed, since Reset: a ship that explodes gives the other a point, a collision gives neither one. Click to clear."></div>';
+    var keysTip = 'Fly the Needle with W A S D and the Wedge with I J K L: W and I fire, S and K the rocket, A and J turn left, D and L turn right.';
     left.innerHTML =
       (dual
         ? '<div class="scopes2"><figure><div class="scope-wrap" title="Scope 1. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 1: the Wedge’s console, centred on the Wedge</figcaption></figure>' +
-          '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' +
+          '<figure><div class="scope-wrap" title="Scope 2. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope2" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div><figcaption>Scope 2: the Needle’s console, centred on the Needle</figcaption></figure></div>' + scoreDiv +
           '<p class="hint scopes2-note">4.4 sends alternate frames to two displays, each centred on one pilot’s ship (the kcb routine subtracts that ship’s place). Its second display is addressed by 720407 (dpy-i 400, in dj6), which DEC’s 1963 PDP-1 Handbook gives as dpp, display one point on a second CRT (Type 31), beside dpy 720007 for the Type 30. Which display MIT used as the second console is not recorded there (F31).' + (build.v.id === '4.4f' ? ' This is Landsteiner’s 2015 fixed version (F33).' : (fixedSyms ? ' Assembled with the tape “foo” fed in after pass 1, as the listing’s pass log records, so the sun is placed correctly. The Needle’s console still shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).' : ' Assembled without the tape “foo” that the pass log records after pass 1, so the sun is misplaced on both consoles; the Needle’s console also shows its stars, torpedoes and explosions at the wrong positions (kcb’s jmp . 6); 4.4f is Landsteiner’s 2015 fix (F33).')) + '</p>'
-        : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>') +
+        : '<div class="scope-wrap" title="Type 30 display. ' + keysTip + '"><canvas class="glow" width="' + scopeSize + '" height="' + scopeSize + '"></canvas><canvas class="flash" id="scope" width="' + scopeSize + '" height="' + scopeSize + '" tabindex="0"></canvas></div>' + scoreDiv) +
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
       '<button class="btn" id="r-over" title="Step over a subroutine call (jsp, jda)">Step over</button>' +
@@ -91,7 +122,7 @@
       (build.v.pass1 ? '<label class="check r-sym" title="The sun routine uses nx1 and ny1 before the line that assigns them. The pass log at the end of the listing (scan p. 31) shows that after pass 1 a short tape, “' + build.v.pass1.name + '”, was fed in with nx1=mtb nob and ny1=nx1 nob, so pass 2 had their final values and the sun was placed correctly. Ticked, the bench assembles with that tape, as MIT did. Unticked, without it, the sun is misplaced (F33). The kcb jump fault on the Needle’s console is a separate coding error and stays either way; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Fix Sun Rendering Bug</label><button class="icon-btn r-symhelp" id="r-symhelp" title="What the fix is, with the pass log and the code">?</button>' : '') + '</div>' +
       '<div class="r-players" id="r-players"></div>' +
       (build.sym.ddd ? '<label class="check r-ddd" title="The constant ddd, “0 to save space for ddt”: at 0 the Needle’s outline is not compiled and both ships are drawn as Wedges (F47). Changing it resets the run."><input type="checkbox" id="r-ddd"' + (SW.store.get('run.ddd', false) ? ' checked' : '') + '> Both ships as Wedges (ddd = 0)</label>' : '') +
-      '<div class="keys">Controls: click the scope, then <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
+      '<div class="keys">Controls: <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
     var right = SW.el('div', { class: 'run-right' });
     right.innerHTML = '<div class="toolbar" id="r-tabs">' +
@@ -114,18 +145,13 @@
     glow = cv.previousElementSibling.getContext('2d');
     glow2 = cv2 ? cv2.previousElementSibling.getContext('2d') : null;
     clearScopes();
-    [cv, cv2].forEach(function (c) {
-      if (!c) return;
-      c.addEventListener('keydown', function (e) { if (KEYS[e.code]) { keyBits |= KEYS[e.code]; compose(); e.preventDefault(); } });
-      c.addEventListener('keyup', function (e) { if (KEYS[e.code]) { keyBits &= ~KEYS[e.code]; compose(); e.preventDefault(); } });
-      c.addEventListener('blur', function () { keyBits = 0; compose(); });
-    });
 
     // Hand focus back to the scope, so the game keys work and a later Space or
     // Enter does not press this button again and resume the game.
     SW.$('#r-run', view).onclick = function () { if (running) { pause(); cv.focus(); } else go(); };
     SW.$('#r-step', view).onclick = function () { pause(); stepOnce(); };
     SW.$('#r-over', view).onclick = stepOver;
+    SW.$('#r-score', view).onclick = clearScore;
     SW.$('#r-reset', view).onclick = function () { pause(); load(true); updateAll(); };
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
     var fo = SW.$('#r-follow', view); if (fo) fo.onchange = function () { follow = fo.checked; SW.store.set('run.follow', follow); };
@@ -243,7 +269,7 @@
     cpu.lastSrcPc = -1;
     cpu.onDisplay = plot;
     ml0At = build.sym.ml0 ? build.sym.ml0.val : -1;
-    aiBits = 0; setPilots(); compose(); renderPlayers();   // a fresh computer pilot, and temperament, for a fresh game
+    aiBits = 0; setPilots(); compose(); renderPlayers(); clearScore();   // a fresh computer pilot, and temperament, for a fresh game
     pts = [];
     clearScopes();
     cpu.breakpoints = SW.breakpoints;
@@ -286,7 +312,7 @@
         return 'break';
       }
       cpu.resumeFrom = -1;
-      if (pc === ml0At && (pilots[0] || pilots[1])) aiFrame();   // each frame of the game, the computer's move
+      if (pc === ml0At && (pilots[0] || pilots[1])) { aiFrame(); tally(); }   // each frame of the game, the computer's move
       cpu.step();
     }
     return cpu.halted ? 'halt' : 'ok';
@@ -453,7 +479,8 @@
       (build && build.v.ctlLoad ? ' <span class="hint">Not for this version: its two control boxes read the same word on the bench (F27).</span>' : !ctlMap && build && build.asm ? ' <span class="hint">Finding the controls…</span>' : '');
     var pl = SW.$('#r-pl', el);
     // choosing who flies does not start the game: Run does
-    if (pl) pl.onchange = function () { players = pl.value; SW.store.set('run.players', players); setPilots(); compose(); renderPlayers(); };
+    if (pl) pl.onchange = function () { players = pl.value; SW.store.set('run.players', players); setPilots(); compose(); renderPlayers(); clearScore(); };
+    showScore();
     SW.$$('[data-al]', el).forEach(function (sel) { sel.onchange = function () { var jj = +sel.dataset.al; aiLevels[jj] = sel.value; SW.store.set('run.ailevel' + jj, sel.value); setPilots(); compose(); renderPlayers(); }; });
   }
   // a source line as its reference (version, tape, line)
