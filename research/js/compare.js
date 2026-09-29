@@ -649,7 +649,8 @@
     // The chart leaves a tall band for its angled labels; the pinned strip is a
     // single 20px line instead, each name level and centred on its column, cut
     // to the column's width (the full name on hover).
-    var band = +labs[0].getAttribute('y') + 8, W = main.getAttribute('width'), H = 20, NS = 'http://www.w3.org/2000/svg';
+    var subs = labs.map(function (t) { return t.getAttribute('data-sub'); }), two = subs.some(Boolean);
+    var band = +labs[0].getAttribute('y') + 8, W = main.getAttribute('width'), H = two ? 32 : 20, NS = 'http://www.w3.org/2000/svg';
     var xs = labs.map(function (t) { return +t.getAttribute('x'); });
     var head = main.cloneNode(false);
     head.setAttribute('height', H);
@@ -665,10 +666,17 @@
       n.setAttribute('font-size', '11'); n.setAttribute('fill', t.getAttribute('fill'));
       n.textContent = full.length > max ? full.slice(0, max - 1) + '…' : full;
       if (vids && vids[i]) { n.setAttribute('data-vid', vids[i]); n.setAttribute('class', 'g-pin'); }
-      var tt = document.createElementNS(NS, 'title'); tt.textContent = full + (vids ? ': click to hide this version' : ''); n.appendChild(tt);
+      var tt = document.createElementNS(NS, 'title'); tt.textContent = full + (subs[i] ? ' ' + subs[i] : '') + (vids ? ': click to hide this version' : ''); n.appendChild(tt);
       head.appendChild(n);
+      if (subs[i]) {   // the reference, small, under the name
+        var r = document.createElementNS(NS, 'text');
+        r.setAttribute('x', xs[i]); r.setAttribute('y', 27); r.setAttribute('text-anchor', 'middle');
+        r.setAttribute('font-size', '9'); r.setAttribute('fill', t.getAttribute('fill')); r.setAttribute('opacity', '0.7');
+        r.textContent = subs[i]; head.appendChild(r);
+      }
       t.setAttribute('visibility', 'hidden');
     });
+    Array.prototype.forEach.call(main.querySelectorAll('.g-colsub'), function (x) { x.setAttribute('visibility', 'hidden'); });
     var strip = SW.el('div', { class: 'flow-head' });
     strip.appendChild(head);
     box.insertBefore(strip, main);
@@ -711,7 +719,7 @@
     var baseOpts = flowOpts;
     flowOpts = function () {
       var o = baseOpts();
-      o.labels = ts.map(function (t) { return t.label + ' [' + SW.refOf(t.id) + ']'; });   // each column with its reference
+      o.sublabels = ts.map(function (t) { return SW.refText(t.id); });   // each column’s reference, under its name
       if (gst.boxes === 'hand') { o.boxFill = handFill; o.boxTip = handTip; o.extraLegend = handLegend(); }
       return o;
     };

@@ -931,9 +931,12 @@
       }
       var lx = x + bw / 2, ly = top - 8;
       // class g-collabel: the bench pins these above the flow while it scrolls (compare.js)
+      var sub = opts.sublabels && opts.sublabels[i];
       s += '<text class="g-collabel" x="' + f1(lx) + '" y="' + f1(ly) + '" font-size="11" fill="' + COLORS.text +
-        '" transform="rotate(-40 ' + f1(lx) + ' ' + f1(ly) + ')"><title>' + esc(texts[i].label) + '</title>' +
-        esc(trunc(labels[i], 22)) + '</text></g>';
+        '" transform="rotate(-40 ' + f1(lx) + ' ' + f1(ly) + ')"' + (sub ? ' data-sub="' + esc(sub) + '"' : '') + '><title>' + esc(texts[i].label) + '</title>' +
+        esc(trunc(labels[i], 22)) + '</text>' +
+        // a second, smaller line under the name: its reference (opts.sublabels)
+        (sub ? '<text class="g-colsub" x="' + f1(lx + 7) + '" y="' + f1(ly + 9) + '" font-size="9" fill="' + COLORS.muted + '" transform="rotate(-40 ' + f1(lx + 7) + ' ' + f1(ly + 9) + ')">' + esc(sub) + '</text>' : '') + '</g>';
     });
     s += legend(left, totalH - 20 - (opts.extraLegend ? 18 : 0), STATUSES);
     if (opts.extraLegend) {
