@@ -298,7 +298,7 @@
   // side as context; it is placed where most of its lines match, in order. Shown
   // faint, read-only: Open goes to the original, Keep here copies it into this
   // version with a link back. A note already kept here is not shown as a ghost.
-  var ghosts = [], ghostKey = '';
+  var ghosts = [], ghostKey = '', keptNow = {};   // keptNow: kept this session, hidden while Hypothesis indexes the copy
   var lineKey = SW.lineKey;
   function flat(b) {
     var out = [];
@@ -325,7 +325,8 @@
       all.forEach(function (n) { if (n.vid === b0.v.id) { var re = /[?&]a=([A-Za-z0-9_-]+)/g, m; while ((m = re.exec(String(n.text).replace(/\\([_\-])/g, '$1')))) kept[m[1]] = 1; } });
       var byV = {};
       all.forEach(function (n) {
-        if (n.vid === b0.v.id || !n.anchor || n.parent || n.source === 'buildlog' || N.isReaction(n) || kept[n.id]) return;
+        // a copy kept from a ghost (tagged carried) is never a ghost itself: its original stands for it
+        if (n.vid === b0.v.id || !n.anchor || n.parent || n.source === 'buildlog' || N.isReaction(n) || kept[n.id] || keptNow[b0.v.id + ':' + n.id] || (n.tags || []).indexOf('carried') >= 0) return;
         (byV[n.vid] = byV[n.vid] || []).push(n);
       });
       var replies = {};
@@ -367,6 +368,7 @@
     N.create({ vid: build.v.id, kind: 'line', anchor: { p: a.p, n0: a.n0, n1: a.n1, src: a.src }, quote: lines,
                text: o.text + '\n\nCarried from ' + N.linkOf(o), tags: (o.tags || []).concat(['carried']) })
       .then(function () {
+        keptNow[build.v.id + ':' + o.id] = true;
         ghosts = ghosts.filter(function (x) { return x !== t; });
         SW.toast('Kept here, with a link back to the original. ↶ Undo (⌘Z) takes it away.', 5000);
       }, function (e) { if (e.message !== 'no initials') SW.toast(e.message, 5000); });
