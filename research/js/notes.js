@@ -703,7 +703,7 @@
       } else if (btn.dataset.act === 'delete') {
         // Into the bin, so no confirmation: it can be restored.
         N.bin(note).then(function () {
-          SW.toast('Moved to the bin. Restore it under Deleted annotations on the Versions page.', 5000);
+          SW.toast('Moved to the bin. ↶ Undo (⌘Z) brings it back.', 5000);
         }, function (e) { SW.toast(e.message, 5000); });
       }
     });
@@ -1166,6 +1166,66 @@
       };
     });
   };
+  // ---------- undo and redo ----------
+  // What you did to annotations in this session, to take back: adding one,
+  // editing it, deleting it (to the bin). Up to fifty steps; a new action
+  // clears the redo list. Replaying an undo or redo is not itself recorded.
+  var H = { undo: [], redo: [] }, replaying = false;
+  function what(n) {
+    var a = n.anchor;
+    return (n.by || '?') + '’s ' + (n.parent ? 'reply' : 'annotation') + ' (' + (a ? (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + ', ' : '') + SW.refOf(n.vid) + ')';
+  }
+  function record(op) {
+    if (replaying) return;
+    H.undo.push(op); if (H.undo.length > 50) H.undo.shift();
+    H.redo = [];
+    SW.emit('notes-history');
+  }
+  var bin1 = N.bin, restore1 = N.restore, create1 = N.create, update1 = N.update;
+  N.bin = function (note) {
+    return bin1(note).then(function (r) { record({ what: 'deleting ' + what(note), undo: function () { return restore1(note); }, redo: function () { return bin1(note); } }); return r; });
+  };
+  N.create = function (note) {
+    return create1(note).then(function (n) {
+      if (n && note.kind !== 'reaction') record({ what: 'adding ' + what(n), undo: function () { return bin1(n); }, redo: function () { return restore1(n); } });
+      return n;
+    });
+  };
+  N.update = function (note, text, tags, dev) {
+    var before = { text: note.text, tags: (note.tags || []).slice(), dev: !!note.dev };
+    var after = { text: text, tags: tags || before.tags, dev: dev === undefined ? before.dev : !!dev };
+    return update1(note, text, tags, dev).then(function (r) {
+      record({ what: 'editing ' + what(note),
+               undo: function () { return update1(note, before.text, before.tags, before.dev); },
+               redo: function () { return update1(note, after.text, after.tags, after.dev); } });
+      return r;
+    });
+  };
+  function step(from, to, word) {
+    var op = from.pop();
+    if (!op) { SW.toast('Nothing to ' + word.toLowerCase()); return Promise.resolve(); }
+    replaying = true;
+    SW.emit('notes-history');
+    return op[word === 'Undo' ? 'undo' : 'redo']().then(function () {
+      to.push(op); SW.toast((word === 'Undo' ? 'Undone: ' : 'Redone: ') + op.what);
+    }, function (e) { from.push(op); SW.toast(e.message, 5000); }).then(function () { replaying = false; SW.emit('notes-history'); });
+  }
+  N.undo = function () { return step(H.undo, H.redo, 'Undo'); };
+  N.redo = function () { return step(H.redo, H.undo, 'Redo'); };
+  N.history = function () {
+    return { undo: H.undo.length ? H.undo[H.undo.length - 1].what : '', redo: H.redo.length ? H.redo[H.redo.length - 1].what : '', busy: replaying };
+  };
+  // ⌘Z and ⇧⌘Z (Ctrl on Windows), when not typing
+  document.addEventListener('keydown', function (e) {
+    if (!(e.metaKey || e.ctrlKey) || e.altKey || e.key.toLowerCase() !== 'z') return;
+    var t = e.target, tag = t && t.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable) || document.querySelector('dialog[open]')) return;
+    var h = N.history();
+    if (e.shiftKey ? !h.redo : !h.undo) return;
+    e.preventDefault();
+    (e.shiftKey ? N.redo : N.undo)();
+  });
+
   // Keep the version panel current as notes change.
   SW.on('notes', function (vid) {
     var body = SW.$('#drawer-body');

@@ -142,7 +142,8 @@
       '<label class="check" title="Hide every line that no annotation covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
       '<label class="check" title="Show only annotations (and the lines they cover) in which these initials take part, as author or in a reply">Annotations by <select id="rd-by"><option value="">anyone</option></select></label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
-      '</div></details><span class="hint" id="rd-nf"></span>';
+      '</div></details><span class="hint" id="rd-nf"></span>' +
+      '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
@@ -717,7 +718,19 @@
     if (cb) cb.checked = on;
     if (build && SW.$('.rd-body', view)) paintNotes();
   }
+  // ↶ ↷: undo and redo what was done to annotations (notes.js keeps the steps)
+  function paintUndo() {
+    var u = SW.$('#rd-undo', view), r = SW.$('#rd-redo', view); if (!u) return;
+    var h = N.history();
+    u.disabled = !h.undo || h.busy; r.disabled = !h.redo || h.busy;
+    u.title = h.undo ? 'Undo ' + h.undo + ' (⌘Z)' : 'Undo: nothing to undo yet';
+    r.title = h.redo ? 'Redo ' + h.redo + ' (⇧⌘Z)' : 'Redo: nothing to redo';
+  }
+  SW.on('notes-history', paintUndo);
   function wireTb(tb) {
+    SW.$('#rd-undo', tb).onclick = function () { N.undo(); };
+    SW.$('#rd-redo', tb).onclick = function () { N.redo(); };
+    setTimeout(paintUndo, 0);
     SW.$('#rd-words', tb).onchange = function (e) { setWords(e.target.checked); };
     SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
     var tapeSel = SW.$('#rd-tape', tb);
