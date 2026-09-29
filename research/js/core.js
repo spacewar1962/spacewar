@@ -915,6 +915,8 @@
     });
     s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { u = unesc(u); return pre + stash(mdLink(u, u, true)); });
     s = s.replace(/\\(&gt;|&lt;|&amp;|[\\`*_\[\]~#+\-.!()])/g, function (m, c) { return stash(c); });   // \* is a plain *
+    // @DMB: a mention of someone by their initials
+    s = s.replace(/(^|[\s(>])@([A-Z][A-Za-z]{1,5})\b/g, function (m, pre, who) { return pre + stash('<span class="mention" title="A mention of ' + who + '">@' + who + '</span>'); });
     s = emph(s);
     return s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return keep[+i]; });
   }
@@ -1171,6 +1173,46 @@
     rich.addEventListener('paste', function (e) { plainIn(e, e.clipboardData); });
     rich.addEventListener('drop', function (e) { plainIn(e, e.dataTransfer); });
     try { document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (x) { /* older browsers */ }
+    // @: the people who have annotated, offered as you type their initials
+    var menu = SW.el('div', { class: 'md-mention', hidden: '' });
+    rich.insertAdjacentElement('afterend', menu);
+    function mentionAt() {
+      if (mode === 'rich') {
+        var sl = window.getSelection(); if (!sl.rangeCount || !rich.contains(sl.anchorNode) || sl.anchorNode.nodeType !== 3) return null;
+        var before = sl.anchorNode.nodeValue.slice(0, sl.anchorOffset), m = /(?:^|\s)@([A-Za-z]{0,6})$/.exec(before);
+        return m ? { q: m[1], node: sl.anchorNode, end: sl.anchorOffset } : null;
+      }
+      var mm = /(?:^|\s)@([A-Za-z]{0,6})$/.exec(ta.value.slice(0, ta.selectionStart));
+      return mm ? { q: mm[1], end: ta.selectionStart } : null;
+    }
+    function people() { return (SW.notes && SW.notes.people ? SW.notes.people() : []); }
+    function offer() {
+      var at = mentionAt();
+      if (!at) { menu.hidden = true; return; }
+      var q = at.q.toLowerCase(), ps = people().filter(function (p) { return !q || p.by.toLowerCase().indexOf(q) === 0 || (p.name || '').toLowerCase().indexOf(q) === 0; }).slice(0, 8);
+      if (!ps.length) { menu.hidden = true; return; }
+      menu.innerHTML = ps.map(function (p) { return '<button type="button" data-who="' + SW.esc(p.by) + '"><b>@' + SW.esc(p.by) + '</b>' + (p.name ? ' <span class="faint">' + SW.esc(p.name) + '</span>' : '') + '</button>'; }).join('');
+      menu.hidden = false;
+    }
+    function pick(who) {
+      var at = mentionAt(); menu.hidden = true; if (!at) return;
+      if (mode === 'rich') {
+        var r = document.createRange(); r.setStart(at.node, at.end - at.q.length - 1); r.setEnd(at.node, at.end);
+        var sl = window.getSelection(); sl.removeAllRanges(); sl.addRange(r);
+        cmd('insertText', '@' + who + ' ');
+      } else put(at.end - at.q.length - 1, at.end, '@' + who + ' ', who.length + 2, who.length + 2);
+    }
+    menu.addEventListener('mousedown', function (e) { e.preventDefault(); });
+    menu.addEventListener('click', function (e) { var b = e.target.closest('[data-who]'); if (b) { e.stopPropagation(); pick(b.dataset.who); } });
+    ta.addEventListener('input', offer);
+    rich.addEventListener('input', offer);
+    function mentionKeys(e) {
+      if (menu.hidden) return;
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); menu.hidden = true; }
+      else if (e.key === 'Tab' || e.key === 'Enter') { var first = menu.querySelector('[data-who]'); if (first) { e.preventDefault(); e.stopPropagation(); pick(first.dataset.who); } }
+    }
+    ta.addEventListener('keydown', mentionKeys, true);
+    rich.addEventListener('keydown', mentionKeys, true);
     // reopened for a fresh note, or the text set from outside: show it again
     ta._mdReset = function () { rich.innerHTML = SW.md(ta.value); setMode(SW.store.get('noteMode', 'rich'), true); };
     rich.innerHTML = SW.md(ta.value);

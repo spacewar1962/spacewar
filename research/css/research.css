@@ -1609,3 +1609,10 @@ body.dev-on .dev-only { display: revert !important; }
 .ann-results .as-where { font: 11.5px var(--mono); color: var(--text-dim); }
 .ann-results .as-text { font-size: 13px; color: var(--text); }
 .ann-results mark { background: color-mix(in srgb, var(--amber) 35%, transparent); color: inherit; border-radius: 2px; }
+/* @mentions */
+.mention { font-weight: 600; color: var(--beam); background: color-mix(in srgb, var(--beam) 10%, transparent); border-radius: 3px; padding: 0 2px; }
+.md-mention { display: grid; gap: 1px; margin: 2px 0; max-width: 320px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 3px; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+.md-mention[hidden] { display: none; }
+.md-mention button { text-align: left; font: 12px var(--sans); color: var(--text); background: none; border: 0; padding: 3px 6px; border-radius: 3px; cursor: pointer; }
+.md-mention button:hover, .md-mention button:first-child { background: var(--sel); }
+.mention-you { color: var(--amber); }

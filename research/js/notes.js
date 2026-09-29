@@ -247,8 +247,9 @@
     var since = newsSince();
     return N.whoami().catch(function () {}).then(function () { return N.listAll({ reactions: true }); }).then(function (all) {
       newsAll = all;
-      newsItems = all.filter(function (n) { return n.source === 'hypothesis' && String(n.date) > since && !isMine(n); })
-        .sort(function (a, b) { return String(b.date) < String(a.date) ? -1 : 1; });
+      var me = SW.me().initials;
+      newsItems = all.filter(function (n) { return n.source === 'hypothesis' && (String(n.date) > since || String(n.updated || '') > since) && !isMine(n); })
+        .sort(function (a, b) { return (N.mentions(b, me) - N.mentions(a, me)) || (String(b.date) < String(a.date) ? -1 : 1); });
       paintNews();
       return newsItems;
     }).catch(function () { return []; });
@@ -263,10 +264,11 @@
   function newsLine(n, byId) {
     var V = root.SWVersions, v = V.byId(n.vid), par = n.parent && byId[n.parent];
     var what = N.isReaction(n) && /^status:/.test(n.text) ? (n.text === 'status:resolved' ? 'resolved ' : 'marked open ') + (par ? par.by + '’s annotation' : 'an annotation') : N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
+    var toYou = !N.isReaction(n) && N.mentions(n, SW.me().initials);
     var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
     var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
     var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + ' ' + (anchor ? SW.refText(n.vid, anchor.p, anchor.n0, anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid));
-    return { n: n, anchor: anchor, html: '<div class="news-item" data-id="' + SW.esc(n.id) + '"><div class="news-meta"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(what) +
+    return { n: n, anchor: anchor, html: '<div class="news-item" data-id="' + SW.esc(n.id) + '"><div class="news-meta"><b>' + SW.esc(n.by) + '</b> · ' + (toYou ? '<b class="mention-you">mentions you</b> in ' : '') + SW.esc(what) +
       ' · <span class="mono">' + SW.esc(where) + '</span> · <span class="faint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
       (N.isReaction(n) ? '' : '<div class="news-text">' + SW.esc(SW.mdPlain(SW.figpack.split(n.text).text).slice(0, 280)) + (SW.mdPlain(SW.figpack.split(n.text).text).length > 280 ? '…' : '') + '</div>') + '</div>' };
   }
@@ -795,6 +797,14 @@
   N.list = function (vid, force) { return list0(vid, force).then(function (ns) { return applyMoves(ns); }).then(devFilter).then(reindex); };
   N.listAll = function (opts) { return listAll0(opts).then(function (ns) { return applyMoves(ns); }).then(devFilter).then(reindex); };
   N.byId = function (id) { return idx.byId[id] || null; };
+  // Everyone who has annotated (initials, and a name where known), for @mentions
+  N.people = function () {
+    var seen = {}, out = [], me = SW.me();
+    if (me.initials) { seen[me.initials] = 1; out.push({ by: me.initials, name: me.name || '' }); }
+    Object.keys(idx.byId).forEach(function (id) { var n = idx.byId[id]; if (n.by && !seen[n.by] && n.source !== 'buildlog') { seen[n.by] = 1; out.push({ by: n.by, name: n.name || '' }); } });
+    return out.sort(function (a, b) { return a.by.localeCompare(b.by); });
+  };
+  N.mentions = function (n, who) { return !!who && new RegExp('(^|[\\s(>])@' + who + '\\b').test(SW.noteHistory.visible(n.text)); };
   N.backlinks = function (id) { return (idx.back[id] || []).map(function (x) { return idx.byId[x]; }).filter(Boolean); };
 
   function lineParam(a) { return a ? a.p + ':' + a.n0 + (a.n1 !== a.n0 ? '-' + a.n1 : '') : null; }
