@@ -78,6 +78,18 @@
     var frame = Math.floor(Math.random() * 3), last = 0, fired = false, hyperAt = -9999, spin = 1;
     // each pilot its own drifting wobble in its aim, so two do not fly as mirror images
     var wob = 0, wobTo = 0;
+    // A plan, drawn afresh at each new life and every few seconds, so that a play
+    // that worked once is not repeated: which way round the star, how slow it lets
+    // its orbit get, how far off it chases, how near a shot must pass before it
+    // fires, a small bias in its aim, and now and then a short feint off its line.
+    var plan = null;
+    function rnd(a, b) { return a + Math.random() * (b - a); }
+    function newPlan() {
+      var p = { spin: Math.random() < 0.5 ? 1 : -1, vt: rnd(-0.12, 0.12), chase: rnd(0.6, 1.5), top: rnd(0.85, 1.2),
+                hit: rnd(0.8, 1.25), bias: rnd(-1, 1) * L.aim, until: frame + Math.floor(rnd(150, 450)), feint: null };
+      if (Math.random() < 0.35) { var at = frame + Math.floor(rnd(20, 120)); p.feint = { at: at, to: at + Math.floor(rnd(20, 50)), turn: (Math.random() < 0.5 ? 1 : -1) * rnd(0.6, 1.3) }; }
+      return p;
+    }
 
     function ship(mem, j) {
       var w = mem[mtb + j], r = w & 0o7777;
@@ -127,13 +139,14 @@
       if (frame % L.every) return last;
       var me = ship(mem, k), him = ship(mem, 1 - k), out = 0;
       track(him);
-      if (!me.alive) { wait = M.wait[0] + Math.floor(Math.random() * (M.wait[1] - M.wait[0])); return (last = 0); }
+      if (!me.alive) { wait = M.wait[0] + Math.floor(Math.random() * (M.wait[1] - M.wait[0] + 30)); plan = null; return (last = 0); }
+      if (!plan || frame > plan.until) plan = newPlan();
       if (wait > 0) { wait--; return (last = 0); }   // a moment's thought at the start of each game
 
       // Fire whenever a torpedo would pass close to the other ship, whatever else it
       // is doing; pressed and released in turn, so versions that fire once a press fire
       var dHim = him.alive ? Math.hypot(wrapD(him.x - me.x), wrapD(him.y - me.y)) : Infinity, mNow = him.alive ? missIf(me, him, me.a) : Infinity;
-      var shoot = mNow < L.hit || (dHim < L.spray && mNow < L.hit * 2.5);
+      var hit = L.hit * plan.hit, shoot = mNow < hit || (dHim < L.spray && mNow < hit * 2.5);
       function trigger(o) { if (shoot) { if (!fired) o |= bits.torpedo; fired = !fired; } else fired = false; return o; }
 
       // 1. torpedoes coming: the nearest approach of each over the next second
@@ -160,8 +173,8 @@
       var r = Math.hypot(me.x, me.y), ox = r ? me.x / r : 0, oy = r ? me.y / r : 1;
       var vr = me.vx * ox + me.vy * oy, h = me.x * me.vy - me.y * me.vx, vt = r ? Math.abs(h) / r : 0;
       if (vt > 0.15) spin = h > 0 ? 1 : -1;
-      else { var hx0 = -Math.sin(me.a), hy0 = Math.cos(me.a); spin = (-oy * hx0 + ox * hy0) >= 0 ? 1 : -1; if (M.name === 'hunter') spin = -spin; }
-      var fall = r < 100 || (r < 420 && vt < L.orbitVt + M.orbit) || (r < 260 && vr < -0.3 && vt < 1);
+      else spin = plan.spin;
+      var fall = r < 100 || (r < 420 && vt < L.orbitVt + M.orbit + plan.vt) || (r < 260 && vr < -0.3 && vt < 1);
       if (fall) {
         var tx = -oy * spin, ty = ox * spin, lift = r < 100 ? 0.6 : 0.15;
         var s2 = steer(me, headingTo(tx + lift * ox, ty + lift * oy), 0.45);
@@ -183,12 +196,13 @@
           return (last = trigger(out));
         }
       }
-      var s3 = steer(me, aimAt(me, him) + wob, L.aim);
+      var feint = plan.feint && frame >= plan.feint.at && frame < plan.feint.to;
+      var s3 = steer(me, aimAt(me, him) + wob + plan.bias + (feint ? plan.feint.turn : 0), L.aim);
       out |= s3.bits;
       var px = wrapD(him.x - me.x), py = wrapD(him.y - me.y), d = Math.hypot(px, py);
       var sp = Math.hypot(me.vx, me.vy), hx = -Math.sin(me.a), hy = Math.cos(me.a);
       // never by thrusting toward the star
-      if (L.chaseAt && s3.on && d > L.chaseAt * M.chase && sp < L.top * M.top && hx * ox + hy * oy > -0.1) out |= bits.rocket;
+      if ((feint || (L.chaseAt && d > L.chaseAt * M.chase * plan.chase)) && s3.on && sp < L.top * M.top * plan.top && hx * ox + hy * oy > -0.1) out |= bits.rocket;
       return (last = trigger(out));
     };
     fly.temper = M.name; fly.level = level;
