@@ -1551,3 +1551,6 @@ body.dev-on .dev-only { display: revert !important; }
 /* between the header rule and the buttons: the annotation's content, on the page's own ground */
 .note:not(.reply) > .nbody { background: var(--bg); border-radius: 3px; padding: 5px 8px; margin: 0 -3px; }
 .note.reply > .nbody { padding: 0; }
+/* an annotation's buttons: reply, reactions, copy, download on the left; link, My notes, edit, delete on the right */
+.note .acts { display: flex; flex-wrap: wrap; align-items: center; }
+.note .acts .acts-right { margin-left: auto; display: inline-flex; align-items: center; gap: 2px; }

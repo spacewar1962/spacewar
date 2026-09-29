@@ -657,11 +657,14 @@
       '</div>' +
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
       '<button data-act="copy" class="ico" title="Copy the annotation as a quotation with its code and reference, ready for a book or chapter; with its replies">⧉</button>' +
-      (n.source !== 'draft' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)">↪</button>' : '') +
       '<button data-act="dl" class="ico" title="Download the annotation with its code and replies (Markdown)">⤓</button>' +
+      // on the right: link, keep, edit, delete
+      '<span class="acts-right">' +
+      (n.source !== 'draft' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)">↪</button>' : '') +
+      (n.source !== 'buildlog' ? '<button data-act="keep" title="Save to My notes: the annotation with its code, citation and replies, kept privately">＋ My notes</button>' : '') +
       (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
       (N.mine(n) ? '<button data-act="delete" class="del-note">' + (n.source === 'draft' ? 'Delete draft' : 'Delete') + '</button>' : '') +
-      '</div></div>';
+      '</span></div></div>';
   };
 
   N.renderThread = function (t, b) {
@@ -697,6 +700,7 @@
         return;
       }
       if (btn.dataset.act === 'dl') { downloadNote(note, all, 'md'); return; }
+      if (btn.dataset.act === 'keep') { keepNote(note, all); return; }
       if (btn.dataset.act === 'react-pick') {
         var pk = btn.parentNode.querySelector('.react-pick');
         pk.hidden = !pk.hidden;
@@ -985,7 +989,7 @@
   }
   // Copy: the annotation as a quotation with its reference, ready for a book or
   // chapter: 'Code:' and the code as it stands, then “Text of the annotation”
-  // (David M. Berry, annotation on SW3.1L, 1.32–34, 30 Sep 2026); replies after.
+  // (DMB, annotation on SW3.1L, 1.32–34, 30 Sep 2026); replies after.
   function refOfNote(n) { var a = n.anchor; return a ? SW.refOf(n.vid, a.p, a.n0, a.n1, SW.nparts(n.vid)) : SW.refOf(n.vid); }
   function plainOf(n) { return SW.mdPlain(N.linksAsNames(SW.figpack.split(n.text).text)).replace(/\s*\n\s*/g, ' ').trim(); }
   // the code as it stands: its lines kept, tabs as spaces (to eight-column stops) so
@@ -1001,7 +1005,7 @@
   }
   function copyNote(note, all) {
     var t = threadOf(note, all), r = t.note, lines = [], code = codeOf(r);
-    function who(n) { return n.name || n.by; }
+    function who(n) { return n.by || n.name; }   // initials
     function one(n, what) { return '“' + plainOf(n) + '” (' + who(n) + ', ' + what + ' on ' + refOfNote(r) + ', ' + SW.fmtDate(n.date) + ')'; }
     if (code) lines.push('Code:', code);
     lines.push(one(note, note.parent ? 'reply' : 'annotation'));
@@ -1010,9 +1014,10 @@
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
       .then(function () { SW.toast('Annotation copied, with its reference'); }, function () { window.prompt('Copy:', text); });
   }
-  function downloadNote(note, all, fmt) {
+  // The annotation as a document: its code, the thread, and where it is (Download, My notes)
+  function noteDoc(note, all) {
     var t = threadOf(note, all), a = t.note.anchor;
-    SW.build(t.note.vid).then(function (b) {
+    return SW.build(t.note.vid).then(function (b) {
       var blocks = [];
       if (a && b.lines[a.p]) {
         blocks.push({ type: 'code', caption: SW.cite(b, a.p, a.n0, a.n1), lines: b.lines[a.p].slice(a.n0 - 1, a.n1).map(function (L) {
@@ -1025,7 +1030,17 @@
                   meta: [['Version', b.v.label + ' ' + SW.refText(b.v.id) + ' (' + b.v.date + ')'], ['Where', a ? SW.cite(b, a.p, a.n0, a.n1) : 'the version as a whole'],
                          ['Link', SW.permalink({ v: b.v.id, l: a ? a.p + ':' + a.n0 + (a.n1 !== a.n0 ? '-' + a.n1 : '') : null })]],
                   blocks: blocks };
-      SW.exportDoc(doc, 'spacewar-' + b.v.id + '-note-' + t.note.by + '-' + String(t.note.date).slice(0, 10), fmt);
+      return { doc: doc, b: b, t: t };
+    });
+  }
+  function downloadNote(note, all, fmt) {
+    noteDoc(note, all).then(function (r) { SW.exportDoc(r.doc, 'spacewar-' + r.b.v.id + '-note-' + r.t.note.by + '-' + String(r.t.note.date).slice(0, 10), fmt); });
+  }
+  function keepNote(note, all) {
+    if (!SW.tray || !SW.tray.addDoc) return;
+    noteDoc(note, all).then(function (r) {
+      var n = r.t.note;
+      SW.tray.addDoc(r.doc, { vid: n.vid, by: n.by, anchor: n.anchor || null, quote: n.quote || '' });   // My notes says so itself
     });
   }
 
