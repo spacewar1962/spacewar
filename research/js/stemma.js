@@ -15,6 +15,7 @@
   var LOST_BETWEEN = { '2a': ['1', '2b'], '4.5': ['4.4', '4.8'] };
 
   function short(v) { return v.label.replace(/^Spacewar! /, ''); }
+  function shortRef(v) { return v ? short(v) + (v.build ? ' ' + SW.refText(v.id) : '') : ''; }   // named with its reference
   function hasTape(v) {
     return !!((v.witnesses || []).length || (v.sourceTapes || []).length || (v.build || []).some(function (b) { return b && b.tape; }));
   }
@@ -195,7 +196,7 @@
       picked = n.dataset.id;
       light(picked);
       var v = V.byId(picked), anc = V.ancestry(picked).map(function (id) { var x = V.byId(id); return x ? short(x) : id; });
-      info.innerHTML = '<b>' + SW.esc(v.label) + '</b> · ' + SW.esc(v.date) + ' · ' + SW.esc(v.status) + (v.medium ? ' · ' + SW.esc(v.medium) : '') +
+      info.innerHTML = '<b>' + SW.esc(v.label) + '</b>' + (v.build ? ' ' + SW.refTag(v.id) : '') + ' · ' + SW.esc(v.date) + ' · ' + SW.esc(v.status) + (v.medium ? ' · ' + SW.esc(v.medium) : '') +
         '<br>' + SW.esc(v.summary || '') + (anc.length > 1 ? '<br><span class="mono">' + SW.esc(anc.join(' → ')) + '</span>' : '') +
         (v.build ? ' <button class="btn ghost" data-go="read">Read it</button> <button class="btn ghost" data-go="about">Versions</button>' : ' <button class="btn ghost" data-go="about">Versions</button>');
     });
@@ -212,12 +213,12 @@
     exp.appendChild(SW.exportButtons(function () {
       var rows = [];
       L.main.forEach(function (v) {
-        if (v.parent) rows.push([short(v), v.date, 'made from', short(V.byId(v.parent)), sims[v.parent + '>' + v.id] == null ? '' : Math.round(sims[v.parent + '>' + v.id] * 100) + '%']);
-        (v.also || []).forEach(function (a) { rows.push([short(v), v.date, 'grafted from', short(V.byId(a)), sims[a + '>' + v.id] == null ? '' : Math.round(sims[a + '>' + v.id] * 100) + '%']); });
-        (v.influence || []).forEach(function (a) { rows.push([short(v), v.date, 'influenced by', short(V.byId(a)), '']); });
+        if (v.parent) rows.push([shortRef(v), v.date, 'made from', shortRef(V.byId(v.parent)), sims[v.parent + '>' + v.id] == null ? '' : Math.round(sims[v.parent + '>' + v.id] * 100) + '%']);
+        (v.also || []).forEach(function (a) { rows.push([shortRef(v), v.date, 'grafted from', shortRef(V.byId(a)), sims[a + '>' + v.id] == null ? '' : Math.round(sims[a + '>' + v.id] * 100) + '%']); });
+        (v.influence || []).forEach(function (a) { rows.push([shortRef(v), v.date, 'influenced by', shortRef(V.byId(a)), '']); });
       });
-      Object.keys(L.wit).forEach(function (k) { L.wit[k].forEach(function (w) { rows.push([short(w), w.date, 'another reading of', short(V.byId(k)), '']); }); });
-      L.lost.forEach(function (p) { rows.push([short(p.v), p.v.date, 'lost; placed between', short(V.byId(p.between[0])) + ' and ' + short(V.byId(p.between[1])), '']); });
+      Object.keys(L.wit).forEach(function (k) { L.wit[k].forEach(function (w) { rows.push([shortRef(w), w.date, 'another reading of', shortRef(V.byId(k)), '']); }); });
+      L.lost.forEach(function (p) { rows.push([shortRef(p.v), p.v.date, 'lost; placed between', shortRef(V.byId(p.between[0])) + ' and ' + shortRef(V.byId(p.between[1])), '']); });
       return SW.figures.svgToPNG(SW.exportSVG(fig()), 2, SW.figBgColour()).then(function (r) {
         return { title: 'Spacewar!: a stemma of the texts', meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]], blocks: [
           { type: 'figure', caption: 'Stemma of the Spacewar! texts. Percentages are routine similarity of each version to its parent.', png: r.png, width: r.width / 2, height: r.height / 2 },

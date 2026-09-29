@@ -236,7 +236,7 @@
     function nm(e) { return e === 'wait' ? 'waiting' : name(b, e); }
     function link(e, text) {
       if (e === 'startup') return '<span class="ov-nm">start-up</span>';
-      if (text) { var at0 = lineOf(b, e) || null; return '<a href="#" class="ov-nm mono" data-p="' + (at0 ? at0.p : '') + '" data-n="' + (at0 ? at0.n : '') + '" title="Open in Read">' + SW.esc(text) + '</a>'; }
+      if (text) { var at0 = lineOf(b, e) || null; return '<a href="#" class="ov-nm mono" data-p="' + (at0 ? at0.p : '') + '" data-n="' + (at0 ? at0.n : '') + '" title="Open in Read' + (at0 ? ': ' + SW.esc(SW.refText(b.v.id, at0.p, at0.n, at0.n, b.parts.length)) : '') + '">' + SW.esc(text) + '</a>'; }
       return '<a href="#" class="ov-nm mono" data-e="' + SW.esc(String(e)) + '" title="Inspect">' + SW.esc(nm(e)) + '</a>';
     }
     function per(n) { var v = n / F; return v >= 10 ? Math.round(v) + ' a frame' : v >= 0.95 ? (Math.round(v * 10) / 10) + ' a frame' : 'in ' + Math.round(100 * v) + '% of frames'; }

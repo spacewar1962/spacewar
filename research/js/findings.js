@@ -504,7 +504,7 @@
     if (live.titles) {
       blocks.push({ type: 'h2', text: 'Punched titles' });
       blocks.push(SW.tableBlock('Titles punched into the tapes, as read by the bench', ['Tape', 'Frames', 'Reading', 'Versions'],
-        live.titles.map(function (r) { return [r.tape.path, r.t.from + '–' + r.t.to, r.t.text, r.tape.versions.map(vLabel).join(', ')]; })));
+        live.titles.map(function (r) { return [r.tape.path, r.t.from + '–' + r.t.to, r.t.text, r.tape.versions.map(function (id) { var v = V.byId(id); return vLabel(id) + (v && v.build ? ' ' + SW.refText(id) : ''); }).join(', ')]; })));
     }
     if (live.notes && live.notes.length) {
       blocks.push({ type: 'h2', text: 'Findings from the group' });
