@@ -1424,7 +1424,8 @@ button.badge.err:hover { filter: brightness(1.2); }
 .md-tools .md-link[hidden] { display: none; }
 .md-tools .md-link input { width: 220px; height: 24px; font: 12px var(--mono); padding: 0 6px; background: var(--bg-2); color: var(--text); border: 1px solid var(--line); border-radius: 3px; }
 /* links between annotations */
-a.swlink { color: var(--amber); text-decoration: underline dotted; text-underline-offset: 2px; cursor: pointer; font: 11px/1.3 var(--sans); letter-spacing: .01em; }
+a.swlink { color: var(--text-dim); text-decoration: underline dotted var(--text-faint); text-underline-offset: 2px; cursor: pointer; font: 11px/1.3 var(--sans); letter-spacing: .01em; }
+a.swlink:hover, a.swlink:focus-visible { color: var(--amber); text-decoration-color: var(--amber); }
 a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-block; }
 .note .backl { margin-top: 3px; font-size: 11px; line-height: 1.4; }
 .note.note-flash { animation: note-flash 1.6s ease-out; }
@@ -1470,7 +1471,7 @@ a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-b
 .ah-svg .ah-box { fill: var(--surface); stroke: var(--line); }
 .ah-svg .ah-t { fill: var(--text); font: 12px var(--sans); }
 .ah-svg .ah-b { font-weight: 600; }
-.ah-svg .ah-l { fill: var(--amber); }
+.ah-svg .ah-l { fill: var(--text-dim); }
 .ah-svg .ah-f, .ah-svg .ah-s { fill: var(--text-dim); font-size: 11px; }
 .ah-svg .ah-line { fill: none; stroke: var(--amber); stroke-width: 1.5; }
 .ah-svg .ah-dash { stroke-dasharray: 4 3; stroke: var(--text-dim); }
