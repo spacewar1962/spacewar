@@ -1,5 +1,6 @@
 /*
- * ai.js - a computer pilot for the Run view.
+ * ai.js - Lensman AI, a computer pilot for the Run view (named after E. E.
+ * Smith's Lensman novels, which Steve Russell drew on for the game).
  *
  * It flies a ship by the same means a player has: each frame of the game (at
  * ml0) it reads the ships, torpedoes and star from core and sets that ship's

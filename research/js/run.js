@@ -66,7 +66,7 @@
   function clearScore() { score = [0, 0]; wasX = [false, false]; showScore(); }
   function showScore() {
     var el = view && SW.$('#r-score', view); if (!el) return;
-    var ai = aiShips(), who = function (j) { return ai.indexOf(j) < 0 ? ' (you)' : ai.length === 1 ? ' (computer)' : ''; };
+    var ai = aiShips(), who = function (j) { return ai.indexOf(j) < 0 ? ' (you)' : ai.length === 1 ? ' (Lensman AI)' : ''; };
     el.hidden = !ai.length || !aiUsable();
     el.innerHTML = 'Needle' + who(0) + ' <b>' + score[0] + '</b> · Wedge' + who(1) + ' <b>' + score[1] + '</b>';
   }
@@ -469,11 +469,11 @@
     var ok = aiUsable();
     var NAME = ['the Needle', 'the Wedge'];
     function lvlSel(jj) {
-      return '<label class="check" title="How the computer flies ' + NAME[jj] + ': a hunter chases hard and closes in; an orbiter keeps its distance and fires from its orbit; a duellist is between.">' + (jj ? 'Wedge' : 'Needle') + ' <select data-al="' + jj + '"' + (ok ? '' : ' disabled') + '>' +
+      return '<label class="check" title="How Lensman AI flies ' + NAME[jj] + ': a hunter chases hard and closes in; an orbiter keeps its distance and fires from its orbit; a duellist is between.">' + (jj ? 'Wedge' : 'Needle') + ' <select data-al="' + jj + '"' + (ok ? '' : ' disabled') + '>' +
         SW.ai.STYLE_NAMES.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === aiStyles[jj] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>';
     }
-    el.innerHTML = '<label class="check" title="Who flies the ships. The computer flies by the same control bits as a player, with a person’s reaction time and the odd slip: it usually circles a while at the start of a round, sometimes swings round the star for show, keeps in orbit, turns to meet the other ship, fires whenever a torpedo would pass close to it, dodges torpedoes and, where the version has it, jumps into hyperspace. Press Run to start.">Players <select id="r-pl"' + (ok ? '' : ' disabled') + '>' +
-      [['keys', 'Two people (keys)'], ['ai1', 'You (Needle) against the computer'], ['ai0', 'You (Wedge) against the computer'], ['aiai', 'The computer against itself']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === players ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
+    el.innerHTML = '<label class="check" title="Who flies the ships. Lensman AI, the computer pilot (named after E. E. “Doc” Smith’s Lensman novels, which Steve Russell drew on for the game), flies by the same control bits as a player, with a person’s reaction time and the odd slip: it usually circles a while at the start of a round, sometimes swings round the star for show, keeps in orbit, turns to meet the other ship, fires whenever a torpedo would pass close to it, dodges torpedoes and, where the version has it, jumps into hyperspace. Press Run to start.">Players <select id="r-pl"' + (ok ? '' : ' disabled') + '>' +
+      [['keys', 'Two people (keys)'], ['ai1', 'You (Needle) against Lensman AI'], ['ai0', 'You (Wedge) against Lensman AI'], ['aiai', 'Lensman AI against itself']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === players ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
       '</select></label> ' + aiShips().map(lvlSel).join(' ') +
       (build && build.v.ctlLoad ? ' <span class="hint">Not for this version: its two control boxes read the same word on the bench (F27).</span>' : !ctlMap && build && build.asm ? ' <span class="hint">Finding the controls…</span>' : '');
     var pl = SW.$('#r-pl', el);
