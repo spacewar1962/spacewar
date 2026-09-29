@@ -159,7 +159,7 @@
           var caps = [
             '<b>1 · The test.</b> The game compares the two centres: a collision when |dx| and |dy| are each under me1 and |dx| + |dy| is under me1 + me2. Shaded, every place the Wedge’s centre was measured to collide; dashed, the octagon the constants give. This area is a distance between the two ships, not the size of either.',
             zones ? '<b>2 · A zone round each ship.</b> The same distance split between the two ships: each carries half of it, ' + (pts / 2) + ' points to each flat side and ' + ((pts + pts2) / 2) + ' along a diagonal, and the two halves touch exactly when the centres are the full distance apart, as two coins of radius 1 cm touch when their centres are 2 cm apart. The ships here are apart.' : '<b>2 · A zone round each ship</b> needs me1 and me2, not found in this version.',
-            '<b>3 · A collision.</b> The Wedge moved in until the zones meet: ' + (-ed.left) + ' points to the left, ' + ed.right + ' to the right, the furthest offsets at which the game declared a collision.',
+            '<b>3 · A collision.</b> The Wedge moved in until the zones meet: ' + ed.right + ' points from the Needle, the furthest offset to the right at which the game declared a collision (the same to the left).',
             '<b>4 · A torpedo.</b> The same loop compares every pair of objects in the table with the same me1 and me2, ships and torpedoes alike, so a torpedo, a single point, carries a zone as large as a ship’s and hits the Needle at the same distance: ' + ed.right + ' points (from the code; not measured separately).'
           ];
           el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5>' +
@@ -188,7 +188,7 @@
   // One of the three steps. The game's test compares the two centres (|dx| and |dy|
   // under me1, |dx| + |dy| under me1 + me2): 1, where the Wedge's centre must come;
   // 2, the same as a zone half that size round each ship, the ships apart; 3, the
-  // Wedge moved in until the zones meet; 4, a torpedo, whose zone is the same (one test
+  // Wedge moved in until the zones meet (on the right); 4, a torpedo, whose zone is the same (one test
   // for every pair of objects: ml1 onward in 3.1).
   function drawCol(cv, d, step) {
     var N = 260, dpr = root.devicePixelRatio || 1; cv.width = N * dpr; cv.height = N * dpr; cv.style.width = N + 'px'; cv.style.height = N + 'px';
@@ -223,8 +223,8 @@
       g.fillStyle = AMB; g.beginPath(); g.arc(X(ed.right), Y(0), 3, 0, 2 * Math.PI); g.fill();   // the torpedo: one point
     } else {
       if (zones) { g.fillStyle = 'rgba(200, 90, 60, 0.30)'; g.strokeStyle = RED; g.lineWidth = 1.4; octagon(0, 0, a / 2, s / 2); g.fill(); g.stroke();
-                   [ed.left, ed.right].forEach(function (e) { g.fillStyle = 'rgba(31, 95, 158, 0.22)'; g.strokeStyle = BLUE; octagon(e, 0, a / 2, s / 2); g.fill(); g.stroke(); }); }
-      ship(0, 0, '#262626'); [ed.left, ed.right].forEach(function (e) { ship(1, e, BLUE); centre(e, BLUE); }); centre(0, '#262626');
+                   g.fillStyle = 'rgba(31, 95, 158, 0.22)'; g.strokeStyle = BLUE; octagon(ed.right, 0, a / 2, s / 2); g.fill(); g.stroke(); }
+      ship(0, 0, '#262626'); ship(1, ed.right, BLUE); centre(ed.right, BLUE); centre(0, '#262626');
     }
     g.fillStyle = '#444'; g.font = '600 12px IBM Plex Mono, monospace'; g.fillText(String(step), 8, 18);
   }
