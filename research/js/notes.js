@@ -528,11 +528,13 @@
   N.publishDrafts = function () {
     if (!N.configured()) { SW.toast('Set the Hypothesis group and token first.'); return Promise.resolve(); }
     var ds = drafts().filter(function (d) { return !d.deleted; }).sort(function (a, b) { return a.date < b.date ? -1 : 1; });
-    var idMap = {}, done = 0;
+    var idMap = {}, done = 0, relinkLater = [];
+    // a link to a draft names its draft id; once shared, the id Hypothesis gave it
+    function relink(t) { return String(t).replace(/([?&]a=)(draft-[A-Za-z0-9-]+)/g, function (m, pre, id) { return idMap[id] ? pre + idMap[id] : m; }); }
     return ds.reduce(function (p, d) {
       return p.then(function () {
         var uri = SW.versionURI(d.vid);
-        var body = { uri: uri, group: cfg().group, text: d.text + '\n\n(drafted ' + SW.fmtDate(d.date) + ')',
+        var body = { uri: uri, group: cfg().group, text: relink(d.text) + '\n\n(drafted ' + SW.fmtDate(d.date) + ')',
                      tags: d.hTags, permissions: { read: ['group:' + cfg().group] },
                      document: { title: ['Spacewar! research bench: ' + d.vid] }, target: [{ source: uri }] };
         if (d.quote && !d.parent) body.target[0].selector = [{ type: 'TextQuoteSelector', exact: d.quote.slice(0, 1200) }];
@@ -543,13 +545,26 @@
         }
         return hx('POST', '/annotations', body).then(function (r) {
           idMap[d.id] = r.id; done++;
+          if (/[?&]a=draft-/.test(body.text)) relinkLater.push({ id: r.id, text: body.text });   // a draft shared after this one
           saveDrafts(drafts().filter(function (x) { return x.id !== d.id; }));
         });
       });
     }, Promise.resolve()).then(function () {
+      // links to the drafts just shared: in those shared before their targets, and in your notes already in the group
+      return N.listAll().then(function (all) {
+        var ids = Object.keys(idMap);
+        all.forEach(function (n) {
+          if (n.source !== 'hypothesis' || !N.mine(n) || relinkLater.some(function (x) { return x.id === n.id; })) return;
+          if (ids.some(function (id) { return String(n.text).indexOf(id) >= 0; })) relinkLater.push({ id: n.id, text: n.text });
+        });
+        return relinkLater.reduce(function (p, x) {
+          return p.then(function () { var t = relink(x.text); return t === x.text ? null : hx('PATCH', '/annotations/' + x.id, { text: t }).catch(function () {}); });
+        }, Promise.resolve());
+      });
+    }).then(function () {
       cache = {};
       SW.emit('notes', SW.state.v);
-      SW.toast('Published ' + done + ' draft annotation' + (done === 1 ? '' : 's') + '.');
+      SW.toast('Published ' + done + ' draft annotation' + (done === 1 ? '' : 's') + (relinkLater.length ? '; links to them updated' : '') + '.');
     });
   };
 
@@ -681,7 +696,7 @@
       '<button data-act="dl" class="ico" title="Download the annotation as a text file: the same as Copy">⤓</button>' +
       // on the right: link, keep, edit, delete
       '<span class="acts-right">' +
-      (n.source !== 'draft' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)">↪</button>' : '') +
+      (n.source !== 'buildlog' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)' + (n.source === 'draft' ? '. A draft: the link is updated when it is shared' : '') + '">↪</button>' : '') +
       (n.source !== 'buildlog' ? '<button data-act="keep" title="Save to My notes: the annotation with its code, citation and replies, kept privately">＋ My notes</button>' : '') +
       (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
       (N.mine(n) ? '<button data-act="delete" class="del-note">' + (n.source === 'draft' ? 'Delete draft' : 'Delete') + '</button>' : '') +
@@ -912,11 +927,10 @@
       }).join('') : '<p class="hint">No annotation matches.' + (v ? ' Try All versions.' : '') + '</p>';
     }
     N.listAll().then(function (ns) {
-      all = ns.filter(function (n) { return n.source !== 'draft' && !N.isReaction(n); }).sort(function (a, b) {
+      all = ns.filter(function (n) { return !N.isReaction(n) && n.source !== 'buildlog'; }).sort(function (a, b) {
         return (order[a.vid] - order[b.vid]) || ((a.anchor ? a.anchor.p * 1e5 + a.anchor.n0 : -1) - (b.anchor ? b.anchor.p * 1e5 + b.anchor.n0 : -1)) || String(a.date).localeCompare(String(b.date));
       });
-      if (!N.configured()) list.innerHTML = '<p class="hint">Links need the shared group (⚙): drafts in this browser cannot be linked to.</p>';
-      else paint();
+      paint();
     });
     qIn.addEventListener('input', paint);
     vSel.addEventListener('change', paint);
@@ -994,7 +1008,7 @@
       '<p>Select lines in Read and click 🔗 Copy link at the foot of the window. Pasted into an annotation, the link is marked ↪ and goes to those lines.</p>' +
 
       '<h3>Good to know</h3><ul class="ah-steps">' +
-      '<li>Drafts cannot be linked to: a draft is given a new identifier when it is shared with the group. Share it first (⚙ sets the group).</li>' +
+      '<li>A draft can be linked to: when it is shared with the group it is given a new identifier, and links to it (in your drafts and your shared annotations) are updated then.</li>' +
       '<li>A link to an annotation that has been deleted, or is not in your group, goes to its lines and says the annotation is not there.</li>' +
       '<li>Links from other versions appear under Linked from once the group’s annotations have loaded, a moment after the bench opens.</li></ul></div>';
     document.body.appendChild(d);
