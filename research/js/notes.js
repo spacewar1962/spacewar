@@ -618,13 +618,25 @@
     return h;
   }
 
+  // The code a note is attached to, at its head, folding under a chevron; the
+  // fold is kept while the page is open.
+  var codeFold = {};
+  function codeQuote(n) {
+    var q = n.quote, k = q.split('\n').length, a = n.anchor;
+    return '<details class="frag-q" data-id="' + SW.esc(n.id) + '"' + (codeFold[n.id] ? '' : ' open') + '><summary title="Fold or unfold the code this annotation is attached to">Code · ' +
+      (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + (k > 1 ? ', ' + k + ' lines' : '') + '</summary><pre>' + SW.esc(q) + '</pre></details>';
+  }
+  document.addEventListener('toggle', function (e) {
+    var d = e.target;
+    if (d && d.matches && d.matches('details.frag-q')) codeFold[d.dataset.id] = !d.open;
+  }, true);
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
       (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
-      (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? '<pre class="frag-q" title="The code this annotation is attached to">' + SW.esc(n.quote) + '</pre>' : '') +
+      (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? codeQuote(n) : '') +
       (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
       (N.backlinks(n.id).length ? '<div class="backl"><span class="faint">Linked from</span> ' + N.backlinks(n.id).map(function (b) {
@@ -727,6 +739,11 @@
     return ns.filter(function (n) { return !dev(n, 0); });
   }
   var list0 = N.list, listAll0 = N.listAll;
+  // Your own notes marked Developer only (for the warning when the mode goes off).
+  N.myDevCount = function () {
+    var me = SW.me().initials;
+    return listAll0().then(function (ns) { return ns.filter(function (n) { return n.dev && !n.parent && (n.source === 'draft' || (me && n.by === me)); }).length; }, function () { return 0; });
+  };
   N.list = function (vid, force) { return list0(vid, force).then(devFilter).then(reindex); };
   N.listAll = function (opts) { return listAll0(opts).then(devFilter).then(reindex); };
   N.byId = function (id) { return idx.byId[id] || null; };
@@ -1078,7 +1095,7 @@
     SW.$('#note-tags').value = (opts.tags || []).join(', ');
     var devBox = SW.$('#note-dev');
     devBox.hidden = !SW.dev() || !!opts.parent;
-    SW.$('input', devBox).checked = SW.store.get('devNote', true);
+    SW.$('input', devBox).checked = false;   // shared unless ticked, each time
     SW.$('#note-who').innerHTML = me.initials
       ? 'Signed <b>' + SW.esc(me.initials) + '</b> · ' + SW.fmtDate(SW.today()) +
         (N.configured() ? ' · shared with the group' : ' · kept as a draft (no group set)')
@@ -1093,7 +1110,6 @@
       if (!text) return;
       var tags = SW.$('#note-tags').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
       var dev = !devBox.hidden && SW.$('input', devBox).checked;
-      if (!devBox.hidden) SW.store.set('devNote', dev);
       N.create({ vid: opts.vid, kind: opts.kind || (opts.anchor ? 'line' : 'version'), anchor: opts.anchor,
                  quote: opts.quote, text: text, tags: tags, parent: opts.parent, dev: dev })
         .catch(function (e) { if (e.message !== 'no initials') SW.toast(e.message, 5000); });

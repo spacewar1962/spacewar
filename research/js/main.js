@@ -138,7 +138,13 @@
       SW.store.set('noteShade', SW.$('#set-noteshade').checked);
       if (SW.store.get('chmBright', true) !== SW.$('#set-chmbright').checked) { SW.store.set('chmBright', SW.$('#set-chmbright').checked); SW.forget('graphics'); if (SW.state.v === '4.1d' || SW.state.v === '4.1f') SW.toast('CHM brightness ' + (SW.$('#set-chmbright').checked ? 'on' : 'off') + ': Run shows it from the next Reset', 4000); }
       SW.applyNoteShade();
-      if (SW.dev() !== SW.$('#set-dev').checked) { SW.store.set('dev', SW.$('#set-dev').checked); SW.applyDev(); SW.toast('Developer mode ' + (SW.dev() ? 'on' : 'off'), 3000); }
+      if (SW.dev() !== SW.$('#set-dev').checked) {
+        SW.store.set('dev', SW.$('#set-dev').checked); SW.applyDev();
+        if (SW.dev()) SW.toast('Developer mode on', 3000);
+        else SW.notes.myDevCount().then(function (k) {
+          SW.toast('Developer mode off' + (k ? '. ' + k + ' of your annotations ' + (k === 1 ? 'is' : 'are') + ' marked Developer only and now hidden: to share ' + (k === 1 ? 'it' : 'them') + ', turn the mode on, Edit, and untick Developer only.' : ''), k ? 9000 : 3000);
+        });
+      }
       SW.store.set('initials', SW.$('#set-initials').value.trim().toUpperCase());
       SW.store.set('name', SW.$('#set-name').value.trim());
       SW.store.set('group', SW.notes.groupId(grp.value));

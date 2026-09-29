@@ -537,7 +537,6 @@
         var an = { p: p, n0: n0, n1: n1, src: build.parts[p].src };
         if (span) { an.c0 = c0; an.c1 = c1; }
         window.getSelection().removeAllRanges(); hideSelPop();
-        SW.state.sel = { p: p, n0: n0, n1: n1 }; paintSel(); SW.writeQuery();
         var q1 = exact.replace(/\s+/g, ' ').trim();
         N.dialog({ vid: build.v.id, kind: 'line', anchor: an, quote: exact, tags: finding ? ['finding'] : [],
                    heading: finding ? 'Add a finding' : 'Annotate',
