@@ -1562,9 +1562,9 @@ body.dev-on .dev-only { display: revert !important; }
 .nfold > .note > .nbody, .nfold > .note > .acts, .nfold > .mc-replies, .nfold > .mc-more { display: none !important; }
 .nfold > .note > .by { border-bottom: 0; margin-bottom: 0; padding-bottom: 0; }
 .nfold { opacity: .75; }
-.mc-where .mc-grip { cursor: grab; color: var(--text-faint); padding: 0 2px; }
-.mc-where .mc-grip:hover { color: var(--text); }
-.mc-where .mc-grip:active { cursor: grabbing; }
+.mcard > .mc-grip, .ithread > .mc-grip { position: absolute; left: 4px; bottom: 5px; width: 14px; text-align: center; cursor: grab; color: var(--text-faint); font-size: 12px; line-height: 1; user-select: none; }
+.mcard > .mc-grip:hover, .ithread > .mc-grip:hover { color: var(--text); }
+.mcard > .mc-grip:active, .ithread > .mc-grip:active { cursor: grabbing; }
 .ln.drop-at { background: color-mix(in srgb, var(--anno-block) 22%, transparent) !important; box-shadow: inset 3px 0 0 var(--anno-block); }
 .edit-lines { display: flex; align-items: center; gap: 4px; margin: 4px 0; font-size: 12px; flex-wrap: wrap; }
 .edit-lines input { width: 5em; }

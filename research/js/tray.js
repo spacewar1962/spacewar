@@ -230,7 +230,7 @@
       : it.kind === 'text' ? '<div class="tray-para note-md">' + SW.md(it.text || '') + '</div>'
       : (it.subtitle ? '<p class="hint">' + SW.esc(it.subtitle) + '</p>' : '') + '<div class="tray-body">' + blocksHTML(it.blocks || []) + '</div>';
     d.innerHTML = '<div class="tray-bighead"><b>' + SW.esc(it.caption || (it.kind === 'text' ? 'Paragraph' : 'Note')) + '</b> <span class="faint">' + SW.esc([it.by, it.from || vShort(it.vid)].filter(Boolean).join(' · ')) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
-      body + (it.note ? '<p class="tray-para"><i>' + SW.esc(it.note) + '</i></p>' : '');
+      body + (it.note ? '<div class="tray-para note-md"><i>' + SW.md(it.note) + '</i></div>' : '');
     document.body.appendChild(d);
     function shut() { d.close(); d.remove(); }
     d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) shut(); });
@@ -249,7 +249,8 @@
     return bl.map(function (b) {
       if (b.type === 'h2' || b.type === 'h3') return '<p class="tray-h"><b>' + SW.esc(b.text || '') + '</b></p>';
       if (b.type === 'p') return b.text ? '<p class="tray-para">' + SW.esc(b.text) + '</p>' : '';
-      if (b.type === 'note') return '<p class="tray-para"><b>' + SW.esc(b.by || '') + '</b> ' + SW.esc(b.text || '') + '</p>';
+      if (b.type === 'note') return '<div class="tray-anno"><b style="color:hsl(' + personHue(b.by) + ',62%,60%)">' + SW.esc(b.by || '') + '</b> <span class="faint">' + SW.esc([b.date, b.anchor].filter(Boolean).join(' · ')) + '</span><div class="note-md">' + SW.md(b.text || '') + '</div>' +
+        (b.replies || []).map(function (r) { return '<div class="tray-anno-r">↳ <b style="color:hsl(' + personHue(r.by) + ',62%,60%)">' + SW.esc(r.by || '') + '</b><div class="note-md">' + SW.md(r.text || '') + '</div></div>'; }).join('') + '</div>';
       if (b.type === 'figure') return b.svg ? '<div class="tray-fig">' + SW.displaySVG(b.svg) + '</div>' : '<p class="hint">' + SW.esc(b.caption || 'Figure') + '</p>';
       if (b.type === 'code') return (b.caption ? '<p class="hint">' + SW.esc(b.caption) + '</p>' : '') + '<div class="mono tray-code tray-full">' + b.lines.map(function (l) {
         return '<div class="tl">' + SW.esc((l.n != null ? String(l.n).padStart(4) + '  ' : '') + l.text) + '</div>' + (l.notes || []).map(function (n) { return noteHTML(n); }).join('');
@@ -369,6 +370,8 @@
       list.appendChild(li);
     });
     el.appendChild(list);
+    // a paragraph, or the note under an item: rich text or Markdown, as annotations are
+    SW.$$('textarea.tray-text, textarea.tray-note', list).forEach(function (ta) { SW.mdTools(ta); });
     list.addEventListener('click', function (e) {
       var fg = e.target.closest('.tray-item > .tray-fig');
       if (fg) { bigView(load().items[+fg.closest('.tray-item').dataset.i]); return; }
