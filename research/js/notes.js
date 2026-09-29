@@ -262,7 +262,7 @@
   }
   function newsLine(n, byId) {
     var V = root.SWVersions, v = V.byId(n.vid), par = n.parent && byId[n.parent];
-    var what = N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
+    var what = N.isReaction(n) && /^status:/.test(n.text) ? (n.text === 'status:resolved' ? 'resolved ' : 'marked open ') + (par ? par.by + '’s annotation' : 'an annotation') : N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
     var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
     var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
     var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + ' ' + (anchor ? SW.refText(n.vid, anchor.p, anchor.n0, anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid));
@@ -555,6 +555,12 @@
   // sw:kind:reaction, so it is shared, signed and dated like any note.
   N.EMOJI = ['👍', '👎', '✅', '😊', '❓', '💡', '❗', '👀'];
   N.isReaction = function (n) { return n.kind === 'reaction'; };
+  // Open or resolved: a reaction 'status:open' or 'status:resolved' by anyone in the
+  // group (only an annotation's author can change its tags); the latest counts.
+  N.statusOf = function (reactions) {
+    var s = (reactions || []).filter(function (r) { return /^status:/.test(r.text); }).sort(function (a, b) { return String(a.date) < String(b.date) ? -1 : 1; }).pop();
+    return s ? { state: s.text.slice(7), by: s.by, date: s.date } : { state: '' };
+  };
   N.threads = function (notes) {
     var byId = {}, roots = [];
     notes.forEach(function (n) { if (!N.isReaction(n)) byId[n.id] = { note: n, replies: [], reactions: [] }; });
@@ -603,7 +609,7 @@
   function renderReactions(n, reactions) {
     if (n.source === 'buildlog') return '';
     var by = {};
-    (reactions || []).forEach(function (r) { (by[r.text] = by[r.text] || []).push(r); });
+    (reactions || []).forEach(function (r) { if (!/^status:/.test(r.text)) (by[r.text] = by[r.text] || []).push(r); });
     var h = '<span class="reacts">';
     N.EMOJI.concat(Object.keys(by).filter(function (e) { return N.EMOJI.indexOf(e) < 0; })).forEach(function (e) {
       var rs = by[e];
@@ -624,14 +630,14 @@
   var codeOpen = {};
   function codeQuote(n) {
     var shut = !codeOpen[n.id];
-    return '<div class="frag-q' + (shut ? ' folded' : '') + '" data-id="' + SW.esc(n.id) + '"><span class="cf-tog cf-own" title="Show or hide the code">' + (shut ? '▸' : '▾') + ' Code</span><pre>' + SW.esc(n.quote) + '</pre></div>';
+    return '<div class="frag-q' + (shut ? ' folded' : '') + '" data-id="' + SW.esc(n.id) + '"><button type="button" class="cf-tog cf-own" aria-expanded="' + !shut + '" title="Show or hide the code">' + (shut ? '▸' : '▾') + ' Code</button><pre>' + SW.esc(n.quote) + '</pre></div>';
   }
   N.hasCode = function (n) { return !!(n && n.anchor && n.anchor.c0 != null && n.quote && !n.parent); };
   N.codeFolded = function (id) { return !codeOpen[id]; };
   N.toggleCode = function (id) {
     codeOpen[id] = !codeOpen[id];
     var shut = !codeOpen[id];
-    SW.$$('.frag-q[data-id="' + id + '"]').forEach(function (el) { el.classList.toggle('folded', shut); var t = el.querySelector('.cf-own'); if (t) t.textContent = (shut ? '▸' : '▾') + ' Code'; });
+    SW.$$('.frag-q[data-id="' + id + '"]').forEach(function (el) { el.classList.toggle('folded', shut); var t = el.querySelector('.cf-own'); if (t) { t.textContent = (shut ? '▸' : '▾') + ' Code'; t.setAttribute('aria-expanded', String(!shut)); } });
     return shut;
   };
   document.addEventListener('click', function (e) {
@@ -640,11 +646,20 @@
     e.stopPropagation();
     N.toggleCode(t.closest('.frag-q').dataset.id);
   });
+  function statusChip(s) {
+    return s.state === 'open' ? '<span class="st st-open" title="An open question: marked by ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '">Open</span>'
+      : s.state === 'resolved' ? '<span class="st st-res" title="Resolved: marked by ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '">✓ Resolved</span>' : '';
+  }
+  function statusButton(state) {
+    return state === 'open' ? '<button data-act="status" data-to="resolved" title="Mark this as answered">✓ Resolve</button>'
+      : state === 'resolved' ? '<button data-act="status" data-to="open" title="Open it again">Reopen</button>'
+      : '<button data-act="status" data-to="open" title="Mark this as an open question, still to be answered (Read can show only these)">? Open</button>';
+  }
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
       '<div class="by"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
-      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
+      (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (!isReply && N.statusOf(reactions).state ? ' ' + statusChip(N.statusOf(reactions)) : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
       '<div class="nbody">' +   // what the annotation holds, set on its own ground
       (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? codeQuote(n) : '') +
@@ -656,6 +671,7 @@
       // one row: Reply | reactions | copy, download, edit, delete
       '</div>' +
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
+      (!isReply && n.source !== 'buildlog' ? statusButton(N.statusOf(reactions).state) : '') +
       '<button data-act="copy" class="ico" title="Copy the annotation as a quotation with its code and reference, ready for a book or chapter; with its replies">⧉</button>' +
       '<button data-act="dl" class="ico" title="Download the annotation as a text file: the same as Copy">⤓</button>' +
       // on the right: link, keep, edit, delete
@@ -701,6 +717,12 @@
       }
       if (btn.dataset.act === 'dl') { downloadNote(note, all, 'md'); return; }
       if (btn.dataset.act === 'keep') { keepNote(note, all); return; }
+      if (btn.dataset.act === 'status') {
+        btn.disabled = true;
+        N.create({ vid: vid, parent: note.id, kind: 'reaction', anchor: note.anchor, text: 'status:' + btn.dataset.to, tags: [], quiet: true, dev: note.dev })
+          .then(function () { SW.toast(btn.dataset.to === 'resolved' ? 'Marked resolved' : 'Marked open'); }, function (err) { btn.disabled = false; if (err.message !== 'no initials') SW.toast(err.message, 5000); });
+        return;
+      }
       if (btn.dataset.act === 'react-pick') {
         var pk = btn.parentNode.querySelector('.react-pick');
         pk.hidden = !pk.hidden;

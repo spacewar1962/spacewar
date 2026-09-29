@@ -1581,3 +1581,16 @@ body.dev-on .dev-only { display: revert !important; }
 .ghost .note:not(.reply) > .nbody { background: transparent; }
 .ghost .acts a.swlink { font-size: 12px; }
 .lncols .ghost-sw.on { color: var(--text); border-color: var(--text-dim); background: color-mix(in srgb, var(--text) 8%, transparent); }
+/* the corner's toggles are buttons (keyboard, screen readers), drawn as text */
+.mc-where button.cf-tog, .mc-where button.cf-lines, .frag-q button.cf-own { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.mc-where button.cf-lines:hover, .mc-where button.cf-tog:hover { color: var(--beam); }
+.mc-where button:focus-visible, .frag-q button:focus-visible, .card-fold:focus-visible, .lncols .ann-cyc:focus-visible { outline: 2px solid var(--beam); outline-offset: 1px; border-radius: 2px; }
+/* the corner's toggles are buttons (keyboard, screen readers), drawn as text */
+.mc-where button.cf-tog, .mc-where button.cf-lines, .frag-q button.cf-own { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.frag-q button.cf-own { font: 10.5px/1.4 var(--sans); color: var(--text-faint); }
+.mc-where button.cf-lines:hover, .mc-where button.cf-tog:hover { color: var(--beam); }
+.mc-where button:focus-visible, .frag-q button:focus-visible, .card-fold:focus-visible, .lncols .ann-cyc:focus-visible, .lncols .colfold:focus-visible { outline: 2px solid var(--beam); outline-offset: 1px; border-radius: 2px; }
+/* open / resolved */
+.note .st { font: 600 10px/1 var(--sans); padding: 2px 5px; border-radius: 3px; letter-spacing: .02em; vertical-align: 1px; }
+.note .st-open { color: #000; background: var(--amber); }
+.note .st-res { color: var(--green); border: 1px solid color-mix(in srgb, var(--green) 50%, transparent); }

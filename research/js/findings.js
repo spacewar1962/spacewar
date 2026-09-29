@@ -377,7 +377,7 @@
   // Reactions and ratings on a finding: an emoji, or a rating of one to three
   // stars (a reaction "★1".."★3", one per person), each signed and removable.
   var RATE = /^★([123])$/;
-  function emojiOf(t) { return t ? t.reactions.filter(function (r) { return !RATE.test(r.text); }) : []; }
+  function emojiOf(t) { return t ? t.reactions.filter(function (r) { return !RATE.test(r.text) && !/^status:/.test(r.text); }) : []; }
   function ratingOf(t) {
     var rs = t ? t.reactions.filter(function (r) { return RATE.test(r.text); }) : [];
     if (!rs.length) return null;

@@ -11,7 +11,7 @@
   var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', false) };
   // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
   // cycled from the chevron on the Annotations heading.
-  var SHOW = { all: '▾ All', mine: '▾ Mine', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'none', none: 'all' };
+  var SHOW = { all: '▾ All', mine: '▾ Mine', open: '▾ Open', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'open', open: 'none', none: 'all' };
   function isMine(n) { var me = SW.me().initials; return N.mine(n) || (!!me && n.by === me); }
   // notes: 'inline' (each thread under its lines, the default), 'margin' (cards
   // beside the lines) or 'off' (initials at the line end); chosen from the ▴ Notes button.
@@ -234,7 +234,7 @@
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
         '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word <button class="colfold" data-cf="0" title="Fold away Address and Word, for more room (View ▸ Addresses &amp; words brings them back too)">‹</button></span>' +
         '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)"><button class="colfold cf-show" data-cf="1" title="Show Address and Word">›</button>Source</span>' +
-        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations<button class="ann-cyc" data-ann title="Show all annotations, only yours, or none (click to change)">' + SHOW[opts.show] + '</button><button class="ann-cyc ghost-sw' + (opts.ghosts ? ' on' : '') + '" data-ghosts aria-pressed="' + !!opts.ghosts + '" title="Ghosts: annotations made on other versions, shown faintly on the lines here that match">Ghosts</button></span></div></div>';
+        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations<button class="ann-cyc" data-ann title="Show all annotations, only yours, only open questions, or none (click to change)">' + SHOW[opts.show] + '</button><button class="ann-cyc ghost-sw' + (opts.ghosts ? ' on' : '') + '" data-ghosts aria-pressed="' + !!opts.ghosts + '" title="Ghosts: annotations made on other versions, shown faintly on the lines here that match">Ghosts</button></span></div></div>';
       sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
     });
@@ -269,10 +269,10 @@
     if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
     var isBlock = a.n1 > a.n0 || a.c0 != null, shut = !!cardFold()[t.note.id];
     return '<div class="' + cls + (open ? ' open' : '') + (isBlock ? ' blockn' : '') + (shut ? ' nfold' : '') + (t.note.source === 'draft' ? ' draft' : '') + '" data-tid="' + SW.esc(t.note.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
-      '<button class="card-fold" title="' + (shut ? 'Unfold this annotation' : 'Fold this annotation away (for you; kept in this browser)') + '">' + (shut ? '▸' : '▾') + '</button>' +
+      '<button type="button" class="card-fold" aria-expanded="' + !shut + '" title="' + (shut ? 'Unfold this annotation' : 'Fold this annotation away (for you; kept in this browser)') + '">' + (shut ? '▸' : '▾') + '</button>' +
       (N.mine(t.note) ? '<span class="mc-grip" draggable="true" title="Drag onto another line to move this annotation there">⠿</span>' : '') +
-      '<div class="mc-where">' + (N.hasCode(t.note) ? '<span class="cf-tog" title="Show or hide the code">' + (N.codeFolded(t.note.id) ? '▸' : '▾') + ' Code</span>' : 'Code') +
-        ' · <span class="cf-lines" title="Select the lines">' + (a.n1 !== a.n0 ? 'lines ' + a.n0 + '–' + a.n1 : 'line ' + a.n0) + '</span></div>' +
+      '<div class="mc-where">' + (N.hasCode(t.note) ? '<button type="button" class="cf-tog" aria-expanded="' + !N.codeFolded(t.note.id) + '" title="Show or hide the code">' + (N.codeFolded(t.note.id) ? '▸' : '▾') + ' Code</button>' : 'Code') +
+        ' · <button type="button" class="cf-lines" title="Select the lines">' + (a.n1 !== a.n0 ? 'lines ' + a.n0 + '–' + a.n1 : 'line ' + a.n0) + '</button></div>' +
       N.renderNote(t.note, false, t.reactions) +
       (nrep ? '<button class="mc-more" data-more="1" title="' + (open ? 'Hide the replies' : 'Show the replies') + '">' + (open ? '−' : '+') + ' ' + nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + '</button>' : '') +
       (open ? '<div class="mc-replies">' + h + '</div>' : '') + '</div>';
@@ -285,6 +285,7 @@
       var a = t.note.anchor;
       if (!a || !showsTape(a.p)) return false;
       if (opts.show === 'mine' && !isMine(t.ghost ? t.note.ghostOf : t.note)) return false;
+      if (opts.show === 'open' && (t.ghost || N.statusOf(t.reactions).state !== 'open')) return false;
       if (keep && !keep[a.p + ':' + a.n0]) return false;
       return !!SW.$('#L' + a.p + '-' + a.n0, view);
     });
@@ -511,13 +512,13 @@
       if (f[id]) delete f[id]; else f[id] = true;
       SW.store.set('read.cardFold', f);
       card.classList.toggle('nfold', !!f[id]);
-      cfb.textContent = f[id] ? '▸' : '▾';
+      cfb.textContent = f[id] ? '▸' : '▾'; cfb.setAttribute('aria-expanded', String(!f[id]));
       cfb.title = f[id] ? 'Unfold this annotation' : 'Fold this annotation away (for you; kept in this browser)';
       if (marginOn()) layoutMargin();
       return true;
     }
     var tog = e.target.closest('.cf-tog');
-    if (tog) { var tc = tog.closest('.mcard, .ithread'); tog.textContent = (N.toggleCode(tc.dataset.tid) ? '▸' : '▾') + ' Code'; if (marginOn()) layoutMargin(); return true; }
+    if (tog) { var tc = tog.closest('.mcard, .ithread'); var shutNow = N.toggleCode(tc.dataset.tid); tog.textContent = (shutNow ? '▸' : '▾') + ' Code'; tog.setAttribute('aria-expanded', String(!shutNow)); if (marginOn()) layoutMargin(); return true; }
     var more = e.target.closest('[data-more]');
     if (more) {
       var c = more.closest('.mcard, .ithread');
@@ -850,7 +851,7 @@
         opts.show = SHOW_NEXT[opts.show] || 'all'; SW.store.set('read.show', opts.show);
         SW.$$('[data-ann]', view).forEach(function (b) { b.textContent = SHOW[opts.show]; });
         paintNotes();
-        SW.toast(opts.show === 'all' ? 'Showing all annotations' : opts.show === 'mine' ? 'Showing only your annotations' : 'Annotations hidden', 2500);
+        SW.toast(opts.show === 'all' ? 'Showing all annotations' : opts.show === 'mine' ? 'Showing only your annotations' : opts.show === 'open' ? 'Showing only open questions' : 'Annotations hidden', 2500);
         return;
       }
       if (e.target.closest('.part-head')) return;   // tape headers only label (their source link opens GitHub)
