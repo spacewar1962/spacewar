@@ -984,21 +984,27 @@
       ' ' + (note.anchor ? SW.refText(note.vid, note.anchor.p, note.anchor.n0, note.anchor.n1, SW.nparts(note.vid)) : SW.refText(note.vid));
   }
   // Copy: the annotation as a quotation with its reference, ready for a book or
-  // chapter: Code: “rcl 9s …”, “Text of the annotation” (David M. Berry,
-  // annotation on SW3.1L, 1.32–34, 30 Sep 2026); its replies after it, alike.
+  // chapter: 'Code:' and the code as it stands, then “Text of the annotation”
+  // (David M. Berry, annotation on SW3.1L, 1.32–34, 30 Sep 2026); replies after.
   function refOfNote(n) { var a = n.anchor; return a ? SW.refOf(n.vid, a.p, a.n0, a.n1, SW.nparts(n.vid)) : SW.refOf(n.vid); }
   function plainOf(n) { return SW.mdPlain(N.linksAsNames(SW.figpack.split(n.text).text)).replace(/\s*\n\s*/g, ' ').trim(); }
+  // the code as it stands: its lines kept, tabs as spaces (to eight-column stops) so
+  // the layout survives pasting
   function codeOf(r) {
     var c = r.quote || '', b = SW.views.read && SW.views.read.build, a = r.anchor;
-    if (!c && a && b && b.v.id === r.vid && b.lines[a.p]) c = b.lines[a.p].slice(a.n0 - 1, a.n1).map(function (L) { return L.raw; }).join(' ');
-    c = c.replace(/\s+/g, ' ').trim();
-    return c.length > 60 ? c.slice(0, 60).trim() + ' …' : c;
+    if (!c && a && b && b.v.id === r.vid && b.lines[a.p]) c = b.lines[a.p].slice(a.n0 - 1, a.n1).map(function (L) { return L.raw; }).join('\n');
+    return c.split('\n').slice(0, 60).map(function (l) {
+      var o = '';
+      for (var k = 0; k < l.length; k++) o += l[k] === '\t' ? new Array(9 - o.length % 8).join(' ') : l[k];
+      return o.replace(/\s+$/, '');
+    }).join('\n').replace(/^\n+|\n+$/g, '');
   }
   function copyNote(note, all) {
     var t = threadOf(note, all), r = t.note, lines = [], code = codeOf(r);
     function who(n) { return n.name || n.by; }
     function one(n, what) { return '“' + plainOf(n) + '” (' + who(n) + ', ' + what + ' on ' + refOfNote(r) + ', ' + SW.fmtDate(n.date) + ')'; }
-    lines.push((code ? 'Code: “' + code + '”, ' : '') + one(note, note.parent ? 'reply' : 'annotation'));
+    if (code) lines.push('Code:', code);
+    lines.push(one(note, note.parent ? 'reply' : 'annotation'));
     if (note.id === r.id) (function walk(rs) { rs.forEach(function (x) { lines.push('Reply: ' + one(x.note, 'reply')); walk(x.replies); }); })(t.replies);
     var text = lines.join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject())
