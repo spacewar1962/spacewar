@@ -2,6 +2,10 @@
 
 All notable changes to the _Spacewar!_ Critical Code Studies website. Versions follow the GitHub releases.
 
+## Unreleased
+
+- **Citing the source code** (`code.html#referencing`): the project's referencing convention for the source texts, `[REF: SW3.1T, 2.141–146]` (version, witness letter, tape, lines; short forms; core addresses; the SWP namespace for ports; SWHIDs alongside), with the full list of references for every text held and every port, each text linked and each reference and SWHID copyable. The version table gains a Reference column.
+
 ## v1.5.0 — 2026-06-13
 
 - New **People page** (`people.html`): the people who conceived, wrote, extended, and preserved _Spacewar!_, with portraits and life dates; the geography of the room (the kluge room and Building 26, the Karl Taylor Compton Laboratories, and a keyed map of the wartime Rad Lab buildings); the Tech Model Railroad Club; the unidentified "dfw"; and a "who is not here" section on the women written out of the record, after Nooney.
