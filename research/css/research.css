@@ -1492,11 +1492,11 @@ a.swlink::before { content: '↪\00a0'; text-decoration: none; display: inline-b
 .ln.blk.blk-b.mlit { --blk: color-mix(in srgb, var(--anno-block) 90%, transparent); }
 .mcard.blockn, .ithread.blockn { border-left-color: var(--anno-block); }
 .mcard.blockn.draft, .ithread.blockn.draft { border-left-color: var(--text-faint); }
-.ln.blk .w { box-shadow: inset -2px 0 0 var(--blk); }
-.ln.blk-top .w { background: linear-gradient(var(--blk), var(--blk)) right top / 7px 1px no-repeat; }
-.ln.blk-end .w { background: linear-gradient(var(--blk), var(--blk)) right bottom / 7px 1px no-repeat; }
-.ln.blk-top.blk-end .w { background: linear-gradient(var(--blk), var(--blk)) right top / 7px 1px no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 7px 1px no-repeat; }
-.rd-body.notes-hidden .ln.blk .w { box-shadow: none; background: none; }
+.ln.blk .w { background: linear-gradient(var(--blk), var(--blk)) right 7px top / 2px 100% no-repeat; }
+.ln.blk-top .w { background: linear-gradient(var(--blk), var(--blk)) right 7px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right top / 9px 1px no-repeat; }
+.ln.blk-end .w { background: linear-gradient(var(--blk), var(--blk)) right 7px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 9px 1px no-repeat; }
+.ln.blk-top.blk-end .w { background: linear-gradient(var(--blk), var(--blk)) right 7px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right top / 9px 1px no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 9px 1px no-repeat; }
+.rd-body.notes-hidden .ln.blk .w { background: none; }
 mark.frag { background: none; color: inherit; text-decoration: underline dotted color-mix(in srgb, var(--anno-block) 60%, transparent); text-underline-offset: 3px; }
 mark.frag.lit { background: color-mix(in srgb, var(--anno-block) 20%, transparent); text-decoration-color: var(--anno-block); }
 .note .frag-q { margin: 2px 0 4px; }
@@ -1519,3 +1519,15 @@ body.dev-on .dev-only { display: revert !important; }
 .settings .dev-set[open] summary::before { content: '▾'; }
 .settings .dev-set summary h2 { display: inline; margin: 0; }
 .settings .dev-set .dev-warn { color: var(--red); font-size: 12px; font-weight: 600; }
+/* the word column hidden (by choice, or on a narrow screen): the bracket by the line number */
+.hide-words .ln.blk .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat; }
+.hide-words .ln.blk-top .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right top / 5px 1px no-repeat; }
+.hide-words .ln.blk-end .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 5px 1px no-repeat; }
+.hide-words .ln.blk-top.blk-end .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right top / 5px 1px no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 5px 1px no-repeat; }
+@media (max-width: 860px) {
+  .ln.blk .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat; }
+  .ln.blk-top .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right top / 5px 1px no-repeat; }
+  .ln.blk-end .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 5px 1px no-repeat; }
+  .ln.blk-top.blk-end .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right top / 5px 1px no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 5px 1px no-repeat; }
+}
+.rd-body.notes-hidden .ln.blk .n { background: none; }
