@@ -701,8 +701,8 @@
     (ns || []).forEach(function (n) { if (n && n.id && !N.isReaction(n)) idx.byId[n.id] = n; });
     var back = {};
     Object.keys(idx.byId).forEach(function (id) {
-      var re = /[?&]a=([A-Za-z0-9_-]+)/g, m, seen = {};
-      while ((m = re.exec(idx.byId[id].text || ''))) if (m[1] !== id && !seen[m[1]]) { seen[m[1]] = 1; (back[m[1]] = back[m[1]] || []).push(id); }
+      var re = /[?&]a=([A-Za-z0-9_-]+)/g, m, seen = {}, tx = (idx.byId[id].text || '').replace(/\\([_\-])/g, '$1');   // \_ from an editor's escaping
+      while ((m = re.exec(tx))) if (m[1] !== id && !seen[m[1]]) { seen[m[1]] = 1; (back[m[1]] = back[m[1]] || []).push(id); }
     });
     idx.back = back;
     var sig = JSON.stringify(back);
@@ -725,7 +725,7 @@
   };
   // A bench link's parameters, or null for a link elsewhere.
   N.parseLink = function (href) {
-    var h = String(href || '').replace(/&amp;/g, '&');
+    var h = String(href || '').replace(/&amp;/g, '&').replace(/\\([_\-])/g, '$1');
     var ok = h.charAt(0) === '?' || [SW.BASE_URI, location.origin + location.pathname].some(function (b) {
       return h.indexOf(b) === 0 && (h.length === b.length || h.charAt(b.length) === '?');
     });

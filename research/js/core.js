@@ -878,13 +878,15 @@
         .replace(/(^|[^\w*])\*(?=\S)([^*\n]*?\S)\*(?!\w)/g, '$1<i>$2</i>')
         .replace(/(^|[^\w])_(?=\S)([^_\n]*?\S)_(?!\w)/g, '$1<i>$2</i>');
     }
-    s = s.replace(/\\(&gt;|&lt;|&amp;|[\\`*_\[\]~#+\-.!()])/g, function (m, c) { return stash(c); });   // \* is a plain *
     s = s.replace(/`([^`\n]+)`/g, function (m, c) { return stash('<code>' + c + '</code>'); });
+    // a web address takes no Markdown escapes (an editor may have put \_ in one)
+    function unesc(u) { return u.replace(/\\([\\`*_\[\]~#+\-.!()])/g, '$1'); }
     s = s.replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, function (m, t, u) {
-      var raw = u.replace(/&amp;/g, '&');
-      return MD_URL.test(raw) ? stash(mdLink(u, emph(t))) : m;
+      u = unesc(u);
+      return MD_URL.test(u.replace(/&amp;/g, '&')) ? stash(mdLink(u, emph(t))) : m;
     });
-    s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { return pre + stash(mdLink(u, u, true)); });
+    s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { u = unesc(u); return pre + stash(mdLink(u, u, true)); });
+    s = s.replace(/\\(&gt;|&lt;|&amp;|[\\`*_\[\]~#+\-.!()])/g, function (m, c) { return stash(c); });   // \* is a plain *
     s = emph(s);
     return s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return keep[+i]; });
   }
@@ -926,8 +928,12 @@
   // Rich text back to Markdown, for the rich editor: what is stored and shared
   // stays Markdown. Marks typed as text are escaped, so they stay text.
   function mdText(s) {
-    return s.replace(/ /g, ' ').replace(/([\\`*\[\]~])/g, '\\$1')
-      .replace(/_/g, function (m, i, all) { return /\w/.test(all.charAt(i - 1)) && /\w/.test(all.charAt(i + 1)) ? '_' : '\\_'; });
+    // web addresses as they are; marks elsewhere escaped
+    return s.replace(/\u00a0/g, ' ').split(/((?:https?:\/\/|mailto:)[^\s<>]+)/).map(function (part, k) {
+      if (k % 2) return part;
+      return part.replace(/([\\`*\[\]~])/g, '\\$1')
+        .replace(/_/g, function (m, i, all) { return /\w/.test(all.charAt(i - 1)) && /\w/.test(all.charAt(i + 1)) ? '_' : '\\_'; });
+    }).join('');
   }
   function mdWrap(mark, inner) {
     var m = /^(\s*)([\s\S]*?)(\s*)$/.exec(inner);
