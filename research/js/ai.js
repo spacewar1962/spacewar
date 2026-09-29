@@ -132,7 +132,30 @@
       return headingTo(ax, ay);
     }
 
+    // Slips, now and then, as a person makes them: a hesitation (holding what it was
+    // doing), turning too far, holding the rocket too long, a wild shot, not seeing
+    // a torpedo coming, letting the orbit sag. One every few seconds, a few frames long.
+    var slip = null, slipAt = Math.floor(rnd(120, 360)), prev = 0, n = 0;
+    var SLIPS = [['freeze', 6, 15], ['overturn', 4, 12], ['burn', 8, 20], ['wild', 1, 1], ['blind', 20, 40], ['drift', 20, 60]];
+    function slipping(kind) { return slip && slip.kind === kind; }
     var fly = function (mem) {
+      n++;
+      if (slip && n >= slip.to) slip = null;
+      if (!slip && n >= slipAt) {
+        var z = SLIPS[Math.floor(Math.random() * SLIPS.length)];
+        slip = { kind: z[0], to: n + Math.floor(rnd(z[1], z[2] + 1)), dir: prev & bits.ccw ? bits.ccw : prev & bits.cw ? bits.cw : (Math.random() < 0.5 ? bits.ccw : bits.cw) };
+        slipAt = n + Math.floor(rnd(120, 360));
+      }
+      var o = think(mem), both = bits.ccw | bits.cw;
+      if (slip && (o & both) !== both) {   // never spoils a jump into hyperspace
+        if (slip.kind === 'freeze') o = prev;
+        else if (slip.kind === 'overturn') o = (o & ~both) | slip.dir;
+        else if (slip.kind === 'burn') o |= bits.rocket;
+        else if (slip.kind === 'wild' && !(prev & bits.torpedo)) o |= bits.torpedo;
+      }
+      return (prev = o);
+    };
+    var think = function (mem) {
       frame++;
       if (frame % 30 === 0) wobTo = (Math.random() - 0.5) * 2 * L.wob;
       wob += (wobTo - wob) * 0.1;
@@ -151,7 +174,7 @@
 
       // 1. torpedoes coming: the nearest approach of each over the next second
       var threat = null;
-      if (L.dodge && tcr >= 0) for (var i = 2; i < nob; i++) {
+      if (L.dodge && tcr >= 0 && !slipping('blind')) for (var i = 2; i < nob; i++) {
         if ((mem[mtb + i] & 0o7777) !== tcr) continue;
         var t = ship(mem, i), rx = wrapD(t.x - me.x), ry = wrapD(t.y - me.y), vx = t.vx - me.vx, vy = t.vy - me.vy;
         var v2 = vx * vx + vy * vy; if (!v2) continue;
@@ -174,7 +197,7 @@
       var vr = me.vx * ox + me.vy * oy, h = me.x * me.vy - me.y * me.vx, vt = r ? Math.abs(h) / r : 0;
       if (vt > 0.15) spin = h > 0 ? 1 : -1;
       else spin = plan.spin;
-      var fall = r < 100 || (r < 420 && vt < L.orbitVt + M.orbit + plan.vt) || (r < 260 && vr < -0.3 && vt < 1);
+      var fall = r < 100 || (!(slipping('drift') && r > 140) && ((r < 420 && vt < L.orbitVt + M.orbit + plan.vt) || (r < 260 && vr < -0.3 && vt < 1)));
       if (fall) {
         var tx = -oy * spin, ty = ox * spin, lift = r < 100 ? 0.6 : 0.15;
         var s2 = steer(me, headingTo(tx + lift * ox, ty + lift * oy), 0.45);
