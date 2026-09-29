@@ -150,8 +150,18 @@
       'How the game decides that two objects collide, in four steps, measured in each version’s own game: the Wedge set at every offset from the Needle, up to 30 screen points each way, both at rest far from the star, and one frame run. The same test serves torpedoes, which collide with ships and each other.',
       'labcol', function (el, vid, alive) {
         el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5><p class="hint lab-prog">Running 3,721 frames…</p>';
+        var b0 = null;
+        SW.build(vid).then(function (bb) { b0 = bb; });
         L.collision(vid, alive, function (f) { var p = SW.$('.lab-prog', el); if (p) p.textContent = 'Running 3,721 frames… ' + Math.round(f * 100) + '%'; }).then(function (d) {
           if (!alive()) return;
+          if (!el._colWired) {   // a link to the code opens it in Read
+            el._colWired = true;
+            el.addEventListener('click', function (e) {
+              var a = e.target.closest('a.col-code'); if (!a) return;
+              e.preventDefault();
+              SW.openAt(vid, { p: +a.dataset.p, n0: +a.dataset.n0, n1: +a.dataset.n1 });
+            });
+          }
           if (d.why) { el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + '</h5><p class="hint">' + SW.esc(d.why) + '.</p>'; return; }
           var n = 0; for (var i = 0; i < d.hit.length; i++) n += d.hit[i];
           var pts = d.me1 != null ? (d.me1 / 256) : null, pts2 = d.me2 != null ? d.me2 / 256 : null, zones = pts != null && pts2 != null;
@@ -165,7 +175,8 @@
           el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5>' +
             '<table class="ov-sub rnd-t"><tbody>' +
             '<tr><td>Constants</td><td class="mono">me1 ' + (d.me1 != null ? oct(d.me1) + ' (' + pts + ' points)' : '—') + ' · me2 ' + (d.me2 != null ? oct(d.me2) + ' (' + pts2 + ' points)' : '—') + '</td></tr>' +
-            '<tr><td>Measured</td><td>' + n.toLocaleString('en-GB') + ' of 3,721 offsets collide</td></tr></tbody></table>' +
+            '<tr><td>Measured</td><td>' + n.toLocaleString('en-GB') + ' of 3,721 offsets collide</td></tr>' +
+            (codeLinks(b0 || null) ? '<tr><td>Code</td><td>' + codeLinks(b0) + '</td></tr>' : '') + '</tbody></table>' +
             [1, 2, 3, 4].map(function (st) { return '<figure class="col-step"><canvas class="lab-cv" data-step="' + st + '"></canvas><figcaption class="hint">' + caps[st - 1] + '</figcaption></figure>'; }).join('') +
             '<div class="rnd-exp"></div>';
           var cvs = SW.$$('.lab-cv', el);
@@ -178,6 +189,19 @@
         });
       });
   };
+  // Links into Read: where me1 and me2 are set, and the test that uses them (a few
+  // lines before the first use of me1, to the jump after the use of me2)
+  function codeLinks(b) {
+    if (!b || !b.sym.me1 || !b.sym.me2) return '';
+    var S = b.sym, d1 = (S.me1.defs || [])[0], d2 = (S.me2.defs || [])[0], u1 = (S.me1.refs || [])[0], u2 = (S.me2.refs || []).slice(-1)[0];
+    var np = SW.nparts(b.v.id), out = [];
+    function a(p, n0, n1, what) {
+      return '<a href="#" class="col-code" data-p="' + p + '" data-n0="' + n0 + '" data-n1="' + n1 + '" title="Open ' + what + ' in Read">' + what + ' <span class="mono">' + SW.esc(SW.refText(b.v.id, p, n0, n1, np)) + '</span></a>';
+    }
+    if (d1 && d2 && d1.file === d2.file) out.push(a(d1.file, Math.min(d1.line, d2.line), Math.max(d1.line, d2.line), 'me1 and me2'));
+    if (u1 && u2 && u1.file === u2.file) out.push(a(u1.file, Math.max(1, u1.line - 7), u2.line + 2, 'the test'));
+    return out.join('<br>');
+  }
   // the Wedge's furthest collision offsets, left and right, on the Needle's own row
   function edges(d) {
     var right = 0, left = 0, ex;
