@@ -21,7 +21,10 @@
   // The bits differ by version (4.4 and 4.8 rotate the control word), so they come from SW.controlMap.
   // Players: 'keys' (two people at the keyboard), 'ai1' (you fly the Needle, the
   // computer the Wedge), 'ai0' (you the Wedge, it the Needle), 'aiai' (it flies both).
-  var players = SW.store.get('run.players', 'keys'), aiLevel = SW.store.get('run.ailevel', 'fair');
+  var players = SW.store.get('run.players', 'keys');
+  var follow = SW.store.get('run.follow', true), paneAt = 0;
+  // each computer pilot its own level (the Needle's, the Wedge's)
+  var aiLevels = [0, 1].map(function (j) { var l = SW.store.get('run.ailevel' + j, SW.store.get('run.ailevel', 'medium')); return l === 'fair' ? 'medium' : l; });
   var ctlMap = null, keyBits = 0, aiBits = 0, pilots = [null, null], ml0At = -1;
   function shipMask(j) { var m = ctlMap && ctlMap[j]; return m ? (m.ccw | m.cw | m.rocket | m.torpedo) : 0; }
   function aiShips() { return players === 'ai1' ? [1] : players === 'ai0' ? [0] : players === 'aiai' ? [0, 1] : []; }
@@ -29,7 +32,7 @@
   function setPilots() {
     pilots = [null, null];
     if (!aiUsable()) return;
-    aiShips().forEach(function (j) { pilots[j] = SW.ai.pilot(build, j, ctlMap[j], aiLevel); });
+    aiShips().forEach(function (j) { pilots[j] = SW.ai.pilot(build, j, ctlMap[j], aiLevels[j]); });
   }
   // the control word: your keys for the ships you fly, the computer's bits for its own
   function compose() {
@@ -94,7 +97,8 @@
     right.innerHTML = '<div class="toolbar" id="r-tabs">' +
       ['source', 'trace', 'profile', 'writes', 'anomalies', 'breakpoints'].map(function (t) {
         return '<button class="btn' + (t === paneTab ? ' on' : '') + '" data-t="' + t + '">' + t.charAt(0).toUpperCase() + t.slice(1) + '</button>';
-      }).join('') + '<span class="sep"></span><span class="hint" id="r-clock"></span></div><div id="r-pane"></div>';
+      }).join('') + '<label class="check r-follow" title="While it runs, keep the source on the line being run, with its counts, five times a second (always, at 0.05× and slower)"><input type="checkbox" id="r-follow"' + (follow ? ' checked' : '') + '> Follow</label>' +
+      '<span class="sep"></span><span class="hint" id="r-clock"></span></div><div id="r-pane"></div>';
     // the divide between the scopes and the code drags; its place is kept per layout
     var split = SW.el('div', { class: 'run-split' });
     SW.dragSplit(wrap, split, 'runSplit.' + (dual ? 2 : 1), 220, 240);
@@ -124,6 +128,7 @@
     SW.$('#r-over', view).onclick = stepOver;
     SW.$('#r-reset', view).onclick = function () { pause(); load(true); updateAll(); };
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
+    var fo = SW.$('#r-follow', view); if (fo) fo.onchange = function () { follow = fo.checked; SW.store.set('run.follow', follow); };
     var sym = SW.$('#r-sym', view);
     if (sym) sym.onchange = function () { SW.store.set('run.sunfix', sym.checked); R.show(build); };
     renderPlayers();
@@ -238,7 +243,7 @@
     cpu.lastSrcPc = -1;
     cpu.onDisplay = plot;
     ml0At = build.sym.ml0 ? build.sym.ml0.val : -1;
-    aiBits = 0; setPilots(); compose();   // a fresh computer pilot for a fresh game
+    aiBits = 0; setPilots(); compose(); renderPlayers();   // a fresh computer pilot, and temperament, for a fresh game
     pts = [];
     clearScopes();
     cpu.breakpoints = SW.breakpoints;
@@ -263,7 +268,11 @@
       pane();
       return;
     }
-    if (paneTab === 'source' && speed <= 0.05) pane();
+    // the source follows the running program: every frame when slowed right down,
+    // otherwise five times a second if Follow is ticked: only the lines in view are
+    // updated, but keeping the line in view lays the listing out again, about 15 to 20
+    // ms a time, so Follow costs about a tenth of one processor core
+    if (paneTab === 'source' && (speed <= 0.05 || (follow && t - paneAt > 200))) { pane(); paneAt = t; }
     raf = requestAnimationFrame(frame);
   }
 
@@ -391,7 +400,7 @@
           '</span><span class="w"></span><span class="t">' + SW.esc(L.raw) + '</span><span></span></div>';
       }
       el.innerHTML = h + '</div><p class="pad hint">Click a line number to set or clear a breakpoint. Use “Run to here” in the Read view to run to any line.</p>';
-      el._key = key;
+      el._key = key; el._cur = null;
       var rowsEls = SW.$$('.listing .ln', el);
       lines.forEach(function (L, k) { el._rows.push({ el: rowsEls[k], w: rowsEls[k].querySelector('.w'), ws: (build.asm.byLine[L.p] || [])[L.n] || [], ex: -1 }); });
       el.onclick = function (e) {
@@ -406,15 +415,20 @@
     }
     SW.$('.run-note', el).innerHTML = note;
     SW.$('.run-ref', el).innerHTML = SW.esc(build.parts[s.p].src || '') + ' · ' + SW.refTag(build.v.id, s.p, s.n, s.n, build.parts.length);
-    var cur = null;
-    el._rows.forEach(function (R, k) {
+    // only the lines in view (and the current one) are brought up to date: the
+    // counts change every frame, and touching every line would cost far more
+    var sc0 = el.closest('.run-right') || el, rows = el._rows, rh = rows.length && rows[0].el.offsetHeight || 20;
+    var top0 = rows.length ? rows[0].el.offsetTop : 0, k0 = Math.max(0, Math.floor((sc0.scrollTop - top0) / rh) - 10), k1 = Math.min(rows.length, k0 + Math.ceil(sc0.clientHeight / rh) + 20);
+    if (el._cur != null && el._cur !== s.n - 1 && rows[el._cur]) rows[el._cur].el.classList.remove('cur');
+    function upd(R, k) {
       var ex = R.ws.reduce(function (a, w) { return a + cpu.execCount[w.loc]; }, 0);
       if (ex !== R.ex) { R.ex = ex; R.w.textContent = ex ? '×' + ex : ''; }
-      var isCur = k + 1 === s.n, bp = R.ws.some(function (w) { return SW.breakpoints[w.loc]; });
-      if (R.el.classList.contains('cur') !== isCur) R.el.classList.toggle('cur', isCur);
+      var bp = R.ws.some(function (w) { return SW.breakpoints[w.loc]; });
       if (R.el.classList.contains('bp') !== bp) R.el.classList.toggle('bp', bp);
-      if (isCur) cur = R.el;
-    });
+    }
+    for (var k = k0; k < k1; k++) upd(rows[k], k);
+    var cur = rows[s.n - 1] ? rows[s.n - 1].el : null;
+    if (cur) { upd(rows[s.n - 1], s.n - 1); cur.classList.add('cur'); el._cur = s.n - 1; }
     // keep the line being run in view, in the middle, without jumping when it already is
     var sc = el.closest('.run-right') || el;
     if (cur) {
@@ -427,13 +441,20 @@
   function renderPlayers() {
     var el = view && SW.$('#r-players', view); if (!el) return;
     var ok = aiUsable();
-    el.innerHTML = '<label class="check" title="Who flies the ships. The computer flies by the same control bits as a player: it points at the other ship and fires, climbs away from the star, and at the higher levels dodges torpedoes and, where the version has it, jumps into hyperspace.">Players <select id="r-pl"' + (ok ? '' : ' disabled') + '>' +
+    var NAME = ['the Needle', 'the Wedge'];
+    function lvlSel(jj) {
+      return '<label class="check" title="How well the computer flies ' + NAME[jj] + ': easy aims loosely and never dodges; medium dodges torpedoes; hard dodges earlier and, where the version has it, jumps into hyperspace; hardcore watches furthest and aims finest.">' + (jj ? 'Wedge' : 'Needle') + ' <select data-al="' + jj + '"' + (ok ? '' : ' disabled') + '>' +
+        SW.ai.LEVEL_NAMES.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === aiLevels[jj] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>' +
+        (pilots[jj] && pilots[jj].temper ? ' <span class="hint" title="Drawn at random for each game: a hunter chases hard, an orbiter keeps its distance and snipes, a duellist is between">' + pilots[jj].temper + '</span>' : '') + '</label>';
+    }
+    el.innerHTML = '<label class="check" title="Who flies the ships. The computer flies by the same control bits as a player: it keeps in orbit round the star, turns to meet the other ship, fires whenever a torpedo would pass close to it, and at the higher levels dodges torpedoes and jumps into hyperspace. Press Run to start.">Players <select id="r-pl"' + (ok ? '' : ' disabled') + '>' +
       [['keys', 'Two people (keys)'], ['ai1', 'You (Needle) against the computer'], ['ai0', 'You (Wedge) against the computer'], ['aiai', 'The computer against itself']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === players ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') +
-      '</select></label> <label class="check">Level <select id="r-al"' + (ok ? '' : ' disabled') + '>' + [['easy', 'easy'], ['fair', 'fair'], ['hard', 'hard']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === aiLevel ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>' +
+      '</select></label> ' + aiShips().map(lvlSel).join(' ') +
       (build && build.v.ctlLoad ? ' <span class="hint">Not for this version: its two control boxes read the same word on the bench (F27).</span>' : !ctlMap && build && build.asm ? ' <span class="hint">Finding the controls…</span>' : '');
-    var pl = SW.$('#r-pl', el), al = SW.$('#r-al', el);
-    if (pl) pl.onchange = function () { players = pl.value; SW.store.set('run.players', players); setPilots(); compose(); if (players !== 'keys' && !running) go(); };
-    if (al) al.onchange = function () { aiLevel = al.value; SW.store.set('run.ailevel', aiLevel); setPilots(); compose(); };
+    var pl = SW.$('#r-pl', el);
+    // choosing who flies does not start the game: Run does
+    if (pl) pl.onchange = function () { players = pl.value; SW.store.set('run.players', players); setPilots(); compose(); renderPlayers(); };
+    SW.$$('[data-al]', el).forEach(function (sel) { sel.onchange = function () { var jj = +sel.dataset.al; aiLevels[jj] = sel.value; SW.store.set('run.ailevel' + jj, sel.value); setPilots(); compose(); renderPlayers(); }; });
   }
   // a source line as its reference (version, tape, line)
   function lineRef(L) { return SW.refOf(build.v.id, L.p, L.n, L.n, build.parts.length); }
