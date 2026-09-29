@@ -160,7 +160,7 @@
             '<b>1 · The test.</b> The game compares the two centres: a collision when |dx| and |dy| are each under me1 and |dx| + |dy| is under me1 + me2. Shaded, every place the Wedge’s centre was measured to collide; dashed, the octagon the constants give. This area is a distance between the two ships, not the size of either.',
             zones ? '<b>2 · A zone round each ship.</b> The same distance split between the two ships: each carries half of it, ' + (pts / 2) + ' points to each flat side and ' + ((pts + pts2) / 2) + ' along a diagonal, and the two halves touch exactly when the centres are the full distance apart, as two coins of radius 1 cm touch when their centres are 2 cm apart. The ships here are apart.' : '<b>2 · A zone round each ship</b> needs me1 and me2, not found in this version.',
             '<b>3 · A collision.</b> The Wedge moved in until the zones meet: ' + ed.right + ' points from the Needle, the furthest offset to the right at which the game declared a collision (the same to the left).',
-            '<b>4 · A torpedo.</b> The same loop compares every pair of objects in the table with the same me1 and me2, ships and torpedoes alike, so a torpedo, a single point, carries a zone as large as a ship’s and hits the Needle at the same distance: ' + ed.right + ' points (from the code; not measured separately).'
+            '<b>4 · A torpedo.</b> The same loop compares every pair of objects in the table with the same me1 and me2, ships and torpedoes alike, so a torpedo, a single point, carries a zone as large as a ship’s and hits the Needle at the same distance: ' + ed.right + ' points (from the code; not measured separately). The dots trace it coming in, one a frame.'
           ];
           el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5>' +
             '<table class="ov-sub rnd-t"><tbody>' +
@@ -220,6 +220,12 @@
       if (zones) { g.fillStyle = 'rgba(200, 90, 60, 0.30)'; g.strokeStyle = RED; g.lineWidth = 1.4; octagon(0, 0, a / 2, s / 2); g.fill(); g.stroke();
                    g.fillStyle = 'rgba(200, 140, 30, 0.25)'; g.strokeStyle = AMB; octagon(ed.right, 0, a / 2, s / 2); g.fill(); g.stroke(); }
       ship(0, 0, '#262626'); centre(0, '#262626');
+      // its trail coming in from the right, a dot for each frame (4 points a frame, as 3.1's torpedoes move), faint to strong
+      var trail = []; for (var tx = ed.right + 4; tx <= R - 1; tx += 4) trail.push(tx);
+      trail.forEach(function (tx, j) { g.globalAlpha = 0.25 + 0.6 * (1 - j / Math.max(1, trail.length)); g.fillStyle = AMB; g.beginPath(); g.arc(X(tx), Y(0), 2, 0, 2 * Math.PI); g.fill(); });
+      g.globalAlpha = 1;
+      if (trail.length) { var ax = X(ed.right + 2.2), ay = Y(0); g.strokeStyle = AMB; g.lineWidth = 1.4; g.beginPath(); g.moveTo(X(trail[trail.length - 1]), ay); g.lineTo(ax, ay); g.stroke();
+                          g.beginPath(); g.moveTo(ax, ay); g.lineTo(ax + 6, ay - 4); g.moveTo(ax, ay); g.lineTo(ax + 6, ay + 4); g.stroke(); }
       g.fillStyle = AMB; g.beginPath(); g.arc(X(ed.right), Y(0), 3, 0, 2 * Math.PI); g.fill();   // the torpedo: one point
     } else {
       if (zones) { g.fillStyle = 'rgba(200, 90, 60, 0.30)'; g.strokeStyle = RED; g.lineWidth = 1.4; octagon(0, 0, a / 2, s / 2); g.fill(); g.stroke();
