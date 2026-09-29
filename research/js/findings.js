@@ -201,7 +201,7 @@
         wrap.insertAdjacentHTML('beforeend', '<span class="fd-gh"><a href="' + SW.esc(SW.sourceURL(ev.tape)) + '" target="_blank" rel="noopener" title="Open ' + SW.esc(ev.tape) + ' on GitHub in a new tab">↗</a></span>');
         return;
       }
-      var btn = SW.el('button', { class: 'btn ghost', title: 'Open in ' + vLabel(ev.v) }, vLabel(ev.v) + (ev.label ? ', ' + ev.label : ''));
+      var bv = V.byId(ev.v), btn = SW.el('button', { class: 'btn ghost', title: 'Open in ' + vLabel(ev.v) }, SW.esc(vLabel(ev.v) + (ev.label ? ', ' + ev.label : '')) + (bv && bv.build ? ' ' + SW.refTag(ev.v) : ''));
       var at = null;
       btn.onclick = function () { go(ev, at); };
       wrap.appendChild(btn);
@@ -456,7 +456,7 @@
       {
         var fp = SW.figpack.split(n.text);
         var lines = fp.text.split(/\n/), title = lines[0].replace(/^#+\s*/, ''), rest = lines.slice(1).join('\n').trim();
-        var where = vLabel(n.vid) + (n.anchor ? ', l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : ', the version');
+        var where = vLabel(n.vid) + ' ' + (n.anchor ? SW.refText(n.vid, n.anchor.p, n.anchor.n0, n.anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid) + ', the version');
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
         var th = threadOf(n), nrep = th ? countReplies(th) : 0, nrx = emojiOf(th).length, R0 = ratingOf(th);
         li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no fd-ref mono" title="Its reference, which does not change">' + refOf(n) + '</span> <b class="fd-title">' + SW.esc(title) + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
@@ -509,7 +509,7 @@
     if (live.notes && live.notes.length) {
       blocks.push({ type: 'h2', text: 'Findings from the group' });
       blocks.push(SW.tableBlock('Annotations tagged “finding”', ['Ref', 'Date', 'By', 'Version', 'Where', 'Finding'], live.notes.map(function (n) {
-        return [refOf(n), SW.fmtDate(n.date), n.by, vLabel(n.vid), n.anchor ? 'l. ' + n.anchor.n0 + (n.anchor.n1 !== n.anchor.n0 ? '–' + n.anchor.n1 : '') : 'version', SW.figpack.split(n.text).text + (SW.figpack.split(n.text).b64 ? ' [with a figure]' : '')];
+        return [refOf(n), SW.fmtDate(n.date), n.by, vLabel(n.vid), n.anchor ? SW.refText(n.vid, n.anchor.p, n.anchor.n0, n.anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid), SW.figpack.split(n.text).text + (SW.figpack.split(n.text).b64 ? ' [with a figure]' : '')];
       })));
     }
     return { title: 'Spacewar! findings', subtitle: 'What the source, the tapes and the assembler show',

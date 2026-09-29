@@ -355,7 +355,7 @@
       var lab = it.kind === 'figure' ? 'Figure ' + (++fig) : it.kind === 'text' ? 'Paragraph' : 'Excerpt';
       var li = SW.el('li', { class: 'tray-item', 'data-i': i });
       li.innerHTML = '<div class="tray-row"><span class="tray-ref mono" title="Its number, which does not change">' + SW.esc(it.ref || '') + '</span><b>' + lab + '</b>' +
-        (it.vid ? ' <span class="tray-v mono">' + SW.esc(vShort(it.vid)) + '</span>' : '') +
+        (it.vid ? ' <span class="tray-v mono">' + SW.esc(vShort(it.vid)) + '</span> ' + SW.refTag(it.vid) : '') +
         ' <span class="badge tray-by" title="Signed">' + SW.esc(it.by || '?') + '</span>' + (it.syncErr ? ' <span class="tray-local" title="' + SW.esc(it.syncErr) + '">⚠ this browser only</span>' : '') +
         ' <span class="faint">' + SW.esc(String(it.from || '').replace(/^[^·]*·\s*/, '')) + '</span>' +
         '<span class="tray-acts"><button class="icon-btn" data-a="big" title="Open larger">⤢</button><button class="icon-btn" data-a="up" title="Move up"' + (k ? '' : ' disabled') + '>↑</button><button class="icon-btn" data-a="down" title="Move down"' + (k < vis.length - 1 ? '' : ' disabled') + '>↓</button><button class="icon-btn" data-a="del" title="Remove">✕</button></span></div>' +
@@ -442,7 +442,7 @@
     var title = it.kind === 'text' ? '' : (it.caption || 'Excerpt');
     var body = [title, it.kind === 'text' ? it.text : it.note].filter(function (z) { return z && String(z).trim(); }).join('\n\n');
     var code = (it.blocks || []).filter(function (b) { return b.type === 'code'; })[0];
-    if (code) body += '\n\n' + code.lines.slice(0, 12).map(function (l) { return (l.n != null ? l.n + '  ' : '') + l.text; }).join('\n');
+    if (code) body += '\n\n' + (code.caption ? code.caption + '\n' : SW.refText(vid) + '\n') + code.lines.slice(0, 12).map(function (l) { return (l.n != null ? l.n + '  ' : '') + l.text; }).join('\n');
     if (!body.trim()) { SW.toast('Write something first: the first line is the finding’s title.', 4000); return; }
     if (!confirm('Share with the group’s Findings, signed ' + by + ', on ' + (vShort(vid) || 'the version open') + '?')) return;
     var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []).concat(['level:' + (it.level || 'notable')]).concat(it.ref ? ['note:' + it.ref] : []);
@@ -469,14 +469,15 @@
     })).then(function (imgs) {
       var blocks = [];
       t.items.forEach(function (it, i) {
-        var src = it.from ? ' (Source: Spacewar! research bench, ' + it.from + '.)' : '';
+        var rf = it.vid && root.SWVersions.byId(it.vid) && root.SWVersions.byId(it.vid).build ? ' ' + SW.refText(it.vid) : '';
+        var src = it.from ? ' (Source: Spacewar! research bench, ' + it.from + rf + '.)' : '';
         if (it.kind === 'figure') blocks.push({ type: 'figure', caption: (it.caption || '') + src, png: imgs[i].png, width: imgs[i].width, height: imgs[i].height });
         else if (it.kind === 'text') { if (it.text) String(it.text).split(/\n{2,}/).forEach(function (p) { blocks.push({ type: 'p', text: p.trim() }); }); }
         else {
           blocks.push({ type: 'h2', text: it.caption || 'Excerpt' });
           if (it.subtitle) blocks.push({ type: 'p', text: it.subtitle });
           blocks = blocks.concat(it.blocks || []);
-          if (it.from) blocks.push({ type: 'p', text: 'Source: Spacewar! research bench, ' + it.from + '.' });
+          if (it.from) blocks.push({ type: 'p', text: 'Source: Spacewar! research bench, ' + it.from + rf + '.' });
         }
         if (it.kind !== 'text' && it.note) String(it.note).split(/\n{2,}/).forEach(function (p) { blocks.push({ type: 'p', text: p.trim() }); });
       });

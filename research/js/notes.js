@@ -262,7 +262,7 @@
     var what = N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
     var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
     var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
-    var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + (anchor ? ', l. ' + anchor.n0 + (anchor.n1 !== anchor.n0 ? '–' + anchor.n1 : '') : '');
+    var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + ' ' + (anchor ? SW.refText(n.vid, anchor.p, anchor.n0, anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid));
     return { n: n, anchor: anchor, html: '<div class="news-item" data-id="' + SW.esc(n.id) + '"><div class="news-meta"><b>' + SW.esc(n.by) + '</b> · ' + SW.esc(what) +
       ' · <span class="mono">' + SW.esc(where) + '</span> · <span class="faint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
       (N.isReaction(n) ? '' : '<div class="news-text">' + SW.esc(String(n.text).slice(0, 280)) + (String(n.text).length > 280 ? '…' : '') + '</div>') + '</div>' };
@@ -689,7 +689,8 @@
     var b = SW.views.read && SW.views.read.build;
     if (note.anchor && b && b.v.id === note.vid) return SW.cite(b, note.anchor.p, note.anchor.n0, note.anchor.n1);
     var v = root.SWVersions.byId(note.vid);
-    return (v ? v.label + ' (' + v.date + ')' : note.vid) + (note.anchor ? ', ' + (note.anchor.src || '') + ', ll. ' + note.anchor.n0 + '–' + note.anchor.n1 : '');
+    return (v ? v.label + ' (' + v.date + ')' : note.vid) + (note.anchor ? ', ' + (note.anchor.src || '') + ', ll. ' + note.anchor.n0 + '–' + note.anchor.n1 : '') +
+      ' ' + (note.anchor ? SW.refText(note.vid, note.anchor.p, note.anchor.n0, note.anchor.n1, SW.nparts(note.vid)) : SW.refText(note.vid));
   }
   function copyNote(note, all) {
     var t = threadOf(note, all), lines = [];
@@ -714,7 +715,7 @@
       }
       blocks = blocks.concat(N.blocks([t], b));
       var doc = { title: 'Annotation by ' + t.note.by + ', ' + SW.fmtDate(t.note.date), subtitle: citeOf(t.note),
-                  meta: [['Version', b.v.label + ' (' + b.v.date + ')'], ['Where', a ? SW.cite(b, a.p, a.n0, a.n1) : 'the version as a whole'],
+                  meta: [['Version', b.v.label + ' ' + SW.refText(b.v.id) + ' (' + b.v.date + ')'], ['Where', a ? SW.cite(b, a.p, a.n0, a.n1) : 'the version as a whole'],
                          ['Link', SW.permalink({ v: b.v.id, l: a ? a.p + ':' + a.n0 + (a.n1 !== a.n0 ? '-' + a.n1 : '') : null })]],
                   blocks: blocks };
       SW.exportDoc(doc, 'spacewar-' + b.v.id + '-note-' + t.note.by + '-' + String(t.note.date).slice(0, 10), fmt);
@@ -840,7 +841,7 @@
       var ts = N.threads(all).filter(function (t) { return t.note.source !== 'buildlog'; });
       function where(a) {
         return a ? '<div class="anchor" data-p="' + a.p + '" data-n="' + a.n0 + '">' + (b.parts.length > 1 ? 'tape ' + (a.p + 1) + ', ' : '') +
-          (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + '</div>' : '<div class="anchor-none">on the version</div>';
+          (a.n1 !== a.n0 ? 'll. ' + a.n0 + '–' + a.n1 : 'l. ' + a.n0) + ' ' + SW.refTag(b.v.id, a.p, a.n0, a.n1, b.parts.length) + '</div>' : '<div class="anchor-none">on the version ' + SW.refTag(b.v.id) + '</div>';
       }
       var html = '<p class="hint" style="margin-top:0">Every annotation on ' + SW.esc(b.v.label) + '. Click a line reference to go to it.</p>' +
         '<p><button class="btn" data-act="vnote">✎ Annotate the version</button> ' +

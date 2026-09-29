@@ -16,7 +16,7 @@
 
   // What the edition says of the version before its text.
   function provenance(b) {
-    var v = b.v, rows = [['Version', v.label], ['Date', v.date], ['Authors', v.authors || ''], ['Status', v.status + (v.medium ? ', ' + v.medium : '')]];
+    var v = b.v, rows = [['Version', v.label], ['Reference', SW.refText(v.id)], ['Date', v.date], ['Authors', v.authors || ''], ['Status', v.status + (v.medium ? ', ' + v.medium : '')]];
     var anc = V.ancestry(v.id);
     if (anc.length > 1) rows.push(['Descent', anc.map(function (id) { return short(V.byId(id)); }).join(' → ')]);
     if (v.witnessOf) rows.push(['A reading of', short(V.byId(v.witnessOf))]);
@@ -94,7 +94,7 @@
       '<p style="font-size:11pt;line-height:1.5;margin-top:8mm">' + esc(v.summary || '') + '</p>' +
       '<table class="meta">' + provenance(b).map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</table>' +
       '<p style="font-size:8.5pt;color:#666;margin-top:12mm">A reading edition made on the Spacewar! research bench v' + esc(SW.VERSION) + ', ' + esc(SW.fmtDate(SW.today())) + '. Line numbers are those of the source files in sources/; annotations are the research group’s, signed and dated. ' +
-      'Cite as: ' + esc(v.label) + ' (' + esc(v.date) + '), ' + esc(SW.versionURI(v.id)) + '.</p><div class="pno">i</div></div>');
+      'Cite as: ' + esc(v.label) + ' (' + esc(v.date) + '), ' + esc(SW.versionURI(v.id)) + ' ' + esc(SW.refText(v.id)) + '.</p><div class="pno">i</div></div>');
     // provenance and contents
     o.push('<div class="sheet"><h2>The text and its record</h2><div class="log">' + (v.buildNotes || []).map(function (n) { return '<p>' + esc(typeof n === 'string' ? n : n.text) + '</p>'; }).join('') + '</div>');
     var vnotes = N.threads(notes).filter(function (t) { return !t.note.anchor; });
@@ -105,7 +105,7 @@
     // pages
     pages.forEach(function (pg, i) {
       var part = b.parts[pg.part], L0 = pg.lines[0].x.L, L1 = pg.lines[pg.lines.length - 1].x.L;
-      o.push('<div class="sheet"><div class="head"><span>' + esc(short(v)) + ' · ' + esc(part.src) + '</span><span>ll. ' + L0.n + '–' + L1.n + '</span></div><pre class="code">');
+      o.push('<div class="sheet"><div class="head"><span>' + esc(short(v)) + ' · ' + esc(part.src) + '</span><span>' + esc(SW.refText(v.id, pg.part, L0.n, L1.n, b.parts.length)) + '</span></div><pre class="code">');
       pg.lines.forEach(function (row) {
         var L = row.x.L, ws = opts.words && b.asm && (b.asm.byLine[L.p] || [])[L.n], err = b.errorsAt[L.p + ':' + L.n];
         var text = layout((L.raw || '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, ''));

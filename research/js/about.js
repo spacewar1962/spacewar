@@ -52,7 +52,7 @@
       ['Tape titles', a ? a.titles.map(function (t) { return '<span class="mono">' + SW.esc(t.text.trim()) + '</span>'; }).join('<br>') : 'none'],
       ['This text', SW.esc(SW.MADE[v.id] || (v.medium || ''))],
       ['SWHID', v.build ? SW.swhidList(SW.filesOf(v)) + '<span class="hint">Software Heritage identifiers of the files, from their bytes; click to copy.</span>' : 'none'],
-      ['Cite this version', SW.esc(v.label + ' (' + v.date + '). ' + (v.authors || '') + '. Spacewar! research bench, ' + SW.versionURI(v.id))]
+      ['Cite this version', SW.esc(v.label + ' (' + v.date + '). ' + (v.authors || '') + '. Spacewar! research bench, ' + SW.versionURI(v.id) + (v.build ? ' ' + SW.refText(v.id) : ''))]
     ];
     pad.innerHTML = '<h2 style="margin-top:0">' + SW.esc(v.label) + (v.build ? ' ' + SW.refTag(v.id) : '') + '</h2><p class="prose">' + SW.esc(v.summary) + '</p>' +
       '<dl class="meta">' + dl.map(function (r) { return '<dt>' + r[0] + '</dt><dd>' + (/</.test(r[1]) ? r[1] : r[1]) + '</dd>'; }).join('') + '</dl>' +
