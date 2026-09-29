@@ -987,7 +987,7 @@
     d.showModal();
     d.addEventListener('click', function (e) {
       if (e.target.closest('[data-share]')) {
-        var url = SW.permalink({ help: 'join' });   // opens the bench with this guide showing (main.js)
+        var url = SW.BASE_URI + 'join.html';   // its own share card (an invitation, RSVP); it opens the bench with this guide showing
         (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
           .then(function () { SW.toast('Link copied: it opens the bench with this guide showing'); }, function () { window.prompt('Copy:', url); });
         return;
