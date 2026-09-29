@@ -228,6 +228,8 @@
     SW.markTabs();
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + SW.state.tab); });
     select(q.v || '3.1');
+    // a link to an annotation: to it, once the version is up
+    if (q.a && q.v) setTimeout(function () { SW.notes.follow(q); }, 900);
     // The welcome tour: from a link (?tour=welcome), from Settings or About, or offered on a first visit.
     SW.$('#set-tour').onclick = function () { SW.$('#dlg-settings').close('cancel'); SW.tours.start('welcome'); };
     SW.$('#about-tour').onclick = function () { SW.$('#dlg-about').close(); SW.tours.start('welcome'); };

@@ -857,6 +857,8 @@
     if (s) setTimeout(function () { R.goto(s.p, s.n0, false); }, 0);
   };
   SW.on('notes', function (vid) { if (build && vid === build.v.id) refreshNotes(); });
+  // a link to a reply: its thread opened, so the reply can be shown
+  SW.on('reveal', function (r) { if (build && r.vid === build.v.id && r.root !== r.id && !openCards[r.root]) { openCards[r.root] = true; paintNotes(); } });
   SW.on('goto', function (g) { if (build && g.tab === 'read') { SW.setTab('read'); setTimeout(function () { R.goto(g.p, g.n, true); paintSel(); }, 0); } });
   SW.on('profile', function () { if (opts.heat && build) render(); });
   // Lines change height with the window or the code size: the cards follow.

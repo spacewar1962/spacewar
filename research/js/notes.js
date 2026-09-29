@@ -614,9 +614,13 @@
       (n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16) ? ' · <i title="' + SW.esc(new Date(n.updated).toLocaleString('en-GB')) + '">edited ' + SW.esc(SW.fmtDate(n.updated)) + '</i>' : '') + '</div>' +
       (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
       (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
+      (N.backlinks(n.id).length ? '<div class="backl"><span class="faint">Linked from</span> ' + N.backlinks(n.id).map(function (b) {
+        return '<a href="' + SW.esc(N.linkOf(b)) + '" class="swlink" title="' + SW.esc('Go to ' + N.labelOf(b)) + '">' + SW.esc(N.labelOf(b)) + '</a>';
+      }).join(' · ') + '</div>' : '') +
       // one row: Reply | reactions | copy, download, edit, delete
       '<div class="acts">' + (n.source !== 'buildlog' ? '<button data-act="reply">Reply</button><span class="acts-sep"></span>' + renderReactions(n, reactions) + '<span class="acts-sep"></span>' : '') +
       '<button data-act="copy" class="ico" title="Copy the annotation, with its citation and replies">⧉</button>' +
+      (n.source !== 'draft' ? '<button data-act="link" class="ico" title="Copy a link to this annotation, to paste into another (or use ↪ in the editor)">↪</button>' : '') +
       '<button data-act="dl" class="ico" title="Download the annotation with its code and replies (Markdown)">⤓</button>' +
       (N.mine(n) ? '<button data-act="edit">Edit</button>' : '') +
       (N.mine(n) ? '<button data-act="delete" class="del-note">' + (n.source === 'draft' ? 'Delete draft' : 'Delete') + '</button>' : '') +
@@ -649,6 +653,12 @@
       if (!note) return;
       if (btn.dataset.act === 'edit') { inlineEdit(btn.closest('.note'), note); return; }
       if (btn.dataset.act === 'copy') { copyNote(note, all); return; }
+      if (btn.dataset.act === 'link') {
+        var url = N.linkOf(note);
+        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+          .then(function () { SW.toast('Link copied: paste it into another annotation, or over selected words'); }, function () { window.prompt('Copy:', url); });
+        return;
+      }
       if (btn.dataset.act === 'dl') { downloadNote(note, all, 'md'); return; }
       if (btn.dataset.act === 'react-pick') {
         var pk = btn.parentNode.querySelector('.react-pick');
@@ -672,6 +682,146 @@
         }, function (e) { SW.toast(e.message, 5000); });
       }
     });
+  };
+
+  // ---------- links between annotations ----------
+  // A link to an annotation is the bench's permalink with a= its id (and v=, l=
+  // for its version and lines), kept in the note's Markdown like any link, so it
+  // also works from Hypothesis or an email. On the bench it does not open a new
+  // tab: it switches to the version and lines, opens the annotation (its thread,
+  // if a reply) and flashes it. Each note lists the notes that link to it.
+  var idx = { byId: {}, back: {}, sig: null };
+  function reindex(ns) {
+    (ns || []).forEach(function (n) { if (n && n.id && !N.isReaction(n)) idx.byId[n.id] = n; });
+    var back = {};
+    Object.keys(idx.byId).forEach(function (id) {
+      var re = /[?&]a=([A-Za-z0-9_-]+)/g, m, seen = {};
+      while ((m = re.exec(idx.byId[id].text || ''))) if (m[1] !== id && !seen[m[1]]) { seen[m[1]] = 1; (back[m[1]] = back[m[1]] || []).push(id); }
+    });
+    idx.back = back;
+    var sig = JSON.stringify(back);
+    if (idx.sig !== null && sig !== idx.sig) setTimeout(function () { SW.emit('notes', SW.state.v); }, 0);
+    idx.sig = sig;
+    return ns;
+  }
+  var list0 = N.list, listAll0 = N.listAll;
+  N.list = function (vid, force) { return list0(vid, force).then(reindex); };
+  N.listAll = function (opts) { return listAll0(opts).then(reindex); };
+  N.byId = function (id) { return idx.byId[id] || null; };
+  N.backlinks = function (id) { return (idx.back[id] || []).map(function (x) { return idx.byId[x]; }).filter(Boolean); };
+
+  function lineParam(a) { return a ? a.p + ':' + a.n0 + (a.n1 !== a.n0 ? '-' + a.n1 : '') : null; }
+  N.linkOf = function (n) { return SW.permalink({ v: n.vid, l: lineParam(n.anchor), a: n.id }); };
+  N.labelOf = function (n) {
+    var a = n.anchor;
+    return (n.by || '?') + (n.parent ? ' (reply)' : '') + ', ' +
+      (a ? SW.refOf(n.vid, a.p, a.n0, a.n1, SW.nparts(n.vid)) : SW.refOf(n.vid) + ', the version');
+  };
+  // A bench link's parameters, or null for a link elsewhere.
+  N.parseLink = function (href) {
+    var h = String(href || '').replace(/&amp;/g, '&');
+    var ok = h.charAt(0) === '?' || [SW.BASE_URI, location.origin + location.pathname].some(function (b) {
+      return h.indexOf(b) === 0 && (h.length === b.length || h.charAt(b.length) === '?');
+    });
+    if (!ok) return null;
+    var q = {};
+    (h.split('?')[1] || '').split('#')[0].split('&').forEach(function (kv) {
+      var i = kv.indexOf('='); if (i > 0) { try { q[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); } catch (e) { /* malformed */ } }
+    });
+    return q.v ? q : null;
+  };
+  // How SW.md draws a bench link: in place, marked ↪, a bare one named for what it points to.
+  SW.internalLink = function (href, label, bare) {
+    var q = N.parseLink(href);
+    if (!q) return null;
+    var n = q.a && idx.byId[q.a], name;
+    if (n) name = N.labelOf(n);
+    else if (q.l) { var m = /^(\d+):(\d+)(?:-(\d+))?$/.exec(q.l); name = m ? SW.refOf(q.v, +m[1], +m[2], +(m[3] || m[2]), SW.nparts(q.v)) : SW.refOf(q.v); }
+    else name = SW.refOf(q.v);
+    if (q.a && !n) name = 'annotation, ' + name;
+    return '<a href="' + href + '" class="swlink" title="' + SW.esc('Go to ' + name) + '">' + (bare ? SW.esc(name) : label) + '</a>';
+  };
+
+  // Following a link: to the version and lines, then the annotation itself.
+  N.follow = function (q) {
+    var m = q.l && /^(\d+):(\d+)(?:-(\d+))?$/.exec(q.l), at = m ? { p: +m[1], n0: +m[2], n1: +(m[3] || m[2]) } : null;
+    if (!q.a) { SW.openAt(q.v, at); return; }
+    N.list(q.v).then(function (ns) {
+      var n = ns.filter(function (x) { return x.id === q.a; })[0];
+      if (!n) { SW.openAt(q.v, at); SW.toast('That annotation is not here: deleted, or not in your group.', 5000); return; }
+      var r = n, byId = {}, guard = 0;
+      ns.forEach(function (x) { byId[x.id] = x; });
+      while (r.parent && byId[r.parent] && guard++ < 50) r = byId[r.parent];
+      SW.openAt(n.vid, r.anchor || n.anchor || at);
+      SW.emit('reveal', { id: n.id, root: r.id, vid: n.vid });
+      var t0 = Date.now(), panel = false;
+      (function look() {
+        var el = SW.$$('.note[data-id="' + n.id + '"]').filter(function (x) { return x.offsetParent; })[0];
+        if (el) {
+          el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          el.classList.remove('note-flash'); void el.offsetWidth; el.classList.add('note-flash');
+          return;
+        }
+        if (Date.now() - t0 < 2500) { setTimeout(look, 150); return; }
+        // not shown where it is (notes hidden or filtered on Read): the version's panel
+        if (!panel) { panel = true; t0 = Date.now(); N.openPanel(n.vid).then(function () { setTimeout(look, 150); }); }
+      })();
+    }, function () { SW.openAt(q.v, at); });
+  };
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a.swlink');
+    if (!a || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;   // a modified click: a new tab, as usual
+    if (a.closest('[contenteditable="true"]')) { e.preventDefault(); return; }
+    var q = N.parseLink(a.getAttribute('href'));
+    if (!q) return;
+    e.preventDefault();
+    var dlg = a.closest('dialog');
+    if (dlg && dlg.open && !dlg.hasAttribute('data-keep')) { dlg.close(); if (dlg.classList.contains('tray-big')) dlg.remove(); }
+    N.follow(q);
+  });
+
+  // Choosing an annotation to link to: every note in the group, any version.
+  N.pick = function (cb) {
+    var d = SW.el('dialog', { class: 'tray-big link-pick' });
+    var V = root.SWVersions, order = {};
+    V.VERSIONS.forEach(function (v, i) { order[v.id] = i; });
+    d.innerHTML = '<div class="tray-bighead"><b>Link to an annotation</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
+      '<div class="lp-bar"><input type="search" placeholder="Search: words, initials, a reference" spellcheck="false">' +
+      '<select><option value="">All versions</option>' + V.VERSIONS.map(function (v) { return '<option value="' + SW.esc(v.id) + '"' + (v.id === SW.state.v ? ' selected' : '') + '>' + SW.esc(SW.refOf(v.id) + ' ' + v.label.replace(/^Spacewar! /, '')) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="lp-list"><p class="hint">Loading the annotations…</p></div>';
+    document.body.appendChild(d);
+    d.showModal();
+    var qIn = SW.$('input', d), vSel = SW.$('select', d), list = SW.$('.lp-list', d), all = [];
+    function close() { d.close(); d.remove(); }
+    function paint() {
+      var q = qIn.value.trim().toLowerCase(), v = vSel.value;
+      var rows = all.filter(function (n) {
+        return (!v || n.vid === v) && (!q || [n.by, n.name, SW.mdPlain(n.text), N.labelOf(n), (n.tags || []).join(' ')].join(' ').toLowerCase().indexOf(q) >= 0);
+      }).slice(0, 300);
+      list.innerHTML = rows.length ? rows.map(function (n) {
+        return '<button type="button" class="lp-item" data-id="' + SW.esc(n.id) + '"><span class="lp-where mono">' + SW.esc(N.labelOf(n)) + '</span>' +
+          '<span class="lp-text">' + SW.esc(SW.mdPlain(SW.figpack.split(n.text).text).slice(0, 160)) + '</span></button>';
+      }).join('') : '<p class="hint">No annotation matches.' + (v ? ' Try All versions.' : '') + '</p>';
+    }
+    N.listAll().then(function (ns) {
+      all = ns.filter(function (n) { return n.source !== 'draft' && !N.isReaction(n); }).sort(function (a, b) {
+        return (order[a.vid] - order[b.vid]) || ((a.anchor ? a.anchor.p * 1e5 + a.anchor.n0 : -1) - (b.anchor ? b.anchor.p * 1e5 + b.anchor.n0 : -1)) || String(a.date).localeCompare(String(b.date));
+      });
+      if (!N.configured()) list.innerHTML = '<p class="hint">Links need the shared group (⚙): drafts in this browser cannot be linked to.</p>';
+      else paint();
+    });
+    qIn.addEventListener('input', paint);
+    vSel.addEventListener('change', paint);
+    qIn.focus();
+    d.addEventListener('click', function (e) {
+      if (e.target === d || e.target.closest('[data-x]')) { close(); return; }
+      var it = e.target.closest('.lp-item');
+      if (!it) return;
+      var n = all.filter(function (x) { return x.id === it.dataset.id; })[0];
+      close();
+      if (n) cb(N.linkOf(n), N.labelOf(n));
+    });
+    d.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
   };
 
   // ---------- copying and downloading a single note ----------

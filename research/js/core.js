@@ -864,7 +864,9 @@
   // - and 1. lists, # headings, [links](https://…) and bare URLs. Everything is
   // escaped first, and a link must be http, https or mailto; links open in a new tab.
   var MD_URL = /^(https?:\/\/|mailto:)/i;
-  function mdLink(href, label) {
+  function mdLink(href, label, bare) {
+    var own = SW.internalLink && SW.internalLink(href, label, bare);   // a link within the bench (notes.js)
+    if (own) return own;
     return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
   }
   function mdInline(s) {
@@ -882,7 +884,7 @@
       var raw = u.replace(/&amp;/g, '&');
       return MD_URL.test(raw) ? stash(mdLink(u, emph(t))) : m;
     });
-    s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { return pre + stash(mdLink(u, u)); });
+    s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { return pre + stash(mdLink(u, u, true)); });
     s = emph(s);
     return s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return keep[+i]; });
   }
@@ -975,7 +977,7 @@
     var mode = SW.store.get('noteMode', 'rich');
     var bar = SW.el('div', { class: 'md-tools' });
     bar.innerHTML = [['b', '<b>B</b>', 'Bold (⌘B)'], ['i', '<i>I</i>', 'Italic (⌘I)'], ['code', '<code>`</code>', 'Code'],
-      ['link', '🔗', 'Link (⌘K): select the words first'], ['quote', '❝', 'Quotation'], ['list', '•', 'List']]
+      ['link', '🔗', 'Link (⌘K): select the words first'], ['ann', '↪', 'Link to another annotation, in this version or any other'], ['quote', '❝', 'Quotation'], ['list', '•', 'List']]
       .map(function (b) { return '<button type="button" data-md="' + b[0] + '" title="' + b[2] + '">' + b[1] + '</button>'; }).join('') +
       '<span class="md-link" hidden><input type="url" placeholder="https://…" spellcheck="false"><button type="button" data-md="link-ok">Link</button></span>' +
       '<span class="md-sep"></span><button type="button" data-md="preview" class="md-prev" title="See it as it will be shown">Preview</button>' +
@@ -1037,8 +1039,25 @@
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); linkBox.hidden = true; rich.focus(); }
     });
 
+    function annLink() {
+      var s = window.getSelection(), m = sel();
+      var keep = mode === 'rich' && s.rangeCount && rich.contains(s.anchorNode) ? s.getRangeAt(0).cloneRange() : null;
+      SW.notes.pick(function (url, label) {
+        label = label.replace(/[\[\]\n]/g, '');
+        if (mode === 'rich') {
+          rich.focus();
+          if (keep) { s.removeAllRanges(); s.addRange(keep); }
+          if (!keep || keep.collapsed) cmd('insertHTML', '<a href="' + SW.esc(url) + '">' + SW.esc(label) + '</a>&nbsp;');
+          else cmd('createLink', url);
+        } else {
+          var t = m.t && !/\n/.test(m.t) ? m.t : label;
+          put(m.a, m.b, '[' + t + '](' + url + ')', 1, 1 + t.length);
+        }
+      });
+    }
     function act(k) {
       if (k === 'link-ok') return doneLink();
+      if (k === 'ann') return annLink();
       if (k === 'preview') {
         var on = prev.hidden;
         prev.hidden = !on; ta.hidden = on;
