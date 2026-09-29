@@ -32,10 +32,16 @@
   // other ship points at it from nearer than this, it thrusts sideways (points; 0, never).
   A.LEVELS = {
     easy: { hit: 24, aim: 0.14, dodge: 0, near: 0, hyper: 0, every: 2, wob: 0.12, chaseAt: 0, top: 0, orbitVt: 0.7, spray: 0, jink: 0 },
-    medium: { hit: 18, aim: 0.05, dodge: 20, near: 14, hyper: 0, every: 1, wob: 0.04, chaseAt: 220, top: 1.6, orbitVt: 0.55, spray: 90, jink: 0 },
-    hard: { hit: 16, aim: 0.035, dodge: 24, near: 15, hyper: 3, every: 1, wob: 0.025, chaseAt: 190, top: 1.8, orbitVt: 0.5, spray: 120, jink: 0 },
-    hardcore: { hit: 14, aim: 0.012, dodge: 40, near: 20, hyper: 6, every: 1, wob: 0.006, chaseAt: 120, top: 2.2, orbitVt: 0.45, spray: 220, jink: 360 }
+    medium: { hit: 18, aim: 0.05, dodge: 20, near: 14, hyper: 0, every: 1, wob: 0.04, chaseAt: 0, top: 1.6, orbitVt: 0.55, spray: 90, jink: 0 },
+    hard: { hit: 18, aim: 0.06, dodge: 22, near: 14, hyper: 2, every: 1, wob: 0.05, chaseAt: 200, top: 1.7, orbitVt: 0.52, spray: 100, jink: 0 },
+    hardcore: { hit: 18, aim: 0.04, dodge: 22, near: 14, hyper: 5, every: 1, wob: 0.01, chaseAt: 200, top: 1.7, orbitVt: 0.52, spray: 100, jink: 0 }
   };
+  // Calibrated on the emulator, 29 Sep 2026, ten 90-second games a pairing in 3.1
+  // and 4.8 (ships lost, weaker first): easy 33, medium 18; medium 36, hard 23;
+  // hard 34, hardcore 5. What tells most is jumping to hyperspace in time; firing
+  // only at near-certain hits, jinking aside when aimed at and a longer watch for
+  // torpedoes were tried for hardcore and made it worse.
+
   A.LEVEL_NAMES = [['easy', 'easy'], ['medium', 'medium'], ['hard', 'hard'], ['hardcore', 'hardcore']];
   // Temperaments, one drawn at random for each pilot each game, so two pilots of
   // one level do not fly alike: they scale the level's chase distance and speed,
@@ -165,8 +171,9 @@
       if (!him.alive) return (last = 0);
       // being aimed at from near: thrust sideways (never toward the star), spoiling its aim
       if (L.jink && dHim < L.jink) {
-        var qx = wrapD(me.x - him.x), qy = wrapD(me.y - him.y), onMe = Math.abs(wrapA(headingTo(qx, qy) - him.a));
-        if (onMe < 0.12) {
+        var qx = wrapD(me.x - him.x), qy = wrapD(me.y - him.y);
+        // only a shot that would hit: the other ship's torpedo, fired now, passing within 12 points
+        if (missIf(him, me, him.a) < 12) {
           var sx = -qy / dHim, sy = qx / dHim; if (sx * ox + sy * oy < 0) { sx = -sx; sy = -sy; }
           var sj = steer(me, headingTo(sx, sy), 0.5);
           out |= sj.bits; if (sj.on && Math.hypot(me.vx, me.vy) < L.top) out |= bits.rocket;
