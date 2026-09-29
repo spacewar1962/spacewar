@@ -8,7 +8,11 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline') };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all') };
+  // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
+  // cycled from the chevron on the Annotations heading.
+  var SHOW = { all: '▾ All', mine: '▾ Mine', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'none', none: 'all' };
+  function isMine(n) { var me = SW.me().initials; return N.mine(n) || (!!me && n.by === me); }
   // notes: 'inline' (each thread under its lines, the default), 'margin' (cards
   // beside the lines) or 'off' (initials at the line end); chosen from the ▴ Notes button.
   function marginOn() { return opts.notes === 'margin'; }
@@ -230,7 +234,7 @@
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
         '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word <button class="colfold" data-cf="0" title="Fold away Address and Word, for more room (View ▸ Addresses &amp; words brings them back too)">‹</button></span>' +
         '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)"><button class="colfold cf-show" data-cf="1" title="Show Address and Word">›</button>Source</span>' +
-        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations</span></div></div>';
+        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations<button class="ann-cyc" data-ann title="Show all annotations, only yours, or none (click to change)">' + SHOW[opts.show] + '</button></span></div></div>';
       sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
     });
@@ -274,9 +278,11 @@
   // The threads to show: anchored on a tape shown, on a line left by the notes filter.
   function shownThreads() {
     var keep = filtering() ? keptLines() : null;
+    if (opts.show === 'none') return [];
     return N.threads(notes).filter(function (t) {
       var a = t.note.anchor;
       if (!a || !showsTape(a.p)) return false;
+      if (opts.show === 'mine' && !isMine(t.note)) return false;
       if (keep && !keep[a.p + ':' + a.n0]) return false;
       return !!SW.$('#L' + a.p + '-' + a.n0, view);
     });
@@ -725,6 +731,13 @@
     box.addEventListener('click', function (e) {
       var cf = e.target.closest('[data-cf]');
       if (cf) { setWords(cf.dataset.cf === '1'); return; }
+      if (e.target.closest('[data-ann]')) {
+        opts.show = SHOW_NEXT[opts.show] || 'all'; SW.store.set('read.show', opts.show);
+        SW.$$('[data-ann]', view).forEach(function (b) { b.textContent = SHOW[opts.show]; });
+        paintNotes();
+        SW.toast(opts.show === 'all' ? 'Showing all annotations' : opts.show === 'mine' ? 'Showing only your annotations' : 'Annotations hidden', 2500);
+        return;
+      }
       if (e.target.closest('.part-head')) return;   // tape headers only label (their source link opens GitHub)
       if (e.target.closest('.inote')) { threadClick(e); return; }   // note buttons are wired by N.wire
       // +A by a line number: a quick annotation on that line, or on the selection it is in

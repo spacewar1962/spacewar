@@ -1568,3 +1568,7 @@ body.dev-on .dev-only { display: revert !important; }
 .ln.drop-at { background: color-mix(in srgb, var(--anno-block) 22%, transparent) !important; box-shadow: inset 3px 0 0 var(--anno-block); }
 .edit-lines { display: flex; align-items: center; gap: 4px; margin: 4px 0; font-size: 12px; flex-wrap: wrap; }
 .edit-lines input { width: 5em; }
+/* Annotations heading: All / Mine / None */
+.lncols .mk { position: relative; }
+.lncols .ann-cyc { display: inline-block; margin-left: 6px; padding: 0 4px; font: 10px/12px var(--sans); letter-spacing: 0; text-transform: none; color: var(--text-faint); background: none; border: 1px solid var(--line); border-radius: 3px; cursor: pointer; vertical-align: top; }
+.lncols .ann-cyc:hover { color: var(--text); border-color: var(--text-faint); }
