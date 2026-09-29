@@ -123,7 +123,7 @@
     else if (L.skipped) title = 'Not assembled (transcription header or outside this tape segment)';
     return '<div class="' + cls + '" id="L' + L.p + '-' + L.n + '" data-p="' + L.p + '" data-n="' + L.n + '"' +
       (title ? ' title="' + SW.esc(title) + '"' : '') + '>' +
-      '<span class="n" style="--d:' + String(L.n).length + ';' + heat + '"><button class="qa" tabindex="-1" title="Annotate this line (or the lines selected, if it is one of them)">+A</button>' + L.n + '</span><span class="a"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + a + '</span>' +
+      '<span class="n" style="--d:' + String(L.n).length + ';' + heat + '"><button class="qa" tabindex="-1" title="Annotate this">+A</button>' + L.n + '</span><span class="a"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + a + '</span>' +
       '<span class="w"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + w + '</span>' +
       '<span class="t">' + (text ? hl(text, b).replace(/\f/g, '<span class="pgbrk" title="Page break: a stop code on the tape, or a form feed in the listing">↡</span>') : ' ') + '</span><span class="mk">' + mk + '</span></div>';
   }
@@ -227,8 +227,8 @@
         (t.title ? ' · <span title="The tape’s own title line">“' + SW.esc(t.title) + '”</span>' : '') + '</div>' +
         '<div class="lncols"><span class="n" title="The line’s number in the source file">Line</span>' +
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
-        '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word</span>' +
-        '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)">Source</span>' +
+        '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word <button class="colfold" data-cf="0" title="Fold away Address and Word, for more room (View ▸ Addresses &amp; words brings them back too)">‹</button></span>' +
+        '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)"><button class="colfold cf-show" data-cf="1" title="Show Address and Word">› Address, Word</button>Source</span>' +
         '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations</span></div></div>';
       sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
@@ -671,6 +671,8 @@
   function wireBox(box) {
     wireLit(box, '.ithread');
     box.addEventListener('click', function (e) {
+      var cf = e.target.closest('[data-cf]');
+      if (cf) { setWords(cf.dataset.cf === '1'); return; }
       if (e.target.closest('.part-head')) return;   // tape headers only label (their source link opens GitHub)
       if (e.target.closest('.inote')) { threadClick(e); return; }   // note buttons are wired by N.wire
       // +A by a line number: a quick annotation on that line, or on the selection it is in
@@ -707,12 +709,16 @@
     });
   }
 
+  // Address and Word shown or folded away: from View, or the chevron in the column headings
+  function setWords(on) {
+    opts.words = on; SW.store.set('read.words', on);
+    var box = SW.$('.listing', view), cb = SW.$('#rd-words', view);
+    if (box) box.classList.toggle('hide-words', !on);
+    if (cb) cb.checked = on;
+    if (build && SW.$('.rd-body', view)) paintNotes();
+  }
   function wireTb(tb) {
-    SW.$('#rd-words', tb).onchange = function (e) {
-      opts.words = e.target.checked; SW.store.set('read.words', opts.words);
-      var box = SW.$('.listing', view);
-      if (box) box.classList.toggle('hide-words', !opts.words);
-    };
+    SW.$('#rd-words', tb).onchange = function (e) { setWords(e.target.checked); };
     SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
     var tapeSel = SW.$('#rd-tape', tb);
     if (tapeSel) tapeSel.onchange = function () { opts.tapes = tapeSel.value; renderListing(); view.scrollTop = 0; };

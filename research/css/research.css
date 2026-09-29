@@ -1531,3 +1531,9 @@ body.dev-on .dev-only { display: revert !important; }
   .ln.blk-top.blk-end .n { background: linear-gradient(var(--blk), var(--blk)) right 3px top / 2px 100% no-repeat, linear-gradient(var(--blk), var(--blk)) right top / 5px 1px no-repeat, linear-gradient(var(--blk), var(--blk)) right bottom / 5px 1px no-repeat; }
 }
 .rd-body.notes-hidden .ln.blk .n { background: none; }
+/* folding Address and Word from the column headings */
+.lncols .colfold { font: 11px/1 var(--sans); letter-spacing: 0; text-transform: none; padding: 1px 5px; margin-left: 4px; color: var(--text-faint); background: none; border: 1px solid var(--line); border-radius: 3px; cursor: pointer; vertical-align: 1px; }
+.lncols .colfold:hover { color: var(--text); border-color: var(--text-faint); }
+.lncols .cf-show { display: none; margin: 0 8px 0 0; }
+.hide-words .lncols .cf-show { display: inline-block; }
+@media (max-width: 860px) { .lncols .colfold { display: none !important; } }
