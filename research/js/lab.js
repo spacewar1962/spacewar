@@ -147,7 +147,7 @@
 
   L.drawCollision = function (b, host) {
     return pair(host, 'Collision shape',
-      'Where two objects collide, as each version’s game decides it: the Wedge set at every offset from the Needle, up to 30 screen points each way, both at rest far from the star, and one frame run. Shaded, the offsets at which the game declared a collision; outlined, the shape its constants give (|dx| and |dy| under me1, and |dx| + |dy| under me1 + me2); drawn to the same scale, the Needle (black) at the centre and the Wedge (blue, its centre ringed) at the furthest offset to the right at which the two collide. The same test serves torpedoes, which collide with ships and each other.',
+      'Where two objects collide, as each version’s game decides it: the Wedge set at every offset from the Needle, up to 30 screen points each way, both at rest far from the star, and one frame run. Shaded, the offsets at which the game declared a collision; outlined, the shape its constants give (|dx| and |dy| under me1, and |dx| + |dy| under me1 + me2); drawn to the same scale, the Needle (black) at the centre and the Wedge (blue, its centre ringed) at the furthest offsets to the left and right at which the two collide. The same test serves torpedoes, which collide with ships and each other.',
       'labcol', function (el, vid, alive) {
         el.innerHTML = '<h5>' + SW.esc(vname(V.byId(vid))) + ' ' + SW.refTag(vid) + '</h5><p class="hint lab-prog">Running 3,721 frames…</p>';
         L.collision(vid, alive, function (f) { var p = SW.$('.lab-prog', el); if (p) p.textContent = 'Running 3,721 frames… ' + Math.round(f * 100) + '%'; }).then(function (d) {
@@ -188,14 +188,18 @@
     }
     g.fillStyle = '#262626';
     d.out[0].forEach(function (v, j, A) { if (j % 2) return; g.fillRect(X(A[j]) - 1, Y(A[j + 1]) - 1, 2, 2); });
-    // the Wedge where it first collides to the Needle's right: the furthest shaded offset on the middle row
-    var edge = 0; for (var ex = R; ex >= 0; ex--) if (d.hit[R * d.W + ex + R]) { edge = ex; break; }
-    g.fillStyle = '#1f5f9e';
-    d.out[1].forEach(function (v, j, A) { if (j % 2) return; g.fillRect(X(A[j] + edge) - 1, Y(A[j + 1]) - 1, 2, 2); });
-    g.strokeStyle = '#1f5f9e'; g.lineWidth = 1; g.beginPath(); g.arc(X(edge), Y(0), 3, 0, 2 * Math.PI); g.stroke();
+    // the Wedge where it first collides on each side of the Needle: the furthest shaded offsets on the middle row
+    var right = 0, left = 0, ex;
+    for (ex = R; ex >= 0; ex--) if (d.hit[R * d.W + ex + R]) { right = ex; break; }
+    for (ex = -R; ex <= 0; ex++) if (d.hit[R * d.W + ex + R]) { left = ex; break; }
+    [left, right].forEach(function (edge) {
+      g.fillStyle = '#1f5f9e';
+      d.out[1].forEach(function (v, j, A) { if (j % 2) return; g.fillRect(X(A[j] + edge) - 1, Y(A[j + 1]) - 1, 2, 2); });
+      g.strokeStyle = '#1f5f9e'; g.lineWidth = 1; g.beginPath(); g.arc(X(edge), Y(0), 3, 0, 2 * Math.PI); g.stroke();
+    });
     g.fillStyle = '#555'; g.font = '11px IBM Plex Mono, monospace';
     g.fillText('Needle (black) at the centre; the Wedge (blue)', 8, N - 36);
-    g.fillText('where it first collides, ' + edge + ' points to the right', 8, N - 22); g.fillText('grid every 10 screen points', 8, N - 8);
+    g.fillText('where it first collides: ' + (-left) + ' points left, ' + right + ' right', 8, N - 22); g.fillText('grid every 10 screen points', 8, N - 8);
   }
 
   L.drawRoulette = function (b, host) {
