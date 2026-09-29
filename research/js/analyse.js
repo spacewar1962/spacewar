@@ -1722,6 +1722,7 @@
       // Grouped, with a divider and a small heading between the groups; About the bench stays last.
       var HELP = [['Getting started', [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
                                        ['refs', 'Referencing and versions', 'How the bench cites a source, as [REF: SW3.1T, 2.141]'],
+                                       ['join', 'Joining the annotation group', 'A Hypothesis account, the group and your token, step by step'],
                                        ['anno', 'Advanced annotation', 'Rich text, and links between annotations across versions'],
                                        ['sitemap', 'Site map', 'Every view and version as a plain link']]],
                   ['Your bench', [['settings', 'Settings', 'Initials, group, theme, fonts'],
@@ -1764,6 +1765,7 @@
           if (p === 'tour') { SW.tours.start('welcome'); return; }
           if (p === 'refs') { SW.refHelp(); return; }
           if (p === 'anno') { SW.notes.help(); return; }
+          if (p === 'join') { SW.notes.joinHelp(); return; }
           if (p === 'sitemap') { location.href = 'sitemap.html'; return; }
           if (p === 'backup') { SW.backup.save(); return; }
           if (p === 'restore') { SW.backup.restore(); return; }

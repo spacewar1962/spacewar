@@ -946,6 +946,49 @@
     d.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
   };
 
+  // ---------- Help ▸ Joining the annotation group ----------
+  // A Hypothesis account, the group, the API token, and the bench's Settings, step by
+  // step; every Hypothesis page named opens in a new tab.
+  N.joinHelp = function () {
+    function ext(url, text) { return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + text + ' ↗</a>'; }
+    var d = SW.el('dialog', { class: 'tray-big annohelp joinhelp' });
+    d.innerHTML = '<div class="tray-bighead"><b>Joining the annotation group</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="ah">' +
+      '<p>Annotations on the bench are shared through a private group on <b>Hypothesis</b>, the open annotation service. To read and write them you need a Hypothesis account, membership of the group, and a personal key (an API token) that lets the bench write as you. Four steps, about five minutes. You need an email address, and the group’s invitation link from the project.</p>' +
+
+      '<h3>1. Create a Hypothesis account</h3>' +
+      '<ol class="ah-steps"><li>Open ' + ext('https://hypothes.is/signup', 'hypothes.is/signup') + '.</li>' +
+      '<li>Choose a username, and give your email address and a password.</li>' +
+      '<li>Confirm the address from the email Hypothesis sends you.</li></ol>' +
+      '<p class="hint">Already have an account? ' + ext('https://hypothes.is/login', 'Log in') + ' and go on to step 2.</p>' +
+
+      '<h3>2. Join the group</h3>' +
+      '<ol class="ah-steps"><li>Ask the project leads for the group’s invitation link if you do not have it. It looks like <span class="mono">https://hypothes.is/groups/Ab12Cd34/name</span>.</li>' +
+      '<li>Open the link while logged in to Hypothesis, and click <b>Join</b>.</li></ol>' +
+
+      '<h3>3. Get your API token</h3>' +
+      '<ol class="ah-steps"><li>Open ' + ext('https://hypothes.is/account/developer', 'hypothes.is/account/developer') + ' (logged in).</li>' +
+      '<li>Click <b>Generate your API token</b>, then copy the token it shows (a long string beginning <span class="mono">6879-</span>).</li></ol>' +
+      '<p class="hint">The token lets the bench write annotations in your name: keep it to yourself, like a password. If it is ever seen by someone else, generate a new one on the same page; the old one stops working.</p>' +
+
+      '<h3>4. Enter them in the bench</h3>' +
+      '<ol class="ah-steps"><li>Open <b>⚙ Settings</b> (top right).</li>' +
+      '<li>Under <b>Your details</b>, give your <b>initials</b> and <b>name</b>: every annotation you write is signed with them.</li>' +
+      '<li>Under <b>Shared annotations</b>, paste the group’s invitation link (or just its ID, the part after <span class="mono">/groups/</span>) and your API token.</li>' +
+      '<li>Click <b>Test connection</b>. It should say <i>Connected as</i> your username, <i>group … found</i>. If the group is not found, check you joined it in step 2 with the same account.</li>' +
+      '<li>Click <b>Save</b>.</li></ol>' +
+
+      '<h3>Then</h3><ul class="ah-steps">' +
+      '<li>Annotate: select lines in Read and click <b>✎ Annotate</b>, or hover a line number and click <b>+A</b>. Help ▸ Advanced annotation covers formatting, links between annotations, searching and the rest.</li>' +
+      '<li>Settings are kept in this browser only. On another computer or browser, enter them again.</li>' +
+      '<li>Without a group and token, annotations are kept as drafts in this browser; once connected, share them with <b>⇪ Publish drafts to the group</b> on Versions ▸ This version.</li>' +
+      '<li>Annotations in the group are seen only by its members, on the bench and on Hypothesis’s own site (' + ext('https://hypothes.is/login', 'hypothes.is') + ').</li></ul>' +
+      '</div>';
+    document.body.appendChild(d);
+    d.showModal();
+    d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
+    d.addEventListener('close', function () { d.remove(); });
+  };
+
   // ---------- Help ▸ Advanced annotation ----------
   // How to format annotations and link them, with figures drawn from the
   // bench's own parts (so they follow the theme) and an editor to try.

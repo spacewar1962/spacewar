@@ -1617,3 +1617,4 @@ body.dev-on .dev-only { display: revert !important; }
 .md-mention button:hover, .md-mention button:first-child { background: var(--sel); }
 .mention-you { color: var(--amber); }
 .note .st-help, .ann-results .st-help { color: var(--bg); background: var(--red); }
+.annohelp .mono, .joinhelp .mono { font-family: var(--mono); font-size: .88em; }
