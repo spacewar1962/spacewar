@@ -228,7 +228,7 @@
         '<div class="lncols"><span class="n" title="The line’s number in the source file">Line</span>' +
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
         '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word <button class="colfold" data-cf="0" title="Fold away Address and Word, for more room (View ▸ Addresses &amp; words brings them back too)">‹</button></span>' +
-        '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)"><button class="colfold cf-show" data-cf="1" title="Show Address and Word">› Address, Word</button>Source</span>' +
+        '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)"><button class="colfold cf-show" data-cf="1" title="Show Address and Word">›</button>Source</span>' +
         '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations</span></div></div>';
       sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
