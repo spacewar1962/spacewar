@@ -1574,3 +1574,10 @@ body.dev-on .dev-only { display: revert !important; }
 .lncols .mk { position: relative; }
 .lncols .ann-cyc { display: inline-block; margin-left: 6px; padding: 0 4px; font: 10px/12px var(--sans); letter-spacing: 0; text-transform: none; color: var(--text-faint); background: none; border: 1px solid var(--line); border-radius: 3px; cursor: pointer; vertical-align: top; }
 .lncols .ann-cyc:hover { color: var(--text); border-color: var(--text-faint); }
+/* ghosts: annotations from other versions */
+.ithread.ghost, .mcard.ghost { opacity: .72; border-left-style: dashed; border-left-color: var(--text-faint) !important; background: transparent; outline: 1px dashed var(--line); outline-offset: -1px; }
+.ithread.ghost:hover, .mcard.ghost:hover { opacity: 1; }
+.ghost .ghost-tag { font: 600 9.5px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 1px 4px; border: 1px solid var(--text-faint); border-radius: 3px; color: var(--text-dim); }
+.ghost .note:not(.reply) > .nbody { background: transparent; }
+.ghost .acts a.swlink { font-size: 12px; }
+.lncols .ghost-sw.on { color: var(--text); border-color: var(--text-dim); background: color-mix(in srgb, var(--text) 8%, transparent); }

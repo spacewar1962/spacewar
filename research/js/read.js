@@ -8,7 +8,7 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all') };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', false) };
   // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
   // cycled from the chevron on the Annotations heading.
   var SHOW = { all: '▾ All', mine: '▾ Mine', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'none', none: 'all' };
@@ -234,7 +234,7 @@
         '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
         '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word <button class="colfold" data-cf="0" title="Fold away Address and Word, for more room (View ▸ Addresses &amp; words brings them back too)">‹</button></span>' +
         '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)"><button class="colfold cf-show" data-cf="1" title="Show Address and Word">›</button>Source</span>' +
-        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations<button class="ann-cyc" data-ann title="Show all annotations, only yours, or none (click to change)">' + SHOW[opts.show] + '</button></span></div></div>';
+        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations<button class="ann-cyc" data-ann title="Show all annotations, only yours, or none (click to change)">' + SHOW[opts.show] + '</button><button class="ann-cyc ghost-sw' + (opts.ghosts ? ' on' : '') + '" data-ghosts aria-pressed="' + !!opts.ghosts + '" title="Ghosts: annotations made on other versions, shown faintly on the lines here that match">Ghosts</button></span></div></div>';
       sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
       box.appendChild(sec);
     });
@@ -263,6 +263,7 @@
   // One thread: its first note, a + for its replies, the replies when open.
   // The same block is an inline note or a margin card (cls).
   function threadBlock(t, cls) {
+    if (t.ghost) return ghostBlock(t, cls);
     var a = t.note.anchor, nrep = 0, open = !!openCards[t.note.id], h = '';
     (function walk(rs) { rs.forEach(function (r) { nrep++; walk(r.replies); }); })(t.replies);
     if (open) (function walk(rs) { rs.forEach(function (r) { h += N.renderNote(r.note, true, r.reactions); walk(r.replies); }); })(t.replies);
@@ -280,15 +281,115 @@
   function shownThreads() {
     var keep = filtering() ? keptLines() : null;
     if (opts.show === 'none') return [];
-    return N.threads(notes).filter(function (t) {
+    return N.threads(notes).concat(opts.ghosts ? ghosts : []).filter(function (t) {
       var a = t.note.anchor;
       if (!a || !showsTape(a.p)) return false;
-      if (opts.show === 'mine' && !isMine(t.note)) return false;
+      if (opts.show === 'mine' && !isMine(t.ghost ? t.note.ghostOf : t.note)) return false;
       if (keep && !keep[a.p + ':' + a.n0]) return false;
       return !!SW.$('#L' + a.p + '-' + a.n0, view);
     });
   }
   function paintNotes() { paintInline(); paintMargin(); paintBlocks(); }
+
+  // ---------- ghosts: annotations from other versions, on the lines here that match ----------
+  // Each annotated block of another version is looked for here by its lines' text
+  // (spacing and comments ignored, blank lines not counted), with two lines either
+  // side as context; it is placed where most of its lines match, in order. Shown
+  // faint, read-only: Open goes to the original, Keep here copies it into this
+  // version with a link back. A note already kept here is not shown as a ghost.
+  var ghosts = [], ghostKey = '';
+  function lineKey(t) { return String(t || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  function flat(b) {
+    var out = [];
+    b.lines.forEach(function (ls, p) { ls.forEach(function (L) { out.push({ p: p, n: L.n, k: lineKey(L.norm || L.raw) }); }); });
+    return out;
+  }
+  function placeHere(srcFlat, s0, s1, here, index) {
+    var len = s1 - s0 + 1, best = null;
+    var cands = {};
+    for (var i = s0; i <= s1; i++) {
+      var k = srcFlat[i].k; if (!k) continue;
+      (index[k] || []).forEach(function (j) { var st = j - (i - s0); if (st >= 0 && st + len <= here.length) cands[st] = 1; });
+    }
+    var need = 0; for (i = s0; i <= s1; i++) if (srcFlat[i].k) need++;
+    if (!need) return null;
+    Object.keys(cands).forEach(function (st) {
+      st = +st;
+      var hit = 0, ctx = 0;
+      for (var q = 0; q < len; q++) if (srcFlat[s0 + q].k && srcFlat[s0 + q].k === here[st + q].k) hit++;
+      for (q = 1; q <= 2; q++) {
+        if (s0 - q >= 0 && st - q >= 0 && srcFlat[s0 - q].k && srcFlat[s0 - q].k === here[st - q].k) ctx++;
+        if (s1 + q < srcFlat.length && st + len - 1 + q < here.length && srcFlat[s1 + q].k && srcFlat[s1 + q].k === here[st + len - 1 + q].k) ctx++;
+      }
+      var score = hit + ctx * 0.5;
+      if (!best || score > best.score) best = { st: st, hit: hit, ctx: ctx, score: score };
+    });
+    if (!best || best.hit < Math.max(1, Math.ceil(need * 0.6))) return null;
+    if (need === 1 && best.ctx === 0 && (index[srcFlat[s0].k] || []).length > 1) return null;   // one common line, no context: too uncertain
+    var a = here[best.st], z = here[best.st + len - 1];
+    if (a.p !== z.p) return null;
+    return { p: a.p, n0: a.n, n1: z.n, src: (build.parts[a.p] || {}).src || '' };
+  }
+  var ghostAt = 0;
+  function loadGhosts(lazy) {
+    if (!opts.ghosts || !build) { ghosts = []; ghostKey = ''; return Promise.resolve(); }
+    var b0 = build;
+    if (lazy && ghostKey === b0.v.id && Date.now() - ghostAt < 60000) return Promise.resolve();   // the regular refresh: at most once a minute
+    ghostKey = b0.v.id; ghostAt = Date.now();
+    return N.listAll().then(function (all) {
+      var here = flat(b0), index = {};
+      here.forEach(function (x, j) { if (x.k) (index[x.k] = index[x.k] || []).push(j); });
+      var kept = {};
+      all.forEach(function (n) { if (n.vid === b0.v.id) { var re = /[?&]a=([A-Za-z0-9_-]+)/g, m; while ((m = re.exec(String(n.text).replace(/\\([_\-])/g, '$1')))) kept[m[1]] = 1; } });
+      var byV = {};
+      all.forEach(function (n) {
+        if (n.vid === b0.v.id || !n.anchor || n.parent || n.source === 'buildlog' || N.isReaction(n) || kept[n.id]) return;
+        (byV[n.vid] = byV[n.vid] || []).push(n);
+      });
+      var replies = {};
+      all.forEach(function (n) { if (n.parent && !N.isReaction(n)) replies[n.parent] = (replies[n.parent] || 0) + 1; });
+      return Promise.all(Object.keys(byV).map(function (vid) {
+        return SW.build(vid).then(function (bv) {
+          var src = flat(bv), at = {};
+          src.forEach(function (x, j) { at[x.p + ':' + x.n] = j; });
+          return byV[vid].map(function (n) {
+            var a = n.anchor, s0 = at[a.p + ':' + a.n0], s1 = at[a.p + ':' + a.n1];
+            if (s0 == null || s1 == null) return null;
+            var pl = placeHere(src, s0, s1, here, index);
+            if (!pl) return null;
+            var g = Object.assign({}, n, { id: 'ghost-' + n.id, anchor: pl, source: 'ghost', ghostOf: n, nreplies: replies[n.id] || 0 });
+            delete g.quote;
+            return { note: g, replies: [], reactions: [], ghost: true };
+          }).filter(Boolean);
+        }, function () { return []; });
+      })).then(function (lists) {
+        if (build !== b0) return;
+        ghosts = [].concat.apply([], lists);
+      });
+    });
+  }
+  function ghostBlock(t, cls) {
+    var g = t.note, o = g.ghostOf, a = g.anchor, oa = o.anchor;
+    var from = SW.refOf(o.vid, oa.p, oa.n0, oa.n1, SW.nparts(o.vid));
+    return '<div class="' + cls + ' ghost" data-tid="' + SW.esc(g.id) + '" data-p="' + a.p + '" data-n0="' + a.n0 + '" data-n1="' + a.n1 + '">' +
+      '<div class="mc-where">Code · ' + (a.n1 !== a.n0 ? 'lines ' + a.n0 + '–' + a.n1 : 'line ' + a.n0) + '</div>' +
+      '<div class="note"><div class="by"><span class="ghost-tag" title="An annotation on another version, shown here on the matching lines">Ghost</span> <b>' + SW.esc(o.by) + '</b> · ' + SW.esc(SW.fmtDate(o.date)) + ' · from ' + SW.esc(from) + '</div>' +
+      '<div class="nbody"><div class="body note-md">' + SW.md(SW.figpack.split(o.text).text) + '</div>' +
+      (g.nreplies ? '<div class="hint">' + g.nreplies + ' repl' + (g.nreplies === 1 ? 'y' : 'ies') + ' there</div>' : '') + '</div>' +
+      '<div class="acts"><a class="swlink" href="' + SW.esc(N.linkOf(o)) + '" title="Go to the original">Open in ' + SW.esc(SW.refOf(o.vid)) + '</a>' +
+      '<span class="acts-right"><button data-keep-ghost="' + SW.esc(o.id) + '" title="Copy it into this version as an annotation of its own, on these lines, with a link back to the original">＋ Keep here</button></span></div></div></div>';
+  }
+  function keepGhost(id) {
+    var t = ghosts.filter(function (x) { return x.note.ghostOf.id === id; })[0]; if (!t) return;
+    var o = t.note.ghostOf, a = t.note.anchor, lines = build.lines[a.p].slice(a.n0 - 1, a.n1).map(function (L) { return L.raw; }).join('\n');
+    N.create({ vid: build.v.id, kind: 'line', anchor: { p: a.p, n0: a.n0, n1: a.n1, src: a.src }, quote: lines,
+               text: o.text + '\n\nCarried from ' + N.linkOf(o), tags: (o.tags || []).concat(['carried']) })
+      .then(function () {
+        ghosts = ghosts.filter(function (x) { return x !== t; });
+        SW.toast('Kept here, with a link back to the original. ↶ Undo (⌘Z) takes it away.', 5000);
+      }, function (e) { if (e.message !== 'no initials') SW.toast(e.message, 5000); });
+  }
+
 
   // ---------- the code an annotation is attached to ----------
   // Its lines bracketed in the listing (a bar down the side, from the first line
@@ -315,6 +416,7 @@
     SW.$$('.ln.blk', view).forEach(function (r) { r.classList.remove('blk', 'blk-top', 'blk-end', 'blk-b'); });
     if (opts.notes === 'hide') return;
     shownThreads().forEach(function (th) {
+      if (th.ghost) return;
       var a = th.note.anchor, isBlock = a.n1 > a.n0 || a.c0 != null;
       for (var n = a.n0; n <= a.n1; n++) {
         var row = SW.$('#L' + a.p + '-' + n, view); if (!row) continue;
@@ -401,6 +503,8 @@
   // cards folded away, by note, kept in this browser
   function cardFold() { return SW.store.get('read.cardFold', {}); }
   function threadClick(e) {
+    var kg = e.target.closest('[data-keep-ghost]');
+    if (kg) { keepGhost(kg.dataset.keepGhost); return true; }
     var cfb = e.target.closest('.card-fold');
     if (cfb) {
       var card = cfb.closest('.mcard, .ithread'), f = cardFold(), id = card.dataset.tid;
@@ -732,6 +836,16 @@
     box.addEventListener('click', function (e) {
       var cf = e.target.closest('[data-cf]');
       if (cf) { setWords(cf.dataset.cf === '1'); return; }
+      if (e.target.closest('[data-ghosts]')) {
+        opts.ghosts = !opts.ghosts; SW.store.set('read.ghosts', opts.ghosts);
+        SW.$$('[data-ghosts]', view).forEach(function (b) { b.classList.toggle('on', opts.ghosts); b.setAttribute('aria-pressed', String(opts.ghosts)); });
+        if (opts.ghosts) SW.toast('Looking for annotations on the other versions…', 2500);
+        loadGhosts().then(function () {
+          paintNotes();
+          if (opts.ghosts) SW.toast(ghosts.length ? ghosts.length + ' ghost annotation' + (ghosts.length === 1 ? '' : 's') + ' from other versions' : 'No annotations on other versions match lines here', 3500);
+        });
+        return;
+      }
       if (e.target.closest('[data-ann]')) {
         opts.show = SHOW_NEXT[opts.show] || 'all'; SW.store.set('read.show', opts.show);
         SW.$$('[data-ann]', view).forEach(function (b) { b.textContent = SHOW[opts.show]; });
@@ -1000,6 +1114,7 @@
       });
       fillBy();
       applyFilter();
+      if (opts.ghosts) loadGhosts(true).then(paintNotes);
       // keep an open panel current; a closed one stays closed (the refresh runs every 20 seconds)
       if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey && document.body.classList.contains('drawer-open')) showNotesFor(openNotesKey, true);
     });
