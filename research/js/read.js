@@ -299,35 +299,16 @@
   // faint, read-only: Open goes to the original, Keep here copies it into this
   // version with a link back. A note already kept here is not shown as a ghost.
   var ghosts = [], ghostKey = '';
-  function lineKey(t) { return String(t || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim().toLowerCase(); }
+  var lineKey = SW.lineKey;
   function flat(b) {
     var out = [];
     b.lines.forEach(function (ls, p) { ls.forEach(function (L) { out.push({ p: p, n: L.n, k: lineKey(L.norm || L.raw) }); }); });
     return out;
   }
   function placeHere(srcFlat, s0, s1, here, index) {
-    var len = s1 - s0 + 1, best = null;
-    var cands = {};
-    for (var i = s0; i <= s1; i++) {
-      var k = srcFlat[i].k; if (!k) continue;
-      (index[k] || []).forEach(function (j) { var st = j - (i - s0); if (st >= 0 && st + len <= here.length) cands[st] = 1; });
-    }
-    var need = 0; for (i = s0; i <= s1; i++) if (srcFlat[i].k) need++;
-    if (!need) return null;
-    Object.keys(cands).forEach(function (st) {
-      st = +st;
-      var hit = 0, ctx = 0;
-      for (var q = 0; q < len; q++) if (srcFlat[s0 + q].k && srcFlat[s0 + q].k === here[st + q].k) hit++;
-      for (q = 1; q <= 2; q++) {
-        if (s0 - q >= 0 && st - q >= 0 && srcFlat[s0 - q].k && srcFlat[s0 - q].k === here[st - q].k) ctx++;
-        if (s1 + q < srcFlat.length && st + len - 1 + q < here.length && srcFlat[s1 + q].k && srcFlat[s1 + q].k === here[st + len - 1 + q].k) ctx++;
-      }
-      var score = hit + ctx * 0.5;
-      if (!best || score > best.score) best = { st: st, hit: hit, ctx: ctx, score: score };
-    });
-    if (!best || best.hit < Math.max(1, Math.ceil(need * 0.6))) return null;
-    if (need === 1 && best.ctx === 0 && (index[srcFlat[s0].k] || []).length > 1) return null;   // one common line, no context: too uncertain
-    var a = here[best.st], z = here[best.st + len - 1];
+    var st = SW.ghostMatch(srcFlat, s0, s1, here, index);
+    if (st < 0) return null;
+    var a = here[st], z = here[st + s1 - s0];
     if (a.p !== z.p) return null;
     return { p: a.p, n0: a.n, n1: z.n, src: (build.parts[a.p] || {}).src || '' };
   }

@@ -862,7 +862,7 @@
     var q = N.parseLink(href);
     if (!q) return null;
     var name = nameOfLink(q);
-    return '<a href="' + href + '" class="swlink" title="' + SW.esc('Go to ' + name) + '">' + (bare ? SW.esc(name) : label) + '</a>';
+    return '<a href="' + href + '" class="swlink"' + (bare ? ' data-bare="1"' : '') + ' title="' + SW.esc('Go to ' + name) + '">' + (bare ? SW.esc(name) : label) + '</a>';
   };
 
   // Following a link: to the version and lines, then the annotation itself.
@@ -1007,6 +1007,14 @@
       '<h3>5. Links to lines of code</h3>' +
       '<p>Select lines in Read and click 🔗 Copy link at the foot of the window. Pasted into an annotation, the link is marked ↪ and goes to those lines.</p>' +
 
+      '<h3>6. More</h3><ul class="ah-steps">' +
+      '<li><b>Search</b>: the box at the top of the Annotations panel (▴ Annotations) searches every annotation and reply, all versions, by words, initials, tags or reference; tick Open questions only for what still needs answering.</li>' +
+      '<li><b>Open and resolved</b>: <i>? Open</i> on an annotation marks it a question still to be answered; <i>✓ Resolve</i> marks it answered, <i>Reopen</i> opens it again. Anyone in the group can mark any annotation. The chevron on Read’s Annotations heading cycles All, Mine, Open, None.</li>' +
+      '<li><b>@mentions</b>: type @ and initials to mention someone; they are offered as you type. What’s new lists a mention of you first.</li>' +
+      '<li><b>Earlier wordings</b>: editing an annotation keeps what it said before; <i>edited … · 2 earlier</i> on the annotation shows them, with when each was written.</li>' +
+      '<li><b>Ghosts</b>: annotations made on other versions, shown faintly on the lines here whose code matches theirs (the Ghosts switch on the Annotations heading). <i>Open in …</i> goes to the original; <i>＋ Keep here</i> copies it into this version, with a link back.</li>' +
+      '<li><b>Moving</b>: drag the ⠿ at a card’s bottom left onto another line, or change Lines in Edit. ↶ Undo (⌘Z) takes back a move, an edit, an addition or a deletion.</li>' +
+      '<li><b>Folding</b>: the chevron at a card’s top left folds it to one line (for you, kept in this browser); ▸ Code in its corner shows the code it is attached to.</li></ul>' +
       '<h3>Good to know</h3><ul class="ah-steps">' +
       '<li>A draft can be linked to: when it is shared with the group it is given a new identifier, and links to it (in your drafts and your shared annotations) are updated then.</li>' +
       '<li>A link to an annotation that has been deleted, or is not in your group, goes to its lines and says the annotation is not there.</li>' +

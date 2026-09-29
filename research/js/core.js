@@ -856,6 +856,36 @@
       return new Response(new Blob([b]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
     }
   };
+  // ---------- ghosts: where a block of lines from one version sits in another ----------
+  // lines as keys: comments, spacing and case set aside; blank lines count for nothing
+  SW.lineKey = function (t) { return String(t || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim().toLowerCase(); };
+  // src and here: arrays of { k } (line keys); index: key -> positions in here.
+  // The start in here of src[s0..s1], where most of its lines match in order
+  // (at least 60% of the non-blank ones), two lines either side counting as
+  // context; -1 when none is good enough, or a single common line has no context.
+  SW.ghostMatch = function (src, s0, s1, here, index) {
+    var len = s1 - s0 + 1, best = null, cands = {}, need = 0, i, q;
+    for (i = s0; i <= s1; i++) {
+      var k = src[i].k; if (!k) continue;
+      need++;
+      (index[k] || []).forEach(function (j) { var st = j - (i - s0); if (st >= 0 && st + len <= here.length) cands[st] = 1; });
+    }
+    if (!need) return -1;
+    Object.keys(cands).forEach(function (st) {
+      st = +st;
+      var hit = 0, ctx = 0;
+      for (q = 0; q < len; q++) if (src[s0 + q].k && src[s0 + q].k === here[st + q].k) hit++;
+      for (q = 1; q <= 2; q++) {
+        if (s0 - q >= 0 && st - q >= 0 && src[s0 - q].k && src[s0 - q].k === here[st - q].k) ctx++;
+        if (s1 + q < src.length && st + len - 1 + q < here.length && src[s1 + q].k && src[s1 + q].k === here[st + len - 1 + q].k) ctx++;
+      }
+      var score = hit + ctx * 0.5;
+      if (!best || score > best.score) best = { st: st, hit: hit, ctx: ctx, score: score };
+    });
+    if (!best || best.hit < Math.max(1, Math.ceil(need * 0.6))) return -1;
+    if (need === 1 && best.ctx === 0 && (index[src[s0].k] || []).length > 1) return -1;
+    return best.st;
+  };
   // ---------- earlier wordings of an annotation ----------
   // When a note is edited, the wording it replaces is kept in the note itself, on
   // a closing line <!-- sw:was DATE BASE64 --> (before any figure), so the record
@@ -895,7 +925,7 @@
   function mdLink(href, label, bare) {
     var own = SW.internalLink && SW.internalLink(href, label, bare);   // a link within the bench (notes.js)
     if (own) return own;
-    return '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + label + '</a>';
+    return '<a href="' + href + '" target="_blank" rel="noopener noreferrer"' + (bare ? ' data-bare="1"' : '') + '>' + label + '</a>';
   }
   function mdInline(s) {
     var keep = [];
@@ -981,6 +1011,7 @@
       if (t === 'I' || t === 'EM') return mdWrap('*', kids(n));
       if (t === 'S' || t === 'STRIKE' || t === 'DEL') return mdWrap('~~', kids(n));
       if (t === 'CODE') return n.textContent ? '`' + n.textContent.replace(/`/g, '') + '`' : '';
+      if (t === 'A' && n.getAttribute('data-bare') && MD_URL.test(n.getAttribute('href') || '')) return n.getAttribute('href');   // written bare, kept bare
       if (t === 'A') { var h = n.getAttribute('href') || '', k = kids(n); return MD_URL.test(h) && k.trim() ? '[' + k.replace(/\n/g, ' ') + '](' + h.replace(/[()\s]/g, encodeURIComponent) + ')' : k; }
       if (t === 'PRE') return '\n\n```\n' + n.textContent.replace(/\n$/, '') + '\n```\n\n';
       if (t === 'UL' || t === 'OL') {
