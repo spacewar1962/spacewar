@@ -289,7 +289,7 @@
       });
       return o.concat(['</svg>']).join('');
     };
-    var c0 = card('The call structure', 'Routines along the line in memory order; each arc a call (blue: to a routine later in memory, amber: to one earlier), thicker for more call sites. Hover for names.');
+    var c0 = card('The call structure', 'Routines along the line in memory order; each arc a call (blue: to a routine later in memory, rose: to one earlier), thicker for more call sites. Hover for names.');
     c0.appendChild(SW.el('div', { class: 'svgbox' }, SW.displaySVG(arcSVG())));
     c0.appendChild(SW.figureButtons(arcSVG, 'spacewar-' + b.v.id + '-calls', SW.refText(b.v.id)));
     c0.style.gridColumn = '1 / -1';
@@ -936,7 +936,7 @@
     os.forEach(function (o) {
       var label = o.name === 'ot1' ? 'ot1, the Needle' : 'ot2, the Wedge';
       var od = b.sym[o.name] && b.sym[o.name].defs && b.sym[o.name].defs[0];
-      var c = card(label, (od ? SW.refTag(b.v.id, od.file, od.line, od.line, b.parts.length) + ' ' : '') + 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. The table describes one side of the ship (pale points). At code 7 the compiled code complements its sideways terms and runs again, drawing the other side as a mirror image (blue points). The amber point is the start, the nose. ' + o.pts.length + ' points, each plotted every frame.');
+      var c = card(label, (od ? SW.refTag(b.v.id, od.file, od.line, od.line, b.parts.length) + ' ' : '') + 'The outline table at ' + SW.oct(o.addr, 4) + ', read three bits at a time: <span class="mono">' + SW.esc(o.words.join(' ')) + '</span>. The table describes one side of the ship (pale points). At code 7 the compiled code complements its sideways terms and runs again, drawing the other side as a mirror image (blue points). The rose point is the start, the nose. ' + o.pts.length + ' points, each plotted every frame.');
       var svg = outlineSVG(o, 9);
       c.appendChild(SW.el('div', { class: 'svgbox', style: 'text-align:center' }, svg));
       c.appendChild(SW.figureButtons(function (pal) { return outlineSVG(o, 12, b.v.label + ' ' + label, pal); }, 'spacewar-' + b.v.id + '-' + o.name, (function () { var d = b.sym[o.name] && b.sym[o.name].defs && b.sym[o.name].defs[0]; return d ? SW.refText(b.v.id, d.file, d.line, d.line, b.parts.length) : SW.refText(b.v.id); })()));

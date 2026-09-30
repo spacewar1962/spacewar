@@ -9,7 +9,7 @@
 
 :root {
   --code-bg: #070b11;   /* the ground of code: listings, diffs */
-  --noted-bg: rgba(255, 206, 122, 0.075);
+  --noted-bg: rgba(255, 143, 200, 0.07);
   --bg: #0a0e15;
   --bg-2: #0f1520;
   --surface: #111926;
@@ -20,11 +20,11 @@
   --text-dim: #8ea3b8;
   --text-faint: #6a7f96;
   --beam: #6cf2ff;
-  --amber: #ffce7a;
+  --amber: #ff8fc8;   /* the bench's accent (rose; gold is kept for kintsugi); the name is historical */
   --green: #7be3a0;
   --red: #ff8a8a;
   --violet: #c7a6ff;
-  --hl: rgba(255, 206, 122, 0.14);
+  --hl: rgba(255, 143, 200, 0.13);
   --sel: rgba(108, 242, 255, 0.13);
   --add-bg: rgba(123, 227, 160, 0.12);
   --del-bg: rgba(255, 138, 138, 0.12);
@@ -49,13 +49,13 @@
   --bar-1: #2c4a57; --bar-2: #1f3640; --bar-fg: #eef6f8; --bar-line: #0b1418;
   --pick-bg: rgba(0, 0, 0, 0.28); --pick-fg: #ffffff; --pick-line: rgba(255, 255, 255, 0.25);
   --plate: #0b1018; --plate-line: #1a2638; --pick-stroke: #ffffff; --hl-filter: brightness(1.45);
-  --on-amber: #1a1100; --tape-paper: #e7e1d0; --tape-hole: #1c2a31;
+  --on-amber: #1a0010; --tape-paper: #e7e1d0; --tape-hole: #1c2a31;
   color-scheme: dark;
 }
 
 :root[data-theme="paper"] {
   --code-bg: #fbf9f3;   /* the ground of code: listings, diffs */
-  --noted-bg: rgba(154, 91, 0, 0.08);
+  --noted-bg: rgba(176, 48, 110, 0.06);
   --bg: #ece7da;
   --bg-2: #e3ddcd;
   --surface: #faf8f2;
@@ -66,11 +66,11 @@
   --text-dim: #45505a;
   --text-faint: #6f767d;
   --beam: #0f6f86;
-  --amber: #9a5b00;
+  --amber: #b0306e;
   --green: #1d7a45;
   --red: #b3261e;
   --violet: #6b3fb5;
-  --hl: rgba(154, 91, 0, 0.12);
+  --hl: rgba(176, 48, 110, 0.10);
   --sel: rgba(15, 111, 134, 0.12);
   --add-bg: rgba(29, 122, 69, 0.12);
   --del-bg: rgba(179, 38, 30, 0.10);
@@ -92,12 +92,12 @@
 /* Paper: plain black on white */
 :root[data-theme="white"] {
   --code-bg: #f8f9fb;   /* the ground of code: listings, diffs */
-  --noted-bg: rgba(138, 75, 0, 0.06);
+  --noted-bg: rgba(163, 36, 95, 0.05);
   --bg: #ffffff; --bg-2: #f3f4f6; --surface: #ffffff; --surface-2: #f1f3f5;
   --line: #cfd4da; --line-soft: #e3e6ea;
   --text: #111418; --text-dim: #4b5563; --text-faint: #6b7280;
-  --beam: #0b5cad; --amber: #8a4b00; --green: #11703c; --red: #b3261e; --violet: #5b2ea6;
-  --hl: rgba(138, 75, 0, 0.10); --sel: rgba(11, 92, 173, 0.10); --add-bg: rgba(17, 112, 60, 0.10); --del-bg: rgba(179, 38, 30, 0.08);
+  --beam: #0b5cad; --amber: #a3245f; --green: #11703c; --red: #b3261e; --violet: #5b2ea6;
+  --hl: rgba(163, 36, 95, 0.09); --sel: rgba(11, 92, 173, 0.10); --add-bg: rgba(17, 112, 60, 0.10); --del-bg: rgba(179, 38, 30, 0.08);
   --g-retained: #0b5cad; --g-moved: #5b2ea6; --g-edited: #a86400; --g-rewritten: #c2410c; --g-added: #11703c; --g-removed: #b3261e;
   --g-text: #111418; --g-muted: #5b6470; --g-stroke: #9aa0a6; --g-box: #e5e7eb; --g-heat: #0b5cad; --g-line: #6b7280; --g-cell-dark: #ffffff;
   --bar-1: #f3f4f6; --bar-2: #e5e7eb; --bar-fg: #111418; --bar-line: #cfd4da;
@@ -110,12 +110,12 @@
 /* Sepia: brown ink on warm paper, easy on the eyes for long reading */
 :root[data-theme="sepia"] {
   --code-bg: #fffefb;   /* the ground of code: listings, diffs */
-  --noted-bg: rgba(156, 107, 18, 0.07);
+  --noted-bg: rgba(156, 58, 100, 0.06);
   --bg: #f7f2e8; --bg-2: #efe9dd; --surface: #fffefb; --surface-2: #ede6d8;   /* lighter, less beige (was #f4ecd8); code sits on near-white */
   --line: #ddd3c1; --line-soft: #ece5d8;
   --text: #3b2f22; --text-dim: #6b5a45; --text-faint: #7a684f;
-  --beam: #8a4f1c; --amber: #8f5f0c; --green: #56682a; --red: #a1392b; --violet: #7b4a7a;
-  --hl: rgba(156, 107, 18, 0.13); --sel: rgba(138, 79, 28, 0.12); --add-bg: rgba(86, 104, 42, 0.13); --del-bg: rgba(161, 57, 43, 0.10);
+  --beam: #8a4f1c; --amber: #9c3a64; --green: #56682a; --red: #a1392b; --violet: #7b4a7a;
+  --hl: rgba(156, 58, 100, 0.11); --sel: rgba(138, 79, 28, 0.12); --add-bg: rgba(86, 104, 42, 0.13); --del-bg: rgba(161, 57, 43, 0.10);
   --g-retained: #2f6f73; --g-moved: #7b4a7a; --g-edited: #a87414; --g-rewritten: #b5541c; --g-added: #56682a; --g-removed: #a1392b;
   --g-text: #3b2f22; --g-muted: #7a6a55; --g-stroke: #c9bb9f; --g-box: #efe8da; --g-heat: #2f6f73; --g-line: #8c7a62; --g-cell-dark: #ffffff;
   --bar-1: #ece3d1; --bar-2: #e4d9c3; --bar-fg: #3b2f22; --bar-line: #d2c5ab;
@@ -164,12 +164,12 @@
 /* High contrast: white and bright colours on black */
 :root[data-theme="contrast"] {
   --code-bg: #0d0d0d;   /* the ground of code: listings, diffs */
-  --noted-bg: rgba(255, 212, 0, 0.10);
+  --noted-bg: rgba(255, 95, 184, 0.10);
   --bg: #000000; --bg-2: #0a0a0a; --surface: #000000; --surface-2: #141414;
   --line: #8a8a8a; --line-soft: #4a4a4a;
   --text: #ffffff; --text-dim: #e6e6e6; --text-faint: #bdbdbd;
-  --beam: #00e5ff; --amber: #ffd400; --green: #3dff6e; --red: #ff5c5c; --violet: #d6a6ff;
-  --hl: rgba(255, 212, 0, 0.20); --sel: rgba(0, 229, 255, 0.18); --add-bg: rgba(61, 255, 110, 0.18); --del-bg: rgba(255, 92, 92, 0.20);
+  --beam: #00e5ff; --amber: #ff5fb8; --green: #3dff6e; --red: #ff5c5c; --violet: #d6a6ff;
+  --hl: rgba(255, 95, 184, 0.20); --sel: rgba(0, 229, 255, 0.18); --add-bg: rgba(61, 255, 110, 0.18); --del-bg: rgba(255, 92, 92, 0.20);
   --g-retained: #00e5ff; --g-moved: #ff3df5; --g-edited: #ffd400; --g-rewritten: #ff8c00; --g-added: #3dff6e; --g-removed: #ff5c5c;
   --g-text: #ffffff; --g-muted: #cfcfcf; --g-stroke: #9a9a9a; --g-box: #1c1c1c; --g-heat: #00e5ff; --g-line: #e6e6e6; --g-cell-dark: #000000;
   --bar-1: #2a2a2a; --bar-2: #222222; --bar-fg: #ffffff; --bar-line: #8a8a8a;   /* lighter than the page and tab row, so the top bar stands apart */
