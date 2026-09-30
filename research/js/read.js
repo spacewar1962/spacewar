@@ -306,6 +306,20 @@
     return { url: '../sources/' + pdf + (m ? '#page=' + m[1] : ''), page: m ? m[1] : '' };
   }
   // ◆ ⌄: the repairs bar, folded down under the toolbar (redrawn as the selection and settings change)
+  // small line icons for the repairs bar (currentColor, 14px)
+  var KI = {
+    list: '<path d="M2 4h10M2 7h10M2 10h10"/>',
+    only: '<path d="M2 3h10L8.2 7.6V11L5.8 12V7.6z"/>',
+    norm: '<path d="M2 6c1.5-1.6 3-1.6 5 0s3.5 1.6 5 0M2 9.5c1.5-1.6 3-1.6 5 0s3.5 1.6 5 0"/>',
+    scan: '<path d="M3.5 1.5h5l2.5 2.5v8.5h-7.5z M8.5 1.5V4H11 M5.5 7h3.5M5.5 9.5h3.5"/>',
+    keep: '<path d="M3.5 1.5h7v11L7 10l-3.5 2.5z M7 4v4M5 6h4"/>',
+    copy: '<path d="M4.5 4.5h7v7h-7z M2.5 9.5v-7h7"/>',
+    card: '<path d="M1.5 3.5h11v7h-11z M3.5 6h7M3.5 8h4.5"/>',
+    cards: '<path d="M3.5 5.5h9v6.5h-9z M1.5 8.5V3.5h9 M5.5 8h5"/>',
+    about: '<path d="M7 1.5a5.5 5.5 0 1 0 0 11a5.5 5.5 0 1 0 0-11z M7 6.2v3.8 M7 4.2v.1"/>'
+  };
+  function kic(k) { return '<svg class="ki" viewBox="0 0 14 14" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + KI[k] + '</svg>'; }
+  // ◆ ⌄: the repairs bar, folded down under the toolbar (redrawn as the selection and settings change)
   function kinBar() {
     var bar = SW.$('.kin-bar', view), tog = SW.$('#rd-klist', view); if (!bar) return;
     var n = opts.repairs ? kinRows().length : 0, on = opts.kinBar && !!n;
@@ -315,31 +329,36 @@
     var nn = SW.$$('.listing .ln.rp-norm', view).length, cur = kinCurrent(), sc = kinScan(cur);
     var ref = cur ? SW.refText(build.v.id, +cur.dataset.p, +cur.dataset.n, +cur.dataset.n, build.parts.length) : '';
     var s = SW.state.sel, here = cur && s && +cur.dataset.p === s.p && +cur.dataset.n >= s.n0 && +cur.dataset.n <= s.n1;
-    function grp(label, html) { return '<span class="kg"><span class="kg-l">' + label + '</span>' + html + '</span>'; }
+    function b(k, title, extra, lab) { return '<button class="kb" data-km="' + k + '" title="' + SW.esc(title) + '"' + (extra || '') + '>' + (KI[k] ? kic(k) : '') + (lab ? '<span>' + lab + '</span>' : '') + '</button>'; }
+    function tg(k, on, title, lab) { return b(k, title, ' aria-pressed="' + (on ? 'true' : 'false') + '"', lab); }
     bar.innerHTML =
-      grp('Repairs', '<button class="btn" data-km="prev" title="The previous repair">‹</button><button class="btn" data-km="next" title="The next repair">›</button>' +
-        '<button class="btn" data-km="list" title="Every repair in this text, to jump to">All ' + n + '…</button>') +
+      '<button class="kb" data-km="prev" title="The previous repair">‹</button><button class="kb" data-km="next" title="The next repair">›</button>' +
+      b('list', 'Every repair in this text (' + n + '), to jump to', '', String(n)) +
       (cur ? '<button class="kin-cur" data-km="go" title="' + SW.esc((here ? 'This repair' : 'The next repair after the selection') + ': ' + ref + ' ' + kinWhat(cur)) + '"><span class="mono">' + SW.esc(ref.replace(/^\[REF: |\]$/g, '')) + '</span> ' + SW.esc(kinWhat(cur)) + '</button>' : '') +
-      grp('Show', '<label class="check" title="Hide every line but the repairs, with two either side"><input type="checkbox" data-km="only"' + (opts.onlyRepaired ? ' checked' : '') + '> Only repaired lines</label>' +
-        '<label class="check" title="Count lines normalised for the assembler among the repairs (paler gold)"><input type="checkbox" data-km="norm"' + (opts.kinNorm ? ' checked' : '') + '> Normalisations (' + nn + ')</label>' +
-        '<label class="check" title="The gold marks in the listing (also View ▸ Repairs)"><input type="checkbox" data-km="marks"' + (opts.repairs ? ' checked' : '') + '> Gold marks</label>') +
-      grp('Evidence', '<button class="btn" data-km="scan"' + (sc ? '' : ' disabled') + ' title="' + (sc ? 'The scanned listing at the page the evidence names, in a new tab' : 'No scan held for this text, or no page named') + '">Scan' + (sc && sc.page ? ' p. ' + sc.page : '') + ' ↗</button>') +
-      grp('Keep', '<button class="btn" data-km="keep"' + (cur ? '' : ' disabled') + ' title="This repair, cited, with the line, into My notes (private)">＋ My notes</button>' +
-        '<button class="btn" data-km="copy" title="Every repair in this text, with references, as plain text">⧉ Copy all</button>') +
-      grp('Cards', '<button class="btn" data-km="card" title="This version’s reconstruction card: every repair, the evidence and who made it">This version</button>' +
-        '<button class="btn" data-km="cards" title="Every version’s card, one at a time">All</button>') +
-      '<span class="kg kg-end"><button class="btn" data-km="about" title="What the gold marks mean">About</button><button class="icon-btn" data-km="close" title="Fold the repairs bar away">✕</button></span>';
+      '<span class="kbs"></span>' +
+      tg('only', opts.onlyRepaired, 'Only the repaired lines, with two either side') +
+      tg('norm', opts.kinNorm, 'Count the ' + nn + ' line' + (nn === 1 ? '' : 's') + ' normalised for the assembler among the repairs (paler gold)', String(nn)) +
+      b('scan', sc ? 'The scanned listing' + (sc.page ? ' at p. ' + sc.page : '') + ', the evidence, in a new tab' : 'No scan held for this text, or no page named', sc ? '' : ' disabled', sc && sc.page ? 'p. ' + sc.page : '') +
+      '<span class="kbs"></span>' +
+      b('keep', cur ? 'Add this repair to My notes (' + ref + '), cited, with the line' : 'No repair selected', cur ? '' : ' disabled') +
+      b('copy', 'Copy every repair in this text, with references, as plain text') +
+      '<span class="kbs"></span>' +
+      b('card', 'This version’s reconstruction card') +
+      b('cards', 'All reconstruction cards') +
+      b('about', 'What the gold marks mean') +
+      '<button class="kb kb-x" data-km="close" title="Fold the repairs bar away">✕</button>';
   }
   function kinAct(k, el) {
+    var on = el && el.getAttribute && el.hasAttribute('aria-pressed') ? el.getAttribute('aria-pressed') !== 'true' : el && el.checked;
     if (k === 'prev') kinStep(-1);
     else if (k === 'next') kinStep(1);
     else if (k === 'list') kinList(el || SW.$('#rd-klist', view));
     else if (k === 'go') { var g = kinCurrent(); if (g) kinGo(g); }
     else if (k === 'close') { opts.kinBar = false; SW.store.set('read.kinBar', false); kinBar(); }
     else if (k === 'scan') { var sc = kinScan(kinCurrent()); if (sc) root.open(sc.url, '_blank', 'noopener'); }
-    else if (k === 'only') { opts.onlyRepaired = el.checked; applyFilter(); var f = kinRows()[0]; if (f && opts.onlyRepaired) f.scrollIntoView({ block: 'center' }); }
-    else if (k === 'norm') { opts.kinNorm = el.checked; SW.store.set('read.kinNorm', opts.kinNorm); if (opts.onlyRepaired) applyFilter(); kinPaint(); }
-    else if (k === 'marks') { var cb = SW.$('#rd-repairs', view); if (cb) { cb.checked = el.checked; cb.dispatchEvent(new Event('change')); } }
+    else if (k === 'only') { opts.onlyRepaired = on; applyFilter(); var f = kinRows()[0]; if (f && opts.onlyRepaired) f.scrollIntoView({ block: 'center' }); }
+    else if (k === 'norm') { opts.kinNorm = on; SW.store.set('read.kinNorm', opts.kinNorm); if (opts.onlyRepaired) applyFilter(); kinPaint(); }
+    else if (k === 'marks') { var cb = SW.$('#rd-repairs', view); if (cb) { cb.checked = on; cb.dispatchEvent(new Event('change')); } }
     else if (k === 'copy') {
       var lines = kinRows(true).map(function (r) { var w = kinWhat(r); return SW.refText(build.v.id, +r.dataset.p, +r.dataset.n, +r.dataset.n, build.parts.length) + '  ' + (w || (r.classList.contains('rp-norm') ? 'normalised for assembly' : '')); });
       var text = 'Repairs in ' + build.v.label + ' ' + SW.refText(build.v.id) + ':\n' + lines.join('\n');
