@@ -8,7 +8,7 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true) };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true), repairs: SW.store.get('read.repairs', true) };
   // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
   // cycled from the chevron on the Annotations heading.
   var SHOW = { all: '▾ All', mine: '▾ Mine', open: '▾ Open', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'open', open: 'none', none: 'all' };
@@ -146,6 +146,7 @@
       '<label class="check" title="Hide every line that no annotation covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
       '<label class="check" title="Show only annotations (and the lines they cover) in which these initials take part, as author or in a reply">Annotations by <select id="rd-by"><option value="">anyone</option></select></label>' +
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
+      '<label class="check" title="Mark in gold where the text had to be changed to read or run (kintsugi): readings corrected against the scan, lines remade, lines normalised for the assembler (paler), uncertain readings (grey). Hover a mark for what was there and why."><input type="checkbox" id="rd-repairs"' + (opts.repairs ? ' checked' : '') + '> Repairs (gold)</label>' +
       '</div></details><span class="hint" id="rd-nf"></span>' +
       '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
@@ -155,6 +156,12 @@
         '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
         '<div><i class="kx kcom"></i>a line of comment only</div>' +
         '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
+        '<div class="faint" style="margin-top:6px">Repairs, in gold (kintsugi; View ▸ Repairs):</div>' +
+        '<div><span style="color:var(--kin)">●</span> <span class="rp-c rp-c-fix">srt</span> a reading corrected against the scan: the changed characters underlined (hover for what was there, and the evidence)</div>' +
+        '<div><span style="color:var(--kin)">■</span> <span class="rp-c rp-c-kake">cma</span> a line remade where none can be read</div>' +
+        '<div><span class="rp-c rp-c-norm">~ssn</span> normalised for assembly, in paler gold: a change for running, not to the reading</div>' +
+        '<div><span style="text-decoration:underline wavy var(--text-faint);text-underline-offset:4px">ior (4</span> an uncertain reading, left as found</div>' +
+        '<div><span class="rp-chip rp-sup">supplied</span> a tape from another text; <span class="rp-chip rp-rec">reconstruction</span> a text rebuilt, not transcribed</div>' +
         '<div><i class="kx knoted"></i>covered by an annotation (initials at the right; click them)</div>' +
         '<div><span class="errs">lac x</span> an assembly error (hover for the message)</div>' +
         '<div><span style="color:var(--red)">●</span> a breakpoint (set from the selection bar)</div>' +
@@ -210,6 +217,65 @@
     modeBtn();
   }
 
+  // ---------- repairs, in gold (kintsugi) ----------
+  // Where the text had to be changed to read or run: a reading corrected against
+  // the scan (gold), a line remade where none can be read (a gold wash), a line
+  // normalised for the assembler (paler gold: a change for running, not to the
+  // evidence), an uncertain reading left as found (a grey wavy line). The changed
+  // characters are underlined; hover for what was there, and why.
+  function diffSpan(a, b) {   // where b differs from a: [start, end) in b
+    var i = 0, j = 0;
+    while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    while (j < a.length - i && j < b.length - i && a[a.length - 1 - j] === b[b.length - 1 - j]) j++;
+    return [i, Math.max(i, b.length - j)];
+  }
+  function wrapChars(t, s, e, cls, title) {
+    var nodes = [], w = document.createTreeWalker(t, NodeFilter.SHOW_TEXT), x, pos = 0;
+    while ((x = w.nextNode())) nodes.push(x);
+    nodes.forEach(function (nd) {
+      var len = nd.nodeValue.length, a = Math.max(s, pos), b = Math.min(e, pos + len);
+      if (a < b) {
+        var piece = nd;
+        if (a > pos) piece = piece.splitText(a - pos);
+        if (b - a < piece.nodeValue.length) piece.splitText(b - a);
+        var sp = SW.el('span', { class: cls, title: title });
+        piece.parentNode.insertBefore(sp, piece); sp.appendChild(piece);
+      }
+      pos += len;
+    });
+  }
+  // a line's code, without its comment or spacing: a normalisation that leaves this as it
+  // was (a page break read as a blank line, a // comment read as /) is not marked
+  function codeOf(x) { return String(x || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim(); }
+  function paintRepairs() {
+    var reg = root.SWVersions.REPAIRS || {};
+    build.parts.forEach(function (part, p) {
+      (reg[part.src] || []).forEach(function (r) {
+        var row = SW.$('#L' + p + '-' + r.n, view), t = row && row.querySelector('.t'); if (!t) return;
+        var L = build.lines[p][r.n - 1], text = opts.norm ? L.norm : L.raw, at = text.indexOf(r.now);
+        var why = (r.kind === 'rebuilt' ? 'Remade: no reading survives here. ' : 'Corrected: ') + (r.was ? 'the transcription had “' + r.was + '”; ' : r.kind === 'fix' ? 'missing from the transcription; ' : '') + 'now “' + r.now + '”. Evidence: ' + r.ev + '. By ' + r.by + ', ' + r.date + '.';
+        row.classList.add(r.kind === 'rebuilt' ? 'rp-kake' : 'rp-fix');
+        if (at < 0) return;
+        var d = r.was ? diffSpan(r.was, r.now) : [0, r.now.length];
+        if (d[1] <= d[0]) d = [0, r.now.length];
+        wrapChars(t, at + d[0], at + d[1], r.kind === 'rebuilt' ? 'rp-c rp-c-kake' : 'rp-c rp-c-fix', why);
+      });
+      build.lines[p].forEach(function (L) {
+        if (L.skipped) return;
+        var row = null;
+        if (L.raw !== L.norm && codeOf(L.raw) !== codeOf(L.norm)) {
+          row = SW.$('#L' + p + '-' + L.n, view); var t = row && row.querySelector('.t');
+          if (t && !row.classList.contains('rp-fix')) {
+            row.classList.add('rp-norm');
+            var shown = opts.norm ? L.norm : L.raw, other = opts.norm ? L.raw : L.norm, d = diffSpan(other, shown);
+            if (d[1] > d[0]) wrapChars(t, d[0], d[1], 'rp-c rp-c-norm', 'Normalised for assembly (a change for running, not to the reading): the assembler reads “' + L.norm.trim() + '”');
+          }
+        }
+        if (/\[\?/.test(L.raw) && codeOf(L.raw)) { row = row || SW.$('#L' + p + '-' + L.n, view); if (row) row.classList.add('rp-unc'); }
+      });
+    });
+  }
+
   // The listing alone, so choosing a tape keeps the toolbar (and a search) as it is.
   function renderListing() {
     var b = build, info = tapeInfo(b), bar = SW.$('#rd-selbar', view);
@@ -226,6 +292,8 @@
       sec.innerHTML = '<div class="part-head" data-p="' + pi + '">' +
         '<div class="ph-main">' + (b.parts.length > 1 ? '<span class="ph-num">Tape ' + (pi + 1) + ' of ' + b.parts.length + '</span>' : '') +
         '<span class="ph-title">' + SW.esc(t.label) + '</span> ' + SW.refTag(b.v.id, pi, null, null, b.parts.length) +
+        (part.role && part.role !== 'program' ? ' <span class="rp-chip rp-sup" title="Supplied: this tape is not part of this version’s surviving text. It comes from another: ' + SW.esc(part.role) + '. Like a piece from another vessel set into a mended bowl (yobitsugi).">supplied</span>' :
+         /R$/.test(SW.REF[b.v.id] || '') ? ' <span class="rp-chip rp-rec" title="A reconstruction: this text was rebuilt, not transcribed from a surviving listing or tape (the R of its reference). ' + SW.esc(SW.MADE[b.v.id] || '') + '">reconstruction</span>' : '') +
         (errs ? '<button class="badge err" data-asmerrs title="What the error' + (errs > 1 ? 's are' : ' is') + ', explained">' + errs + ' error' + (errs > 1 ? 's' : '') + '</button>' : '') + '</div>' +
         '<div class="ph-sub">' + SW.sourceLink(part.src, part.src.split('/').pop()) +
         ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
@@ -241,6 +309,8 @@
     wrap.appendChild(box);
     wrap.appendChild(margin);
     view.insertBefore(wrap, bar);
+    paintRepairs();
+    box.classList.toggle('no-repairs', !opts.repairs);
     wireBox(box);
     wireMargin(margin);
     applyFilter();
@@ -891,6 +961,7 @@
   }
   SW.on('notes-history', paintUndo);
   function wireTb(tb) {
+    SW.$('#rd-repairs', tb).onchange = function (e) { opts.repairs = e.target.checked; SW.store.set('read.repairs', opts.repairs); var bx = SW.$('.listing', view); if (bx) bx.classList.toggle('no-repairs', !opts.repairs); };
     SW.$('#rd-undo', tb).onclick = function () { N.undo(); };
     SW.$('#rd-redo', tb).onclick = function () { N.redo(); };
     setTimeout(paintUndo, 0);

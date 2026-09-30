@@ -230,13 +230,20 @@
       if (p.role !== 'program') items.push(['Supplied tape', p.src + ': ' + p.role]);
       if (p.title > 1) items.push(['Skipped header', p.src + ': lines 1–' + (p.title - 1) + ' (transcription header, not assembled)']);
     });
+    // the repairs register: readings corrected against the scan, lines remade (kintsugi in Read)
+    b.parts.forEach(function (p, pi) {
+      ((V.REPAIRS || {})[p.src] || []).forEach(function (r) {
+        items.push([r.kind === 'rebuilt' ? 'Remade' : 'Corrected', SW.refText(b.v.id, pi, r.n, r.n, b.parts.length) + '  ' + (r.was ? '“' + r.was + '” → ' : '') + '“' + r.now + '”  (' + r.ev + '; ' + r.by + ', ' + r.date + ')']);
+      });
+    });
+    if (/R$/.test(SW.REF[b.v.id] || '')) items.push(['Reconstruction', SW.refText(b.v.id) + '  ' + (SW.MADE[b.v.id] || 'a reconstructed text')]);
     (b.v.transforms || []).forEach(function (k) { items.push(['Normalisation', V.TRANSFORMS[k].label]); });
     var norm = 0; b.lines.forEach(function (ls) { ls.forEach(function (L) { if (L.raw !== L.norm && !L.skipped) norm++; }); });
     if (norm) items.push(['Lines normalised', String(norm)]);
     allLines(b).forEach(function (L) { if (/illegible|\[\?|uncertain|unclear/i.test(L.raw)) items.push(['Marked uncertain', SW.refText(b.v.id, L.p, L.n, L.n, b.parts.length) + '  ' + L.raw.trim()]); });
     if (b.asm) b.asm.errors.forEach(function (e) { items.push(['Assembly error', SW.refText(b.v.id, e.file, e.line, e.line, b.parts.length) + '  ' + e.message + (e.symbol ? ' "' + e.symbol + '"' : '')]); });
     V.VERSIONS.filter(function (v) { return v.status === 'lost'; }).forEach(function (v) { items.push(['Lost version', v.label + ' (' + v.date + '): ' + v.summary]); });
-    var c = card('What the record does not hold', 'Every place where this build depends on something other than the text as held: supplied tapes, normalisations, uncertain readings, errors, and the versions that do not survive at all.');
+    var c = card('What the record does not hold', 'Every place where this build depends on something other than the text as held, the version’s reconstruction card: readings corrected against the scan and lines remade (marked in gold in Read), supplied tapes, normalisations, uncertain readings, errors, and the versions that do not survive at all.');
     c.appendChild(SW.table(['Kind', 'Detail'], items, { cls: ['', 'mono'] }));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);

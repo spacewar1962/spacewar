@@ -189,6 +189,35 @@
       witnesses: ['spacewar-2015-landsteiner.rim'] }
   ];
 
+  // Repairs made to the texts to make them read and run, marked in Read in gold
+  // (kintsugi): by source file, line (as the file numbers it; line counts are kept
+  // when a text is corrected), what the text had, what it has now, the evidence,
+  // who and when. kind: 'fix', a reading corrected against the scan (a crack filled);
+  // 'rebuilt', a line supplied where none can be read (a lost piece remade).
+  // Normalisations for assembly (versions' transforms), supplied tapes and
+  // uncertain [?] readings are read from the build itself.
+  var REPAIRS = {
+    'spacewar-4.0-2feb1963-(Morris).txt': [
+      { n: 1130, kind: 'fix', was: 'jmp sr1', now: 'jmp srt', ev: 'scan p. 27', by: 'the project', date: '29 Sep 2026' },
+      { n: 1135, kind: 'fix', was: 'jmp sr1', now: 'jmp srt', ev: 'scan p. 27', by: 'the project', date: '29 Sep 2026' }],
+    'spacewar-4.2-11may1963-(Morris).txt': [
+      { n: 444, kind: 'fix', was: 'dpy-1', now: 'dpy-i', ev: 'scan p. 10', by: 'the project', date: '28 Sep 2026' }],
+    'spacewar-4.3-17may1963-(Morris).txt': [
+      { n: 475, kind: 'fix', was: 'dpy-1', now: 'dpy-i', ev: 'scan p. 10', by: 'the project', date: '28 Sep 2026' }],
+    'spacewar-4.4-21may1963-(Morris).txt': [
+      { n: 445, kind: 'rebuilt', was: '', now: 'lac ~by', ev: 'clipped at the page break (scan pp. 9–10); supplied as in 3.1, following Landsteiner 2015', by: 'the project', date: '29 Sep 2026' },
+      { n: 446, kind: 'rebuilt', was: '', now: 'cma', ev: 'clipped at the page break (scan pp. 9–10); supplied as in 3.1, following Landsteiner 2015', by: 'the project', date: '29 Sep 2026' },
+      { n: 447, kind: 'rebuilt', was: '', now: 'dac ~by', ev: 'clipped at the page break (scan pp. 9–10); supplied as in 3.1, following Landsteiner 2015', by: 'the project', date: '29 Sep 2026' },
+      { n: 666, kind: 'fix', was: 'law i 1', now: 'law i1', ev: 'scan p. 15 (the error MACRO reported in 1963, F48)', by: 'the project', date: '29 Sep 2026' }],
+    'spacewar-4.8-scorer-24jul1963.txt': [
+      { n: 12, kind: 'fix', was: 'lac ( jmpscc 1', now: 'lac (jmp scc 1', ev: 'the scan', by: 'the project', date: '29 Sep 2026' },
+      { n: 16, kind: 'fix', was: '', now: 'dzm ssm', ev: 'the scan (the line was missing from the transcription; a blank line after dio t2 taken out to keep the count)', by: 'the project', date: '29 Sep 2026' },
+      { n: 24, kind: 'fix', was: 'add isc', now: 'add 1sc', ev: 'the scan', by: 'the project', date: '29 Sep 2026' },
+      { n: 38, kind: 'fix', was: 'rar is', now: 'rar 1s', ev: 'the scan', by: 'the project', date: '29 Sep 2026' },
+      { n: 61, kind: 'fix', was: 'jmp 1 .', now: 'jmp i .', ev: 'the scan', by: 'the project', date: '29 Sep 2026' },
+      { n: 67, kind: 'fix', was: 'jsp 1 cwg', now: 'jsp i cwg', ev: 'the scan', by: 'the project', date: '29 Sep 2026' }]
+  };
+
   // Assembler dialects: 'macro1963' allots overlined variables when a macro
   // is defined (as the 1962-63 MACRO did, which reproduces the authentic 2B
   // and 3.1 tapes); 'macro1' is the 2003 cross-assembler used for the
@@ -320,7 +349,7 @@
     });
   }
 
-  var api = { VERSIONS: VERSIONS, TRANSFORMS: TRANSFORMS, DIALECTS: DIALECTS, byId: byId, load: load,
+  var api = { VERSIONS: VERSIONS, TRANSFORMS: TRANSFORMS, DIALECTS: DIALECTS, REPAIRS: REPAIRS, byId: byId, load: load,
               findTitle: findTitle, SRC: SRC, LINES: LINES, ancestry: ancestry };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SWVersions = api;
