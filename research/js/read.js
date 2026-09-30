@@ -8,7 +8,7 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true), repairs: SW.store.get('read.repairs', true) };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), onlyRepaired: false, kinNorm: SW.store.get('read.kinNorm', false), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true), repairs: SW.store.get('read.repairs', true) };
   // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
   // cycled from the chevron on the Annotations heading.
   var SHOW = { all: '▾ All', mine: '▾ Mine', open: '▾ Open', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'open', open: 'none', none: 'all' };
@@ -149,7 +149,9 @@
       '<label class="check" title="Mark in gold where the text had to be changed to read or run (kintsugi): readings corrected against the scan, lines remade, lines normalised for the assembler (paler), uncertain readings (grey). Hover a mark for what was there and why."><input type="checkbox" id="rd-repairs"' + (opts.repairs ? ' checked' : '') + '> Repairs (gold)</label>' +
       '</div></details><span class="hint" id="rd-nf"></span>' +
       '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>' +
-      '<span class="kin-nav" hidden><button class="btn" id="rd-kprev" title="The previous repair">‹</button><button class="btn" id="rd-klist" title="The repairs in this text: corrected, remade, uncertain (click for the list)">◆ <span class="kin-n"></span></button><button class="btn" id="rd-knext" title="The next repair">›</button></span>';
+      '<span class="kin-nav" hidden><button class="btn" id="rd-kprev" title="The previous repair">‹</button>' +
+      '<details class="menu kin-menu"><summary class="btn" id="rd-klist" title="Repairs: where this text had to be changed to read or run (kintsugi). Click for the menu">◆ <span class="kin-n"></span> <span class="kin-chev" aria-hidden="true">⌄</span></summary><div class="menu-body kin-body"></div></details>' +
+      '<button class="btn" id="rd-knext" title="The next repair">›</button></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
@@ -251,7 +253,7 @@
   // The repairs in order through the text, for ◆ ‹ › in the toolbar: corrected,
   // remade and uncertain lines (normalisations are left to the pale marks)
   var kinAt = -1;
-  function kinRows() { return SW.$$('.listing .ln.rp-fix, .listing .ln.rp-kake, .listing .ln.rp-unc', view).filter(function (r) { return r.offsetParent; }); }
+  function kinRows(all) { return SW.$$('.listing .ln.rp-fix, .listing .ln.rp-kake, .listing .ln.rp-unc' + (opts.kinNorm ? ', .listing .ln.rp-norm' : ''), view).filter(function (r) { return all || r.offsetParent; }); }
   function kinWhat(r) {
     var m = r.querySelector('.rp-c[title]');
     return m ? m.title : r.classList.contains('rp-unc') ? 'Uncertain reading, left as found: ' + (build.lines[+r.dataset.p][+r.dataset.n - 1] || { raw: '' }).raw.trim() : '';
@@ -285,6 +287,73 @@
     }).join('') + '</div>');
     var pop = SW.$('.pop');
     if (pop) pop.addEventListener('click', function (e) { var a = e.target.closest('[data-k]'); if (!a) return; e.preventDefault(); SW.unpop(); kinGo(rows[+a.dataset.k]); });
+  }
+  // ◆ ▾: the repairs menu (built each time it opens, so it shows the state as it is)
+  function kinCurrent() {   // the selected line if it is a repair, else the next one after it
+    var rows = kinRows(), s = SW.state.sel;
+    if (!rows.length) return null;
+    if (s) { var hit = rows.filter(function (r) { return +r.dataset.p === s.p && +r.dataset.n >= s.n0 && +r.dataset.n <= s.n1; })[0]; if (hit) return hit;
+             var nx = rows.filter(function (r) { return +r.dataset.p > s.p || (+r.dataset.p === s.p && +r.dataset.n > s.n1); })[0]; if (nx) return nx; }
+    return rows[0];
+  }
+  function kinScan(r) {   // the scanned listing, and the page the evidence names
+    if (!r) return null;
+    var p = +r.dataset.p, n = +r.dataset.n, src = build.parts[p].src, pdf = src.replace(/\.txt$/, '.pdf');
+    if (!SW.SWHID || !SW.SWHID[pdf]) return null;
+    var reg = ((root.SWVersions.REPAIRS || {})[src] || []).filter(function (x) { return x.n === n; })[0];
+    var m = reg && /scan pp?\.\s*(\d+)/.exec(reg.ev);
+    return { url: '../sources/' + pdf + (m ? '#page=' + m[1] : ''), page: m ? m[1] : '' };
+  }
+  function kinMenu(body) {
+    var n = kinRows().length, nn = SW.$$('.listing .ln.rp-norm', view).length, cur = kinCurrent(), sc = kinScan(cur);
+    body.innerHTML =
+      '<button data-km="prev">‹ Previous repair</button><button data-km="next">Next repair ›</button>' +
+      '<button data-km="list">All the repairs in this text (' + n + ')…</button>' +
+      '<button data-km="scan"' + (sc ? '' : ' disabled') + ' title="' + (sc ? 'The scanned listing, in a new tab' : 'No scan held for this text, or no page named') + '">Open the scan' + (sc && sc.page ? ' at p. ' + sc.page : '') + (cur ? ' (' + SW.esc(SW.refText(build.v.id, +cur.dataset.p, +cur.dataset.n, +cur.dataset.n, build.parts.length)) + ')' : '') + ' ↗</button>' +
+      '<hr class="menu-rule">' +
+      '<label class="check"><input type="checkbox" data-km="only"' + (opts.onlyRepaired ? ' checked' : '') + '> Show only the repaired lines (two either side)</label>' +
+      '<label class="check"><input type="checkbox" data-km="norm"' + (opts.kinNorm ? ' checked' : '') + '> Include normalisations (' + nn + ')</label>' +
+      '<label class="check"><input type="checkbox" data-km="marks"' + (opts.repairs ? ' checked' : '') + '> Gold marks on</label>' +
+      '<hr class="menu-rule">' +
+      '<button data-km="keep"' + (cur ? '' : ' disabled') + '>Add this repair to My notes' + (cur ? ' (' + SW.esc(SW.refText(build.v.id, +cur.dataset.p, +cur.dataset.n, +cur.dataset.n, build.parts.length)) + ')' : '') + '</button>' +
+      '<button data-km="copy">Copy the repairs, for citing</button>' +
+      '<button data-km="card">This version’s reconstruction card</button>' +
+      '<button data-km="cards">All reconstruction cards</button>' +
+      '<button data-km="about">About the repair marks</button>';
+  }
+  function kinAct(k, el) {
+    if (k === 'prev') kinStep(-1);
+    else if (k === 'next') kinStep(1);
+    else if (k === 'list') kinList(SW.$('#rd-klist', view));
+    else if (k === 'scan') { var sc = kinScan(kinCurrent()); if (sc) root.open(sc.url, '_blank', 'noopener'); }
+    else if (k === 'only') { opts.onlyRepaired = el.checked; applyFilter(); var f = kinRows()[0]; if (f && opts.onlyRepaired) f.scrollIntoView({ block: 'center' }); }
+    else if (k === 'norm') { opts.kinNorm = el.checked; SW.store.set('read.kinNorm', opts.kinNorm); if (opts.onlyRepaired) applyFilter(); kinPaint(); }
+    else if (k === 'marks') { var cb = SW.$('#rd-repairs', view); if (cb) { cb.checked = el.checked; cb.dispatchEvent(new Event('change')); } }
+    else if (k === 'copy') {
+      var lines = kinRows(true).map(function (r) { var w = kinWhat(r); return SW.refText(build.v.id, +r.dataset.p, +r.dataset.n, +r.dataset.n, build.parts.length) + '  ' + (w || (r.classList.contains('rp-norm') ? 'normalised for assembly' : '')); });
+      var text = 'Repairs in ' + build.v.label + ' ' + SW.refText(build.v.id) + ':\n' + lines.join('\n');
+      (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { SW.toast(lines.length + ' repairs copied'); }, function () { root.prompt('Copy:', text); });
+    }
+    else if (k === 'keep') {   // the line, cited, with what was done to it, into My notes
+      var r = kinCurrent(); if (!r || !SW.tray) return;
+      var p = +r.dataset.p, n = +r.dataset.n, L = build.lines[p][n - 1], ref = SW.refText(build.v.id, p, n, n, build.parts.length);
+      listingDoc(build, { p: p, n0: n, n1: n }).then(function (d) {
+        d.title = 'Repair ' + ref;
+        d.blocks.push({ type: 'p', text: kinWhat(r) || 'Normalised for assembly: the assembler reads “' + L.norm.trim() + '”' });
+        SW.tray.addDoc(d, { anchor: { p: p, n0: n, n1: n, src: build.parts[p].src }, quote: L.raw, tags: ['repair'] });
+      });
+    }
+    else if (k === 'card') { if (SW.setLens) SW.setLens(7); if (SW.forget) SW.forget('analyse'); SW.setTab('analyse'); }
+    else if (k === 'cards') SW.cardsHelp();
+    else if (k === 'about') {
+      var r0 = SW.$('#rd-klist', view).getBoundingClientRect();
+      SW.pop(r0.left, r0.bottom + 4, '<h4>The repair marks</h4><div class="keylist">' +
+        '<div><span style="color:var(--kin)">●</span> <span class="rp-c rp-c-fix">srt</span> a reading corrected against the scan</div>' +
+        '<div><span style="color:var(--kin)">■</span> <span class="rp-c rp-c-kake">cma</span> a line remade where none can be read</div>' +
+        '<div><span class="rp-c rp-c-norm">~ssn</span> normalised for assembly: a change for running, not to the reading</div>' +
+        '<div><span style="text-decoration:underline wavy var(--text-faint);text-underline-offset:4px">ior (4</span> an uncertain reading, left as found</div>' +
+        '<div class="faint" style="margin-top:6px">After kintsugi, the mending of pottery with gold, which leaves the repair visible: see Help ▸ What you should read, and Help ▸ Reconstruction cards.</div></div>');
+    }
   }
   function paintRepairs() {
     var reg = root.SWVersions.REPAIRS || {};
@@ -1004,7 +1073,10 @@
     SW.$('#rd-repairs', tb).onchange = function (e) { opts.repairs = e.target.checked; SW.store.set('read.repairs', opts.repairs); var bx = SW.$('.listing', view); if (bx) bx.classList.toggle('no-repairs', !opts.repairs); kinPaint(); };
     SW.$('#rd-kprev', tb).onclick = function () { kinStep(-1); };
     SW.$('#rd-knext', tb).onclick = function () { kinStep(1); };
-    SW.$('#rd-klist', tb).onclick = function (e) { e.stopPropagation(); kinList(e.currentTarget); };
+    var km = SW.$('.kin-menu', tb);
+    km.addEventListener('toggle', function () { if (km.open) kinMenu(SW.$('.kin-body', km)); });
+    SW.$('.kin-body', km).addEventListener('click', function (e) { var b = e.target.closest('[data-km]'); if (b && b.tagName !== 'INPUT') { e.preventDefault(); km.open = false; kinAct(b.dataset.km, b); } });
+    SW.$('.kin-body', km).addEventListener('change', function (e) { var b = e.target.closest('[data-km]'); if (b) kinAct(b.dataset.km, b); });
     SW.$('#rd-undo', tb).onclick = function () { N.undo(); };
     SW.$('#rd-redo', tb).onclick = function () { N.redo(); };
     setTimeout(paintUndo, 0);
@@ -1155,6 +1227,10 @@
   // Lines covered by notes, limited to those in which the chosen initials take part.
   function keptLines() {
     var keep = {};
+    if (opts.onlyRepaired) {
+      kinRows(true).forEach(function (r) { var p = +r.dataset.p, n = +r.dataset.n; for (var k = n - 2; k <= n + 2; k++) keep[p + ':' + k] = true; });
+      return keep;
+    }
     Object.keys(counts).forEach(function (k) {
       var c = counts[k];
       if (opts.by && c.by.indexOf(opts.by) < 0) return;
@@ -1162,7 +1238,7 @@
     });
     return keep;
   }
-  function filtering() { return opts.onlyNoted || !!opts.by; }
+  function filtering() { return opts.onlyNoted || !!opts.by || opts.onlyRepaired; }
   function fillBy() {
     var sel = SW.$('#rd-by', view);
     if (!sel) return;
@@ -1185,7 +1261,7 @@
       sec.classList.toggle('nf-empty', on && !SW.$('.ln:not(.nf-hide)', sec));
     });
     var out = SW.$('#rd-nf', view);
-    if (out) out.textContent = on ? shown + ' annotated line' + (shown === 1 ? '' : 's') + (opts.by ? ' with ' + opts.by : '') : '';
+    if (out) out.textContent = !on ? '' : opts.onlyRepaired ? shown + ' lines: the repairs, two either side' : shown + ' annotated line' + (shown === 1 ? '' : 's') + (opts.by ? ' with ' + opts.by : '');
     var box = SW.$('.listing', view);
     if (box) {
       var none = SW.$('.nf-none', box);
