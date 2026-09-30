@@ -256,7 +256,7 @@
   function kinRows(all) { return SW.$$('.listing .ln.rp-fix, .listing .ln.rp-kake, .listing .ln.rp-unc' + (opts.kinNorm ? ', .listing .ln.rp-norm' : ''), view).filter(function (r) { return all || r.offsetParent; }); }
   function kinWhat(r) {
     var m = r.querySelector('.rp-c[title]');
-    return m ? m.title : r.classList.contains('rp-unc') ? 'Uncertain reading, left as found: ' + (build.lines[+r.dataset.p][+r.dataset.n - 1] || { raw: '' }).raw.trim() : '';
+    return m ? m.title.replace(/^Kintsugi · /, '') : r.classList.contains('rp-unc') ? 'Uncertain reading, left as found: ' + (build.lines[+r.dataset.p][+r.dataset.n - 1] || { raw: '' }).raw.trim() : '';
   }
   function kinPaint() {
     var nav = SW.$('.kin-nav', view); if (!nav) return;
@@ -361,7 +361,7 @@
       (reg[part.src] || []).forEach(function (r) {
         var row = SW.$('#L' + p + '-' + r.n, view), t = row && row.querySelector('.t'); if (!t) return;
         var L = build.lines[p][r.n - 1], text = opts.norm ? L.norm : L.raw, at = text.indexOf(r.now);
-        var why = (r.kind === 'rebuilt' ? 'Remade: no reading survives here. ' : 'Corrected: ') + (r.was ? 'the transcription had “' + r.was + '”; ' : r.kind === 'fix' ? 'missing from the transcription; ' : '') + 'now “' + r.now + '”. Evidence: ' + r.ev + '. By ' + r.by + ', ' + r.date + '.';
+        var why = 'Kintsugi · ' + (r.kind === 'rebuilt' ? 'Remade: no reading survives here. ' : 'Corrected: ') + (r.was ? 'the transcription had “' + r.was + '”; ' : r.kind === 'fix' ? 'missing from the transcription; ' : '') + 'now “' + r.now + '”. Evidence: ' + r.ev + '. By ' + r.by + ', ' + r.date + '.';
         row.classList.add(r.kind === 'rebuilt' ? 'rp-kake' : 'rp-fix');
         if (at < 0) return;
         var d = r.was ? diffSpan(r.was, r.now) : [0, r.now.length];
@@ -376,10 +376,13 @@
           if (t && !row.classList.contains('rp-fix')) {
             row.classList.add('rp-norm');
             var shown = opts.norm ? L.norm : L.raw, other = opts.norm ? L.raw : L.norm, d = diffSpan(other, shown);
-            if (d[1] > d[0]) wrapChars(t, d[0], d[1], 'rp-c rp-c-norm', 'Normalised for assembly (a change for running, not to the reading): the assembler reads “' + L.norm.trim() + '”');
+            if (d[1] > d[0]) wrapChars(t, d[0], d[1], 'rp-c rp-c-norm', 'Kintsugi · Normalised for assembly (a change for running, not to the reading): the assembler reads “' + L.norm.trim() + '”');
           }
         }
-        if (/\[\?/.test(L.raw) && codeOf(L.raw)) { row = row || SW.$('#L' + p + '-' + L.n, view); if (row) row.classList.add('rp-unc'); }
+        if (/\[\?/.test(L.raw) && codeOf(L.raw)) {
+          row = row || SW.$('#L' + p + '-' + L.n, view);
+          if (row) { row.classList.add('rp-unc'); var tu = row.querySelector('.t'); if (tu && !tu.title && !tu.querySelector('.rp-c')) tu.title = 'Kintsugi · Uncertain reading, left as found (not repaired): ' + L.raw.trim(); }
+        }
       });
     });
   }
@@ -400,8 +403,8 @@
       sec.innerHTML = '<div class="part-head" data-p="' + pi + '">' +
         '<div class="ph-main">' + (b.parts.length > 1 ? '<span class="ph-num">Tape ' + (pi + 1) + ' of ' + b.parts.length + '</span>' : '') +
         '<span class="ph-title">' + SW.esc(t.label) + '</span> ' + SW.refTag(b.v.id, pi, null, null, b.parts.length) +
-        (part.role && part.role !== 'program' ? ' <span class="rp-chip rp-sup" title="Supplied: this tape is not part of this version’s surviving text. It comes from another: ' + SW.esc(part.role) + '. Like a piece from another vessel set into a mended bowl (yobitsugi).">supplied</span>' :
-         /R$/.test(SW.REF[b.v.id] || '') ? ' <span class="rp-chip rp-rec" title="A reconstruction: this text was rebuilt, not transcribed from a surviving listing or tape (the R of its reference). ' + SW.esc(SW.MADE[b.v.id] || '') + '">reconstruction</span>' : '') +
+        (part.role && part.role !== 'program' ? ' <span class="rp-chip rp-sup" title="Kintsugi · Supplied (yobitsugi): this tape is not part of this version’s surviving text. It comes from another: ' + SW.esc(part.role) + '. Like a piece from another vessel set into a mended bowl (yobitsugi).">supplied</span>' :
+         /R$/.test(SW.REF[b.v.id] || '') ? ' <span class="rp-chip rp-rec" title="Kintsugi · A reconstruction: this text was rebuilt, not transcribed from a surviving listing or tape (the R of its reference). ' + SW.esc(SW.MADE[b.v.id] || '') + '">reconstruction</span>' : '') +
         (errs ? '<button class="badge err" data-asmerrs title="What the error' + (errs > 1 ? 's are' : ' is') + ', explained">' + errs + ' error' + (errs > 1 ? 's' : '') + '</button>' : '') + '</div>' +
         '<div class="ph-sub">' + SW.sourceLink(part.src, part.src.split('/').pop()) +
         ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
