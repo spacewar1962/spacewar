@@ -385,15 +385,14 @@
         '<div class="faint" style="margin-top:6px">After kintsugi, the mending of pottery with gold, which leaves the repair visible: see Help ▸ What you should read, and Help ▸ Reconstruction cards.</div></div>');
     }
   }
-  // The gold squiggle under a repaired line, from its number to the end of its code:
+  // The squiggle under a repaired (gold) or uncertain (grey) line, its code and comment:
   // measured once drawn, in em so it follows the text size
   function kinMeasure() {
     SW.$$('.listing .ln.rp-sq', view).forEach(function (row) {
-      var rl = row.querySelectorAll('.rp-line'), nn = row.querySelector('.n'), last = rl[rl.length - 1];
-      if (!last || !nn || !nn.lastChild) return;
-      var r0 = row.getBoundingClientRect(), fs = parseFloat(getComputedStyle(row).fontSize) || 13, rg = document.createRange();
-      rg.selectNodeContents(nn.lastChild);
-      var a = rg.getBoundingClientRect().left - r0.left, z = last.getBoundingClientRect().right - r0.left;
+      var rl = row.querySelectorAll('.rp-line'), first = rl[0], last = rl[rl.length - 1];
+      if (!last) return;
+      var r0 = row.getBoundingClientRect(), fs = parseFloat(getComputedStyle(row).fontSize) || 13;
+      var tt = row.querySelector('.t'), a = first.getBoundingClientRect().left - r0.left, z = Math.min(last.getBoundingClientRect().right, tt ? tt.getBoundingClientRect().right : Infinity) - r0.left;   // not past a comment cut short
       if (!r0.width || z <= a) return;
       row.style.setProperty('--k0', (a / fs).toFixed(2) + 'em');
       row.style.setProperty('--kw', ((z - a) / fs).toFixed(2) + 'em');
@@ -407,8 +406,8 @@
         var L = build.lines[p][r.n - 1], text = opts.norm ? L.norm : L.raw, at = text.indexOf(r.now);
         var why = 'Kintsugi · ' + (r.kind === 'rebuilt' ? 'Remade: no reading survives here. ' : 'Corrected: ') + (r.was ? 'the transcription had “' + r.was + '”; ' : r.kind === 'fix' ? 'missing from the transcription; ' : '') + 'now “' + r.now + '”. Evidence: ' + r.ev + '. By ' + r.by + ', ' + r.date + '.';
         row.classList.add(r.kind === 'rebuilt' ? 'rp-kake' : 'rp-fix');
-        // the whole of the line's code, wavy in gold (not its comment)
-        var cm = text.search(/\//), c1 = (cm < 0 ? text : text.slice(0, cm)).replace(/\s+$/, '').length, c0 = text.search(/\S/);
+        // the line's code and comment, with a gold squiggle under them
+        var c1 = text.replace(/\s+$/, '').length, c0 = text.search(/\S/);
         if (c0 >= 0 && c1 > c0) { wrapChars(t, c0, c1, 'rp-line', why); row.classList.add('rp-sq'); }
         if (at < 0) return;
         var d = r.was ? diffSpan(r.was, r.now) : [0, r.now.length];
@@ -428,7 +427,11 @@
         }
         if (/\[\?/.test(L.raw) && codeOf(L.raw)) {
           row = row || SW.$('#L' + p + '-' + L.n, view);
-          if (row) { row.classList.add('rp-unc'); var tu = row.querySelector('.t'); if (tu && !tu.title && !tu.querySelector('.rp-c')) tu.title = 'Kintsugi · Uncertain reading, left as found (not repaired): ' + L.raw.trim(); }
+          if (row) {
+            row.classList.add('rp-unc');
+            var tu = row.querySelector('.t'), sh = opts.norm ? L.norm : L.raw, u0 = sh.search(/\S/), u1 = sh.replace(/\s+$/, '').length;
+            if (tu && !row.classList.contains('rp-sq') && u0 >= 0 && u1 > u0) { wrapChars(tu, u0, u1, 'rp-line', 'Kintsugi · Uncertain reading, left as found (not repaired): ' + L.raw.trim()); row.classList.add('rp-sq', 'rp-sq-unc'); }
+          }
         }
       });
     });
