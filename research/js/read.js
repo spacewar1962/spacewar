@@ -343,7 +343,7 @@
         SW.tray.addDoc(d, { anchor: { p: p, n0: n, n1: n, src: build.parts[p].src }, quote: L.raw, tags: ['repair'] });
       });
     }
-    else if (k === 'card') { if (SW.setLens) SW.setLens(7); if (SW.forget) SW.forget('analyse'); SW.setTab('analyse'); }
+    else if (k === 'card') SW.cardsOne(build.v.id);
     else if (k === 'cards') SW.cardsHelp();
     else if (k === 'about') {
       var r0 = SW.$('#rd-klist', view).getBoundingClientRect();

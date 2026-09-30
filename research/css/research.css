@@ -1660,9 +1660,21 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .readhelp .rh-ref { margin: 0 0 10px; padding-left: 1.6em; text-indent: -1.6em; font-family: var(--serif); font-size: 14.5px; line-height: 1.5; }
 .readhelp .rh-note { display: block; text-indent: 0; margin-top: 3px; font: 12px var(--sans); color: var(--kin); }
 .readhelp .rh-ref a { overflow-wrap: anywhere; }
-.cardshelp .cards-t td.num { text-align: right; }
-.cardshelp .cards-t a { color: var(--beam); }
-.cardshelp .cards-made { font-size: 12px; color: var(--text-dim); max-width: 26em; }
+.kin-card { border: 1px solid var(--kin); border-left-width: 3px; border-radius: 4px; padding: 10px 14px; margin: 16px 0; background: color-mix(in srgb, var(--kin) 10%, transparent); }
+.kin-card h3 { color: var(--kin); margin: 0 0 6px; }
+.kin-card h3 .swref-sm { font-size: 11px; font-weight: 400; color: var(--text-faint); margin-left: 6px; }
+.kin-card .hint { margin: 0 0 8px; }
+.kin-card .kin-t td { font-size: 12.5px; }
+.kin-card .kin-t td:first-child { white-space: nowrap; }
+.kin-card .rp-chip, .cardshelp .keylist .rp-chip { margin-left: 0; white-space: nowrap; }
+.rp-chip.rp-m-yobitsugi { background: color-mix(in srgb, var(--kin) 14%, transparent); }
+.rp-chip.rp-m-kake { background: color-mix(in srgb, var(--kin) 22%, transparent); }
+.rp-chip.rp-m-mount { border-color: color-mix(in srgb, var(--kin) 50%, transparent); color: color-mix(in srgb, var(--kin) 70%, var(--text-faint)); }
+.rp-chip.rp-m-unc { border-color: var(--text-faint); color: var(--text-faint); }
+.cardshelp .kin-key { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 16px; font-size: 12.5px; margin: 6px 0 12px; }
+.kin-pick { display: flex; gap: 6px; align-items: center; margin: 10px 0 0; }
+.kin-pick select { flex: 1; min-width: 0; max-width: 36em; font: 13px var(--mono); padding: 4px 6px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
+.kin-pick + .kin-one .kin-card { margin-top: 10px; }
 /* ◆ ‹ ›: the repairs in the text */
 .toolbar .kin-nav { display: inline-flex; gap: 2px; margin-left: 4px; }
 .toolbar .kin-nav[hidden] { display: none; }

@@ -494,50 +494,118 @@
     d.addEventListener('close', function () { d.remove(); });
   };
 
-  // ---------- Help ▸ Reconstruction cards ----------
-  // For every version the bench builds, what was done to it to read and run:
-  // corrections, lines remade, normalisations that change the code, uncertain
-  // readings, tapes supplied from other texts, and whether it is a reconstruction.
-  // Each opens that version's full card (Program ▸ What the record does not hold).
-  SW.cardsHelp = function () {
+  // ---------- Reconstruction cards (as on the SHRDLU bench) ----------
+  // A card per version the bench builds: every repair made to read and run it,
+  // with its line, kind, evidence and author. Gold in Read; the held files are
+  // never altered.
+  function cardCode(x) { return String(x || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim(); }
+  var KCHIP = {
+    fix: ['rp-m-hibi', 'Corrected', 'A reading corrected against the scan'],
+    rebuilt: ['rp-m-kake', 'Remade', 'A line remade where no reading survives'],
+    sup: ['rp-m-yobitsugi', 'Supplied', 'A tape supplied from another text'],
+    rec: ['rp-m-yobitsugi', 'Reconstruction', 'The whole text is a reconstruction'],
+    norm: ['rp-m-mount', 'For assembly', 'How the assembler reads the text, not the reading itself'],
+    unc: ['rp-m-unc', 'Uncertain', 'A reading marked uncertain in the transcription, left as found']
+  };
+  function kchip(k) { var c = KCHIP[k]; return '<span class="rp-chip ' + c[0] + '" title="' + SW.esc(c[2]) + '">' + c[1] + '</span>'; }
+  // the card as data: one row per repair, [where, kind, what, evidence, by]
+  function cardRows(b) {
+    var V = root.SWVersions, v = b.v, rows = [], n = b.parts.length;
+    if (/R$/.test(SW.REF[v.id] || '')) rows.push([SW.refOf(v.id), 'rec', SW.MADE[v.id] || 'a reconstructed text', '', '']);
+    b.parts.forEach(function (part, pi) {
+      if (part.role && part.role !== 'program') rows.push([SW.refOf(v.id, pi, null, null, n), 'sup', part.src + ': ' + part.role, '', '']);
+      ((V.REPAIRS || {})[part.src] || []).forEach(function (r) {
+        rows.push([SW.refOf(v.id, pi, r.n, r.n, n), r.kind === 'rebuilt' ? 'rebuilt' : 'fix', (r.was ? '“' + r.was + '” → ' : '') + '“' + r.now + '”', r.ev, r.by + ', ' + r.date]);
+      });
+    });
+    var norm = 0, unc = [];
+    b.lines.forEach(function (ls, pi) { ls.forEach(function (L) {
+      if (L.skipped) return;
+      if (L.raw !== L.norm && cardCode(L.raw) !== cardCode(L.norm)) norm++;
+      if (/\[\?/.test(L.raw) && cardCode(L.raw)) unc.push([pi, L]);
+    }); });
+    if (norm || (v.transforms || []).length) rows.push([SW.refOf(v.id), 'norm', (norm ? norm + ' line' + (norm === 1 ? '' : 's') + ' whose code the assembler reads in another form' : 'no line’s code changed') +
+      ((v.transforms || []).length ? ': ' + v.transforms.map(function (k) { return V.TRANSFORMS[k].label; }).join('; ') : ''), 'the bench’s assembler', 'the bench']);
+    unc.forEach(function (u) { rows.push([SW.refOf(v.id, u[0], u[1].n, u[1].n, n), 'unc', u[1].raw.trim(), 'the transcription', '']); });
+    return rows;
+  }
+  SW.reconstructionCard = function (b) {
+    var v = b.v, esc = SW.esc, rows = cardRows(b);
+    return '<div class="kin-card"><h3>Reconstruction card: ' + esc(v.label) + ' <span class="swref-sm mono">' + esc(SW.refText(v.id)) + '</span></h3>' +
+      (SW.MADE[v.id] ? '<p class="hint">This text: ' + esc(SW.MADE[v.id].replace(/read by the bench/, 'read by the project')) + '.</p>' : '') +
+      (rows.length ? '<table class="ov-sub kin-t"><thead><tr><th>Where</th><th>Kind</th><th>What</th><th>Evidence</th><th>By</th></tr></thead><tbody>' +
+        rows.map(function (r) { return '<tr><td class="mono">' + esc(r[0]) + '</td><td>' + kchip(r[1]) + '</td><td' + (r[1] === 'norm' || r[1] === 'rec' || r[1] === 'sup' ? '' : ' class="mono"') + '>' + esc(r[2]) + '</td><td class="faint">' + esc(r[3]) + '</td><td class="faint">' + esc(r[4]) + '</td></tr>'; }).join('') +
+        '</tbody></table>' : '<p>No repairs: the text is read and assembled as held.</p>') + '</div>';
+  };
+  // for Copy, export and My notes
+  SW.cardText = function (b) {
+    var rows = cardRows(b);
+    return 'Reconstruction card: ' + b.v.label + ' ' + SW.refText(b.v.id) + ' (Spacewar! Research Bench ' + SW.VERSION + ')\n' +
+      (SW.MADE[b.v.id] ? 'This text: ' + SW.MADE[b.v.id] + '.\n' : '') +
+      (rows.length ? rows.map(function (r) { return r[0] + '  ' + KCHIP[r[1]][1] + ': ' + r[2] + (r[3] ? '. Evidence: ' + r[3] : '') + (r[4] ? '. By ' + r[4] : '') + '.'; }).join('\n') : 'No repairs.');
+  };
+  function cardBlocks(b) {
+    var rows = cardRows(b);
+    return [{ type: 'h2', text: 'Reconstruction card: ' + b.v.label + ' ' + SW.refText(b.v.id) }]
+      .concat(SW.MADE[b.v.id] ? [{ type: 'p', text: 'This text: ' + SW.MADE[b.v.id] + '.' }] : [])
+      .concat(rows.length ? [{ type: 'table', head: ['Where', 'Kind', 'What', 'Evidence', 'By'], rows: rows.map(function (r) { return [r[0], KCHIP[r[1]][1], r[2], r[3], r[4]]; }) }] : [{ type: 'p', text: 'No repairs.' }]);
+  }
+  SW.cardDoc = function (bs) {
+    return { title: bs.length === 1 ? 'Reconstruction card: ' + bs[0].v.label : 'Spacewar! reconstruction cards',
+      subtitle: 'What was done to each surviving text to read and run it',
+      meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION], ['Bench', SW.BASE_URI]],
+      blocks: [{ type: 'p', text: 'After the principles for repairing digital ruins (Berry 2025): minimum intervention, reversible, recorded, and marked in gold in Read. The held files are never altered.' }]
+        .concat([].concat.apply([], bs.map(cardBlocks))) };
+  };
+  // One card at a time, chosen from a list of the versions the bench builds
+  function cardDialog(id) {
     var V = root.SWVersions, vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; });
-    function codeOf(x) { return String(x || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim(); }
+    var cur = V.byId(id) && V.byId(id).build ? id : vs[0].id, esc = SW.esc;
     var d = SW.el('dialog', { class: 'tray-big annohelp cardshelp' });
-    d.innerHTML = '<div class="tray-bighead"><b>Reconstruction cards</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="ah">' +
-      '<p>What was done to each surviving text to read and run it, after the principle that a repair should stay visible (Help ▸ What you should read). In Read the repairs are marked in gold. Click a version for its full card: every repair with its line, the evidence, who made it and when.</p>' +
-      '<table class="ov-sub cards-t"><thead><tr><th>Reference</th><th>Version</th><th title="Readings corrected against the scan">Corrected</th><th title="Lines remade where none can be read">Remade</th><th title="Lines whose code the assembler reads differently (normalised)">Normalised</th><th title="Readings marked uncertain">Uncertain</th><th title="Tapes supplied from other texts">Supplied</th><th>How this text was made</th></tr></thead><tbody>' +
-      vs.map(function (v) { return '<tr data-v="' + SW.esc(v.id) + '"><td class="mono">' + SW.esc(SW.refOf(v.id)) + '</td><td><a href="#" data-card="' + SW.esc(v.id) + '">' + SW.esc(v.label) + '</a></td><td class="num" colspan="5"><span class="faint">…</span></td><td class="cards-made">' + SW.esc(SW.MADE[v.id] ? SW.MADE[v.id].replace(/read by the bench/, 'read by the project') : (/R$/.test(SW.REF[v.id] || '') ? 'a reconstruction' : '')) + '</td></tr>'; }).join('') +
-      '</tbody></table></div>';
+    d.innerHTML = '<div class="tray-bighead"><b>Reconstruction cards</b><span class="refhelp-acts">' +
+      '<button class="btn ghost" data-cx="copy" title="This card as plain text, with its references">⧉ Copy</button>' +
+      '<details class="menu more-menu"><summary class="btn ghost" title="This card, or every card, as a file">⤓ Export ▾</summary><div class="menu-body">' +
+      '<button class="btn ghost" data-cx="docx">⤓ This card, Word</button><button class="btn ghost" data-cx="md">⤓ This card, Markdown</button>' +
+      '<button class="btn ghost" data-cx="docx-all">⤓ All cards, Word</button><button class="btn ghost" data-cx="md-all">⤓ All cards, Markdown</button></div></details>' +
+      '<button class="btn ghost" data-cx="keep" title="Put this card in My notes (private), to gather with others for a chapter">＋ My notes</button>' +
+      '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div><div class="ah">' +
+      '<p>What was done to each surviving text to read and run it, after the principles for repairing digital ruins (Berry 2025): minimum intervention, reversible, recorded, and marked in gold in Read. The held files are never altered.</p>' +
+      '<div class="keylist kin-key">' + ['fix', 'rebuilt', 'sup', 'norm', 'unc'].map(function (k) { return '<div>' + kchip(k) + ' ' + KCHIP[k][2].charAt(0).toLowerCase() + KCHIP[k][2].slice(1) + '</div>'; }).join('') + '</div>' +
+      '<div class="kin-pick"><button class="btn ghost" data-cx="prev" title="The previous version">‹</button><select aria-label="Version">' +
+      vs.map(function (v) { return '<option value="' + esc(v.id) + '"' + (v.id === cur ? ' selected' : '') + '>' + esc(SW.refOf(v.id) + '  ' + v.label) + '</option>'; }).join('') +
+      '</select><button class="btn ghost" data-cx="next" title="The next version">›</button></div><div class="kin-one"></div></div>';
     document.body.appendChild(d);
-    d.showModal();
+    var sel = d.querySelector('select'), box = d.querySelector('.kin-one');
+    function show(vid) {
+      cur = vid; sel.value = vid;
+      box.innerHTML = '<div class="kin-card"><h3>Reconstruction card: ' + esc(V.byId(vid).label) + '</h3><p class="faint">…</p></div>';
+      SW.build(vid).then(function (b) { if (cur === vid) box.innerHTML = SW.reconstructionCard(b); }, function () {});
+    }
+    function all() { return vs.reduce(function (p, v) { return p.then(function (acc) { return SW.build(v.id).then(function (b) { return acc.concat([b]); }, function () { return acc; }); }); }, Promise.resolve([])); }
+    sel.addEventListener('change', function () { show(sel.value); });
     d.addEventListener('click', function (e) {
-      var c = e.target.closest('[data-card]');
-      if (c) { e.preventDefault(); d.close(); d.remove(); SW.select(c.dataset.card); if (SW.setLens) SW.setLens(7); SW.forget && SW.forget('analyse'); SW.setTab('analyse'); return; }
+      var c = e.target.closest('[data-cx]');
+      if (c) {
+        var k = c.dataset.cx, m = c.closest('details'); if (m) m.open = false;
+        var i = vs.findIndex(function (v) { return v.id === cur; });
+        if (k === 'prev' || k === 'next') { show(vs[(i + (k === 'next' ? 1 : -1) + vs.length) % vs.length].id); return; }
+        if (/-all$/.test(k)) { SW.toast('Assembling every version…'); all().then(function (bs) { SW.exportDoc(SW.cardDoc(bs), 'spacewar-reconstruction-cards', k.replace('-all', '')); }); return; }
+        SW.build(cur).then(function (b) {
+          if (k === 'copy') SW.copyText(SW.cardText(b), 'the reconstruction card');
+          else if (k === 'keep') { if (SW.tray) SW.tray.addDoc(SW.cardDoc([b]), { vid: b.v.id, tags: ['repair', 'reconstruction card'] }); }
+          else SW.exportDoc(SW.cardDoc([b]), 'reconstruction-card-' + SW.refOf(b.v.id), k);
+        });
+        return;
+      }
       if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); }
     });
     d.addEventListener('close', function () { d.remove(); });
-    // the counts, one version at a time (each build is assembled once and kept)
-    vs.reduce(function (p, v) {
-      return p.then(function () {
-        if (!d.isConnected) return;
-        return SW.build(v.id).then(function (b) {
-          var fix = 0, remade = 0, norm = 0, unc = 0, sup = 0;
-          b.parts.forEach(function (part) {
-            if (part.role && part.role !== 'program') sup++;
-            ((V.REPAIRS || {})[part.src] || []).forEach(function (r) { if (r.kind === 'rebuilt') remade++; else fix++; });
-          });
-          b.lines.forEach(function (ls) { ls.forEach(function (L) {
-            if (L.skipped) return;
-            if (L.raw !== L.norm && codeOf(L.raw) !== codeOf(L.norm)) norm++;
-            if (/\[\?/.test(L.raw) && codeOf(L.raw)) unc++;
-          }); });
-          var tr = d.querySelector('tr[data-v="' + v.id + '"]'); if (!tr) return;
-          var cell = tr.children[2];
-          cell.outerHTML = [fix, remade, norm, unc, sup].map(function (n) { return '<td class="num">' + (n || '<span class="faint">–</span>') + '</td>'; }).join('');
-        }, function () {});
-      });
-    }, Promise.resolve());
-  };
+    d.showModal();
+    show(cur);
+  }
+  SW.cardsOne = function (id) { cardDialog(id); };
+  // Help ▸ Reconstruction cards: opens on the version in view
+  SW.cardsHelp = function () { cardDialog(SW.state && SW.state.v); };
 
   // Help ▸ Referencing and versions: the convention, and every source's reference
   SW.refHelp = function () {
