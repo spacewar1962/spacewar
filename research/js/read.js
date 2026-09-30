@@ -148,7 +148,8 @@
       '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
       '<label class="check" title="Mark in gold where the text had to be changed to read or run (kintsugi): readings corrected against the scan, lines remade, lines normalised for the assembler (paler), uncertain readings (grey). Hover a mark for what was there and why."><input type="checkbox" id="rd-repairs"' + (opts.repairs ? ' checked' : '') + '> Repairs (gold)</label>' +
       '</div></details><span class="hint" id="rd-nf"></span>' +
-      '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>';
+      '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>' +
+      '<span class="kin-nav" hidden><button class="btn" id="rd-kprev" title="The previous repair">‹</button><button class="btn" id="rd-klist" title="The repairs in this text: corrected, remade, uncertain (click for the list)">◆ <span class="kin-n"></span></button><button class="btn" id="rd-knext" title="The next repair">›</button></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
         '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
@@ -247,6 +248,44 @@
   // a line's code, without its comment or spacing: a normalisation that leaves this as it
   // was (a page break read as a blank line, a // comment read as /) is not marked
   function codeOf(x) { return String(x || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim(); }
+  // The repairs in order through the text, for ◆ ‹ › in the toolbar: corrected,
+  // remade and uncertain lines (normalisations are left to the pale marks)
+  var kinAt = -1;
+  function kinRows() { return SW.$$('.listing .ln.rp-fix, .listing .ln.rp-kake, .listing .ln.rp-unc', view).filter(function (r) { return r.offsetParent; }); }
+  function kinWhat(r) {
+    var m = r.querySelector('.rp-c[title]');
+    return m ? m.title : r.classList.contains('rp-unc') ? 'Uncertain reading, left as found: ' + (build.lines[+r.dataset.p][+r.dataset.n - 1] || { raw: '' }).raw.trim() : '';
+  }
+  function kinPaint() {
+    var nav = SW.$('.kin-nav', view); if (!nav) return;
+    var n = opts.repairs ? kinRows().length : 0;
+    nav.hidden = !n;
+    SW.$('.kin-n', nav).textContent = n;
+  }
+  function kinGo(r) {
+    var p = +r.dataset.p, n = +r.dataset.n;
+    SW.state.sel = { p: p, n0: n, n1: n }; paintSel(); SW.writeQuery();
+    r.scrollIntoView({ block: 'center' });
+    r.classList.remove('kin-flash'); void r.offsetWidth; r.classList.add('kin-flash');
+    var w = kinWhat(r); if (w) SW.toast(w, 6000);
+  }
+  function kinStep(dir) {
+    var rows = kinRows(); if (!rows.length) return;
+    var s = SW.state.sel, cur = -1;
+    if (s) rows.forEach(function (r, i) { var p = +r.dataset.p, n = +r.dataset.n; if (p < s.p || (p === s.p && n <= s.n0)) cur = i; });
+    var i = dir > 0 ? (s && cur >= 0 && +rows[cur].dataset.p === s.p && +rows[cur].dataset.n === s.n0 ? cur + 1 : cur + 1) : (s && cur >= 0 && +rows[cur].dataset.p === s.p && +rows[cur].dataset.n === s.n0 ? cur - 1 : cur);
+    i = (i + rows.length) % rows.length;
+    kinGo(rows[i]);
+  }
+  function kinList(btn) {
+    var rows = kinRows(), r0 = btn.getBoundingClientRect();
+    SW.pop(r0.left, r0.bottom + 4, '<h4>Repairs in this text (' + rows.length + ')</h4><div class="kin-list">' + rows.map(function (r, i) {
+      var kind = r.classList.contains('rp-kake') ? 'remade' : r.classList.contains('rp-fix') ? 'corrected' : 'uncertain';
+      return '<a href="#" data-k="' + i + '"><span class="kin-k kin-' + kind + '">' + kind + '</span> <span class="mono">' + SW.esc(SW.refText(build.v.id, +r.dataset.p, +r.dataset.n, +r.dataset.n, build.parts.length)) + '</span><span class="kin-w">' + SW.esc(kinWhat(r).replace(/^(Corrected|Remade[^.]*\.|Uncertain reading, left as found): ?/, '')) + '</span></a>';
+    }).join('') + '</div>');
+    var pop = SW.$('.pop');
+    if (pop) pop.addEventListener('click', function (e) { var a = e.target.closest('[data-k]'); if (!a) return; e.preventDefault(); SW.unpop(); kinGo(rows[+a.dataset.k]); });
+  }
   function paintRepairs() {
     var reg = root.SWVersions.REPAIRS || {};
     build.parts.forEach(function (part, p) {
@@ -311,6 +350,7 @@
     view.insertBefore(wrap, bar);
     paintRepairs();
     box.classList.toggle('no-repairs', !opts.repairs);
+    setTimeout(kinPaint, 0);
     wireBox(box);
     wireMargin(margin);
     applyFilter();
@@ -961,7 +1001,10 @@
   }
   SW.on('notes-history', paintUndo);
   function wireTb(tb) {
-    SW.$('#rd-repairs', tb).onchange = function (e) { opts.repairs = e.target.checked; SW.store.set('read.repairs', opts.repairs); var bx = SW.$('.listing', view); if (bx) bx.classList.toggle('no-repairs', !opts.repairs); };
+    SW.$('#rd-repairs', tb).onchange = function (e) { opts.repairs = e.target.checked; SW.store.set('read.repairs', opts.repairs); var bx = SW.$('.listing', view); if (bx) bx.classList.toggle('no-repairs', !opts.repairs); kinPaint(); };
+    SW.$('#rd-kprev', tb).onclick = function () { kinStep(-1); };
+    SW.$('#rd-knext', tb).onclick = function () { kinStep(1); };
+    SW.$('#rd-klist', tb).onclick = function (e) { e.stopPropagation(); kinList(e.currentTarget); };
     SW.$('#rd-undo', tb).onclick = function () { N.undo(); };
     SW.$('#rd-redo', tb).onclick = function () { N.redo(); };
     setTimeout(paintUndo, 0);

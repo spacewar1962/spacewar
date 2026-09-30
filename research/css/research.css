@@ -1663,3 +1663,17 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .cardshelp .cards-t td.num { text-align: right; }
 .cardshelp .cards-t a { color: var(--beam); }
 .cardshelp .cards-made { font-size: 12px; color: var(--text-dim); max-width: 26em; }
+/* ◆ ‹ ›: the repairs in the text */
+.toolbar .kin-nav { display: inline-flex; gap: 2px; margin-left: 4px; }
+.toolbar .kin-nav[hidden] { display: none; }
+.toolbar .kin-nav .btn { color: var(--kin); border-color: color-mix(in srgb, var(--kin) 45%, var(--line)); padding-left: 7px; padding-right: 7px; }
+.toolbar .kin-nav .btn:hover { border-color: var(--kin); }
+.ln.kin-flash { animation: kin-flash 1.8s ease-out; }
+@keyframes kin-flash { 0%, 35% { background: color-mix(in srgb, var(--kin) 26%, transparent); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .ln.kin-flash { animation: none; background: color-mix(in srgb, var(--kin) 18%, transparent); } }
+.kin-list { display: grid; gap: 2px; max-height: 50vh; overflow: auto; max-width: 460px; }
+.kin-list a { display: grid; grid-template-columns: auto 1fr; gap: 1px 8px; padding: 4px 6px; border-radius: 4px; color: var(--text); text-decoration: none; }
+.kin-list a:hover { background: var(--sel); }
+.kin-list .kin-w { grid-column: 1 / -1; font-size: 12px; color: var(--text-dim); }
+.kin-k { font: 600 9.5px/1.6 var(--sans); text-transform: uppercase; letter-spacing: .05em; padding: 0 5px; border-radius: 3px; border: 1px solid var(--kin); color: var(--kin); }
+.kin-k.kin-uncertain { border-color: var(--text-faint); color: var(--text-faint); }
