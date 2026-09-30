@@ -255,7 +255,7 @@
     SW.$('#set-tour').onclick = function () { SW.$('#dlg-settings').close('cancel'); SW.tours.start('welcome'); };
     SW.$('#about-tour').onclick = function () { SW.$('#dlg-about').close(); SW.tours.start('welcome'); };
     // a Help item named in the link
-    var HELP = { refs: function () { SW.refHelp(); }, anno: function () { SW.notes.help(); }, join: function () { SW.notes.joinHelp(); }, about: about, settings: settings };
+    var HELP = { refs: function () { SW.refHelp(); }, anno: function () { SW.notes.help(); }, join: function () { SW.notes.joinHelp(); }, reading: function () { SW.readingHelp(); }, cards: function () { SW.cardsHelp(); }, about: about, settings: settings };
     if (HELP[q.help]) setTimeout(HELP[q.help], 700);
     if (q.tour) setTimeout(function () { SW.tours.start(q.tour); }, 900);
     else if (!SW.store.get('tour.seen', false)) setTimeout(SW.tours.offer, 1200);

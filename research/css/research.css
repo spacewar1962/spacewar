@@ -1656,3 +1656,10 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .listing.no-repairs .ln.rp-unc .t { text-decoration: none; }
 .listing.no-repairs .ln.rp-fix .n::before, .listing.no-repairs .ln.rp-kake .n::before { display: none; }
 .listing.no-repairs .rp-chip { display: none; }
+/* What you should read; Reconstruction cards */
+.readhelp .rh-ref { margin: 0 0 10px; padding-left: 1.6em; text-indent: -1.6em; font-family: var(--serif); font-size: 14.5px; line-height: 1.5; }
+.readhelp .rh-note { display: block; text-indent: 0; margin-top: 3px; font: 12px var(--sans); color: var(--kin); }
+.readhelp .rh-ref a { overflow-wrap: anywhere; }
+.cardshelp .cards-t td.num { text-align: right; }
+.cardshelp .cards-t a { color: var(--beam); }
+.cardshelp .cards-made { font-size: 12px; color: var(--text-dim); max-width: 26em; }

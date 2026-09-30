@@ -466,6 +466,79 @@
     d.addEventListener('close', function () { d.remove(); });
     d.showModal();
   };
+  // ---------- Help ▸ What you should read ----------
+  // A short bibliography, every entry checked against the project's Zotero library.
+  SW.readingHelp = function () {
+    function a(url, t) { return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + (t || url) + '</a>'; }
+    var groups = [
+      ['Repairing old code', [
+        'Berry, D. M. (2025) ‘Digital Ruins and Critical Code Studies: Towards an Ethics of Historical Software Reconstruction’, <i>Stunlaw: Philosophy and Critique for a Digital Age</i>. Available at: ' + a('https://stunlaw.blogspot.com/2025/01/digital-ruins-and-critical-code-studies.html') + '. <span class="rh-note">The approach behind the bench’s repair marks (gold, in Read) and its reconstruction cards.</span>']],
+      ['Critical code studies', [
+        'Marino, M. C. (2020) <i>Critical Code Studies</i>. Cambridge, MA: The MIT Press.',
+        'Berry, D. M. and Marino, M. C. (2024) ‘Reading ELIZA: Critical Code Studies in Action’, <i>Electronic Book Review</i>. Available at: ' + a('https://electronicbookreview.com/essay/reading-eliza-critical-code-studies-in-action/') + '.',
+        'Marino, M. C., Weil, P., Shrager, J., Schwarz, A., Hay, A., Ciston, S., Berry, D. M. and Millican, P. (2026) ‘Conversations about conversational code: on the collaborative critical code studies reading of ELIZA’, <i>AI &amp; Society</i>. ' + a('https://doi.org/10.1007/s00146-026-03086-7', 'https://doi.org/10.1007/s00146-026-03086-7') + '.',
+        'Montfort, N., Baudoin, P., Bell, J., Bogost, I., Douglass, J., Marino, M. C., Mateas, M., Reas, C., Sample, M. and Vawter, N. (2014) <i>10 PRINT CHR$(205.5+RND(1)); : GOTO 10</i>. Cambridge, MA: MIT Press.']],
+      ['Spacewar!', [
+        'Graetz, J. M. (1981) ‘The Origin of Spacewar’. Available at: ' + a('https://www.masswerk.at/spacewar/SpacewarOrigin.html') + '.',
+        'Monnens, D. and Goldberg, M. (2015) ‘Space Odyssey: The Long Journey of Spacewar! from MIT to Computer Labs Around the World’, <i>Kinephanos</i>. Available at: ' + a('https://www.kinephanos.ca/2015/space-odyssey-the-long-journey-of-spacewar-from-mit-to-computer-labs-around-the-world/') + '.',
+        'Landsteiner, N. (n.d.) <i>Spacewar! – video games 60s style</i>. Available at: ' + a('https://www.masswerk.at/spacewar/') + '.']]
+    ];
+    var d = SW.el('dialog', { class: 'tray-big annohelp readhelp' });
+    d.innerHTML = '<div class="tray-bighead"><b>What you should read</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="ah">' +
+      '<p>Where to begin: on repairing old code, on reading code as a cultural text, and on Spacewar! itself. Links open in a new tab.</p>' +
+      groups.map(function (g) { return '<h3>' + g[0] + '</h3><div class="rh-list">' + g[1].map(function (r) { return '<p class="rh-ref">' + r + '</p>'; }).join('') + '</div>'; }).join('') +
+      '</div>';
+    document.body.appendChild(d);
+    d.showModal();
+    d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
+    d.addEventListener('close', function () { d.remove(); });
+  };
+
+  // ---------- Help ▸ Reconstruction cards ----------
+  // For every version the bench builds, what was done to it to read and run:
+  // corrections, lines remade, normalisations that change the code, uncertain
+  // readings, tapes supplied from other texts, and whether it is a reconstruction.
+  // Each opens that version's full card (Program ▸ What the record does not hold).
+  SW.cardsHelp = function () {
+    var V = root.SWVersions, vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; });
+    function codeOf(x) { return String(x || '').replace(/\/.*$/, '').replace(/\s+/g, ' ').trim(); }
+    var d = SW.el('dialog', { class: 'tray-big annohelp cardshelp' });
+    d.innerHTML = '<div class="tray-bighead"><b>Reconstruction cards</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="ah">' +
+      '<p>What was done to each surviving text to read and run it, after the principle that a repair should stay visible (Help ▸ What you should read). In Read the repairs are marked in gold. Click a version for its full card: every repair with its line, the evidence, who made it and when.</p>' +
+      '<table class="ov-sub cards-t"><thead><tr><th>Reference</th><th>Version</th><th title="Readings corrected against the scan">Corrected</th><th title="Lines remade where none can be read">Remade</th><th title="Lines whose code the assembler reads differently (normalised)">Normalised</th><th title="Readings marked uncertain">Uncertain</th><th title="Tapes supplied from other texts">Supplied</th><th>How this text was made</th></tr></thead><tbody>' +
+      vs.map(function (v) { return '<tr data-v="' + SW.esc(v.id) + '"><td class="mono">' + SW.esc(SW.refOf(v.id)) + '</td><td><a href="#" data-card="' + SW.esc(v.id) + '">' + SW.esc(v.label) + '</a></td><td class="num" colspan="5"><span class="faint">…</span></td><td class="cards-made">' + SW.esc(SW.MADE[v.id] ? SW.MADE[v.id].replace(/read by the bench/, 'read by the project') : (/R$/.test(SW.REF[v.id] || '') ? 'a reconstruction' : '')) + '</td></tr>'; }).join('') +
+      '</tbody></table></div>';
+    document.body.appendChild(d);
+    d.showModal();
+    d.addEventListener('click', function (e) {
+      var c = e.target.closest('[data-card]');
+      if (c) { e.preventDefault(); d.close(); d.remove(); SW.select(c.dataset.card); if (SW.setLens) SW.setLens(7); SW.forget && SW.forget('analyse'); SW.setTab('analyse'); return; }
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); }
+    });
+    d.addEventListener('close', function () { d.remove(); });
+    // the counts, one version at a time (each build is assembled once and kept)
+    vs.reduce(function (p, v) {
+      return p.then(function () {
+        if (!d.isConnected) return;
+        return SW.build(v.id).then(function (b) {
+          var fix = 0, remade = 0, norm = 0, unc = 0, sup = 0;
+          b.parts.forEach(function (part) {
+            if (part.role && part.role !== 'program') sup++;
+            ((V.REPAIRS || {})[part.src] || []).forEach(function (r) { if (r.kind === 'rebuilt') remade++; else fix++; });
+          });
+          b.lines.forEach(function (ls) { ls.forEach(function (L) {
+            if (L.skipped) return;
+            if (L.raw !== L.norm && codeOf(L.raw) !== codeOf(L.norm)) norm++;
+            if (/\[\?/.test(L.raw) && codeOf(L.raw)) unc++;
+          }); });
+          var tr = d.querySelector('tr[data-v="' + v.id + '"]'); if (!tr) return;
+          var cell = tr.children[2];
+          cell.outerHTML = [fix, remade, norm, unc, sup].map(function (n) { return '<td class="num">' + (n || '<span class="faint">–</span>') + '</td>'; }).join('');
+        }, function () {});
+      });
+    }, Promise.resolve());
+  };
+
   // Help ▸ Referencing and versions: the convention, and every source's reference
   SW.refHelp = function () {
     var V = root.SWVersions, vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; });
