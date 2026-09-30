@@ -150,7 +150,7 @@
       '</div></details><span class="hint" id="rd-nf"></span>' +
       '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>' +
       '<span class="kin-nav" hidden><button class="btn" id="rd-kprev" title="The previous repair">‹</button>' +
-      '<button class="btn kin-tog" id="rd-klist" aria-expanded="false" title="Repairs: where this text had to be changed to read or run (kintsugi). Click to show or hide the repairs bar">◆ <span class="kin-n"></span> <span class="kin-chev" aria-hidden="true">⌄</span></button>' +
+      '<button class="btn kin-tog" id="rd-klist" aria-expanded="false" title="Repairs: where this text had to be changed to read or run (kintsugi). Click to show or hide the repairs bar"><span class="kin-dia">◆</span> <span class="kin-n"></span> <span class="kin-chev" aria-hidden="true">⌄</span></button>' +
       '<button class="btn" id="rd-knext" title="The next repair">›</button></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
