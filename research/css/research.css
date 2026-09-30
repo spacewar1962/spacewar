@@ -1644,15 +1644,18 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 /* repairs, in gold (kintsugi): corrected, remade, normalised, uncertain */
 :root { --kin: light-dark(#a8801c, #e2bb52); }
 .rp-c { text-decoration-line: underline; text-underline-offset: 3px; cursor: help; }
-.rp-c-fix { text-decoration-style: solid; text-decoration-color: var(--kin); text-decoration-thickness: 2px; }
-.rp-c-kake { text-decoration-style: solid; text-decoration-color: var(--kin); text-decoration-thickness: 2px; background: color-mix(in srgb, var(--kin) 16%, transparent); border-radius: 2px; }
+.rp-line { text-decoration: underline wavy var(--kin); text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-skip-ink: none; cursor: help; }
+.rp-c-fix, .rp-c-kake { text-decoration-line: none; border-radius: 2px; }
+.rp-c-fix { background: color-mix(in srgb, var(--kin) 24%, transparent); }
+.rp-c-kake { background: color-mix(in srgb, var(--kin) 14%, transparent); }
+.ln.rp-fix.rp-unc .t, .ln.rp-kake.rp-unc .t { text-decoration: none; }   /* the gold line stands for both */
 .rp-c-norm { text-decoration-style: dotted; text-decoration-color: color-mix(in srgb, var(--kin) 55%, transparent); text-decoration-thickness: 1.5px; }
 .ln.rp-unc .t { text-decoration: underline wavy color-mix(in srgb, var(--text-faint) 70%, transparent); text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .ln.rp-fix .n::before, .ln.rp-kake .n::before { content: ''; position: absolute; left: 3px; top: 50%; width: 5px; height: 5px; border-radius: 50%; background: var(--kin); transform: translateY(-50%); }
 .ln.rp-kake .n::before { border-radius: 1px; }
 .rp-chip { font: 600 9.5px/1 var(--sans); letter-spacing: .06em; text-transform: uppercase; padding: 2px 5px; border-radius: 3px; border: 1px solid var(--kin); color: var(--kin); vertical-align: 1px; margin-left: 6px; cursor: help; }
 .rp-chip.rp-rec { background: color-mix(in srgb, var(--kin) 14%, transparent); }
-.listing.no-repairs .rp-c { text-decoration: none; background: none; }
+.listing.no-repairs .rp-c, .listing.no-repairs .rp-line { text-decoration: none; background: none; }
 .listing.no-repairs .ln.rp-unc .t { text-decoration: none; }
 .listing.no-repairs .ln.rp-fix .n::before, .listing.no-repairs .ln.rp-kake .n::before { display: none; }
 .listing.no-repairs .rp-chip { display: none; }

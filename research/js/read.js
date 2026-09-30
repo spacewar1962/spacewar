@@ -160,8 +160,8 @@
         '<div><i class="kx kcom"></i>a line of comment only</div>' +
         '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
         '<div class="faint" style="margin-top:6px">Repairs, in gold (kintsugi; View ▸ Repairs):</div>' +
-        '<div><span style="color:var(--kin)">●</span> <span class="rp-c rp-c-fix">srt</span> a reading corrected against the scan: the changed characters underlined (hover for what was there, and the evidence)</div>' +
-        '<div><span style="color:var(--kin)">■</span> <span class="rp-c rp-c-kake">cma</span> a line remade where none can be read</div>' +
+        '<div><span style="color:var(--kin)">●</span> <span class="rp-line">jmp <span class="rp-c rp-c-fix">srt</span></span> a reading corrected against the scan: the line’s code underlined in gold, the changed characters shaded (hover for what was there, and the evidence)</div>' +
+        '<div><span style="color:var(--kin)">■</span> <span class="rp-line"><span class="rp-c rp-c-kake">cma</span></span> a line remade where none can be read</div>' +
         '<div><span class="rp-c rp-c-norm">~ssn</span> normalised for assembly, in paler gold: a change for running, not to the reading</div>' +
         '<div><span style="text-decoration:underline wavy var(--text-faint);text-underline-offset:4px">ior (4</span> an uncertain reading, left as found</div>' +
         '<div><span class="rp-chip rp-sup">supplied</span> a tape from another text; <span class="rp-chip rp-rec">reconstruction</span> a text rebuilt, not transcribed</div>' +
@@ -378,8 +378,8 @@
     else if (k === 'about') {
       var r0 = (el || SW.$('#rd-klist', view)).getBoundingClientRect();
       SW.pop(r0.left, r0.bottom + 4, '<h4>The repair marks</h4><div class="keylist">' +
-        '<div><span style="color:var(--kin)">●</span> <span class="rp-c rp-c-fix">srt</span> a reading corrected against the scan</div>' +
-        '<div><span style="color:var(--kin)">■</span> <span class="rp-c rp-c-kake">cma</span> a line remade where none can be read</div>' +
+        '<div><span style="color:var(--kin)">●</span> <span class="rp-line">jmp <span class="rp-c rp-c-fix">srt</span></span> a reading corrected against the scan (the changed characters shaded)</div>' +
+        '<div><span style="color:var(--kin)">■</span> <span class="rp-line"><span class="rp-c rp-c-kake">cma</span></span> a line remade where none can be read</div>' +
         '<div><span class="rp-c rp-c-norm">~ssn</span> normalised for assembly: a change for running, not to the reading</div>' +
         '<div><span style="text-decoration:underline wavy var(--text-faint);text-underline-offset:4px">ior (4</span> an uncertain reading, left as found</div>' +
         '<div class="faint" style="margin-top:6px">After kintsugi, the mending of pottery with gold, which leaves the repair visible: see Help ▸ What you should read, and Help ▸ Reconstruction cards.</div></div>');
@@ -393,6 +393,9 @@
         var L = build.lines[p][r.n - 1], text = opts.norm ? L.norm : L.raw, at = text.indexOf(r.now);
         var why = 'Kintsugi · ' + (r.kind === 'rebuilt' ? 'Remade: no reading survives here. ' : 'Corrected: ') + (r.was ? 'the transcription had “' + r.was + '”; ' : r.kind === 'fix' ? 'missing from the transcription; ' : '') + 'now “' + r.now + '”. Evidence: ' + r.ev + '. By ' + r.by + ', ' + r.date + '.';
         row.classList.add(r.kind === 'rebuilt' ? 'rp-kake' : 'rp-fix');
+        // the whole of the line's code, wavy in gold (not its comment)
+        var cm = text.search(/\//), c1 = (cm < 0 ? text : text.slice(0, cm)).replace(/\s+$/, '').length, c0 = text.search(/\S/);
+        if (c0 >= 0 && c1 > c0) wrapChars(t, c0, c1, 'rp-line', why);
         if (at < 0) return;
         var d = r.was ? diffSpan(r.was, r.now) : [0, r.now.length];
         if (d[1] <= d[0]) d = [0, r.now.length];
