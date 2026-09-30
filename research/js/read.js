@@ -8,7 +8,7 @@
   var R = SW.views.read = {};
   var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
   // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), onlyRepaired: false, kinNorm: SW.store.get('read.kinNorm', false), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true), repairs: SW.store.get('read.repairs', true) };
+  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), onlyRepaired: false, kinNorm: SW.store.get('read.kinNorm', false), kinBar: SW.store.get('read.kinBar', false), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true), repairs: SW.store.get('read.repairs', true) };
   // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
   // cycled from the chevron on the Annotations heading.
   var SHOW = { all: '▾ All', mine: '▾ Mine', open: '▾ Open', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'open', open: 'none', none: 'all' };
@@ -150,7 +150,7 @@
       '</div></details><span class="hint" id="rd-nf"></span>' +
       '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>' +
       '<span class="kin-nav" hidden><button class="btn" id="rd-kprev" title="The previous repair">‹</button>' +
-      '<details class="menu kin-menu"><summary class="btn" id="rd-klist" title="Repairs: where this text had to be changed to read or run (kintsugi). Click for the menu">◆ <span class="kin-n"></span> <span class="kin-chev" aria-hidden="true">⌄</span></summary><div class="menu-body kin-body"></div></details>' +
+      '<button class="btn kin-tog" id="rd-klist" aria-expanded="false" title="Repairs: where this text had to be changed to read or run (kintsugi). Click to show or hide the repairs bar">◆ <span class="kin-n"></span> <span class="kin-chev" aria-hidden="true">⌄</span></button>' +
       '<button class="btn" id="rd-knext" title="The next repair">›</button></span>';
     tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
       SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
@@ -263,6 +263,7 @@
     var n = opts.repairs ? kinRows().length : 0;
     nav.hidden = !n;
     SW.$('.kin-n', nav).textContent = n;
+    kinBar();
   }
   function kinGo(r) {
     var p = +r.dataset.p, n = +r.dataset.n;
@@ -304,27 +305,37 @@
     var m = reg && /scan pp?\.\s*(\d+)/.exec(reg.ev);
     return { url: '../sources/' + pdf + (m ? '#page=' + m[1] : ''), page: m ? m[1] : '' };
   }
-  function kinMenu(body) {
-    var n = kinRows().length, nn = SW.$$('.listing .ln.rp-norm', view).length, cur = kinCurrent(), sc = kinScan(cur);
-    body.innerHTML =
-      '<button data-km="prev">‹ Previous repair</button><button data-km="next">Next repair ›</button>' +
-      '<button data-km="list">All the repairs in this text (' + n + ')…</button>' +
-      '<button data-km="scan"' + (sc ? '' : ' disabled') + ' title="' + (sc ? 'The scanned listing, in a new tab' : 'No scan held for this text, or no page named') + '">Open the scan' + (sc && sc.page ? ' at p. ' + sc.page : '') + (cur ? ' (' + SW.esc(SW.refText(build.v.id, +cur.dataset.p, +cur.dataset.n, +cur.dataset.n, build.parts.length)) + ')' : '') + ' ↗</button>' +
-      '<hr class="menu-rule">' +
-      '<label class="check"><input type="checkbox" data-km="only"' + (opts.onlyRepaired ? ' checked' : '') + '> Show only the repaired lines (two either side)</label>' +
-      '<label class="check"><input type="checkbox" data-km="norm"' + (opts.kinNorm ? ' checked' : '') + '> Include normalisations (' + nn + ')</label>' +
-      '<label class="check"><input type="checkbox" data-km="marks"' + (opts.repairs ? ' checked' : '') + '> Gold marks on</label>' +
-      '<hr class="menu-rule">' +
-      '<button data-km="keep"' + (cur ? '' : ' disabled') + '>Add this repair to My notes' + (cur ? ' (' + SW.esc(SW.refText(build.v.id, +cur.dataset.p, +cur.dataset.n, +cur.dataset.n, build.parts.length)) + ')' : '') + '</button>' +
-      '<button data-km="copy">Copy the repairs, for citing</button>' +
-      '<button data-km="card">This version’s reconstruction card</button>' +
-      '<button data-km="cards">All reconstruction cards</button>' +
-      '<button data-km="about">About the repair marks</button>';
+  // ◆ ⌄: the repairs bar, folded down under the toolbar (redrawn as the selection and settings change)
+  function kinBar() {
+    var bar = SW.$('.kin-bar', view), tog = SW.$('#rd-klist', view); if (!bar) return;
+    var n = opts.repairs ? kinRows().length : 0, on = opts.kinBar && !!n;
+    bar.hidden = !on;
+    if (tog) { tog.setAttribute('aria-expanded', on ? 'true' : 'false'); tog.classList.toggle('open', on); }
+    if (!on) return;
+    var nn = SW.$$('.listing .ln.rp-norm', view).length, cur = kinCurrent(), sc = kinScan(cur);
+    var ref = cur ? SW.refText(build.v.id, +cur.dataset.p, +cur.dataset.n, +cur.dataset.n, build.parts.length) : '';
+    var s = SW.state.sel, here = cur && s && +cur.dataset.p === s.p && +cur.dataset.n >= s.n0 && +cur.dataset.n <= s.n1;
+    function grp(label, html) { return '<span class="kg"><span class="kg-l">' + label + '</span>' + html + '</span>'; }
+    bar.innerHTML =
+      grp('Repairs', '<button class="btn" data-km="prev" title="The previous repair">‹</button><button class="btn" data-km="next" title="The next repair">›</button>' +
+        '<button class="btn" data-km="list" title="Every repair in this text, to jump to">All ' + n + '…</button>') +
+      (cur ? '<button class="kin-cur" data-km="go" title="' + SW.esc((here ? 'This repair' : 'The next repair after the selection') + ': ' + ref + ' ' + kinWhat(cur)) + '"><span class="mono">' + SW.esc(ref.replace(/^\[REF: |\]$/g, '')) + '</span> ' + SW.esc(kinWhat(cur)) + '</button>' : '') +
+      grp('Show', '<label class="check" title="Hide every line but the repairs, with two either side"><input type="checkbox" data-km="only"' + (opts.onlyRepaired ? ' checked' : '') + '> Only repaired lines</label>' +
+        '<label class="check" title="Count lines normalised for the assembler among the repairs (paler gold)"><input type="checkbox" data-km="norm"' + (opts.kinNorm ? ' checked' : '') + '> Normalisations (' + nn + ')</label>' +
+        '<label class="check" title="The gold marks in the listing (also View ▸ Repairs)"><input type="checkbox" data-km="marks"' + (opts.repairs ? ' checked' : '') + '> Gold marks</label>') +
+      grp('Evidence', '<button class="btn" data-km="scan"' + (sc ? '' : ' disabled') + ' title="' + (sc ? 'The scanned listing at the page the evidence names, in a new tab' : 'No scan held for this text, or no page named') + '">Scan' + (sc && sc.page ? ' p. ' + sc.page : '') + ' ↗</button>') +
+      grp('Keep', '<button class="btn" data-km="keep"' + (cur ? '' : ' disabled') + ' title="This repair, cited, with the line, into My notes (private)">＋ My notes</button>' +
+        '<button class="btn" data-km="copy" title="Every repair in this text, with references, as plain text">⧉ Copy all</button>') +
+      grp('Cards', '<button class="btn" data-km="card" title="This version’s reconstruction card: every repair, the evidence and who made it">This version</button>' +
+        '<button class="btn" data-km="cards" title="Every version’s card, one at a time">All</button>') +
+      '<span class="kg kg-end"><button class="btn" data-km="about" title="What the gold marks mean">About</button><button class="icon-btn" data-km="close" title="Fold the repairs bar away">✕</button></span>';
   }
   function kinAct(k, el) {
     if (k === 'prev') kinStep(-1);
     else if (k === 'next') kinStep(1);
-    else if (k === 'list') kinList(SW.$('#rd-klist', view));
+    else if (k === 'list') kinList(el || SW.$('#rd-klist', view));
+    else if (k === 'go') { var g = kinCurrent(); if (g) kinGo(g); }
+    else if (k === 'close') { opts.kinBar = false; SW.store.set('read.kinBar', false); kinBar(); }
     else if (k === 'scan') { var sc = kinScan(kinCurrent()); if (sc) root.open(sc.url, '_blank', 'noopener'); }
     else if (k === 'only') { opts.onlyRepaired = el.checked; applyFilter(); var f = kinRows()[0]; if (f && opts.onlyRepaired) f.scrollIntoView({ block: 'center' }); }
     else if (k === 'norm') { opts.kinNorm = el.checked; SW.store.set('read.kinNorm', opts.kinNorm); if (opts.onlyRepaired) applyFilter(); kinPaint(); }
@@ -346,7 +357,7 @@
     else if (k === 'card') SW.cardsOne(build.v.id);
     else if (k === 'cards') SW.cardsHelp();
     else if (k === 'about') {
-      var r0 = SW.$('#rd-klist', view).getBoundingClientRect();
+      var r0 = (el || SW.$('#rd-klist', view)).getBoundingClientRect();
       SW.pop(r0.left, r0.bottom + 4, '<h4>The repair marks</h4><div class="keylist">' +
         '<div><span style="color:var(--kin)">●</span> <span class="rp-c rp-c-fix">srt</span> a reading corrected against the scan</div>' +
         '<div><span style="color:var(--kin)">■</span> <span class="rp-c rp-c-kake">cma</span> a line remade where none can be read</div>' +
@@ -769,6 +780,7 @@
   // ---------- selection ----------
   function paintSel() {
     SW.$$('.ln.sel', view).forEach(function (e) { e.classList.remove('sel'); });
+    if (opts.kinBar) setTimeout(kinBar, 0);   // the bar names the repair at or after the selection
     var s = SW.state.sel, bar = SW.$('#rd-selbar', view);
     if (!s || !bar) { if (bar) bar.classList.remove('on'); return; }
     for (var n = s.n0; n <= s.n1; n++) { var e = SW.$('#L' + s.p + '-' + n, view); if (e) e.classList.add('sel'); }
@@ -1076,10 +1088,11 @@
     SW.$('#rd-repairs', tb).onchange = function (e) { opts.repairs = e.target.checked; SW.store.set('read.repairs', opts.repairs); var bx = SW.$('.listing', view); if (bx) bx.classList.toggle('no-repairs', !opts.repairs); kinPaint(); };
     SW.$('#rd-kprev', tb).onclick = function () { kinStep(-1); };
     SW.$('#rd-knext', tb).onclick = function () { kinStep(1); };
-    var km = SW.$('.kin-menu', tb);
-    km.addEventListener('toggle', function () { if (km.open) kinMenu(SW.$('.kin-body', km)); });
-    SW.$('.kin-body', km).addEventListener('click', function (e) { var b = e.target.closest('[data-km]'); if (b && b.tagName !== 'INPUT') { e.preventDefault(); km.open = false; kinAct(b.dataset.km, b); } });
-    SW.$('.kin-body', km).addEventListener('change', function (e) { var b = e.target.closest('[data-km]'); if (b) kinAct(b.dataset.km, b); });
+    var kb = SW.el('div', { class: 'kin-bar', role: 'toolbar', 'aria-label': 'Repairs' }); kb.hidden = true;
+    tb.appendChild(kb);
+    SW.$('#rd-klist', tb).onclick = function () { opts.kinBar = !opts.kinBar; SW.store.set('read.kinBar', opts.kinBar); kinBar(); };
+    kb.addEventListener('click', function (e) { var b = e.target.closest('[data-km]'); if (b && b.tagName !== 'INPUT' && !b.disabled) { e.preventDefault(); kinAct(b.dataset.km, b); if (!/^(close|list|about|card|cards)$/.test(b.dataset.km)) kinBar(); } });
+    kb.addEventListener('change', function (e) { var b = e.target.closest('[data-km]'); if (b) { kinAct(b.dataset.km, b); kinBar(); } });
     SW.$('#rd-undo', tb).onclick = function () { N.undo(); };
     SW.$('#rd-redo', tb).onclick = function () { N.redo(); };
     setTimeout(paintUndo, 0);
