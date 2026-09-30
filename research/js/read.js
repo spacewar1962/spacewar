@@ -385,6 +385,20 @@
         '<div class="faint" style="margin-top:6px">After kintsugi, the mending of pottery with gold, which leaves the repair visible: see Help ▸ What you should read, and Help ▸ Reconstruction cards.</div></div>');
     }
   }
+  // The gold squiggle under a repaired line, from its number to the end of its code:
+  // measured once drawn, in em so it follows the text size
+  function kinMeasure() {
+    SW.$$('.listing .ln.rp-sq', view).forEach(function (row) {
+      var rl = row.querySelectorAll('.rp-line'), nn = row.querySelector('.n'), last = rl[rl.length - 1];
+      if (!last || !nn || !nn.lastChild) return;
+      var r0 = row.getBoundingClientRect(), fs = parseFloat(getComputedStyle(row).fontSize) || 13, rg = document.createRange();
+      rg.selectNodeContents(nn.lastChild);
+      var a = rg.getBoundingClientRect().left - r0.left, z = last.getBoundingClientRect().right - r0.left;
+      if (!r0.width || z <= a) return;
+      row.style.setProperty('--k0', (a / fs).toFixed(2) + 'em');
+      row.style.setProperty('--kw', ((z - a) / fs).toFixed(2) + 'em');
+    });
+  }
   function paintRepairs() {
     var reg = root.SWVersions.REPAIRS || {};
     build.parts.forEach(function (part, p) {
@@ -395,7 +409,7 @@
         row.classList.add(r.kind === 'rebuilt' ? 'rp-kake' : 'rp-fix');
         // the whole of the line's code, wavy in gold (not its comment)
         var cm = text.search(/\//), c1 = (cm < 0 ? text : text.slice(0, cm)).replace(/\s+$/, '').length, c0 = text.search(/\S/);
-        if (c0 >= 0 && c1 > c0) wrapChars(t, c0, c1, 'rp-line', why);
+        if (c0 >= 0 && c1 > c0) { wrapChars(t, c0, c1, 'rp-line', why); row.classList.add('rp-sq'); }
         if (at < 0) return;
         var d = r.was ? diffSpan(r.was, r.now) : [0, r.now.length];
         if (d[1] <= d[0]) d = [0, r.now.length];
@@ -454,6 +468,8 @@
     wrap.appendChild(margin);
     view.insertBefore(wrap, bar);
     paintRepairs();
+    kinMeasure();
+    if (root.ResizeObserver && SW.$('.ln.rp-sq', box)) new ResizeObserver(function () { kinMeasure(); }).observe(box);   // measured again once shown (Read opened from another tab)
     box.classList.toggle('no-repairs', !opts.repairs);
     setTimeout(kinPaint, 0);
     wireBox(box);
@@ -1095,6 +1111,7 @@
     var box = SW.$('.listing', view), cb = SW.$('#rd-words', view);
     if (box) box.classList.toggle('hide-words', !on);
     if (cb) cb.checked = on;
+    kinMeasure();
     if (build && SW.$('.rd-body', view)) paintNotes();
   }
   // ↶ ↷: undo and redo what was done to annotations (notes.js keeps the steps)
