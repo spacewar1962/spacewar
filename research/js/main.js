@@ -40,6 +40,7 @@
     SW.state.tab = tab;
     SW.markTabs();
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + tab); });
+    document.body.dataset.tab = tab;   // the language label shows on Read and Run
     SW.writeQuery();
     showCurrent();
   };
@@ -68,6 +69,15 @@
     if (SW.state.v && SW.state.v !== id) SW.state.sel = null;
     SW.state.v = id;
     SW.$('#pick-a').value = id;
+    // the language, and the variant that matters: the assembler, and the machine option
+    var vl = SW.$('#vlang'), vv = V.byId(id);
+    if (vl) {
+      var modern = vv && vv.dialect === 'macro1';
+      vl.textContent = vv && vv.build ? 'MACRO · PDP-1 · ' + (modern ? 'macro1 (2003)' : '1962–63') + ' · ' + (vv.mdv ? 'mul/div' : 'mus/dis') : '';
+      vl.title = vv && vv.build ? 'Language: MACRO, DEC’s assembly language for the PDP-1 (manual F-36, 1962). ' +
+        (modern ? 'This text was prepared for macro1, the 2003 cross-assembler (simh), and is assembled with it. ' : 'Assembled as MACRO behaved in 1962–63 (variables allotted as macros are defined). ') +
+        (vv.mdv ? 'Machine: needs the PDP-1’s automatic multiply/divide option (mul, div).' : 'Machine: uses the step instructions mus and dis, without the multiply/divide option, as the 1962 programs did.') : '';
+    }
     var vr = SW.$('#vref'); if (vr) { vr.textContent = V.byId(id) && V.byId(id).build ? SW.refText(id) : ''; vr.dataset.copy = vr.textContent; vr.title = 'Click to copy. The bench’s reference to this source (Help ▸ Referencing and versions)'; }
     shown = {};
     SW.build(id).then(function (b) {
@@ -235,6 +245,7 @@
     if (q.lens) { SW.setLens(q.lens); if (!q.tab) q.tab = 'analyse'; }
     if (q.g) { SW.setGraphic(q.g); if (!q.tab) q.tab = 'graphics'; }
     SW.state.tab = ORDER.indexOf(q.tab) >= 0 ? q.tab : 'read';
+    document.body.dataset.tab = SW.state.tab;
     SW.markTabs();
     SW.$$('.view').forEach(function (v) { v.classList.toggle('on', v.id === 'view-' + SW.state.tab); });
     select(q.v || '3.1');

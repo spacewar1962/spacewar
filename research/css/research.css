@@ -1636,3 +1636,7 @@ body.dev-on .dev-only { display: revert !important; }
 .col-step { margin: 10px 0 14px; }
 .col-step canvas { display: block; border: 1px solid var(--line-soft); border-radius: 3px; }
 .col-step figcaption { margin-top: 5px; max-width: 280px; font-size: 12px; line-height: 1.45; }
+/* the language, in tiny type beside the reference, on Read and Run */
+.vlang { display: none; font: 400 9.5px var(--mono); color: var(--text-faint); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; margin-left: 8px; cursor: help; }
+body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
+@media (max-width: 860px) { body[data-tab] .vlang { display: none; } }
