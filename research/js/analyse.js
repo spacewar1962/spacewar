@@ -267,11 +267,11 @@
   // emulator for some seconds of machine time, both ships flown by Lensman AI
   // where the version allows, in slices so the page stays responsive.
   var sampling = null;
-  function sampleRun(b, secs, styles, progress) {
+  function sampleRun(b, secs, styles, useAI, progress) {
     return SW.controlMap(b.v.id).then(function (m) { return m; }, function () { return null; }).then(function (m) {
       var C = root.PDP1CPU, cpu = new C.PDP1(SW.cpuOpts(b.v));
       cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
-      var ai = !!(m && !b.v.ctlLoad && b.sym.nth && b.sym.ndx && SW.ai);
+      var ai = !!(useAI && m && !b.v.ctlLoad && b.sym.nth && b.sym.ndx && SW.ai);
       var pilots = ai ? [0, 1].map(function (j) { return SW.ai.pilot(b, j, m[j], styles[j]); }) : [];
       var ml0 = b.sym.ml0 ? b.sym.ml0.val : -1, end = Math.round(secs * 200000);
       return new Promise(function (done) {
@@ -300,12 +300,14 @@
     var secs = SW.store.get('an.gizmoSecs', 10), cover = SW.store.get('an.gizmoCover', 0.9);
     var SN = SW.ai ? SW.ai.STYLE_NAMES : [['duellist', 'duellist']];
     var styles = [0, 1].map(function (j) { var v = SW.store.get('an.gizmoStyle' + j, 'duellist'); return SN.some(function (o) { return o[0] === v; }) ? v : 'duellist'; });
+    var useAI = SW.store.get('an.gizmoAI', true);
     function styleSel(j) { return '<label class="check" title="How Lensman AI flies ' + (j ? 'the Wedge' : 'the Needle') + ' in the sample run: a hunter chases hard and closes in; an orbiter keeps its distance and fires from its orbit; a duellist is between">' + (j ? 'Wedge' : 'Needle') + ' <select class="gz-style" data-j="' + j + '">' + SN.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === styles[j] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>'; }
     var F = prof ? flowBlocks(b, prof) : null, B = F ? F.blocks : [], tot = F ? F.total || 1 : 1;
-    var from = prof ? (prof.sample ? 'sample run, ' + (prof.sample.ai ? 'Lensman AI: Needle ' + (prof.sample.styles || ['duellist'])[0] + ', Wedge ' + (prof.sample.styles || ['', 'duellist'])[1] : 'no pilots') : 'your run in Run') : '';
+    var from = prof ? (prof.sample ? 'sample run, ' + (prof.sample.ai ? 'Lensman AI: Needle ' + (prof.sample.styles || ['duellist'])[0] + ', Wedge ' + (prof.sample.styles || ['', 'duellist'])[1] : 'no one at the controls') : 'your run in Run') : '';
     var bar = SW.el('div', { class: 'gz-bar' });
-    bar.innerHTML = '<button class="btn gz-run" title="Run the program here for the time chosen, both ships flown by Lensman AI, and draw the graph from that run">▶ Sample run</button>' +
-      '<select class="gz-secs" title="How long to run, in machine time">' + [5, 10, 30, 60].map(function (n) { return '<option value="' + n + '"' + (n === secs ? ' selected' : '') + '>' + n + ' s</option>'; }).join('') + '</select>' + styleSel(0) + styleSel(1) +
+    bar.innerHTML = '<button class="btn gz-run" title="Run the program here for the time chosen and draw the graph from that run">▶ Sample run</button>' +
+      '<select class="gz-secs" title="How long to run, in machine time">' + [5, 10, 30, 60].map(function (n) { return '<option value="' + n + '"' + (n === secs ? ' selected' : '') + '>' + n + ' s</option>'; }).join('') + '</select>' +
+      '<span class="gz-ai' + (useAI ? '' : ' off') + '" title="Lensman AI, the bench’s computer pilot, flies both ships in the sample run. Off, no one is at the controls: the ships only drift under gravity"><label class="check"><input type="checkbox" class="gz-ai-on"' + (useAI ? ' checked' : '') + '> Lensman AI</label>' + styleSel(0) + styleSel(1) + '</span>' +
       (prof ? '<span class="sep"></span><label class="check" title="The busiest blocks that together take this share of the time">Show <select class="gz-cover">' + [[0.8, '80%'], [0.9, '90%'], [0.95, '95%'], [0.99, '99%'], [1, '100%']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cover ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select> of the time</label>' : '') +
       '<span class="gz-src hint">' + (prof ? B.length + ' blocks · ' + F.edges.length + ' edges · ' + (prof.cycles / 200000).toFixed(2) + ' s · ' + prof.instructions.toLocaleString('en-GB') + ' instructions · ' + from : 'Press ▶ Sample run, or play the game in Run and come back.') + '</span>' +
       (prof ? '<details class="gz-about"><summary title="What the graph shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>' : '');
@@ -313,11 +315,16 @@
     if (!prof) c.insertAdjacentHTML('beforeend', '<p class="lede">' + lede + '</p>');
     var gb = bar.querySelector('.gz-run'), gs = bar.querySelector('.gz-secs'), src = bar.querySelector('.gz-src');
     gs.addEventListener('change', function () { secs = +gs.value; SW.store.set('an.gizmoSecs', secs); });
-    SW.$$('.gz-style', bar).forEach(function (x) { x.addEventListener('change', function () { styles[+x.dataset.j] = x.value; SW.store.set('an.gizmoStyle' + x.dataset.j, x.value); }); });
+    SW.$$('.gz-style', bar).forEach(function (x) { x.disabled = !useAI; x.addEventListener('change', function () { styles[+x.dataset.j] = x.value; SW.store.set('an.gizmoStyle' + x.dataset.j, x.value); }); });
+    bar.querySelector('.gz-ai-on').addEventListener('change', function (e) {
+      useAI = e.target.checked; SW.store.set('an.gizmoAI', useAI);
+      bar.querySelector('.gz-ai').classList.toggle('off', !useAI);
+      SW.$$('.gz-style', bar).forEach(function (x) { x.disabled = !useAI; });
+    });
     gb.addEventListener('click', function () {
       if (sampling) { sampling = null; return; }   // a second press stops it
-      sampling = {}; gb.textContent = '■ Stop'; gs.disabled = true; SW.$$('.gz-style', bar).forEach(function (x) { x.disabled = true; });
-      sampleRun(b, secs, styles, function (f) { src.textContent = 'Running… ' + Math.round(100 * f) + '%'; }).then(function (p) {
+      sampling = {}; gb.textContent = '■ Stop'; gs.disabled = true; SW.$$('.gz-style, .gz-ai-on', bar).forEach(function (x) { x.disabled = true; });
+      sampleRun(b, secs, styles, useAI, function (f) { src.textContent = 'Running… ' + Math.round(100 * f) + '%'; }).then(function (p) {
         sampling = null;
         if (build !== b) return;
         SW.profile = p; SW.emit('profile');

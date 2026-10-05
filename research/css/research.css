@@ -1738,3 +1738,7 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .gz-about-b { position: absolute; right: 0; top: 100%; z-index: 4; width: min(560px, 90vw); padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.35); font-size: 13px; }
 .gz-about-b p { margin: 0 0 6px; }
 .svgbox.gizmo { max-height: calc(100vh - 210px); }
+.gz-ai { display: inline-flex; align-items: center; gap: 8px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); font-size: 12.5px; }
+.gz-ai .check { gap: 4px; }
+.gz-ai > .check:first-child { font-weight: 600; }
+.gz-ai.off > .check:not(:first-child) { opacity: .45; }
