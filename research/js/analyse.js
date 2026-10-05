@@ -668,7 +668,7 @@
         R.rows.map(function (r, i) {
           return '<div class="sbs-row k-' + r.kind + '" data-r="' + i + '" title="Click for the blocks side by side">' +
             '<div class="sbs-a">' + (r.a ? side(r.a, GA, R.RA) : '<span class="faint">Inserted or moved</span>') + '</div>' +
-            '<div class="sbs-mid"><span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span><span class="faint">' + esc(r.kind === 'same' ? '' : r.kind === 'moved' ? 'its code is in another routine' : tallyText(r.t)) + '</span></div>' +
+            '<div class="sbs-mid"><span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span><span class="faint">' + esc(r.kind === 'same' ? '' : r.kind === 'moved' ? 'its code is mostly in another routine' + (r.t.removed || r.t.inserted ? ' (' + tallyText(r.t) + ')' : '') : tallyText(r.t)) + '</span></div>' +
             '<div class="sbs-b">' + (r.b ? side(r.b, GB, R.RB) : '<span class="faint">Removed or moved</span>') + '</div></div>';
         }).join('') + '</div>';
       rlist.addEventListener('click', function (e) { var r = e.target.closest('.sbs-row[data-r]'); if (r) openRoutine(R.rows[+r.dataset.r]); });

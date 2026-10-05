@@ -70,7 +70,7 @@
     }
     for (var a1 = 0; a1 < 4096; a1++) {
       if (!reach[a1]) { cur = null; continue; }
-      if (!cur || lead[a1] || branchy[a1 - 1] || dynOut[a1 - 1]) { cur = { i: blocks.length, a0: a1, a1: a1, keys: [], lines: [] }; blocks.push(cur); }
+      if (!cur || lead[a1] || branchy[a1 - 1] || dynOut[a1 - 1]) { cur = { i: blocks.length, a0: a1, a1: a1, keys: [], mkeys: [], lines: [] }; blocks.push(cur); }
       cur.a1 = a1; at[a1] = cur.i;
     }
     blocks.forEach(function (bl) {
@@ -82,6 +82,10 @@
         var id = s.p + ':' + s.n;
         if (id === lastLine) k++; else { k = 0; lastLine = id; bl.lines.push({ p: s.p, n: s.n, raw: L.raw, key: codeKey(L) }); }
         bl.keys.push(codeKey(L) + (k ? '#' + k : '') + ':' + opOf(mem[a].val));
+        // a word a macro made, by the macro and its operation (its arguments aside)
+        bl.mkeys.push((mem[a].macro ? '@' + mem[a].macro : codeKey(L)) + ':' + opOf(mem[a].val));
+        if (mem[a].macro) bl.macro = true;
+        if (a === bl.a0) bl.k0 = k;
       }
       bl.fp = bl.keys.join('\n');
       var ps = bl.lines.length ? bl.lines[0] : null;
@@ -147,12 +151,29 @@
     A.blocks.forEach(function (x) { var y = byName[x.name]; if (mA[x.i] == null && onA[x.name] === 1 && y && mB[y.i] == null) { mA[x.i] = y.i; mB[y.i] = x.i; kind[x.i] = 'altered'; } });
     // 3. like code: an unmatched block whose lines are mostly another's (at least 60% in
     // common, counted both ways), when it is the one most like it on either side
-    function lines(z) { return z.lines.map(function (l) { return l.key; }); }
-    function like(x, y) { var a = lines(x), c = lines(y); if (!a.length || !c.length) return 0; var k = lcs(a, c).length; return 2 * k / (a.length + c.length); }
-    var ua = A.blocks.filter(function (x) { return mA[x.i] == null && x.lines.length >= 3; }), ub = B.blocks.filter(function (y) { return mB[y.i] == null && y.lines.length >= 3; });
+    // (by line for blocks of several lines; by word for a block made from one or two lines,
+    // as a macro makes: the line's code and the operation of each word)
+    function seq(z) { return z.lines.length >= 3 ? z.lines.map(function (l) { return l.key; }) : z.mkeys; }
+    function grams(t) { var g = {}; for (var i = 0; i < t.length - 1; i++) g[t.substr(i, 2)] = 1; return g; }
+    function textLike(x, y) {   // how alike the lines' text is, arguments and all: to choose between equals
+      var a = grams(x.lines.map(function (l) { return l.key; }).join(' ')), c = grams(y.lines.map(function (l) { return l.key; }).join(' ')), n = 0, ka = Object.keys(a), kc = Object.keys(c);
+      ka.forEach(function (q) { if (c[q]) n++; });
+      return ka.length + kc.length ? 2 * n / (ka.length + kc.length) : 0;
+    }
+    function like(x, y) {
+      if ((x.lines.length >= 3) !== (y.lines.length >= 3)) return 0;
+      var a = seq(x), c = seq(y); if (!a.length || !c.length) return 0;
+      var v = 2 * lcs(a, c).length / (a.length + c.length);
+      if (v < 0.6) return 0;
+      return v + 0.2 * textLike(x, y) - 0.001 * Math.abs((x.k0 || 0) - (y.k0 || 0));
+    }
+    function big(z) { return z.lines.length >= 3 || z.keys.length >= 2 || z.macro; }
+    var ua = A.blocks.filter(function (x) { return mA[x.i] == null && big(x); }), ub = B.blocks.filter(function (y) { return mB[y.i] == null && big(y); });
     var best = [];
-    ua.forEach(function (x) { ub.forEach(function (y) { var v = like(x, y); if (v >= 0.6) best.push([v, x.i, y.i]); }); });
+    ua.forEach(function (x) { ub.forEach(function (y) { var v = like(x, y); if (v > 0) best.push([v, x.i, y.i]); }); });
     best.sort(function (p, q) { return q[0] - p[0]; }).forEach(function (t) { if (mA[t[1]] == null && mB[t[2]] == null) { mA[t[1]] = t[2]; mB[t[2]] = t[1]; kind[t[1]] = 'altered'; } });
+    // a block placed by its neighbours must still have some code in common: a word alike
+    function shares(x, y) { var s0 = {}; x.mkeys.forEach(function (k) { s0[k] = 1; }); return y.mkeys.some(function (k) { return s0[k]; }); }
     // 4. the same place in the graph: one unmatched block on each side, between the same matched neighbours
     function nbrs(G) { var pre = {}, suc = {}; G.edges.forEach(function (e) { (suc[e.f] = suc[e.f] || []).push(e.t); (pre[e.t] = pre[e.t] || []).push(e.f); }); return { pre: pre, suc: suc }; }
     var NA = nbrs(A), NB = nbrs(B);
@@ -167,7 +188,7 @@
           (NA[d[0]][x.i] || []).forEach(function (n) {
             if (mA[n] == null) return;
             nv++;
-            (NB[d[1]][mA[n]] || []).forEach(function (y) { if (mB[y] == null) votes[y] = (votes[y] || 0) + 1; });
+            (NB[d[1]][mA[n]] || []).forEach(function (y) { if (mB[y] == null && shares(x, B.blocks[y])) votes[y] = (votes[y] || 0) + 1; });
           });
         });
         var ys = Object.keys(votes).sort(function (p, q) { return votes[q] - votes[p]; });
@@ -333,14 +354,14 @@
     RB.list.forEach(function (rb) {
       var ai = pairB[rb.i], ra = ai == null ? null : RA.list[ai], t = tally(ra, rb);
       // a routine new only as an entry point, its code all found elsewhere, has moved
-      rows.push({ a: ra, b: rb, t: t, kind: !ra ? (t.inserted ? 'inserted' : 'moved') : (t.altered || t.inserted || t.removed) ? 'altered' : 'same', ord: rb.a0 });
+      rows.push({ a: ra, b: rb, t: t, kind: !ra ? (t.inserted * 2 > rb.blocks.length ? 'inserted' : 'moved') : (t.altered || t.inserted || t.removed) ? 'altered' : 'same', ord: rb.a0 });
     });
     RA.list.forEach(function (ra) {
       if (pairA[ra.i] != null) return;
       // a removed routine sits after the routine that came before it in the other version
       var prev = RA.list.filter(function (q) { return q.a0 < ra.a0 && pairA[q.i] != null; }).pop();
       var tr = tally(ra, null);
-      rows.push({ a: ra, b: null, t: tr, kind: tr.removed ? 'removed' : 'moved', ord: prev ? RB.list[pairA[prev.i]].a0 + 0.5 : -1 });
+      rows.push({ a: ra, b: null, t: tr, kind: tr.removed * 2 > ra.blocks.length ? 'removed' : 'moved', ord: prev ? RB.list[pairA[prev.i]].a0 + 0.5 : -1 });
     });
     rows.sort(function (p, q) { return p.ord - q.ord; });
     return { RA: RA, RB: RB, rows: rows, pairA: pairA, pairB: pairB };
