@@ -235,6 +235,10 @@
       theme(SW.themeInfo().dark ? SW.store.get('theme.light', 'paper') : SW.store.get('theme.dark', 'phosphor'));
     };
     SW.$('#drawer-close').onclick = SW.closeDrawer;
+    // the tab row, scrolled sideways on a narrow screen: a fade while more lies to the right
+    var tabsRow = SW.$('.tabs');
+    function tabsFade() { if (tabsRow) tabsRow.classList.toggle('more-right', tabsRow.scrollLeft + tabsRow.clientWidth < tabsRow.scrollWidth - 4); }
+    if (tabsRow) { tabsRow.addEventListener('scroll', tabsFade, { passive: true }); window.addEventListener('resize', tabsFade); setTimeout(tabsFade, 0); }
     var q = SW.readQuery();
     if (q.l) {
       var m = /^(\d+):(\d+)(?:-(\d+))?$/.exec(q.l);

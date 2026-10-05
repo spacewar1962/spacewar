@@ -1853,3 +1853,8 @@ dialog.fd-big { width: min(92vw, 780px); padding: 10px 14px; }
 .gz-acr .ac-moved { color: var(--text-dim); }
 .gz-acr .ac-new { color: var(--g-added); background: color-mix(in srgb, var(--g-added) 12%, transparent); }
 .gz-acr .ac-gone { color: var(--g-removed); background: color-mix(in srgb, var(--g-removed) 12%, transparent); }
+/* Phones: the punched-tape strip gives way, and the tab row fades at its right edge while there is more of it to scroll to */
+@media (max-width: 600px) {
+  .bar .tape-strip { display: none; }
+  .tabs.more-right { -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); }
+}
