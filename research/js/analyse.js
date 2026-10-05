@@ -264,12 +264,12 @@
     return { blocks: blocks, edges: Object.keys(edges).map(function (k) { return edges[k]; }), entry: at[entry], total: blocks.reduce(function (t, x) { return t + x.cyc; }, 0) };
   }
   function gizmo(b, el) {
-    var prof = SW.profile && SW.profile.build === b && SW.profile.branches ? SW.profile : null;
+    var prof = SW.profile && SW.profile.build === b && SW.profile.branches && SW.profile.instructions ? SW.profile : null;
     var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
     var c = card('Art’s Dynamic Profile Gizmo', lede + (prof ? '' : ' <b>Run the program in the Run view first</b> (a few seconds of play is enough), then come back here.'));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
-    if (!prof || !prof.instructions) return null;
+    if (!prof) return null;
     var F = flowBlocks(b, prof), B = F.blocks, tot = F.total || 1;
     var cover = SW.store.get('an.gizmoCover', 0.9);
     var ctl = SW.el('div', { class: 'gz-ctl' });

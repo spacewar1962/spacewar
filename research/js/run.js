@@ -22,7 +22,9 @@
   // Players: 'keys' (two people at the keyboard), 'ai1' (you fly the Needle, the
   // computer the Wedge), 'ai0' (you the Wedge, it the Needle), 'aiai' (it flies both).
   var players = SW.store.get('run.players', 'keys');
-  var follow = SW.store.get('run.follow', true), paneAt = 0;
+  // Follow is off unless chosen (from 1.17.24): at full speed the line being run, sampled a few
+  // times a second, is anywhere in the main loop, and following it shook the listing about
+  var follow = SW.store.get('run.follow2', false), paneAt = 0, paneStill = false;
   // each computer pilot its own style (the Needle's, the Wedge's)
   var aiStyles = [0, 1].map(function (j) { var l = SW.store.get('run.aistyle' + j, 'duellist'); return SW.ai.STYLE_NAMES.some(function (o) { return o[0] === l; }) ? l : 'duellist'; });
   var ctlMap = null, keyBits = 0, aiBits = 0, pilots = [null, null], ml0At = -1;
@@ -128,7 +130,7 @@
     right.innerHTML = '<div class="toolbar" id="r-tabs">' +
       ['source', 'trace', 'profile', 'writes', 'anomalies', 'breakpoints'].map(function (t) {
         return '<button class="btn' + (t === paneTab ? ' on' : '') + '" data-t="' + t + '">' + t.charAt(0).toUpperCase() + t.slice(1) + '</button>';
-      }).join('') + '<label class="check r-follow" title="While it runs, keep the source on the line being run, with its counts, five times a second (always, at 0.05× and slower)"><input type="checkbox" id="r-follow"' + (follow ? ' checked' : '') + '> Follow</label>' +
+      }).join('') + '<label class="check r-follow" title="While it runs, jump the source to the line being run, five times a second (always, at 0.05× and slower). Off, the listing stays where you put it and its counts go on updating"><input type="checkbox" id="r-follow"' + (follow ? ' checked' : '') + '> Follow</label>' +
       '<span class="sep"></span><span class="hint" id="r-clock"></span></div><div id="r-pane"></div>';
     // the divide between the scopes and the code drags; its place is kept per layout
     var split = SW.el('div', { class: 'run-split' });
@@ -154,7 +156,7 @@
     SW.$('#r-score', view).onclick = clearScore;
     SW.$('#r-reset', view).onclick = function () { pause(); load(true); updateAll(); };
     SW.$('#r-speed', view).onchange = function (e) { speed = +e.target.value; SW.store.set('run.speed', speed); };
-    var fo = SW.$('#r-follow', view); if (fo) fo.onchange = function () { follow = fo.checked; SW.store.set('run.follow', follow); };
+    var fo = SW.$('#r-follow', view); if (fo) fo.onchange = function () { follow = fo.checked; SW.store.set('run.follow2', follow); };
     var sym = SW.$('#r-sym', view);
     if (sym) sym.onchange = function () { SW.store.set('run.sunfix', sym.checked); R.show(build); };
     renderPlayers();
@@ -299,6 +301,7 @@
     // updated, but keeping the line in view lays the listing out again, about 15 to 20
     // ms a time, so Follow costs about a tenth of one processor core
     if (paneTab === 'source' && (speed <= 0.05 || (follow && t - paneAt > 200))) { pane(); paneAt = t; }
+    else if (paneTab === 'source' && t - paneAt > 500) { paneStill = true; pane(); paneStill = false; paneAt = t; }   // counts only, the listing kept still
     raf = requestAnimationFrame(frame);
   }
 
@@ -361,9 +364,10 @@
   // ---------- profile ----------
   function publishProfile() {
     if (!cpu) return;
-    SW.profile = { build: build, exec: cpu.execCount, read: cpu.readCount, write: cpu.writeCount,
-                   lastWriter: cpu.lastWriter, cycles: cpu.cycles, instructions: cpu.instructions,
-                   steps: cpu.stepCount, cyc: cpu.cycCount, branches: cpu.branches, entry: cpu.entry };
+    var c = cpu;   // the counts are read live, so a profile opened mid-run is current
+    SW.profile = { build: build, exec: c.execCount, read: c.readCount, write: c.writeCount,
+                   lastWriter: c.lastWriter, steps: c.stepCount, cyc: c.cycCount, branches: c.branches,
+                   get cycles() { return c.cycles; }, get instructions() { return c.instructions; }, get entry() { return c.entry; } };
     SW.emit('profile');
   }
 
@@ -458,7 +462,7 @@
     if (cur) { upd(rows[s.n - 1], s.n - 1); cur.classList.add('cur'); el._cur = s.n - 1; }
     // keep the line being run in view, in the middle, without jumping when it already is
     var sc = el.closest('.run-right') || el;
-    if (cur) {
+    if (cur && !paneStill) {
       var r = cur.getBoundingClientRect(), rs = sc.getBoundingClientRect();
       if (r.top < rs.top + 60 || r.bottom > rs.bottom - 40) sc.scrollTop += (r.top - rs.top) - rs.height / 2;
     }
