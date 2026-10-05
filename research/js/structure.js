@@ -255,7 +255,8 @@
   // A routine runs from an entry point to the next: the start, anything called
   // (jsp, jda, cal), and anything reached by a jump the code does not name
   // (jmp i, from the sample run: the main loop's dispatch to each object).
-  S.routines = function (G) {
+  // opts.split: the largest routine (the main loop) cut at each label a branch arrives at
+  S.routines = function (G, opts) {
     var ent = {}, called = {}; if (G.entry != null) ent[G.blocks[G.entry].a0] = 1;
     // where a call comes back to is not an entry: the word after a call
     // (a call may be followed by its arguments, so up to three words after it)
@@ -265,6 +266,13 @@
       if (e.kind === 'call') { ent[t] = 1; called[t] = 1; }
       else if (e.kind === 'branch' && G.blocks[e.f].open && !back[t]) ent[t] = 1;
     });
+    if (opts && opts.split) {
+      var st0 = Object.keys(ent).map(Number).sort(function (x, y) { return x - y; }), size = {};
+      G.blocks.forEach(function (bl) { var s0 = st0[0]; for (var i = 0; i < st0.length && st0[i] <= bl.a0; i++) s0 = st0[i]; size[s0] = (size[s0] || 0) + 1; });
+      var big = +Object.keys(size).sort(function (x, y) { return size[y] - size[x]; })[0], end = st0.filter(function (a) { return a > big; })[0] || 4096;
+      var into = {}; G.edges.forEach(function (e) { if (e.kind !== 'next' && e.kind !== 'return') into[e.t] = 1; });
+      G.blocks.forEach(function (bl) { if (bl.a0 > big && bl.a0 < end && (bl.a0 in G.b.labelAt) && into[bl.i]) ent[bl.a0] = 1; });
+    }
     var starts = Object.keys(ent).map(Number).sort(function (x, y) { return x - y; }), rs = [], of = {};
     G.blocks.forEach(function (bl) {
       var s0 = -1; for (var i = 0; i < starts.length && starts[i] <= bl.a0; i++) s0 = starts[i];
@@ -287,8 +295,8 @@
     return { list: rs, of: of };
   };
   // Routines of two versions paired, from the blocks the comparison matched.
-  S.compareRoutines = function (C) {
-    var RA = S.routines(C.A), RB = S.routines(C.B), pairA = {}, pairB = {};
+  S.compareRoutines = function (C, opts) {
+    var RA = S.routines(C.A, opts), RB = S.routines(C.B, opts), pairA = {}, pairB = {};
     // by name first, then by where most of a routine's matched blocks went
     var byName = {}; RB.list.forEach(function (r) { byName[r.name] = r; });
     RA.list.forEach(function (r) { var q = byName[r.name]; if (q && pairB[q.i] == null) { pairA[r.i] = q.i; pairB[q.i] = r.i; } });

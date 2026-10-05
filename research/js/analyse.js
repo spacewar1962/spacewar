@@ -267,6 +267,13 @@
   // emulator for some seconds of machine time, both ships flown by Lensman AI
   // where the version allows, in slices so the page stays responsive.
   var sampling = null;
+  // machine time, from memory cycles (5 µs each)
+  // names a reader gives to blocks and routines, kept in this browser: version -> address -> name
+  function gzName(vid, a0) { return ((SW.store.get('gz.names', {}) || {})[vid] || {})[a0] || ''; }
+  function gzSetName(vid, a0, name) { var all = SW.store.get('gz.names', {}) || {}; all[vid] = all[vid] || {}; if (name) all[vid][a0] = name; else delete all[vid][a0]; SW.store.set('gz.names', all); }
+  function gzNameField(cur, label) { return '<label class="gz-name" title="Your name for it, kept in this browser and shown in the graph in place of ' + SW.esc(label) + '">Name <input type="text" maxlength="40" value="' + SW.esc(cur) + '" placeholder="' + SW.esc(label) + '"></label>'; }
+  function gzN(n) { return (n || 0).toLocaleString('en-GB'); }
+  function gzMs(cycles) { var ms = (cycles || 0) * 5 / 1000; return (ms >= 100 ? Math.round(ms).toLocaleString('en-GB') : ms >= 10 ? ms.toFixed(1) : ms.toFixed(2)) + ' ms'; }
   function sampleRun(b, secs, styles, useAI, progress) {
     return SW.controlMap(b.v.id).then(function (m) { return m; }, function () { return null; }).then(function (m) {
       var C = root.PDP1CPU, cpu = new C.PDP1(SW.cpuOpts(b.v));
@@ -390,7 +397,7 @@
         });
         place();
       }
-      var NW = 150, NH = 46, GX = 30, GY = 52, wmax = Math.max.apply(null, rows.map(function (r) { return r.length; })), W = wmax * (NW + GX) + 140, H = rows.length * (NH + GY) + 30;
+      var NW = 176, NH = 46, GX = 26, GY = 52, wmax = Math.max.apply(null, rows.map(function (r) { return r.length; })), W = wmax * (NW + GX) + 140, H = rows.length * (NH + GY) + 30;
       function xy(id) { var p = pos[id], r = rows[p.r]; return { x: 40 + (W - 140 - r.length * (NW + GX)) / 2 + p.k * (NW + GX), y: 20 + p.r * (NH + GY) }; }
       var nmax = E.reduce(function (m, e) { return Math.max(m, e.n); }, 1), smax = ids.reduce(function (m, id) { return Math.max(m, B[id].cyc); }, 1);
       var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><rect width="' + W + '" height="' + H + '" fill="var(--surface)"/>',
@@ -409,9 +416,9 @@
         o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc(bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--surface)"/>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(bl.name) + '</text>' +
-          '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="700" fill="var(--text)">' + (100 * sh).toFixed(1) + '%</text>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc(lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(gzName(b.v.id, bl.a0) || bl.name) + '</text>' +
+          '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="var(--text)"><tspan font-weight="700">' + gzMs(bl.cyc) + '</tspan> (' + (100 * sh).toFixed(1) + '%)</text>' +
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc((gzName(b.v.id, bl.a0) ? bl.name + ' · ' : '') + lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
       });
       o.push('</svg>');
       lastSVG = o.join('');
@@ -432,6 +439,12 @@
           if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
           var j = e.target.closest('[data-gb]'); if (j) { openBlock(+j.dataset.gb); return; }
           if (e.target.closest('[data-read]')) { dlg.close(); inRead(B[+dlg.dataset.b]); }
+          if (e.target.closest('[data-keep]')) keepBlock(B[+dlg.dataset.b]);
+        });
+        dlg.addEventListener('change', function (e) {
+          if (!e.target.closest('.gz-name')) return;
+          var bl0 = B[+dlg.dataset.b]; gzSetName(b.v.id, bl0.a0, e.target.value.trim()); draw();
+          SW.toast(e.target.value.trim() ? 'Named ' + e.target.value.trim() : 'Name cleared');
         });
         dlg.addEventListener('close', function () { dlg.remove(); dlg = null; });
       }
@@ -451,14 +464,30 @@
         }).join(' ') : '<span class="faint">none</span>';
       }
       var ins = F.edges.filter(function (e) { return e.t === id && e.f !== id; }), outs = F.edges.filter(function (e) { return e.f === id && e.t !== id; }), self = F.edges.filter(function (e) { return e.f === id && e.t === id; })[0];
-      dlg.innerHTML = '<div class="tray-bighead"><b>' + esc(bl.name) + '</b> <span class="faint mono">' + esc(ref) + '</span><span class="refhelp-acts">' +
+      dlg.innerHTML = '<div class="tray-bighead"><b>' + esc(bl.name) + '</b> <span class="faint mono">' + esc(ref) + '</span>' + gzNameField(gzName(b.v.id, bl.a0), bl.name) + '<span class="refhelp-acts">' +
+        '<button class="btn ghost" data-keep title="This block, with its name, figures and code, in My notes (private)">＋ My notes</button>' +
         (bl.src ? '<button class="btn" data-read title="This code in Read, in its context">Read in context ↗</button>' : '') +
         '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+        '<table class="ov-sub gz-q"><tbody>' + blockFigures(bl).map(function (r) { return '<tr><th>' + r[0] + '</th><td>' + esc(r[1]) + '</td></tr>'; }).join('') + '</tbody></table>' +
         '<p class="hint">' + (100 * bl.cyc / tot).toFixed(2) + '% of the time (' + Math.round(bl.cyc * 5).toLocaleString('en-GB') + ' µs); entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (bl.a1 - bl.a0 + 1) + ' instruction' + (bl.a1 > bl.a0 ? 's' : '') + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + ')' + (self ? '; loops on itself ×' + self.n.toLocaleString('en-GB') : '') + (id === F.entry ? '; the run began here' : '') + '.</p>' +
         '<div class="gz-cols"><div><h4>The source</h4><div class="listing gz-src-l">' + (src || '<p class="faint">No source line.</p>') + '</div></div>' +
         '<div><h4>The instructions run</h4><table class="ov-sub"><thead><tr><th>Address</th><th>As assembled</th><th>Times</th><th>µs</th></tr></thead><tbody>' + words.join('') + '</tbody></table></div></div>' +
         '<h4>Comes from</h4><p>' + links(ins, function (e) { return e.f; }) + '</p><h4>Goes to</h4><p>' + links(outs, function (e) { return e.t; }) + '</p>';
       if (!dlg.open) dlg.showModal();
+    }
+    function blockFigures(bl) {
+      var outs = F.edges.filter(function (e) { return e.f === bl.i; }), ins = F.edges.filter(function (e) { return e.t === bl.i; });
+      return [['Time', gzMs(bl.cyc) + ' (' + (100 * bl.cyc / tot).toFixed(2) + '% of the run)'], ['Per entry', bl.entries ? (bl.cyc * 5 / bl.entries).toFixed(1) + ' µs' : ''],
+        ['Entered', gzN(bl.entries) + ' times'], ['Instructions run', gzN(bl.steps)], ['Length', (bl.a1 - bl.a0 + 1) + ' instruction' + (bl.a1 > bl.a0 ? 's' : '') + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + ')'],
+        ['Branches in', ins.length + ' (' + gzN(ins.reduce(function (t, e) { return t + e.n; }, 0)) + ' times)'], ['Branches out', outs.length + ' (' + gzN(outs.reduce(function (t, e) { return t + e.n; }, 0)) + ' times)'],
+        ['The run', (prof.cycles / 200000).toFixed(2) + ' s of machine time, ' + gzN(prof.instructions) + ' instructions']];
+    }
+    function keepBlock(bl) {
+      if (!SW.tray) return;
+      var nm = gzName(b.v.id, bl.a0), ref = bl.src ? SW.refText(b.v.id, bl.src.p, bl.src.n0, bl.src.n1, b.parts.length) : SW.refText(b.v.id);
+      SW.tray.addDoc({ title: 'Block ' + (nm ? nm + ' (' + bl.name + ')' : bl.name) + ' ' + ref, subtitle: 'Art’s Dynamic Profile Gizmo, ' + b.v.label,
+        blocks: [SW.tableBlock('The figures', ['', ''], blockFigures(bl))].concat(bl.src ? [{ type: 'code', caption: ref, lines: b.lines[bl.src.p].slice(bl.src.n0 - 1, bl.src.n1).map(function (L) { return { n: L.n, text: L.raw }; }) }] : []) },
+        { vid: b.v.id, anchor: bl.src ? { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1, src: b.parts[bl.src.p].src } : null, tags: ['profile'] });
     }
     box.addEventListener('click', function (e) {
       var g = e.target.closest('[data-b]'); if (!g) return;
@@ -470,15 +499,15 @@
     var trows = B.slice().sort(function (x, y) { return y.cyc - x.cyc; }).map(function (bl) {
       return [bl.name, bl.src ? SW.refOf(b.v.id, bl.src.p, bl.src.n0, bl.src.n1, b.parts.length) : SW.oct(bl.a0, 4), bl.a1 - bl.a0 + 1, bl.entries, bl.steps, Math.round(bl.cyc * 5), +(100 * bl.cyc / tot).toFixed(2)];
     });
-    var c2 = card('The blocks', 'Each block of sequential code the run passed through, busiest first: its length, how often it was entered, the instructions run in it, and the time.');
-    var s2 = SW.el('div', { class: 'scroll' });
+    var c2 = SW.el('div', { class: 'gz-sec' }); c2.innerHTML = '<h4>The blocks</h4><p class="hint">Each block of sequential code the run passed through, busiest first: its length, how often it was entered, the instructions run in it, and the time.</p>';
+    var s2 = SW.el('div');
     s2.appendChild(SW.table(['Block', 'Reference', 'Length', 'Entered', 'Instructions run', 'Time (µs)', '% of time'], trows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num'], onRow: function (r) { var bl = B.filter(function (x) { return x.name === r[0]; })[0]; if (bl) openBlock(bl.i); } }));
-    c2.appendChild(s2); el.appendChild(c2);
+    c2.appendChild(s2); c.appendChild(c2);
     var erows = F.edges.slice().sort(function (x, y) { return y.n - x.n; }).map(function (e) { return [B[e.f].name, B[e.t].name, e.kind === 'fall' ? 'falls through' : 'branch', e.n]; });
-    var c3 = card('The branches', 'Each edge between blocks, most taken first.');
-    var s3 = SW.el('div', { class: 'scroll' });
+    var c3 = SW.el('div', { class: 'gz-sec' }); c3.innerHTML = '<h4>The branches</h4><p class="hint">Each edge between blocks, most taken first.</p>';
+    var s3 = SW.el('div');
     s3.appendChild(SW.table(['From', 'To', 'How', 'Times'], erows, { cls: ['mono', 'mono', '', 'num'] }));
-    c3.appendChild(s3); el.appendChild(c3);
+    c3.appendChild(s3); c.appendChild(c3);
     return function () {
       return [{ type: 'p', text: lede + ' The graph itself saves from under it, as SVG or PNG.' },
         SW.tableBlock('The blocks', ['Block', 'Reference', 'Length', 'Entered', 'Instructions run', 'Time (µs)', '% of time'], trows),
@@ -501,6 +530,7 @@
     var earlier = vs.filter(function (v) { return v.sort <= b.v.sort; });
     var other = SW.store.get('an.gizmoCmp', '');
     if (!vs.some(function (v) { return v.id === other; })) other = (earlier[earlier.length - 1] || vs[0] || {}).id;
+    var split = !!SW.store.get('an.gizmoSplit', false);
     var lede = 'After Art Schwarz: each version’s code without its comments, cut into blocks between branches (a block begins where a branch arrives and ends at an instruction that can branch), read from the assembled code; jumps the code does not name (jmp i, jsp i, xct) are taken from a 5 s sample run of each version. Blocks are matched across the two versions by their code, then their label, then their place between matched blocks. Here they are gathered into routines, each running from an entry point (the start, anything called, anything the main loop dispatches to) to the next, and the two versions’ routines are set side by side.';
     var legend = 'The same: every block matched and unchanged. Altered: some of its blocks changed, were inserted or were removed. Moved: a routine on one side only whose code is all found in another routine on the other. Inserted, removed: a routine with no counterpart. Click a routine for its blocks side by side, and a block for its code in both versions.';
     var c = SW.el('div', { class: 'card gz-card' });
@@ -509,13 +539,17 @@
     var bar = SW.el('div', { class: 'gz-bar' });
     bar.innerHTML = gzMode('compare') + '<span class="sep"></span><label class="check" title="The version to compare this one with">' + esc(SW.refOf(b.v.id)) + ' against <select class="gz-cmp">' +
       vs.map(function (v) { return '<option value="' + esc(v.id) + '"' + (v.id === other ? ' selected' : '') + '>' + esc(SW.refOf(v.id) + '  ' + v.label) + '</option>'; }).join('') + '</select></label>' +
+      '<button class="btn ghost gz-swap" title="Swap the two versions round: ' + esc(SW.refOf(other || '') + ' on the right, ' + SW.refOf(b.v.id) + ' on the left') + '">⇄ Swap</button>' +
+      '<label class="check" title="Draw the largest routine, the main loop, as its labelled parts: each label a branch arrives at begins a part"><input type="checkbox" class="gz-split"' + (split ? ' checked' : '') + '> Split the main loop</label>' +
       '<span class="gz-src hint">Reading both versions…</span>' +
       '<details class="gz-about"><summary title="What the comparison shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>';
     c.appendChild(bar);
     gzModeWire(bar);
     bar.querySelector('.gz-cmp').addEventListener('change', function (e) { SW.store.set('an.gizmoCmp', e.target.value); render(); });
+    bar.querySelector('.gz-swap').addEventListener('click', function () { if (!other) return; SW.store.set('an.gizmoCmp', b.v.id); SW.select(other); });
+    bar.querySelector('.gz-split').addEventListener('change', function (e) { SW.store.set('an.gizmoSplit', e.target.checked); render(); });
     var src = bar.querySelector('.gz-src'), body = SW.el('div', { class: 'gz-sbs' }), more = SW.el('div', { class: 'gz-more' });
-    c.appendChild(body); el.appendChild(more);
+    c.appendChild(body); c.appendChild(more);
     var out = { rrows: [], rows: [], erows: [], summary: '' };
     if (!other) { src.textContent = 'No other version to compare with.'; return null; }
     SW.build(other).then(function (bo) {
@@ -530,7 +564,7 @@
     function ref(G, x) { return x.src ? SW.refOf(G.b.v.id, x.src.p, x.src.n0, x.src.n1, G.b.parts.length) : SW.oct(x.a0, 4); }
     function linesOf(x) { return x.src ? (x.src.n1 !== x.src.n0 ? 'lines ' + x.src.n0 + '–' + x.src.n1 : 'line ' + x.src.n0) : SW.oct(x.a0, 4); }
     function draw(bo, GA, GB, C, dA, dB) {
-      var ra = SW.refOf(bo.v.id), rb = SW.refOf(b.v.id), R = ST.compareRoutines(C);
+      var ra = SW.refOf(bo.v.id), rb = SW.refOf(b.v.id), R = ST.compareRoutines(C, { split: split });
       var rk = { same: 0, altered: 0, moved: 0, inserted: 0, removed: 0 }; R.rows.forEach(function (r) { rk[r.kind]++; });
       out.summary = ra + ' → ' + rb + ': ' + R.RA.list.length + ' → ' + R.RB.list.length + ' routines (the same ' + rk.same + ', altered ' + rk.altered + ', moved ' + rk.moved + ', inserted ' + rk.inserted + ', removed ' + rk.removed + '); ' + GA.blocks.length + ' → ' + GB.blocks.length + ' blocks (the same ' + C.same + ', altered ' + C.altered.length + ', inserted ' + C.inserted.length + ', removed ' + C.removed.length + '); branches added ' + C.edgesNew.length + ', removed ' + C.edgesGone.length + '.';
       src.textContent = R.RA.list.length + ' → ' + R.RB.list.length + ' routines · same ' + rk.same + ' · altered ' + rk.altered + (rk.moved ? ' · moved ' + rk.moved : '') + ' · inserted ' + rk.inserted + ' · removed ' + rk.removed;
@@ -561,16 +595,31 @@
         var tot = 0, sh = {};
         if (!d || !d.cyc) return sh;
         for (var a = 0; a < 4096; a++) tot += d.cyc[a];
-        RR.list.forEach(function (r) { var c = 0; r.blocks.forEach(function (bi) { var bl = G.blocks[bi]; for (var a = bl.a0; a <= bl.a1; a++) c += d.cyc[a]; }); sh[r.i] = tot ? c / tot : 0; });
+        RR.list.forEach(function (r) { var c = 0; r.blocks.forEach(function (bi) { var bl = G.blocks[bi]; for (var a = bl.a0; a <= bl.a1; a++) c += d.cyc[a]; }); sh[r.i] = tot ? c / tot : 0; sh['c' + r.i] = c; });
         return sh;
       }
       var FA = flows(GA, R.RA, dA, rowOfA), FB = flows(GB, R.RB, dB, rowOfB), SA = shares(GA, R.RA, dA), SB = shares(GB, R.RB, dB);
+      // a routine's name, given on either side, holds for both
+      function rName(row) { return (row.b && gzName(b.v.id, row.b.a0)) || (row.a && gzName(bo.v.id, row.a.a0)) || ''; }
+      function blockMs(d, x) { var c = 0; if (d && d.cyc && x) for (var a = x.a0; a <= x.a1; a++) c += d.cyc[a]; return c; }
+      function routineFigures(row) {
+        function col(r, G, d, SH, F, rowOf) {
+          if (!r) return ['', '', '', '', '', '', ''];
+          var steps = 0, words = 0; r.blocks.forEach(function (bi) { var bl = G.blocks[bi]; words += bl.a1 - bl.a0 + 1; if (d && d.steps) for (var a = bl.a0; a <= bl.a1; a++) steps += d.steps[a]; });
+          var k = rowOf[r.i], outs = [], ins = [];
+          Object.keys(F).forEach(function (key) { var e = F[key]; var o = R.rows[e.t], q = R.rows[e.f]; if (e.f === k && e.t !== k) outs.push(((o.b || o.a).name) + ' ×' + gzN(e.n)); if (e.t === k && e.f !== k) ins.push(((q.b || q.a).name) + ' ×' + gzN(e.n)); });
+          var ent = d && d.steps ? d.steps[r.a0] : 0;
+          return [gzMs(SH['c' + r.i]) + ' (' + (100 * (SH[r.i] || 0)).toFixed(1) + '%)', ent ? (SH['c' + r.i] * 5 / ent).toFixed(1) + ' µs' : '', gzN(ent) + ' times', gzN(steps), r.blocks.length + ' blocks, ' + words + ' words', outs.join(', ') || 'none', ins.join(', ') || 'none'];
+        }
+        var A = col(row.a, GA, dA, SA, FA, rowOfA), B2 = col(row.b, GB, dB, SB, FB, rowOfB);
+        return ['Time in the 5 s run', 'Per entry', 'Entered', 'Instructions run', 'Size', 'Calls and jumps to', 'Reached from'].map(function (h, i) { return [h, A[i], B2[i]]; });
+      }
       var uni = {}; [FA, FB].forEach(function (F) { Object.keys(F).forEach(function (k) { uni[k] = F[k]; }); });
       var entryRow = rowOfB[R.RB.of[GB.entry]];
       var Lay = ST.layout(R.rows.map(function (r, k) { return { id: k, ord: (r.b || r.a).a0 }; }), Object.keys(uni).map(function (k) { return uni[k]; }), entryRow, 3);
       var nmax = 1; [FA, FB].forEach(function (F) { Object.keys(F).forEach(function (k) { nmax = Math.max(nmax, F[k].n); }); });
       var smax = 0.0001; [SA, SB].forEach(function (S0) { Object.keys(S0).forEach(function (k) { smax = Math.max(smax, S0[k]); }); });
-      var NW = 136, NH = 42, GX = 18, GY = 46, rowsL = Lay.rows, wmax = Math.max.apply(null, rowsL.map(function (r) { return r.length; }).concat([1]));
+      var NW = 164, NH = 42, GX = 18, GY = 46, rowsL = Lay.rows, wmax = Math.max.apply(null, rowsL.map(function (r) { return r.length; }).concat([1]));
       var W = wmax * (NW + GX) + 90, H = rowsL.length * (NH + GY) + 24;
       function xy(k) { var p = Lay.pos[k], r = rowsL[p.r]; return { x: 20 + (W - 90 - r.length * (NW + GX)) / 2 + p.k * (NW + GX), y: 14 + p.r * (NH + GY) }; }
       var EDGE = { altered: 'var(--violet)', inserted: 'var(--g-added)', removed: 'var(--g-removed)' };
@@ -592,13 +641,13 @@
           if (!Lay.pos[k]) return;
           var r = isA ? row.a : row.b, p = xy(k);
           if (!r) { o.push('<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="4" fill="none" stroke="var(--line)" stroke-dasharray="4 3"/>'); return; }
-          var sh = SH[r.i] || 0, heat = Math.round(6 + 60 * Math.sqrt(sh / smax)), ring = EDGE[row.kind];
-          o.push('<g class="gz-node" data-r="' + k + '" style="cursor:pointer"><title>' + esc(r.name + ', ' + linesOf(r) + ', ' + r.blocks.length + ' blocks; ' + (100 * sh).toFixed(1) + '% of the time in the sample run; ' + row.kind) + '</title>' +
+          var sh = SH[r.i] || 0, heat = Math.round(6 + 60 * Math.sqrt(sh / smax)), ring = EDGE[row.kind], nm = rName(row);
+          o.push('<g class="gz-node" data-r="' + k + '" style="cursor:pointer"><title>' + esc(r.name + ', ' + linesOf(r) + ', ' + r.blocks.length + ' blocks; ' + gzMs(SH['c' + r.i]) + ' (' + (100 * sh).toFixed(1) + '% of the time) in the 5 s sample run; ' + row.kind) + '</title>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--surface)"/>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="' + (ring || 'var(--text-faint)') + '" stroke-width="' + (ring ? 2 : 1) + '"/>' +
-            '<text x="' + (p.x + 7) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + esc(r.name) + '</text>' +
-            '<text x="' + (p.x + NW - 7) + '" y="' + (p.y + 17) + '" text-anchor="end" font-family="sans-serif" font-size="11" font-weight="700" fill="var(--text)">' + (100 * sh).toFixed(1) + '%</text>' +
-            '<text x="' + (p.x + 7) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc(linesOf(r)) + '</text></g>');
+            '<text x="' + (p.x + 7) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + esc(nm || r.name) + '</text>' +
+            '<text x="' + (p.x + NW - 7) + '" y="' + (p.y + 17) + '" text-anchor="end" font-family="sans-serif" font-size="11" fill="var(--text)"><tspan font-weight="700">' + gzMs(SH['c' + r.i]) + '</tspan> (' + (100 * sh).toFixed(1) + '%)</text>' +
+            '<text x="' + (p.x + 7) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc((nm ? r.name + ' · ' : '') + linesOf(r)) + '</text></g>');
         });
         o.push('</svg>');
         return o.join('');
@@ -606,15 +655,15 @@
       var svgA = sideSVG(true), svgB = sideSVG(false);
       body.innerHTML = '<div class="gz-flow2"><div><div class="fl-h">' + esc(ra) + ' · ' + esc(bo.v.label) + '</div><div class="svgbox fl-box">' + SW.displaySVG(svgA) + '</div></div>' +
         '<div><div class="fl-h">' + esc(rb) + ' · ' + esc(b.v.label) + '</div><div class="svgbox fl-box">' + SW.displaySVG(svgB) + '</div></div></div>' +
-        '<p class="hint fl-key">Each routine in the same place on both sides. Shaded by its share of the time in a 5 s sample run of that version; edges are calls and dispatches between routines, thicker for more often, dashed if in the code but not taken in the run. Outlined violet: altered; green: inserted; red: removed; an empty dashed box: no counterpart on this side. The rounded routine is where the program starts. Click a routine for its blocks side by side.</p>';
+        '<p class="hint fl-key">Each routine in the same place on both sides. Shaded by its share of the time in a 5 s sample run of that version, with the machine time it took there (milliseconds, the share in brackets); edges are calls and dispatches between routines, thicker for more often, dashed if in the code but not taken in the run. Outlined violet: altered; green: inserted; red: removed; an empty dashed box: no counterpart on this side. The rounded routine is where the program starts. Click a routine for its blocks side by side.</p>';
       var fb = SW.el('div'); body.appendChild(fb);
       fb.appendChild(SW.figureButtons(function () { return svgA; }, 'spacewar-' + bo.v.id + '-flow', ra));
       fb.appendChild(document.createTextNode(' '));
       fb.appendChild(SW.figureButtons(function () { return svgB; }, 'spacewar-' + b.v.id + '-flow', rb));
       body.onclick = function (e) { var g = e.target.closest('[data-r]'); if (g) openRoutine(R.rows[+g.dataset.r]); };
       // ---- the routines, row by row, folded ----
-      var rlist = SW.el('details', { class: 'card gz-fold' }); rlist.style.gridColumn = '1 / -1';
-      rlist.innerHTML = '<summary><b>The routines, row by row</b> <span class="faint">(' + R.rows.length + ': ' + rk.altered + ' altered, ' + rk.moved + ' moved, ' + rk.inserted + ' inserted, ' + rk.removed + ' removed)</span></summary>' +
+      var rlist = SW.el('div', { class: 'gz-sec' });
+      rlist.innerHTML = '<h4>The routines, row by row <span class="faint">(' + R.rows.length + ': ' + rk.altered + ' altered, ' + rk.moved + ' moved, ' + rk.inserted + ' inserted, ' + rk.removed + ' removed)</span></h4>' +
         '<div class="gz-sbs"><div class="sbs-row sbs-head"><div>' + esc(ra) + '</div><div></div><div>' + esc(rb) + '</div></div>' +
         R.rows.map(function (r, i) {
           return '<div class="sbs-row k-' + r.kind + '" data-r="' + i + '" title="Click for the blocks side by side">' +
@@ -634,14 +683,14 @@
       out.erows = C.edgesNew.map(function (e) { return ['added', GB.blocks[e.f].name, GB.blocks[e.t].name]; }).concat(C.edgesGone.map(function (e) { return ['removed', GA.blocks[e.f].name, GA.blocks[e.t].name]; }));
       more.innerHTML = '';
       more.appendChild(listHost);
-      var d2 = SW.el('details', { class: 'card gz-fold' }); d2.style.gridColumn = '1 / -1';
-      d2.innerHTML = '<summary><b>Every block that changed</b> <span class="faint">(' + out.rows.length + ')</span></summary>';
-      var s2 = SW.el('div', { class: 'scroll' });
+      var d2 = SW.el('div', { class: 'gz-sec' });
+      d2.innerHTML = '<h4>Every block that changed <span class="faint">(' + out.rows.length + ')</span></h4>';
+      var s2 = SW.el('div');
       s2.appendChild(SW.table(['Change', 'In ' + ra, 'In ' + rb, 'Lines', 'Reference'], out.rows.map(function (o) { return o.r; }), { cls: ['', 'mono', 'mono', '', 'mono'], onRow: function (r) { var o = out.rows.filter(function (q) { return q.r === r; })[0]; if (o) openBlock(o.id); } }));
       d2.appendChild(s2); more.appendChild(d2);
-      var d3 = SW.el('details', { class: 'card gz-fold' }); d3.style.gridColumn = '1 / -1';
-      d3.innerHTML = '<summary><b>Every branch that changed</b> <span class="faint">(' + out.erows.length + ', between blocks matched in both)</span></summary>';
-      var s3 = SW.el('div', { class: 'scroll' });
+      var d3 = SW.el('div', { class: 'gz-sec' });
+      d3.innerHTML = '<h4>Every branch that changed <span class="faint">(' + out.erows.length + ', between blocks matched in both)</span></h4>';
+      var s3 = SW.el('div');
       s3.appendChild(SW.table(['Branch', 'From', 'To'], out.erows, { cls: ['', 'mono', 'mono'] }));
       d3.appendChild(s3); more.appendChild(d3);
       function kindOf(id) { var isA = id.charAt(0) === 'a', n = +id.slice(1), xi = isA ? n : C.mB[n]; return isA ? 'removed' : xi == null ? 'inserted' : C.kind[xi] === 'altered' ? 'altered' : 'same'; }
@@ -663,12 +712,35 @@
           items.push({ ord: prev != null ? GB.blocks[C.mA[prev]].a0 + 0.5 : -1 + xi / 1e4, a: GA.blocks[xi], b: C.mA[xi] != null ? GB.blocks[C.mA[xi]] : null, id: C.mA[xi] != null ? 'b' + C.mA[xi] : 'a' + xi });
         });
         items.sort(function (p, q) { return p.ord - q.ord; });
-        function cell(x) { return x ? '<b class="mono">' + esc(x.name) + '</b> <span class="faint">' + esc(linesOf(x)) + '</span>' : ''; }
-        var dlg = dialog('<div class="tray-bighead"><b>' + esc(r.a && r.b && r.a.name !== r.b.name ? r.a.name + ' → ' + r.b.name : (r.b || r.a).name) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span><span class="refhelp-acts"><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
-          '<div class="sbs-row sbs-head"><div>' + esc(r.a ? ref(GA, r.a) : ra + ': Inserted or moved') + '</div><div></div><div>' + esc(r.b ? ref(GB, r.b) : rb + ': Removed or moved') + '</div></div>' +
-          '<div class="gz-sbs gz-sbs-in">' + items.map(function (it) { var k = kindOf(it.id); return '<div class="sbs-row k-' + k + '" data-id="' + it.id + '" title="Click for the code in both versions"><div class="sbs-a">' + (cell(it.a) || '<span class="faint">Inserted or moved</span>') + '</div><div class="sbs-mid"><span class="gz-k gz-k-' + k + '">' + k + '</span></div><div class="sbs-b">' + (cell(it.b) || '<span class="faint">Removed or moved</span>') + '</div></div>'; }).join('') + '</div>' +
+        function cell(x, d) { return x ? '<b class="mono">' + esc(x.name) + '</b> <span class="faint">' + esc(linesOf(x)) + '</span>' + (d ? '<span class="gz-t">' + gzMs(blockMs(d, x)) + '</span>' : '') : ''; }
+        var label = r.a && r.b && r.a.name !== r.b.name ? r.a.name + ' → ' + r.b.name : (r.b || r.a).name, figs = routineFigures(r);
+        var dlg = dialog('<div class="tray-bighead"><b>' + esc(label) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span>' + gzNameField(rName(r), label) + '<span class="refhelp-acts"><button class="btn ghost" data-keep title="This routine in both versions, with its name and figures, in My notes (private)">＋ My notes</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+          '<table class="ov-sub gz-q gz-q2"><thead><tr><th></th><th>' + esc(r.a ? ref(GA, r.a) : ra + ': Inserted or moved') + '</th><th>' + esc(r.b ? ref(GB, r.b) : rb + ': Removed or moved') + '</th></tr></thead><tbody>' +
+            figs.map(function (q) { return '<tr><th>' + q[0] + '</th><td>' + esc(q[1]) + '</td><td>' + esc(q[2]) + '</td></tr>'; }).join('') + '</tbody></table>' +
+          '<h4>Its blocks</h4><div class="sbs-row sbs-head gz-sbs"><div>' + esc(ra) + '</div><div></div><div>' + esc(rb) + '</div></div>' +
+          '<div class="gz-sbs gz-sbs-in">' + items.map(function (it) { var k = kindOf(it.id); return '<div class="sbs-row k-' + k + '" data-id="' + it.id + '" title="Click for the code in both versions"><div class="sbs-a">' + (cell(it.a, dA) || '<span class="faint">Inserted or moved</span>') + '</div><div class="sbs-mid"><span class="gz-k gz-k-' + k + '">' + k + '</span></div><div class="sbs-b">' + (cell(it.b, dB) || '<span class="faint">Removed or moved</span>') + '</div></div>'; }).join('') + '</div>' +
           '<p class="hint">Click a block for its code in both versions.</p>');
-        dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; } var it = e.target.closest('[data-id]'); if (it) openBlock(it.dataset.id); });
+        dlg.addEventListener('click', function (e) {
+          if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
+          if (e.target.closest('[data-keep]')) { keepRoutine(r, items, figs); return; }
+          var it = e.target.closest('[data-id]'); if (it) openBlock(it.dataset.id);
+        });
+        dlg.addEventListener('change', function (e) {
+          if (!e.target.closest('.gz-name')) return;
+          var v = e.target.value.trim();
+          if (r.b) gzSetName(b.v.id, r.b.a0, v);
+          if (r.a) gzSetName(bo.v.id, r.a.a0, v);
+          SW.toast(v ? 'Named ' + v : 'Name cleared');
+          render();
+        });
+      }
+      function keepRoutine(r, items, figs) {
+        if (!SW.tray) return;
+        var nm = rName(r), label = (r.b || r.a).name;
+        SW.tray.addDoc({ title: 'Routine ' + (nm ? nm + ' (' + label + ')' : label) + ', ' + ra + ' and ' + rb, subtitle: 'Art’s Dynamic Profile Gizmo, ⇄ Compare: ' + r.kind,
+          blocks: [SW.tableBlock('The figures', ['', ra + (r.a ? ' ' + ref(GA, r.a) : ''), rb + (r.b ? ' ' + ref(GB, r.b) : '')], figs),
+                   SW.tableBlock('Its blocks', [ra, 'Change', rb], items.map(function (it) { return [it.a ? it.a.name + ' ' + linesOf(it.a) + ' ' + gzMs(blockMs(dA, it.a)) : '', kindOf(it.id), it.b ? it.b.name + ' ' + linesOf(it.b) + ' ' + gzMs(blockMs(dB, it.b)) : '']; }))] },
+          { vid: b.v.id, anchor: r.b && r.b.src ? { p: r.b.src.p, n0: r.b.src.n0, n1: r.b.src.n1, src: b.parts[r.b.src.p].src } : null, tags: ['profile', 'compare'] });
       }
       // a block: its code in both versions, side by side
       function openBlock(id) {
