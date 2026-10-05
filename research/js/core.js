@@ -713,6 +713,7 @@
     var s = SW.state, q = { v: s.v, tab: s.tab !== 'read' ? s.tab : null };
     if (s.b && (s.tab === 'compare')) q.b = s.b;
     if (s.tab === 'analyse' && SW.anLens) q.lens = SW.anLens();
+    if (s.tab === 'analyse' && SW.gzQuery) { var gq = SW.gzQuery(); for (var gk in gq) q[gk] = gq[gk]; }
     if (s.tab === 'graphics' && SW.gfxItem) q.g = SW.gfxItem();
     if (s.sel && s.tab === 'read') q.l = s.sel.p + ':' + s.sel.n0 + (s.sel.n1 !== s.sel.n0 ? '-' + s.sel.n1 : '');
     for (var k in extra || {}) q[k] = extra[k];

@@ -10,6 +10,10 @@
   var build = null, lens = SW.store.get('an.lens', 1);
   if (lens === 12 || lens === 13) lens = 1;   // the sky and the ships are under Graphics now
   SW.anLens = function () { return lens; };
+  // Art's gizmo in the address: its mode, the version compared with, the split, the routine open
+  var gzQ = {};
+  SW.gzQuery = function () { return lens === 16 ? gzQ : {}; };
+  function gzWrite(o) { gzQ = o; SW.writeQuery(); }
   SW.anLensName = function () { return LENSES[lens - 1][1]; };
 
   var LENSES = [
@@ -240,15 +244,15 @@
     var blocks = [], at = new Int32Array(4096).fill(-1), cur = null;
     for (var a = 0; a < 4096; a++) {
       if (!steps[a]) { cur = null; continue; }
-      if (!cur || into[a] || out[a - 1]) { cur = { i: blocks.length, a0: a, a1: a, steps: 0, cyc: 0, entries: steps[a] }; blocks.push(cur); }
+      if (!cur || into[a] || out[a - 1]) { cur = { i: blocks.length, a0: a, a1: a, steps: 0, cyc: 0, entries: Math.round(steps[a]) }; blocks.push(cur); }
       cur.a1 = a; cur.steps += steps[a]; cur.cyc += cyc[a]; at[a] = cur.i;
     }
     var edges = {};
     function edge(f, t, n, kind) { var k = f + '>' + t; (edges[k] = edges[k] || { f: f, t: t, n: 0, kind: kind }).n += n; }
-    br.forEach(function (n, k) { var f = at[Math.floor(k / 4096)], t = at[k % 4096]; if (f >= 0 && t >= 0) edge(f, t, n, 'branch'); });
+    br.forEach(function (n, k) { var f = at[Math.floor(k / 4096)], t = at[k % 4096]; if (f >= 0 && t >= 0) edge(f, t, Math.round(n), 'branch'); });
     blocks.forEach(function (bl) {   // falling through into the next block
       var ft = steps[bl.a1] - (out[bl.a1] || 0), nx = at[(bl.a1 + 1) & 4095];
-      if (ft > 0 && nx >= 0 && nx !== bl.i) edge(bl.i, nx, ft, 'fall');
+      if (Math.round(ft) > 0 && nx >= 0 && nx !== bl.i) edge(bl.i, nx, Math.round(ft), 'fall');
     });
     var labs = Object.keys(b.labelAt).map(Number).sort(function (x, y) { return x - y; });
     function nameOf(a) {   // its label, or the nearest label before it and how far on
@@ -272,7 +276,7 @@
   function gzName(vid, a0) { return ((SW.store.get('gz.names', {}) || {})[vid] || {})[a0] || ''; }
   function gzSetName(vid, a0, name) { var all = SW.store.get('gz.names', {}) || {}; all[vid] = all[vid] || {}; if (name) all[vid][a0] = name; else delete all[vid][a0]; SW.store.set('gz.names', all); }
   function gzNameField(cur, label) { return '<label class="gz-name" title="Your name for it, kept in this browser and shown in the graph in place of ' + SW.esc(label) + '">Name <input type="text" maxlength="40" value="' + SW.esc(cur) + '" placeholder="' + SW.esc(label) + '"></label>'; }
-  function gzN(n) { return (n || 0).toLocaleString('en-GB'); }
+  function gzN(n) { return Math.round(n || 0).toLocaleString('en-GB'); }
   function gzMs(cycles) { var ms = (cycles || 0) * 5 / 1000; return (ms >= 100 ? Math.round(ms).toLocaleString('en-GB') : ms >= 10 ? ms.toFixed(1) : ms.toFixed(2)) + ' ms'; }
   function sampleRun(b, secs, styles, useAI, progress) {
     return SW.controlMap(b.v.id).then(function (m) { return m; }, function () { return null; }).then(function (m) {
@@ -298,29 +302,61 @@
     });
   }
   function gzMode(mode) {
-    return '<span class="seg-btns gz-mode"><button class="btn' + (mode === 'profile' ? ' on' : '') + '" data-gzm="profile" title="This version as it runs: the blocks it passed through and the time in each">Profile</button><button class="btn' + (mode === 'compare' ? ' on' : '') + '" data-gzm="compare" title="This version against another, by the structure of their code: blocks between branches, and the branches">⇄ Compare</button></span>';
+    return '<span class="seg-btns gz-mode"><button class="btn' + (mode === 'profile' ? ' on' : '') + '" data-gzm="profile" title="This version as it runs: the blocks it passed through and the time in each">Profile</button><button class="btn' + (mode === 'compare' ? ' on' : '') + '" data-gzm="compare" title="This version against another, by the structure of their code: blocks between branches, and the branches">⇄ Compare</button>' +
+      '<button class="btn' + (mode === 'across' ? ' on' : '') + '" data-gzm="across" title="Every routine traced through the versions, each version against the one it was made from">☰ Across the versions</button></span>';
   }
   function gzModeWire(bar) {
     bar.addEventListener('click', function (e) { var m = e.target.closest('[data-gzm]'); if (m) { SW.store.set('an.gizmoMode', m.dataset.gzm); render(); } });
   }
+  // Several sample runs, averaged (Lensman AI flies a little differently each time); each run's
+  // cycles kept, for the range of a block's or routine's time over the runs
+  function sampleRuns(b, secs, styles, useAI, runs, progress) {
+    var ps = [];
+    function next(k) {
+      if (k >= runs || (k && !sampling)) return Promise.resolve();
+      return sampleRun(b, secs, styles, useAI, function (f) { progress((k + f) / runs); }).then(function (p) { ps.push(p); return next(k + 1); });
+    }
+    return next(0).then(function () {
+      var n = ps.length, P = ps[0];
+      if (n === 1) { P.runCyc = [P.cyc]; return P; }
+      var steps = new Float64Array(4096), cyc = new Float64Array(4096), exec = new Float64Array(4096), br = new Map();
+      ps.forEach(function (p) {
+        for (var a = 0; a < 4096; a++) { steps[a] += p.steps[a] / n; cyc[a] += p.cyc[a] / n; exec[a] += p.exec[a] / n; }
+        p.branches.forEach(function (v, k) { br.set(k, (br.get(k) || 0) + v / n); });
+      });
+      return { build: P.build, exec: exec, read: P.read, write: P.write, lastWriter: P.lastWriter, steps: steps, cyc: cyc, branches: br,
+               cycles: ps.reduce(function (t, p) { return t + p.cycles; }, 0) / n, instructions: Math.round(ps.reduce(function (t, p) { return t + p.instructions; }, 0) / n),
+               entry: P.entry, sample: Object.assign({}, P.sample, { runs: n }), runCyc: ps.map(function (p) { return p.cyc; }) };
+    });
+  }
+  // the range of a stretch's time over the runs, in ms (empty for one run)
+  function gzRange(runCyc, ranges) {
+    if (!runCyc || runCyc.length < 2) return '';
+    var v = runCyc.map(function (c) { var t = 0; ranges.forEach(function (r) { for (var a = r[0]; a <= r[1]; a++) t += c[a]; }); return t * 5 / 1000; });
+    var lo = Math.min.apply(null, v), hi = Math.max.apply(null, v), f = function (x) { return x >= 100 ? Math.round(x) : x >= 10 ? x.toFixed(1) : x.toFixed(2); };
+    return f(lo) + '–' + f(hi) + ' ms over ' + v.length + ' runs';
+  }
   function gizmo(b, el) {
     if (SW.store.get('an.gizmoMode', 'profile') === 'compare' && SW.structure) return gizmoCompare(b, el);
+    if (SW.store.get('an.gizmoMode', 'profile') === 'across' && SW.structure) return gizmoAcross(b, el);
+    gzWrite({ gz: 'profile' });
     var prof = SW.profile && SW.profile.build === b && SW.profile.branches && SW.profile.instructions ? SW.profile : null;
     var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
     var legend = 'Darker blocks take more of the time; the rounded block is where the run began. Solid edges are branches, dashed ones falling through into a block a branch also reaches, dotted ones a way through blocks left out; thicker for more often. An edge up or across returns to a block drawn above (a loop). Click a block for its code, the instructions it ran and where it branches.';
     var c = SW.el('div', { class: 'card gz-card' });
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
-    var secs = SW.store.get('an.gizmoSecs', 10), cover = SW.store.get('an.gizmoCover', 0.9);
+    var secs = SW.store.get('an.gizmoSecs', 10), cover = SW.store.get('an.gizmoCover', 0.9), runs = SW.store.get('an.gizmoRuns', 3);
     var SN = SW.ai ? SW.ai.STYLE_NAMES : [['duellist', 'duellist']];
     var styles = [0, 1].map(function (j) { var v = SW.store.get('an.gizmoStyle' + j, 'duellist'); return SN.some(function (o) { return o[0] === v; }) ? v : 'duellist'; });
     var useAI = SW.store.get('an.gizmoAI', true);
     function styleSel(j) { return '<label class="check" title="How Lensman AI flies ' + (j ? 'the Wedge' : 'the Needle') + ' in the sample run: a hunter chases hard and closes in; an orbiter keeps its distance and fires from its orbit; a duellist is between">' + (j ? 'Wedge' : 'Needle') + ' <select class="gz-style" data-j="' + j + '">' + SN.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === styles[j] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label>'; }
     var F = prof ? flowBlocks(b, prof) : null, B = F ? F.blocks : [], tot = F ? F.total || 1 : 1;
-    var from = prof ? (prof.sample ? 'sample run, ' + (prof.sample.ai ? 'Lensman AI: Needle ' + (prof.sample.styles || ['duellist'])[0] + ', Wedge ' + (prof.sample.styles || ['', 'duellist'])[1] : 'no one at the controls') : 'your run in Run') : '';
+    var from = prof ? (prof.sample ? 'sample run' + (prof.sample.runs > 1 ? ' ×' + prof.sample.runs + ', averaged' : '') + ', ' + (prof.sample.ai ? 'Lensman AI: Needle ' + (prof.sample.styles || ['duellist'])[0] + ', Wedge ' + (prof.sample.styles || ['', 'duellist'])[1] : 'no one at the controls') : 'your run in Run') : '';
     var bar = SW.el('div', { class: 'gz-bar' });
     bar.innerHTML = gzMode('profile') + '<span class="sep"></span><button class="btn gz-run" title="Run the program here for the time chosen and draw the graph from that run">▶ Sample run</button>' +
       '<select class="gz-secs" title="How long to run, in machine time">' + [5, 10, 30, 60].map(function (n) { return '<option value="' + n + '"' + (n === secs ? ' selected' : '') + '>' + n + ' s</option>'; }).join('') + '</select>' +
+      '<select class="gz-runs" title="How many runs to average (the computer pilot flies a little differently each time); the times show their range over the runs">' + [1, 3, 5].map(function (n) { return '<option value="' + n + '"' + (n === runs ? ' selected' : '') + '>× ' + n + '</option>'; }).join('') + '</select>' +
       '<span class="gz-ai' + (useAI ? '' : ' off') + '" title="Lensman AI, the bench’s computer pilot, flies both ships in the sample run. Off, no one is at the controls: the ships only drift under gravity"><label class="check"><input type="checkbox" class="gz-ai-on"' + (useAI ? ' checked' : '') + '> Lensman AI</label>' + styleSel(0) + styleSel(1) + '</span>' +
       (prof ? '<span class="sep"></span><label class="check" title="The busiest blocks that together take this share of the time">Show <select class="gz-cover">' + [[0.8, '80%'], [0.9, '90%'], [0.95, '95%'], [0.99, '99%'], [1, '100%']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cover ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select> of the time</label>' : '') +
       '<span class="gz-src hint">' + (prof ? B.length + ' blocks · ' + F.edges.length + ' edges · ' + (prof.cycles / 200000).toFixed(2) + ' s · ' + prof.instructions.toLocaleString('en-GB') + ' instructions · ' + from : 'Press ▶ Sample run, or play the game in Run and come back.') + '</span>' +
@@ -330,6 +366,7 @@
     if (!prof) c.insertAdjacentHTML('beforeend', '<p class="lede">' + lede + '</p>');
     var gb = bar.querySelector('.gz-run'), gs = bar.querySelector('.gz-secs'), src = bar.querySelector('.gz-src');
     gs.addEventListener('change', function () { secs = +gs.value; SW.store.set('an.gizmoSecs', secs); });
+    bar.querySelector('.gz-runs').addEventListener('change', function (e) { runs = +e.target.value; SW.store.set('an.gizmoRuns', runs); dynCache = {}; });
     SW.$$('.gz-style', bar).forEach(function (x) { x.disabled = !useAI; x.addEventListener('change', function () { styles[+x.dataset.j] = x.value; SW.store.set('an.gizmoStyle' + x.dataset.j, x.value); }); });
     bar.querySelector('.gz-ai-on').addEventListener('change', function (e) {
       useAI = e.target.checked; SW.store.set('an.gizmoAI', useAI);
@@ -339,7 +376,7 @@
     gb.addEventListener('click', function () {
       if (sampling) { sampling = null; return; }   // a second press stops it
       sampling = {}; gb.textContent = '■ Stop'; gs.disabled = true; SW.$$('.gz-style, .gz-ai-on', bar).forEach(function (x) { x.disabled = true; });
-      sampleRun(b, secs, styles, useAI, function (f) { src.textContent = 'Running… ' + Math.round(100 * f) + '%'; }).then(function (p) {
+      sampleRuns(b, secs, styles, useAI, runs, function (f) { src.textContent = 'Running… ' + Math.round(100 * f) + '%'; }).then(function (p) {
         sampling = null;
         if (build !== b) return;
         SW.profile = p; SW.emit('profile');
@@ -477,7 +514,8 @@
     }
     function blockFigures(bl) {
       var outs = F.edges.filter(function (e) { return e.f === bl.i; }), ins = F.edges.filter(function (e) { return e.t === bl.i; });
-      return [['Time', gzMs(bl.cyc) + ' (' + (100 * bl.cyc / tot).toFixed(2) + '% of the run)'], ['Per entry', bl.entries ? (bl.cyc * 5 / bl.entries).toFixed(1) + ' µs' : ''],
+      var rg = gzRange(prof.runCyc, [[bl.a0, bl.a1]]);
+      return [['Time', gzMs(bl.cyc) + ' (' + (100 * bl.cyc / tot).toFixed(2) + '% of the run' + (prof.sample && prof.sample.runs > 1 ? ', averaged' : '') + ')' + (rg ? '; ' + rg : '')], ['Per entry', bl.entries ? (bl.cyc * 5 / bl.entries).toFixed(1) + ' µs' : ''],
         ['Entered', gzN(bl.entries) + ' times'], ['Instructions run', gzN(bl.steps)], ['Length', (bl.a1 - bl.a0 + 1) + ' instruction' + (bl.a1 > bl.a0 ? 's' : '') + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + ')'],
         ['Branches in', ins.length + ' (' + gzN(ins.reduce(function (t, e) { return t + e.n; }, 0)) + ' times)'], ['Branches out', outs.length + ' (' + gzN(outs.reduce(function (t, e) { return t + e.n; }, 0)) + ' times)'],
         ['The run', (prof.cycles / 200000).toFixed(2) + ' s of machine time, ' + gzN(prof.instructions) + ' instructions']];
@@ -522,7 +560,84 @@
   function dynOf(b) {
     if (dynCache[b.v.id]) return Promise.resolve(dynCache[b.v.id]);
     sampling = sampling || {};
-    return sampleRun(b, 5, ['duellist', 'duellist'], true, function () {}).then(function (p) { dynCache[b.v.id] = p; return p; });
+    return sampleRuns(b, 5, ['duellist', 'duellist'], true, SW.store.get('an.gizmoRuns', 3), function () {}).then(function (p) { dynCache[b.v.id] = p; return p; });
+  }
+  // ☰ Across the versions: each version compared with the one it was made from (its parent in the
+  // descent), routines followed from parent to child; a row for each routine, a column for each version
+  var acrossCache = {};
+  function gizmoAcross(b, el) {
+    var V = root.SWVersions, ST = SW.structure, esc = SW.esc, split = !!SW.store.get('an.gizmoSplit', false);
+    gzWrite({ gz: 'across', split: split ? 1 : null });
+    var c = SW.el('div', { class: 'card gz-card' }); c.style.gridColumn = '1 / -1'; el.appendChild(c);
+    var bar = SW.el('div', { class: 'gz-bar' });
+    bar.innerHTML = gzMode('across') + '<span class="sep"></span><label class="check" title="Draw the largest routine, the main loop, as its labelled parts"><input type="checkbox" class="gz-split"' + (split ? ' checked' : '') + '> Split the main loop</label>' +
+      '<span class="gz-src hint">Reading every version…</span>' +
+      '<details class="gz-about"><summary>About</summary><div class="gz-about-b"><p>Each version is compared with the one it was made from (its parent in the descent: 4.2 from dfw’s 4.1, 4.8 from 4.1, 4.0TS a side branch), by the structure of its code, as ⇄ Compare does; a routine is followed from parent to child. Witnesses (another text of the same version) are left out. The jumps the code does not name come from one 5 s sample run of each version.</p><p>● the same as in its parent · ◐ altered · ↪ moved (its code from another routine) · ＋ new · × gone (in the version that lost it). Click a cell for that version against its parent, the routine open.</p></div></details>';
+    c.appendChild(bar); gzModeWire(bar);
+    bar.querySelector('.gz-split').addEventListener('change', function (e) { SW.store.set('an.gizmoSplit', e.target.checked); render(); });
+    var src = bar.querySelector('.gz-src'), body = SW.el('div', { class: 'gz-across' }); c.appendChild(body);
+    // the versions in order of descent, depth first from the earliest
+    var vs = V.VERSIONS.filter(function (v) { return v.build && !v.witnessOf && v.id !== 'stars'; });
+    var kids = {}; vs.forEach(function (v) { var pid = v.parent && vs.some(function (x) { return x.id === v.parent; }) ? v.parent : ''; (kids[pid] = kids[pid] || []).push(v); });
+    Object.keys(kids).forEach(function (k) { kids[k].sort(function (x, y) { return x.sort - y.sort; }); });
+    var order = []; (function walk(pid) { (kids[pid] || []).forEach(function (v) { order.push(v); walk(v.id); }); })('');
+    var out = { rows: [], head: [] };
+    var key = order.map(function (v) { return v.id; }).join(',');
+    (acrossCache[key] ? Promise.resolve(acrossCache[key]) : (function () {
+      var G = {}, k = 0;
+      return order.reduce(function (p, v) {
+        return p.then(function () {
+          src.textContent = 'Reading ' + SW.refOf(v.id) + ' (' + (++k) + ' of ' + order.length + ')…';
+          return SW.build(v.id).then(function (bv) {
+            if (!bv.asm) return;
+            sampling = sampling || {};
+            return sampleRun(bv, 5, ['duellist', 'duellist'], true, function () {}).then(function (d) { G[v.id] = ST.graph(bv, d); });
+          }, function () {});
+        });
+      }, Promise.resolve()).then(function () { sampling = null; acrossCache[key] = G; return G; });
+    })()).then(function (G) {
+      if (build !== b) return;
+      var cols = order.filter(function (v) { return G[v.id]; }), lineOf = {}, lines = [], R = {};
+      cols.forEach(function (v) { R[v.id] = ST.routines(G[v.id], { split: split }); });
+      cols.forEach(function (v, ci) {
+        var par = v.parent && G[v.parent] ? v.parent : null, cr = null, cell = {};
+        if (par) cr = ST.compareRoutines(ST.compare(G[par], G[v.id]), { split: split });
+        if (cr) cr.rows.forEach(function (row) {
+          if (row.b) cell[row.b.i] = row;
+          else if (row.a && lineOf[par + ':' + row.a.i] != null) lines[lineOf[par + ':' + row.a.i]].cells[v.id] = { k: 'gone', name: row.a.name };
+        });
+        cr && cr.RB.list.forEach(function (r, i) { R[v.id].list[i] = r; });   // the same routines the comparison found
+        R[v.id].list.forEach(function (r) {
+          var row = cell[r.i], li = row && row.a && lineOf[par + ':' + row.a.i] != null ? lineOf[par + ':' + row.a.i] : null;
+          // new here: joins a row of the same name not yet in this column (a sibling or another branch has it), else starts one
+          if (li == null) for (var q = 0; q < lines.length; q++) if (lines[q].name === r.name && !lines[q].cells[v.id]) { li = q; break; }
+          if (li == null) { li = lines.length; lines.push({ name: r.name, first: ci, a0: r.a0, cells: {} }); }
+          lineOf[v.id + ':' + r.i] = li;
+          lines[li].cells[v.id] = { k: !par || !row || row.kind === 'inserted' ? 'new' : row.kind, name: r.name };
+        });
+      });
+      lines.sort(function (x, y) { return (x.first - y.first) || (x.a0 - y.a0); });
+      var MARK = { same: '●', altered: '◐', moved: '↪', new: '＋', gone: '×' };
+      var TIP = { same: 'the same as in its parent', altered: 'altered from its parent', moved: 'moved: its code from another routine in the parent', new: 'new in this version', gone: 'gone: in the parent, not here' };
+      src.textContent = cols.length + ' versions · ' + lines.length + ' routines followed through them';
+      body.innerHTML = '<div class="gz-acr-wrap"><table class="gz-acr"><thead><tr><th>Routine</th>' + cols.map(function (v) { return '<th title="' + esc(v.label + (v.parent ? ', made from ' + SW.refOf(v.parent) : '')) + '">' + esc(SW.refOf(v.id).replace(/^SW/, '')) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+        lines.map(function (ln) {
+          return '<tr><th class="mono">' + esc(ln.name) + '</th>' + cols.map(function (v) {
+            var cl = ln.cells[v.id]; if (!cl) return '<td></td>';
+            return '<td class="ac-' + cl.k + '" data-v="' + esc(v.id) + '" data-n="' + esc(cl.name) + '" title="' + esc(cl.name + ' in ' + SW.refOf(v.id) + ': ' + TIP[cl.k] + (v.parent ? ' (' + SW.refOf(v.parent) + ')' : '')) + '">' + MARK[cl.k] + (cl.name !== ln.name && cl.k !== 'gone' ? '<i>' + esc(cl.name) + '</i>' : '') + '</td>';
+          }).join('') + '</tr>';
+        }).join('') + '</tbody></table></div>';
+      body.onclick = function (e) {
+        var td = e.target.closest('td[data-v]'); if (!td) return;
+        var v = V.byId(td.dataset.v); if (!v || !v.parent) return;
+        var m = SW.store.get('an.gizmoCmpBy', {}) || {}; m[v.id] = v.parent; SW.store.set('an.gizmoCmpBy', m);
+        SW.store.set('an.gizmoMode', 'compare'); SW.state.gzRoutine = td.dataset.n;
+        if (SW.state.v === v.id) render(); else SW.select(v.id);
+      };
+      out.head = ['Routine'].concat(cols.map(function (v) { return SW.refOf(v.id); }));
+      out.rows = lines.map(function (ln) { return [ln.name].concat(cols.map(function (v) { var cl = ln.cells[v.id]; return cl ? MARK[cl.k] + (cl.name !== ln.name && cl.k !== 'gone' ? ' ' + cl.name : '') : ''; })); });
+    });
+    return function () { return [{ type: 'p', text: 'Each version compared with the one it was made from; a routine followed from parent to child. ● the same, ◐ altered, ↪ moved, ＋ new, × gone.' }, SW.tableBlock('Routines across the versions', out.head, out.rows)]; };
   }
   function gizmoCompare(b, el) {
     var V = root.SWVersions, ST = SW.structure, esc = SW.esc;
@@ -534,6 +649,7 @@
     var other = ok(byV[b.v.id]) ? byV[b.v.id] : ok(SW.store.get('an.gizmoCmp', '')) ? SW.store.get('an.gizmoCmp', '') : (earlier[earlier.length - 1] || vs[0] || {}).id;
     function keep(cur, cmp) { var m = SW.store.get('an.gizmoCmpBy', {}) || {}; m[cur] = cmp; SW.store.set('an.gizmoCmpBy', m); SW.store.set('an.gizmoCmp', cmp); }
     var split = !!SW.store.get('an.gizmoSplit', false);
+    gzWrite({ gz: 'compare', cmp: other, split: split ? 1 : null });
     var lede = 'After Art Schwarz: each version’s code without its comments, cut into blocks between branches (a block begins where a branch arrives and ends at an instruction that can branch), read from the assembled code; jumps the code does not name (jmp i, jsp i, xct) are taken from a 5 s sample run of each version. Blocks are matched across the two versions by their code, then their label, then their place between matched blocks. Here they are gathered into routines, each running from an entry point (the start, anything called, anything the main loop dispatches to) to the next, and the two versions’ routines are set side by side.';
     var legend = 'The same: every block matched and unchanged. Altered: some of its blocks changed, were inserted or were removed. Moved: a routine on one side only whose code is all found in another routine on the other. Inserted, removed: a routine with no counterpart. Click a routine for its blocks side by side, and a block for its code in both versions.';
     var c = SW.el('div', { class: 'card gz-card' });
@@ -542,6 +658,7 @@
     var bar = SW.el('div', { class: 'gz-bar' });
     bar.innerHTML = gzMode('compare') + '<span class="sep"></span><label class="check" title="The version to compare this one with">' + esc(SW.refOf(b.v.id)) + ' against <select class="gz-cmp">' +
       vs.map(function (v) { return '<option value="' + esc(v.id) + '"' + (v.id === other ? ' selected' : '') + '>' + esc(SW.refOf(v.id) + '  ' + v.label) + '</option>'; }).join('') + '</select></label>' +
+      '<button class="btn ghost gz-link" title="Copy a link that opens the bench on this comparison (and the routine open, if one is)">🔗 Link</button>' +
       '<button class="btn ghost gz-swap" title="Swap the two versions round: ' + esc(SW.refOf(other || '') + ' on the right, ' + SW.refOf(b.v.id) + ' on the left') + '">⇄ Swap</button>' +
       '<label class="check" title="Draw the largest routine, the main loop, as its labelled parts: each label a branch arrives at begins a part"><input type="checkbox" class="gz-split"' + (split ? ' checked' : '') + '> Split the main loop</label>' +
       '<span class="gz-src hint">Reading both versions…</span>' +
@@ -549,6 +666,7 @@
     c.appendChild(bar);
     gzModeWire(bar);
     bar.querySelector('.gz-cmp').addEventListener('change', function (e) { keep(b.v.id, e.target.value); render(); });
+    bar.querySelector('.gz-link').addEventListener('click', function () { SW.copyText(location.href.replace(/&nc=\d+/, ''), 'the link to this comparison'); });
     bar.querySelector('.gz-swap').addEventListener('click', function () { if (!other) return; keep(other, b.v.id); SW.select(other); });
     bar.querySelector('.gz-split').addEventListener('change', function (e) { SW.store.set('an.gizmoSplit', e.target.checked); render(); });
     var src = bar.querySelector('.gz-src'), body = SW.el('div', { class: 'gz-sbs' }), more = SW.el('div', { class: 'gz-more' });
@@ -612,10 +730,11 @@
           var k = rowOf[r.i], outs = [], ins = [];
           Object.keys(F).forEach(function (key) { var e = F[key]; var o = R.rows[e.t], q = R.rows[e.f]; if (e.f === k && e.t !== k) outs.push(((o.b || o.a).name) + ' ×' + gzN(e.n)); if (e.t === k && e.f !== k) ins.push(((q.b || q.a).name) + ' ×' + gzN(e.n)); });
           var ent = d && d.steps ? d.steps[r.a0] : 0;
-          return [gzMs(SH['c' + r.i]) + ' (' + (100 * (SH[r.i] || 0)).toFixed(1) + '%)', ent ? (SH['c' + r.i] * 5 / ent).toFixed(1) + ' µs' : '', gzN(ent) + ' times', gzN(steps), r.blocks.length + ' blocks, ' + words + ' words', outs.join(', ') || 'none', ins.join(', ') || 'none'];
+          var rg = gzRange(d && d.runCyc, r.blocks.map(function (bi) { return [G.blocks[bi].a0, G.blocks[bi].a1]; }));
+          return [gzMs(SH['c' + r.i]) + ' (' + (100 * (SH[r.i] || 0)).toFixed(1) + '%)' + (rg ? '; ' + rg : ''), ent ? (SH['c' + r.i] * 5 / ent).toFixed(1) + ' µs' : '', gzN(ent) + ' times', gzN(steps), r.blocks.length + ' blocks, ' + words + ' words', outs.join(', ') || 'none', ins.join(', ') || 'none'];
         }
         var A = col(row.a, GA, dA, SA, FA, rowOfA), B2 = col(row.b, GB, dB, SB, FB, rowOfB);
-        return ['Time in the 5 s run', 'Per entry', 'Entered', 'Instructions run', 'Size', 'Calls and jumps to', 'Reached from'].map(function (h, i) { return [h, A[i], B2[i]]; });
+        return ['Time in a 5 s run' + ((dB && dB.sample && dB.sample.runs > 1) ? ' (×' + dB.sample.runs + ', averaged)' : ''), 'Per entry', 'Entered', 'Instructions run', 'Size', 'Calls and jumps to', 'Reached from'].map(function (h, i) { return [h, A[i], B2[i]]; });
       }
       var uni = {}; [FA, FB].forEach(function (F) { Object.keys(F).forEach(function (k) { uni[k] = F[k]; }); });
       var entryRow = rowOfB[R.RB.of[GB.entry]];
@@ -664,6 +783,12 @@
       fb.appendChild(document.createTextNode(' '));
       fb.appendChild(SW.figureButtons(function () { return svgB; }, 'spacewar-' + b.v.id + '-flow', rb));
       body.onclick = function (e) { var g = e.target.closest('[data-r]'); if (g) openRoutine(R.rows[+g.dataset.r]); };
+      // a routine named in the link (?rt=), opened once drawn
+      if (SW.state.gzRoutine) {
+        var want = SW.state.gzRoutine; SW.state.gzRoutine = null;
+        var hit = R.rows.filter(function (r) { return (r.b && r.b.name === want) || (r.a && r.a.name === want) || rName(r) === want; })[0];
+        if (hit) openRoutine(hit);
+      }
       // ---- the routines, row by row, folded ----
       var rlist = SW.el('div', { class: 'gz-sec' });
       rlist.innerHTML = '<h4>The routines, row by row <span class="faint">(' + R.rows.length + ': ' + rk.altered + ' altered, ' + rk.moved + ' moved, ' + rk.inserted + ' inserted, ' + rk.removed + ' removed)</span></h4>' +
@@ -707,6 +832,7 @@
       }
       // a routine: its blocks in both versions, side by side
       function openRoutine(r) {
+        gzWrite({ gz: 'compare', cmp: other, split: split ? 1 : null, rt: (r.b || r.a).name });
         var items = [];
         (r.b ? r.b.blocks : []).forEach(function (yi) { var xi = C.mB[yi]; items.push({ ord: GB.blocks[yi].a0, a: xi == null ? null : GA.blocks[xi], b: GB.blocks[yi], id: 'b' + yi }); });
         (r.a ? r.a.blocks : []).forEach(function (xi) {
@@ -744,12 +870,13 @@
         var first = items.filter(function (it) { return kindOf(it.id) !== 'same'; })[0] || items[0];
         if (first) showBlock(first.id);
         dlg.addEventListener('click', function (e) {
-          if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
+          if (e.target === dlg || e.target.closest('[data-x]')) { gzWrite({ gz: 'compare', cmp: other, split: split ? 1 : null }); dlg.close(); return; }
           if (e.target.closest('[data-keep]')) { keepRoutine(r, items, figs); return; }
           var vb = e.target.closest('[data-view]'); if (vb) { view(vb.dataset.view); return; }
           var st = e.target.closest('[data-step]'); if (st) { var ids = items.map(function (it) { return it.id; }), at = ids.indexOf(cur); showBlock(ids[(at + +st.dataset.step + ids.length) % ids.length]); return; }
           var it = e.target.closest('[data-id]'); if (it) { showBlock(it.dataset.id); view('code'); }
         });
+        dlg.addEventListener('close', function () { gzWrite({ gz: 'compare', cmp: other, split: split ? 1 : null }); });
         dlg.addEventListener('change', function (e) {
           if (!e.target.closest('.gz-name')) return;
           var v = e.target.value.trim();

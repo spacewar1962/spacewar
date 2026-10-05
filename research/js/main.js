@@ -244,6 +244,11 @@
     if (q.tab === 'sky') q.tab = 'graphics';   // the Star map tab became Graphics
     // a view named in the link (the site map links to each): its lens or graphic
     if (q.lens) { SW.setLens(q.lens); if (!q.tab) q.tab = 'analyse'; }
+    // Art's gizmo as a link left it: its mode, the version compared with, the split, a routine to open
+    if (q.gz === 'profile' || q.gz === 'compare' || q.gz === 'across') SW.store.set('an.gizmoMode', q.gz);
+    if (q.cmp && q.v) { var cb = SW.store.get('an.gizmoCmpBy', {}) || {}; cb[q.v] = q.cmp; SW.store.set('an.gizmoCmpBy', cb); }
+    if (q.gz === 'compare') SW.store.set('an.gizmoSplit', q.split === '1');
+    if (q.rt) SW.state.gzRoutine = q.rt;
     if (q.g) { SW.setGraphic(q.g); if (!q.tab) q.tab = 'graphics'; }
     SW.state.tab = ORDER.indexOf(q.tab) >= 0 ? q.tab : 'read';
     document.body.dataset.tab = SW.state.tab;
