@@ -676,7 +676,7 @@
       out.rrows = R.rows.map(function (r) { return [r.kind, r.a ? r.a.name : '', r.b ? r.b.name : '', r.kind === 'same' ? '' : tallyText(r.t), r.b ? ref(GB, r.b) : ref(GA, r.a)]; });
       // the block-level detail, folded away
       out.rows = [];
-      C.altered.forEach(function (xi) { var x = GA.blocks[xi], y = GB.blocks[C.mA[xi]], d = ST.lineDiff(x.lines.map(function (l) { return l.key; }), y.lines.map(function (l) { return l.key; })); out.rows.push({ id: 'b' + y.i, r: ['altered', x.name, y.name, d.filter(function (q) { return q[0] === '-'; }).length + ' out, ' + d.filter(function (q) { return q[0] === '+'; }).length + ' in', ref(GB, y)] }); });
+      C.altered.forEach(function (xi) { var x = GA.blocks[xi], y = GB.blocks[C.mA[xi]], d = ST.lineDiff(x.lines.map(function (l) { return l.key; }), y.lines.map(function (l) { return l.key; })); var no = d.filter(function (q) { return q[0] === '-'; }).length, ni = d.filter(function (q) { return q[0] === '+'; }).length; out.rows.push({ id: 'b' + y.i, r: ['altered', x.name, y.name, no || ni ? no + ' out, ' + ni + ' in' : 'same lines, assembled differently', ref(GB, y)] }); });
       C.inserted.forEach(function (yi) { var y = GB.blocks[yi], w = C.into[yi]; out.rows.push({ id: 'b' + yi, r: ['inserted', '', y.name, y.lines.length + ' line' + (y.lines.length === 1 ? '' : 's') + (w ? ', between ' + GB.blocks[w[0]].name + ' and ' + GB.blocks[w[1]].name : ''), ref(GB, y)] }); });
       C.removed.forEach(function (xi) { var x = GA.blocks[xi]; out.rows.push({ id: 'a' + xi, r: ['removed', x.name, '', x.lines.length + ' line' + (x.lines.length === 1 ? '' : 's'), ref(GA, x)] }); });
       out.rows.sort(function (p, q) { return p.r[4] < q.r[4] ? -1 : 1; });
@@ -778,7 +778,7 @@
         function link(G, bl, label) { if (!bl || !bl.src) return ''; var u = location.pathname + '?v=' + encodeURIComponent(G.b.v.id) + '&tab=read&l=' + bl.src.p + ':' + bl.src.n0 + (bl.src.n1 > bl.src.n0 ? '-' + bl.src.n1 : ''); return '<a class="btn" href="' + esc(u) + '" target="_blank" rel="noopener" title="These lines in Read, in a new tab">' + label + ' ↗</a>'; }
         return ('<div class="tray-bighead' + (own ? '' : ' gz-bvh') + '"><b>' + esc((x ? x.name : '') + (x && y && x.name !== y.name ? ' → ' : '') + (y && (!x || x.name !== y.name) ? y.name : '')) + '</b> <span class="gz-k gz-k-' + k + '">' + k + '</span><span class="refhelp-acts">' + link(GA, x, 'Read in ' + ra) + link(GB, y, 'Read in ' + rb) + (own ? '<button class="icon-btn" data-x title="Close (Esc)">✕</button>' : '') + '</span></div>' +
           '<div class="gz-pair gz-pairh"><div>' + esc(x ? ref(GA, x) : ra + ': Inserted or moved') + '</div><div>' + esc(y ? ref(GB, y) : rb + ': Removed or moved') + '</div></div>' +
-          '<div class="listing gz-src-l gz-cmpl">' + rowsH + '</div><p class="hint">Comments and spacing are left out of the comparison; lines shown as held.</p>');
+          '<div class="listing gz-src-l gz-cmpl">' + rowsH + '</div>' + (k === 'altered' && !d.some(function (q) { return q[0] !== '='; }) ? '<p class="hint">The same lines, assembled differently: a macro they use, a repeat count or a symbol they name has changed between the versions.</p>' : '') + '<p class="hint">Comments and spacing are left out of the comparison; lines shown as held.</p>');
       }
     }
     return function () {

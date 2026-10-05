@@ -145,7 +145,15 @@
     var onA = once(A, mA), onB = once(B, mB), byName = {};
     B.blocks.forEach(function (y) { if (mB[y.i] == null && onB[y.name] === 1) byName[y.name] = y; });
     A.blocks.forEach(function (x) { var y = byName[x.name]; if (mA[x.i] == null && onA[x.name] === 1 && y && mB[y.i] == null) { mA[x.i] = y.i; mB[y.i] = x.i; kind[x.i] = 'altered'; } });
-    // 3. the same place in the graph: one unmatched block on each side, between the same matched neighbours
+    // 3. like code: an unmatched block whose lines are mostly another's (at least 60% in
+    // common, counted both ways), when it is the one most like it on either side
+    function lines(z) { return z.lines.map(function (l) { return l.key; }); }
+    function like(x, y) { var a = lines(x), c = lines(y); if (!a.length || !c.length) return 0; var k = lcs(a, c).length; return 2 * k / (a.length + c.length); }
+    var ua = A.blocks.filter(function (x) { return mA[x.i] == null && x.lines.length >= 3; }), ub = B.blocks.filter(function (y) { return mB[y.i] == null && y.lines.length >= 3; });
+    var best = [];
+    ua.forEach(function (x) { ub.forEach(function (y) { var v = like(x, y); if (v >= 0.6) best.push([v, x.i, y.i]); }); });
+    best.sort(function (p, q) { return q[0] - p[0]; }).forEach(function (t) { if (mA[t[1]] == null && mB[t[2]] == null) { mA[t[1]] = t[2]; mB[t[2]] = t[1]; kind[t[1]] = 'altered'; } });
+    // 4. the same place in the graph: one unmatched block on each side, between the same matched neighbours
     function nbrs(G) { var pre = {}, suc = {}; G.edges.forEach(function (e) { (suc[e.f] = suc[e.f] || []).push(e.t); (pre[e.t] = pre[e.t] || []).push(e.f); }); return { pre: pre, suc: suc }; }
     var NA = nbrs(A), NB = nbrs(B);
     for (var pass = 0; pass < 6; pass++) {
