@@ -372,7 +372,8 @@
       }
       var items = list.map(function (n, i) {
         var c = catOf(n.text, n.tags), lvl = levelOf(n.tags);
-        return { key: 'n:' + n.id, by: n.by, cat: c, lvl: lvl, order: i, text: refOf(n) + ' ' + n.text + ' ' + (n.tags || []).join(' ') + ' ' + n.by, vids: [n.vid], card: function () { return groupCard(n, i, c, lvl); } };
+        var th0 = threadOf(n), st = th0 ? N.statusOf(th0.reactions).state : '';
+        return { key: 'n:' + n.id, by: n.by, cat: c, lvl: lvl, st: st, order: i, text: refOf(n) + ' ' + n.text + ' ' + (n.tags || []).join(' ') + ' ' + n.by, vids: [n.vid], card: function () { return groupCard(n, i, c, lvl); } };
       });
       grouped(box, items, 'None.');
     });
@@ -431,7 +432,7 @@
     function paintReplies() { var box = SW.$('.fd-repl', d); if (box) box.innerHTML = repliesHTML(threadOf(n)); }
     function paint() {
       var t = threadOf(n);
-      d.innerHTML = '<div class="tray-bighead"><span class="fd-no fd-ref mono">' + refOf(n) + '</span> <b>' + SW.md(title).replace(/^<p>|<\/p>$/g, '') + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) +
+      d.innerHTML = '<div class="tray-bighead"><span class="fd-no fd-ref mono">' + refOf(n) + '</span> ' + (t ? N.statusChip(N.statusOf(t.reactions)) + ' ' : '') + '<b>' + SW.md(title).replace(/^<p>|<\/p>$/g, '') + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) +
         ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
         (rest ? '<div class="fd-rtext note-md">' + SW.md(rest) + '</div>' : '') + '<div class="fd-bigfig"></div>' +
         '<div class="fd-meta">' + tags.map(function (g) { return '<span class="fd-tag">' + SW.esc(SW.tagLabel(g)) + '</span>'; }).join(' ') + '<span class="hint">Evidence: ' + SW.esc(where) + '</span></div>' + rxBar(t) +
@@ -473,7 +474,7 @@
         var where = vLabel(n.vid) + ' ' + (n.anchor ? SW.refText(n.vid, n.anchor.p, n.anchor.n0, n.anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid) + ', the version');
         var li = SW.el('li', { class: 'fd', style: 'border-left-color:' + colourOf(n.by) });
         var th = threadOf(n), nrep = th ? countReplies(th) : 0, nrx = emojiOf(th).length, R0 = ratingOf(th);
-        li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no fd-ref mono" title="Its reference, which does not change">' + refOf(n) + '</span> <b class="fd-title">' + SW.md(title).replace(/^<p>|<\/p>$/g, '') + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
+        li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no fd-ref mono" title="Its reference, which does not change">' + refOf(n) + '</span> ' + (th ? N.statusChip(N.statusOf(th.reactions)) + ' ' : '') + '<b class="fd-title">' + SW.md(title).replace(/^<p>|<\/p>$/g, '') + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
           (rest ? '<div class="note-md">' + SW.md(rest) + '</div>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return /^note:/.test(g) ? '<span class="fd-tag fd-noteref mono" title="The note in its author’s My notes that this was shared from">from ' + SW.esc(g.slice(5)) + '</span>' : '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
         if (nrep || nrx || R0) SW.$('.fd-ev', li).insertAdjacentHTML('beforeend', ' <a href="#" class="fd-replies">' + [nrep ? nrep + (nrep === 1 ? ' reply' : ' replies') : '', nrx ? emojiOf(th).map(function (r) { return r.text; }).join('') : '', R0 ? 'crew ' + (Math.round(R0.avg * 10) / 10) + '★ (' + R0.n + ')' : ''].filter(Boolean).join(' · ') + '</a>');
         li.addEventListener('click', function (e) {
@@ -577,6 +578,9 @@
     if (FS.v && it.vids.indexOf(FS.v) < 0) return false;
     if (FS.by && it.by !== 'bench' && it.by !== FS.by) return false;
     if (FS.q && it.text.toLowerCase().indexOf(FS.q.toLowerCase()) < 0) return false;
+    if (FS.st === 'open' && !(it.st === 'open' || it.st === 'help')) return false;
+    if (FS.st === 'resolved' && it.st !== 'resolved') return false;
+    if (FS.st === 'none' && it.st) return false;
     return true;
   }
   var LORD = { key: 0, notable: 1, minor: 2 };
@@ -625,6 +629,7 @@
     bar.innerHTML = '<label class="check">Category <select data-f="cat"><option value="">All</option>' + CATS.concat([['other', 'Other']]).map(function (c) { return '<option value="' + c[0] + '"' + (FS.cat === c[0] ? ' selected' : '') + '>' + c[1] + '</option>'; }).join('') + '</select></label>' +
       '<label class="check">Importance <select data-f="lvl"><option value="">All</option><option value="notable"' + (FS.lvl === 'notable' ? ' selected' : '') + '>Key and notable</option><option value="key"' + (FS.lvl === 'key' ? ' selected' : '') + '>Key only</option></select></label>' +
       '<label class="check">Version <select data-f="v"><option value="">All</option>' + vs.map(function (v) { return '<option value="' + v.id + '"' + (FS.v === v.id ? ' selected' : '') + '>' + SW.esc(v.label.replace(/^Spacewar! /, '')) + '</option>'; }).join('') + '</select></label>' +
+      '<label class="check" title="From the group’s reactions: 🔓 open, 💡 help wanted, ✅ resolved (the latest counts)">Status <select data-f="st"><option value="">All</option><option value="open"' + (FS.st === 'open' ? ' selected' : '') + '>Open or help wanted</option><option value="resolved"' + (FS.st === 'resolved' ? ' selected' : '') + '>Resolved</option><option value="none"' + (FS.st === 'none' ? ' selected' : '') + '>No status</option></select></label>' +
       '<input type="search" data-f="q" placeholder="Find in findings" value="' + SW.esc(FS.q || '') + '">' +
       '<button class="btn ghost" type="button" data-fold="all" title="Fold every finding down to its heading">Fold all</button><button class="btn ghost" type="button" data-fold="none" title="Open every finding and category">Open all</button>';
     function set(e) { var f = e.target.dataset.f; if (!f) return; FS[f] = e.target.value; SW.store.set('fd.filt', FS); onChange(); }
@@ -718,6 +723,20 @@
     run();
   }
   SW.findings = { list: FIND, showMine: function () { SW.setTab('notes'); } };
+  // To a finding by its code: Findings opened on the side it is on, with the filters off, and the finding shown
+  function reveal(side, match, then) {
+    FS.by = ''; FS.cat = ''; FS.lvl = ''; FS.v = ''; FS.q = ''; SW.store.set('fd.filt', FS);
+    SW.store.set('fd.side', side); done = false;
+    if (SW.state.tab === 'findings') render(); else SW.setTab('findings');
+    var t0 = Date.now();
+    (function look() {
+      var li = SW.$$('#view-findings li.fd').filter(function (x) { return match(x); })[0];
+      if (li) { li.scrollIntoView({ block: 'center', behavior: 'smooth' }); li.classList.remove('note-flash'); void li.offsetWidth; li.classList.add('note-flash'); if (then) then(li); return; }
+      if (Date.now() - t0 < 8000) setTimeout(look, 200); else SW.toast('Not found among the findings.', 4000);
+    })();
+  }
+  SW.findings.openRef = function (ref) { reveal('crew', function (li) { var r = li.querySelector('.fd-ref'); return r && r.textContent.trim() === ref; }, function (li) { var o = li.querySelector('.fd-open'); if (o) o.click(); }); };
+  SW.findings.openBench = function (no) { reveal('bench', function (li) { var r = li.querySelector('.fd-no'); return r && r.textContent.trim() === no; }); };
   // A note added or changed: the list is brought up to date in place, quietly, once a
   // finding open in its window is closed (the window keeps itself current)
   var listStale = false, listT = null;

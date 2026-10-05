@@ -1832,3 +1832,11 @@ dialog.fd-big { width: min(92vw, 780px); padding: 10px 14px; }
 .fd-big .fd-replybox .btn { justify-self: end; }
 .fd-big .fd-replybox > :not(textarea):not(.btn) { grid-column: 1 / -1; }   /* the formatting bar across the top */
 .gz-cmpdlg .gz-pairh a.btn { font: 500 11.5px var(--sans); padding: 1px 7px; margin-left: 8px; vertical-align: 1px; }
+.fd.note-flash, .tray-item.note-flash { animation: note-flash 1.6s ease-out; }
+.news-btn.has-mine { color: var(--amber); }
+.news-item.news-mine { border-left: 3px solid var(--amber); padding-left: 8px; }
+.pop .code-in { width: 100%; font-size: 14px; padding: 5px 8px; margin: 4px 0; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
+.fd .st, .fd-big .st { font: 700 9.5px/1 var(--sans); letter-spacing: .05em; padding: 2px 5px; border-radius: 3px; vertical-align: 2px; }
+.fd .st-open, .fd-big .st-open { color: #000; background: var(--amber); }
+.fd .st-help, .fd-big .st-help { color: var(--bg); background: var(--red); }
+.fd .st-res, .fd-big .st-res { color: var(--green); border: 1px solid color-mix(in srgb, var(--green) 50%, transparent); }

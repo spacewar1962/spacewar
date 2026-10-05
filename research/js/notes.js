@@ -251,27 +251,36 @@
     return N.whoami().catch(function () {}).then(function () { return N.listAll({ reactions: true }); }).then(function (all) {
       newsAll = all;
       var me = SW.me().initials;
+      var byId = {}; all.forEach(function (n) { byId[n.id] = n; });
       newsItems = all.filter(function (n) { return n.source === 'hypothesis' && (String(n.date) > since || String(n.updated || '') > since) && !isMine(n); })
-        .sort(function (a, b) { return (N.mentions(b, me) - N.mentions(a, me)) || (String(b.date) < String(a.date) ? -1 : 1); });
+        .sort(function (a, b) { return (N.mentions(b, me) - N.mentions(a, me)) || (!!toMine(b, byId) - !!toMine(a, byId)) || (String(b.date) < String(a.date) ? -1 : 1); });
+      newsMine = newsItems.filter(function (n) { return toMine(n, byId); }).length;
       paintNews();
       return newsItems;
     }).catch(function () { return []; });
   };
+  // a reply or reaction under an annotation or finding of one's own: what it answers
+  var newsMine = 0;
+  function rootOf(n, byId) { var r = n, g = 0; while (r && r.parent && byId[r.parent] && g++ < 50) r = byId[r.parent]; return r; }
+  function isFinding(n) { return !n.parent && (n.tags || []).some(function (g) { return /^findings?$/i.test(g); }); }
+  function toMine(n, byId) { if (!n.parent) return null; var r = rootOf(n, byId); return r && r !== n && isMine(r) ? r : null; }
   function paintNews() {
     var n = SW.$('#news-n'), btn = SW.$('#btn-news');
     if (!n || !btn) return;
     n.textContent = newsItems.length ? (newsItems.length > 99 ? '99+' : String(newsItems.length)) : '';
     btn.classList.toggle('has-news', !!newsItems.length);
-    btn.title = newsItems.length ? newsItems.length + ' new in the group’s annotations since ' + SW.fmtDate(newsSince()) : 'What’s new in the group’s annotations';
+    btn.classList.toggle('has-mine', !!newsMine);
+    btn.title = newsItems.length ? newsItems.length + ' new in the group’s annotations since ' + SW.fmtDate(newsSince()) + (newsMine ? '; ' + newsMine + ' answer' + (newsMine === 1 ? 's' : '') + ' you' : '') : 'What’s new in the group’s annotations';
   }
   function newsLine(n, byId) {
     var V = root.SWVersions, v = V.byId(n.vid), par = n.parent && byId[n.parent];
     var what = N.isReaction(n) && (OPEN[n.text] || DONE[n.text]) ? (DONE[n.text] ? 'resolved ' : OPEN[n.text] === 'help' ? 'asked for help on ' : 'marked open ') + (par ? par.by + '’s annotation' : 'an annotation') : N.isReaction(n) ? n.text + ' on ' + (par ? par.by + '’s annotation' : 'an annotation') : n.parent ? 'reply to ' + (par ? par.by : 'an annotation') : n.anchor ? 'annotation' : 'annotation on the version';
-    var toYou = !N.isReaction(n) && N.mentions(n, SW.me().initials);
+    var toYou = !N.isReaction(n) && N.mentions(n, SW.me().initials), mine = toMine(n, byId);
+    if (mine) what = (N.isReaction(n) ? n.text + ' on' : n.parent === mine.id ? 'replies to' : 'replies under') + ' your ' + (isFinding(mine) ? 'finding' : 'annotation') + ' ' + N.code(mine).replace(/^A-/, isFinding(mine) ? 'C-' : 'A-');
     var root0 = par; while (root0 && root0.parent && byId[root0.parent]) root0 = byId[root0.parent];
     var anchor = n.anchor || (root0 && root0.anchor) || (par && par.anchor);
     var where = (v ? v.label.replace(/^Spacewar! /, '') : n.vid) + ' ' + (anchor ? SW.refText(n.vid, anchor.p, anchor.n0, anchor.n1, SW.nparts(n.vid)) : SW.refText(n.vid));
-    return { n: n, anchor: anchor, html: '<div class="news-item" data-id="' + SW.esc(n.id) + '"><div class="news-meta"><b>' + SW.esc(n.by) + '</b> · ' + (toYou ? '<b class="mention-you">mentions you</b> in ' : '') + SW.esc(what) +
+    return { n: n, anchor: anchor, mine: mine, html: '<div class="news-item' + (mine ? ' news-mine' : '') + '" data-id="' + SW.esc(n.id) + '"><div class="news-meta"><b>' + SW.esc(n.by) + '</b> · ' + (toYou ? '<b class="mention-you">mentions you</b> in ' : '') + (mine ? '<b class="mention-you">' + SW.esc(what) + '</b>' : SW.esc(what)) +
       ' · <span class="mono">' + SW.esc(where) + '</span> · <span class="faint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
       (N.isReaction(n) ? '' : '<div class="news-text">' + SW.esc(SW.mdPlain(SW.figpack.split(n.text).text).slice(0, 280)) + (SW.mdPlain(SW.figpack.split(n.text).text).length > 280 ? '…' : '') + '</div>') + '</div>' };
   }
@@ -298,6 +307,7 @@
         if (!it) return;
         var l = lines.filter(function (x) { return x.n.id === it.dataset.id; })[0];
         if (!l) return;
+        if (l.mine && isFinding(l.mine)) { SW.findings.openRef('C-' + N.code(l.mine).slice(2)); return; }   // a reply to one's finding: the finding, with its replies
         SW.openAt(l.n.vid, l.anchor);
       });
       body.appendChild(list);
@@ -672,6 +682,8 @@
     e.stopPropagation();
     N.toggleCode(t.closest('.frag-q').dataset.id);
   });
+  // the chip for a status, for a finding's card too (resolved shown as well)
+  N.statusChip = function (s) { return !s || !s.state ? '' : s.state === 'resolved' ? '<span class="st st-res" title="Resolved (✅ from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + ')">RESOLVED</span>' : statusChip(s); };
   function statusChip(s) {
     return s.state === 'help'
       ? '<span class="st st-help" title="Help wanted (💡 from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '; ✅ resolves it)">HELP!</span>'
@@ -683,6 +695,22 @@
     if (!n || !n.id || n.source === 'buildlog') return '';
     var h = 5381, id = String(n.id); for (var k = 0; k < id.length; k++) h = ((h * 33) ^ id.charCodeAt(k)) >>> 0;
     return (n.parent ? 'R-' : 'A-') + h.toString(36).toUpperCase().slice(-5).padStart(5, '0');
+  };
+  // A code to what it names: an annotation or reply (A-, R-), a finding of the group's (C-),
+  // one of the bench's (F12), a note in My notes (initials-N3). Typed in the top bar (#), or ?code= in a link.
+  N.goCode = function (code) {
+    code = String(code || '').trim().toUpperCase().replace(/^\[|\]$/g, '');
+    var m;
+    if ((m = /^F(\d+)$/.exec(code))) { SW.findings.openBench('F' + m[1]); return; }
+    if (/^[A-Z]{1,4}-N\d+$/.test(code)) { SW.tray.reveal(code); return; }
+    if (!(m = /^([ARC])-([0-9A-Z]{5})$/.exec(code))) { SW.toast('Not a code: A-, R- or C- and five letters or figures, F and a number, or initials-N and a number.', 6000); return; }
+    if (m[1] === 'C') { SW.findings.openRef(code); return; }
+    N.listAll().then(function (all) {
+      var n = all.filter(function (x) { return x.id && x.source !== 'buildlog' && N.code(x).slice(2) === m[2]; })[0];
+      if (!n) { SW.toast(code + ' is not here: deleted, or not in your group.', 5000); return; }
+      if (!n.parent && (n.tags || []).some(function (g) { return /^findings?$/i.test(g); })) { SW.findings.openRef('C-' + m[2]); return; }
+      N.follow({ v: n.vid, a: n.id });
+    });
   };
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');

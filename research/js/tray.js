@@ -155,6 +155,20 @@
     });
     add({ kind: 'doc', caption: doc.title || 'Excerpt', subtitle: doc.subtitle || '', blocks: blocks }, extra);
   };
+  // To a note by its number: My notes opened with the filters off, the note shown (or the Shared box, or the bin)
+  T.reveal = function (ref) {
+    var t = load(), it = t.items.filter(function (z) { return String(z.ref).toUpperCase() === ref; })[0];
+    if (!it) { SW.toast((t.bin || []).some(function (z) { return String(z.ref).toUpperCase() === ref; }) ? ref + ' is in the bin (🗑 on My notes).' : 'No note ' + ref + ' in My notes here (My notes are kept per person).', 5000); SW.setTab('notes'); return; }
+    t.chapter = '*'; t.filter = {}; save(t);
+    SW.setTab('notes'); paint();
+    if (sharedAway(it)) { setTimeout(sharedView, 300); return; }
+    var t0 = Date.now();
+    (function look() {
+      var li = SW.$$('.tray-item').filter(function (x) { var r = x.querySelector('.tray-ref'); return r && r.textContent.trim().toUpperCase() === ref; })[0];
+      if (li) { li.scrollIntoView({ block: 'center', behavior: 'smooth' }); li.classList.remove('note-flash'); void li.offsetWidth; li.classList.add('note-flash'); return; }
+      if (Date.now() - t0 < 4000) setTimeout(look, 150);
+    })();
+  };
   T.addText = function () { add({ kind: 'text', caption: '', text: '' }); };
 
   // A group finding of one's own, back into My notes: into the note it was
