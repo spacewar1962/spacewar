@@ -564,6 +564,8 @@
   }
   // ☰ Across the versions: each version compared with the one it was made from (its parent in the
   // descent), routines followed from parent to child; a row for each routine, a column for each version
+  // a sample run as Compare makes it, for the comparison tests (tests/compare.html)
+  SW.gzSample = function (bv) { sampling = sampling || {}; return sampleRun(bv, 5, ['duellist', 'duellist'], true, function () {}).then(function (p) { sampling = null; return p; }); };
   var acrossCache = {};
   function gizmoAcross(b, el) {
     var V = root.SWVersions, ST = SW.structure, esc = SW.esc, split = !!SW.store.get('an.gizmoSplit', false);
@@ -689,7 +691,7 @@
       var rk = { same: 0, altered: 0, moved: 0, inserted: 0, removed: 0 }; R.rows.forEach(function (r) { rk[r.kind]++; });
       out.summary = ra + ' → ' + rb + ': ' + R.RA.list.length + ' → ' + R.RB.list.length + ' routines (the same ' + rk.same + ', altered ' + rk.altered + ', moved ' + rk.moved + ', inserted ' + rk.inserted + ', removed ' + rk.removed + '); ' + GA.blocks.length + ' → ' + GB.blocks.length + ' blocks (the same ' + C.same + ', altered ' + C.altered.length + ', inserted ' + C.inserted.length + ', removed ' + C.removed.length + '); branches added ' + C.edgesNew.length + ', removed ' + C.edgesGone.length + '.';
       src.textContent = R.RA.list.length + ' → ' + R.RB.list.length + ' routines · same ' + rk.same + ' · altered ' + rk.altered + (rk.moved ? ' · moved ' + rk.moved : '') + ' · inserted ' + rk.inserted + ' · removed ' + rk.removed;
-      function tallyText(t) { return ['altered', 'inserted', 'removed'].filter(function (k) { return t[k]; }).map(function (k) { return t[k] + ' ' + k; }).join(' · ') || 'unchanged'; }
+      function tallyText(t) { var W = { altered: 'altered', inserted: 'inserted', removed: 'removed', out: 'moved out', in: 'moved in' }; return ['altered', 'inserted', 'removed', 'out', 'in'].filter(function (k) { return t[k]; }).map(function (k) { return t[k] + ' ' + W[k]; }).join(' · ') || 'unchanged'; }
       function side(r, G, R0) {
         if (!r) return '';
         var calls = r.to.map(function (z) { return R0.list[z].name; });

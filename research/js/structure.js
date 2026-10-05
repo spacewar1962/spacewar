@@ -344,17 +344,29 @@
       var best = Object.keys(votes).sort(function (p, q) { return votes[q] - votes[p]; }).filter(function (q) { return pairB[q] == null; })[0];
       if (best != null && votes[best] * 2 >= r.blocks.length) { pairA[r.i] = +best; pairB[best] = r.i; }
     });
+    // a routine's blocks: the same, altered, removed, inserted; a block matched into another
+    // routine has moved out (from this side's routine) or in (to it)
     function tally(ra, rb) {
-      var t = { same: 0, altered: 0, inserted: 0, removed: 0 };
-      (ra ? ra.blocks : []).forEach(function (xi) { if (C.mA[xi] == null) t.removed++; else if (C.kind[xi] === 'altered') t.altered++; else t.same++; });
-      (rb ? rb.blocks : []).forEach(function (yi) { if (C.mB[yi] == null) t.inserted++; });
+      var t = { same: 0, altered: 0, inserted: 0, removed: 0, out: 0, in: 0 };
+      (ra ? ra.blocks : []).forEach(function (xi) {
+        var y = C.mA[xi];
+        if (y == null) t.removed++;
+        else if (rb && RB.of[y] !== rb.i) t.out++;
+        else if (!rb) t.out++;
+        else if (C.kind[xi] === 'altered') t.altered++; else t.same++;
+      });
+      (rb ? rb.blocks : []).forEach(function (yi) {
+        var x = C.mB[yi];
+        if (x == null) t.inserted++;
+        else if (!ra || RA.of[x] !== ra.i) t.in++;
+      });
       return t;
     }
     var rows = [];
     RB.list.forEach(function (rb) {
       var ai = pairB[rb.i], ra = ai == null ? null : RA.list[ai], t = tally(ra, rb);
       // a routine new only as an entry point, its code all found elsewhere, has moved
-      rows.push({ a: ra, b: rb, t: t, kind: !ra ? (t.inserted * 2 > rb.blocks.length ? 'inserted' : 'moved') : (t.altered || t.inserted || t.removed) ? 'altered' : 'same', ord: rb.a0 });
+      rows.push({ a: ra, b: rb, t: t, kind: !ra ? (t.inserted * 2 > rb.blocks.length ? 'inserted' : 'moved') : (t.altered || t.inserted || t.removed || t.out || t.in) ? 'altered' : 'same', ord: rb.a0 });
     });
     RA.list.forEach(function (ra) {
       if (pairA[ra.i] != null) return;

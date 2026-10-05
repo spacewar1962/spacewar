@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comparison tests · Spacewar! Research Bench</title>
+<style>
+  :root { --bg: #0a0e15; --text: #dde8f3; --dim: #8ea3b8; --ok: #7be3a0; --bad: #ff8a8a; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #f7f4ec; --text: #1d2430; --dim: #5d6a78; --ok: #1f7a45; --bad: #b3261e; } }
+  body { background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 16px; }
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  p { color: var(--dim); margin: 0 0 12px; max-width: 70ch; }
+  #sum { font-weight: 600; margin: 8px 0 12px; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); }
+  ol { padding-left: 1.4em; margin: 0; }
+  li { margin: 2px 0; }
+  pre { white-space: pre-wrap; font: 12px ui-monospace, monospace; color: var(--dim); margin: 2px 0 6px; }
+</style>
+</head>
+<body>
+<h1>Comparison tests</h1>
+<p>Checks of Art’s Dynamic Profile Gizmo’s ⇄ Compare (structure.js) on pairs whose changes are known: the bench is opened in a hidden frame, each pair built, sample-run and compared as the gizmo does. The computer pilot flies a little differently each run, so the checks are of what should hold whatever the run. The result is also in window.__results.</p>
+<div id="sum">Opening the bench…</div>
+<ol id="out"></ol>
+<iframe id="bench" src="../index.html?v=3.1&amp;tab=about" style="position:absolute;width:1200px;height:800px;left:-3000px;top:0" title="The bench, for the tests"></iframe>
+<script src="compare.test.js"></script>
+</body>
+</html>
