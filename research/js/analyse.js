@@ -225,7 +225,7 @@
   }
 
   // ---------- 16 Art's Dynamic Profile Gizmo ----------
-  // A profile in the professional sense (after a letter from Art Schwarz): the
+  // A profile in the professional sense (after a letter from Art): the
   // run as a graph whose nodes are blocks of sequential code and whose edges are
   // the branches taken between them, with the time spent in each block. A block
   // begins where a branch arrives (or at the first instruction run) and ends at
@@ -265,7 +265,7 @@
   }
   function gizmo(b, el) {
     var prof = SW.profile && SW.profile.build === b && SW.profile.branches ? SW.profile : null;
-    var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
+    var lede = 'A profile in the professional sense: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
     var c = card('Art’s Dynamic Profile Gizmo', lede + (prof ? '' : ' <b>Run the program in the Run view first</b> (a few seconds of play is enough), then come back here.'));
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
