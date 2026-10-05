@@ -250,5 +250,76 @@
     return o.join('');
   };
 
+  // ---------- routines: the high level ----------
+  // A routine runs from an entry point to the next: the start, anything called
+  // (jsp, jda, cal), and anything reached by a jump the code does not name
+  // (jmp i, from the sample run: the main loop's dispatch to each object).
+  S.routines = function (G) {
+    var ent = {}, called = {}; if (G.entry != null) ent[G.blocks[G.entry].a0] = 1;
+    // where a call comes back to is not an entry: the word after a call
+    // (a call may be followed by its arguments, so up to three words after it)
+    var back = {}; G.edges.forEach(function (e) { if (e.kind === 'call') { var c = G.blocks[e.f].a1; back[c + 1] = back[c + 2] = back[c + 3] = 1; } });
+    G.edges.forEach(function (e) {
+      var t = G.blocks[e.t].a0;
+      if (e.kind === 'call') { ent[t] = 1; called[t] = 1; }
+      else if (e.kind === 'branch' && G.blocks[e.f].open && !back[t]) ent[t] = 1;
+    });
+    var starts = Object.keys(ent).map(Number).sort(function (x, y) { return x - y; }), rs = [], of = {};
+    G.blocks.forEach(function (bl) {
+      var s0 = -1; for (var i = 0; i < starts.length && starts[i] <= bl.a0; i++) s0 = starts[i];
+      var key = s0 < 0 ? bl.a0 : s0, r = rs.filter(function (q) { return q.a0 === key; })[0];
+      if (!r) {
+        var nm = s0 < 0 ? bl.name : G.blocks[G.at[key]].name;
+        if (called[key] && /\+1$/.test(nm) && (key - 1) in G.b.labelAt) nm = G.b.labelAt[key - 1];   // jda x enters at x+1: the routine is x
+        r = { i: rs.length, a0: key, name: nm, blocks: [], words: 0 }; rs.push(r);
+      }
+      r.blocks.push(bl.i); r.words += bl.a1 - bl.a0 + 1; of[bl.i] = r.i;
+    });
+    rs.forEach(function (r) {   // its lines: all those of its first tape it covers
+      var f = G.blocks[r.blocks[0]].src; if (!f) { r.src = null; return; }
+      var ns = []; r.blocks.forEach(function (i) { G.blocks[i].lines.forEach(function (l) { if (l.p === f.p) ns.push(l.n); }); });
+      r.src = { p: f.p, n0: Math.min.apply(null, ns), n1: Math.max.apply(null, ns) };
+    });
+    var calls = {};
+    G.edges.forEach(function (e) { var a = of[e.f], z = of[e.t]; if (a !== z && G.blocks[e.t].a0 === rs[z].a0) (calls[a] = calls[a] || {})[z] = 1; });
+    rs.forEach(function (r) { r.to = Object.keys(calls[r.i] || {}).map(Number); });
+    return { list: rs, of: of };
+  };
+  // Routines of two versions paired, from the blocks the comparison matched.
+  S.compareRoutines = function (C) {
+    var RA = S.routines(C.A), RB = S.routines(C.B), pairA = {}, pairB = {};
+    // by name first, then by where most of a routine's matched blocks went
+    var byName = {}; RB.list.forEach(function (r) { byName[r.name] = r; });
+    RA.list.forEach(function (r) { var q = byName[r.name]; if (q && pairB[q.i] == null) { pairA[r.i] = q.i; pairB[q.i] = r.i; } });
+    RA.list.forEach(function (r) {
+      if (pairA[r.i] != null) return;
+      var votes = {};
+      r.blocks.forEach(function (xi) { var y = C.mA[xi]; if (y != null) { var q = RB.of[y]; votes[q] = (votes[q] || 0) + 1; } });
+      var best = Object.keys(votes).sort(function (p, q) { return votes[q] - votes[p]; }).filter(function (q) { return pairB[q] == null; })[0];
+      if (best != null && votes[best] * 2 >= r.blocks.length) { pairA[r.i] = +best; pairB[best] = r.i; }
+    });
+    function tally(ra, rb) {
+      var t = { same: 0, altered: 0, inserted: 0, removed: 0 };
+      (ra ? ra.blocks : []).forEach(function (xi) { if (C.mA[xi] == null) t.removed++; else if (C.kind[xi] === 'altered') t.altered++; else t.same++; });
+      (rb ? rb.blocks : []).forEach(function (yi) { if (C.mB[yi] == null) t.inserted++; });
+      return t;
+    }
+    var rows = [];
+    RB.list.forEach(function (rb) {
+      var ai = pairB[rb.i], ra = ai == null ? null : RA.list[ai], t = tally(ra, rb);
+      // a routine new only as an entry point, its code all found elsewhere, has moved
+      rows.push({ a: ra, b: rb, t: t, kind: !ra ? (t.inserted ? 'inserted' : 'moved') : (t.altered || t.inserted || t.removed) ? 'altered' : 'same', ord: rb.a0 });
+    });
+    RA.list.forEach(function (ra) {
+      if (pairA[ra.i] != null) return;
+      // a removed routine sits after the routine that came before it in the other version
+      var prev = RA.list.filter(function (q) { return q.a0 < ra.a0 && pairA[q.i] != null; }).pop();
+      var tr = tally(ra, null);
+      rows.push({ a: ra, b: null, t: tr, kind: tr.removed ? 'removed' : 'moved', ord: prev ? RB.list[pairA[prev.i]].a0 + 0.5 : -1 });
+    });
+    rows.sort(function (p, q) { return p.ord - q.ord; });
+    return { RA: RA, RB: RB, rows: rows, pairA: pairA, pairB: pairB };
+  };
+
   root.SWStructure = SW.structure = S;
 })(typeof window !== 'undefined' ? window : globalThis);

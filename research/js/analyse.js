@@ -501,25 +501,26 @@
     var earlier = vs.filter(function (v) { return v.sort <= b.v.sort; });
     var other = SW.store.get('an.gizmoCmp', '');
     if (!vs.some(function (v) { return v.id === other; })) other = (earlier[earlier.length - 1] || vs[0] || {}).id;
-    var show = SW.store.get('an.gizmoCmpShow', 'changes');
-    var lede = 'After Art Schwarz: each version’s code without its comments, cut into blocks between branches (a block begins where a branch arrives and ends at an instruction that can branch), read from the assembled code. Jumps the code does not name (jmp i, jsp i, xct) are taken from a 5 s sample run of each version. Blocks are matched across the two versions by their code, then by their label, then by their place between matched blocks. The same: matched, code identical. Altered: the same place, the code changed. Inserted, removed: no counterpart. A branch added or removed is a change of structure.';
-    var legend = 'Grey: the same. Violet: altered. Green: inserted (and branches added). Red, dashed: removed (and branches removed). The rounded block is where the program starts. Click a block for the two versions of its code side by side.';
+    var show = SW.store.get('an.gizmoCmpShow', 'changed');
+    if (show !== 'all') show = 'changed';
+    var lede = 'After Art Schwarz: each version’s code without its comments, cut into blocks between branches (a block begins where a branch arrives and ends at an instruction that can branch), read from the assembled code; jumps the code does not name (jmp i, jsp i, xct) are taken from a 5 s sample run of each version. Blocks are matched across the two versions by their code, then their label, then their place between matched blocks. Here they are gathered into routines, each running from an entry point (the start, anything called, anything the main loop dispatches to) to the next, and the two versions’ routines are set side by side.';
+    var legend = 'The same: every block matched and unchanged. Altered: some of its blocks changed, were inserted or were removed. Moved: a routine on one side only whose code is all found in another routine on the other. Inserted, removed: a routine with no counterpart. Click a routine for its blocks side by side, and a block for its code in both versions.';
     var c = SW.el('div', { class: 'card gz-card' });
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
     var bar = SW.el('div', { class: 'gz-bar' });
     bar.innerHTML = gzMode('compare') + '<span class="sep"></span><label class="check" title="The version to compare this one with">' + esc(SW.refOf(b.v.id)) + ' against <select class="gz-cmp">' +
       vs.map(function (v) { return '<option value="' + esc(v.id) + '"' + (v.id === other ? ' selected' : '') + '>' + esc(SW.refOf(v.id) + '  ' + v.label) + '</option>'; }).join('') + '</select></label>' +
-      '<label class="check">Show <select class="gz-cshow"><option value="changes"' + (show === 'changes' ? ' selected' : '') + '>the changes, with their neighbours</option><option value="all"' + (show === 'all' ? ' selected' : '') + '>everything</option></select></label>' +
+      '<label class="check">Show <select class="gz-cshow"><option value="changed"' + (show === 'changed' ? ' selected' : '') + '>the routines that changed</option><option value="all"' + (show === 'all' ? ' selected' : '') + '>every routine</option></select></label>' +
       '<span class="gz-src hint">Reading both versions…</span>' +
       '<details class="gz-about"><summary title="What the comparison shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>';
     c.appendChild(bar);
     gzModeWire(bar);
     bar.querySelector('.gz-cmp').addEventListener('change', function (e) { SW.store.set('an.gizmoCmp', e.target.value); render(); });
     bar.querySelector('.gz-cshow').addEventListener('change', function (e) { SW.store.set('an.gizmoCmpShow', e.target.value); render(); });
-    var src = bar.querySelector('.gz-src'), box = SW.el('div', { class: 'svgbox gizmo' }), figs = SW.el('div'), more = SW.el('div', { class: 'gz-more' });
-    c.appendChild(box); c.appendChild(figs); el.appendChild(more);
-    var out = { rows: [], erows: [], summary: '' }, lastSVG = '';
+    var src = bar.querySelector('.gz-src'), body = SW.el('div', { class: 'gz-sbs' }), more = SW.el('div', { class: 'gz-more' });
+    c.appendChild(body); el.appendChild(more);
+    var out = { rrows: [], rows: [], erows: [], summary: '' };
     if (!other) { src.textContent = 'No other version to compare with.'; return null; }
     SW.build(other).then(function (bo) {
       if (!bo.asm) { src.textContent = SW.refOf(other) + ' has no source to compare.'; return; }
@@ -530,49 +531,33 @@
         draw(bo, GA, GB, C);
       }); });
     }, function () { src.textContent = 'Could not build ' + SW.refOf(other) + '.'; });
-    function ref(G, bl) { return bl.src ? SW.refOf(G.b.v.id, bl.src.p, bl.src.n0, bl.src.n1, G.b.parts.length) : SW.oct(bl.a0, 4); }
-    function linesOf(bl) { return bl.src ? (bl.src.n1 !== bl.src.n0 ? 'lines ' + bl.src.n0 + '–' + bl.src.n1 : 'line ' + bl.src.n0) : SW.oct(bl.a0, 4); }
+    function ref(G, x) { return x.src ? SW.refOf(G.b.v.id, x.src.p, x.src.n0, x.src.n1, G.b.parts.length) : SW.oct(x.a0, 4); }
+    function linesOf(x) { return x.src ? (x.src.n1 !== x.src.n0 ? 'lines ' + x.src.n0 + '–' + x.src.n1 : 'line ' + x.src.n0) : SW.oct(x.a0, 4); }
     function draw(bo, GA, GB, C) {
-      var ra = SW.refOf(bo.v.id), rb = SW.refOf(b.v.id);
-      out.summary = ra + ' → ' + rb + ': ' + GA.blocks.length + ' → ' + GB.blocks.length + ' blocks; the same ' + C.same + ', altered ' + C.altered.length + ', inserted ' + C.inserted.length + ', removed ' + C.removed.length + '; branches added ' + C.edgesNew.length + ', removed ' + C.edgesGone.length + '.';
-      src.textContent = GA.blocks.length + ' → ' + GB.blocks.length + ' blocks · same ' + C.same + ' · altered ' + C.altered.length + ' · inserted ' + C.inserted.length + ' · removed ' + C.removed.length + ' · branches +' + C.edgesNew.length + ' −' + C.edgesGone.length;
-      // the merged graph: this version's blocks, with the other's removed ones beside them
-      var nodes = [], edges = [], cls = {};
-      GB.blocks.forEach(function (y) {
-        var xi = C.mB[y.i], k = xi == null ? 'inserted' : C.kind[xi] === 'altered' ? 'altered' : 'same';
-        cls['b' + y.i] = k;
-        nodes.push({ id: 'b' + y.i, ord: y.a0, name: y.name, sub: linesOf(y), cls: k, tag: k === 'same' ? '' : k, tip: y.name + ' in ' + rb + (xi != null && k === 'altered' ? ' (' + GA.blocks[xi].name + ' in ' + ra + ')' : '') + ': ' + k });
-      });
-      C.removed.forEach(function (xi) {
-        var x = GA.blocks[xi]; cls['a' + xi] = 'removed';
-        nodes.push({ id: 'a' + xi, ord: (function () { var p = GA.edges.filter(function (e) { return e.t === xi && C.mA[e.f] != null; })[0]; return p ? GB.blocks[C.mA[p.f]].a0 + 0.5 : 1e5 + x.a0; })(), name: x.name, sub: linesOf(x) + ' in ' + ra, cls: 'removed', tag: 'removed', tip: x.name + ' in ' + ra + ': removed' });
-      });
-      function inA(f, t) { return GA.edges.some(function (e) { return e.f === f && e.t === t; }); }
-      GB.edges.forEach(function (e) {
-        var fa = C.mB[e.f], ta = C.mB[e.t], same = fa != null && ta != null && inA(fa, ta);
-        edges.push({ f: 'b' + e.f, t: 'b' + e.t, cls: same ? 'same' : 'added', tip: GB.blocks[e.f].name + ' → ' + GB.blocks[e.t].name + (same ? '' : ': added') });
-      });
-      function idA(xi) { return C.mA[xi] != null ? 'b' + C.mA[xi] : 'a' + xi; }
-      GA.edges.forEach(function (e) {
-        if (C.mA[e.f] != null && C.mA[e.t] != null && GB.edges.some(function (g) { return g.f === C.mA[e.f] && g.t === C.mA[e.t]; })) return;
-        edges.push({ f: idA(e.f), t: idA(e.t), cls: 'removed', tip: GA.blocks[e.f].name + ' → ' + GA.blocks[e.t].name + ' in ' + ra + ': removed' });
-      });
-      if (show !== 'all') {   // the changes and the blocks next to them
-        var keep = {};
-        nodes.forEach(function (n) { if (n.cls !== 'same') keep[n.id] = 1; });
-        edges.forEach(function (e) { if (e.cls !== 'same') { keep[e.f] = 1; keep[e.t] = 1; } });
-        edges.forEach(function (e) { if (cls[e.f] !== 'same' || cls[e.t] !== 'same') { keep[e.f] = 1; keep[e.t] = 1; } });
-        nodes = nodes.filter(function (n) { return keep[n.id]; });
-        edges = edges.filter(function (e) { return keep[e.f] && keep[e.t]; });
+      var ra = SW.refOf(bo.v.id), rb = SW.refOf(b.v.id), R = ST.compareRoutines(C);
+      var rk = { same: 0, altered: 0, moved: 0, inserted: 0, removed: 0 }; R.rows.forEach(function (r) { rk[r.kind]++; });
+      out.summary = ra + ' → ' + rb + ': ' + R.RA.list.length + ' → ' + R.RB.list.length + ' routines (the same ' + rk.same + ', altered ' + rk.altered + ', moved ' + rk.moved + ', inserted ' + rk.inserted + ', removed ' + rk.removed + '); ' + GA.blocks.length + ' → ' + GB.blocks.length + ' blocks (the same ' + C.same + ', altered ' + C.altered.length + ', inserted ' + C.inserted.length + ', removed ' + C.removed.length + '); branches added ' + C.edgesNew.length + ', removed ' + C.edgesGone.length + '.';
+      src.textContent = R.RA.list.length + ' → ' + R.RB.list.length + ' routines · same ' + rk.same + ' · altered ' + rk.altered + (rk.moved ? ' · moved ' + rk.moved : '') + ' · inserted ' + rk.inserted + ' · removed ' + rk.removed;
+      function tallyText(t) { return ['altered', 'inserted', 'removed'].filter(function (k) { return t[k]; }).map(function (k) { return t[k] + ' ' + k; }).join(' · ') || 'unchanged'; }
+      function side(r, G, R0) {
+        if (!r) return '';
+        var calls = r.to.map(function (z) { return R0.list[z].name; });
+        return '<b class="mono">' + esc(r.name) + '</b><span class="faint"> ' + esc(linesOf(r)) + ' · ' + r.blocks.length + ' block' + (r.blocks.length === 1 ? '' : 's') + '</span>' +
+          (calls.length ? '<div class="sbs-calls faint">→ ' + esc(calls.slice(0, 6).join(', ') + (calls.length > 6 ? ' and ' + (calls.length - 6) + ' more' : '')) + '</div>' : '');
       }
-      if (!nodes.length) { box.innerHTML = '<p class="hint" style="padding:12px">The two versions have the same structure and the same code between their branches.</p>'; }
-      else {
-        lastSVG = ST.svg(nodes, edges, 'b' + GB.entry);
-        box.innerHTML = SW.displaySVG(lastSVG);
-        figs.innerHTML = '';
-        figs.appendChild(SW.figureButtons(function () { return lastSVG; }, 'spacewar-' + bo.v.id + '-' + b.v.id + '-structure', ra + ' → ' + rb));
-      }
-      // the changes, as a table
+      var rows = R.rows.filter(function (r) { return show === 'all' || r.kind !== 'same'; });
+      body.innerHTML = '<div class="sbs-row sbs-head"><div>' + esc(ra) + ' · ' + esc(bo.v.label) + '</div><div></div><div>' + esc(rb) + ' · ' + esc(b.v.label) + '</div></div>' +
+        rows.map(function (r, i) {
+          return '<div class="sbs-row k-' + r.kind + '" data-r="' + R.rows.indexOf(r) + '" title="Click for the blocks side by side">' +
+            '<div class="sbs-a">' + (r.a ? side(r.a, GA, R.RA) : '<span class="faint">Inserted or moved</span>') + '</div>' +
+            '<div class="sbs-mid"><span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span><span class="faint">' + esc(r.kind === 'same' ? '' : r.kind === 'moved' ? 'its code is in another routine' : tallyText(r.t)) + '</span></div>' +
+            '<div class="sbs-b">' + (r.b ? side(r.b, GB, R.RB) : '<span class="faint">Removed or moved</span>') + '</div></div>';
+        }).join('') +
+        (show === 'changed' && rk.same ? '<p class="hint" style="margin:8px 0 0">' + rk.same + ' routine' + (rk.same === 1 ? '' : 's') + ' the same in both, not shown (Show ▸ every routine).</p>' : '') +
+        (!rows.length ? '<p class="hint" style="padding:12px">The two versions have the same routines and the same code between their branches.</p>' : '');
+      body.onclick = function (e) { var r = e.target.closest('[data-r]'); if (r) openRoutine(R.rows[+r.dataset.r]); };
+      out.rrows = R.rows.map(function (r) { return [r.kind, r.a ? r.a.name : '', r.b ? r.b.name : '', r.kind === 'same' ? '' : tallyText(r.t), r.b ? ref(GB, r.b) : ref(GA, r.a)]; });
+      // the block-level detail, folded away
       out.rows = [];
       C.altered.forEach(function (xi) { var x = GA.blocks[xi], y = GB.blocks[C.mA[xi]], d = ST.lineDiff(x.lines.map(function (l) { return l.key; }), y.lines.map(function (l) { return l.key; })); out.rows.push({ id: 'b' + y.i, r: ['altered', x.name, y.name, d.filter(function (q) { return q[0] === '-'; }).length + ' out, ' + d.filter(function (q) { return q[0] === '+'; }).length + ' in', ref(GB, y)] }); });
       C.inserted.forEach(function (yi) { var y = GB.blocks[yi], w = C.into[yi]; out.rows.push({ id: 'b' + yi, r: ['inserted', '', y.name, y.lines.length + ' line' + (y.lines.length === 1 ? '' : 's') + (w ? ', between ' + GB.blocks[w[0]].name + ' and ' + GB.blocks[w[1]].name : ''), ref(GB, y)] }); });
@@ -580,35 +565,58 @@
       out.rows.sort(function (p, q) { return p.r[4] < q.r[4] ? -1 : 1; });
       out.erows = C.edgesNew.map(function (e) { return ['added', GB.blocks[e.f].name, GB.blocks[e.t].name]; }).concat(C.edgesGone.map(function (e) { return ['removed', GA.blocks[e.f].name, GA.blocks[e.t].name]; }));
       more.innerHTML = '';
-      var c2 = card('The blocks that changed', 'Altered, inserted and removed, in the order of the code. Click a row for the two versions side by side.');
+      var d2 = SW.el('details', { class: 'card gz-fold' }); d2.style.gridColumn = '1 / -1';
+      d2.innerHTML = '<summary><b>Every block that changed</b> <span class="faint">(' + out.rows.length + ')</span></summary>';
       var s2 = SW.el('div', { class: 'scroll' });
-      s2.appendChild(SW.table(['Change', 'In ' + ra, 'In ' + rb, 'Lines', 'Reference'], out.rows.map(function (o) { return o.r; }), { cls: ['', 'mono', 'mono', '', 'mono'], onRow: function (r) { var o = out.rows.filter(function (q) { return q.r === r; })[0]; if (o) open(o.id); } }));
-      c2.appendChild(s2); more.appendChild(c2);
-      var c3 = card('The branches that changed', 'Between blocks that match in both versions: a change of structure.');
+      s2.appendChild(SW.table(['Change', 'In ' + ra, 'In ' + rb, 'Lines', 'Reference'], out.rows.map(function (o) { return o.r; }), { cls: ['', 'mono', 'mono', '', 'mono'], onRow: function (r) { var o = out.rows.filter(function (q) { return q.r === r; })[0]; if (o) openBlock(o.id); } }));
+      d2.appendChild(s2); more.appendChild(d2);
+      var d3 = SW.el('details', { class: 'card gz-fold' }); d3.style.gridColumn = '1 / -1';
+      d3.innerHTML = '<summary><b>Every branch that changed</b> <span class="faint">(' + out.erows.length + ', between blocks matched in both)</span></summary>';
       var s3 = SW.el('div', { class: 'scroll' });
       s3.appendChild(SW.table(['Branch', 'From', 'To'], out.erows, { cls: ['', 'mono', 'mono'] }));
-      c3.appendChild(s3); more.appendChild(c3);
-      // a block in a box: its code in both versions, side by side
-      function open(id) {
-        var isA = id.charAt(0) === 'a', n = +id.slice(1), y = isA ? null : GB.blocks[n], xi = isA ? n : C.mB[n], x = xi == null ? null : GA.blocks[xi];
-        var k = isA ? 'removed' : xi == null ? 'inserted' : C.kind[xi] === 'altered' ? 'altered' : 'same';
-        var la = x ? x.lines : [], lb = y ? y.lines : [], d = ST.lineDiff(la.map(function (l) { return l.key; }), lb.map(function (l) { return l.key; }));
-        function cell(l, mark) { return l ? '<div class="gz-l ' + mark + '"><span class="n">' + l.n + '</span><span class="t">' + esc(l.raw) + '</span></div>' : '<div class="gz-l gap"></div>'; }
-        var body = d.map(function (q) { return '<div class="gz-pair">' + cell(q[1] != null ? la[q[1]] : null, q[0] === '-' ? 'del' : '') + cell(q[2] != null ? lb[q[2]] : null, q[0] === '+' ? 'add' : '') + '</div>'; }).join('');
-        function link(G, bl, label) { if (!bl || !bl.src) return ''; var u = location.pathname + '?v=' + encodeURIComponent(G.b.v.id) + '&tab=read&l=' + bl.src.p + ':' + bl.src.n0 + (bl.src.n1 > bl.src.n0 ? '-' + bl.src.n1 : ''); return '<a class="btn" href="' + esc(u) + '" target="_blank" rel="noopener" title="These lines in Read, in a new tab">' + label + ' ↗</a>'; }
+      d3.appendChild(s3); more.appendChild(d3);
+      function kindOf(id) { var isA = id.charAt(0) === 'a', n = +id.slice(1), xi = isA ? n : C.mB[n]; return isA ? 'removed' : xi == null ? 'inserted' : C.kind[xi] === 'altered' ? 'altered' : 'same'; }
+      function dialog(html) {
         var dlg = SW.el('dialog', { class: 'tray-big gz-dlg gz-cmpdlg' });
-        dlg.innerHTML = '<div class="tray-bighead"><b>' + esc((x ? x.name : '') + (x && y && x.name !== y.name ? ' → ' : '') + (y && (!x || x.name !== y.name) ? y.name : '')) + '</b> <span class="gz-k gz-k-' + k + '">' + k + '</span><span class="refhelp-acts">' + link(GA, x, 'Read in ' + ra) + link(GB, y, 'Read in ' + rb) + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
-          '<div class="gz-pair gz-pairh"><div>' + esc(x ? ref(GA, x) : ra + ': Inserted or moved') + '</div><div>' + esc(y ? ref(GB, y) : rb + ': Removed or moved') + '</div></div>' +
-          '<div class="listing gz-src-l gz-cmpl">' + body + '</div><p class="hint">Comments and spacing are left out of the comparison; lines shown as held.</p>';
+        dlg.innerHTML = html;
         document.body.appendChild(dlg);
-        dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) dlg.close(); });
         dlg.addEventListener('close', function () { dlg.remove(); });
         dlg.showModal();
+        return dlg;
       }
-      box.onclick = function (e) { var g = e.target.closest('[data-n]'); if (g) open(g.dataset.n); };
+      // a routine: its blocks in both versions, side by side
+      function openRoutine(r) {
+        var items = [];
+        (r.b ? r.b.blocks : []).forEach(function (yi) { var xi = C.mB[yi]; items.push({ ord: GB.blocks[yi].a0, a: xi == null ? null : GA.blocks[xi], b: GB.blocks[yi], id: 'b' + yi }); });
+        (r.a ? r.a.blocks : []).forEach(function (xi) {
+          if (C.mA[xi] != null && r.b && r.b.blocks.indexOf(C.mA[xi]) >= 0) return;
+          var prev = r.a.blocks.filter(function (q) { return q < xi && C.mA[q] != null; }).pop();
+          items.push({ ord: prev != null ? GB.blocks[C.mA[prev]].a0 + 0.5 : -1 + xi / 1e4, a: GA.blocks[xi], b: C.mA[xi] != null ? GB.blocks[C.mA[xi]] : null, id: C.mA[xi] != null ? 'b' + C.mA[xi] : 'a' + xi });
+        });
+        items.sort(function (p, q) { return p.ord - q.ord; });
+        function cell(x) { return x ? '<b class="mono">' + esc(x.name) + '</b> <span class="faint">' + esc(linesOf(x)) + '</span>' : ''; }
+        var dlg = dialog('<div class="tray-bighead"><b>' + esc(r.a && r.b && r.a.name !== r.b.name ? r.a.name + ' → ' + r.b.name : (r.b || r.a).name) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span><span class="refhelp-acts"><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+          '<div class="sbs-row sbs-head"><div>' + esc(r.a ? ref(GA, r.a) : ra + ': Inserted or moved') + '</div><div></div><div>' + esc(r.b ? ref(GB, r.b) : rb + ': Removed or moved') + '</div></div>' +
+          '<div class="gz-sbs gz-sbs-in">' + items.map(function (it) { var k = kindOf(it.id); return '<div class="sbs-row k-' + k + '" data-id="' + it.id + '" title="Click for the code in both versions"><div class="sbs-a">' + (cell(it.a) || '<span class="faint">Inserted or moved</span>') + '</div><div class="sbs-mid"><span class="gz-k gz-k-' + k + '">' + k + '</span></div><div class="sbs-b">' + (cell(it.b) || '<span class="faint">Removed or moved</span>') + '</div></div>'; }).join('') + '</div>' +
+          '<p class="hint">Click a block for its code in both versions.</p>');
+        dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; } var it = e.target.closest('[data-id]'); if (it) openBlock(it.dataset.id); });
+      }
+      // a block: its code in both versions, side by side
+      function openBlock(id) {
+        var isA = id.charAt(0) === 'a', n = +id.slice(1), y = isA ? null : GB.blocks[n], xi = isA ? n : C.mB[n], x = xi == null ? null : GA.blocks[xi], k = kindOf(id);
+        var la = x ? x.lines : [], lb = y ? y.lines : [], d = ST.lineDiff(la.map(function (l) { return l.key; }), lb.map(function (l) { return l.key; }));
+        function cell(l, mark) { return l ? '<div class="gz-l ' + mark + '"><span class="n">' + l.n + '</span><span class="t">' + esc(l.raw) + '</span></div>' : '<div class="gz-l gap"></div>'; }
+        var rowsH = d.map(function (q) { return '<div class="gz-pair">' + cell(q[1] != null ? la[q[1]] : null, q[0] === '-' ? 'del' : '') + cell(q[2] != null ? lb[q[2]] : null, q[0] === '+' ? 'add' : '') + '</div>'; }).join('');
+        function link(G, bl, label) { if (!bl || !bl.src) return ''; var u = location.pathname + '?v=' + encodeURIComponent(G.b.v.id) + '&tab=read&l=' + bl.src.p + ':' + bl.src.n0 + (bl.src.n1 > bl.src.n0 ? '-' + bl.src.n1 : ''); return '<a class="btn" href="' + esc(u) + '" target="_blank" rel="noopener" title="These lines in Read, in a new tab">' + label + ' ↗</a>'; }
+        var dlg = dialog('<div class="tray-bighead"><b>' + esc((x ? x.name : '') + (x && y && x.name !== y.name ? ' → ' : '') + (y && (!x || x.name !== y.name) ? y.name : '')) + '</b> <span class="gz-k gz-k-' + k + '">' + k + '</span><span class="refhelp-acts">' + link(GA, x, 'Read in ' + ra) + link(GB, y, 'Read in ' + rb) + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+          '<div class="gz-pair gz-pairh"><div>' + esc(x ? ref(GA, x) : ra + ': Inserted or moved') + '</div><div>' + esc(y ? ref(GB, y) : rb + ': Removed or moved') + '</div></div>' +
+          '<div class="listing gz-src-l gz-cmpl">' + rowsH + '</div><p class="hint">Comments and spacing are left out of the comparison; lines shown as held.</p>');
+        dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) dlg.close(); });
+      }
     }
     return function () {
       return [{ type: 'p', text: lede }, { type: 'p', text: out.summary },
+        SW.tableBlock('The routines', ['Change', 'Before', 'After', 'Blocks', 'Reference'], out.rrows),
         SW.tableBlock('The blocks that changed', ['Change', 'Before', 'After', 'Lines', 'Reference'], out.rows.map(function (o) { return o.r; })),
         SW.tableBlock('The branches that changed', ['Branch', 'From', 'To'], out.erows)];
     };

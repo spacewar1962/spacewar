@@ -1754,3 +1754,23 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .gz-k-inserted { border-color: var(--g-added); color: var(--g-added); }
 .gz-k-removed { border-color: var(--g-removed); color: var(--g-removed); }
 .gz-more { display: contents; }
+.gz-sbs { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; }
+.gz-sbs .sbs-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px minmax(0, 1fr); gap: 10px; align-items: center; }
+.gz-sbs .sbs-row:not(.sbs-head), .gz-sbs-in .sbs-row { cursor: pointer; }
+.sbs-head { font: 600 12px var(--sans); color: var(--text-dim); padding: 0 10px; }
+.gz-sbs .sbs-a, .gz-sbs .sbs-b { border: 1px solid var(--line); border-radius: 5px; padding: 6px 10px; background: var(--surface); font-size: 12.5px; min-height: 2.2em; }
+.gz-sbs .sbs-a:empty, .gz-sbs .sbs-b:empty { border-style: dashed; }
+.gz-sbs .sbs-mid { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 11px; text-align: center; }
+.gz-sbs .sbs-mid .gz-k { margin-left: 0; }
+.gz-sbs .sbs-calls { font-size: 11.5px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gz-sbs .k-altered .sbs-a, .gz-sbs .k-altered .sbs-b { border-color: var(--violet); }
+.gz-sbs .k-inserted .sbs-b { border-color: var(--g-added); background: color-mix(in srgb, var(--g-added) 8%, var(--surface)); }
+.gz-sbs .k-removed .sbs-a { border-color: var(--g-removed); border-style: dashed; background: color-mix(in srgb, var(--g-removed) 8%, var(--surface)); }
+.gz-sbs .k-inserted .sbs-a, .gz-sbs .k-removed .sbs-b { border-style: dashed; background: none; }
+.gz-sbs .k-same { opacity: .75; }
+.gz-sbs .sbs-row:not(.sbs-head):hover .sbs-a, .gz-sbs .sbs-row:not(.sbs-head):hover .sbs-b { border-color: var(--text-dim); }
+.gz-sbs-in { max-height: 66vh; overflow: auto; }
+.gz-fold > summary { cursor: pointer; }
+@media (max-width: 700px) { .gz-sbs .sbs-row { grid-template-columns: 1fr 90px 1fr; } }
+.gz-k-moved { border-style: dashed; }
+.gz-sbs .k-moved .sbs-a, .gz-sbs .k-moved .sbs-b { border-style: dashed; }
