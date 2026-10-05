@@ -1091,6 +1091,16 @@
     s = emph(s);
     return s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return keep[+i]; });
   }
+  // A tag as a reader should see it: the bench's own marks (level:, note:, chapter:, cat:) in words
+  SW.tagLabel = function (g) {
+    g = String(g || '');
+    var m;
+    if ((m = /^level:(key|notable|minor)$/.exec(g))) return { key: '★★★ key', notable: '★★ notable', minor: '★ minor' }[m[1]];
+    if ((m = /^note:(.+)$/.exec(g))) return 'from note ' + m[1];
+    if ((m = /^chapter:(.+)$/.exec(g))) return 'Chapter: ' + m[1];
+    if ((m = /^cat:(.+)$/.exec(g))) return 'Category: ' + m[1];
+    return g;
+  };
   SW.md = function (text) {
     var fences = [];
     var src = String(text == null ? '' : text).replace(/\n*<!-- sw:[\s\S]*?-->/g, '').replace(/\r\n?/g, '\n')

@@ -1375,7 +1375,10 @@
     var s = SW.state.sel;
     if (s) setTimeout(function () { R.goto(s.p, s.n0, false); }, 0);
   };
-  SW.on('notes', function (vid) { if (build && vid === build.v.id) { ghostKey = ''; refreshNotes(); } });   // a note added, edited or binned: look for ghosts again
+  // a note added, edited or binned: look again (ghosts too), now if Read is open, else when it is next opened
+  var readStale = false;
+  SW.on('notes', function (vid) { if (build && vid === build.v.id) { ghostKey = ''; if (SW.state.tab === 'read') refreshNotes(); else readStale = true; } });
+  R.enter = function () { if (readStale && build) { readStale = false; refreshNotes(); } };
   // a link to a reply: its thread opened, so the reply can be shown
   SW.on('reveal', function (r) { if (build && r.vid === build.v.id && r.root !== r.id && !openCards[r.root]) { openCards[r.root] = true; paintNotes(); } });
   SW.on('goto', function (g) {

@@ -349,7 +349,7 @@
   // Annotations tagged "finding": cards in their author's colour; the first line is the title.
   function checkNotes(box, cached) {
     live.box = box;
-    if (!cached || !live.notes) box.innerHTML = '<p class="hint">Gathering the group’s findings…</p>';
+    if ((!cached || !live.notes) && !box.querySelector('li.fd')) box.innerHTML = '<p class="hint">Gathering the group’s findings…</p>';   // only when there is nothing yet to show
     return (cached && live.notes ? Promise.resolve(null) : N.whoami().catch(function () {}).then(function () { return N.listAll({ reactions: true }); })).then(function (all) {
       if (all) live.threads = N.threads(all.filter(function (x) { return x.source !== 'buildlog'; }));
       var list = all ? all.filter(function (n) {
@@ -427,15 +427,16 @@
           '<div class="fd-rtext note-md">' + SW.md(r.note.text) + '</div>' + (r.reactions.length ? '<div>' + rx(r) + '</div>' : '') + '</div>' + replies(r, depth + 1);
       }).join('');
     }
+    function repliesHTML(t) { return '<h4 class="fd-rh">Replies' + (t ? ' <span class="faint">' + countReplies(t) + '</span>' : '') + '</h4>' + (t && t.replies.length ? replies(t, 0) : '<p class="hint">None yet.</p>'); }
+    function paintReplies() { var box = SW.$('.fd-repl', d); if (box) box.innerHTML = repliesHTML(threadOf(n)); }
     function paint() {
       var t = threadOf(n);
       d.innerHTML = '<div class="tray-bighead"><span class="fd-no fd-ref mono">' + refOf(n) + '</span> <b>' + SW.md(title).replace(/^<p>|<\/p>$/g, '') + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) +
         ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
         (rest ? '<div class="fd-rtext note-md">' + SW.md(rest) + '</div>' : '') + '<div class="fd-bigfig"></div>' +
-        (tags.length ? '<p>' + tags.map(function (g) { return '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') + '</p>' : '') +
-        '<p class="hint">Evidence: ' + SW.esc(where) + '</p>' + rxBar(t) +
-        '<h4 class="fd-rh">Replies' + (t ? ' <span class="faint">' + countReplies(t) + '</span>' : '') + '</h4>' + (t && t.replies.length ? replies(t, 0) : '<p class="hint">None yet.</p>') +
-        '<div class="fd-replybox"><textarea rows="3" placeholder="Reply, signed with your initials"></textarea><button class="btn" data-reply>Reply</button></div>';
+        '<div class="fd-meta">' + tags.map(function (g) { return '<span class="fd-tag">' + SW.esc(SW.tagLabel(g)) + '</span>'; }).join(' ') + '<span class="hint">Evidence: ' + SW.esc(where) + '</span></div>' + rxBar(t) +
+        '<div class="fd-repl">' + repliesHTML(t) + '</div>' +
+        '<div class="fd-replybox"><textarea rows="2" placeholder="Reply, signed with your initials"></textarea><button class="btn" data-reply>Reply</button></div>';
       SW.mdTools(SW.$('.fd-replybox textarea', d));
       if (fp.b64) SW.figpack.unpack(fp.b64).then(function (svg) { var fb = SW.$('.fd-bigfig', d); if (fb) fb.innerHTML = '<div class="tray-fig">' + SW.figpack.img(svg, 'fig-full') + '</div>'; });
     }
@@ -449,12 +450,19 @@
       if (rb) {
         var ta = SW.$('.fd-replybox textarea', d), text = ta.value.trim(); if (!text) return;
         rb.disabled = true;
-        N.create({ vid: n.vid, parent: n.id, kind: n.kind, anchor: n.anchor, text: text, tags: [] }).then(function () {
-          return N.listAll({ reactions: true });
-        }).then(function (all) { live.threads = N.threads(all.filter(function (x) { return x.source !== 'buildlog'; })); paint(); }, function (err) { rb.disabled = false; if (err.message !== 'no initials') SW.toast(err.message, 5000); });
+        N.create({ vid: n.vid, parent: n.id, kind: n.kind, anchor: n.anchor, text: text, tags: [] }).then(function (made) {
+          // shown at once, in its thread; the group's copy is fetched when the window closes
+          var t = threadOf(n);
+          if (!t) { t = { note: n, replies: [], reactions: [] }; live.threads = (live.threads || []).concat([t]); }
+          if (made) t.replies.push({ note: made, replies: [], reactions: [] });
+          listStale = true;
+          ta.value = ''; rb.disabled = false;
+          paintReplies();
+          var last = SW.$('.fd-repl .fd-reply:last-child', d); if (last) last.scrollIntoView({ block: 'nearest' });
+        }, function (err) { rb.disabled = false; if (err.message !== 'no initials') SW.toast(err.message, 5000); });
       }
     });
-    d.addEventListener('close', function () { d.remove(); });
+    d.addEventListener('close', function () { d.remove(); if (listStale) { clearTimeout(listT); listT = setTimeout(refreshList, 50); } });
     d.showModal();
     if (toReply) { var ta = SW.$('.fd-replybox textarea', d); if (ta) { ta.scrollIntoView({ block: 'center' }); ta.focus(); } }
   }
@@ -710,7 +718,19 @@
     run();
   }
   SW.findings = { list: FIND, showMine: function () { SW.setTab('notes'); } };
-  SW.on('notes', function () { if (done && SW.state.tab === 'findings') render(); });
+  // A note added or changed: the list is brought up to date in place, quietly, once a
+  // finding open in its window is closed (the window keeps itself current)
+  var listStale = false, listT = null;
+  function refreshList() {
+    listStale = false;
+    if (!done || SW.state.tab !== 'findings' || !live.box || !live.box.isConnected) { done = done && SW.state.tab === 'findings'; return; }
+    checkNotes(live.box, false);
+  }
+  SW.on('notes', function () {
+    if (!done) return;
+    if (document.querySelector('dialog.fd-big[open]')) { listStale = true; return; }
+    clearTimeout(listT); listT = setTimeout(refreshList, 400);
+  });
 
   // Category opens on All each time Findings is opened
   function catAll() { if (FS.cat) { FS.cat = ''; SW.store.set('fd.filt', FS); done = false; } if (!done) render(); }

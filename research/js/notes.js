@@ -695,7 +695,7 @@
       '<div class="nbody">' +   // what the annotation holds, set on its own ground
       (n.anchor && n.anchor.c0 != null && n.quote && !n.parent ? codeQuote(n) : '') +
       (n.source === 'buildlog' ? '<div class="body">' + SW.esc(n.text) + '</div>' : '<div class="body note-md">' + SW.md(SW.figpack.split(n.text).text) + '</div>') +
-      (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(SW.esc).join(' · ') + '</div>' : '') +
+      (n.tags && n.tags.length ? '<div class="tagl">' + n.tags.map(function (g) { return SW.esc(SW.tagLabel(g)); }).join(' · ') + '</div>' : '') +
       (N.backlinks(n.id).length ? '<div class="backl"><span class="faint">Linked from</span> ' + N.backlinks(n.id).map(function (b) {
         return '<a href="' + SW.esc(N.linkOf(b)) + '" class="swlink" title="' + SW.esc('Go to ' + N.labelOf(b)) + '">' + SW.esc(N.labelOf(b)) + '</a>';
       }).join(' · ') + '</div>' : '') +
@@ -1188,7 +1188,10 @@
     var ta = box.querySelector('textarea'), tg = box.querySelector('.edit-tags');
     ta.value = SW.noteHistory.visible(note.text);
     SW.mdTools(ta);
-    if (tg) tg.value = (note.tags || []).join(', ');
+    // the bench's own marks (level:, note:, cat:, chapter:) are kept out of the box and kept on saving
+    var own = /^(level|note|cat|chapter):/;
+    var marks = (note.tags || []).filter(function (g) { return own.test(g); });
+    if (tg) tg.value = (note.tags || []).filter(function (g) { return !own.test(g); }).join(', ');
     body.hidden = true;
     body.insertAdjacentElement('afterend', box);
     ta.focus();
@@ -1196,7 +1199,7 @@
     function save() {
       var text = ta.value.trim();
       if (!text) { ta.focus(); return; }
-      var tags = tg ? tg.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean) : null;
+      var tags = tg ? tg.value.split(',').map(function (x) { return x.trim(); }).filter(Boolean).concat(marks) : null;
       box.querySelector('[data-r="save"]').disabled = true;
       var dv = box.querySelector('.edit-dev'), e0 = box.querySelector('.el-n0'), e1 = box.querySelector('.el-n1');
       var ln0 = e0 ? parseInt(e0.value, 10) : 0, ln1 = e1 ? parseInt(e1.value, 10) : 0;

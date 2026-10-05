@@ -1812,3 +1812,23 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .fd.fd-click .fd-title:hover { text-decoration: underline; }
 .note .by .ncode { font-size: 10px; color: var(--text-faint); border: 1px solid var(--line-soft); border-radius: 3px; padding: 0 4px; cursor: copy; }
 .note .by .ncode:hover { color: var(--text); border-color: var(--line); }
+/* a finding in its window: compact */
+dialog.fd-big { width: min(92vw, 780px); padding: 10px 14px; }
+.fd-big .tray-bighead { gap: 6px 8px; margin-bottom: 6px; font-size: 14px; }
+.fd-big .fd-rtext { margin: 2px 0 6px; }
+.fd-big .fd-rtext p { margin: 0 0 6px; }
+.fd-big .fd-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin: 4px 0; font-size: 12px; }
+.fd-big .fd-meta .fd-tag { margin: 0; }
+.fd-big .fd-meta .hint { margin-left: 4px; }
+.fd-big .fd-rxbar { margin: 6px 0 4px; gap: 3px; }
+.fd-big .fd-rxbar button { font-size: 12.5px; padding: 0 6px; line-height: 1.6; }
+.fd-big .fd-rate button { font-size: 15px; }
+.fd-big .fd-rh { margin: 8px 0 4px; font-size: 13px; }
+.fd-big .fd-reply { margin: 4px 0; padding: 2px 8px; }
+.fd-big .fd-rtext.note-md, .fd-big .fd-reply .note-md { font-size: 13.5px; }
+.fd-big .fd-reply .note-md p { margin: 2px 0; }
+.fd-big .fd-replybox { grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 8px; margin-top: 8px; }
+.fd-big .fd-replybox textarea { min-height: 2.6em; }
+.fd-big .fd-replybox .btn { justify-self: end; }
+.fd-big .fd-replybox > :not(textarea):not(.btn) { grid-column: 1 / -1; }   /* the formatting bar across the top */
+.gz-cmpdlg .gz-pairh a.btn { font: 500 11.5px var(--sans); padding: 1px 7px; margin-left: 8px; vertical-align: 1px; }
