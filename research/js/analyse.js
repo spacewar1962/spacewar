@@ -28,7 +28,7 @@
     [13, 'The ships', 'The ship outlines'],
     [14, 'Symbol histories', 'One symbol across the versions'],
     [15, 'Functional overview', 'Start-up, the main loop, each object’s routine, the calls'],
-    [16, 'Art’s Dynamic Profile Gizmo', 'The run as a graph of code blocks joined by branches, with the time spent in each']
+    [16, 'Art’s Dynamic Profile Gizmo', 'The code as a graph of blocks']
   ];
 
   function progLines(b) {
