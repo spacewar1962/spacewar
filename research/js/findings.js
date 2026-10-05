@@ -561,6 +561,7 @@
       ' <span class="fd-lvl fd-' + lvl + '" title="' + L[1] + '">' + L[2] + '</span>';
   }
   var FS = SW.store.get('fd.filt', {}) || {};
+  FS.cat = '';   // Category opens on All; the other filters are kept
   function passes(it) {
     if (FS.cat && it.cat.id !== FS.cat) return false;
     if (FS.lvl === 'key' && it.lvl !== 'key') return false;
@@ -711,5 +712,7 @@
   SW.findings = { list: FIND, showMine: function () { SW.setTab('notes'); } };
   SW.on('notes', function () { if (done && SW.state.tab === 'findings') render(); });
 
-  SW.views.findings = { show: function () { if (!done) render(); }, reset: function () { done = false; } };
+  // Category opens on All each time Findings is opened
+  function catAll() { if (FS.cat) { FS.cat = ''; SW.store.set('fd.filt', FS); done = false; } if (!done) render(); }
+  SW.views.findings = { show: catAll, enter: catAll, reset: function () { done = false; } };
 })(this);

@@ -59,6 +59,7 @@
         return;
       }
       if (shown[tab] !== b || tab === 'about' || tab === 'run' || (tab === 'tape' && SW.state.tapeGo)) { shown[tab] = b; view.show(b); }
+      else if (view.enter) view.enter(b);   // a view already drawn, opened again
     }).catch(function (e) {
       SW.$('#view-' + tab).innerHTML = '<div class="pad"><p class="badge err">Could not load</p> ' + SW.esc(e.message) + '</div>';
     });
