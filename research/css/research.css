@@ -1983,3 +1983,15 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .px-wdf input { font: 13px var(--sans); padding: 4px 7px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
 .px-danger:not(:disabled) { background: #b3412f; border-color: #b3412f; color: #fff; }
 .px-wdnote { display: block; margin: 4px 0; }
+.joinhelp .js-form { display: grid; gap: 6px; max-width: 34em; margin: 6px 0; }
+.joinhelp .js-form label { display: grid; grid-template-columns: 7.5em 1fr; gap: 8px; align-items: center; font-size: 13px; color: var(--text-dim); }
+.joinhelp .js-form input { font: 13px var(--sans); padding: 4px 7px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; min-width: 0; }
+.joinhelp .js-pw { display: flex; gap: 6px; }
+.joinhelp .js-pw input { flex: 1; }
+.joinhelp .js-ok { margin: 4px 0; font-size: 13px; min-height: 1em; }
+.joinhelp .js-ok.good { color: var(--green); }
+.joinhelp .js-ok.warn { color: var(--amber); }
+.joinhelp .js-ok.err { color: var(--red); }
+@media (max-width: 520px) { .joinhelp .js-form label { grid-template-columns: 1fr; gap: 2px; } }
+.px-cfold > summary { cursor: pointer; list-style: revert; margin: 8px 0 4px; }
+.px-cfold > summary .faint { font-weight: 400; }

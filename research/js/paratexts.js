@@ -484,7 +484,7 @@
       var who = me();
       if (who === '?') { SW.toast('Please set your initials first (⚙).', 4000); return Promise.resolve(); }
       return save('Paratext ' + it.code + ': ' + label + ', by ' + who, function (c) { c.items.forEach(function (x) { if (x.code === it.code) change(x, who); }); })
-        .then(function () { it = byCode(code); var t = SW.$('.px-talk', d); t.innerHTML = talkHTML(it); SW.mdTools(SW.$('.px-cbox textarea', t)); refresh(); }, function (err) { SW.toast(err.message, 5000); });
+        .then(function () { it = byCode(code); var t = SW.$('.px-talk', d), op = SW.$('.px-cfold', t) && SW.$('.px-cfold', t).open; t.innerHTML = talkHTML(it); if (op) SW.$('.px-cfold', t).open = true; SW.mdTools(SW.$('.px-cbox textarea', t)); refresh(); }, function (err) { SW.toast(err.message, 5000); });
     }
     SW.mdTools(SW.$('.px-cbox textarea', d));
     function colls0() { it = byCode(code); var b = SW.$('.px-colls', d); if (b) b.innerHTML = collsHTML(it); }
@@ -548,9 +548,9 @@
       [1, 2, 3].map(function (k) { return '<button data-rate="' + k + '" class="' + ((r[mine] || 0) >= k ? 'on' : '') + '">★</button>'; }).join('') +
       (a ? ' <span class="hint" title="' + esc(a.who.join('; ')) + '">' + (Math.round(a.avg * 10) / 10) + ' from ' + a.n + '</span>' : '') + '</span>' +
       EM.map(function (e) { var by = rx[e] || []; return '<button class="fd-emo' + (by.indexOf(mine) >= 0 ? ' on' : '') + '" data-emoji="' + e + '" title="' + esc(by.join(', ') || 'React') + '">' + e + (by.length ? '<sup>' + by.length + '</sup>' : '') + '</button>'; }).join('') + '</div>' +
-      '<h4 class="fd-rh">Comments' + ((it.comments || []).length ? ' <span class="faint">' + it.comments.length + '</span>' : '') + '</h4>' +
-      ((it.comments || []).length ? it.comments.map(function (c) { return '<div class="fd-reply"><div class="fd-rhead"><b>' + esc(c.by) + '</b> <span class="faint">' + esc(SW.fmtDate(c.date)) + '</span></div><div class="note-md">' + SW.md(c.text) + '</div></div>'; }).join('') : '<p class="hint">None yet.</p>') +
-      '<div class="fd-replybox px-cbox"><textarea rows="2" placeholder="A comment, signed ' + esc(mine) + '"></textarea><button class="btn" data-a="comment">Comment</button></div>';
+      '<details class="px-cfold"><summary class="fd-rh">Comments' + ((it.comments || []).length ? ' <span class="faint">' + it.comments.length + '</span>' : ' <span class="faint">none yet</span>') + '</summary>' +
+      ((it.comments || []).length ? it.comments.map(function (c) { return '<div class="fd-reply"><div class="fd-rhead"><b>' + esc(c.by) + '</b> <span class="faint">' + esc(SW.fmtDate(c.date)) + '</span></div><div class="note-md">' + SW.md(c.text) + '</div></div>'; }).join('') : '') +
+      '<div class="fd-replybox px-cbox"><textarea rows="2" placeholder="A comment, signed ' + esc(mine) + '"></textarea><button class="btn" data-a="comment">Comment</button></div></details>';
   }
   function refresh() { var body = view && SW.$('.px-body', view); if (body && cat) paint(body); }
 
@@ -607,5 +607,8 @@
     P.load().then(function () { openItem(code); }, function (e) { SW.toast(e.message, 5000); });
   };
   SW.views.paratexts = { show: function () { if (!done) render(); }, enter: function () { if (!done) render(); }, reset: function () { done = false; } };
+  P.TOKEN_URL = TOKEN_URL;
+  // The token in Settings, tried: the number in the catalogue, or why not
+  P.test = function () { cat = null; return P.load(true).then(function (c) { return c.items.filter(function (it) { return !it.withdrawn; }).length; }); };
   P.reset = function () { done = false; cat = null; if (SW.state.tab === 'paratexts') render(); };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -990,11 +990,22 @@
   // ---------- Help ▸ Joining the annotation group ----------
   // A Hypothesis account, the group, the API token, and the bench's Settings, step by
   // step; every Hypothesis page named opens in a new tab.
+  // Joining: a guide that is also the form. An invitation link (join.html#ID, which the project sends
+  // privately: the group's ID is its invitation, so it is never in the bench's public source) arrives
+  // as ?join=ID, sets the group, and opens this.
+  N.join = function (id) {
+    id = N.groupId(id); if (!/^[A-Za-z0-9]{4,}$/.test(id)) return;
+    var had = N.groupId(SW.store.get('group', ''));
+    if (had && had !== id && !confirm('This invitation is to another annotation group (' + id + ') than the one set here (' + had + '). Use the new one?')) return;
+    SW.store.set('group', id); N.forget && N.forget();
+  };
   N.joinHelp = function () {
     function ext(url, text) { return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + text + ' ↗</a>'; }
+    var esc = SW.esc, grp = N.groupId(SW.store.get('group', '')), P = SW.paratexts;
     var d = SW.el('dialog', { class: 'tray-big annohelp joinhelp' });
-    d.innerHTML = '<div class="tray-bighead"><b>Joining the annotation group</b><span class="refhelp-acts"><button class="btn ghost" data-share title="Copy a link that opens the bench with this guide showing, to send to someone joining">🔗 Copy link to this guide</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div><div class="ah">' +
-      '<p>Annotations on the bench are shared through a private group on <b>Hypothesis</b>, the open annotation service. To read and write them you need a Hypothesis account, membership of the group, and a personal key (an API token) that lets the bench write as you. Four steps, about five minutes. You need an email address, and the group’s invitation link from the project.</p>' +
+    function ok(t) { return '<p class="js-ok" data-ok="' + t + '"></p>'; }
+    d.innerHTML = '<div class="tray-bighead"><b>Joining the annotation group</b><span class="refhelp-acts"><button class="btn ghost" data-share title="' + (grp ? 'A link that opens this guide with your group filled in, to send privately to someone joining: anyone with it can join the group' : 'A link that opens this guide, to send to someone joining') + '">🔗 Copy ' + (grp ? 'an invitation link' : 'a link to this guide') + '</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div><div class="ah">' +
+      '<p>Annotations on the bench are shared through a private group on <b>Hypothesis</b>, the open annotation service. To read and write them you need a Hypothesis account, membership of the group, and a personal key (an API token) that lets the bench write as you. About five minutes.</p>' +
 
       '<div class="js-steps"><section class="js-step"><div class="js-num" aria-hidden="true">1</div><div class="js-body"><h3><span class="vh">Step 1: </span>Create a Hypothesis account</h3>' +
       '<ol class="ah-steps"><li>Open ' + ext('https://hypothes.is/signup', 'hypothes.is/signup') + '.</li>' +
@@ -1003,37 +1014,73 @@
       '<p class="hint">Already have an account? ' + ext('https://hypothes.is/login', 'Log in') + ' and go on to step 2.</p>' +
 
       '</div></section><section class="js-step"><div class="js-num" aria-hidden="true">2</div><div class="js-body"><h3><span class="vh">Step 2: </span>Join the group</h3>' +
-      '<ol class="ah-steps"><li>Ask the project leads for the group’s invitation link if you do not have it. It looks like <span class="mono">https://hypothes.is/groups/Ab12Cd34/name</span>.</li>' +
-      '<li>Open the link while logged in to Hypothesis, and click <b>Join</b>.</li></ol>' +
+      (grp ? '<p>Your invitation has set the group here. Open it while logged in to Hypothesis, and click <b>Join</b>:</p><p><a class="btn" href="https://hypothes.is/groups/' + esc(grp) + '" target="_blank" rel="noopener noreferrer">Open the group on Hypothesis ↗</a></p>'
+        : '<ol class="ah-steps"><li>Ask the project leads for an invitation link if you do not have one. Opening it fills in the group here.</li>' +
+          '<li>Or paste the group’s link (<span class="mono">https://hypothes.is/groups/Ab12Cd34/name</span>) into step 4, open it while logged in to Hypothesis, and click <b>Join</b>.</li></ol>') +
 
       '</div></section><section class="js-step"><div class="js-num" aria-hidden="true">3</div><div class="js-body"><h3><span class="vh">Step 3: </span>Get your API token</h3>' +
       '<ol class="ah-steps"><li>Open ' + ext('https://hypothes.is/account/developer', 'hypothes.is/account/developer') + ' (logged in).</li>' +
       '<li>Click <b>Generate your API token</b>, then copy the token it shows (a long string beginning <span class="mono">6879-</span>).</li></ol>' +
       '<p class="hint">The token lets the bench write annotations in your name: keep it to yourself, like a password. If it is ever seen by someone else, generate a new one on the same page; the old one stops working.</p>' +
 
-      '</div></section><section class="js-step"><div class="js-num" aria-hidden="true">4</div><div class="js-body"><h3><span class="vh">Step 4: </span>Enter the group URL and the API key in the bench</h3>' +
-      '<ol class="ah-steps"><li>Open <b>⚙ Settings</b> (top right).</li>' +
-      '<li>Under <b>Your details</b>, give your <b>initials</b> and <b>name</b>: every annotation you write is signed with them.</li>' +
-      '<li>Under <b>Shared annotations</b>, paste the group’s invitation link (or just its ID, the part after <span class="mono">/groups/</span>) and your API token.</li>' +
-      '<li>Click <b>Test connection</b>. It should say <i>Connected as</i> your username, <i>group … found</i>. If the group is not found, check you joined it in step 2 with the same account.</li>' +
-      '<li>Click <b>Save</b>.</li></ol>' +
+      '</div></section><section class="js-step"><div class="js-num" aria-hidden="true">4</div><div class="js-body"><h3><span class="vh">Step 4: </span>Your details and the token, here</h3>' +
+      '<div class="js-form">' +
+      '<label><span>Initials</span><input data-j="initials" maxlength="4" value="' + esc(SW.store.get('initials', '')) + '" placeholder="e.g. AB" autocomplete="off"></label>' +
+      '<label><span>Name</span><input data-j="name" value="' + esc(SW.store.get('name', '')) + '" autocomplete="name"></label>' +
+      '<label><span>Group</span><input data-j="group" value="' + esc(grp) + '" placeholder="the group’s link, or its ID" autocomplete="off"></label>' +
+      '<label><span>API token</span><span class="js-pw"><input data-j="token" type="password" value="' + esc(SW.store.get('token', '')) + '" placeholder="6879-…" autocomplete="off"><button class="btn ghost" data-show="token">Show</button></span></label>' +
+      '</div><p><button class="btn" data-a="hyp">Save and test</button></p>' + ok('hyp') +
+      '<p class="hint">Every annotation you write is signed with your initials. These are kept in this browser only (⚙ Settings has them too); on another computer, enter them again.</p>' +
+
+      (P ? '</div></section><section class="js-step"><div class="js-num" aria-hidden="true">5</div><div class="js-body"><h3><span class="vh">Step 5: </span>The paratexts (if you were invited to them)</h3>' +
+        '<p>The scans, clippings and documents are in a private GitHub repository. If GitHub has emailed you an invitation to the <b>spacewar1962</b> organisation, accept it, then:</p>' +
+        '<ol class="ah-steps"><li><a class="btn ghost" href="' + esc(P.TOKEN_URL) + '" target="_blank" rel="noopener noreferrer">Open the token form ↗</a> (its name, owner, expiry and permission are filled in).</li>' +
+        '<li>Under <b>Repository access</b>, choose <b>Only select repositories</b>, then <b>sw_paratexts</b>; then <b>Generate token</b> and copy it.</li></ol>' +
+        '<div class="js-form"><label><span>GitHub token</span><span class="js-pw"><input data-j="gh" type="password" value="' + esc(SW.store.get('gh.token', '')) + '" placeholder="github_pat_…" autocomplete="off"><button class="btn ghost" data-show="gh">Show</button></span></label></div>' +
+        '<p><button class="btn" data-a="gh">Save and test</button></p>' + ok('gh') : '') +
 
       '</div></section><section class="js-step js-then"><div class="js-num" aria-hidden="true">✓</div><div class="js-body"><h3>Then</h3><ul class="ah-steps">' +
       '<li>Annotate: select lines in Read and click <b>✎ Annotate</b>, or hover a line number and click <b>+A</b>. Help ▸ Advanced annotation covers formatting, links between annotations, searching and the rest.</li>' +
-      '<li>Settings are kept in this browser only. On another computer or browser, enter them again.</li>' +
       '<li>Without a group and token, annotations are kept as drafts in this browser; once connected, share them with <b>⇪ Publish drafts to the group</b> on Versions ▸ This version.</li>' +
       '<li>Annotations in the group are seen only by its members, on the bench and on Hypothesis’s own site (' + ext('https://hypothes.is/login', 'hypothes.is') + ').</li></ul>' +
       '</div></section></div></div>';
     document.body.appendChild(d);
     d.showModal();
+    function val(k) { var el = d.querySelector('[data-j="' + k + '"]'); return el ? el.value.trim() : ''; }
+    function say(k, cls, t) { var el = d.querySelector('[data-ok="' + k + '"]'); el.className = 'js-ok ' + cls; el.textContent = t; }
     d.addEventListener('click', function (e) {
-      if (e.target.closest('[data-share]')) {
-        var url = SW.BASE_URI + 'join.html';   // its own share card (an invitation, RSVP); it opens the bench with this guide showing
-        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
-          .then(function () { SW.toast('Link copied: it opens the bench with this guide showing'); }, function () { window.prompt('Copy:', url); });
+      var sh = e.target.closest('[data-show]');
+      if (sh) { var inp = d.querySelector('[data-j="' + sh.dataset.show + '"]'), hid = inp.type === 'password'; inp.type = hid ? 'text' : 'password'; sh.textContent = hid ? 'Hide' : 'Show'; return; }
+      var a = e.target.closest('[data-a]');
+      if (a && a.dataset.a === 'hyp') {
+        var ini = val('initials').toUpperCase();
+        if (!ini) { say('hyp', 'err', 'Give your initials first.'); return; }
+        SW.store.set('initials', ini); SW.store.set('name', val('name'));
+        SW.store.set('group', N.groupId(val('group'))); SW.store.set('token', val('token'));
+        N.forget(); if (SW.state.v) N.invalidate(SW.state.v);
+        if (!val('group') || !val('token')) { say('hyp', 'warn', 'Saved. Without ' + (!val('group') ? 'the group' : 'a token') + ', annotations are kept as drafts here.'); return; }
+        say('hyp', '', 'Checking…');
+        N.test().then(function (r) {
+          if (r.group) say('hyp', 'good', '✓ Connected as ' + r.user.replace(/^acct:|@hypothes\.is$/g, '') + ', a member of “' + r.group + '”. You can annotate.');
+          else say('hyp', 'warn', 'Connected as ' + r.user.replace(/^acct:|@hypothes\.is$/g, '') + ', but not yet a member of the group: join it (step 2) with this account, then test again.');
+        }, function (err) { say('hyp', 'err', err.message); });
         return;
       }
-      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); }
+      if (a && a.dataset.a === 'gh' && P) {
+        SW.store.set('gh.token', val('gh')); P.reset();
+        if (!val('gh')) { say('gh', 'warn', 'No token: Paratexts will show how to get one.'); return; }
+        say('gh', '', 'Checking…');
+        P.test().then(function (n) { say('gh', 'good', '✓ The paratexts are open to you (' + n + ' in the catalogue).'); }, function (err) { say('gh', 'err', err.message); });
+        return;
+      }
+      if (e.target.closest('[data-share]')) {
+        var g = N.groupId(SW.store.get('group', ''));
+        var url = SW.BASE_URI + 'join.html' + (g ? '#' + g : '');   // its own share card; it opens the bench with this guide showing
+        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+          .then(function () { SW.toast(g ? 'Invitation link copied: send it privately; anyone with it can join the group' : 'Link copied: it opens the bench with this guide showing', 6000); }, function () { window.prompt('Copy:', url); });
+        return;
+      }
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); }
     });
     d.addEventListener('close', function () { d.remove(); });
   };

@@ -245,6 +245,8 @@
     function tabsFade() { if (tabsRow) tabsRow.classList.toggle('more-right', tabsRow.scrollLeft + tabsRow.clientWidth < tabsRow.scrollWidth - 4); }
     if (tabsRow) { tabsRow.addEventListener('scroll', tabsFade, { passive: true }); window.addEventListener('resize', tabsFade); setTimeout(tabsFade, 0); }
     var q = SW.readQuery();
+    // an invitation (join.html#ID → ?join=ID): the group set, the ID taken out of the address, the guide opened
+    if (q.join) { SW.notes.join(q.join); delete q.join; q.help = 'join'; try { history.replaceState(null, '', location.pathname + location.search.replace(/([?&])join=[^&]*&?/, '$1').replace(/[?&]$/, '')); } catch (e) { /* file: urls */ } }
     if (q.l) {
       var m = /^(\d+):(\d+)(?:-(\d+))?$/.exec(q.l);
       if (m) SW.state.sel = { p: +m[1], n0: +m[2], n1: +(m[3] || m[2]) };
