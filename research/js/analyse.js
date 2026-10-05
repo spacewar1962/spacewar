@@ -528,8 +528,11 @@
     var V = root.SWVersions, ST = SW.structure, esc = SW.esc;
     var vs = V.VERSIONS.filter(function (v) { return v.build && v.id !== b.v.id; }).sort(function (x, y) { return x.sort - y.sort; });
     var earlier = vs.filter(function (v) { return v.sort <= b.v.sort; });
-    var other = SW.store.get('an.gizmoCmp', '');
-    if (!vs.some(function (v) { return v.id === other; })) other = (earlier[earlier.length - 1] || vs[0] || {}).id;
+    // the version to compare with: as last chosen for this version, else the last chosen at all,
+    // else the one before it
+    var byV = SW.store.get('an.gizmoCmpBy', {}) || {}, ok = function (id) { return vs.some(function (v) { return v.id === id; }); };
+    var other = ok(byV[b.v.id]) ? byV[b.v.id] : ok(SW.store.get('an.gizmoCmp', '')) ? SW.store.get('an.gizmoCmp', '') : (earlier[earlier.length - 1] || vs[0] || {}).id;
+    function keep(cur, cmp) { var m = SW.store.get('an.gizmoCmpBy', {}) || {}; m[cur] = cmp; SW.store.set('an.gizmoCmpBy', m); SW.store.set('an.gizmoCmp', cmp); }
     var split = !!SW.store.get('an.gizmoSplit', false);
     var lede = 'After Art Schwarz: each version’s code without its comments, cut into blocks between branches (a block begins where a branch arrives and ends at an instruction that can branch), read from the assembled code; jumps the code does not name (jmp i, jsp i, xct) are taken from a 5 s sample run of each version. Blocks are matched across the two versions by their code, then their label, then their place between matched blocks. Here they are gathered into routines, each running from an entry point (the start, anything called, anything the main loop dispatches to) to the next, and the two versions’ routines are set side by side.';
     var legend = 'The same: every block matched and unchanged. Altered: some of its blocks changed, were inserted or were removed. Moved: a routine on one side only whose code is all found in another routine on the other. Inserted, removed: a routine with no counterpart. Click a routine for its blocks side by side, and a block for its code in both versions.';
@@ -545,8 +548,8 @@
       '<details class="gz-about"><summary title="What the comparison shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>';
     c.appendChild(bar);
     gzModeWire(bar);
-    bar.querySelector('.gz-cmp').addEventListener('change', function (e) { SW.store.set('an.gizmoCmp', e.target.value); render(); });
-    bar.querySelector('.gz-swap').addEventListener('click', function () { if (!other) return; SW.store.set('an.gizmoCmp', b.v.id); SW.select(other); });
+    bar.querySelector('.gz-cmp').addEventListener('change', function (e) { keep(b.v.id, e.target.value); render(); });
+    bar.querySelector('.gz-swap').addEventListener('click', function () { if (!other) return; keep(other, b.v.id); SW.select(other); });
     bar.querySelector('.gz-split').addEventListener('change', function (e) { SW.store.set('an.gizmoSplit', e.target.checked); render(); });
     var src = bar.querySelector('.gz-src'), body = SW.el('div', { class: 'gz-sbs' }), more = SW.el('div', { class: 'gz-more' });
     c.appendChild(body); c.appendChild(more);
