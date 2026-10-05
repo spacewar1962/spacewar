@@ -130,16 +130,21 @@
     // 1. the same code
     var byFp = {};
     B.blocks.forEach(function (y) { (byFp[y.fp] = byFp[y.fp] || []).push(y); });
-    A.blocks.forEach(function (x) {
-      var c = (byFp[x.fp] || []).filter(function (y) { return mB[y.i] == null; });
-      if (!c.length) return;
-      var y = c.filter(function (y) { return y.name === x.name; })[0] || c[0];
-      mA[x.i] = y.i; mB[y.i] = x.i; kind[x.i] = 'same';
+    // identical code under the same label first, so a short common fragment pairs with its namesake
+    [true, false].forEach(function (sameName) {
+      A.blocks.forEach(function (x) {
+        if (mA[x.i] != null) return;
+        var c = (byFp[x.fp] || []).filter(function (y) { return mB[y.i] == null && (!sameName || y.name === x.name); });
+        if (!c.length) return;
+        var y = c[0];
+        mA[x.i] = y.i; mB[y.i] = x.i; kind[x.i] = 'same';
+      });
     });
-    // 2. the same label, different code
-    var byName = {};
-    B.blocks.forEach(function (y) { if (mB[y.i] == null && !/\+\d+$/.test(y.name)) byName[y.name] = y; });
-    A.blocks.forEach(function (x) { var y = byName[x.name]; if (mA[x.i] == null && y && mB[y.i] == null) { mA[x.i] = y.i; mB[y.i] = x.i; kind[x.i] = 'altered'; } });
+    // 2. the same label (or label and offset), different code: a name left on each side only once
+    function once(G, m) { var n = {}; G.blocks.forEach(function (z) { if (m[z.i] == null) n[z.name] = (n[z.name] || 0) + 1; }); return n; }
+    var onA = once(A, mA), onB = once(B, mB), byName = {};
+    B.blocks.forEach(function (y) { if (mB[y.i] == null && onB[y.name] === 1) byName[y.name] = y; });
+    A.blocks.forEach(function (x) { var y = byName[x.name]; if (mA[x.i] == null && onA[x.name] === 1 && y && mB[y.i] == null) { mA[x.i] = y.i; mB[y.i] = x.i; kind[x.i] = 'altered'; } });
     // 3. the same place in the graph: one unmatched block on each side, between the same matched neighbours
     function nbrs(G) { var pre = {}, suc = {}; G.edges.forEach(function (e) { (suc[e.f] = suc[e.f] || []).push(e.t); (pre[e.t] = pre[e.t] || []).push(e.f); }); return { pre: pre, suc: suc }; }
     var NA = nbrs(A), NB = nbrs(B);
@@ -147,15 +152,18 @@
       var changed = false;
       A.blocks.forEach(function (x) {
         if (mA[x.i] != null) return;
-        var cands = null;
+        // each matched neighbour votes for the unmatched blocks next to its counterpart;
+        // the block with most votes is taken if no other has as many
+        var votes = {}, nv = 0;
         [['pre', 'suc'], ['suc', 'pre']].forEach(function (d) {
           (NA[d[0]][x.i] || []).forEach(function (n) {
             if (mA[n] == null) return;
-            var here = (NB[d[1]][mA[n]] || []).filter(function (y) { return mB[y] == null; });
-            cands = cands == null ? here : cands.filter(function (y) { return here.indexOf(y) >= 0; });
+            nv++;
+            (NB[d[1]][mA[n]] || []).forEach(function (y) { if (mB[y] == null) votes[y] = (votes[y] || 0) + 1; });
           });
         });
-        if (cands && cands.length === 1) { mA[x.i] = cands[0]; mB[cands[0]] = x.i; kind[x.i] = 'altered'; changed = true; }
+        var ys = Object.keys(votes).sort(function (p, q) { return votes[q] - votes[p]; });
+        if (ys.length && (ys.length === 1 || votes[ys[0]] > votes[ys[1]]) && (votes[ys[0]] >= 2 || nv === 1)) { var y0 = +ys[0]; mA[x.i] = y0; mB[y0] = x.i; kind[x.i] = 'altered'; changed = true; }
       });
       if (!changed) break;
     }
