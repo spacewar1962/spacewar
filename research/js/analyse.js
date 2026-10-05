@@ -598,7 +598,7 @@
         function link(G, bl, label) { if (!bl || !bl.src) return ''; var u = location.pathname + '?v=' + encodeURIComponent(G.b.v.id) + '&tab=read&l=' + bl.src.p + ':' + bl.src.n0 + (bl.src.n1 > bl.src.n0 ? '-' + bl.src.n1 : ''); return '<a class="btn" href="' + esc(u) + '" target="_blank" rel="noopener" title="These lines in Read, in a new tab">' + label + ' ↗</a>'; }
         var dlg = SW.el('dialog', { class: 'tray-big gz-dlg gz-cmpdlg' });
         dlg.innerHTML = '<div class="tray-bighead"><b>' + esc((x ? x.name : '') + (x && y && x.name !== y.name ? ' → ' : '') + (y && (!x || x.name !== y.name) ? y.name : '')) + '</b> <span class="gz-k gz-k-' + k + '">' + k + '</span><span class="refhelp-acts">' + link(GA, x, 'Read in ' + ra) + link(GB, y, 'Read in ' + rb) + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
-          '<div class="gz-pair gz-pairh"><div>' + esc(x ? ref(GA, x) : ra + ': not there') + '</div><div>' + esc(y ? ref(GB, y) : rb + ': not there') + '</div></div>' +
+          '<div class="gz-pair gz-pairh"><div>' + esc(x ? ref(GA, x) : ra + ': Inserted or moved') + '</div><div>' + esc(y ? ref(GB, y) : rb + ': Removed or moved') + '</div></div>' +
           '<div class="listing gz-src-l gz-cmpl">' + body + '</div><p class="hint">Comments and spacing are left out of the comparison; lines shown as held.</p>';
         document.body.appendChild(dlg);
         dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) dlg.close(); });
