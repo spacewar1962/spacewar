@@ -68,6 +68,8 @@
   // These record this session's moves, while the group's search catches up.
   var binnedNow = {}, restoredNow = {};
   function isBinTag(t) { return t === 'sw:deleted' || t.indexOf('sw:deleted-at:') === 0; }
+  // a note binned or deleted this session (the group's search may not know yet)
+  N.isGone = function (id) { return !!binnedNow[id] || !!deleted[id] || drafts().some(function (d) { return d.id === id && d.deleted; }); };
   function isBinned(n) {
     if (n.source === 'draft') return !!n.deleted;
     return !!binnedNow[n.id] || (!!n.binned && !restoredNow[n.id]);
@@ -109,7 +111,7 @@
       anchor: anchor, text: a.text || '', by: by, name: (a.user_info && a.user_info.display_name) || '',
       date: a.created, updated: a.updated, parent: (a.references || []).slice(-1)[0] || null,
       tags: tags.filter(function (t) { return t.indexOf('sw:') !== 0; }), source: 'hypothesis', user: a.user || '', rawTags: tags,
-      binned: tags.indexOf('sw:deleted') >= 0, dev: tags.indexOf('sw:dev') >= 0, binnedAt: tagVal(tags, 'sw:deleted-at:'),
+      binned: tags.indexOf('sw:deleted') >= 0, dev: tags.indexOf('sw:dev') >= 0, binnedAt: tagVal(tags, 'sw:deleted-at:'), from: tagVal(tags, 'sw:from:') || null,
       link: a.links && (a.links.incontext || a.links.html), quote: qsel ? qsel.exact : ''
     };
   }
@@ -325,13 +327,14 @@
       // a span within the lines: from character c0 of the first to c1 of the last
       .concat(note.anchor && note.anchor.c0 != null ? ['sw:chars:' + note.anchor.c0 + '-' + note.anchor.c1] : [])
       .concat(note.dev ? ['sw:dev'] : [])
+      .concat(note.from ? ['sw:from:' + note.from] : [])   // kept from a ghost: the original's id
       .concat(note.tags || []);
     if (!N.configured()) {
       var d = drafts();
       d.push({ id: 'draft-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6), vid: note.vid, kind: note.kind || 'line', anchor: note.anchor,
                quote: note.quote || '', text: note.text, by: by, name: me.name,
                date: new Date().toISOString(), parent: note.parent || null, tags: note.tags || [],
-               source: 'draft', hTags: tags, dev: !!note.dev });
+               source: 'draft', hTags: tags, dev: !!note.dev, from: note.from || null });
       saveDrafts(d);
       N.invalidate(note.vid);
       if (!note.quiet) SW.toast('Saved as a draft in this browser (no Hypothesis group set).');
@@ -1063,7 +1066,7 @@
       '<li><b>Open and resolved</b>: react 🔓 to mark an annotation a question still to be answered (a small OPEN shows before its initials); react 💡 to ask for help (HELP!); react ✅ to mark it answered. Anyone in the group can; the latest of these counts. The chevron on Read’s Annotations heading cycles All, Mine, Open, None.</li>' +
       '<li><b>@mentions</b>: type @ and initials to mention someone; they are offered as you type. What’s new lists a mention of you first.</li>' +
       '<li><b>Earlier wordings</b>: editing an annotation keeps what it said before; <i>edited … · 2 earlier</i> on the annotation shows them, with when each was written.</li>' +
-      '<li><b>Ghosts</b>: annotations made on other versions, shown faintly on the lines here whose code matches theirs (the Ghosts switch on the Annotations heading). <i>Open in …</i> goes to the original; <i>＋ Keep here</i> copies it into this version, with a link back.</li>' +
+      '<li><b>Ghosts</b>: annotations made on other versions, shown faintly on the lines here whose code matches theirs (the Ghosts switch on the Annotations heading). <i>Open in …</i> goes to the original; <i>＋ Keep here</i> copies it into this version, with a link back: the copy is your own to edit or delete, and the original is not changed. While the copy stands the ghost is not shown; delete the copy and the ghost returns. The chevron at a ghost’s top left folds it away; the Ghosts switch hides them all.</li>' +
       '<li><b>Moving</b>: drag the ⠿ at a card’s bottom left onto another line, or change Lines in Edit. ↶ Undo (⌘Z) takes back a move, an edit, an addition or a deletion.</li>' +
       '<li><b>Folding</b>: the chevron at a card’s top left folds it to one line (for you, kept in this browser); ▸ Code in its corner shows the code it is attached to.</li></ul>' +
       '<h3>Good to know</h3><ul class="ah-steps">' +
