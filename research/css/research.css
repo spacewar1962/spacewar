@@ -1715,6 +1715,8 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .kin-bar .kin-cur .mono { color: var(--kin); }
 
 /* Art's Dynamic Profile Gizmo */
+.gz-go { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin: 2px 0 10px; }
+.gz-go .gz-src { font-variant-numeric: tabular-nums; }
 .gz-ctl { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin: 4px 0 8px; }
 .svgbox.gizmo { overflow: auto; max-height: 78vh; }
 .svgbox.gizmo .gz-node:hover rect { stroke: var(--text); stroke-width: 2; }

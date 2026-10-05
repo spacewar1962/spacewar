@@ -263,12 +263,57 @@
     });
     return { blocks: blocks, edges: Object.keys(edges).map(function (k) { return edges[k]; }), entry: at[entry], total: blocks.reduce(function (t, x) { return t + x.cyc; }, 0) };
   }
+  // A sample run for the gizmo, without the Run view: the program run on its own
+  // emulator for some seconds of machine time, both ships flown by Lensman AI
+  // where the version allows, in slices so the page stays responsive.
+  var sampling = null;
+  function sampleRun(b, secs, progress) {
+    return SW.controlMap(b.v.id).then(function (m) { return m; }, function () { return null; }).then(function (m) {
+      var C = root.PDP1CPU, cpu = new C.PDP1(SW.cpuOpts(b.v));
+      cpu.load(b.asm.memory, b.asm.start); cpu.tw = 0; cpu.control = 0;
+      var ai = !!(m && !b.v.ctlLoad && b.sym.nth && b.sym.ndx && SW.ai);
+      var pilots = ai ? [0, 1].map(function (j) { return SW.ai.pilot(b, j, m[j], 'duellist'); }) : [];
+      var ml0 = b.sym.ml0 ? b.sym.ml0.val : -1, end = Math.round(secs * 200000);
+      return new Promise(function (done) {
+        (function slice() {
+          var stop = Math.min(end, cpu.cycles + 200000);
+          while (cpu.cycles < stop && !cpu.halted) {
+            if (cpu.pc === ml0 && pilots.length) { var bits = 0; pilots.forEach(function (p) { if (p) bits |= p(cpu.mem); }); cpu.control = bits; }
+            cpu.step();
+          }
+          progress(cpu.cycles / end);
+          if (cpu.cycles < end && !cpu.halted && sampling) setTimeout(slice, 0);
+          else done({ build: b, exec: cpu.execCount, read: cpu.readCount, write: cpu.writeCount, lastWriter: cpu.lastWriter,
+                      steps: cpu.stepCount, cyc: cpu.cycCount, branches: cpu.branches, cycles: cpu.cycles, instructions: cpu.instructions,
+                      entry: cpu.entry, sample: { secs: secs, ai: ai } });
+        })();
+      });
+    });
+  }
   function gizmo(b, el) {
     var prof = SW.profile && SW.profile.build === b && SW.profile.branches && SW.profile.instructions ? SW.profile : null;
     var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
-    var c = card('Art’s Dynamic Profile Gizmo', lede + (prof ? '' : ' <b>Run the program in the Run view first</b> (a few seconds of play is enough), then come back here.'));
+    var c = card('Art’s Dynamic Profile Gizmo', lede);
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
+    var secs = SW.store.get('an.gizmoSecs', 10);
+    var go = SW.el('div', { class: 'gz-go' });
+    go.innerHTML = '<button class="btn gz-run" title="Run the program here for a while, both ships flown by the computer, and draw the graph from that run">▶ Sample run</button>' +
+      '<label class="check">for <select>' + [5, 10, 30, 60].map(function (n) { return '<option value="' + n + '"' + (n === secs ? ' selected' : '') + '>' + n + ' s</option>'; }).join('') + '</select> of machine time</label>' +
+      '<span class="gz-src hint">' + (prof ? (prof.sample ? 'Drawn from a sample run of ' + prof.sample.secs + ' s' + (prof.sample.ai ? ', both ships flown by Lensman AI' : ', no one at the controls') + '.' : 'Drawn from your run in Run.') + ' Run again for a fresh profile.' : 'Press <b>▶ Sample run</b>, or play the game in Run and come back: the graph is drawn from the last run.') + '</span>';
+    c.appendChild(go);
+    var gb = go.querySelector('.gz-run'), gs = go.querySelector('select'), src = go.querySelector('.gz-src');
+    gs.addEventListener('change', function () { secs = +gs.value; SW.store.set('an.gizmoSecs', secs); });
+    gb.addEventListener('click', function () {
+      if (sampling) { sampling = null; return; }   // a second press stops it
+      sampling = {}; gb.textContent = '■ Stop'; gs.disabled = true;
+      sampleRun(b, secs, function (f) { src.textContent = 'Running… ' + Math.round(100 * f) + '%'; }).then(function (p) {
+        sampling = null;
+        if (build !== b) return;
+        SW.profile = p; SW.emit('profile');
+        render();
+      });
+    });
     if (!prof) return null;
     var F = flowBlocks(b, prof), B = F.blocks, tot = F.total || 1;
     var cover = SW.store.get('an.gizmoCover', 0.9);
