@@ -1715,8 +1715,26 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .kin-bar .kin-cur .mono { color: var(--kin); }
 
 /* Art's Dynamic Profile Gizmo */
-.gz-go { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin: 2px 0 10px; }
-.gz-go .gz-src { font-variant-numeric: tabular-nums; }
 .gz-ctl { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin: 4px 0 8px; }
 .svgbox.gizmo { overflow: auto; max-height: 78vh; }
 .svgbox.gizmo .gz-node:hover rect { stroke: var(--text); stroke-width: 2; }
+.gz-dlg { width: min(96vw, 1000px); }
+.gz-dlg h4 { margin: 12px 0 4px; }
+.gz-cols { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; }
+@media (max-width: 760px) { .gz-cols { grid-template-columns: 1fr; } }
+.gz-src-l { padding: 6px 0; max-height: 50vh; overflow: auto; border-radius: 4px; }
+.gz-src-l .gz-l { display: grid; grid-template-columns: 3.6em 1fr; column-gap: 10px; padding: 0 10px; white-space: pre; }
+.gz-src-l .gz-l .n { color: var(--text-faint); text-align: right; }
+.gz-dlg .btn.ghost { margin: 0 4px 4px 0; }
+.gz-card { padding-top: 8px; padding-bottom: 8px; }
+.gz-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0 0 6px; position: relative; }
+.gz-bar select { font-size: 12.5px; }
+.gz-bar .sep { width: 1px; height: 18px; background: var(--line); }
+.gz-bar .gz-src { font-size: 12px; font-variant-numeric: tabular-nums; }
+.gz-about { margin-left: auto; font-size: 12.5px; }
+.gz-about > summary { cursor: pointer; color: var(--text-dim); list-style: none; }
+.gz-about > summary::before { content: 'ⓘ '; }
+.gz-about[open] > summary { color: var(--text); }
+.gz-about-b { position: absolute; right: 0; top: 100%; z-index: 4; width: min(560px, 90vw); padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 6px 20px rgba(0,0,0,.35); font-size: 13px; }
+.gz-about-b p { margin: 0 0 6px; }
+.svgbox.gizmo { max-height: calc(100vh - 210px); }

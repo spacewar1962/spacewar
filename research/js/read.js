@@ -1378,7 +1378,12 @@
   SW.on('notes', function (vid) { if (build && vid === build.v.id) { ghostKey = ''; refreshNotes(); } });   // a note added, edited or binned: look for ghosts again
   // a link to a reply: its thread opened, so the reply can be shown
   SW.on('reveal', function (r) { if (build && r.vid === build.v.id && r.root !== r.id && !openCards[r.root]) { openCards[r.root] = true; paintNotes(); } });
-  SW.on('goto', function (g) { if (build && g.tab === 'read') { SW.setTab('read'); setTimeout(function () { R.goto(g.p, g.n, true); paintSel(); }, 0); } });
+  SW.on('goto', function (g) {
+    if (g.tab !== 'read') return;
+    // Read not drawn yet this visit: opening it goes to the selection (R.show)
+    if (!build) { var s = SW.state.sel; if (!s || s.p !== g.p || s.n0 !== g.n) SW.state.sel = { p: g.p, n0: g.n, n1: g.n }; SW.setTab('read'); return; }
+    SW.setTab('read'); setTimeout(function () { R.goto(g.p, g.n, true); paintSel(); }, 0);
+  });
   SW.on('profile', function () { if (opts.heat && build) render(); });
   // Lines change height with the window or the code size: the cards follow.
   var relay = null;

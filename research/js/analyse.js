@@ -293,16 +293,22 @@
   function gizmo(b, el) {
     var prof = SW.profile && SW.profile.build === b && SW.profile.branches && SW.profile.instructions ? SW.profile : null;
     var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
-    var c = card('Art’s Dynamic Profile Gizmo', lede);
+    var legend = 'Darker blocks take more of the time; the rounded block is where the run began. Solid edges are branches, dashed ones falling through into a block a branch also reaches, dotted ones a way through blocks left out; thicker for more often. An edge up or across returns to a block drawn above (a loop). Click a block for its code, the instructions it ran and where it branches.';
+    var c = SW.el('div', { class: 'card gz-card' });
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
-    var secs = SW.store.get('an.gizmoSecs', 10);
-    var go = SW.el('div', { class: 'gz-go' });
-    go.innerHTML = '<button class="btn gz-run" title="Run the program here for a while, both ships flown by the computer, and draw the graph from that run">▶ Sample run</button>' +
-      '<label class="check">for <select>' + [5, 10, 30, 60].map(function (n) { return '<option value="' + n + '"' + (n === secs ? ' selected' : '') + '>' + n + ' s</option>'; }).join('') + '</select> of machine time</label>' +
-      '<span class="gz-src hint">' + (prof ? (prof.sample ? 'Drawn from a sample run of ' + prof.sample.secs + ' s' + (prof.sample.ai ? ', both ships flown by Lensman AI' : ', no one at the controls') + '.' : 'Drawn from your run in Run.') + ' Run again for a fresh profile.' : 'Press <b>▶ Sample run</b>, or play the game in Run and come back: the graph is drawn from the last run.') + '</span>';
-    c.appendChild(go);
-    var gb = go.querySelector('.gz-run'), gs = go.querySelector('select'), src = go.querySelector('.gz-src');
+    var secs = SW.store.get('an.gizmoSecs', 10), cover = SW.store.get('an.gizmoCover', 0.9);
+    var F = prof ? flowBlocks(b, prof) : null, B = F ? F.blocks : [], tot = F ? F.total || 1 : 1;
+    var from = prof ? (prof.sample ? 'sample run' + (prof.sample.ai ? ', Lensman AI' : ', no pilots') : 'your run in Run') : '';
+    var bar = SW.el('div', { class: 'gz-bar' });
+    bar.innerHTML = '<button class="btn gz-run" title="Run the program here for the time chosen, both ships flown by Lensman AI, and draw the graph from that run">▶ Sample run</button>' +
+      '<select class="gz-secs" title="How long to run, in machine time">' + [5, 10, 30, 60].map(function (n) { return '<option value="' + n + '"' + (n === secs ? ' selected' : '') + '>' + n + ' s</option>'; }).join('') + '</select>' +
+      (prof ? '<span class="sep"></span><label class="check" title="The busiest blocks that together take this share of the time">Show <select class="gz-cover">' + [[0.8, '80%'], [0.9, '90%'], [0.95, '95%'], [0.99, '99%'], [1, '100%']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cover ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select> of the time</label>' : '') +
+      '<span class="gz-src hint">' + (prof ? B.length + ' blocks · ' + F.edges.length + ' edges · ' + (prof.cycles / 200000).toFixed(2) + ' s · ' + prof.instructions.toLocaleString('en-GB') + ' instructions · ' + from : 'Press ▶ Sample run, or play the game in Run and come back.') + '</span>' +
+      (prof ? '<details class="gz-about"><summary title="What the graph shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>' : '');
+    c.appendChild(bar);
+    if (!prof) c.insertAdjacentHTML('beforeend', '<p class="lede">' + lede + '</p>');
+    var gb = bar.querySelector('.gz-run'), gs = bar.querySelector('.gz-secs'), src = bar.querySelector('.gz-src');
     gs.addEventListener('change', function () { secs = +gs.value; SW.store.set('an.gizmoSecs', secs); });
     gb.addEventListener('click', function () {
       if (sampling) { sampling = null; return; }   // a second press stops it
@@ -315,12 +321,7 @@
       });
     });
     if (!prof) return null;
-    var F = flowBlocks(b, prof), B = F.blocks, tot = F.total || 1;
-    var cover = SW.store.get('an.gizmoCover', 0.9);
-    var ctl = SW.el('div', { class: 'gz-ctl' });
-    ctl.innerHTML = '<label class="check">Show the busiest blocks, together <select>' + [[0.8, '80%'], [0.9, '90%'], [0.95, '95%'], [0.99, '99%'], [1, '100%']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cover ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select> of the time</label>' +
-      '<span class="hint">' + B.length + ' blocks, ' + F.edges.length + ' edges; ' + (prof.cycles / 200000).toFixed(2) + ' s of machine time, ' + prof.instructions.toLocaleString('en-GB') + ' instructions. Click a block for its code.</span>';
-    c.appendChild(ctl);
+    var ctl = bar;
     var box = SW.el('div', { class: 'svgbox gizmo' }), figs = SW.el('div');
     c.appendChild(box); c.appendChild(figs);
     var lastSVG = '';
@@ -387,25 +388,64 @@
         var bl = B[id], p = xy(id), sh = bl.cyc / tot, heat = Math.round(8 + 62 * Math.sqrt(bl.cyc / smax));
         var lines = bl.src ? (bl.src.n1 !== bl.src.n0 ? 'lines ' + bl.src.n0 + '–' + bl.src.n1 : 'line ' + bl.src.n0) : SW.oct(bl.a0, 4);
         o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc(bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
-          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="color-mix(in srgb, var(--amber) ' + heat + '%, var(--surface))" stroke="var(--text-dim)" stroke-width="1"/>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="var(--mono)" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(bl.name) + '</text>' +
-          '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="var(--sans)" font-size="12" font-weight="700" fill="var(--text)">' + (100 * sh).toFixed(1) + '%</text>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="var(--sans)" font-size="10.5" fill="var(--text-dim)">' + SW.esc(lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
+          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--surface)"/>' +
+          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' +
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(bl.name) + '</text>' +
+          '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="700" fill="var(--text)">' + (100 * sh).toFixed(1) + '%</text>' +
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc(lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
       });
       o.push('</svg>');
       lastSVG = o.join('');
       box.innerHTML = SW.displaySVG(lastSVG);
       var hid = B.length - ids.length;
-      figs.innerHTML = '<p class="hint">Darker blocks take more of the time; the rounded block is where the run began. Solid edges are branches, dashed ones falling through into a block a branch also reaches, dotted ones a way through blocks left out; thicker for more often; an edge up or across returns to a block drawn above (a loop). ' + (hid ? hid + ' quieter block' + (hid === 1 ? '' : 's') + ' (' + (100 * (tot - acc) / tot).toFixed(1) + '% of the time) left out; the dotted edges pass through them.' : '') + '</p>';
+      figs.innerHTML = hid ? '<span class="hint">' + hid + ' quieter block' + (hid === 1 ? '' : 's') + ' (' + (100 * (tot - acc) / tot).toFixed(1) + '% of the time) left out; the dotted edges pass through them.</span> ' : '';
       figs.appendChild(SW.figureButtons(function () { return lastSVG; }, 'spacewar-' + b.v.id + '-dynamic-profile', SW.refText(b.v.id)));
+    }
+    // a block in a box: its source lines, the instructions it ran, the branches in and out
+    function inRead(bl) { SW.state.sel = { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1 }; SW.emit('goto', { p: bl.src.p, n: bl.src.n0, tab: 'read' }); }
+    var dlg = null;
+    function openBlock(id) {
+      var bl = B[id], esc = SW.esc, C = root.PDP1CPU;
+      if (!dlg) {
+        dlg = SW.el('dialog', { class: 'tray-big gz-dlg' });
+        document.body.appendChild(dlg);
+        dlg.addEventListener('click', function (e) {
+          if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
+          var j = e.target.closest('[data-gb]'); if (j) { openBlock(+j.dataset.gb); return; }
+          if (e.target.closest('[data-read]')) { dlg.close(); inRead(B[+dlg.dataset.b]); }
+        });
+        dlg.addEventListener('close', function () { dlg.remove(); dlg = null; });
+      }
+      dlg.dataset.b = id;
+      var ref = bl.src ? SW.refText(b.v.id, bl.src.p, bl.src.n0, bl.src.n1, b.parts.length) : '';
+      var src = bl.src ? b.lines[bl.src.p].slice(bl.src.n0 - 1, bl.src.n1).map(function (L) {
+        return '<div class="gz-l"><span class="n">' + L.n + '</span><span class="t">' + esc(L.raw) + '</span></div>'; }).join('') : '';
+      var words = [];
+      for (var a = bl.a0; a <= bl.a1; a++) {
+        var w = b.asm.memory[a];
+        words.push('<tr><td class="mono">' + SW.oct(a, 4) + '</td><td class="mono">' + esc(w ? C.disasm(w.val, b.symAt) : '') + '</td><td class="num">' + prof.steps[a].toLocaleString('en-GB') + '</td><td class="num">' + Math.round(prof.cyc[a] * 5).toLocaleString('en-GB') + '</td></tr>');
+      }
+      function links(list, other) {
+        return list.length ? list.sort(function (x, y) { return y.n - x.n; }).map(function (e) {
+          var o = B[other(e)];
+          return '<button class="btn ghost" data-gb="' + o.i + '" title="Open this block">' + esc(o.name) + ' <span class="faint">' + (e.kind === 'fall' ? 'falls through, ' : '') + '×' + e.n.toLocaleString('en-GB') + '</span></button>';
+        }).join(' ') : '<span class="faint">none</span>';
+      }
+      var ins = F.edges.filter(function (e) { return e.t === id && e.f !== id; }), outs = F.edges.filter(function (e) { return e.f === id && e.t !== id; }), self = F.edges.filter(function (e) { return e.f === id && e.t === id; })[0];
+      dlg.innerHTML = '<div class="tray-bighead"><b>' + esc(bl.name) + '</b> <span class="faint mono">' + esc(ref) + '</span><span class="refhelp-acts">' +
+        (bl.src ? '<button class="btn" data-read title="This code in Read, in its context">Read in context ↗</button>' : '') +
+        '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+        '<p class="hint">' + (100 * bl.cyc / tot).toFixed(2) + '% of the time (' + Math.round(bl.cyc * 5).toLocaleString('en-GB') + ' µs); entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (bl.a1 - bl.a0 + 1) + ' instruction' + (bl.a1 > bl.a0 ? 's' : '') + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + ')' + (self ? '; loops on itself ×' + self.n.toLocaleString('en-GB') : '') + (id === F.entry ? '; the run began here' : '') + '.</p>' +
+        '<div class="gz-cols"><div><h4>The source</h4><div class="listing gz-src-l">' + (src || '<p class="faint">No source line.</p>') + '</div></div>' +
+        '<div><h4>The instructions run</h4><table class="ov-sub"><thead><tr><th>Address</th><th>As assembled</th><th>Times</th><th>µs</th></tr></thead><tbody>' + words.join('') + '</tbody></table></div></div>' +
+        '<h4>Comes from</h4><p>' + links(ins, function (e) { return e.f; }) + '</p><h4>Goes to</h4><p>' + links(outs, function (e) { return e.t; }) + '</p>';
+      if (!dlg.open) dlg.showModal();
     }
     box.addEventListener('click', function (e) {
       var g = e.target.closest('[data-b]'); if (!g) return;
-      var bl = B[+g.dataset.b]; if (!bl.src) return;
-      SW.state.sel = { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1 };
-      SW.emit('goto', { p: bl.src.p, n: bl.src.n0, tab: 'read' });
+      openBlock(+g.dataset.b);
     });
-    ctl.querySelector('select').addEventListener('change', function (e) { cover = +e.target.value; SW.store.set('an.gizmoCover', cover); draw(); });
+    ctl.querySelector('.gz-cover').addEventListener('change', function (e) { cover = +e.target.value; SW.store.set('an.gizmoCover', cover); draw(); });
     draw();
     // the blocks and branches as tables
     var trows = B.slice().sort(function (x, y) { return y.cyc - x.cyc; }).map(function (bl) {
@@ -413,7 +453,7 @@
     });
     var c2 = card('The blocks', 'Each block of sequential code the run passed through, busiest first: its length, how often it was entered, the instructions run in it, and the time.');
     var s2 = SW.el('div', { class: 'scroll' });
-    s2.appendChild(SW.table(['Block', 'Reference', 'Length', 'Entered', 'Instructions run', 'Time (µs)', '% of time'], trows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num'], onRow: function (r) { var bl = B.filter(function (x) { return x.name === r[0]; })[0]; if (bl && bl.src) { SW.state.sel = { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1 }; SW.emit('goto', { p: bl.src.p, n: bl.src.n0, tab: 'read' }); } } }));
+    s2.appendChild(SW.table(['Block', 'Reference', 'Length', 'Entered', 'Instructions run', 'Time (µs)', '% of time'], trows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num'], onRow: function (r) { var bl = B.filter(function (x) { return x.name === r[0]; })[0]; if (bl) openBlock(bl.i); } }));
     c2.appendChild(s2); el.appendChild(c2);
     var erows = F.edges.slice().sort(function (x, y) { return y.n - x.n; }).map(function (e) { return [B[e.f].name, B[e.t].name, e.kind === 'fall' ? 'falls through' : 'branch', e.n]; });
     var c3 = card('The branches', 'Each edge between blocks, most taken first.');
