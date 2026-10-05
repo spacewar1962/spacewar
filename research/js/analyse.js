@@ -717,13 +717,19 @@
         var dlg = dialog('<div class="tray-bighead"><b>' + esc(label) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span>' + gzNameField(rName(r), label) + '<span class="refhelp-acts"><button class="btn ghost" data-keep title="This routine in both versions, with its name and figures, in My notes (private)">＋ My notes</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
           '<table class="ov-sub gz-q gz-q2"><thead><tr><th></th><th>' + esc(r.a ? ref(GA, r.a) : ra + ': Inserted or moved') + '</th><th>' + esc(r.b ? ref(GB, r.b) : rb + ': Removed or moved') + '</th></tr></thead><tbody>' +
             figs.map(function (q) { return '<tr><th>' + q[0] + '</th><td>' + esc(q[1]) + '</td><td>' + esc(q[2]) + '</td></tr>'; }).join('') + '</tbody></table>' +
-          '<h4>Its blocks</h4><div class="sbs-row sbs-head gz-sbs"><div>' + esc(ra) + '</div><div></div><div>' + esc(rb) + '</div></div>' +
+          '<h4>Its blocks</h4><div class="gz-sbs"><div class="sbs-row sbs-head"><div>' + esc(ra) + '</div><div></div><div>' + esc(rb) + '</div></div></div>' +
           '<div class="gz-sbs gz-sbs-in">' + items.map(function (it) { var k = kindOf(it.id); return '<div class="sbs-row k-' + k + '" data-id="' + it.id + '" title="Click for the code in both versions"><div class="sbs-a">' + (cell(it.a, dA) || '<span class="faint">Inserted or moved</span>') + '</div><div class="sbs-mid"><span class="gz-k gz-k-' + k + '">' + k + '</span></div><div class="sbs-b">' + (cell(it.b, dB) || '<span class="faint">Removed or moved</span>') + '</div></div>'; }).join('') + '</div>' +
-          '<p class="hint">Click a block for its code in both versions.</p>');
+          '<div class="gz-bv"><p class="hint">Click a block above for its code in both versions.</p></div>');
+        function showBlock(bid) {
+          var bv = dlg.querySelector('.gz-bv'); bv.innerHTML = blockHTML(bid, false);
+          SW.$$('.gz-sbs-in .sbs-row', dlg).forEach(function (row) { row.classList.toggle('on', row.dataset.id === bid); });
+        }
+        var first = items.filter(function (it) { return kindOf(it.id) !== 'same'; })[0] || items[0];
+        if (first) showBlock(first.id);
         dlg.addEventListener('click', function (e) {
           if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
           if (e.target.closest('[data-keep]')) { keepRoutine(r, items, figs); return; }
-          var it = e.target.closest('[data-id]'); if (it) openBlock(it.dataset.id);
+          var it = e.target.closest('[data-id]'); if (it) { showBlock(it.dataset.id); var bv = dlg.querySelector('.gz-bv'); if (bv.getBoundingClientRect().top > dlg.getBoundingClientRect().bottom - 80) bv.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
         });
         dlg.addEventListener('change', function (e) {
           if (!e.target.closest('.gz-name')) return;
@@ -744,15 +750,19 @@
       }
       // a block: its code in both versions, side by side
       function openBlock(id) {
+        var dlg = dialog(blockHTML(id, true));
+        dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) dlg.close(); });
+      }
+      // a block's code in both versions, side by side (in its own box, or under a routine's blocks)
+      function blockHTML(id, own) {
         var isA = id.charAt(0) === 'a', n = +id.slice(1), y = isA ? null : GB.blocks[n], xi = isA ? n : C.mB[n], x = xi == null ? null : GA.blocks[xi], k = kindOf(id);
         var la = x ? x.lines : [], lb = y ? y.lines : [], d = ST.lineDiff(la.map(function (l) { return l.key; }), lb.map(function (l) { return l.key; }));
         function cell(l, mark) { return l ? '<div class="gz-l ' + mark + '"><span class="n">' + l.n + '</span><span class="t">' + esc(l.raw) + '</span></div>' : '<div class="gz-l gap"></div>'; }
         var rowsH = d.map(function (q) { return '<div class="gz-pair">' + cell(q[1] != null ? la[q[1]] : null, q[0] === '-' ? 'del' : '') + cell(q[2] != null ? lb[q[2]] : null, q[0] === '+' ? 'add' : '') + '</div>'; }).join('');
         function link(G, bl, label) { if (!bl || !bl.src) return ''; var u = location.pathname + '?v=' + encodeURIComponent(G.b.v.id) + '&tab=read&l=' + bl.src.p + ':' + bl.src.n0 + (bl.src.n1 > bl.src.n0 ? '-' + bl.src.n1 : ''); return '<a class="btn" href="' + esc(u) + '" target="_blank" rel="noopener" title="These lines in Read, in a new tab">' + label + ' ↗</a>'; }
-        var dlg = dialog('<div class="tray-bighead"><b>' + esc((x ? x.name : '') + (x && y && x.name !== y.name ? ' → ' : '') + (y && (!x || x.name !== y.name) ? y.name : '')) + '</b> <span class="gz-k gz-k-' + k + '">' + k + '</span><span class="refhelp-acts">' + link(GA, x, 'Read in ' + ra) + link(GB, y, 'Read in ' + rb) + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+        return ('<div class="tray-bighead' + (own ? '' : ' gz-bvh') + '"><b>' + esc((x ? x.name : '') + (x && y && x.name !== y.name ? ' → ' : '') + (y && (!x || x.name !== y.name) ? y.name : '')) + '</b> <span class="gz-k gz-k-' + k + '">' + k + '</span><span class="refhelp-acts">' + link(GA, x, 'Read in ' + ra) + link(GB, y, 'Read in ' + rb) + (own ? '<button class="icon-btn" data-x title="Close (Esc)">✕</button>' : '') + '</span></div>' +
           '<div class="gz-pair gz-pairh"><div>' + esc(x ? ref(GA, x) : ra + ': Inserted or moved') + '</div><div>' + esc(y ? ref(GB, y) : rb + ': Removed or moved') + '</div></div>' +
           '<div class="listing gz-src-l gz-cmpl">' + rowsH + '</div><p class="hint">Comments and spacing are left out of the comparison; lines shown as held.</p>');
-        dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) dlg.close(); });
       }
     }
     return function () {

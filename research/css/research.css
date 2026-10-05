@@ -1791,3 +1791,7 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .gz-q2 { width: 100%; table-layout: fixed; }
 .gz-q2 th:first-child { width: 11em; }
 .gz-t { float: right; font-variant-numeric: tabular-nums; color: var(--text-dim); font-size: 12px; }
+.gz-bv { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.gz-bv .gz-bvh { margin-bottom: 6px; }
+.gz-sbs-in .sbs-row.on .sbs-a, .gz-sbs-in .sbs-row.on .sbs-b { box-shadow: 0 0 0 2px var(--beam); }
+.gz-sbs-in { max-height: 40vh; }
