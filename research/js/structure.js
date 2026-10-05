@@ -181,7 +181,8 @@
 
   // ---------- drawing ----------
   // nodes: [{ id, name, sub, cls }]; edges: [{ f, t, cls, tip }]; entry: a node id
-  S.layout = function (nodes, edges, entry) {
+  S.layout = function (nodes, edges, entry, perRow) {
+    perRow = perRow || 7;
     var adj = {}, depth = {};
     edges.forEach(function (e) { (adj[e.f] = adj[e.f] || []).push(e.t); });
     var q = [entry != null ? entry : nodes[0].id]; depth[q[0]] = 0;
@@ -193,7 +194,7 @@
     var order = {}; nodes.forEach(function (n, i) { order[n.id] = n.ord != null ? n.ord : i; });
     ids.sort(function (x, y) { return ((depth[x] == null ? 1e9 : depth[x]) - (depth[y] == null ? 1e9 : depth[y])) || (order[x] - order[y]); });
     var rows = [], lastD = null;
-    ids.forEach(function (id) { var d = depth[id] == null ? 1e9 : depth[id]; if (d !== lastD || rows[rows.length - 1].length >= 7) { rows.push([]); lastD = d; } rows[rows.length - 1].push(id); });
+    ids.forEach(function (id) { var d = depth[id] == null ? 1e9 : depth[id]; if (d !== lastD || rows[rows.length - 1].length >= perRow) { rows.push([]); lastD = d; } rows[rows.length - 1].push(id); });
     var pos = {};
     function place() { rows.forEach(function (r, ri) { r.forEach(function (id, k) { pos[id] = { r: ri, k: k }; }); }); }
     place();

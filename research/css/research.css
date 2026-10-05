@@ -1774,3 +1774,10 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 @media (max-width: 700px) { .gz-sbs .sbs-row { grid-template-columns: 1fr 90px 1fr; } }
 .gz-k-moved { border-style: dashed; }
 .gz-sbs .k-moved .sbs-a, .gz-sbs .k-moved .sbs-b { border-style: dashed; }
+.gz-flow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+.gz-flow2 .fl-h { font: 600 12.5px var(--sans); color: var(--text-dim); margin: 0 0 4px 2px; }
+.gz-flow2 .fl-box { overflow: auto; max-height: calc(100vh - 230px); }
+.gz-flow2 .fl-box svg { width: 100%; height: auto; display: block; }
+.gz-flow2 .gz-node:hover rect + rect { stroke: var(--text); stroke-width: 2; }
+.fl-key { margin: 6px 0; }
+@media (max-width: 800px) { .gz-flow2 { grid-template-columns: 1fr; } }
