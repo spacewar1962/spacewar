@@ -726,6 +726,7 @@
           '<div class="gz-pane" data-pane="code" hidden><div class="gz-bv"></div></div>');
         var cur = null;
         function view(v) {
+          dlg.style.minHeight = Math.max(dlg.offsetHeight, parseFloat(dlg.style.minHeight) || 0) + 'px';   // the box keeps its size between the two views
           SW.$$('[data-view]', dlg).forEach(function (bt) { bt.classList.toggle('on', bt.dataset.view === v); });
           SW.$$('.gz-pane', dlg).forEach(function (pn) { pn.hidden = pn.dataset.pane !== v; });
           dlg.querySelector('.gz-step').hidden = v !== 'code';
