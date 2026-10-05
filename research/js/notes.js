@@ -677,10 +677,17 @@
       ? '<span class="st st-help" title="Help wanted (💡 from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '; ✅ resolves it)">HELP!</span>'
       : '<span class="st st-open" title="Open: a question still to be answered (🔓 from ' + SW.esc(s.by) + ', ' + SW.esc(SW.fmtDate(s.date)) + '; ✅ resolves it)">OPEN</span>';
   }
+  // Each annotation's code: from its id, so it is the same for everyone and never changes
+  // (A- for an annotation, R- for a reply; the group's findings are C-, My notes initials-N)
+  N.code = function (n) {
+    if (!n || !n.id || n.source === 'buildlog') return '';
+    var h = 5381, id = String(n.id); for (var k = 0; k < id.length; k++) h = ((h * 33) ^ id.charCodeAt(k)) >>> 0;
+    return (n.parent ? 'R-' : 'A-') + h.toString(36).toUpperCase().slice(-5).padStart(5, '0');
+  };
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +
-      '<div class="by">' + (!isReply && N.isOpen(N.statusOf(reactions).state) ? statusChip(N.statusOf(reactions)) + ' ' : '') + '<b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
+      '<div class="by">' + (!isReply && N.isOpen(N.statusOf(reactions).state) ? statusChip(N.statusOf(reactions)) + ' ' : '') + (N.code(n) ? '<span class="ncode mono" data-copy="' + N.code(n) + '" title="Its code, which does not change: click to copy">' + N.code(n) + '</span> ' : '') + '<b>' + SW.esc(n.by) + '</b> · ' + SW.esc(SW.fmtDate(n.date)) +
       (who ? ' · ' + SW.esc(who) : '') + (n.source === 'draft' ? ' · <i>draft</i>' : '') + (n.dev ? ' · <span class="dev-badge" title="Developer only: hidden on the bench unless Developer mode is on (⚙)">dev</span>' : '') +
       ((n.updated && String(n.updated).slice(0, 16) !== String(n.date).slice(0, 16)) || SW.noteHistory.list(n.text).length ? ' · ' + (SW.noteHistory.list(n.text).length
         ? '<button type="button" class="hist" data-act="history" title="See the earlier wordings">edited ' + SW.esc(SW.fmtDate(n.updated || n.date)) + ' · ' + SW.noteHistory.list(n.text).length + ' earlier</button>'

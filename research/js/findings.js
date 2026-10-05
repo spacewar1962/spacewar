@@ -338,8 +338,11 @@
       N.bin(n).then(function () { did('Finding moved to the bin', function () { return N.restore(n); }); }, function (err) { SW.toast(err.message, 5000); });
     } }, '🗑 Delete'));
     box.appendChild(SW.el('button', { class: 'btn ghost', title: 'Take it out of the group and back into My notes, private', onclick: function () {
-      if (!confirm('Take this finding out of the group and back into My notes?')) return;
-      N.bin(n).then(function () { SW.tray.recall(n); did('Back in My notes', function () { SW.tray.undo(); return N.restore(n); }); }, function (err) { SW.toast(err.message, 5000); });
+      var nr = threadOf(n) ? countReplies(threadOf(n)) : 0;
+      if (!confirm('Take this finding out of the group and back into My notes?' + (nr ? ' Its ' + nr + ' comment' + (nr === 1 ? '' : 's') + ' from the group will come with it, into the note.' : ''))) return;
+      // the group's replies come with it, into the note (they stay with the finding in the bin, and return if it is restored)
+      var said = []; (function walk(rs) { rs.forEach(function (r) { said.push({ by: r.note.by, date: r.note.date, text: r.note.text }); walk(r.replies); }); })((threadOf(n) || { replies: [] }).replies);
+      N.bin(n).then(function () { SW.tray.recall(n, said); did('Back in My notes' + (said.length ? ', with ' + said.length + ' comment' + (said.length === 1 ? '' : 's') : ''), function () { SW.tray.undo(); return N.restore(n); }); }, function (err) { SW.toast(err.message, 5000); });
     } }, '↩ Recall to My notes'));
     return box;
   }
@@ -410,7 +413,7 @@
   function countReplies(t) { return t.replies.reduce(function (a, r) { return a + 1 + countReplies(r); }, 0); }
   // A finding in a large window: its whole text and figure, its tags, and
   // what others have added (replies and reactions), with a reply box.
-  function openFinding(n, i, title, fp, c, lvl, where) {
+  function openFinding(n, i, title, fp, c, lvl, where, toReply) {
     var d = SW.el('dialog', { class: 'tray-big fd-big' });
     var rest = fp.text.split('\n').slice(1).join('\n').trim();
     var tags = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); });
@@ -453,6 +456,7 @@
     });
     d.addEventListener('close', function () { d.remove(); });
     d.showModal();
+    if (toReply) { var ta = SW.$('.fd-replybox textarea', d); if (ta) { ta.scrollIntoView({ block: 'center' }); ta.focus(); } }
   }
   function groupCard(n, i, c, lvl) {
       {
@@ -464,7 +468,13 @@
         li.innerHTML = '<div class="fd-head"><button class="icon-btn fd-open" title="Open: the whole finding, replies and reactions">⤢</button><span class="fd-no fd-ref mono" title="Its reference, which does not change">' + refOf(n) + '</span> <b class="fd-title">' + SW.md(title).replace(/^<p>|<\/p>$/g, '') + '</b> <span class="badge" style="background:' + colourOf(n.by) + ';color:#000">' + SW.esc(n.by) + '</span>' + chips(c, lvl) + ' <span class="hint">' + SW.esc(SW.fmtDate(n.date)) + '</span></div>' +
           (rest ? '<div class="note-md">' + SW.md(rest) + '</div>' : '') + ((n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^(cat|level):/.test(g); }).map(function (g) { return /^note:/.test(g) ? '<span class="fd-tag fd-noteref mono" title="The note in its author’s My notes that this was shared from">from ' + SW.esc(g.slice(5)) + '</span>' : '<span class="fd-tag">' + SW.esc(g.replace(/^chapter:/, '')) + '</span>'; }).join(' ') || '') + '<div class="fd-ev"><span class="hint">Evidence </span><a href="#" class="fd-go">' + SW.esc(where) + '</a></div>';
         if (nrep || nrx || R0) SW.$('.fd-ev', li).insertAdjacentHTML('beforeend', ' <a href="#" class="fd-replies">' + [nrep ? nrep + (nrep === 1 ? ' reply' : ' replies') : '', nrx ? emojiOf(th).map(function (r) { return r.text; }).join('') : '', R0 ? 'crew ' + (Math.round(R0.avg * 10) / 10) + '★ (' + R0.n + ')' : ''].filter(Boolean).join(' · ') + '</a>');
-        li.addEventListener('click', function (e) { if (e.target.closest('.fd-open, .fd-title, .fd-replies')) { e.preventDefault(); openFinding(n, i, title, fp, c, lvl, where); } });
+        li.addEventListener('click', function (e) {
+          if (e.target.closest('.fd-open, .fd-title, .fd-replies')) { e.preventDefault(); openFinding(n, i, title, fp, c, lvl, where); return; }
+          if (e.target.closest('[data-freply]')) { e.preventDefault(); openFinding(n, i, title, fp, c, lvl, where, true); return; }
+          // anywhere else on the card that is not a control opens it to read
+          if (!e.target.closest('a, button, input, textarea, select, label, .fd-edit, .fd-fig, .fd-fold, details')) openFinding(n, i, title, fp, c, lvl, where);
+        });
+        li.classList.add('fd-click');
         SW.$('.fd-go', li).onclick = function (e) {
           e.preventDefault();
           if (n.anchor) SW.state.sel = { p: n.anchor.p, n0: n.anchor.n0, n1: n.anchor.n1 };
@@ -480,6 +490,7 @@
             fbox._svg = svg;
           }, function (e) { fbox.innerHTML = '<p class="hint">' + SW.esc(e.message) + '</p>'; });
         }
+        li.appendChild(SW.el('button', { class: 'btn ghost fd-replybtn', 'data-freply': '1', title: 'Read it, with what others have said, and reply' }, '💬 ' + (nrep ? nrep + ' repl' + (nrep === 1 ? 'y' : 'ies') + ' · ' : '') + 'Reply'));
         if (N.mine(n)) li.appendChild(ownActions(n, li));
         if (fp.b64) li.appendChild(SW.el('button', { class: 'btn ghost fd-mine', title: 'Put this finding’s figure in My notes (private)', onclick: function () { var fb = SW.$('.fd-fig', li); if (fb && fb._svg) SW.tray.addFigure(fb._svg, title); } }, '＋ My notes'));
         else li.appendChild(mineButton(function () { return { title: title, subtitle: n.by + ', ' + SW.fmtDate(n.date) + '; ' + where, blocks: rest ? [{ type: 'p', text: rest }] : [] }; }, { by: n.by, vid: n.vid, shared: { date: n.date }, tags: (n.tags || []).filter(function (g) { return !/^findings?$|^chapter:/i.test(g); }) }));

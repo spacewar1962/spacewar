@@ -160,22 +160,25 @@
   // A group finding of one's own, back into My notes: into the note it was
   // shared from if that is still here (no longer marked shared), else as a new
   // paragraph with its version, initials, tags and chapter.
-  T.recall = function (n) {
+  T.recall = function (n, comments) {
     snap();
+    comments = comments || [];
+    var said = comments.length ? '\n\n**Comments from the group**\n\n' + comments.map(function (c) { return '> **' + c.by + '**, ' + SW.fmtDate(c.date) + ': ' + String(c.text || '').replace(/\n/g, '\n> '); }).join('\n\n') : '';
     var t = load(), tags = (n.tags || []).filter(function (g) { return !/^findings?$/i.test(g) && !/^chapter:/.test(g); });
     var ch = (n.tags || []).filter(function (g) { return /^chapter:/.test(g); }).map(function (g) { return g.slice(8); })[0] || '';
     var it = t.items.filter(function (z) { return z.shared && z.shared.id && z.shared.id === n.id; })[0];
     if (it) {
       delete it.shared;
-      if (it.kind === 'text') it.text = n.text;
+      if (it.kind === 'text') it.text = n.text + said;
+      else if (said) it.note = (it.note ? it.note + '\n\n' : '') + said.trim();
       it.tags = tags; it.chapter = ch;
       save(t); paint();
       SW.toast('Back in My notes');
       return;
     }
     var sp = SW.figpack.split(n.text), extra = { vid: n.vid, by: n.by, tags: tags, chapter: ch, anchor: n.anchor || null, quote: n.quote || '' };
-    if (sp.b64) { SW.figpack.unpack(sp.b64).then(function (svg) { var ls = sp.text.split('\n'); add({ kind: 'figure', svg: svg, caption: ls[0], note: ls.slice(1).join('\n').trim() }, extra); }); return; }
-    add({ kind: 'text', caption: '', text: n.text, from: '' }, extra);
+    if (sp.b64) { SW.figpack.unpack(sp.b64).then(function (svg) { var ls = sp.text.split('\n'); add({ kind: 'figure', svg: svg, caption: ls[0], note: (ls.slice(1).join('\n').trim() + said).trim() }, extra); }); return; }
+    add({ kind: 'text', caption: '', text: n.text + said, from: '' }, extra);
   };
   // Notes from an exported file (or a backup) come in beside those here; a note
   // already here (the same id) is left as it is.
@@ -223,6 +226,33 @@
   }
   var openDocs = {};   // excerpts left open, this session
   // a note in a large window: a figure at full size, an excerpt all open
+  // The notes shared to Findings, apart from the list: each can be opened, or kept in the list too
+  function sharedView() {
+    var d = SW.el('dialog', { class: 'tray-big tray-shbox' });
+    function draw() {
+      var t = load(), rows = t.items.map(function (it, i) { return { it: it, i: i }; }).filter(function (r) { return sharedAway(r.it); });
+      d.innerHTML = '<div class="tray-bighead"><b>Shared to Findings</b> <span class="faint">(' + rows.length + ')</span><button class="icon-btn" data-x title="Close (Esc)">✕</button></div>' +
+        '<p class="hint">Notes you have sent to the group’s Findings, kept here so the list holds what is still your own work. They stay in Findings either way.</p>' +
+        (rows.length ? '<ul class="tray-shlist">' + rows.map(function (r) {
+          var it = r.it, lab = it.kind === 'figure' ? 'Figure' : it.kind === 'text' ? 'Paragraph' : 'Excerpt';
+          return '<li data-kind="' + SW.esc(it.kind || 'doc') + '" data-i="' + r.i + '"><span class="tray-ref mono">' + SW.esc(it.ref || '') + '</span> <b>' + SW.esc(it.caption || lab) + '</b>' +
+            (it.vid ? ' <span class="tray-v mono">' + SW.esc(vShort(it.vid)) + '</span>' : '') + ' <span class="badge tray-by">' + SW.esc(it.by || '?') + '</span>' +
+            ' <span class="faint">shared ' + SW.esc(it.shared.date ? SW.fmtDate(it.shared.date) : '') + (it.shared.draft ? ' (draft)' : '') + '</span>' +
+            '<span class="tray-acts"><button class="btn ghost" data-s="big" title="Open larger">⤢ Open</button><button class="btn ghost" data-s="keep" title="Show it in the list again, marked as in Findings">↩ Back to the list</button></span></li>';
+        }).join('') + '</ul>' : '<p class="hint">None.</p>');
+    }
+    draw();
+    document.body.appendChild(d);
+    d.addEventListener('click', function (e) {
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); return; }
+      var b = e.target.closest('[data-s]'); if (!b) return;
+      var i = +b.closest('[data-i]').dataset.i, x = load();
+      if (b.dataset.s === 'big') bigView(x.items[i]);
+      else { x.items[i].shared.keep = true; save(x); paint(); draw(); }
+    });
+    d.addEventListener('close', function () { d.remove(); });
+    d.showModal();
+  }
   function bigView(it) {
     if (!it) return;
     var d = SW.el('dialog', { class: 'tray-big' });
@@ -266,9 +296,12 @@
   var CHAPTERS = ['Introduction', 'Chapter 1', 'Chapter 2', 'Chapter 3', 'Chapter 4', 'Chapter 5', 'Chapter 6', 'Chapter 7', 'Chapter 8', 'Conclusion', 'Appendix'];
   function vShort(id) { var v = id && root.SWVersions.byId(id); return v ? v.label.replace(/^Spacewar! /, '') : ''; }
   function uniq(a) { return a.filter(function (x, i) { return x && a.indexOf(x) === i; }); }
+  // a note shared from here to the group's Findings (it carries the finding's id), not asked back into the list
+  function sharedAway(it) { return !!(it.shared && it.shared.id && !it.shared.keep); }
   function shown(t) {   // the items the filters let through, with their places in the list
     var f = t.filter || {}, out = [];
     t.items.forEach(function (it, i) {
+      if (sharedAway(it)) return;   // shared from here to Findings: in the Shared box, not the list
       if (t.chapter && t.chapter !== '*' && (it.chapter || '') !== (t.chapter === '-' ? '' : t.chapter)) return;
       if (f.v && it.vid !== f.v) return;
       if (f.tag && (it.tags || []).indexOf(f.tag) < 0) return;
@@ -331,6 +364,8 @@
     tb.appendChild(ub);
     var binB = SW.el('button', { class: 'btn ghost ov-binbtn' + (binOpen ? ' on' : ''), title: (binOpen ? 'Close the bin' : 'Open the bin') + ' (' + (t.bin || []).length + ')', onclick: function () { binOpen = !binOpen; paint(); } }, '🗑' + ((t.bin || []).length ? '<sup>' + t.bin.length + '</sup>' : ''));
     tb.appendChild(binB);
+    var nShared = t.items.filter(sharedAway).length;
+    if (nShared) tb.appendChild(SW.el('button', { class: 'btn ghost', title: 'The notes you have shared to the group’s Findings, kept here apart from the list', onclick: function () { sharedView(); } }, '↗ Shared (' + nShared + ')'));
     tb.appendChild(more);
     head.addEventListener('change', function (e) {
       var f = e.target.dataset.f, x = load(), val = e.target.value;
@@ -354,7 +389,7 @@
     vis.forEach(function (i, k) {
       var it = t.items[i];
       var lab = it.kind === 'figure' ? 'Figure ' + (++fig) : it.kind === 'text' ? 'Paragraph' : 'Excerpt';
-      var li = SW.el('li', { class: 'tray-item', 'data-i': i });
+      var li = SW.el('li', { class: 'tray-item', 'data-i': i, 'data-kind': it.kind || 'doc' });
       li.innerHTML = '<div class="tray-row"><span class="tray-ref mono" title="Its number, which does not change">' + SW.esc(it.ref || '') + '</span><b>' + lab + '</b>' +
         (it.vid ? ' <span class="tray-v mono">' + SW.esc(vShort(it.vid)) + '</span> ' + SW.refTag(it.vid) : '') +
         ' <span class="badge tray-by" title="Signed">' + SW.esc(it.by || '?') + '</span>' + (it.syncErr ? ' <span class="tray-local" title="' + SW.esc(it.syncErr) + '">⚠ this browser only</span>' : '') +
@@ -365,7 +400,7 @@
         '<div class="tray-meta"><label>Chapter <input class="tray-ch" list="tray-chs" value="' + SW.esc(it.chapter || '') + '" placeholder="none"></label>' +
         '<label>Tags <input class="tray-tags" value="' + SW.esc((it.tags || []).join(', ')) + '" placeholder="comma separated"></label>' +
         '<label title="Carried to Findings when shared">Importance <select class="tray-lvl">' + [['key', '★★★ Key'], ['notable', '★★ Notable'], ['minor', '★ Minor']].map(function (l) { return '<option value="' + l[0] + '"' + ((it.level || 'notable') === l[0] ? ' selected' : '') + '>' + l[1] + '</option>'; }).join('') + '</select></label>' +
-        (it.shared ? '<span class="hint tray-shared">In Findings' + (it.shared.date ? ', ' + SW.esc(SW.fmtDate(it.shared.date)) : '') + (it.shared.draft ? ' (draft)' : '') + '</span>'
+        (it.shared ? '<span class="hint tray-shared">In Findings' + (it.shared.date ? ', ' + SW.esc(SW.fmtDate(it.shared.date)) : '') + (it.shared.draft ? ' (draft)' : '') + '</span> <button class="btn ghost" data-a="unkeep" title="Put it back with your shared notes, out of this list">↗ To Shared</button>'
                    : '<button class="btn ghost" data-a="share" title="Send to the group’s Findings, signed ' + SW.esc(it.by || SW.me().initials || '') + '">↗ Share to Findings</button>') + '</div>';
       list.appendChild(li);
     });
@@ -380,6 +415,7 @@
       var i = +b.closest('.tray-item').dataset.i, x = load();
       if (b.dataset.a === 'share') { share(i); return; }
       if (b.dataset.a === 'big') { bigView(x.items[i]); return; }
+      if (b.dataset.a === 'unkeep') { if (x.items[i].shared) { x.items[i].shared.keep = false; save(x); paint(); } return; }
       snap();
       if (b.dataset.a === 'del') { toBin(x, [i]); save(x); paint(); SW.toast('Moved to the bin', 0, undoAct); return; }
       var k = vis.indexOf(i), j = vis[b.dataset.a === 'up' ? k - 1 : k + 1]; var tmp = x.items[i]; x.items[i] = x.items[j]; x.items[j] = tmp;
@@ -435,6 +471,22 @@
     if (T.undo()) e.preventDefault();
   });
 
+  // What a note holds, as text for a finding: its paragraphs, its tables row by row,
+  // its code (to 40 lines), and any annotations it carries
+  function blocksText(bl, vid) {
+    return bl.map(function (b) {
+      if (b.type === 'p') return b.text || '';
+      if (b.type === 'h2' || b.type === 'h3') return b.text ? '**' + b.text + '**' : '';
+      if (b.type === 'table') {
+        var h = (b.head || []).map(cellText);
+        return (b.caption ? '**' + b.caption + '**\n' : '') + (h.some(Boolean) ? '_' + h.filter(Boolean).join(' · ') + '_\n' : '') +
+          (b.rows || []).slice(0, 40).map(function (r) { return '- ' + r.map(cellText).filter(function (x) { return x !== ''; }).join(' · '); }).join('\n');
+      }
+      if (b.type === 'code') return (b.caption || SW.refText(vid)) + '\n```\n' + (b.lines || []).slice(0, 40).map(function (l) { return (l.n != null ? l.n + '  ' : '') + l.text; }).join('\n') + '\n```';
+      if (b.type === 'note') return '> ' + (b.by ? b.by + ': ' : '') + String(b.text || '').replace(/\n/g, '\n> ');
+      return '';
+    }).filter(function (z) { return z && String(z).trim(); }).join('\n\n');
+  }
   // A note as a finding: the first line its title, then the note, then an
   // excerpt of what it holds; tagged finding, its tags, and its chapter.
   function share(i) {
@@ -444,8 +496,8 @@
     var vid = it.vid || SW.state.v;
     var title = it.kind === 'text' ? '' : (it.caption || 'Excerpt');
     var body = [title, it.kind === 'text' ? it.text : it.note].filter(function (z) { return z && String(z).trim(); }).join('\n\n');
-    var code = (it.blocks || []).filter(function (b) { return b.type === 'code'; })[0];
-    if (code) body += '\n\n' + (code.caption ? code.caption + '\n' : SW.refText(vid) + '\n') + code.lines.slice(0, 12).map(function (l) { return (l.n != null ? l.n + '  ' : '') + l.text; }).join('\n');
+    var held = blocksText(it.blocks || [], vid);
+    if (held) body += '\n\n' + held;
     if (!body.trim()) { SW.toast('Write something first: the first line is the finding’s title.', 4000); return; }
     if (!confirm('Share with the group’s Findings, signed ' + by + ', on ' + (vShort(vid) || 'the version open') + '?')) return;
     var tags = ['finding'].concat(it.tags || []).concat(it.chapter ? ['chapter:' + it.chapter] : []).concat(['level:' + (it.level || 'notable')]).concat(it.ref ? ['note:' + it.ref] : []);

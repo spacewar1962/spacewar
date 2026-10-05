@@ -725,8 +725,15 @@ dialog.wire-dlg { width: min(560px, 94vw); }
 .tray-head label { display: grid; gap: 4px; font-size: 13px; }
 .tray-head input { padding: 6px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
 .tray-list { list-style: none; padding: 0; margin: 8px 0; }
-.tray-item { border: 1px solid var(--line-soft); border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; }
-.tray-row { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.tray-item { border: 1px solid var(--line); border-left: 4px solid var(--kind, var(--text-faint)); border-radius: 7px; padding: 0 12px 10px; margin-bottom: 18px; background: var(--surface); box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+.tray-item[data-kind="figure"], .tray-shlist li[data-kind="figure"] { --kind: var(--beam); }
+.tray-item[data-kind="doc"], .tray-shlist li[data-kind="doc"] { --kind: var(--violet); }
+.tray-item[data-kind="text"], .tray-shlist li[data-kind="text"] { --kind: var(--green); }
+.tray-row { display: flex; align-items: center; gap: 8px; font-size: 13px; margin: 0 -12px 8px; padding: 7px 12px; background: var(--bg); border-bottom: 1px solid var(--line-soft); border-radius: 0 6px 0 0; }
+.tray-row > b { color: var(--kind, var(--text)); }
+.tray-ref { font-weight: 700; color: var(--text); background: var(--surface-2, var(--surface)); border: 1px solid var(--line); border-radius: 4px; padding: 0 6px; }
+.tray-shlist { list-style: none; padding: 0; margin: 8px 0; }
+.tray-shlist li { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 10px; margin-bottom: 8px; border: 1px solid var(--line); border-left: 4px solid var(--kind, var(--text-faint)); border-radius: 6px; background: var(--surface); font-size: 13px; }
 .tray-acts { margin-left: auto; display: flex; gap: 2px; }
 .tray-cap, .tray-text { width: 100%; margin: 6px 0; padding: 5px 8px; background: var(--surface-2); color: var(--text); border: 1px solid var(--line); border-radius: 4px; font: inherit; }
 .tray-fig { overflow: hidden; background: var(--plate); border-radius: 4px; padding: 4px; }
@@ -1800,3 +1807,8 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .gz-view .gz-step[hidden] { display: none; }
 .gz-pane[data-pane="code"] .gz-bv { margin-top: 0; padding-top: 0; border-top: 0; }
 .gz-pane[data-pane="blocks"] .gz-sbs-in { max-height: none; }
+.fd.fd-click { cursor: pointer; }
+.fd.fd-click:hover { background: color-mix(in srgb, var(--text) 4%, transparent); }
+.fd.fd-click .fd-title:hover { text-decoration: underline; }
+.note .by .ncode { font-size: 10px; color: var(--text-faint); border: 1px solid var(--line-soft); border-radius: 3px; padding: 0 4px; cursor: copy; }
+.note .by .ncode:hover { color: var(--text); border-color: var(--line); }
