@@ -290,7 +290,14 @@
       });
     });
   }
+  function gzMode(mode) {
+    return '<span class="seg-btns gz-mode"><button class="btn' + (mode === 'profile' ? ' on' : '') + '" data-gzm="profile" title="This version as it runs: the blocks it passed through and the time in each">Profile</button><button class="btn' + (mode === 'compare' ? ' on' : '') + '" data-gzm="compare" title="This version against another, by the structure of their code: blocks between branches, and the branches">⇄ Compare</button></span>';
+  }
+  function gzModeWire(bar) {
+    bar.addEventListener('click', function (e) { var m = e.target.closest('[data-gzm]'); if (m) { SW.store.set('an.gizmoMode', m.dataset.gzm); render(); } });
+  }
   function gizmo(b, el) {
+    if (SW.store.get('an.gizmoMode', 'profile') === 'compare' && SW.structure) return gizmoCompare(b, el);
     var prof = SW.profile && SW.profile.build === b && SW.profile.branches && SW.profile.instructions ? SW.profile : null;
     var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
     var legend = 'Darker blocks take more of the time; the rounded block is where the run began. Solid edges are branches, dashed ones falling through into a block a branch also reaches, dotted ones a way through blocks left out; thicker for more often. An edge up or across returns to a block drawn above (a loop). Click a block for its code, the instructions it ran and where it branches.';
@@ -305,13 +312,14 @@
     var F = prof ? flowBlocks(b, prof) : null, B = F ? F.blocks : [], tot = F ? F.total || 1 : 1;
     var from = prof ? (prof.sample ? 'sample run, ' + (prof.sample.ai ? 'Lensman AI: Needle ' + (prof.sample.styles || ['duellist'])[0] + ', Wedge ' + (prof.sample.styles || ['', 'duellist'])[1] : 'no one at the controls') : 'your run in Run') : '';
     var bar = SW.el('div', { class: 'gz-bar' });
-    bar.innerHTML = '<button class="btn gz-run" title="Run the program here for the time chosen and draw the graph from that run">▶ Sample run</button>' +
+    bar.innerHTML = gzMode('profile') + '<span class="sep"></span><button class="btn gz-run" title="Run the program here for the time chosen and draw the graph from that run">▶ Sample run</button>' +
       '<select class="gz-secs" title="How long to run, in machine time">' + [5, 10, 30, 60].map(function (n) { return '<option value="' + n + '"' + (n === secs ? ' selected' : '') + '>' + n + ' s</option>'; }).join('') + '</select>' +
       '<span class="gz-ai' + (useAI ? '' : ' off') + '" title="Lensman AI, the bench’s computer pilot, flies both ships in the sample run. Off, no one is at the controls: the ships only drift under gravity"><label class="check"><input type="checkbox" class="gz-ai-on"' + (useAI ? ' checked' : '') + '> Lensman AI</label>' + styleSel(0) + styleSel(1) + '</span>' +
       (prof ? '<span class="sep"></span><label class="check" title="The busiest blocks that together take this share of the time">Show <select class="gz-cover">' + [[0.8, '80%'], [0.9, '90%'], [0.95, '95%'], [0.99, '99%'], [1, '100%']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cover ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select> of the time</label>' : '') +
       '<span class="gz-src hint">' + (prof ? B.length + ' blocks · ' + F.edges.length + ' edges · ' + (prof.cycles / 200000).toFixed(2) + ' s · ' + prof.instructions.toLocaleString('en-GB') + ' instructions · ' + from : 'Press ▶ Sample run, or play the game in Run and come back.') + '</span>' +
       (prof ? '<details class="gz-about"><summary title="What the graph shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>' : '');
     c.appendChild(bar);
+    gzModeWire(bar);
     if (!prof) c.insertAdjacentHTML('beforeend', '<p class="lede">' + lede + '</p>');
     var gb = bar.querySelector('.gz-run'), gs = bar.querySelector('.gz-secs'), src = bar.querySelector('.gz-src');
     gs.addEventListener('change', function () { secs = +gs.value; SW.store.set('an.gizmoSecs', secs); });
@@ -475,6 +483,134 @@
       return [{ type: 'p', text: lede + ' The graph itself saves from under it, as SVG or PNG.' },
         SW.tableBlock('The blocks', ['Block', 'Reference', 'Length', 'Entered', 'Instructions run', 'Time (µs)', '% of time'], trows),
         SW.tableBlock('The branches', ['From', 'To', 'How', 'Times'], erows)];
+    };
+  }
+
+  // ⇄ Compare: this version against another by the structure of their code
+  // (structure.js): blocks between branches read from the assembled code, with
+  // the jumps the code does not name taken from a 5 s sample run of each.
+  var dynCache = {};
+  function dynOf(b) {
+    if (dynCache[b.v.id]) return Promise.resolve(dynCache[b.v.id]);
+    sampling = sampling || {};
+    return sampleRun(b, 5, ['duellist', 'duellist'], true, function () {}).then(function (p) { dynCache[b.v.id] = p; return p; });
+  }
+  function gizmoCompare(b, el) {
+    var V = root.SWVersions, ST = SW.structure, esc = SW.esc;
+    var vs = V.VERSIONS.filter(function (v) { return v.build && v.id !== b.v.id; }).sort(function (x, y) { return x.sort - y.sort; });
+    var earlier = vs.filter(function (v) { return v.sort <= b.v.sort; });
+    var other = SW.store.get('an.gizmoCmp', '');
+    if (!vs.some(function (v) { return v.id === other; })) other = (earlier[earlier.length - 1] || vs[0] || {}).id;
+    var show = SW.store.get('an.gizmoCmpShow', 'changes');
+    var lede = 'After Art Schwarz: each version’s code without its comments, cut into blocks between branches (a block begins where a branch arrives and ends at an instruction that can branch), read from the assembled code. Jumps the code does not name (jmp i, jsp i, xct) are taken from a 5 s sample run of each version. Blocks are matched across the two versions by their code, then by their label, then by their place between matched blocks. The same: matched, code identical. Altered: the same place, the code changed. Inserted, removed: no counterpart. A branch added or removed is a change of structure.';
+    var legend = 'Grey: the same. Violet: altered. Green: inserted (and branches added). Red, dashed: removed (and branches removed). The rounded block is where the program starts. Click a block for the two versions of its code side by side.';
+    var c = SW.el('div', { class: 'card gz-card' });
+    c.style.gridColumn = '1 / -1';
+    el.appendChild(c);
+    var bar = SW.el('div', { class: 'gz-bar' });
+    bar.innerHTML = gzMode('compare') + '<span class="sep"></span><label class="check" title="The version to compare this one with">' + esc(SW.refOf(b.v.id)) + ' against <select class="gz-cmp">' +
+      vs.map(function (v) { return '<option value="' + esc(v.id) + '"' + (v.id === other ? ' selected' : '') + '>' + esc(SW.refOf(v.id) + '  ' + v.label) + '</option>'; }).join('') + '</select></label>' +
+      '<label class="check">Show <select class="gz-cshow"><option value="changes"' + (show === 'changes' ? ' selected' : '') + '>the changes, with their neighbours</option><option value="all"' + (show === 'all' ? ' selected' : '') + '>everything</option></select></label>' +
+      '<span class="gz-src hint">Reading both versions…</span>' +
+      '<details class="gz-about"><summary title="What the comparison shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>';
+    c.appendChild(bar);
+    gzModeWire(bar);
+    bar.querySelector('.gz-cmp').addEventListener('change', function (e) { SW.store.set('an.gizmoCmp', e.target.value); render(); });
+    bar.querySelector('.gz-cshow').addEventListener('change', function (e) { SW.store.set('an.gizmoCmpShow', e.target.value); render(); });
+    var src = bar.querySelector('.gz-src'), box = SW.el('div', { class: 'svgbox gizmo' }), figs = SW.el('div'), more = SW.el('div', { class: 'gz-more' });
+    c.appendChild(box); c.appendChild(figs); el.appendChild(more);
+    var out = { rows: [], erows: [], summary: '' }, lastSVG = '';
+    if (!other) { src.textContent = 'No other version to compare with.'; return null; }
+    SW.build(other).then(function (bo) {
+      if (!bo.asm) { src.textContent = SW.refOf(other) + ' has no source to compare.'; return; }
+      return dynOf(bo).then(function (dA) { return dynOf(b).then(function (dB) {
+        sampling = null;
+        if (build !== b) return;
+        var GA = ST.graph(bo, dA), GB = ST.graph(b, dB), C = ST.compare(GA, GB);
+        draw(bo, GA, GB, C);
+      }); });
+    }, function () { src.textContent = 'Could not build ' + SW.refOf(other) + '.'; });
+    function ref(G, bl) { return bl.src ? SW.refOf(G.b.v.id, bl.src.p, bl.src.n0, bl.src.n1, G.b.parts.length) : SW.oct(bl.a0, 4); }
+    function linesOf(bl) { return bl.src ? (bl.src.n1 !== bl.src.n0 ? 'lines ' + bl.src.n0 + '–' + bl.src.n1 : 'line ' + bl.src.n0) : SW.oct(bl.a0, 4); }
+    function draw(bo, GA, GB, C) {
+      var ra = SW.refOf(bo.v.id), rb = SW.refOf(b.v.id);
+      out.summary = ra + ' → ' + rb + ': ' + GA.blocks.length + ' → ' + GB.blocks.length + ' blocks; the same ' + C.same + ', altered ' + C.altered.length + ', inserted ' + C.inserted.length + ', removed ' + C.removed.length + '; branches added ' + C.edgesNew.length + ', removed ' + C.edgesGone.length + '.';
+      src.textContent = GA.blocks.length + ' → ' + GB.blocks.length + ' blocks · same ' + C.same + ' · altered ' + C.altered.length + ' · inserted ' + C.inserted.length + ' · removed ' + C.removed.length + ' · branches +' + C.edgesNew.length + ' −' + C.edgesGone.length;
+      // the merged graph: this version's blocks, with the other's removed ones beside them
+      var nodes = [], edges = [], cls = {};
+      GB.blocks.forEach(function (y) {
+        var xi = C.mB[y.i], k = xi == null ? 'inserted' : C.kind[xi] === 'altered' ? 'altered' : 'same';
+        cls['b' + y.i] = k;
+        nodes.push({ id: 'b' + y.i, ord: y.a0, name: y.name, sub: linesOf(y), cls: k, tag: k === 'same' ? '' : k, tip: y.name + ' in ' + rb + (xi != null && k === 'altered' ? ' (' + GA.blocks[xi].name + ' in ' + ra + ')' : '') + ': ' + k });
+      });
+      C.removed.forEach(function (xi) {
+        var x = GA.blocks[xi]; cls['a' + xi] = 'removed';
+        nodes.push({ id: 'a' + xi, ord: (function () { var p = GA.edges.filter(function (e) { return e.t === xi && C.mA[e.f] != null; })[0]; return p ? GB.blocks[C.mA[p.f]].a0 + 0.5 : 1e5 + x.a0; })(), name: x.name, sub: linesOf(x) + ' in ' + ra, cls: 'removed', tag: 'removed', tip: x.name + ' in ' + ra + ': removed' });
+      });
+      function inA(f, t) { return GA.edges.some(function (e) { return e.f === f && e.t === t; }); }
+      GB.edges.forEach(function (e) {
+        var fa = C.mB[e.f], ta = C.mB[e.t], same = fa != null && ta != null && inA(fa, ta);
+        edges.push({ f: 'b' + e.f, t: 'b' + e.t, cls: same ? 'same' : 'added', tip: GB.blocks[e.f].name + ' → ' + GB.blocks[e.t].name + (same ? '' : ': added') });
+      });
+      function idA(xi) { return C.mA[xi] != null ? 'b' + C.mA[xi] : 'a' + xi; }
+      GA.edges.forEach(function (e) {
+        if (C.mA[e.f] != null && C.mA[e.t] != null && GB.edges.some(function (g) { return g.f === C.mA[e.f] && g.t === C.mA[e.t]; })) return;
+        edges.push({ f: idA(e.f), t: idA(e.t), cls: 'removed', tip: GA.blocks[e.f].name + ' → ' + GA.blocks[e.t].name + ' in ' + ra + ': removed' });
+      });
+      if (show !== 'all') {   // the changes and the blocks next to them
+        var keep = {};
+        nodes.forEach(function (n) { if (n.cls !== 'same') keep[n.id] = 1; });
+        edges.forEach(function (e) { if (e.cls !== 'same') { keep[e.f] = 1; keep[e.t] = 1; } });
+        edges.forEach(function (e) { if (cls[e.f] !== 'same' || cls[e.t] !== 'same') { keep[e.f] = 1; keep[e.t] = 1; } });
+        nodes = nodes.filter(function (n) { return keep[n.id]; });
+        edges = edges.filter(function (e) { return keep[e.f] && keep[e.t]; });
+      }
+      if (!nodes.length) { box.innerHTML = '<p class="hint" style="padding:12px">The two versions have the same structure and the same code between their branches.</p>'; }
+      else {
+        lastSVG = ST.svg(nodes, edges, 'b' + GB.entry);
+        box.innerHTML = SW.displaySVG(lastSVG);
+        figs.innerHTML = '';
+        figs.appendChild(SW.figureButtons(function () { return lastSVG; }, 'spacewar-' + bo.v.id + '-' + b.v.id + '-structure', ra + ' → ' + rb));
+      }
+      // the changes, as a table
+      out.rows = [];
+      C.altered.forEach(function (xi) { var x = GA.blocks[xi], y = GB.blocks[C.mA[xi]], d = ST.lineDiff(x.lines.map(function (l) { return l.key; }), y.lines.map(function (l) { return l.key; })); out.rows.push({ id: 'b' + y.i, r: ['altered', x.name, y.name, d.filter(function (q) { return q[0] === '-'; }).length + ' out, ' + d.filter(function (q) { return q[0] === '+'; }).length + ' in', ref(GB, y)] }); });
+      C.inserted.forEach(function (yi) { var y = GB.blocks[yi], w = C.into[yi]; out.rows.push({ id: 'b' + yi, r: ['inserted', '', y.name, y.lines.length + ' line' + (y.lines.length === 1 ? '' : 's') + (w ? ', between ' + GB.blocks[w[0]].name + ' and ' + GB.blocks[w[1]].name : ''), ref(GB, y)] }); });
+      C.removed.forEach(function (xi) { var x = GA.blocks[xi]; out.rows.push({ id: 'a' + xi, r: ['removed', x.name, '', x.lines.length + ' line' + (x.lines.length === 1 ? '' : 's'), ref(GA, x)] }); });
+      out.rows.sort(function (p, q) { return p.r[4] < q.r[4] ? -1 : 1; });
+      out.erows = C.edgesNew.map(function (e) { return ['added', GB.blocks[e.f].name, GB.blocks[e.t].name]; }).concat(C.edgesGone.map(function (e) { return ['removed', GA.blocks[e.f].name, GA.blocks[e.t].name]; }));
+      more.innerHTML = '';
+      var c2 = card('The blocks that changed', 'Altered, inserted and removed, in the order of the code. Click a row for the two versions side by side.');
+      var s2 = SW.el('div', { class: 'scroll' });
+      s2.appendChild(SW.table(['Change', 'In ' + ra, 'In ' + rb, 'Lines', 'Reference'], out.rows.map(function (o) { return o.r; }), { cls: ['', 'mono', 'mono', '', 'mono'], onRow: function (r) { var o = out.rows.filter(function (q) { return q.r === r; })[0]; if (o) open(o.id); } }));
+      c2.appendChild(s2); more.appendChild(c2);
+      var c3 = card('The branches that changed', 'Between blocks that match in both versions: a change of structure.');
+      var s3 = SW.el('div', { class: 'scroll' });
+      s3.appendChild(SW.table(['Branch', 'From', 'To'], out.erows, { cls: ['', 'mono', 'mono'] }));
+      c3.appendChild(s3); more.appendChild(c3);
+      // a block in a box: its code in both versions, side by side
+      function open(id) {
+        var isA = id.charAt(0) === 'a', n = +id.slice(1), y = isA ? null : GB.blocks[n], xi = isA ? n : C.mB[n], x = xi == null ? null : GA.blocks[xi];
+        var k = isA ? 'removed' : xi == null ? 'inserted' : C.kind[xi] === 'altered' ? 'altered' : 'same';
+        var la = x ? x.lines : [], lb = y ? y.lines : [], d = ST.lineDiff(la.map(function (l) { return l.key; }), lb.map(function (l) { return l.key; }));
+        function cell(l, mark) { return l ? '<div class="gz-l ' + mark + '"><span class="n">' + l.n + '</span><span class="t">' + esc(l.raw) + '</span></div>' : '<div class="gz-l gap"></div>'; }
+        var body = d.map(function (q) { return '<div class="gz-pair">' + cell(q[1] != null ? la[q[1]] : null, q[0] === '-' ? 'del' : '') + cell(q[2] != null ? lb[q[2]] : null, q[0] === '+' ? 'add' : '') + '</div>'; }).join('');
+        function link(G, bl, label) { if (!bl || !bl.src) return ''; var u = location.pathname + '?v=' + encodeURIComponent(G.b.v.id) + '&tab=read&l=' + bl.src.p + ':' + bl.src.n0 + (bl.src.n1 > bl.src.n0 ? '-' + bl.src.n1 : ''); return '<a class="btn" href="' + esc(u) + '" target="_blank" rel="noopener" title="These lines in Read, in a new tab">' + label + ' ↗</a>'; }
+        var dlg = SW.el('dialog', { class: 'tray-big gz-dlg gz-cmpdlg' });
+        dlg.innerHTML = '<div class="tray-bighead"><b>' + esc((x ? x.name : '') + (x && y && x.name !== y.name ? ' → ' : '') + (y && (!x || x.name !== y.name) ? y.name : '')) + '</b> <span class="gz-k gz-k-' + k + '">' + k + '</span><span class="refhelp-acts">' + link(GA, x, 'Read in ' + ra) + link(GB, y, 'Read in ' + rb) + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+          '<div class="gz-pair gz-pairh"><div>' + esc(x ? ref(GA, x) : ra + ': not there') + '</div><div>' + esc(y ? ref(GB, y) : rb + ': not there') + '</div></div>' +
+          '<div class="listing gz-src-l gz-cmpl">' + body + '</div><p class="hint">Comments and spacing are left out of the comparison; lines shown as held.</p>';
+        document.body.appendChild(dlg);
+        dlg.addEventListener('click', function (e) { if (e.target === dlg || e.target.closest('[data-x]')) dlg.close(); });
+        dlg.addEventListener('close', function () { dlg.remove(); });
+        dlg.showModal();
+      }
+      box.onclick = function (e) { var g = e.target.closest('[data-n]'); if (g) open(g.dataset.n); };
+    }
+    return function () {
+      return [{ type: 'p', text: lede }, { type: 'p', text: out.summary },
+        SW.tableBlock('The blocks that changed', ['Change', 'Before', 'After', 'Lines', 'Reference'], out.rows.map(function (o) { return o.r; })),
+        SW.tableBlock('The branches that changed', ['Branch', 'From', 'To'], out.erows)];
     };
   }
 

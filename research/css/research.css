@@ -1742,3 +1742,15 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .gz-ai .check { gap: 4px; }
 .gz-ai > .check:first-child { font-weight: 600; }
 .gz-ai.off > .check:not(:first-child) { opacity: .45; }
+.gz-mode .btn { padding: 3px 10px; }
+.gz-cmpdlg .gz-pair { display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px; }
+.gz-cmpdlg .gz-pairh { font: 600 12px var(--sans); color: var(--text-dim); margin-bottom: 4px; }
+.gz-cmpl { max-height: 64vh; }
+.gz-cmpl .gz-l.del { background: color-mix(in srgb, var(--g-removed) 16%, transparent); }
+.gz-cmpl .gz-l.add { background: color-mix(in srgb, var(--g-added) 16%, transparent); }
+.gz-cmpl .gz-l.gap { min-height: 1.5em; }
+.gz-k { font: 600 10px/1 var(--sans); text-transform: uppercase; letter-spacing: .05em; padding: 3px 6px; border-radius: 3px; border: 1px solid var(--text-faint); color: var(--text-dim); margin-left: 6px; }
+.gz-k-altered { border-color: var(--violet); color: var(--violet); }
+.gz-k-inserted { border-color: var(--g-added); color: var(--g-added); }
+.gz-k-removed { border-color: var(--g-removed); color: var(--g-removed); }
+.gz-more { display: contents; }
