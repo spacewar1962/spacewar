@@ -715,21 +715,36 @@
         function cell(x, d) { return x ? '<b class="mono">' + esc(x.name) + '</b> <span class="faint">' + esc(linesOf(x)) + '</span>' + (d ? '<span class="gz-t">' + gzMs(blockMs(d, x)) + '</span>' : '') : ''; }
         var label = r.a && r.b && r.a.name !== r.b.name ? r.a.name + ' → ' + r.b.name : (r.b || r.a).name, figs = routineFigures(r);
         var dlg = dialog('<div class="tray-bighead"><b>' + esc(label) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span>' + gzNameField(rName(r), label) + '<span class="refhelp-acts"><button class="btn ghost" data-keep title="This routine in both versions, with its name and figures, in My notes (private)">＋ My notes</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+          '<div class="gz-view"><span class="seg-btns"><button class="btn on" data-view="blocks" title="The routine’s figures and its blocks">Blocks</button><button class="btn" data-view="code" title="One block’s code in both versions">Code</button></span>' +
+          '<span class="gz-step" hidden><button class="btn ghost" data-step="-1" title="The block before">‹</button><span class="gz-stepn faint"></span><button class="btn ghost" data-step="1" title="The block after">›</button></span></div>' +
+          '<div class="gz-pane" data-pane="blocks">' +
           '<table class="ov-sub gz-q gz-q2"><thead><tr><th></th><th>' + esc(r.a ? ref(GA, r.a) : ra + ': Inserted or moved') + '</th><th>' + esc(r.b ? ref(GB, r.b) : rb + ': Removed or moved') + '</th></tr></thead><tbody>' +
             figs.map(function (q) { return '<tr><th>' + q[0] + '</th><td>' + esc(q[1]) + '</td><td>' + esc(q[2]) + '</td></tr>'; }).join('') + '</tbody></table>' +
           '<h4>Its blocks</h4><div class="gz-sbs"><div class="sbs-row sbs-head"><div>' + esc(ra) + '</div><div></div><div>' + esc(rb) + '</div></div></div>' +
           '<div class="gz-sbs gz-sbs-in">' + items.map(function (it) { var k = kindOf(it.id); return '<div class="sbs-row k-' + k + '" data-id="' + it.id + '" title="Click for the code in both versions"><div class="sbs-a">' + (cell(it.a, dA) || '<span class="faint">Inserted or moved</span>') + '</div><div class="sbs-mid"><span class="gz-k gz-k-' + k + '">' + k + '</span></div><div class="sbs-b">' + (cell(it.b, dB) || '<span class="faint">Removed or moved</span>') + '</div></div>'; }).join('') + '</div>' +
-          '<div class="gz-bv"><p class="hint">Click a block above for its code in both versions.</p></div>');
+          '<p class="hint">Click a block for its code in both versions.</p></div>' +
+          '<div class="gz-pane" data-pane="code" hidden><div class="gz-bv"></div></div>');
+        var cur = null;
+        function view(v) {
+          SW.$$('[data-view]', dlg).forEach(function (bt) { bt.classList.toggle('on', bt.dataset.view === v); });
+          SW.$$('.gz-pane', dlg).forEach(function (pn) { pn.hidden = pn.dataset.pane !== v; });
+          dlg.querySelector('.gz-step').hidden = v !== 'code';
+        }
         function showBlock(bid) {
-          var bv = dlg.querySelector('.gz-bv'); bv.innerHTML = blockHTML(bid, false);
+          cur = bid;
+          dlg.querySelector('.gz-bv').innerHTML = blockHTML(bid, false);
           SW.$$('.gz-sbs-in .sbs-row', dlg).forEach(function (row) { row.classList.toggle('on', row.dataset.id === bid); });
+          var at = items.map(function (it) { return it.id; }).indexOf(bid);
+          dlg.querySelector('.gz-stepn').textContent = 'block ' + (at + 1) + ' of ' + items.length;
         }
         var first = items.filter(function (it) { return kindOf(it.id) !== 'same'; })[0] || items[0];
         if (first) showBlock(first.id);
         dlg.addEventListener('click', function (e) {
           if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
           if (e.target.closest('[data-keep]')) { keepRoutine(r, items, figs); return; }
-          var it = e.target.closest('[data-id]'); if (it) { showBlock(it.dataset.id); var bv = dlg.querySelector('.gz-bv'); if (bv.getBoundingClientRect().top > dlg.getBoundingClientRect().bottom - 80) bv.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+          var vb = e.target.closest('[data-view]'); if (vb) { view(vb.dataset.view); return; }
+          var st = e.target.closest('[data-step]'); if (st) { var ids = items.map(function (it) { return it.id; }), at = ids.indexOf(cur); showBlock(ids[(at + +st.dataset.step + ids.length) % ids.length]); return; }
+          var it = e.target.closest('[data-id]'); if (it) { showBlock(it.dataset.id); view('code'); }
         });
         dlg.addEventListener('change', function (e) {
           if (!e.target.closest('.gz-name')) return;

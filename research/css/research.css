@@ -1795,3 +1795,8 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .gz-bv .gz-bvh { margin-bottom: 6px; }
 .gz-sbs-in .sbs-row.on .sbs-a, .gz-sbs-in .sbs-row.on .sbs-b { box-shadow: 0 0 0 2px var(--beam); }
 .gz-sbs-in { max-height: 40vh; }
+.gz-view { display: flex; align-items: center; gap: 12px; margin: 2px 0 10px; }
+.gz-view .gz-step { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
+.gz-view .gz-step[hidden] { display: none; }
+.gz-pane[data-pane="code"] .gz-bv { margin-top: 0; padding-top: 0; border-top: 0; }
+.gz-pane[data-pane="blocks"] .gz-sbs-in { max-height: none; }
