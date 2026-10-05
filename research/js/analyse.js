@@ -27,7 +27,8 @@
     [12, 'The sky', 'The star table as a chart'],
     [13, 'The ships', 'The ship outlines'],
     [14, 'Symbol histories', 'One symbol across the versions'],
-    [15, 'Functional overview', 'Start-up, the main loop, each object’s routine, the calls']
+    [15, 'Functional overview', 'Start-up, the main loop, each object’s routine, the calls'],
+    [16, 'Art’s Dynamic Profile Gizmo', 'The run as a graph of code blocks joined by branches, with the time spent in each']
   ];
 
   function progLines(b) {
@@ -221,6 +222,164 @@
     c.insertAdjacentHTML('beforeend', '<div class="scroll">' + bars(rows.slice(0, 30).map(function (r) { return [r[0], +(100 * r[1] / tot).toFixed(1)]; })) + '</div><p class="hint">Percentages of executed instructions.</p>');
     el.appendChild(c);
     return function () { return [SW.tableBlock('Share of executed instructions by routine', ['Routine', 'Instructions', '%'], rows.map(function (r) { return [r[0], r[1], (100 * r[1] / tot).toFixed(2)]; }))]; };
+  }
+
+  // ---------- 16 Art's Dynamic Profile Gizmo ----------
+  // A profile in the professional sense (after a letter from Art Schwarz): the
+  // run as a graph whose nodes are blocks of sequential code and whose edges are
+  // the branches taken between them, with the time spent in each block. A block
+  // begins where a branch arrives (or at the first instruction run) and ends at
+  // an instruction that branched (or the last). The emulator records, for the
+  // last run in Run, the instructions stepped and cycles spent at each address
+  // and every transfer of control other than to the next address.
+  function flowBlocks(b, prof) {
+    var steps = prof.steps, cyc = prof.cyc, br = prof.branches, out = {}, into = {};
+    br.forEach(function (n, k) { var f = Math.floor(k / 4096), t = k % 4096; out[f] = (out[f] || 0) + n; into[t] = 1; });
+    var entry = prof.entry >= 0 ? prof.entry : b.asm.start;
+    into[entry] = 1;
+    var blocks = [], at = new Int32Array(4096).fill(-1), cur = null;
+    for (var a = 0; a < 4096; a++) {
+      if (!steps[a]) { cur = null; continue; }
+      if (!cur || into[a] || out[a - 1]) { cur = { i: blocks.length, a0: a, a1: a, steps: 0, cyc: 0, entries: steps[a] }; blocks.push(cur); }
+      cur.a1 = a; cur.steps += steps[a]; cur.cyc += cyc[a]; at[a] = cur.i;
+    }
+    var edges = {};
+    function edge(f, t, n, kind) { var k = f + '>' + t; (edges[k] = edges[k] || { f: f, t: t, n: 0, kind: kind }).n += n; }
+    br.forEach(function (n, k) { var f = at[Math.floor(k / 4096)], t = at[k % 4096]; if (f >= 0 && t >= 0) edge(f, t, n, 'branch'); });
+    blocks.forEach(function (bl) {   // falling through into the next block
+      var ft = steps[bl.a1] - (out[bl.a1] || 0), nx = at[(bl.a1 + 1) & 4095];
+      if (ft > 0 && nx >= 0 && nx !== bl.i) edge(bl.i, nx, ft, 'fall');
+    });
+    var labs = Object.keys(b.labelAt).map(Number).sort(function (x, y) { return x - y; });
+    function nameOf(a) {   // its label, or the nearest label before it and how far on
+      if (a in b.labelAt) return b.labelAt[a];
+      var l = -1; for (var i = 0; i < labs.length && labs[i] <= a; i++) l = labs[i];
+      return l < 0 ? SW.oct(a, 4) : b.labelAt[l] + '+' + (a - l);
+    }
+    blocks.forEach(function (bl) {
+      bl.name = nameOf(bl.a0);
+      var s0 = b.srcOf(bl.a0), s1 = b.srcOf(bl.a1);
+      bl.src = s0 ? { p: s0.p, n0: s0.n, n1: s1 && s1.p === s0.p ? s1.n : s0.n } : null;
+    });
+    return { blocks: blocks, edges: Object.keys(edges).map(function (k) { return edges[k]; }), entry: at[entry], total: blocks.reduce(function (t, x) { return t + x.cyc; }, 0) };
+  }
+  function gizmo(b, el) {
+    var prof = SW.profile && SW.profile.build === b && SW.profile.branches ? SW.profile : null;
+    var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
+    var c = card('Art’s Dynamic Profile Gizmo', lede + (prof ? '' : ' <b>Run the program in the Run view first</b> (a few seconds of play is enough), then come back here.'));
+    c.style.gridColumn = '1 / -1';
+    el.appendChild(c);
+    if (!prof || !prof.instructions) return null;
+    var F = flowBlocks(b, prof), B = F.blocks, tot = F.total || 1;
+    var cover = SW.store.get('an.gizmoCover', 0.9);
+    var ctl = SW.el('div', { class: 'gz-ctl' });
+    ctl.innerHTML = '<label class="check">Show the busiest blocks, together <select>' + [[0.8, '80%'], [0.9, '90%'], [0.95, '95%'], [0.99, '99%'], [1, '100%']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cover ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select> of the time</label>' +
+      '<span class="hint">' + B.length + ' blocks, ' + F.edges.length + ' edges; ' + (prof.cycles / 200000).toFixed(2) + ' s of machine time, ' + prof.instructions.toLocaleString('en-GB') + ' instructions. Click a block for its code.</span>';
+    c.appendChild(ctl);
+    var box = SW.el('div', { class: 'svgbox gizmo' }), figs = SW.el('div');
+    c.appendChild(box); c.appendChild(figs);
+    var lastSVG = '';
+    function draw() {
+      var order = B.slice().sort(function (x, y) { return y.cyc - x.cyc; }), shown = {}, acc = 0;
+      for (var i = 0; i < order.length && (acc < cover * tot || cover >= 1) && i < 400; i++) { shown[order[i].i] = 1; acc += order[i].cyc; }
+      if (F.entry >= 0) shown[F.entry] = 1;
+      // depth from the first block, by the branches taken (shortest path)
+      var adj = {}, depth = {};
+      F.edges.forEach(function (e) { (adj[e.f] = adj[e.f] || []).push(e.t); });
+      var q = [F.entry >= 0 ? F.entry : order[0].i]; depth[q[0]] = 0;
+      while (q.length) { var u = q.shift(); (adj[u] || []).forEach(function (v) { if (depth[v] == null) { depth[v] = depth[u] + 1; q.push(v); } }); }
+      var ids = Object.keys(shown).map(Number);
+      ids.sort(function (x, y) { return ((depth[x] == null ? 1e9 : depth[x]) - (depth[y] == null ? 1e9 : depth[y])) || (B[x].a0 - B[y].a0); });
+      // rows by depth, at most seven to a row
+      var rows = [], lastD = null;
+      ids.forEach(function (id) { var d = depth[id] == null ? 1e9 : depth[id]; if (d !== lastD || rows[rows.length - 1].length >= 7) { rows.push([]); lastD = d; } rows[rows.length - 1].push(id); });
+      var E = F.edges.filter(function (e) { return shown[e.f] && shown[e.t]; }), pos = {};
+      // a path through blocks left out becomes one dotted edge between the blocks shown
+      var via = {};
+      ids.forEach(function (sid) {
+        (adj[sid] || []).forEach(function (h) {
+          if (shown[h]) return;
+          var seen = {}, st = [h], n = 0; seen[h] = 1;
+          var first = F.edges.filter(function (e) { return e.f === sid && e.t === h; })[0];
+          while (st.length && n++ < 300) {
+            var u = st.pop();
+            (adj[u] || []).forEach(function (v) {
+              if (shown[v]) { var k = sid + '>' + v; via[k] = via[k] || { f: sid, t: v, n: 0, kind: 'via' }; via[k].n += first ? first.n : 0; }
+              else if (!seen[v]) { seen[v] = 1; st.push(v); }
+            });
+          }
+        });
+      });
+      Object.keys(via).forEach(function (k) { if (!E.some(function (e) { return e.f === via[k].f && e.t === via[k].t; })) E.push(via[k]); });
+      function place() { rows.forEach(function (r, ri) { r.forEach(function (id, k) { pos[id] = { r: ri, k: k }; }); }); }
+      place();
+      for (var sweep = 0; sweep < 4; sweep++) {   // order each row by where its neighbours sit
+        rows.forEach(function (r, ri) {
+          if (!ri) return;
+          var bc = {};
+          r.forEach(function (id) {
+            var xs = E.filter(function (e) { return (e.t === id && pos[e.f].r < ri) || (e.f === id && pos[e.t].r < ri); }).map(function (e) { var o = e.t === id ? e.f : e.t; return pos[o].k - (rows[pos[o].r].length - 1) / 2; });
+            bc[id] = xs.length ? xs.reduce(function (s, x) { return s + x; }, 0) / xs.length : 0;
+          });
+          r.sort(function (x, y) { return bc[x] - bc[y]; });
+        });
+        place();
+      }
+      var NW = 150, NH = 46, GX = 30, GY = 52, wmax = Math.max.apply(null, rows.map(function (r) { return r.length; })), W = wmax * (NW + GX) + 140, H = rows.length * (NH + GY) + 30;
+      function xy(id) { var p = pos[id], r = rows[p.r]; return { x: 40 + (W - 140 - r.length * (NW + GX)) / 2 + p.k * (NW + GX), y: 20 + p.r * (NH + GY) }; }
+      var nmax = E.reduce(function (m, e) { return Math.max(m, e.n); }, 1), smax = ids.reduce(function (m, id) { return Math.max(m, B[id].cyc); }, 1);
+      var o = ['<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + ' ' + H + '"><rect width="' + W + '" height="' + H + '" fill="var(--surface)"/>',
+        '<defs><marker id="gz-ar" viewBox="0 0 8 8" refX="7" refY="4" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0L8 4L0 8z" fill="var(--text-dim)"/></marker></defs>'];
+      E.forEach(function (e) {
+        var a = xy(e.f), z = xy(e.t), sw = (0.8 + 3.2 * Math.log(1 + e.n) / Math.log(1 + nmax)).toFixed(2), d;
+        var tip = B[e.f].name + ' → ' + B[e.t].name + (e.kind === 'via' ? ': through blocks left out' : ': ' + e.n.toLocaleString('en-GB') + ' time' + (e.n === 1 ? '' : 's') + (e.kind === 'fall' ? ' (falling through)' : ''));
+        if (e.f === e.t) d = 'M' + (a.x + NW) + ' ' + (a.y + 14) + ' c 26 -10 26 28 0 18';
+        else if (pos[e.t].r > pos[e.f].r) d = 'M' + (a.x + NW / 2) + ' ' + (a.y + NH) + ' C ' + (a.x + NW / 2) + ' ' + (a.y + NH + GY * 0.6) + ' ' + (z.x + NW / 2) + ' ' + (z.y - GY * 0.6) + ' ' + (z.x + NW / 2) + ' ' + (z.y - 1);
+        else { var bx = Math.max(a.x, z.x) + NW + 24 + 10 * (pos[e.f].r - pos[e.t].r); d = 'M' + (a.x + NW) + ' ' + (a.y + NH / 2 + 6) + ' C ' + bx + ' ' + (a.y + NH / 2 + 6) + ' ' + bx + ' ' + (z.y + NH / 2 - 6) + ' ' + (z.x + NW + 1) + ' ' + (z.y + NH / 2 - 6); }
+        o.push('<path d="' + d + '" fill="none" stroke="var(--text-dim)" stroke-opacity="0.75" stroke-width="' + sw + '"' + (e.kind === 'fall' ? ' stroke-dasharray="4 3"' : e.kind === 'via' ? ' stroke-dasharray="1 3" stroke-linecap="round"' : '') + ' marker-end="url(#gz-ar)"><title>' + SW.esc(tip) + '</title></path>');
+      });
+      ids.forEach(function (id) {
+        var bl = B[id], p = xy(id), sh = bl.cyc / tot, heat = Math.round(8 + 62 * Math.sqrt(bl.cyc / smax));
+        var lines = bl.src ? (bl.src.n1 !== bl.src.n0 ? 'lines ' + bl.src.n0 + '–' + bl.src.n1 : 'line ' + bl.src.n0) : SW.oct(bl.a0, 4);
+        o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc(bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
+          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="color-mix(in srgb, var(--amber) ' + heat + '%, var(--surface))" stroke="var(--text-dim)" stroke-width="1"/>' +
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="var(--mono)" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(bl.name) + '</text>' +
+          '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="var(--sans)" font-size="12" font-weight="700" fill="var(--text)">' + (100 * sh).toFixed(1) + '%</text>' +
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="var(--sans)" font-size="10.5" fill="var(--text-dim)">' + SW.esc(lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
+      });
+      o.push('</svg>');
+      lastSVG = o.join('');
+      box.innerHTML = SW.displaySVG(lastSVG);
+      var hid = B.length - ids.length;
+      figs.innerHTML = '<p class="hint">Darker blocks take more of the time; the rounded block is where the run began. Solid edges are branches, dashed ones falling through into a block a branch also reaches, dotted ones a way through blocks left out; thicker for more often; an edge up or across returns to a block drawn above (a loop). ' + (hid ? hid + ' quieter block' + (hid === 1 ? '' : 's') + ' (' + (100 * (tot - acc) / tot).toFixed(1) + '% of the time) left out; the dotted edges pass through them.' : '') + '</p>';
+      figs.appendChild(SW.figureButtons(function () { return lastSVG; }, 'spacewar-' + b.v.id + '-dynamic-profile', SW.refText(b.v.id)));
+    }
+    box.addEventListener('click', function (e) {
+      var g = e.target.closest('[data-b]'); if (!g) return;
+      var bl = B[+g.dataset.b]; if (!bl.src) return;
+      SW.state.sel = { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1 };
+      SW.emit('goto', { p: bl.src.p, n: bl.src.n0, tab: 'read' });
+    });
+    ctl.querySelector('select').addEventListener('change', function (e) { cover = +e.target.value; SW.store.set('an.gizmoCover', cover); draw(); });
+    draw();
+    // the blocks and branches as tables
+    var trows = B.slice().sort(function (x, y) { return y.cyc - x.cyc; }).map(function (bl) {
+      return [bl.name, bl.src ? SW.refOf(b.v.id, bl.src.p, bl.src.n0, bl.src.n1, b.parts.length) : SW.oct(bl.a0, 4), bl.a1 - bl.a0 + 1, bl.entries, bl.steps, Math.round(bl.cyc * 5), +(100 * bl.cyc / tot).toFixed(2)];
+    });
+    var c2 = card('The blocks', 'Each block of sequential code the run passed through, busiest first: its length, how often it was entered, the instructions run in it, and the time.');
+    var s2 = SW.el('div', { class: 'scroll' });
+    s2.appendChild(SW.table(['Block', 'Reference', 'Length', 'Entered', 'Instructions run', 'Time (µs)', '% of time'], trows, { cls: ['mono', 'mono', 'num', 'num', 'num', 'num', 'num'], onRow: function (r) { var bl = B.filter(function (x) { return x.name === r[0]; })[0]; if (bl && bl.src) { SW.state.sel = { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1 }; SW.emit('goto', { p: bl.src.p, n: bl.src.n0, tab: 'read' }); } } }));
+    c2.appendChild(s2); el.appendChild(c2);
+    var erows = F.edges.slice().sort(function (x, y) { return y.n - x.n; }).map(function (e) { return [B[e.f].name, B[e.t].name, e.kind === 'fall' ? 'falls through' : 'branch', e.n]; });
+    var c3 = card('The branches', 'Each edge between blocks, most taken first.');
+    var s3 = SW.el('div', { class: 'scroll' });
+    s3.appendChild(SW.table(['From', 'To', 'How', 'Times'], erows, { cls: ['mono', 'mono', '', 'num'] }));
+    c3.appendChild(s3); el.appendChild(c3);
+    return function () {
+      return [{ type: 'p', text: lede + ' The graph itself saves from under it, as SVG or PNG.' },
+        SW.tableBlock('The blocks', ['Block', 'Reference', 'Length', 'Entered', 'Instructions run', 'Time (µs)', '% of time'], trows),
+        SW.tableBlock('The branches', ['From', 'To', 'How', 'Times'], erows)];
+    };
   }
 
   // ---------- 7 absence ----------
@@ -949,7 +1108,7 @@
     };
   }
 
-  var FNS = { 1: comments, 2: hands, 3: lexicon, 4: adjustable, 5: machine, 6: timeGoes, 7: absence, 8: calls, 9: instructions, 10: memmap, 11: macros, 12: sky, 13: ships };
+  var FNS = { 1: comments, 2: hands, 3: lexicon, 4: adjustable, 5: machine, 6: timeGoes, 7: absence, 8: calls, 9: instructions, 10: memmap, 11: macros, 12: sky, 13: ships, 16: gizmo };
 
   // ---------- 14 symbol histories (once "biographies") ----------
   // A symbol or macro followed through every version that can be built.
@@ -1574,7 +1733,7 @@
 
   // The lenses in a drop-down, grouped; exports in a menu of their own.
   // The lenses by menu in the tab row: Text, Program, and Absence under Versions.
-  var MENUS = { text: [['', [1, 2, 3, 14]]], program: [['The program', [15, 4, 8, 9, 11]], ['The machine', [5, 6, 10]]], versions: [['', [7]]] };
+  var MENUS = { text: [['', [1, 2, 3, 14]]], program: [['The program', [15, 4, 8, 9, 11]], ['The machine', [5, 6, 16, 10]]], versions: [['', [7]]] };
   function menuOf(n) { for (var m in MENUS) if (MENUS[m].some(function (gr) { return gr[1].indexOf(n) >= 0; })) return m; return 'text'; }
   function lensItems(groups, attr, cur) {
     return groups.map(function (gr) {
@@ -1633,7 +1792,8 @@
       }, function () { return 'spacewar-symbol-history-' + bioName; })));
       return;
     }
-    if (mode === 'across') { renderAcross(cards, head, L); return; }
+    if (lens === 16) SW.$$('[data-mode]', head).forEach(function (x) { x.style.display = 'none'; });   // one run, one version
+    if (mode === 'across' && lens !== 16) { renderAcross(cards, head, L); return; }
     if (!b.asm && lens !== 7) { cards.innerHTML = '<p class="hint">No source survives for this version.</p>'; return; }
     var blocks = FNS[lens](b, cards);
     if (blocks) head.appendChild(expMenu(SW.exportButtons(function () {

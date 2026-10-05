@@ -32,6 +32,11 @@
     this.execCount = new Uint32Array(4096);
     this.readCount = new Uint32Array(4096);
     this.writeCount = new Uint32Array(4096);
+    // the flow of a run: instructions stepped at each address (not counting xct's targets),
+    // the cycles they took, and every transfer of control other than to the next address
+    this.stepCount = new Uint32Array(4096);
+    this.cycCount = new Float64Array(4096);
+    this.branches = new Map();   // from * 4096 + to -> times taken
     this.lastWriter = new Int32Array(4096).fill(-1);
     this.trace = [];
     this.traceMax = opts.traceMax || 4000;
@@ -55,6 +60,7 @@
     this.lastPC = 4;
     this.mb = 0;
     this.execCount.fill(0); this.readCount.fill(0); this.writeCount.fill(0);
+    this.stepCount.fill(0); this.cycCount.fill(0); this.branches.clear(); this.entry = -1;
     this.lastWriter.fill(-1);
     this.trace = [];
     this.anomalies = [];
@@ -103,7 +109,11 @@
     var before = this.tracing ? { ac: this.ac, io: this.io } : null;
     var c = this.dispatch(md, 1);
     this.cycles += c;
+    if (this.instructions === 0) this.entry = pc0;
     this.instructions++;
+    this.stepCount[pc0]++;
+    this.cycCount[pc0] += c;
+    if (this.pc !== ((pc0 + 1) & 0o7777)) { var k = pc0 * 4096 + this.pc; this.branches.set(k, (this.branches.get(k) || 0) + 1); }
     if (this.tracing) {
       this.trace.push({ pc: pc0, md: md, ac: this.ac, io: this.io, ov: this.ov,
                         acBefore: before.ac, ioBefore: before.io, t: this.cycles });

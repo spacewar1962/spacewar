@@ -362,7 +362,8 @@
   function publishProfile() {
     if (!cpu) return;
     SW.profile = { build: build, exec: cpu.execCount, read: cpu.readCount, write: cpu.writeCount,
-                   lastWriter: cpu.lastWriter, cycles: cpu.cycles, instructions: cpu.instructions };
+                   lastWriter: cpu.lastWriter, cycles: cpu.cycles, instructions: cpu.instructions,
+                   steps: cpu.stepCount, cyc: cpu.cycCount, branches: cpu.branches, entry: cpu.entry };
     SW.emit('profile');
   }
 
