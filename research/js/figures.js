@@ -58,24 +58,33 @@
   };
 
   F.svgToPNG = function (svg, scale, bg) {
-    return new Promise(function (resolve, reject) {
-      var img = new Image();
-      var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
-      img.onload = function () {
-        // Stay within the browser's canvas limits (32,767 px a side, ~250 megapixels).
-        scale = Math.min(scale, 32000 / img.height, 32000 / img.width, Math.sqrt(2.4e8 / (img.width * img.height)));
-        var c = document.createElement('canvas');
-        c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
-        var g = c.getContext('2d');
-        if (bg) { g.fillStyle = bg; g.fillRect(0, 0, c.width, c.height); }
-        g.scale(scale, scale);
-        g.drawImage(img, 0, 0);
-        URL.revokeObjectURL(url);
-        c.toBlob(function (bl) { bl.arrayBuffer().then(function (a) { resolve({ png: new Uint8Array(a), width: c.width, height: c.height }); }); }, 'image/png');
-      };
-      img.onerror = reject;
-      img.src = url;
-    });
+    function load(src) {
+      return new Promise(function (ok, no) { var img = new Image(); img.onload = function () { ok(img); }; img.onerror = no; img.src = src; });
+    }
+    var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+    // Safari will not always draw an SVG from a blob address: then from a data address
+    return load(url).catch(function () { return load('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)); }).then(function (img) {
+      URL.revokeObjectURL(url);
+      var w = img.width || +((/\bwidth="([\d.]+)"/.exec(svg) || [])[1]) || 800, h = img.height || +((/\bheight="([\d.]+)"/.exec(svg) || [])[1]) || 600;
+      // within every browser's canvas limits: Safari's is the smallest, about 16.7 megapixels
+      scale = Math.min(scale, 16000 / h, 16000 / w, Math.sqrt(1.6e7 / (w * h)));
+      function draw(k) {
+        return new Promise(function (ok, no) {
+          var c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+          var g = c.getContext('2d'); if (!g) { no(new Error('canvas')); return; }
+          if (bg) { g.fillStyle = bg; g.fillRect(0, 0, c.width, c.height); }
+          g.scale(k, k);
+          g.drawImage(img, 0, 0, w, h);
+          c.toBlob(function (bl) {
+            if (!bl) { no(new Error('canvas')); return; }
+            bl.arrayBuffer().then(function (a) { ok({ png: new Uint8Array(a), width: c.width, height: c.height }); }, no);
+          }, 'image/png');
+        });
+      }
+      // a canvas the browser still refuses: smaller, down to a quarter
+      return draw(scale).catch(function () { return draw(scale / 2); }).catch(function () { return draw(scale / 4); });
+    }, function (e) { URL.revokeObjectURL(url); throw e; });
   };
 
   function dialog(title, body, actions) {
