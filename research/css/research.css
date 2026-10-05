@@ -279,6 +279,8 @@ main { position: relative; overflow: hidden; min-height: 0; }
 .run-left .r-players { margin: 4px 0 2px; font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; }
 .run-left .r-players select { font-size: 12px; }
 #r-tabs .r-follow { margin-left: 8px; font-size: 12px; }
+/* the clock changes every frame: fixed-width digits, and it takes only the room left on its line, so it never wraps the toolbar (which shook the code below it) */
+#r-clock { flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-variant-numeric: tabular-nums; }
 .controls .r-symhelp { font-size: 12px; width: 22px; height: 22px; border: 1px solid var(--line); border-radius: 50%; }
 .sunhelp { width: min(96vw, 1100px); }
 abbr.term, a.term { text-decoration: underline dotted; text-underline-offset: 2px; cursor: help; }
