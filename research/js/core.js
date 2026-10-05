@@ -1087,6 +1087,8 @@
     });
     s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { u = unesc(u); return pre + stash(mdLink(u, u, true)); });
     s = s.replace(/\\(&gt;|&lt;|&amp;|[\\`*_\[\]~#+\-.!()])/g, function (m, c) { return stash(c); });   // \* is a plain *
+    // A-…, R-…, C-…, P-…: a code of the bench's, a link to what it names
+    s = s.replace(/(^|[\s(>\[,;])([ARCP]-[0-9A-Z]{5})(?![\w-])/g, function (m, pre, code) { return pre + stash('<a class="swlink swcode mono" href="?code=' + code + '" title="Go to ' + code + '">' + code + '</a>'); });
     // @DMB: a mention of someone by their initials
     s = s.replace(/(^|[\s(>])@([A-Z][A-Za-z]{1,5})\b/g, function (m, pre, who) { return pre + stash('<span class="mention" title="A mention of ' + who + '">@' + who + '</span>'); });
     s = emph(s);

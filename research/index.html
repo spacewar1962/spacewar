@@ -28,7 +28,7 @@
        below to the day of the release; the About box shows both. -->
   <meta name="bench-date" content="2026-09-29">
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css?v=1.18.12">
+  <link rel="stylesheet" href="css/research.css?v=1.18.13">
 </head>
 <body>
   <header class="bar">
@@ -65,6 +65,7 @@
     <button data-menu="versions" data-tabs="about compare genealogy tape analyse" data-lenses="7" aria-expanded="false" title="The version open, comparison, genealogy, the tapes, gaps in the record">Versions <span class="caret" aria-hidden="true">▾</span></button>
     <button data-tab="findings" title="What the bench and the group have established, with evidence; shared">Findings</button>
     <button data-tab="notes" title="What you have gathered for writing: figures, excerpts, findings, paragraphs; private, in this browser">My notes</button>
+    <button data-tab="paratexts" title="The scans, clippings, photographs and documents around the program, shared with the crew">Paratexts</button>
     <button data-menu="help" aria-expanded="false" title="About the bench, settings, the code">Help <span class="caret" aria-hidden="true">▾</span></button>
     <a class="tabs-map" href="sitemap.html" title="Every view and version as a plain link, for when a menu will not open">Site map</a>
   </nav>
@@ -81,6 +82,7 @@
     <section class="view" id="view-about"></section>
     <section class="view" id="view-findings"></section>
     <section class="view" id="view-notes"></section>
+    <section class="view" id="view-paratexts"></section>
   </main>
 
   <aside class="drawer" id="drawer" aria-label="Details">
@@ -105,6 +107,10 @@
       <div class="token-row"><input id="set-token" type="password" placeholder="6879-…" autocomplete="off" spellcheck="false"><button id="set-token-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
       <p class="hint" id="set-check"></p>
       <p class="hint"><button type="button" class="btn ghost" id="set-join">New to this? How to join the group</button> An account, the group and your token, step by step.</p>
+      <h2>Paratexts</h2>
+      <p class="hint">The paratexts are kept in a private GitHub repository shared with the crew (spacewar1962/sw_paratexts). Paste a fine-grained token limited to that repository, with Contents read and write (Paratexts, in the menu, says how). It is kept in this browser only.</p>
+      <label for="set-ghtoken">GitHub token</label>
+      <div class="token-row"><input id="set-ghtoken" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false"><button id="set-ghtoken-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
       <h2>Colour theme</h2>
       <p class="hint">The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.</p>
       <label>Theme <select id="set-theme"></select></label>
@@ -184,36 +190,37 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js?v=1.18.12"></script>
-  <script src="js/pdp1cpu.js?v=1.18.12"></script>
-  <script src="js/fiodec.js?v=1.18.12"></script>
-  <script src="js/versions.js?v=1.18.12"></script>
-  <script src="js/export.js?v=1.18.12"></script>
-  <script src="js/genealogy.js?v=1.18.12"></script>
-  <script src="js/core.js?v=1.18.12"></script>
-  <script src="js/swhid.js?v=1.18.12"></script>
-  <script src="js/notes.js?v=1.18.12"></script>
-  <script src="js/tray.js?v=1.18.12"></script>
-  <script src="js/figures.js?v=1.18.12"></script>
-  <script src="js/read.js?v=1.18.12"></script>
-  <script src="js/ai.js?v=1.18.12"></script>
-  <script src="js/run.js?v=1.18.12"></script>
-  <script src="js/analyse.js?v=1.18.12"></script>
-  <script src="js/structure.js?v=1.18.12"></script>
-  <script src="js/draws.js?v=1.18.12"></script>
-  <script src="js/gravity.js?v=1.18.12"></script>
-  <script src="js/orbits.js?v=1.18.12"></script>
-  <script src="js/random.js?v=1.18.12"></script>
-  <script src="js/lab.js?v=1.18.12"></script>
-  <script src="js/overview.js?v=1.18.12"></script>
-  <script src="js/compare.js?v=1.18.12"></script>
-  <script src="js/stemma.js?v=1.18.12"></script>
-  <script src="js/tape.js?v=1.18.12"></script>
-  <script src="js/reader.js?v=1.18.12"></script>
-  <script src="js/about.js?v=1.18.12"></script>
-  <script src="js/edition.js?v=1.18.12"></script>
-  <script src="js/findings.js?v=1.18.12"></script>
-  <script src="js/tours.js?v=1.18.12"></script>
-  <script src="js/main.js?v=1.18.12"></script>
+  <script src="js/pdp1asm.js?v=1.18.13"></script>
+  <script src="js/pdp1cpu.js?v=1.18.13"></script>
+  <script src="js/fiodec.js?v=1.18.13"></script>
+  <script src="js/versions.js?v=1.18.13"></script>
+  <script src="js/export.js?v=1.18.13"></script>
+  <script src="js/genealogy.js?v=1.18.13"></script>
+  <script src="js/core.js?v=1.18.13"></script>
+  <script src="js/swhid.js?v=1.18.13"></script>
+  <script src="js/notes.js?v=1.18.13"></script>
+  <script src="js/tray.js?v=1.18.13"></script>
+  <script src="js/figures.js?v=1.18.13"></script>
+  <script src="js/read.js?v=1.18.13"></script>
+  <script src="js/ai.js?v=1.18.13"></script>
+  <script src="js/run.js?v=1.18.13"></script>
+  <script src="js/analyse.js?v=1.18.13"></script>
+  <script src="js/structure.js?v=1.18.13"></script>
+  <script src="js/paratexts.js?v=1.18.13"></script>
+  <script src="js/draws.js?v=1.18.13"></script>
+  <script src="js/gravity.js?v=1.18.13"></script>
+  <script src="js/orbits.js?v=1.18.13"></script>
+  <script src="js/random.js?v=1.18.13"></script>
+  <script src="js/lab.js?v=1.18.13"></script>
+  <script src="js/overview.js?v=1.18.13"></script>
+  <script src="js/compare.js?v=1.18.13"></script>
+  <script src="js/stemma.js?v=1.18.13"></script>
+  <script src="js/tape.js?v=1.18.13"></script>
+  <script src="js/reader.js?v=1.18.13"></script>
+  <script src="js/about.js?v=1.18.13"></script>
+  <script src="js/edition.js?v=1.18.13"></script>
+  <script src="js/findings.js?v=1.18.13"></script>
+  <script src="js/tours.js?v=1.18.13"></script>
+  <script src="js/main.js?v=1.18.13"></script>
 </body>
 </html>

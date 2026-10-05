@@ -5,7 +5,7 @@
   'use strict';
   var SW = root.SW, V = root.SWVersions;
 
-  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'graphics', 'about', 'findings', 'notes'];
+  var ORDER = ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'graphics', 'about', 'findings', 'notes', 'paratexts'];
 
   function fillPicker() {
     var sel = SW.$('#pick-a');
@@ -98,6 +98,9 @@
     grp.value = SW.notes.groupId(SW.store.get('group', ''));
     tok.value = SW.store.get('token', '');
     tok.type = 'password'; show.textContent = 'Show'; show.setAttribute('aria-pressed', 'false');
+    var gtok = SW.$('#set-ghtoken'), gshow = SW.$('#set-ghtoken-show');
+    gtok.value = SW.store.get('gh.token', ''); gtok.type = 'password'; gshow.textContent = 'Show'; gshow.setAttribute('aria-pressed', 'false');
+    gshow.onclick = function () { var hid = gtok.type === 'password'; gtok.type = hid ? 'text' : 'password'; gshow.textContent = hid ? 'Hide' : 'Show'; gshow.setAttribute('aria-pressed', String(hid)); };
     SW.$('#set-check').textContent = '';
     dlg.returnValue = '';
     dlg.showModal();
@@ -161,6 +164,8 @@
       SW.store.set('name', SW.$('#set-name').value.trim());
       SW.store.set('group', SW.notes.groupId(grp.value));
       SW.store.set('token', tok.value.trim());
+      var gwas = SW.store.get('gh.token', ''); SW.store.set('gh.token', gtok.value.trim());
+      if (gwas !== gtok.value.trim() && SW.paratexts) SW.paratexts.reset();
       SW.notes.forget();
       SW.notes.invalidate(SW.state.v);
       SW.toast('Saved');
@@ -265,7 +270,7 @@
     if (q.code) setTimeout(function () { SW.notes.goCode(q.code); }, 1000);
     SW.$('#btn-code').onclick = function (e) {
       var r = e.currentTarget.getBoundingClientRect();
-      SW.pop(r.left - 180, r.bottom + 6, '<h4>Go to a code</h4><input type="text" class="code-in mono" placeholder="A-MLKH5, C-FT1A7, F33, DMB-N14" autocomplete="off"><p class="hint">An annotation or reply (A-, R-), a group finding (C-), the bench’s (F), or a note in My notes (initials-N). A link can carry one: ?code=…</p>');
+      SW.pop(r.left - 180, r.bottom + 6, '<h4>Go to a code</h4><input type="text" class="code-in mono" placeholder="A-MLKH5, C-FT1A7, P-U1J8Q, F33, DMB-N14" autocomplete="off"><p class="hint">An annotation or reply (A-, R-), a group finding (C-), the bench’s (F), or a note in My notes (initials-N). A link can carry one: ?code=…</p>');
       var inp = SW.$('.pop .code-in'); if (!inp) return;
       inp.focus();
       inp.addEventListener('keydown', function (k) { if (k.key === 'Enter' && inp.value.trim()) { SW.unpop(); SW.notes.goCode(inp.value); } });

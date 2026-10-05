@@ -703,7 +703,8 @@
     var m;
     if ((m = /^F(\d+)$/.exec(code))) { SW.findings.openBench('F' + m[1]); return; }
     if (/^[A-Z]{1,4}-N\d+$/.test(code)) { SW.tray.reveal(code); return; }
-    if (!(m = /^([ARC])-([0-9A-Z]{5})$/.exec(code))) { SW.toast('Not a code: A-, R- or C- and five letters or figures, F and a number, or initials-N and a number.', 6000); return; }
+    if (/^P-[0-9A-Z]{5}$/.test(code)) { SW.paratexts.reveal(code); return; }
+    if (!(m = /^([ARC])-([0-9A-Z]{5})$/.exec(code))) { SW.toast('Not a code: A-, R-, C- or P- and five letters or figures, F and a number, or initials-N and a number.', 6000); return; }
     if (m[1] === 'C') { SW.findings.openRef(code); return; }
     N.listAll().then(function (all) {
       var n = all.filter(function (x) { return x.id && x.source !== 'buildlog' && N.code(x).slice(2) === m[2]; })[0];
@@ -878,10 +879,11 @@
     (h.split('?')[1] || '').split('#')[0].split('&').forEach(function (kv) {
       var i = kv.indexOf('='); if (i > 0) { try { q[kv.slice(0, i)] = decodeURIComponent(kv.slice(i + 1)); } catch (e) { /* malformed */ } }
     });
-    return q.v ? q : null;
+    return q.v || q.code ? q : null;
   };
   // How SW.md draws a bench link: in place, marked ↪, a bare one named for what it points to.
   function nameOfLink(q) {
+    if (q.code && !q.v) return q.code;   // a code: named by itself
     var n = q.a && idx.byId[q.a], name;
     if (n) name = N.labelOf(n);
     else if (q.l) { var m = /^(\d+):(\d+)(?:-(\d+))?$/.exec(q.l); name = m ? SW.refOf(q.v, +m[1], +m[2], +(m[3] || m[2]), SW.nparts(q.v)) : SW.refOf(q.v); }
@@ -938,6 +940,7 @@
     e.preventDefault();
     var dlg = a.closest('dialog');
     if (dlg && dlg.open && !dlg.hasAttribute('data-keep')) { dlg.close(); if (dlg.classList.contains('tray-big')) dlg.remove(); }
+    if (q.code) { N.goCode(q.code); return; }   // a code written in the text
     N.follow(q);
   });
 
