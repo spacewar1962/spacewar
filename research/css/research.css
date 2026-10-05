@@ -1897,3 +1897,6 @@ dialog.px-dlg { width: min(96vw, 1200px); }
 .px-drop.on { border-color: var(--beam); color: var(--text); }
 .px-drop input { display: none; }
 a.swcode { font-size: .92em; }
+/* the stars given to a paratext, in gold */
+.px-rx .fd-rate button.on { color: var(--kin); }
+.px-s.px-star { color: var(--kin); }

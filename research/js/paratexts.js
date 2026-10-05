@@ -220,7 +220,7 @@
   function avg(it) { var r = it.rates || {}, k = Object.keys(r); return k.length ? { avg: k.reduce(function (t, x) { return t + r[x]; }, 0) / k.length, n: k.length, who: k.map(function (x) { return x + ' ' + '★'.repeat(r[x]); }) } : null; }
   function summary(it) {
     var a = avg(it), rx = it.rx || {}, em = Object.keys(rx).filter(function (e) { return (rx[e] || []).length; }), nc = (it.comments || []).length;
-    return (a ? '<span class="px-s" title="' + SW.esc(a.who.join('; ')) + '">★ ' + (Math.round(a.avg * 10) / 10) + '</span>' : '') +
+    return (a ? '<span class="px-s px-star" title="' + SW.esc(a.who.join('; ')) + '">★ ' + (Math.round(a.avg * 10) / 10) + '</span>' : '') +
       (em.length ? '<span class="px-s">' + em.map(function (e) { return e + (rx[e].length > 1 ? '<sup>' + rx[e].length + '</sup>' : ''); }).join('') + '</span>' : '') +
       (nc ? '<span class="px-s">💬 ' + nc + '</span>' : '');
   }
