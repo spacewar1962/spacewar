@@ -286,7 +286,13 @@
       '<button class="gz-mk gz-mk-none' + (cur ? '' : ' on') + '" data-mark="" title="No mark" aria-pressed="' + !cur + '">✕</button></span>';
   }
   function gzMarkSet(box, m) { SW.$$('.gz-mk', box).forEach(function (x) { var on = x.dataset.mark === m; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); }); }
-  function gzMarkBar(m, x, y, h) { return m ? '<rect x="' + (x + 1.5) + '" y="' + (y + 1.5) + '" width="6" height="' + (h - 3) + '" rx="2" fill="' + gzMarkHex(m) + '"/>' : ''; }
+  // the mark's bar, clipped to the box's own outline (rounded for the start)
+  var gzMkN = 0;
+  function gzMarkBar(m, x, y, w, h, rx) {
+    if (!m) return '';
+    var id = 'gzmk' + (++gzMkN);
+    return '<clipPath id="' + id + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + rx + '"/></clipPath><rect x="' + x + '" y="' + y + '" width="6" height="' + h + '" fill="' + gzMarkHex(m) + '" clip-path="url(#' + id + ')"/>';
+  }
   // A block or routine's heading: your name for it, its own label beside it in grey brackets
   function gzTitle(nm, real) { return nm ? SW.esc(nm) + ' <span class="gz-real">(' + SW.esc(real) + ')</span>' : SW.esc(real); }
   // in a graph box: the name cut to the room left beside the time (the box's own label goes on its second line)
@@ -468,7 +474,7 @@
         var lines = bl.src ? (bl.src.n1 !== bl.src.n0 ? 'lines ' + bl.src.n0 + '–' + bl.src.n1 : 'line ' + bl.src.n0) : SW.oct(bl.a0, 4);
         o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc((gzName(b.v.id, bl.a0) ? gzName(b.v.id, bl.a0) + ': ' : '') + bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--surface)"/>' +
-          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' + gzMarkBar(gzMark(b.v.id, bl.a0), p.x, p.y, NH) +
+          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' + gzMarkBar(gzMark(b.v.id, bl.a0), p.x, p.y, NW, NH, id === F.entry ? 14 : 4) +
           '<text x="' + (p.x + (gzMark(b.v.id, bl.a0) ? 11 : 8)) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(gzFit(gzName(b.v.id, bl.a0) || bl.name, NW - 24 - 6.6 * gzMs(bl.cyc).length)) + '</text>' +
           '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="var(--text)" font-weight="700">' + gzMs(bl.cyc) + '</text>' +
           '<text x="' + (p.x + (gzMark(b.v.id, bl.a0) ? 11 : 8)) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc((gzName(b.v.id, bl.a0) ? bl.name + ' · ' : '') + lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
@@ -787,7 +793,7 @@
           var sh = SH[r.i] || 0, heat = Math.round(6 + 60 * Math.sqrt(sh / smax)), ring = EDGE[row.kind], nm = rName(row);
           o.push('<g class="gz-node" data-r="' + k + '" style="cursor:pointer"><title>' + esc((nm ? nm + ': ' : '') + r.name + ', ' + linesOf(r) + ', ' + r.blocks.length + ' blocks; ' + gzMs(SH['c' + r.i]) + ' (' + (100 * sh).toFixed(1) + '% of the time) in the 5 s sample run; ' + row.kind) + '</title>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--surface)"/>' +
-            '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="' + (ring || 'var(--text-faint)') + '" stroke-width="' + (ring ? 2 : 1) + '"/>' + gzMarkBar(rMark(row), p.x, p.y, NH) +
+            '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="' + (ring || 'var(--text-faint)') + '" stroke-width="' + (ring ? 2 : 1) + '"/>' + gzMarkBar(rMark(row), p.x, p.y, NW, NH, k === entryRow ? 12 : 4) +
             '<text x="' + (p.x + (rMark(row) ? 10 : 7)) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + esc(gzFit(nm || r.name, NW - 22 - 6.4 * gzMs(SH['c' + r.i]).length)) + '</text>' +
             '<text x="' + (p.x + NW - 7) + '" y="' + (p.y + 17) + '" text-anchor="end" font-family="sans-serif" font-size="11" fill="var(--text)" font-weight="700">' + gzMs(SH['c' + r.i]) + '</text>' +
             '<text x="' + (p.x + (rMark(row) ? 10 : 7)) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc((nm ? r.name + ' · ' : '') + linesOf(r)) + '</text></g>');
