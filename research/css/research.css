@@ -2020,3 +2020,8 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .px-ib { font-size: 16px; color: var(--text-dim); margin-bottom: 8px; }
 .px-ib[aria-expanded="true"] { color: var(--beam); }
 .px-lede { font-size: 12.5px; max-width: 80ch; margin: 0 0 12px; }
+.px-addbtn { display: block; width: 100%; margin: 0 0 10px; }
+.px-dc { margin: 8px 0 0; }
+.px-dc > summary { cursor: pointer; font-size: 12.5px; color: var(--text-dim); margin-bottom: 6px; }
+.px-fields select { font: 13px var(--sans); padding: 3px 6px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
+.px-fmt { color: var(--text); font-size: 12.5px; }

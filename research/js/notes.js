@@ -1004,7 +1004,7 @@
     var esc = SW.esc, grp = N.groupId(SW.store.get('group', '')), P = SW.paratexts;
     var d = SW.el('dialog', { class: 'tray-big annohelp joinhelp' });
     function ok(t) { return '<p class="js-ok" data-ok="' + t + '"></p>'; }
-    d.innerHTML = '<div class="tray-bighead"><b>Joining the annotation group</b><span class="refhelp-acts"><button class="btn ghost" data-share title="' + (grp ? 'A link that opens this guide with your group filled in, to send privately to someone joining: anyone with it can join the group' : 'A link that opens this guide, to send to someone joining') + '">🔗 Copy ' + (grp ? 'an invitation link' : 'a link to this guide') + '</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div><div class="ah">' +
+    d.innerHTML = '<div class="tray-bighead"><b>Joining the annotation group</b><span class="refhelp-acts"><button class="btn ghost" data-share title="' + (grp ? 'A link that opens this guide with your group filled in, to send privately to someone joining: anyone with it can join the group' : 'A link that opens this guide, to send to someone joining') + '">' + SW.SHARE_ICON + ' Share ' + (grp ? 'an invitation' : 'this guide') + '</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div><div class="ah">' +
       '<p>Annotations on the bench are shared through a private group on <b>Hypothesis</b>, the open annotation service. To read and write them you need a Hypothesis account, membership of the group, and a personal key (an API token) that lets the bench write as you. About five minutes.</p>' +
 
       '<div class="js-steps"><section class="js-step"><div class="js-num" aria-hidden="true">1</div><div class="js-body"><h3><span class="vh">Step 1: </span>Create a Hypothesis account</h3>' +
@@ -1075,9 +1075,7 @@
       }
       if (e.target.closest('[data-share]')) {
         var g = N.groupId(SW.store.get('group', ''));
-        var url = SW.BASE_URI + 'join.html' + (g ? '#' + g : '');   // its own share card; it opens the bench with this guide showing
-        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
-          .then(function () { SW.toast(g ? 'Invitation link copied: send it privately; anyone with it can join the group' : 'Link copied: it opens the bench with this guide showing', 6000); }, function () { window.prompt('Copy:', url); });
+        SW.share({ title: g ? 'Join the Spacewar! annotation group' : 'Joining the Spacewar! annotation group', text: g ? 'An invitation to read and annotate the Spacewar! source code together on the Research Bench. Keep it to the crew: anyone with the link can join.' : '', url: SW.BASE_URI + 'join.html' + (g ? '#' + g : '') });
         return;
       }
       if (e.target === d || e.target.closest('[data-x]')) { d.close(); }

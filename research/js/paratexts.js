@@ -37,9 +37,27 @@
   function fileB64(file) {
     return new Promise(function (ok, no) { var r = new FileReader(); r.onload = function () { ok(String(r.result).replace(/^data:[^,]*,/, '')); }; r.onerror = no; r.readAsDataURL(file); });
   }
+  // Kept in this browser's cache (Cache Storage, cleared when the token is taken out): the files, each
+  // fetched from GitHub once, and the catalogue, shown at once and checked with GitHub behind it.
+  var CACHE = 'sw-paratexts-1', CK = 'https://sw-paratexts.invalid/';
+  function store() { try { return root.caches ? caches.open(CACHE) : Promise.reject(); } catch (e) { return Promise.reject(e); } }
+  function cacheGet(key) { return store().then(function (c) { return c.match(CK + key); }).catch(function () { return null; }); }
+  function cachePut(key, body, type) { store().then(function (c) { return c.put(CK + key, new Response(body, { headers: { 'Content-Type': type } })); }).catch(function () {}); }
+  P.forgetCache = function () { try { if (root.caches) caches.delete(CACHE); } catch (e) { /* none */ } };
+  function keepCat() { cachePut('catalogue.json', JSON.stringify({ sha: catSha, cat: cat }), 'application/json'); }
+  function fetchCat() { return gh('GET', '/contents/catalogue.json').then(function (r) { catSha = r.sha; cat = JSON.parse(utf8b64(r.content)); cat.items = cat.items || []; keepCat(); return cat; }); }
   P.load = function (force) {
     if (cat && !force) return Promise.resolve(cat);
-    return gh('GET', '/contents/catalogue.json').then(function (r) { catSha = r.sha; cat = JSON.parse(utf8b64(r.content)); cat.items = cat.items || []; return cat; });
+    if (force) return fetchCat();
+    return cacheGet('catalogue.json').then(function (r) { return r ? r.json() : null; }).then(function (k) {
+      if (!k || !k.cat || cat) return cat || fetchCat();
+      cat = k.cat; cat.items = cat.items || []; catSha = k.sha;
+      var was = k.sha;
+      fetchCat().then(function () { if (catSha !== was) refresh(); }, function (e) {   // GitHub's answer, behind the copy shown
+        if (e.status === 401 || e.status === 404) { P.forgetCache(); cat = null; SW.toast(e.message, 6000); done = false; if (SW.state.tab === 'paratexts') render(); }
+      });
+      return cat;
+    }, function () { return fetchCat(); });
   };
   // A change to the catalogue: made on the newest copy, and made again if someone saved in between
   function save(message, change, tries) {
@@ -47,14 +65,20 @@
     return P.load(true).then(function () {
       change(cat);
       return gh('PUT', '/contents/catalogue.json', { message: message, content: b64utf8(JSON.stringify(cat, null, 1) + '\n'), sha: catSha });
-    }).then(function (r) { catSha = r.content.sha; return cat; }, function (e) {
+    }).then(function (r) { catSha = r.content.sha; keepCat(); return cat; }, function (e) {
       if (e.message === 'conflict' && tries < 3) return save(message, change, tries + 1);
       throw e;
     });
   }
   function blobOf(it) {
     if (urls[it.code]) return Promise.resolve(urls[it.code]);
-    return gh('GET', '/contents/' + it.file.split('/').map(encodeURIComponent).join('/'), null, 'application/vnd.github.raw').then(function (b) {
+    var key = 'files/' + it.file + '?' + (it.size || 0);
+    return cacheGet(key).then(function (hit) { return hit ? hit.blob() : null; }).then(function (b) {
+      if (b) return b;
+      return gh('GET', '/contents/' + it.file.split('/').map(encodeURIComponent).join('/'), null, 'application/vnd.github.raw').then(function (b2) {
+        cachePut(key, b2, it.mime || b2.type || 'application/octet-stream'); return b2;
+      });
+    }).then(function (b) {
       if (it.mime && b.type !== it.mime) b = b.slice(0, b.size, it.mime);
       return (urls[it.code] = URL.createObjectURL(b));
     });
@@ -185,12 +209,13 @@
     if (inC()) return all.filter(function (it) { return inColl(it).indexOf(F.c) >= 0; });
     return all;
   }
-  var SORTS = [['date', 'Date', 1], ['title', 'Title', 1], ['added', 'Recently added', -1], ['rating', 'Rating', -1], ['code', 'Code', 1], ['size', 'Size', -1], ['creator', 'Creator', 1], ['kind', 'Kind', 1]];
+  var SORTS = [['date', 'Date made', 1], ['title', 'Title', 1], ['added', 'Accessioned (newest)', -1], ['rating', 'Rating', -1], ['code', 'Code', 1], ['size', 'Size', -1], ['creator', 'Creator', 1], ['kind', 'Kind', 1]];
   function defDir(k) { var s = SORTS.filter(function (x) { return x[0] === k; })[0]; return s ? s[2] : 1; }
   function sortKey(it, k) {
     if (k === 'date') return String(it.date || '9999');
     if (k === 'rating') { var a = avg(it); return a ? a.avg : -1; }
     if (k === 'size') return it.size || 0;
+    if (k === 'added') return (it.accessioned || String(it.added || '').slice(0, 10)) + (it.added || '');
     return String(it[k] || '').toLowerCase();
   }
   function shown() {
@@ -199,7 +224,7 @@
       if (F.tag && (it.tags || []).indexOf(F.tag) < 0) return false;
       if (F.v && (it.versions || []).indexOf(F.v) < 0) return false;
       if (F.kind && it.kind !== F.kind) return false;
-      if (F.q) { var t = [it.code, it.title, it.date, it.creator, it.source, it.description, (it.tags || []).join(' '), it.name, inColl(it).map(pathName).join(' ')].join(' ').toLowerCase(); if (t.indexOf(F.q.toLowerCase()) < 0) return false; }
+      if (F.q) { var t = [it.code, it.title, it.date, it.creator, it.source, it.archive, it.archiveId, it.publisher, (it.contributor || []).join(' '), it.coverage, it.description, (it.tags || []).join(' '), it.name, inColl(it).map(pathName).join(' ')].join(' ').toLowerCase(); if (t.indexOf(F.q.toLowerCase()) < 0) return false; }
       return true;
     }).sort(function (a, b) {
       var x = sortKey(a, k), y = sortKey(b, k); if (x < y) return -d; if (x > y) return d;
@@ -247,7 +272,6 @@
       '<span class="px-seg">' + seg('view', 'grid', '▦', VW.mode !== 'list', 'Grid') + seg('view', 'list', '☰', VW.mode === 'list', 'List') + '</span>' +
       (VW.mode !== 'list' ? '<span class="px-seg">' + seg('size', 's', 'S', VW.size === 's', 'Small') + seg('size', 'm', 'M', VW.size === 'm', 'Medium') + seg('size', 'l', 'L', VW.size === 'l', 'Large') + '</span>' : '') +
       '<span class="hint px-count"></span><span class="hint px-busy">' + (busyN ? 'Saving…' : '') + '</span>' +
-      '<button class="btn" data-px="add" title="Upload a file with its details, to the crew’s repository">＋ Add a paratext</button>' +
       '<button class="btn ghost" data-px="reload" title="Read the catalogue again (others may have added)">↻</button></div>' +
       '<div class="px-list"></div></div></div>';
     paintNav(body); paintList(body); wire(body);
@@ -268,7 +292,7 @@
       if (editing && editing.mode === 'new' && editing.parent === c.id) r += editRow(o.depth + 1, '');
       return r;
     }).join('');
-    nav.innerHTML = row('', '▤', 'All', lv.length) + row('_none', '◌', 'Not in a collection', lv.filter(function (it) { return !inColl(it).length; }).length) +
+    nav.innerHTML = '<button class="btn px-addbtn" data-px="add" title="Upload a file with its details, to the crew’s repository">＋ Add a paratext</button>' + row('', '▤', 'All', lv.length) + row('_none', '◌', 'Not in a collection', lv.filter(function (it) { return !inColl(it).length; }).length) +
       '<div class="px-ch"><span>Collections</span><button class="icon-btn" data-px="newc" title="A new collection">＋</button></div>' +
       tree + (editing && editing.mode === 'new' && !editing.parent ? editRow(0, '') : '') +
       (!colls().length && !editing ? '<p class="hint px-navfoot">None yet: ＋ makes one; then drag items onto it, or tick them and Add to.</p>' : '') +
@@ -309,7 +333,7 @@
         '<div class="px-tags">' + summary(it) + (it.tags || []).map(function (g) { return '<span class="fd-tag">' + esc(g) + '</span>'; }).join(' ') + (it.versions || []).map(function (v) { return ' <span class="fd-tag px-v">' + esc(vShort(v)) + '</span>'; }).join('') + collChips(it) + '</div></div></li>';
     }).join('') + '</ul>';
   }
-  var COLS = [['code', 'Code'], ['title', 'Title'], ['date', 'Date'], ['creator', 'Creator'], ['kind', 'Kind'], ['size', 'Size'], ['rating', '★'], [null, 'Collections'], ['added', 'Added']];
+  var COLS = [['code', 'Code'], ['title', 'Title'], ['date', 'Made'], ['creator', 'Creator'], ['kind', 'Kind'], ['size', 'Size'], ['rating', '★'], [null, 'Collections'], ['added', 'Accessioned']];
   function listHTML(l) {
     var esc = SW.esc;
     return '<div class="px-tablewrap"><table class="px-table"><thead><tr><th><button class="px-pick" data-px="pickall" aria-pressed="' + l.every(function (it) { return sel[it.code]; }) + '" title="Select all shown"></button></th><th></th>' +
@@ -321,7 +345,7 @@
           '<td class="num">' + esc(it.date || '') + '</td><td>' + esc(it.creator || '') + '</td><td>' + esc(it.kind || '') + '</td><td class="num">' + fmtSize(it.size) + '</td>' +
           '<td>' + (a ? SW.stars(a.avg, (Math.round(a.avg * 10) / 10) + ' from ' + a.n + ': ' + a.who.join('; ')) : '') + '</td>' +
           '<td>' + inColl(it).map(function (id) { return '<span class="px-cl" title="' + esc(pathName(id)) + '">📁 ' + esc(coll(id).name) + '</span>'; }).join('') + '</td>' +
-          '<td class="num">' + esc(SW.fmtDate(it.added) || '') + '</td></tr>';
+          '<td class="num">' + esc(it.accessioned || SW.fmtDate(it.added) || '') + '</td></tr>';
       }).join('') + '</tbody></table></div>';
   }
   function selCodes() { return cur.filter(function (it) { return sel[it.code]; }).map(function (it) { return it.code; }); }
@@ -344,6 +368,7 @@
       (F.c === '_wd' ? '' : '<select data-px="to" title="Put the selected items in a collection"><option value="">Add to a collection…</option>' + treeOpts(c0 ? [c0.id] : []) + '<option value="_new">＋ A new collection…</option></select>') +
       (c0 ? '<button class="btn ghost" data-px="out" title="Take them out of this collection (they stay in the catalogue)">Out of “' + esc(c0.name) + '”</button>' : '') +
       '<span class="px-tagadd"><input class="px-tagin" placeholder="A tag"><button class="btn ghost" data-px="tag" title="Add this tag to each">Tag</button></span>' +
+      '<button class="btn ghost" data-px="dc" title="Their records in Dublin Core (oai_dc XML), to save">Dublin Core ⤓</button>' +
       '<button class="btn ghost" data-px="codes" title="Their codes, to paste into an annotation, note or finding, where each becomes a link">Copy the codes</button>' +
       (F.c === '_wd' ? '<button class="btn" data-px="restore">Bring back</button>' : moreMenu('<button data-px="wd">Withdraw from the list…</button>')) +
       '<button class="icon-btn" data-px="clear" title="Clear the selection">✕</button>';
@@ -384,6 +409,7 @@
       if (act === 'out') { outOf(selCodes(), F.c); return; }
       if (act === 'tag') { var ti = SW.$('.px-tagin', body), tg = ti && ti.value.trim(); if (!tg) return; var cs = selCodes(); change(who(cs) + ': tagged “' + tg + '”', each(cs, function (x) { x.tags = (x.tags || []).slice(); if (x.tags.indexOf(tg) < 0) x.tags.push(tg); })); return; }
       if (act === 'codes') { SW.copyText(selCodes().join(' '), 'the codes'); return; }
+      if (act === 'dc') { var cd = selCodes(); saveFile('paratexts-dc-' + cd.length + '.xml', dcXML(cd.map(byCode)), 'application/xml'); return; }
       if (act === 'wd') { var mm = b.closest('details'); if (mm) mm.open = false; withdrawBox(selCodes(), function () { sel = {}; }); return; }
       if (act === 'restore') { var cr = selCodes(); sel = {}; change(who(cr) + ': brought back', each(cr, unwithdraw)); return; }
       var th = t.closest('th[data-sort]');
@@ -441,13 +467,44 @@
   function byCode(c) { return (cat ? cat.items : []).filter(function (it) { return it.code === c; })[0] || null; }
 
   // ---------- one paratext ----------
-  var FIELDS = [['title', 'Title'], ['date', 'Date'], ['creator', 'Creator'], ['source', 'Source'], ['rights', 'Rights'], ['accessioned', 'Accession date'], ['description', 'Description', 'area'], ['tags', 'Tags', 'list'], ['versions', 'Versions', 'list'], ['refs', 'References', 'list']];
+  // The record: [key, label, kind, placeholder, group]. The 'dc' group, the rest of Dublin Core's fifteen
+  // elements, folds away under More metadata; the archive fields say where the original is kept.
+  var DCMI = ['Collection', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'MovingImage', 'PhysicalObject', 'Service', 'Software', 'Sound', 'StillImage', 'Text'];
+  var FIELDS = [['title', 'Title'], ['date', 'Date made', '', 'e.g. 1963-05-17, or 1963'], ['creator', 'Creator'], ['source', 'Source', '', 'where this copy came from'],
+    ['archive', 'Held at', '', 'the archive with the original, e.g. Computer History Museum'], ['archiveId', 'Archive ref', '', 'its catalogue number, or box and folder'], ['archiveUrl', 'Archive link', 'url', 'https://… the original in its archive’s catalogue'],
+    ['rights', 'Rights'], ['accessioned', 'Accession date', '', 'the day it came into the collection'], ['description', 'Description', 'area'],
+    ['tags', 'Tags', 'list', 'comma separated'], ['versions', 'Versions', 'list', 'e.g. 4.3, 4.4'], ['refs', 'References', 'list', 'e.g. [REF: SW4.3L, 2.10–20]'],
+    ['type', 'Type', 'dcmi', '', 'dc'], ['publisher', 'Publisher', '', 'e.g. Rolling Stone', 'dc'], ['contributor', 'Contributors', 'list', 'comma separated', 'dc'],
+    ['language', 'Language', '', 'e.g. en', 'dc'], ['coverage', 'Coverage', '', 'a place or a period', 'dc'], ['identifier', 'Identifiers', 'list', 'DOI, ISBN, URL; comma separated', 'dc']];
+  function okURL(u) { return /^https?:\/\/\S+$/i.test(String(u || '').trim()); }
   function fieldsHTML(it) {
-    return '<div class="px-fields">' + FIELDS.map(function (f) {
-      var v = it[f[0]], val = f[2] === 'list' ? (v || []).join(', ') : (v || '');
-      var ph = f[0] === 'versions' ? 'e.g. 4.3, 4.4' : f[0] === 'refs' ? 'e.g. [REF: SW4.3L, 2.10–20]' : f[0] === 'tags' ? 'comma separated' : f[0] === 'date' ? 'e.g. 1963-05-17, or 1963' : f[0] === 'accessioned' ? 'the day it came into the collection' : '';
-      return '<label><span>' + f[1] + '</span>' + (f[2] === 'area' ? '<textarea data-k="' + f[0] + '" rows="3">' + SW.esc(val) + '</textarea>' : '<input data-k="' + f[0] + '" value="' + SW.esc(val) + '" placeholder="' + SW.esc(ph) + '">') + '</label>';
-    }).join('') + '</div>';
+    function one(f) {
+      var v = it[f[0]], val = f[2] === 'list' ? (v || []).join(', ') : (v || ''), ph = f[3] || '';
+      var inp = f[2] === 'area' ? '<textarea data-k="' + f[0] + '" rows="3">' + SW.esc(val) + '</textarea>' :
+        f[2] === 'dcmi' ? '<select data-k="' + f[0] + '"><option value="">—</option>' + DCMI.map(function (t) { return '<option' + (t === val ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select>' :
+        '<input data-k="' + f[0] + '"' + (f[2] === 'url' ? ' type="url"' : '') + ' value="' + SW.esc(val) + '" placeholder="' + SW.esc(ph) + '">';
+      return '<label><span>' + f[1] + '</span>' + inp + '</label>';
+    }
+    var dc = FIELDS.filter(function (f) { return f[4] === 'dc'; }), filled = dc.filter(function (f) { var v = it[f[0]]; return Array.isArray(v) ? v.length : v; }).length;
+    return '<div class="px-fields">' + FIELDS.filter(function (f) { return f[4] !== 'dc'; }).map(one).join('') + '</div>' +
+      '<details class="px-dc"><summary>More metadata <span class="faint">(Dublin Core' + (filled ? ', ' + filled + ' filled' : '') + ')</span></summary><div class="px-fields">' + dc.map(one).join('') +
+      (it.mime || it.size ? '<label><span>Format</span><span class="px-fmt">' + SW.esc([it.mime, fmtSize(it.size)].filter(Boolean).join(', ')) + '</span></label>' : '') + '</div></details>';
+  }
+  // Dublin Core (oai_dc) records, for the selection or one item
+  function dcXML(items) {
+    var x = SW.esc;
+    function el(n, v) { return (Array.isArray(v) ? v : [v]).filter(function (y) { return y; }).map(function (y) { return '  <dc:' + n + '>' + x(String(y)) + '</dc:' + n + '>\n'; }).join(''); }
+    return '<?xml version="1.0" encoding="UTF-8"?>\n<records xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">\n' + items.map(function (it) {
+      return '<oai_dc:dc>\n' + el('title', it.title) + el('creator', it.creator) + el('subject', it.tags) + el('description', it.description) + el('publisher', it.publisher) + el('contributor', it.contributor) +
+        el('date', it.date) + el('type', it.type || (it.kind === 'image' ? 'StillImage' : it.kind === 'pdf' || it.kind === 'text' ? 'Text' : '')) + el('format', it.mime) +
+        el('identifier', [it.code, SW.BASE_URI + '?code=' + it.code].concat(it.identifier || [], okURL(it.archiveUrl) ? [it.archiveUrl] : [])) +
+        el('source', [it.source, [it.archive, it.archiveId].filter(Boolean).join(', ')]) + el('language', it.language) +
+        el('relation', (it.refs || []).concat((it.versions || []).map(function (v) { return 'Spacewar! ' + vShort(v); }))) + el('coverage', it.coverage) + el('rights', it.rights) + '</oai_dc:dc>\n';
+    }).join('') + '</records>\n';
+  }
+  function saveFile(name, text, type) {
+    var u = URL.createObjectURL(new Blob([text], { type: type })), a = SW.el('a', { href: u, download: name });
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
   }
   function readFields(box) {
     var o = {};
@@ -472,13 +529,13 @@
     var esc = SW.esc, d = SW.el('dialog', { class: 'tray-big px-dlg' });
     var gh0 = 'https://github.com/' + REPO + '/blob/main/' + it.file.split('/').map(encodeURIComponent).join('/');
     d.innerHTML = '<div class="tray-bighead"><span class="px-code mono" data-copy="' + esc(it.code) + '" title="Its code: click to copy">' + esc(it.code) + '</span> <b>' + esc(it.title) + '</b>' +
-      '<span class="refhelp-acts"><button class="btn ghost" data-a="keep" title="This paratext, with its details, in My notes (private)">＋ My notes</button><a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a><a class="btn ghost" href="' + esc(gh0) + '" target="_blank" rel="noopener" title="On GitHub, with its history">GitHub ↗</a><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+      '<span class="refhelp-acts"><button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button><button class="btn ghost" data-a="keep" title="This paratext, with its details, in My notes (private)">＋ My notes</button><a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a><a class="btn ghost" href="' + esc(gh0) + '" target="_blank" rel="noopener" title="On GitHub, with its history">GitHub ↗</a>' + (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">In the archive ↗</a>' : '') + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
       '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' + fieldsHTML(it) +
       '<div class="px-colls">' + collsHTML(it) + '</div>' +
       '<p class="hint">Catalogued by ' + esc(it.addedBy || '?') + (it.updated && it.updated !== it.added ? '; changed ' + esc(SW.fmtDate(it.updated)) + ' by ' + esc(it.updatedBy || '?') : '') + '.</p>' +
-      '<div class="px-acts"><button class="btn" data-a="save">Save the details</button> <span class="hint px-msg"></span>' + (it.withdrawn ? '<button class="btn ghost px-wd" data-a="restore" title="Back into the list">Bring back</button>' : moreMenu('<button data-a="withdraw">Withdraw from the list…</button>')) + '</div>' +
+      '<div class="px-acts"><button class="btn" data-a="save">Save the details</button> <span class="hint px-msg"></span>' + (it.withdrawn ? '<button class="btn ghost px-wd" data-a="restore" title="Back into the list">Bring back</button>' : moreMenu('<button data-a="dc">Dublin Core record (XML) ⤓</button><button data-a="withdraw">Withdraw from the list…</button>')) + '</div>' +
       (it.withdrawn ? '<p class="badge px-wdnote">Withdrawn ' + esc(SW.fmtDate(it.withdrawn)) + (it.withdrawnBy ? ' by ' + esc(it.withdrawnBy) : '') + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
-      '<div class="px-linkline"><b>Link</b> Write its code, <span class="mono">' + esc(it.code) + '</span>, in an annotation, note or finding: it becomes a link to this box. <button class="btn ghost" data-copy="' + esc(it.code) + '">Copy the code</button> <button class="btn ghost" data-copy="' + esc(SW.BASE_URI + '?code=' + it.code) + '" title="A web address that opens the bench at this paratext, for email or elsewhere">Copy a web link</button></div>' +
+      '<div class="px-linkline"><b>Link</b> Write its code, <span class="mono">' + esc(it.code) + '</span>, in an annotation, note or finding: it becomes a link to this box. <button class="btn ghost" data-copy="' + esc(it.code) + '">Copy the code</button></div>' +
       '<div class="px-talk">' + talkHTML(it) + '</div></div></div>';
     document.body.appendChild(d);
     d.addEventListener('close', function () { d.remove(); });
@@ -524,6 +581,9 @@
       } else if (a.dataset.a === 'restore') {
         change('Paratext ' + it.code + ': brought back', each([it.code], unwithdraw))
           .then(function (ok) { if (ok) { d.close(); SW.toast(it.code + ' brought back'); } });
+      } else if (a.dataset.a === 'dc') {
+        var md = a.closest('details'); if (md) md.open = false;
+        saveFile(it.code + '-dc.xml', dcXML([byCode(code)]), 'application/xml');
       } else if (a.dataset.a === 'keep') {
         if (!SW.tray) return;
         var rows = FIELDS.map(function (f) { var v = it[f[0]]; return [f[1], Array.isArray(v) ? v.join(', ') : v || '']; }).filter(function (r) { return r[1]; });
@@ -629,10 +689,10 @@
       var cs = inColl(it); if (cs.length) rows.push(['Collections', cs.map(pathName).join('; ')]);
       rows = rows.filter(function (r) { return r[1]; });
       var nc = (it.comments || []).length;
-      d.innerHTML = head(it.title, '<a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a>') +
+      d.innerHTML = head(it.title, (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">In the archive ↗</a>' : '') + '<button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button><a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a>') +
         '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' +
         (it.withdrawn ? '<p class="badge">Withdrawn from the list' + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
-        '<dl class="px-ro">' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[0] === 'Description' ? SW.md(r[1]) : esc(r[1])) + '</dd>'; }).join('') + '</dl>' +
+        '<dl class="px-ro">' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[0] === 'Description' ? SW.md(r[1]) : r[0] === 'Archive link' && okURL(r[1]) ? '<a href="' + esc(r[1].trim()) + '" target="_blank" rel="noopener">' + esc(r[1]) + ' ↗</a>' : esc(r[1])) + '</dd>'; }).join('') + '</dl>' +
         '<div class="px-tags">' + summary(it) + '</div>' +
         (nc ? '<details class="px-cfold"><summary class="fd-rh">Comments <span class="faint">' + nc + '</span></summary>' + it.comments.map(function (c) { return '<div class="fd-reply"><div class="fd-rhead"><b>' + esc(c.by) + '</b> <span class="faint">' + esc(SW.fmtDate(c.date)) + '</span></div><div class="note-md">' + SW.md(c.text) + '</div></div>'; }).join('') + '</details>' : '') +
         '</div></div>' +
@@ -640,6 +700,11 @@
       showFile(it, SW.$('.px-view', d), SW.$('[data-a="dl"]', d));
     }, function (e) { d.innerHTML = head('Could not open') + '<p class="badge err">' + esc(e.message) + '</p>'; });
   };
+  document.addEventListener('click', function (e) {
+    var sb = e.target.closest && e.target.closest('dialog [data-share^="P-"]'); if (!sb) return;
+    var it = byCode(sb.dataset.share);
+    SW.share({ title: 'Paratext ' + sb.dataset.share + (it ? ': ' + it.title : ''), text: it ? it.title : '', url: SW.BASE_URI + '?code=' + sb.dataset.share });
+  });
   // To a paratext by its code (P-XXXXX): Paratexts opened, the item shown
   P.reveal = function (code) {
     SW.setTab('paratexts');
@@ -658,5 +723,5 @@
   };
   // The token in Settings, tried: the number in the catalogue, or why not
   P.test = function () { cat = null; return P.load(true).then(function (c) { return c.items.filter(function (it) { return !it.withdrawn; }).length; }); };
-  P.reset = function () { done = false; cat = null; wanted = false; if (SW.state.tab === 'paratexts') render(); };
+  P.reset = function () { done = false; cat = null; wanted = false; if (!P.configured()) P.forgetCache(); if (SW.state.tab === 'paratexts') render(); };
 })(typeof window !== 'undefined' ? window : globalThis);

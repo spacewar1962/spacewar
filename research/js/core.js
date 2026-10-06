@@ -406,6 +406,16 @@
   SW.swhidList = function (files) {
     return files.map(function (f) { var id = SW.swhidOf(f); return '<div class="swhid-row"><a class="mono" href="' + SW.esc(SW.permalinkOf(f)) + '" target="_blank" rel="noopener" title="The file on GitHub, at its last change">' + SW.esc(f.split('/').pop()) + '</a> ' + (id ? '<button class="swhid mono" title="Copy ' + SW.esc(id) + '" data-copy="' + SW.esc(id) + '">' + SW.esc(id.slice(0, 17)) + '…</button> <a class="swhid-go" href="' + SW.esc(SW.swhidURL(id)) + '" target="_blank" rel="noopener" title="Open in the Software Heritage archive (once the repository is archived there)">↗</a>' : '<span class="faint">no SWHID (not in the repository)</span>') + '</div>'; }).join('');
   };
+  // Share a link: the system's share sheet where the browser has one (Mail, Messages…), else the link copied.
+  // A local address becomes the public one.
+  SW.share = function (o) {
+    var url = String(o.url || location.href).replace(/[?&]nc=\d+/, '');
+    var m = /\/research\/(?:index\.html)?(\?.*)?$/.exec(url); if (m && url.indexOf(SW.BASE_URI) !== 0) url = SW.BASE_URI + (m[1] || '');
+    var d = { title: o.title || document.title, text: o.text || '', url: url };
+    if (navigator.share && (!navigator.canShare || navigator.canShare(d))) return navigator.share(d).catch(function (e) { if (e && e.name !== 'AbortError') SW.copyText(url, 'the link'); });
+    SW.copyText(url, 'the link');
+  };
+  SW.SHARE_ICON = '<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" style="vertical-align:-2px"><path d="M8 1.5v8M5 4.5l3-3 3 3M3.5 7.5v6h9v-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   // Copy text; where the clipboard API is refused, through a selected textarea.
   SW.copyText = function (t, what) {
     function old() {
