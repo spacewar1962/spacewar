@@ -368,7 +368,8 @@
       (F.c === '_wd' ? '' : '<select data-px="to" title="Put the selected items in a collection"><option value="">Add to a collection…</option>' + treeOpts(c0 ? [c0.id] : []) + '<option value="_new">＋ A new collection…</option></select>') +
       (c0 ? '<button class="btn ghost" data-px="out" title="Take them out of this collection (they stay in the catalogue)">Out of “' + esc(c0.name) + '”</button>' : '') +
       '<span class="px-tagadd"><input class="px-tagin" placeholder="A tag"><button class="btn ghost" data-px="tag" title="Add this tag to each">Tag</button></span>' +
-      '<button class="btn ghost" data-px="dc" title="Their records in Dublin Core (oai_dc XML), to save">Dublin Core ⤓</button>' +
+      (n === 2 ? '<button class="btn" data-px="sbs" title="The two side by side, to zoom and pan together">Side by side</button>' : '') +
+      exportMenu('data-pxx') +
       '<button class="btn ghost" data-px="codes" title="Their codes, to paste into an annotation, note or finding, where each becomes a link">Copy the codes</button>' +
       (F.c === '_wd' ? '<button class="btn" data-px="restore">Bring back</button>' : moreMenu('<button data-px="wd">Withdraw from the list…</button>')) +
       '<button class="icon-btn" data-px="clear" title="Clear the selection">✕</button>';
@@ -409,7 +410,9 @@
       if (act === 'out') { outOf(selCodes(), F.c); return; }
       if (act === 'tag') { var ti = SW.$('.px-tagin', body), tg = ti && ti.value.trim(); if (!tg) return; var cs = selCodes(); change(who(cs) + ': tagged “' + tg + '”', each(cs, function (x) { x.tags = (x.tags || []).slice(); if (x.tags.indexOf(tg) < 0) x.tags.push(tg); })); return; }
       if (act === 'codes') { SW.copyText(selCodes().join(' '), 'the codes'); return; }
-      if (act === 'dc') { var cd = selCodes(); saveFile('paratexts-dc-' + cd.length + '.xml', dcXML(cd.map(byCode)), 'application/xml'); return; }
+      if (act === 'sbs') { var two = selCodes(); if (two.length === 2) P.sideBySide(two); return; }
+      var xb = t.closest('[data-pxx]');
+      if (xb) { var xd = xb.closest('details'); if (xd) xd.open = false; var cd = selCodes(); exportItems(xb.dataset.pxx, cd.map(byCode), 'paratexts-' + cd.length); return; }
       if (act === 'wd') { var mm = b.closest('details'); if (mm) mm.open = false; withdrawBox(selCodes(), function () { sel = {}; }); return; }
       if (act === 'restore') { var cr = selCodes(); sel = {}; change(who(cr) + ': brought back', each(cr, unwithdraw)); return; }
       var th = t.closest('th[data-sort]');
@@ -502,6 +505,57 @@
         el('relation', (it.refs || []).concat((it.versions || []).map(function (v) { return 'Spacewar! ' + vShort(v); }))) + el('coverage', it.coverage) + el('rights', it.rights) + '</oai_dc:dc>\n';
     }).join('') + '</records>\n';
   }
+  // For Zotero and other reference managers: CSL-JSON and RIS. The creator field may hold several
+  // people, separated by semicolons, each 'Family, Given' or 'Given Family'; an organisation stays whole.
+  function people(s) {
+    return String(s || '').split(/\s*;\s*/).filter(Boolean).map(function (p) {
+      var m = /^([^,]+),\s*(.+)$/.exec(p); if (m) return { family: m[1].trim(), given: m[2].trim() };
+      var w = p.trim().split(/\s+/);
+      return w.length === 2 || w.length === 3 && /^[A-Z]\.?$/.test(w[1]) ? { family: w[w.length - 1], given: w.slice(0, -1).join(' ') } : { literal: p.trim() };
+    });
+  }
+  function dateParts(d) { var m = /^(\d{4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?/.exec(String(d || '')); return m ? [m.slice(1).filter(Boolean).map(Number)] : null; }
+  function dcType(it) { return it.type || (it.kind === 'image' ? 'StillImage' : it.kind === 'pdf' || it.kind === 'text' ? 'Text' : ''); }
+  function benchLink(it) { return SW.BASE_URI + '?code=' + it.code; }
+  function ids(it) { var o = {}; (it.identifier || []).forEach(function (x) { x = String(x).trim(); if (/^(doi:)?10\.\d{4,}\//i.test(x)) o.DOI = x.replace(/^doi:/i, ''); else if (/^(isbn:)?[\d-]{10,17}X?$/i.test(x)) o.ISBN = x.replace(/^isbn:/i, ''); else if (/^https?:/.test(x) && !o.URL) o.URL = x; }); return o; }
+  function cslJSON(items) {
+    var T = { StillImage: 'graphic', Image: 'graphic', MovingImage: 'motion_picture', Sound: 'song', Software: 'software', Dataset: 'dataset', Text: 'document' };
+    return JSON.stringify(items.map(function (it) {
+      var o = { id: it.code, type: T[dcType(it)] || 'document', title: it.title }, x = ids(it), dp;
+      var au = people(it.creator); if (au.length) o.author = au;
+      if ((dp = dateParts(it.date))) o.issued = { 'date-parts': dp };
+      if ((dp = dateParts(it.accessioned))) o.accessed = { 'date-parts': dp };
+      if (it.publisher) o.publisher = it.publisher;
+      if (it.description) o.abstract = it.description;
+      if (it.archive) o.archive = it.archive;
+      if (it.archiveId) o.archive_location = it.archiveId;
+      if (it.language) o.language = it.language;
+      if (it.rights) o.license = it.rights;
+      if (it.mime) o.medium = it.mime;
+      if (x.DOI) o.DOI = x.DOI; if (x.ISBN) o.ISBN = x.ISBN;
+      o.URL = okURL(it.archiveUrl) ? it.archiveUrl.trim() : x.URL || benchLink(it);
+      if ((it.tags || []).length) o.keyword = it.tags.join(', ');
+      o.note = 'Spacewar! paratext ' + it.code + ' (' + benchLink(it) + ')' + (it.source ? '. Source: ' + it.source : '');
+      return o;
+    }), null, 2) + '\n';
+  }
+  function risText(items) {
+    function line(k, v) { return v ? k + '  - ' + String(v).replace(/\s*\n\s*/g, ' ') + '\r\n' : ''; }
+    var T = { StillImage: 'ART', Image: 'ART', MovingImage: 'VIDEO', Sound: 'SOUND', Software: 'COMP', Dataset: 'DATA', Text: 'GEN' };
+    return items.map(function (it) {
+      var x = ids(it), dp = dateParts(it.date), da = dp ? dp[0].map(function (n, i) { return i ? ('0' + n).slice(-2) : n; }).join('/') + '/'.repeat(4 - dp[0].length) : '';
+      return line('TY', T[dcType(it)] || 'GEN') + line('ID', it.code) + line('TI', it.title) +
+        people(it.creator).map(function (p) { return line('AU', p.literal || p.family + ', ' + p.given); }).join('') +
+        line('PY', dp ? dp[0][0] : '') + line('DA', da) + line('PB', it.publisher) + line('AB', it.description) +
+        (it.tags || []).map(function (g) { return line('KW', g); }).join('') + line('LA', it.language) + line('DO', x.DOI) + line('SN', x.ISBN) +
+        line('UR', okURL(it.archiveUrl) ? it.archiveUrl.trim() : x.URL || benchLink(it)) + line('AV', [it.archive, it.archiveId].filter(Boolean).join(', ')) +
+        line('N1', 'Spacewar! paratext ' + it.code + ' (' + benchLink(it) + ')' + (it.source ? '. Source: ' + it.source : '')) + 'ER  - \r\n';
+    }).join('\r\n');
+  }
+  // the export menu's formats: [key, label, file extension, mime, maker]
+  var FORMATS = [['csl', 'CSL-JSON (Zotero)', 'json', 'application/json', cslJSON], ['ris', 'RIS', 'ris', 'application/x-research-info-systems', risText], ['dc', 'Dublin Core (XML)', 'xml', 'application/xml', dcXML]];
+  function exportItems(fmt, items, base) { var f = FORMATS.filter(function (x) { return x[0] === fmt; })[0]; if (f && items.length) saveFile(base + '.' + f[2], f[4](items), f[3]); }
+  function exportMenu(attr) { return '<details class="px-more px-exp"><summary class="btn ghost" title="Its record, to save: for Zotero (CSL-JSON or RIS) or in Dublin Core">⤓ Export</summary><div class="px-menu">' + FORMATS.map(function (f) { return '<button ' + attr + '="' + f[0] + '">' + f[1] + '</button>'; }).join('') + '</div></details>'; }
   function saveFile(name, text, type) {
     var u = URL.createObjectURL(new Blob([text], { type: type })), a = SW.el('a', { href: u, download: name });
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
@@ -533,7 +587,7 @@
       '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' + fieldsHTML(it) +
       '<div class="px-colls">' + collsHTML(it) + '</div>' +
       '<p class="hint">Catalogued by ' + esc(it.addedBy || '?') + (it.updated && it.updated !== it.added ? '; changed ' + esc(SW.fmtDate(it.updated)) + ' by ' + esc(it.updatedBy || '?') : '') + '.</p>' +
-      '<div class="px-acts"><button class="btn" data-a="save">Save the details</button> <span class="hint px-msg"></span>' + (it.withdrawn ? '<button class="btn ghost px-wd" data-a="restore" title="Back into the list">Bring back</button>' : moreMenu('<button data-a="dc">Dublin Core record (XML) ⤓</button><button data-a="withdraw">Withdraw from the list…</button>')) + '</div>' +
+      '<div class="px-acts"><button class="btn" data-a="save">Save the details</button> <span class="hint px-msg"></span>' + exportMenu('data-xp') + (it.withdrawn ? '<button class="btn ghost px-wd" data-a="restore" title="Back into the list">Bring back</button>' : moreMenu('<button data-a="withdraw">Withdraw from the list…</button>')) + '</div>' +
       (it.withdrawn ? '<p class="badge px-wdnote">Withdrawn ' + esc(SW.fmtDate(it.withdrawn)) + (it.withdrawnBy ? ' by ' + esc(it.withdrawnBy) : '') + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
       '<div class="px-linkline"><b>Link</b> Write its code, <span class="mono">' + esc(it.code) + '</span>, in an annotation, note or finding: it becomes a link to this box. <button class="btn ghost" data-copy="' + esc(it.code) + '">Copy the code</button></div>' +
       '<div class="px-talk">' + talkHTML(it) + '</div></div></div>';
@@ -557,6 +611,8 @@
     });
     d.addEventListener('click', function (e) {
       if (e.target === d || e.target.closest('[data-x]')) { d.close(); return; }
+      var xp = e.target.closest('[data-xp]');
+      if (xp) { var xd = xp.closest('details'); if (xd) xd.open = false; exportItems(xp.dataset.xp, [byCode(code)], code); return; }
       var uc = e.target.closest('[data-uncoll]');
       if (uc) { var pr = outOf([code], uc.dataset.uncoll); colls0(); pr.then(colls0); return; }
       var rb = e.target.closest('[data-rate]');
@@ -581,9 +637,6 @@
       } else if (a.dataset.a === 'restore') {
         change('Paratext ' + it.code + ': brought back', each([it.code], unwithdraw))
           .then(function (ok) { if (ok) { d.close(); SW.toast(it.code + ' brought back'); } });
-      } else if (a.dataset.a === 'dc') {
-        var md = a.closest('details'); if (md) md.open = false;
-        saveFile(it.code + '-dc.xml', dcXML([byCode(code)]), 'application/xml');
       } else if (a.dataset.a === 'keep') {
         if (!SW.tray) return;
         var rows = FIELDS.map(function (f) { var v = it[f[0]]; return [f[1], Array.isArray(v) ? v.join(', ') : v || '']; }).filter(function (r) { return r[1]; });
@@ -675,6 +728,7 @@
     d.addEventListener('click', function (e) {
       if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); return; }
       if (e.target.closest('[data-px="full"]')) { e.preventDefault(); d.close(); d.remove(); P.reveal(code); return; }
+      var xp = e.target.closest('[data-xp]'); if (xp) { var xd = xp.closest('details'); if (xd) xd.open = false; exportItems(xp.dataset.xp, [byCode(code)], code); return; }
       if (e.target.closest('[data-px="join"]')) { d.close(); d.remove(); if (SW.notes) SW.notes.joinHelp(); }
     });
     if (!P.configured()) {
@@ -689,7 +743,7 @@
       var cs = inColl(it); if (cs.length) rows.push(['Collections', cs.map(pathName).join('; ')]);
       rows = rows.filter(function (r) { return r[1]; });
       var nc = (it.comments || []).length;
-      d.innerHTML = head(it.title, (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">In the archive ↗</a>' : '') + '<button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button><a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a>') +
+      d.innerHTML = head(it.title, (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">In the archive ↗</a>' : '') + '<button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button>' + exportMenu('data-xp') + '<a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a>') +
         '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' +
         (it.withdrawn ? '<p class="badge">Withdrawn from the list' + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
         '<dl class="px-ro">' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[0] === 'Description' ? SW.md(r[1]) : r[0] === 'Archive link' && okURL(r[1]) ? '<a href="' + esc(r[1].trim()) + '" target="_blank" rel="noopener">' + esc(r[1]) + ' ↗</a>' : esc(r[1])) + '</dd>'; }).join('') + '</dl>' +
@@ -705,6 +759,99 @@
     var it = byCode(sb.dataset.share);
     SW.share({ title: 'Paratext ' + sb.dataset.share + (it ? ': ' + it.title : ''), text: it ? it.title : '', url: SW.BASE_URI + '?code=' + sb.dataset.share });
   });
+  // Two paratexts side by side: pictures zoom (wheel, pinch, +/−, double-click) and pan (drag) together
+  // while Together is on, as for two printings of one page; a PDF or a text scrolls on its own.
+  P.sideBySide = function (codes) {
+    var esc = SW.esc, items = codes.map(byCode).filter(Boolean); if (items.length !== 2) return;
+    var d = SW.el('dialog', { class: 'tray-big px-dlg px-sbs' }), linked = SW.store.get('px.sbsLinked', true);
+    function paneHTML(it, i) {
+      return '<div class="px-pane" data-i="' + i + '"><div class="px-ph"><span class="px-code mono">' + esc(it.code) + '</span> <b>' + esc(it.title) + '</b>' +
+        '<span class="faint">' + esc([it.date, it.archive, it.archiveId].filter(Boolean).join(' · ')) + '</span></div><div class="px-zoom"><p class="hint">Opening…</p></div></div>';
+    }
+    function draw() {
+      d.innerHTML = '<div class="tray-bighead"><b>Side by side</b><span class="refhelp-acts">' +
+        '<label class="check" title="Zoom and pan both pictures together"><input type="checkbox" class="px-link"' + (linked ? ' checked' : '') + '> Together</label>' +
+        '<button class="btn ghost" data-z="fit" title="Fit both (0)">Fit</button><button class="btn ghost" data-z="in" title="Zoom in (+)">＋</button><button class="btn ghost" data-z="out" title="Zoom out (−)">−</button>' +
+        '<button class="btn ghost" data-z="swap" title="Swap the two round">⇄ Swap</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+        '<div class="px-panes">' + items.map(paneHTML).join('') + '</div><p class="hint">Drag to move; wheel or pinch to zoom where the pointer is; double-click to zoom in. With Together on, both follow, matched by their place on the page.</p>';
+      views = items.map(function (it, i) { return view(it, SW.$('.px-pane[data-i="' + i + '"] .px-zoom', d)); });
+    }
+    // a picture's view: z (zoom over fit), and cx, cy (the point of the picture at the pane's centre, 0 to 1)
+    var views = [], st = { z: 1, cx: 0.5, cy: 0.5 };
+    function view(it, box) {
+      var v = { box: box, img: null, w: 0, h: 0, st: { z: 1, cx: 0.5, cy: 0.5 } };
+      blobOf(it).then(function (u) {
+        if (it.kind === 'image') {
+          box.innerHTML = '<img alt="' + esc(it.title) + '" draggable="false">'; v.img = SW.$('img', box);
+          v.img.onload = function () { v.w = v.img.naturalWidth; v.h = v.img.naturalHeight; place(v); };
+          v.img.src = u;
+        } else if (it.kind === 'pdf') { box.innerHTML = '<iframe class="px-pdf" title="' + esc(it.title) + '" src="' + u + '"></iframe>'; box.classList.add('px-free'); }
+        else if (/^text\//.test(it.mime || '')) { box.classList.add('px-free'); fetch(u).then(function (r) { return r.text(); }).then(function (t) { box.innerHTML = '<pre class="px-text">' + esc(t) + '</pre>'; }); }
+        else box.innerHTML = '<p class="hint">No preview for this kind of file.</p>';
+      }, function (e) { box.innerHTML = '<p class="badge err">' + esc(e.message) + '</p>'; });
+      return v;
+    }
+    function cur(v) { return linked ? st : v.st; }
+    function place(v) {
+      if (!v.img || !v.w) return;
+      var W = v.box.clientWidth, H = v.box.clientHeight, s0 = cur(v), sc = Math.min(W / v.w, H / v.h) * s0.z;
+      v.img.style.width = v.w * sc + 'px'; v.img.style.height = v.h * sc + 'px';
+      v.img.style.transform = 'translate(' + (W / 2 - s0.cx * v.w * sc) + 'px,' + (H / 2 - s0.cy * v.h * sc) + 'px)';
+    }
+    function all() { views.forEach(place); }
+    function zoomAt(v, f, mx, my) {   // zoom by f, keeping the point under (mx, my) where it is
+      if (!v.img || !v.w) return;
+      var s0 = cur(v), W = v.box.clientWidth, H = v.box.clientHeight, fit = Math.min(W / v.w, H / v.h), sc = fit * s0.z;
+      if (mx == null) { mx = W / 2; my = H / 2; }
+      var px = s0.cx + (mx - W / 2) / (v.w * sc), py = s0.cy + (my - H / 2) / (v.h * sc);
+      s0.z = Math.max(0.5, Math.min(40, s0.z * f)); var sc2 = fit * s0.z;
+      s0.cx = px - (mx - W / 2) / (v.w * sc2); s0.cy = py - (my - H / 2) / (v.h * sc2);
+      linked ? all() : place(v);
+    }
+    function fit() { st = { z: 1, cx: 0.5, cy: 0.5 }; views.forEach(function (v) { v.st = { z: 1, cx: 0.5, cy: 0.5 }; }); all(); }
+    function paneOf(t) { var p = t.closest && t.closest('.px-pane'); return p ? views[+p.dataset.i] : null; }
+    document.body.appendChild(d);
+    draw();
+    d.showModal();
+    d.addEventListener('close', function () { window.removeEventListener('resize', all); d.remove(); });
+    window.addEventListener('resize', all);
+    d.addEventListener('click', function (e) {
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); return; }
+      var z = e.target.closest('[data-z]'); if (!z) return;
+      if (z.dataset.z === 'fit') fit();
+      else if (z.dataset.z === 'swap') { items.reverse(); draw(); }
+      else views.forEach(function (v, i) { if (!linked || i === 0) zoomAt(v, z.dataset.z === 'in' ? 1.5 : 1 / 1.5); });
+    });
+    d.addEventListener('change', function (e) {
+      if (!e.target.classList.contains('px-link')) return;
+      linked = e.target.checked; SW.store.set('px.sbsLinked', linked);
+      if (linked && views[0]) st = Object.assign({}, views[0].st); else views.forEach(function (v) { v.st = Object.assign({}, st); });
+      all();
+    });
+    d.addEventListener('wheel', function (e) {
+      var v = paneOf(e.target); if (!v || !v.img) return;
+      e.preventDefault();
+      var r = v.box.getBoundingClientRect();
+      zoomAt(v, Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0025)), e.clientX - r.left, e.clientY - r.top);
+    }, { passive: false });
+    d.addEventListener('dblclick', function (e) { var v = paneOf(e.target); if (!v || !v.img) return; var r = v.box.getBoundingClientRect(); zoomAt(v, 2, e.clientX - r.left, e.clientY - r.top); });
+    var drag = null;
+    d.addEventListener('pointerdown', function (e) { var v = paneOf(e.target); if (!v || !v.img || e.button) return; drag = { v: v, x: e.clientX, y: e.clientY }; v.box.setPointerCapture(e.pointerId); v.box.classList.add('dragging'); });
+    d.addEventListener('pointermove', function (e) {
+      if (!drag) return;
+      var v = drag.v, s0 = cur(v), sc = Math.min(v.box.clientWidth / v.w, v.box.clientHeight / v.h) * s0.z;
+      s0.cx -= (e.clientX - drag.x) / (v.w * sc); s0.cy -= (e.clientY - drag.y) / (v.h * sc);
+      drag.x = e.clientX; drag.y = e.clientY;
+      linked ? all() : place(v);
+    });
+    d.addEventListener('pointerup', function () { if (drag) drag.v.box.classList.remove('dragging'); drag = null; });
+    d.addEventListener('keydown', function (e) {
+      if (e.target.closest('input, textarea')) return;
+      if (e.key === '+' || e.key === '=') { views.forEach(function (v, i) { if (!linked || i === 0) zoomAt(v, 1.5); }); }
+      else if (e.key === '-' || e.key === '−') { views.forEach(function (v, i) { if (!linked || i === 0) zoomAt(v, 1 / 1.5); }); }
+      else if (e.key === '0') fit();
+    });
+  };
   // To a paratext by its code (P-XXXXX): Paratexts opened, the item shown
   P.reveal = function (code) {
     SW.setTab('paratexts');

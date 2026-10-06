@@ -2029,3 +2029,19 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .guidehelp .gh-toc a { color: var(--beam); }
 .guidehelp section p { max-width: 75ch; }
 .guidehelp kbd { font: 11.5px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; }
+.px-acts .px-exp { margin-left: auto; }
+.px-acts .px-exp + .px-more, .px-acts .px-exp + .px-wd { margin-left: 0; }
+/* paratexts side by side */
+dialog.px-sbs { width: min(98vw, 1600px); }
+.px-panes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 760px) { .px-panes { grid-template-columns: 1fr; } }
+.px-pane { min-width: 0; display: flex; flex-direction: column; }
+.px-ph { font-size: 13px; margin: 0 0 4px; display: flex; gap: 8px; align-items: baseline; white-space: nowrap; overflow: hidden; }
+.px-ph b { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.px-ph .faint { overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1; }
+.px-zoom { position: relative; height: 72vh; overflow: hidden; background: var(--bg); border-radius: 6px; cursor: grab; touch-action: none; }
+.px-zoom.dragging { cursor: grabbing; }
+.px-zoom img { position: absolute; left: 0; top: 0; transform-origin: 0 0; max-width: none; user-select: none; }
+.px-zoom.px-free { cursor: auto; overflow: auto; touch-action: auto; }
+.px-zoom.px-free .px-pdf { height: 100%; }
+.px-sbs .refhelp-acts .check { font-size: 13px; margin-right: 6px; }

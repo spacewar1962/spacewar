@@ -28,14 +28,16 @@
         'Your view is remembered in this browser. ↻ reads the catalogue again.'])],
       ['Selecting several', ul([
         'Tick the box at a card’s corner, ' + k('⌘') + '-click to add or take one, ' + k('⇧') + '-click to take a run, or ' + k('Space') + ' on a focused card.',
-        'The bar that appears: add them to a collection (or a new one), take them out of this one, tag them, save their records as Dublin Core, copy their codes, and, under ⋯, withdraw them.'])],
+        'The bar that appears: add them to a collection (or a new one), take them out of this one, tag them, ⤓ Export their records, copy their codes, and, under ⋯, withdraw them.',
+        'With two selected, <b>Side by side</b> shows them in one box. Pictures zoom (wheel, pinch, ＋ −, double-click) and pan (drag); with <b>Together</b> on, both follow, matched by their place on the page, for comparing two printings or copies. Fit (' + k('0') + ') puts them back; ⇄ Swap turns them round.'])],
       ['One item', ul([
         'Click a card for its box: the file (a picture, a PDF, a text), its record, its collections, the crew’s ratings, reactions and comments.',
         'The record: title, date made, creator, source (where this copy came from), <b>Held at</b>, <b>Archive ref</b> and <b>Archive link</b> (the original, in its archive: an <b>In the archive ↗</b> button appears), rights, accession date (the day it came into the collection, set on upload), description, tags, versions and references. <b>Save the details</b> keeps them.',
         '<b>More metadata</b> folds out the rest of Dublin Core: type (from DCMI’s list), publisher, contributors, language, coverage, identifiers (DOI, ISBN, URL), and the file’s format.',
         'Rate it with one to three stars (gold up to the crew’s average), react with an emoji, and comment; comments fold away until you open them.',
         'At the top: <b>Share</b>, ＋ My notes, ⤓ Download, the file on GitHub with its history.',
-        'Under ⋯: its <b>Dublin Core record</b> (oai_dc XML, to save), and <b>Withdraw from the list</b>.'])],
+        '<b>⤓ Export</b> saves its record: <b>CSL-JSON</b> or <b>RIS</b> to import into Zotero (File ▸ Import; creators as Family, Given, separated by semicolons; the archive and its reference go to Zotero’s Archive and Loc. in Archive), or <b>Dublin Core</b> (oai_dc XML). The read-only box has it too.',
+        'Under ⋯: <b>Withdraw from the list</b>.'])],
       ['Withdrawing', '<p>Withdrawing takes an item out of the list for the whole crew. It asks for a reason, kept with the record, and for the item’s code typed in (for several, their number). The file stays in the repository, with its history. <b>Withdrawn</b>, in the left panel, lists them, with who withdrew each and why; select them there and <b>Bring back</b>.</p>'],
       ['Linking to one', ul([
         'In an annotation, note or finding, write its code, as <span class="mono">P-MJH2M</span>. It shows as a link, <b>Paratext:</b> and its title.',
