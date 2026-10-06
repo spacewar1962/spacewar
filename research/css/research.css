@@ -2005,3 +2005,4 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .sw-stars b { color: var(--kin); font-weight: inherit; }
 .sw-stars i { color: var(--line); font-style: normal; }
 .px-s .sw-stars { font-size: 13px; }
+.pxlink { font-style: normal; }

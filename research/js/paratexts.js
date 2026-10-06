@@ -647,7 +647,15 @@
   };
   SW.views.paratexts = { show: function () { if (!done) render(); }, enter: function () { if (!done) render(); }, reset: function () { done = false; } };
   P.TOKEN_URL = TOKEN_URL;
+  // Titles for paratext links in annotations, notes and findings: the catalogue read once, in the background
+  var wanted = false;
+  P.titleOf = function (c) { var it = byCode(c); return it ? it.title : null; };
+  P.want = function () {
+    if (cat || wanted || !P.configured()) return;
+    wanted = true;
+    P.load().then(function () { SW.$$('a.pxlink[data-pcode]').forEach(function (a) { var t = P.titleOf(a.dataset.pcode); if (t) a.textContent = 'Paratext: ' + t; }); }, function () {});
+  };
   // The token in Settings, tried: the number in the catalogue, or why not
   P.test = function () { cat = null; return P.load(true).then(function (c) { return c.items.filter(function (it) { return !it.withdrawn; }).length; }); };
-  P.reset = function () { done = false; cat = null; if (SW.state.tab === 'paratexts') render(); };
+  P.reset = function () { done = false; cat = null; wanted = false; if (SW.state.tab === 'paratexts') render(); };
 })(typeof window !== 'undefined' ? window : globalThis);

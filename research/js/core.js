@@ -1093,7 +1093,14 @@
     s = s.replace(/(^|[\s(])((?:https?:\/\/)[^\s<]+?)(?=[.,;:!?)]*(?:\s|$|&lt;))/g, function (m, pre, u) { u = unesc(u); return pre + stash(mdLink(u, u, true)); });
     s = s.replace(/\\(&gt;|&lt;|&amp;|[\\`*_\[\]~#+\-.!()])/g, function (m, c) { return stash(c); });   // \* is a plain *
     // A-…, R-…, C-…, P-…: a code of the bench's, a link to what it names
-    s = s.replace(/(^|[\s(>\[,;])([ARCP]-[0-9A-Z]{5})(?![\w-])/g, function (m, pre, code) { return pre + stash('<a class="swlink swcode mono" href="?code=' + code + '" title="Go to ' + code + '">' + code + '</a>'); });
+    s = s.replace(/(^|[\s(>\[,;])([ARCP]-[0-9A-Z]{5})(?![\w-])/g, function (m, pre, code) {
+      if (code.charAt(0) === 'P') {   // a paratext: by its title once the catalogue is read (the code until then, or without access)
+        var PT = SW.paratexts, t = PT && PT.titleOf(code);
+        if (!t && PT) PT.want();
+        return pre + stash('<a class="swlink swcode pxlink" data-pcode="' + code + '" href="?code=' + code + '" title="Paratext ' + code + ': read it here">Paratext: ' + SW.esc(t || code) + '</a>');
+      }
+      return pre + stash('<a class="swlink swcode mono" href="?code=' + code + '" title="Go to ' + code + '">' + code + '</a>');
+    });
     // @DMB: a mention of someone by their initials
     s = s.replace(/(^|[\s(>])@([A-Z][A-Za-z]{1,5})\b/g, function (m, pre, who) { return pre + stash('<span class="mention" title="A mention of ' + who + '">@' + who + '</span>'); });
     s = emph(s);
