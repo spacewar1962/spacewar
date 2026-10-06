@@ -292,7 +292,7 @@
       if (editing && editing.mode === 'new' && editing.parent === c.id) r += editRow(o.depth + 1, '');
       return r;
     }).join('');
-    nav.innerHTML = '<button class="btn px-addbtn" data-px="add" title="Upload a file with its details, to the crew’s repository">＋ Add a paratext</button>' + row('', '▤', 'All', lv.length) + row('_none', '◌', 'Not in a collection', lv.filter(function (it) { return !inColl(it).length; }).length) +
+    nav.innerHTML = '<button class="btn px-addbtn" data-px="add" title="Upload a file with its details, to the crew’s repository">＋ Add an item</button>' + row('', '▤', 'All', lv.length) + row('_none', '◌', 'Not in a collection', lv.filter(function (it) { return !inColl(it).length; }).length) +
       '<div class="px-ch"><span>Collections</span><button class="icon-btn" data-px="newc" title="A new collection">＋</button></div>' +
       tree + (editing && editing.mode === 'new' && !editing.parent ? editRow(0, '') : '') +
       (!colls().length && !editing ? '<p class="hint px-navfoot">None yet: ＋ makes one; then drag items onto it, or tick them and Add to.</p>' : '') +
@@ -694,7 +694,7 @@
     var esc = SW.esc, d = SW.el('dialog', { class: 'tray-big px-dlg px-add' });
     var blank = { title: '', date: '', creator: '', source: '', rights: '', accessioned: now().slice(0, 10), description: '', tags: [], versions: SW.state.v ? [SW.state.v] : [], refs: [] };
     var into = coll(F.c);
-    d.innerHTML = '<div class="tray-bighead"><b>Add a paratext</b><span class="refhelp-acts"><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+    d.innerHTML = '<div class="tray-bighead"><b>Add an item</b><span class="refhelp-acts"><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
       '<label class="px-drop"><input type="file" class="px-file"><span>Choose a file, or drop one here: a scan, photograph, PDF or text (up to 50 MB).</span></label>' +
       fieldsHTML(blank) + (into ? '<label class="check px-into"><input type="checkbox" class="px-intoc" checked> Into the collection “' + esc(into.name) + '”</label>' : '') + '<div class="px-acts"><button class="btn" data-a="up">Upload</button> <span class="hint px-msg"></span></div>';
     document.body.appendChild(d);

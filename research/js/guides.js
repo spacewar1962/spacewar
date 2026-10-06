@@ -17,7 +17,7 @@
         'Help ▸ Joining the annotation group, step 5: open the token form (its name, owner, expiry and permission are filled in), choose <b>Only select repositories</b> and <b>sw_paratexts</b>, generate the token, paste it in, and <b>Save and test</b>. ⚙ Settings has the same box.',
         'The token stays in this browser. On another computer, paste it there too.'])],
       ['The left panel', ul([
-        '<b>＋ Add a paratext</b>: choose or drop a file (up to 50 MB), give it a title and what else you know, and Upload. It goes into the collection you are in, unless you untick it.',
+        '<b>＋ Add an item</b>: choose or drop a file (up to 50 MB), give it a title and what else you know, and Upload. It goes into the collection you are in, unless you untick it.',
         '<b>All</b>, <b>Not in a collection</b>, your <b>collections</b>, and <b>Withdrawn</b>, each with its count.',
         'Collections nest like folders, and an item can be in several. ＋ beside Collections makes one; on a collection, ＋ makes one inside it, ✎ renames it and ✕ deletes it (its items stay in the catalogue; the collections inside it move up a level).',
         'Drag items onto a collection to put them in it. From inside a collection a drag moves them; hold ' + k('⌥') + ' to add them instead. Drag one collection onto another to nest it, or onto All to bring it to the top.'])],
