@@ -277,7 +277,8 @@
   function gzSetName(vid, a0, name) { var all = SW.store.get('gz.names', {}) || {}; all[vid] = all[vid] || {}; if (name) all[vid][a0] = name; else delete all[vid][a0]; SW.store.set('gz.names', all); }
   // A block or routine's heading: your name for it, its own label beside it in grey brackets
   function gzTitle(nm, real) { return nm ? SW.esc(nm) + ' <span class="gz-real">(' + SW.esc(real) + ')</span>' : SW.esc(real); }
-  function gzSvgName(nm, real) { return nm ? SW.esc(nm) + '<tspan font-weight="400" fill="var(--text-faint)"> (' + SW.esc(real) + ')</tspan>' : SW.esc(real); }
+  // in a graph box: the name cut to the room left beside the time (the box's own label goes on its second line)
+  function gzFit(name, room) { var n = Math.max(3, Math.floor(room / 7.2)); return name.length > n ? name.slice(0, n - 1) + '…' : name; }
   function gzNameField(cur, label) { return '<label class="gz-name" title="Your name for it, kept in this browser and shown in the graph in place of ' + SW.esc(label) + '">Name <input type="text" maxlength="40" value="' + SW.esc(cur) + '" placeholder="' + SW.esc(label) + '"></label>'; }
   function gzN(n) { return Math.round(n || 0).toLocaleString('en-GB'); }
   function gzMs(cycles) { var ms = (cycles || 0) * 5 / 1000; return (ms >= 100 ? Math.round(ms).toLocaleString('en-GB') : ms >= 10 ? ms.toFixed(1) : ms.toFixed(2)) + ' ms'; }
@@ -453,12 +454,12 @@
       ids.forEach(function (id) {
         var bl = B[id], p = xy(id), sh = bl.cyc / tot, heat = Math.round(8 + 62 * Math.sqrt(bl.cyc / smax));
         var lines = bl.src ? (bl.src.n1 !== bl.src.n0 ? 'lines ' + bl.src.n0 + '–' + bl.src.n1 : 'line ' + bl.src.n0) : SW.oct(bl.a0, 4);
-        o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc(bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
+        o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc((gzName(b.v.id, bl.a0) ? gzName(b.v.id, bl.a0) + ': ' : '') + bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--surface)"/>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + gzSvgName(gzName(b.v.id, bl.a0), bl.name) + '</text>' +
-          '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="var(--text)"><tspan font-weight="700">' + gzMs(bl.cyc) + '</tspan> (' + (100 * sh).toFixed(1) + '%)</text>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc(lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(gzFit(gzName(b.v.id, bl.a0) || bl.name, NW - 24 - 6.6 * gzMs(bl.cyc).length)) + '</text>' +
+          '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="var(--text)" font-weight="700">' + gzMs(bl.cyc) + '</text>' +
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc((gzName(b.v.id, bl.a0) ? '(' + bl.name + ') · ' : '') + lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
       });
       o.push('</svg>');
       lastSVG = o.join('');
@@ -770,12 +771,12 @@
           var r = isA ? row.a : row.b, p = xy(k);
           if (!r) { o.push('<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="4" fill="none" stroke="var(--line)" stroke-dasharray="4 3"/>'); return; }
           var sh = SH[r.i] || 0, heat = Math.round(6 + 60 * Math.sqrt(sh / smax)), ring = EDGE[row.kind], nm = rName(row);
-          o.push('<g class="gz-node" data-r="' + k + '" style="cursor:pointer"><title>' + esc(r.name + ', ' + linesOf(r) + ', ' + r.blocks.length + ' blocks; ' + gzMs(SH['c' + r.i]) + ' (' + (100 * sh).toFixed(1) + '% of the time) in the 5 s sample run; ' + row.kind) + '</title>' +
+          o.push('<g class="gz-node" data-r="' + k + '" style="cursor:pointer"><title>' + esc((nm ? nm + ': ' : '') + r.name + ', ' + linesOf(r) + ', ' + r.blocks.length + ' blocks; ' + gzMs(SH['c' + r.i]) + ' (' + (100 * sh).toFixed(1) + '% of the time) in the 5 s sample run; ' + row.kind) + '</title>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--surface)"/>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="' + (ring || 'var(--text-faint)') + '" stroke-width="' + (ring ? 2 : 1) + '"/>' +
-            '<text x="' + (p.x + 7) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + gzSvgName(nm, r.name) + '</text>' +
-            '<text x="' + (p.x + NW - 7) + '" y="' + (p.y + 17) + '" text-anchor="end" font-family="sans-serif" font-size="11" fill="var(--text)"><tspan font-weight="700">' + gzMs(SH['c' + r.i]) + '</tspan> (' + (100 * sh).toFixed(1) + '%)</text>' +
-            '<text x="' + (p.x + 7) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc((nm ? r.name + ' · ' : '') + linesOf(r)) + '</text></g>');
+            '<text x="' + (p.x + 7) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + esc(gzFit(nm || r.name, NW - 22 - 6.4 * gzMs(SH['c' + r.i]).length)) + '</text>' +
+            '<text x="' + (p.x + NW - 7) + '" y="' + (p.y + 17) + '" text-anchor="end" font-family="sans-serif" font-size="11" fill="var(--text)" font-weight="700">' + gzMs(SH['c' + r.i]) + '</text>' +
+            '<text x="' + (p.x + 7) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc((nm ? '(' + r.name + ') · ' : '') + linesOf(r)) + '</text></g>');
         });
         o.push('</svg>');
         return o.join('');
@@ -783,7 +784,7 @@
       var svgA = sideSVG(true), svgB = sideSVG(false);
       body.innerHTML = '<div class="gz-flow2"><div><div class="fl-h">' + esc(ra) + ' · ' + esc(bo.v.label) + '</div><div class="svgbox fl-box">' + SW.displaySVG(svgA) + '</div></div>' +
         '<div><div class="fl-h">' + esc(rb) + ' · ' + esc(b.v.label) + '</div><div class="svgbox fl-box">' + SW.displaySVG(svgB) + '</div></div></div>' +
-        '<p class="hint fl-key">Each routine in the same place on both sides. Shaded by its share of the time in a 5 s sample run of that version, with the machine time it took there (milliseconds, the share in brackets); edges are calls and dispatches between routines, thicker for more often, dashed if in the code but not taken in the run. Outlined violet: altered; green: inserted; red: removed; an empty dashed box: no counterpart on this side. The rounded routine is where the program starts. Click a routine for its blocks side by side.</p>';
+        '<p class="hint fl-key">Each routine in the same place on both sides. Shaded by its share of the time in a 5 s sample run of that version, with the machine time it took there in milliseconds (the share is in the hover and in its box); edges are calls and dispatches between routines, thicker for more often, dashed if in the code but not taken in the run. Outlined violet: altered; green: inserted; red: removed; an empty dashed box: no counterpart on this side. The rounded routine is where the program starts. Click a routine for its blocks side by side.</p>';
       var fb = SW.el('div'); body.appendChild(fb);
       fb.appendChild(SW.figureButtons(function () { return svgA; }, 'spacewar-' + bo.v.id + '-flow', ra));
       fb.appendChild(document.createTextNode(' '));
