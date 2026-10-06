@@ -2499,10 +2499,13 @@
       // Grouped, with a divider and a small heading between the groups; About the bench stays last.
       var HELP = [['Getting started', [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
                                        ['refs', 'Referencing and versions', 'How the bench cites a source, as [REF: SW3.1T, 2.141]'],
-                                       ['join', 'Joining the annotation group', 'A Hypothesis account, the group and your token, step by step'],
+                                       ['join', 'Joining the annotation group', 'An invitation, a Hypothesis account and your tokens, step by step'],
                                        ['reading', 'What you should read', 'A short bibliography: repairing old code, critical code studies, Spacewar!'],
                                        ['cards', 'Reconstruction cards', 'What was done to each text to read and run it; repairs in gold in Read'],
                                        ['anno', 'Advanced annotation', 'Rich text, and links between annotations across versions'],
+                                       ['codes', 'Codes, links and sharing', 'Every item’s code, links in annotations, Share, Findings and My notes'],
+                                       ['paratexts', 'Paratexts', 'The crew’s scans and documents: collections, views, metadata, links'],
+                                       ['gizmo', 'Art’s Dynamic Profile Gizmo', 'Profiling a run, comparing versions, naming and marking blocks'],
                                        ['sitemap', 'Site map', 'Every view and version as a plain link']]],
                   ['Your bench', [['settings', 'Settings', 'Initials, group, theme, fonts'],
                                   ['backup', 'Back up everything', 'Notes, drafts, settings and findings in one file'],
@@ -2545,6 +2548,7 @@
           if (p === 'refs') { SW.refHelp(); return; }
           if (p === 'anno') { SW.notes.help(); return; }
           if (p === 'join') { SW.notes.joinHelp(); return; }
+          if (p === 'codes' || p === 'paratexts' || p === 'gizmo') { SW.guide(p); return; }
           if (p === 'reading') { SW.readingHelp(); return; }
           if (p === 'cards') { SW.cardsHelp(); return; }
           if (p === 'sitemap') { location.href = 'sitemap.html'; return; }

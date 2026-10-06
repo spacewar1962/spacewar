@@ -2025,3 +2025,7 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .px-dc > summary { cursor: pointer; font-size: 12.5px; color: var(--text-dim); margin-bottom: 6px; }
 .px-fields select { font: 13px var(--sans); padding: 3px 6px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
 .px-fmt { color: var(--text); font-size: 12.5px; }
+.guidehelp .gh-toc { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; padding-bottom: 8px; border-bottom: 1px solid var(--line-soft); }
+.guidehelp .gh-toc a { color: var(--beam); }
+.guidehelp section p { max-width: 75ch; }
+.guidehelp kbd { font: 11.5px var(--mono); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 4px; }
