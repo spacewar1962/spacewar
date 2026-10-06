@@ -213,8 +213,9 @@
     view = SW.$('#view-paratexts'); if (!view) return;
     done = true;
     var esc = SW.esc;
-    view.innerHTML = '<div class="pad px"><h2>Paratexts</h2><p class="lede">The scans, clippings, photographs and documents around the program, kept for the crew in a private repository (' + esc(REPO) + '). Click one to read it; add with ＋. To link to one from an annotation, note or finding, write its code (P-XXXXX).</p><div class="px-body"></div></div>';
-    var body = SW.$('.px-body', view);
+    view.innerHTML = '<div class="pad px"><div class="px-head"><h2>Paratexts</h2><button class="icon-btn px-ib" aria-expanded="false" title="About Paratexts">ⓘ</button></div><p class="hint px-lede" hidden>The scans, clippings, photographs and documents around the program, kept for the crew in a private repository (' + esc(REPO) + '). Click one to read it; add with ＋. To link to one from an annotation, note or finding, write its code (P-XXXXX).</p><div class="px-body"></div></div>';
+    var body = SW.$('.px-body', view), ib = SW.$('.px-ib', view), lede = SW.$('.px-lede', view);
+    ib.onclick = function () { lede.hidden = !lede.hidden; ib.setAttribute('aria-expanded', String(!lede.hidden)); };
     if (!P.configured()) {
       body.innerHTML = '<div class="px-howto"><p>The paratexts are in a private repository for the crew. To open them here, the bench needs a GitHub token of your own, limited to that repository. Four steps, once:</p><ol>' +
         '<li>Be a member of the <b>spacewar1962</b> organisation on GitHub: ask to be added if you are not, and accept the invitation GitHub emails you. (A token cannot reach the repository for someone added to it alone, as an outside collaborator.)</li>' +

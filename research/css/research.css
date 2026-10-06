@@ -2015,3 +2015,8 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .gz-mk:focus-visible { outline: 2px solid var(--beam); outline-offset: 1px; }
 .gz-pen { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text-dim); }
 .gz-pen .gz-mk { width: 12px; height: 12px; cursor: default; display: inline-block; }
+.px-head { display: flex; align-items: center; gap: 8px; }
+.px-head h2 { margin: 0 0 8px; }
+.px-ib { font-size: 16px; color: var(--text-dim); margin-bottom: 8px; }
+.px-ib[aria-expanded="true"] { color: var(--beam); }
+.px-lede { font-size: 12.5px; max-width: 80ch; margin: 0 0 12px; }
