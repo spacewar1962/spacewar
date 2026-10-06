@@ -275,6 +275,18 @@
   // names a reader gives to blocks and routines, kept in this browser: version -> address -> name
   function gzName(vid, a0) { return ((SW.store.get('gz.names', {}) || {})[vid] || {})[a0] || ''; }
   function gzSetName(vid, a0, name) { var all = SW.store.get('gz.names', {}) || {}; all[vid] = all[vid] || {}; if (name) all[vid][a0] = name; else delete all[vid][a0]; SW.store.set('gz.names', all); }
+  // Marks for tracing: a colour on a block or routine, kept in this browser like its name (not gold:
+  // gold is the repairs')
+  var GZ_MARKS = [['orange', '#f76b15'], ['blue', '#0090ff'], ['pink', '#d6409f'], ['teal', '#12a594'], ['brown', '#a07553']];   // none the outlines' red, green or violet
+  function gzMarkHex(m) { var c = GZ_MARKS.filter(function (x) { return x[0] === m; })[0]; return c ? c[1] : ''; }
+  function gzMark(vid, a0) { return ((SW.store.get('gz.marks', {}) || {})[vid] || {})[a0] || ''; }
+  function gzSetMark(vid, a0, m) { var all = SW.store.get('gz.marks', {}) || {}; all[vid] = all[vid] || {}; if (m) all[vid][a0] = m; else delete all[vid][a0]; SW.store.set('gz.marks', all); }
+  function gzMarkField(cur) {
+    return '<span class="gz-marks" title="Mark it in a colour, for tracing (kept in this browser)">' + GZ_MARKS.map(function (c) { return '<button class="gz-mk' + (cur === c[0] ? ' on' : '') + '" data-mark="' + c[0] + '" style="--mk:' + c[1] + '" title="' + c[0] + '" aria-pressed="' + (cur === c[0]) + '"></button>'; }).join('') +
+      '<button class="gz-mk gz-mk-none' + (cur ? '' : ' on') + '" data-mark="" title="No mark" aria-pressed="' + !cur + '">✕</button></span>';
+  }
+  function gzMarkSet(box, m) { SW.$$('.gz-mk', box).forEach(function (x) { var on = x.dataset.mark === m; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); }); }
+  function gzMarkBar(m, x, y, h) { return m ? '<rect x="' + (x + 1.5) + '" y="' + (y + 1.5) + '" width="6" height="' + (h - 3) + '" rx="2" fill="' + gzMarkHex(m) + '"/>' : ''; }
   // A block or routine's heading: your name for it, its own label beside it in grey brackets
   function gzTitle(nm, real) { return nm ? SW.esc(nm) + ' <span class="gz-real">(' + SW.esc(real) + ')</span>' : SW.esc(real); }
   // in a graph box: the name cut to the room left beside the time (the box's own label goes on its second line)
@@ -346,7 +358,7 @@
     gzWrite({ gz: 'profile' });
     var prof = SW.profile && SW.profile.build === b && SW.profile.branches && SW.profile.instructions ? SW.profile : null;
     var lede = 'A profile in the professional sense, after Art Schwarz: the run drawn as a graph. Each node is a block of sequential code; each edge a branch taken between blocks. A block begins where a branch arrives, or at the first instruction run, and ends at an instruction that branched, or at the last. The time is the machine’s, in 5 µs memory cycles, summed over everything between branches.';
-    var legend = 'Darker blocks take more of the time; the rounded block is where the run began. Solid edges are branches, dashed ones falling through into a block a branch also reaches, dotted ones a way through blocks left out; thicker for more often. An edge up or across returns to a block drawn above (a loop). Click a block for its code, the instructions it ran and where it branches.';
+    var legend = 'Darker blocks take more of the time; the rounded block is where the run began. Solid edges are branches, dashed ones falling through into a block a branch also reaches, dotted ones a way through blocks left out; thicker for more often. An edge up or across returns to a block drawn above (a loop). Click a block for its code, the instructions it ran and where it branches; there you can name it, or mark it in a colour (a bar at its left) to trace it.';
     var c = SW.el('div', { class: 'card gz-card' });
     c.style.gridColumn = '1 / -1';
     el.appendChild(c);
@@ -456,10 +468,10 @@
         var lines = bl.src ? (bl.src.n1 !== bl.src.n0 ? 'lines ' + bl.src.n0 + '–' + bl.src.n1 : 'line ' + bl.src.n0) : SW.oct(bl.a0, 4);
         o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc((gzName(b.v.id, bl.a0) ? gzName(b.v.id, bl.a0) + ': ' : '') + bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--surface)"/>' +
-          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(gzFit(gzName(b.v.id, bl.a0) || bl.name, NW - 24 - 6.6 * gzMs(bl.cyc).length)) + '</text>' +
+          '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' + gzMarkBar(gzMark(b.v.id, bl.a0), p.x, p.y, NH) +
+          '<text x="' + (p.x + (gzMark(b.v.id, bl.a0) ? 11 : 8)) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(gzFit(gzName(b.v.id, bl.a0) || bl.name, NW - 24 - 6.6 * gzMs(bl.cyc).length)) + '</text>' +
           '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="var(--text)" font-weight="700">' + gzMs(bl.cyc) + '</text>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc((gzName(b.v.id, bl.a0) ? bl.name + ' · ' : '') + lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
+          '<text x="' + (p.x + (gzMark(b.v.id, bl.a0) ? 11 : 8)) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc((gzName(b.v.id, bl.a0) ? bl.name + ' · ' : '') + lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
       });
       o.push('</svg>');
       lastSVG = o.join('');
@@ -478,6 +490,7 @@
         document.body.appendChild(dlg);
         dlg.addEventListener('click', function (e) {
           if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
+          var mk = e.target.closest('[data-mark]'); if (mk) { gzSetMark(b.v.id, B[+dlg.dataset.b].a0, mk.dataset.mark); gzMarkSet(dlg, mk.dataset.mark); draw(); return; }
           var j = e.target.closest('[data-gb]'); if (j) { openBlock(+j.dataset.gb); return; }
           if (e.target.closest('[data-read]')) { dlg.close(); inRead(B[+dlg.dataset.b]); }
           if (e.target.closest('[data-keep]')) keepBlock(B[+dlg.dataset.b]);
@@ -506,7 +519,7 @@
         }).join(' ') : '<span class="faint">none</span>';
       }
       var ins = F.edges.filter(function (e) { return e.t === id && e.f !== id; }), outs = F.edges.filter(function (e) { return e.f === id && e.t !== id; }), self = F.edges.filter(function (e) { return e.f === id && e.t === id; })[0];
-      dlg.innerHTML = '<div class="tray-bighead"><b>' + gzTitle(gzName(b.v.id, bl.a0), bl.name) + '</b> <span class="faint mono">' + esc(ref) + '</span>' + gzNameField(gzName(b.v.id, bl.a0), bl.name) + '<span class="refhelp-acts">' +
+      dlg.innerHTML = '<div class="tray-bighead"><b>' + gzTitle(gzName(b.v.id, bl.a0), bl.name) + '</b> <span class="faint mono">' + esc(ref) + '</span>' + gzNameField(gzName(b.v.id, bl.a0), bl.name) + gzMarkField(gzMark(b.v.id, bl.a0)) + '<span class="refhelp-acts">' +
         '<button class="btn ghost" data-keep title="This block, with its name, figures and code, in My notes (private)">＋ My notes</button>' +
         (bl.src ? '<button class="btn" data-read title="This code in Read, in its context">Read in context ↗</button>' : '') +
         '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
@@ -728,6 +741,7 @@
       }
       var FA = flows(GA, R.RA, dA, rowOfA), FB = flows(GB, R.RB, dB, rowOfB), SA = shares(GA, R.RA, dA), SB = shares(GB, R.RB, dB);
       // a routine's name, given on either side, holds for both
+      function rMark(row) { return (row.b && gzMark(b.v.id, row.b.a0)) || (row.a && gzMark(bo.v.id, row.a.a0)) || ''; }
       function rName(row) { return (row.b && gzName(b.v.id, row.b.a0)) || (row.a && gzName(bo.v.id, row.a.a0)) || ''; }
       function blockMs(d, x) { var c = 0; if (d && d.cyc && x) for (var a = x.a0; a <= x.a1; a++) c += d.cyc[a]; return c; }
       function routineFigures(row) {
@@ -773,10 +787,10 @@
           var sh = SH[r.i] || 0, heat = Math.round(6 + 60 * Math.sqrt(sh / smax)), ring = EDGE[row.kind], nm = rName(row);
           o.push('<g class="gz-node" data-r="' + k + '" style="cursor:pointer"><title>' + esc((nm ? nm + ': ' : '') + r.name + ', ' + linesOf(r) + ', ' + r.blocks.length + ' blocks; ' + gzMs(SH['c' + r.i]) + ' (' + (100 * sh).toFixed(1) + '% of the time) in the 5 s sample run; ' + row.kind) + '</title>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--surface)"/>' +
-            '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="' + (ring || 'var(--text-faint)') + '" stroke-width="' + (ring ? 2 : 1) + '"/>' +
-            '<text x="' + (p.x + 7) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + esc(gzFit(nm || r.name, NW - 22 - 6.4 * gzMs(SH['c' + r.i]).length)) + '</text>' +
+            '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="' + (ring || 'var(--text-faint)') + '" stroke-width="' + (ring ? 2 : 1) + '"/>' + gzMarkBar(rMark(row), p.x, p.y, NH) +
+            '<text x="' + (p.x + (rMark(row) ? 10 : 7)) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + esc(gzFit(nm || r.name, NW - 22 - 6.4 * gzMs(SH['c' + r.i]).length)) + '</text>' +
             '<text x="' + (p.x + NW - 7) + '" y="' + (p.y + 17) + '" text-anchor="end" font-family="sans-serif" font-size="11" fill="var(--text)" font-weight="700">' + gzMs(SH['c' + r.i]) + '</text>' +
-            '<text x="' + (p.x + 7) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc((nm ? r.name + ' · ' : '') + linesOf(r)) + '</text></g>');
+            '<text x="' + (p.x + (rMark(row) ? 10 : 7)) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc((nm ? r.name + ' · ' : '') + linesOf(r)) + '</text></g>');
         });
         o.push('</svg>');
         return o.join('');
@@ -784,7 +798,7 @@
       var svgA = sideSVG(true), svgB = sideSVG(false);
       body.innerHTML = '<div class="gz-flow2"><div><div class="fl-h">' + esc(ra) + ' · ' + esc(bo.v.label) + '</div><div class="svgbox fl-box">' + SW.displaySVG(svgA) + '</div></div>' +
         '<div><div class="fl-h">' + esc(rb) + ' · ' + esc(b.v.label) + '</div><div class="svgbox fl-box">' + SW.displaySVG(svgB) + '</div></div></div>' +
-        '<p class="hint fl-key">Each routine in the same place on both sides. Shaded by its share of the time in a 5 s sample run of that version, with the machine time it took there in milliseconds (the share is in the hover and in its box); edges are calls and dispatches between routines, thicker for more often, dashed if in the code but not taken in the run. Outlined violet: altered; green: inserted; red: removed; an empty dashed box: no counterpart on this side. The rounded routine is where the program starts. Click a routine for its blocks side by side.</p>';
+        '<p class="hint fl-key">Each routine in the same place on both sides. Shaded by its share of the time in a 5 s sample run of that version, with the machine time it took there in milliseconds (the share is in the hover and in its box); edges are calls and dispatches between routines, thicker for more often, dashed if in the code but not taken in the run. Outlined violet: altered; green: inserted; red: removed; an empty dashed box: no counterpart on this side. The rounded routine is where the program starts. A coloured bar at the left is your mark, set in its box. Click a routine for its blocks side by side.</p>';
       var fb = SW.el('div'); body.appendChild(fb);
       fb.appendChild(SW.figureButtons(function () { return svgA; }, 'spacewar-' + bo.v.id + '-flow', ra));
       fb.appendChild(document.createTextNode(' '));
@@ -850,7 +864,7 @@
         items.sort(function (p, q) { return p.ord - q.ord; });
         function cell(x, d) { return x ? '<b class="mono">' + esc(x.name) + '</b> <span class="faint">' + esc(linesOf(x)) + '</span>' + (d ? '<span class="gz-t">' + gzMs(blockMs(d, x)) + '</span>' : '') : ''; }
         var label = r.a && r.b && r.a.name !== r.b.name ? r.a.name + ' → ' + r.b.name : (r.b || r.a).name, figs = routineFigures(r);
-        var dlg = dialog('<div class="tray-bighead"><b>' + gzTitle(rName(r), label) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span>' + gzNameField(rName(r), label) + '<span class="refhelp-acts"><button class="btn ghost" data-keep title="This routine in both versions, with its name and figures, in My notes (private)">＋ My notes</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+        var dlg = dialog('<div class="tray-bighead"><b>' + gzTitle(rName(r), label) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span>' + gzNameField(rName(r), label) + gzMarkField(rMark(r)) + '<span class="refhelp-acts"><button class="btn ghost" data-keep title="This routine in both versions, with its name and figures, in My notes (private)">＋ My notes</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
           '<div class="gz-view"><span class="seg-btns"><button class="btn on" data-view="blocks" title="The routine’s figures and its blocks">Blocks</button><button class="btn" data-view="code" title="One block’s code in both versions">Code</button></span>' +
           '<span class="gz-step" hidden><button class="btn ghost" data-step="-1" title="The block before">‹</button><span class="gz-stepn faint"></span><button class="btn ghost" data-step="1" title="The block after">›</button></span></div>' +
           '<div class="gz-pane" data-pane="blocks">' +
@@ -879,6 +893,7 @@
         dlg.addEventListener('click', function (e) {
           if (e.target === dlg || e.target.closest('[data-x]')) { gzWrite({ gz: 'compare', cmp: other, split: split ? 1 : null }); dlg.close(); return; }
           if (e.target.closest('[data-keep]')) { keepRoutine(r, items, figs); return; }
+          var mk = e.target.closest('[data-mark]'); if (mk) { if (r.b) gzSetMark(b.v.id, r.b.a0, mk.dataset.mark); if (r.a) gzSetMark(bo.v.id, r.a.a0, mk.dataset.mark); gzMarkSet(dlg, mk.dataset.mark); render(); return; }
           var vb = e.target.closest('[data-view]'); if (vb) { view(vb.dataset.view); return; }
           var st = e.target.closest('[data-step]'); if (st) { var ids = items.map(function (it) { return it.id; }), at = ids.indexOf(cur); showBlock(ids[(at + +st.dataset.step + ids.length) % ids.length]); return; }
           var it = e.target.closest('[data-id]'); if (it) { showBlock(it.dataset.id); view('code'); }
