@@ -604,7 +604,7 @@
       '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' + fieldsHTML(it) +
       '<div class="px-colls">' + collsHTML(it) + '</div>' +
       '<p class="hint">Catalogued by ' + esc(it.addedBy || '?') + (it.updated && it.updated !== it.added ? '; changed ' + esc(SW.fmtDate(it.updated)) + ' by ' + esc(it.updatedBy || '?') : '') + '.</p>' +
-      '<div class="px-acts"><button class="btn" data-a="save">Save the details</button> <span class="hint px-msg"></span>' + exportMenu('data-xp') + (it.withdrawn ? '<button class="btn ghost px-wd" data-a="restore" title="Back into the list">Bring back</button>' : moreMenu('<button data-a="withdraw">Withdraw from the list…</button>')) + '</div>' +
+      '<div class="px-acts"><button class="btn" data-a="save">Save changes</button> <span class="hint px-msg"></span>' + exportMenu('data-xp') + (it.withdrawn ? '<button class="btn ghost px-wd" data-a="restore" title="Back into the list">Bring back</button>' : moreMenu('<button data-a="withdraw">Withdraw from the list…</button>')) + '</div>' +
       (it.withdrawn ? '<p class="badge px-wdnote">Withdrawn ' + esc(SW.fmtDate(it.withdrawn)) + (it.withdrawnBy ? ' by ' + esc(it.withdrawnBy) : '') + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
       '<div class="px-linkline">Use the code <span class="mono">' + esc(it.code) + '</span> in an annotation to link it. <button class="btn ghost" data-copy="' + esc(it.code) + '">Copy the code</button></div>' +
       '<div class="px-talk">' + talkHTML(it) + '</div><div class="px-cited"></div></div></div>';
