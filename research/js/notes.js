@@ -1263,15 +1263,18 @@
       '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Save</button></span></div>';
     var ta = box.querySelector('textarea'), tg = box.querySelector('.edit-tags');
     ta.value = SW.noteHistory.visible(note.text);
+    var was = ta.value.trim(), wasTags = tg ? null : '';
     SW.mdTools(ta);
     // the bench's own marks (level:, note:, cat:, chapter:) are kept out of the box and kept on saving
     var own = /^(level|note|cat|chapter):/;
     var marks = (note.tags || []).filter(function (g) { return own.test(g); });
     if (tg) tg.value = (note.tags || []).filter(function (g) { return !own.test(g); }).join(', ');
+    if (tg) wasTags = tg.value;
     body.hidden = true;
     body.insertAdjacentElement('afterend', box);
     ta.focus();
     function close() { box.remove(); body.hidden = false; }
+    function leave() { if (discardOK(ta.value.trim() !== was || (tg && tg.value !== wasTags), 'your changes')) close(); else ta.focus(); }
     function save() {
       var text = ta.value.trim();
       if (!text) { ta.focus(); return; }
@@ -1288,11 +1291,11 @@
     box.addEventListener('click', function (e) {
       e.stopPropagation();
       var b = e.target.closest('[data-r]');
-      if (b) (b.dataset.r === 'cancel' ? close : save)();
+      if (b) (b.dataset.r === 'cancel' ? leave : save)();
     });
     box.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); save(); }
-      if (e.key === 'Escape') { e.stopPropagation(); close(); }
+      if (e.key === 'Escape') { e.stopPropagation(); leave(); }
     });
   }
 
@@ -1324,17 +1327,28 @@
       e.stopPropagation();
       var b = e.target.closest('[data-r]');
       if (!b) return;
-      if (b.dataset.r === 'cancel') box.remove(); else save();
+      if (b.dataset.r === 'cancel') leave(); else save();
     });
+    function leave() { if (discardOK(!!ta.value.trim(), 'this reply')) box.remove(); else ta.focus(); }
     ta.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); save(); }
-      if (e.key === 'Escape') { e.stopPropagation(); box.remove(); }
+      if (e.key === 'Escape') { e.stopPropagation(); leave(); }
     });
   }
 
+  // Unsaved writing is not thrown away by a slip. Cancel, or Esc, in a box that holds new text asks
+  // first; leaving the page asks too; and the note dialog's text is kept in this browser as it is
+  // typed, until it is saved or discarded, so it comes back if the window closes another way.
+  function discardOK(changed, what) { return !changed || confirm('Discard ' + what + '? What you have written will be lost.'); }
+  window.addEventListener('beforeunload', function (e) {
+    var d = SW.$('#dlg-note'), held = d && d.open && SW.$('#note-text').value.trim();
+    if (!held) held = SW.$$('.reply-box textarea').some(function (t) { return t.value.trim(); });
+    if (held) { e.preventDefault(); e.returnValue = ''; }
+  });
+  function unsavedKey(o) { var a = o.anchor; return [o.vid, o.parent || '', o.kind || '', a ? a.p + ':' + a.n0 + '-' + a.n1 : ''].join('|'); }
   // The note dialog. opts: {vid, kind, anchor, quote, parent, heading, anchorText}
   N.dialog = function (opts) {
-    var dlg = SW.$('#dlg-note'), me = SW.me();
+    var dlg = SW.$('#dlg-note'), me = SW.me(), key = unsavedKey(opts), kept = SW.store.get('note.unsaved', null);
     SW.$('#note-title').textContent = opts.heading || 'Annotate';
     SW.$('#note-anchor').textContent = opts.anchorText || '';
     SW.$('#note-text').value = '';
@@ -1349,18 +1363,36 @@
         (N.configured() ? ' · shared with the group' : ' · kept as a draft (no group set)')
       : '<span style="color:var(--red)">Set your initials first (⚙).</span>';
     dlg.returnValue = '';
-    SW.$('.keep-hint', dlg).hidden = true;
+    var hint = SW.$('.keep-hint', dlg), ta = SW.$('#note-text'), tgs = SW.$('#note-tags');
+    hint.textContent = 'Unsaved annotation. Save it, or Cancel to discard it.'; hint.hidden = true;
+    if (kept && kept.key === key && kept.text) {   // what was being written here before, not saved
+      ta.value = kept.text; if (kept.tags) tgs.value = kept.tags;
+      hint.textContent = 'Your unsaved text from ' + kept.at + ' is back. Save it, or Cancel to discard it.'; hint.hidden = false;
+    }
+    function keep() { var t = ta.value.trim(); SW.store.set('note.unsaved', t ? { key: key, text: ta.value, tags: tgs.value, at: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) } : null); }
+    function forget() { var k0 = SW.store.get('note.unsaved', null); if (k0 && k0.key === key) SW.store.set('note.unsaved', null); }
+    ta.oninput = keep; tgs.oninput = keep;
+    dlg.oncancel = function (e) {   // Esc: not while it holds text
+      if (!ta.value.trim()) return;
+      e.preventDefault();
+      dlg.classList.remove('nudge'); void dlg.offsetWidth; dlg.classList.add('nudge');
+      hint.hidden = false; ta.focus();
+    };
+    SW.$('button[value="cancel"]', dlg).onclick = function (e) {
+      if (!discardOK(!!ta.value.trim(), 'this annotation')) { e.preventDefault(); ta.focus(); return; }
+      forget();
+    };
     dlg.showModal();
-    SW.$('#note-text').focus();
+    ta.focus();
     dlg.onclose = function () {
-      if (dlg.returnValue !== 'save') return;
-      var text = SW.$('#note-text').value.trim();
-      if (!text) return;
-      var tags = SW.$('#note-tags').value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+      if (dlg.returnValue !== 'save') return;   // closed another way, its text kept to come back
+      var text = ta.value.trim();
+      if (!text) { forget(); return; }
+      var tags = tgs.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
       var dev = !devBox.hidden && SW.$('input', devBox).checked;
       N.create({ vid: opts.vid, kind: opts.kind || (opts.anchor ? 'line' : 'version'), anchor: opts.anchor,
                  quote: opts.quote, text: text, tags: tags, parent: opts.parent, dev: dev })
-        .catch(function (e) { if (e.message !== 'no initials') SW.toast(e.message, 5000); });
+        .then(forget, function (e) { if (e.message !== 'no initials') SW.toast(e.message + ' Your text is kept: annotate the same lines again to get it back.', 7000); });
     };
   };
 
