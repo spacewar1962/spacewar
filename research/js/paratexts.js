@@ -318,7 +318,7 @@
         return '<tr class="px-row" data-code="' + esc(it.code) + '" tabindex="0" draggable="true"><td><button class="px-pick" data-pick aria-pressed="false" title="Select"></button></td><td><div class="px-thumb px-mini" data-kind="' + esc(it.kind) + '">' + thumb(it) + '</div></td>' +
           '<td class="mono px-code-c">' + esc(it.code) + '</td><td><b>' + esc(it.title) + '</b>' + ((it.tags || []).length ? ' ' + it.tags.map(function (g) { return '<span class="fd-tag">' + esc(g) + '</span>'; }).join(' ') : '') + '</td>' +
           '<td class="num">' + esc(it.date || '') + '</td><td>' + esc(it.creator || '') + '</td><td>' + esc(it.kind || '') + '</td><td class="num">' + fmtSize(it.size) + '</td>' +
-          '<td>' + (a ? '<span class="px-s px-star" title="' + esc(a.who.join('; ')) + '">★ ' + (Math.round(a.avg * 10) / 10) + '</span>' : '') + '</td>' +
+          '<td>' + (a ? SW.stars(a.avg, (Math.round(a.avg * 10) / 10) + ' from ' + a.n + ': ' + a.who.join('; ')) : '') + '</td>' +
           '<td>' + inColl(it).map(function (id) { return '<span class="px-cl" title="' + esc(pathName(id)) + '">📁 ' + esc(coll(id).name) + '</span>'; }).join('') + '</td>' +
           '<td class="num">' + esc(SW.fmtDate(it.added) || '') + '</td></tr>';
       }).join('') + '</tbody></table></div>';
@@ -540,7 +540,7 @@
   function avg(it) { var r = it.rates || {}, k = Object.keys(r); return k.length ? { avg: k.reduce(function (t, x) { return t + r[x]; }, 0) / k.length, n: k.length, who: k.map(function (x) { return x + ' ' + '★'.repeat(r[x]); }) } : null; }
   function summary(it) {
     var a = avg(it), rx = it.rx || {}, em = Object.keys(rx).filter(function (e) { return (rx[e] || []).length; }), nc = (it.comments || []).length;
-    return (a ? '<span class="px-s px-star" title="' + SW.esc(a.who.join('; ')) + '">★ ' + (Math.round(a.avg * 10) / 10) + '</span>' : '') +
+    return (a ? '<span class="px-s">' + SW.stars(a.avg, (Math.round(a.avg * 10) / 10) + ' from ' + a.n + ': ' + a.who.join('; ')) + '</span>' : '') +
       (em.length ? '<span class="px-s">' + em.map(function (e) { return e + (rx[e].length > 1 ? '<sup>' + rx[e].length + '</sup>' : ''); }).join('') + '</span>' : '') +
       (nc ? '<span class="px-s">💬 ' + nc + '</span>' : '');
   }

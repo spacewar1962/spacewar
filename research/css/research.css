@@ -1201,7 +1201,7 @@ a.ov-nm:hover { text-decoration: underline; }
 .fd-rxbar sup { font-size: 10px; margin-left: 2px; }
 .fd-rate { display: inline-flex; align-items: center; gap: 1px; margin-right: 10px; }
 .fd-rate button { border: none; padding: 0 2px; font-size: 18px; color: var(--line); }
-.fd-rate button.on { color: var(--amber); background: none; }
+.fd-rate button.on { color: var(--kin); background: none; }
 .tray-code.tray-full { white-space: pre; }
 .tray-code .tl { white-space: pre; }
 .tray-anno { white-space: normal; font-family: var(--sans, inherit); font-size: 12.5px; text-align: right; margin: 3px 0 6px auto; max-width: 80%; padding: 3px 10px 4px; border-right: 3px solid var(--line); background: color-mix(in srgb, var(--surface-2) 60%, transparent); border-radius: 4px 0 0 4px; }
@@ -1899,7 +1899,6 @@ dialog.px-dlg { width: min(96vw, 1200px); }
 a.swcode { font-size: .92em; }
 /* the stars given to a paratext, in gold */
 .px-rx .fd-rate button.on { color: var(--kin); }
-.px-s.px-star { color: var(--kin); }
 /* Paratexts: collections and views */
 .px-shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 18px; align-items: start; }
 .px-nav { position: sticky; top: 8px; font-size: 13px; border-right: 1px solid var(--line-soft); padding-right: 10px; max-height: calc(100vh - 120px); overflow: auto; }
@@ -2001,3 +2000,8 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .px-ro dd p { margin: 0 0 4px; }
 .px-peekfoot { display: flex; flex-wrap: wrap; gap: 6px 20px; justify-content: flex-end; border-top: 1px solid var(--line-soft); margin-top: 12px; padding-top: 10px; font-size: 13.5px; }
 .px-peekfoot a { color: var(--beam); }
+/* a rating as a row of three stars */
+.sw-stars { white-space: nowrap; letter-spacing: 1px; }
+.sw-stars b { color: var(--kin); font-weight: inherit; }
+.sw-stars i { color: var(--line); font-style: normal; }
+.px-s .sw-stars { font-size: 13px; }

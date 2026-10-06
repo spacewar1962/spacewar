@@ -23,6 +23,11 @@
   // ---------- small helpers ----------
   SW.$ = function (sel, el) { return (el || document).querySelector(sel); };
   SW.$$ = function (sel, el) { return Array.prototype.slice.call((el || document).querySelectorAll(sel)); };
+  // A rating out of three as a row of stars: gold up to the average (rounded), the rest dim
+  SW.stars = function (avg, title) {
+    var n = Math.max(0, Math.min(3, Math.round(avg || 0)));
+    return '<span class="sw-stars"' + (title ? ' title="' + SW.esc(title) + '"' : '') + ' aria-label="' + (Math.round((avg || 0) * 10) / 10) + ' of 3 stars">' + '<b>' + '★'.repeat(n) + '</b>' + '<i>' + '★'.repeat(3 - n) + '</i></span>';
+  };
   SW.esc = function (s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
