@@ -4,6 +4,7 @@ All notable changes to the _Spacewar!_ Critical Code Studies website. Versions f
 
 ## Unreleased
 
+- **Captions corrected against their sources.** PDP-11 (`pdp11.html`, `ports.html`, `code.html`): Bryant and Seiler's 1974 version (DECUS 11-192) ran on a PDP-11/10 drawing on a large-screen oscilloscope through DEC's AD01-D and AA11-D converters, as the DECUS entry says, not on a GT40; the mines and "wild variable" belong to Eross's Stanford GT40 version. The Tech, 1963 (`people.html`): "Telephone hackers active", by Henry Lichstein. Barbera Stephenson (`index.html`, `overview.html`): playing Spacewar! at the AFIPS Fall Joint Computer Conference, about 1964 (Computer History Museum, 102652460), not 1961.
 - **Citing the source code** (`code.html#referencing`): the project's referencing convention for the source texts, `[REF: SW3.1T, 2.141–146]` (version, witness letter, tape, lines; short forms; core addresses; the SWP namespace for ports; SWHIDs alongside), with the full list of references for every text held and every port, each text linked and each reference and SWHID copyable. The version table gains a Reference column.
 
 ## v1.5.0 — 2026-06-13

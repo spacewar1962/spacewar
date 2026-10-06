@@ -58,7 +58,7 @@ English-language sources, not closure.
   - https://github.com/PDP-10/Spacewar
 - **GT40 / PDP-11 vector line** [US]:
   - Eross — Botond G. Eross, Stanford AI Project, 1973, MACRO-11 (inspired by Gorin's PDP-10 version). https://www.saildart.org/ (`SW.P11[11,BO]`)
-  - Bryant & Seiler — "Space War Version 5B," Larry Bryant & Bill Seiler, 21 Jul 1974 (DECUS 11-192; recovered from Seiler's printout by Mattis Lind, 2021). https://github.com/MattisLind/SPACEWAR
+  - Bryant & Seiler — "Space War Version 5B," Larry Bryant & Bill Seiler, 21 Jul 1974 (DECUS 11-192; not a GT40 version: a PDP-11/10 drawing on a large-screen oscilloscope through AA11-D converters, per the DECUS entry; recovered from Seiler's printout by Mattis Lind, 2021). https://github.com/MattisLind/SPACEWAR
   - Waters & Billmers — MIT AI Lab, c.1976 (depends on the GTROS minimal OS). https://github.com/pdp11/mit-gt40-spacewar
 - **PDP-8 / LAB-8** [US] — Evan Suits, "Interplanetary Death and Destruction on your
   LAB-8," 11 Jan 1971, PAL. *(Source file in `sources/ports/`; upstream URL to confirm.)*

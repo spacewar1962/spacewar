@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Spacewar on the PDP-11: Bryant, Seiler and the GT40</title>
-  <meta name="description" content="The 1974 PDP-11 port of Spacewar! written by Larry Bryant and Bill Seiler for the GT40 graphics terminal, submitted to DECUS as 11-192, lost, and recovered from Seiler's printout by Mattis Lind in 2021.">
+  <title>Spacewar on the PDP-11: Bryant, Seiler and the oscilloscope</title>
+  <meta name="description" content="The 1974 PDP-11 port of Spacewar! by Larry Bryant and Bill Seiler at the University of South Florida, drawn on a large-screen oscilloscope through DEC's analog converters, submitted to DECUS as 11-192, lost, and recovered from Seiler's printout by Mattis Lind in 2021.">
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-  <meta property="og:title" content="Spacewar on the PDP-11: Bryant, Seiler and the GT40">
-  <meta property="og:description" content="Larry Bryant and Bill Seiler's 1974 PDP-11 GT40 Spacewar (DECUS 11-192), lost by DECUS and recovered from a saved printout by Mattis Lind in 2021.">
+  <meta property="og:title" content="Spacewar on the PDP-11: Bryant, Seiler and the oscilloscope">
+  <meta property="og:description" content="Larry Bryant and Bill Seiler's 1974 PDP-11 Spacewar (DECUS 11-192), played on a large-screen oscilloscope, lost by DECUS and recovered from a saved printout by Mattis Lind in 2021.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://spacewar1962.github.io/spacewar/pdp11.html">
   <meta property="og:image" content="https://spacewar1962.github.io/spacewar/assets/og-card.png">
@@ -104,20 +104,20 @@
 
     <section class="block lede">
       <span class="kicker">Digging deeper into the PDP-11 port</span>
-      <h2>Spacewar on the PDP-11: Bryant, Seiler and the GT40</h2>
-      <p>By the early 1970s <i>Spacewar!</i> had jumped off the PDP-1 and onto the next generation of DEC hardware. In <b>1974</b> two programmers, <b>Larry Bryant</b> and <b>Bill Seiler</b>, wrote a PDP-11 version for the <b>GT40</b> graphics terminal and submitted it to the DEC users' group, <b>DECUS</b>, as program <b>11-192</b>. It is a port in the fullest sense: a fresh implementation in PDP-11 assembler, driving DEC's own vector display, carrying the 1962 game forward onto the machine that would define minicomputing for the rest of the decade.</p>
+      <h2>Spacewar on the PDP-11: Bryant, Seiler and the oscilloscope</h2>
+      <p>By the early 1970s <i>Spacewar!</i> had jumped off the PDP-1 and onto the next generation of DEC hardware. In <b>1974</b> two programmers, <b>Larry Bryant</b> and <b>Bill Seiler</b>, wrote a PDP-11 version at SYCOM, the University of South Florida in Tampa, and submitted it to the DEC users' group, <b>DECUS</b>, as program <b>11-192</b>. It is a port in the fullest sense: a fresh implementation in PDP-11 assembler (PAL-11S), drawing the game on a large-screen oscilloscope through DEC's analog converters, carrying the 1962 game forward onto the machine that would define minicomputing for the rest of the decade.</p>
     </section>
 
     <div class="rule"><span>the machine and the display</span></div>
 
     <section class="block">
-      <span class="kicker">PDP-11 + GT40, 1974</span>
+      <span class="kicker">PDP-11/10 + oscilloscope, 1974</span>
       <h3>A new machine for an old game</h3>
       <p><figure style="float:right;width:44%;max-width:300px;margin:0.2rem 0 0.9rem 1.4rem;">
         <a href="assets/images/1974-DECUS-PDP-11-Bill-Seiler-Larry-Bryant-in-197411-192.png" target="_blank" rel="noopener noreferrer" title="Click to view full size"><img src="assets/images/1974-DECUS-PDP-11-Bill-Seiler-Larry-Bryant-in-197411-192.png" alt="DECUS catalogue entry 11-192 crediting Bill Seiler and Larry Bryant with the PDP-11 Spacewar" style="width:100%;height:auto;display:block;border:1px solid var(--line);background:#0b0f0c;padding:0.35rem;"></a>
         <figcaption style="font-size:0.6rem;line-height:1.5;color:var(--phosphor-dim);margin-top:0.4rem;">The DECUS listing for 11-192, crediting Bill Seiler and Larry Bryant. <span style="display:block;margin-top:0.2rem;">Click to view full size.</span></figcaption>
       </figure>
-      The <b>GT40</b> was DEC's intelligent graphics terminal: a PDP-11/05 paired with a <b>VT11</b> vector display processor that could draw lines and points directly from a display list in core, complete with a light pen. For a game built out of moving points and vectors it was an almost exact match to the PDP-1's Type 30 a dozen years earlier, only faster and far more widely sold. Bryant and Seiler's <i>Spacewar!</i> uses the VT11 to draw the two ships, their torpedoes and the star field, and adds touches of its own, including mines and what the recovered source calls a "wild variable". Like the Stanford GT40 version by Botond Eross from the same period, it shows the game settling onto the PDP-11/GT40 combination as its natural early-1970s home.</p>
+      The DECUS entry gives the machine: a <b>PDP-11/10</b> with four channels of DEC's <b>AD01-D</b> analog-to-digital converter, the first four channels of its <b>AA11-D</b> digital-to-analog converter, a teletype and a <b>large-screen oscilloscope</b>. The digital-to-analog channels steered the oscilloscope's beam, much as the PDP-1 had steered the Type 30 point by point a dozen years earlier; the analog inputs most likely read the players' controls, which, the entry notes, "users must construct" for themselves. The entry lists what a player could vary: the number of torpedoes each spacecraft carries, the number of hits needed to destroy one, and whether there is a sun and gravity. Other PDP-11 versions of the game ran on DEC's <b>GT40</b> graphics terminal (a PDP-11/05 with a VT11 vector display processor): Botond Eross's at the Stanford AI Project (1973), with mines and a "wild variable", and Waters and Billmers's at MIT (c. 1976). Bryant and Seiler's went the cheaper way, through general-purpose converters and an oscilloscope, the route Mattis Lind followed again in 2021.</p>
     </section>
 
     <div class="rule"><span>lost and found</span></div>
