@@ -767,6 +767,62 @@
              units: texts.map(function (t) { return units(t, opts.granularity, opts); }), steps: steps };
   }
 
+  /*
+   * forks(texts, fl, opts) -> per step {links, hiddenA, hiddenB}: the flow's ribbons from the lines
+   * themselves, many to many. Each line matched from one version to the next (retained, moved or
+   * edited) counts for the routine it leaves and the routine it lands in; a pair of routines that
+   * shares lines is a candidate ribbon, as wide as the lines it carries. So code re-cut between
+   * versions forks and joins (4.2's bck into 1m–4m) instead of showing removed + added. Kept, to
+   * spare the eye (opts.detail):
+   *   main  - each routine's largest share out and in, and the routine-level pairs;
+   *   forks - (the default) also any pair carrying >= 5 lines and >= 20% of either routine, at most
+   *           three out of and three into a routine;
+   *   all   - any pair carrying >= 2 lines.
+   * The routine-level pair (compare()) is always kept, with its status; a fork not in it is 'moved'
+   * (its code went to another routine). What is not drawn is listed in hiddenA / hiddenB.
+   */
+  function forks(texts, fl, opts) {
+    opts = opts || {};
+    var detail = opts.detail || 'forks';
+    return fl.steps.map(function (st) {
+      var A = texts[st.from], B = texts[st.to], UA = fl.units[st.from], UB = fl.units[st.to];
+      var c = compare(A, B, { granularity: 'line', script: false });
+      function owner(us, n) { var o = new Int32Array(n).fill(-1); us.forEach(function (u, k) { for (var i = u.start; i <= u.end; i++) o[i] = k; }); return o; }
+      var oa = owner(UA, A.lines.length), ob = owner(UB, B.lines.length), W = Object.create(null);
+      c.pairs.forEach(function (p) {
+        if (p.a == null || p.b == null) return;
+        var ka = oa[c.unitsA[p.a].start], kb = ob[c.unitsB[p.b].start];
+        if (ka < 0 || kb < 0) return;
+        var key = ka + ':' + kb, w = W[key] || (W[key] = { a: ka, b: kb, n: 0 });
+        w.n++;
+      });
+      var pairOf = Object.create(null);
+      st.pairs.forEach(function (p) { if (p.a != null && p.b != null) pairOf[p.a + ':' + p.b] = p; });
+      var all = Object.keys(W).map(function (k) { return W[k]; });
+      Object.keys(pairOf).forEach(function (k) { if (!W[k]) { var p = pairOf[k]; all.push(W[k] = { a: p.a, b: p.b, n: 0 }); } });
+      var bestA = {}, bestB = {};
+      all.forEach(function (w) { if (!bestA[w.a] || w.n > bestA[w.a].n) bestA[w.a] = w; if (!bestB[w.b] || w.n > bestB[w.b].n) bestB[w.b] = w; });
+      all.forEach(function (w) {
+        var pr = pairOf[w.a + ':' + w.b], la = UA[w.a].lines, lb = UB[w.b].lines;
+        w.status = pr ? pr.status : 'moved'; w.pair = !!pr; w.fork = !pr;
+        w.shareA = w.n / la; w.shareB = w.n / lb; w.sim = pr ? pr.similarity : 0;
+        w.keep = w.pair || (detail === 'all' ? w.n >= 2 :
+          detail === 'main' ? w.n >= 5 && (bestA[w.a] === w || bestB[w.b] === w) && (w.shareA >= 0.2 || w.shareB >= 0.2) :
+          w.n >= 5 && (w.shareA >= 0.2 || w.shareB >= 0.2));
+      });
+      if (detail === 'forks') {   // at most three out of and three into a routine, the widest
+        [['a', 'b'], ['b', 'a']].forEach(function (ab) {
+          var by = {};
+          all.forEach(function (w) { if (w.keep && !w.pair) (by[w[ab[0]]] = by[w[ab[0]]] || []).push(w); });
+          Object.keys(by).forEach(function (k) { by[k].sort(function (x, y) { return y.n - x.n; }).slice(3).forEach(function (w) { w.keep = false; }); });
+        });
+      }
+      var links = all.filter(function (w) { return w.keep; }), hiddenA = {}, hiddenB = {};
+      all.forEach(function (w) { if (!w.keep && w.n) { (hiddenA[w.a] = hiddenA[w.a] || []).push(w); (hiddenB[w.b] = hiddenB[w.b] || []).push(w); } });
+      return { links: links, hiddenA: hiddenA, hiddenB: hiddenB };
+    });
+  }
+
   /* ------------------------------------------------------------------ */
   /* SVG                                                                 */
   /* ------------------------------------------------------------------ */
@@ -856,7 +912,65 @@
     var s = svgOpen(W, totalH, 'g-alluvial', opts.title || ('Genealogy flow (' + fl.granularity + ')'));
     // ribbons
     s += '<g class="g-ribbons" fill-opacity="0.55">';
-    fl.steps.forEach(function (st, si) {
+    if (opts.forks) fl.steps.forEach(function (st, si) {
+      var xa = left + st.from * cw + bw, xb = left + st.to * cw, fk = opts.forks[si];
+      var UA = fl.units[st.from], UB = fl.units[st.to], PA = cols[st.from].pos, PB = cols[st.to].pos;
+      var outA = {}, inB = {};
+      fk.links.forEach(function (w) { (outA[w.a] = outA[w.a] || []).push(w); (inB[w.b] = inB[w.b] || []).push(w); });
+      // each routine's ribbons stacked down its box in the order of the routines they join
+      function stack(groups, P, U, other) {
+        Object.keys(groups).forEach(function (k) {
+          var g = groups[k].sort(function (x, y) { return x[other] - y[other]; }), p = P[k], tot = 0;
+          g.forEach(function (w) { tot += Math.max(w.n, w.pair ? 1 : 0); });
+          var y = p.y, room = Math.max(p.h, 0.5), per = room / Math.max(tot, U[k].lines);
+          g.forEach(function (w) { var h = Math.max(Math.max(w.n, w.pair ? 1 : 0) * per, 0.5); w['y' + (other === 'b' ? 'a' : 'b')] = [y, y + h]; y += h; });
+        });
+      }
+      stack(outA, PA, UA, 'b'); stack(inB, PB, UB, 'a');
+      // runs of plain one-to-one pairs (consecutive on both sides, same status, nothing else leaving or
+      // arriving) drawn as one band, as the one-to-one chart draws them
+      var solo = function (w) { return w.pair && outA[w.a].length === 1 && inB[w.b].length === 1; };
+      var runs = [], cur = null;
+      fk.links.filter(solo).sort(function (x, y) { return x.a - y.a; }).forEach(function (w) {
+        if (cur && cur.status === w.status && w.a === cur.a1 + 1 && w.b === cur.b1 + 1) { cur.a1 = w.a; cur.b1 = w.b; cur.ya[1] = w.ya[1]; cur.yb[1] = w.yb[1]; cur.n++; return; }
+        runs.push(cur = { a0: w.a, a1: w.a, b0: w.b, b1: w.b, status: w.status, ya: w.ya.slice(), yb: w.yb.slice(), n: 1, w: w });
+      });
+      runs.forEach(function (r) {
+        if (r.n === 1) { r.w.run = false; return; }
+        var tip = texts[st.from].label + ' → ' + texts[st.to].label + ': ' + r.status + ' ' + r.n + ' units, ' + UA[r.a0].name + ' … ' + UA[r.a1].name;
+        s += '<path d="' + band(xa, r.ya[0], r.ya[1], xb, r.yb[0], r.yb[1]) + '" fill="' + COLORS[r.status] + '"' + (r.status === 'moved' ? ' fill-opacity="0.8"' : '') +
+          ' data-step="' + si + '" data-status="' + r.status + '" data-a0="' + r.a0 + '" data-a1="' + r.a1 + '" data-b0="' + r.b0 + '" data-b1="' + r.b1 + '"><title>' + esc(tip) + '</title></path>';
+        for (var a = r.a0; a <= r.a1; a++) outA[a][0].run = true;
+      });
+      fk.links.forEach(function (w) {
+        if (w.run) return;
+        var ua = UA[w.a], ub = UB[w.b];
+        var tip = texts[st.from].label + ' → ' + texts[st.to].label + ': ' + ua.name + (ub.name !== ua.name ? ' → ' + ub.name : '') + ', ' +
+          (w.fork ? 'a fork: ' : w.status + ': ') + w.n + ' line' + (w.n === 1 ? '' : 's') + ' (' + pct(w.shareA) + ' of ' + ua.name + ', ' + pct(w.shareB) + ' of ' + ub.name + ')';
+        s += '<path d="' + band(xa, w.ya[0], w.ya[1], xb, w.yb[0], w.yb[1]) + '" fill="' + COLORS[w.status] + '"' + (w.fork ? ' fill-opacity="0.45"' : w.status === 'moved' ? ' fill-opacity="0.8"' : '') +
+          ' data-step="' + si + '" data-status="' + w.status + '" data-a0="' + w.a + '" data-a1="' + w.a + '" data-b0="' + w.b + '" data-b1="' + w.b + '"' + (w.fork ? ' data-fork="1"' : '') + ' data-n="' + w.n + '"><title>' + esc(tip) + '</title></path>';
+      });
+      // no ribbon kept: added and removed stubs, as before
+      UA.forEach(function (u, k) {
+        if (outA[k]) return;
+        var pa = PA[k];
+        s += '<path d="' + band(xa, pa.y, pa.y + Math.max(pa.h, 0.5), xa + stub, pa.y + pa.h / 2, pa.y + pa.h / 2) + '" fill="' + COLORS.removed + '" data-step="' + si + '" data-status="removed" data-a0="' + k + '" data-a1="' + k + '" data-b0="" data-b1=""><title>' +
+          esc(texts[st.from].label + ': ' + u.name + ' removed (' + u.lines + ' lines)' + (fk.hiddenA[k] ? '; a few lines go on: ' + fk.hiddenA[k].map(function (w) { return UB[w.b].name + ' ' + w.n; }).join(', ') : '')) + '</title></path>';
+      });
+      UB.forEach(function (u, k) {
+        if (inB[k]) return;
+        var pb = PB[k];
+        s += '<path d="' + band(xb - stub, pb.y + pb.h / 2, pb.y + pb.h / 2, xb, pb.y, pb.y + Math.max(pb.h, 0.5)) + '" fill="' + COLORS.added + '" data-step="' + si + '" data-status="added" data-a0="" data-a1="" data-b0="' + k + '" data-b1="' + k + '"><title>' +
+          esc(texts[st.to].label + ': ' + u.name + ' added (' + u.lines + ' lines)' + (fk.hiddenB[k] ? '; a few lines come from: ' + fk.hiddenB[k].map(function (w) { return UA[w.a].name + ' ' + w.n; }).join(', ') : '')) + '</title></path>';
+      });
+      // ⑂: lines that went elsewhere in amounts too small to draw, listed in the mark's hover
+      Object.keys(fk.hiddenA).forEach(function (k) {
+        var p = PA[k], hs = fk.hiddenA[k], tot = hs.reduce(function (t, w) { return t + w.n; }, 0);
+        if (!outA[k] || p.h < 3) return;
+        s += '<circle cx="' + f1(xa + 2.5) + '" cy="' + f1(p.y + Math.min(3, p.h / 2)) + '" r="1.8" fill="' + COLORS.text + '" fill-opacity="0.7"><title>' + esc(UA[k].name + ': ' + tot + ' more line' + (tot === 1 ? '' : 's') + ' went elsewhere, not drawn: ' + hs.sort(function (x, y) { return y.n - x.n; }).map(function (w) { return UB[w.b].name + ' ' + w.n; }).join(', ')) + '</title></circle>';
+      });
+    });
+    else fl.steps.forEach(function (st, si) {
       var xa = left + st.from * cw + bw, xb = left + st.to * cw;
       var UA = fl.units[st.from], UB = fl.units[st.to], PA = cols[st.from].pos, PB = cols[st.to].pos;
       coalesce(st.pairs).forEach(function (r) {
@@ -1137,7 +1251,7 @@
     STATUSES: STATUSES, COLORS: COLORS,
     parseLine: parseLine, normalize: normalize, prepare: prepare, units: units,
     compare: compare, editScript: editScript, similarity: seqSimilarity,
-    matrix: matrix, tree: tree, lineage: lineage, annotate: annotate, flows: flows,
+    matrix: matrix, tree: tree, lineage: lineage, annotate: annotate, flows: flows, forks: forks,
     svgAlluvial: svgAlluvial, svgBlockMap: svgBlockMap, svgMatrix: svgMatrix, svgTree: svgTree,
     escapeXml: esc
   };

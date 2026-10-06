@@ -691,6 +691,10 @@
     gst.boxes = SW.store.get('gen.boxes', gst.boxes);
     if (gst.gran === 'line') { body.innerHTML = '<p class="hint">Line granularity is too fine for the flow view; choose routine or section, or use Compare → Routines for a pair.</p>'; return; }
     var fl = G.flows(ts, { granularity: gst.gran });
+    // Detail: the ribbons from the lines themselves (forks and joins where code was re-cut), or one to one
+    gst.detail = SW.store.get('gen.detail', 'forks');
+    var fkCache = {};
+    function fk() { return gst.detail === 'one' ? null : (fkCache[gst.detail] = fkCache[gst.detail] || G.forks(ts, fl, { detail: gst.detail })); }
     // Zoom, in pixels per source line (0 = fit to the window). Further in, each
     // box shows its routine's name, then its code.
     var NAMES_AT = 2.5, CODE_AT_G = 8;
@@ -720,13 +724,14 @@
     flowOpts = function () {
       var o = baseOpts();
       o.sublabels = ts.map(function (t) { return SW.refText(t.id); });   // each column’s reference, under its name
+      o.forks = fk();
       if (gst.boxes === 'hand') { o.boxFill = handFill; o.boxTip = handTip; o.extraLegend = handLegend(); }
       return o;
     };
     var svg = function () { return G.svgAlluvial(ts, fl, flowOpts()); };
     var help = SW.$('#gn-help');
     if (help) help.title = 'Each column is a version in date order; each box a ' + gst.gran + ', stacked in source order with height by length. ' +
-      'Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped.\n\n' +
+      'Ribbons join a ' + gst.gran + ' to its ancestor in the previous column: retained in place, moved, edited (with similarity), and stubs for what is added or dropped. With Detail at forks (the default) they are drawn from the lines themselves: code re-cut between versions forks or joins (a paler ribbon, as wide as the lines it carries), and only ribbons carrying 5 lines and a fifth of a ' + gst.gran + ' are drawn; a small dot on a box lists, in its hover, the few lines that went elsewhere.\n\n' +
       'Hover a box or ribbon for names. Click one to read the code it stands for, coloured by what happened to it; a clicked box also lights the same ' + gst.gran + ' in every version before and after it (click it again, or empty space, to clear).\n\n' +
       'Zoom in for names, then code. Chart only hides the tables below; drag the bar under the chart to resize it.';
     body.innerHTML = '';
@@ -773,6 +778,10 @@
       'Boxes <select><option value="change"' + (gst.boxes !== 'hand' ? ' selected' : '') + '>plain</option><option value="hand"' + (gst.boxes === 'hand' ? ' selected' : '') + '>whose hand</option></select>');
     boxSel.querySelector('select').onchange = function (e) { gst.boxes = e.target.value; SW.store.set('gen.boxes', gst.boxes); drawFlow(); handTable(); };
     zbar.appendChild(boxSel);
+    var detSel = SW.el('label', { class: 'check', title: 'How the ribbons are drawn. Forks: from the lines themselves, so code re-cut between versions forks and joins, with only the ribbons that carry a real share of a ' + gst.gran + ' (5 lines and a fifth of it); the rest listed in a ⑂ mark’s hover. Main paths: only each ' + gst.gran + '’s largest share. All: every pair sharing two lines or more. One to one: each ' + gst.gran + ' paired with one in the next version, as before.' },
+      'Detail <select>' + [['main', 'main paths'], ['forks', 'forks'], ['all', 'all'], ['one', 'one to one']].map(function (o) { return '<option value="' + o[0] + '"' + (gst.detail === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select>');
+    detSel.querySelector('select').onchange = function (e) { gst.detail = e.target.value; SW.store.set('gen.detail', gst.detail); drawFlow(); };
+    zbar.appendChild(detSel);
     zbar.appendChild(SW.el('span', { class: 'sep' }));
     var gv = body.closest('.view') || body;
     var bigBtn = SW.el('button', { class: 'btn', title: 'Give the chart the whole page: hides the version choices, the explanation and the tables below (click again to bring them back)' });
@@ -987,6 +996,12 @@
   // A ribbon: every unit pair it carries, side by side.
   function showRibbon(ts, fl, d) {
     var si = +d.step, st = fl.steps[si], ta = ts[st.from], tb = ts[st.to];
+    if (d.fork) {   // a fork: code that went from one routine into another
+      var fa = fl.units[st.from][+d.a0], fb = fl.units[st.to][+d.b0];
+      drawerWide(ta.label + ' → ' + tb.label, '<p class="hint" style="margin-top:0">' + SW.esc(ta.label) + ' → ' + SW.esc(tb.label) + ': a fork. ' + SW.esc(d.n) + ' line' + (+d.n === 1 ? '' : 's') + ' of ' + SW.esc(fa.name) + ' went into ' + SW.esc(fb.name) + '. Left: ' + SW.esc(ta.label) + '; right: ' + SW.esc(tb.label) + '.</p>' +
+        '<h3>' + SW.esc(fa.name) + ' → ' + SW.esc(fb.name) + '</h3><div class="diff">' + pairRows(ta, fa, tb, fb) + '</div><p>' + openButton(ta, fa) + ' ' + openButton(tb, fb) + '</p>');
+      return;
+    }
     var a0 = d.a0 === '' ? null : +d.a0, a1 = d.a1 === '' ? null : +d.a1, b0 = d.b0 === '' ? null : +d.b0, b1 = d.b1 === '' ? null : +d.b1;
     var pairs = st.pairs.filter(function (p) {
       if (a0 == null) return p.a == null && p.b === b0;
