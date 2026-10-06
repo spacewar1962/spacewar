@@ -635,7 +635,7 @@
         '<div class="px-tags">' + summary(it) + '</div>' +
         (nc ? '<details class="px-cfold"><summary class="fd-rh">Comments <span class="faint">' + nc + '</span></summary>' + it.comments.map(function (c) { return '<div class="fd-reply"><div class="fd-rhead"><b>' + esc(c.by) + '</b> <span class="faint">' + esc(SW.fmtDate(c.date)) + '</span></div><div class="note-md">' + SW.md(c.text) + '</div></div>'; }).join('') + '</details>' : '') +
         '</div></div>' +
-        '<div class="px-peekfoot"><a href="?tab=paratexts&code=' + esc(code) + '" data-px="full" title="In Paratexts, where it can be edited, rated and commented on">Go to ' + esc(code) + ' in Paratexts →</a><a href="https://github.com/' + REPO + '/blob/main/' + it.file.split('/').map(encodeURIComponent).join('/') + '" target="_blank" rel="noopener">The file on GitHub ↗</a></div>';
+        '<div class="px-peekfoot"><a href="?tab=paratexts&code=' + esc(code) + '" data-px="full" title="In Paratexts, where it can be edited, rated and commented on">Go to ' + esc(code) + ' in Paratexts →</a></div>';
       showFile(it, SW.$('.px-view', d), SW.$('[data-a="dl"]', d));
     }, function (e) { d.innerHTML = head('Could not open') + '<p class="badge err">' + esc(e.message) + '</p>'; });
   };
