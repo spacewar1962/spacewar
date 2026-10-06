@@ -568,6 +568,23 @@
     });
     return o;
   }
+  // Cited in: the annotations, replies, findings and notes that write its code, each a link to it
+  function citedIn(code, box) {
+    if (!box || !SW.notes || !SW.notes.citing) return;
+    var esc = SW.esc;
+    box.innerHTML = '<h4 class="fd-rh">Cited in</h4><p class="hint">Looking…</p>';
+    SW.notes.citing(code).then(function (l) {
+      box.innerHTML = '<h4 class="fd-rh">Cited in' + (l.length ? ' <span class="faint">' + l.length + '</span>' : '') + '</h4>' + (l.length ? '<ul class="px-citelist">' + l.map(function (c) {
+        return '<li><button class="px-cite" data-go="' + esc(c.code) + '" title="Go to it"><span class="px-code mono">' + esc(c.code || '?') + '</span> <b>' + esc(c.what) + '</b>' + (c.by && c.by !== 'bench' ? ' by ' + esc(c.by) : '') + (c.where ? ' · ' + esc(c.where) : '') + (c.date ? ' · <span class="faint">' + esc(SW.fmtDate(c.date)) + '</span>' : '') + (c.text ? '<span class="px-citetext">' + esc(c.text) + '</span>' : '') + '</button></li>';
+      }).join('') + '</ul>' : '<p class="hint">Not yet: write ' + esc(code) + ' in an annotation, note or finding to cite it.</p>');
+    });
+  }
+  // a click on a citation: the box (or boxes) closed, and on to it
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('dialog [data-go]'); if (!b || !b.dataset.go) return;
+    SW.$$('dialog.px-dlg[open]').forEach(function (d) { d.close(); d.remove(); });
+    SW.notes.goCode(b.dataset.go);
+  });
   function showFile(it, pv, dl) {
     var esc = SW.esc;
     blobOf(it).then(function (u) {
@@ -589,12 +606,13 @@
       '<p class="hint">Catalogued by ' + esc(it.addedBy || '?') + (it.updated && it.updated !== it.added ? '; changed ' + esc(SW.fmtDate(it.updated)) + ' by ' + esc(it.updatedBy || '?') : '') + '.</p>' +
       '<div class="px-acts"><button class="btn" data-a="save">Save the details</button> <span class="hint px-msg"></span>' + exportMenu('data-xp') + (it.withdrawn ? '<button class="btn ghost px-wd" data-a="restore" title="Back into the list">Bring back</button>' : moreMenu('<button data-a="withdraw">Withdraw from the list…</button>')) + '</div>' +
       (it.withdrawn ? '<p class="badge px-wdnote">Withdrawn ' + esc(SW.fmtDate(it.withdrawn)) + (it.withdrawnBy ? ' by ' + esc(it.withdrawnBy) : '') + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
-      '<div class="px-linkline"><b>Link</b> Write its code, <span class="mono">' + esc(it.code) + '</span>, in an annotation, note or finding: it becomes a link to this box. <button class="btn ghost" data-copy="' + esc(it.code) + '">Copy the code</button></div>' +
-      '<div class="px-talk">' + talkHTML(it) + '</div></div></div>';
+      '<div class="px-linkline">Use the code <span class="mono">' + esc(it.code) + '</span> in an annotation to link it. <button class="btn ghost" data-copy="' + esc(it.code) + '">Copy the code</button></div>' +
+      '<div class="px-talk">' + talkHTML(it) + '</div><div class="px-cited"></div></div></div>';
     document.body.appendChild(d);
     d.addEventListener('close', function () { d.remove(); });
     d.showModal();
     showFile(it, SW.$('.px-view', d), SW.$('[data-a="dl"]', d));
+    citedIn(code, SW.$('.px-cited', d));
     function talk(label, change) {   // a rating, emoji or comment: saved, then the talk redrawn
       var who = me();
       if (who === '?') { SW.toast('Please set your initials first (⚙).', 4000); return Promise.resolve(); }
@@ -749,9 +767,10 @@
         '<dl class="px-ro">' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[0] === 'Description' ? SW.md(r[1]) : r[0] === 'Archive link' && okURL(r[1]) ? '<a href="' + esc(r[1].trim()) + '" target="_blank" rel="noopener">' + esc(r[1]) + ' ↗</a>' : esc(r[1])) + '</dd>'; }).join('') + '</dl>' +
         '<div class="px-tags">' + summary(it) + '</div>' +
         (nc ? '<details class="px-cfold"><summary class="fd-rh">Comments <span class="faint">' + nc + '</span></summary>' + it.comments.map(function (c) { return '<div class="fd-reply"><div class="fd-rhead"><b>' + esc(c.by) + '</b> <span class="faint">' + esc(SW.fmtDate(c.date)) + '</span></div><div class="note-md">' + SW.md(c.text) + '</div></div>'; }).join('') + '</details>' : '') +
-        '</div></div>' +
+        '<div class="px-cited"></div></div></div>' +
         '<div class="px-peekfoot"><a href="?tab=paratexts&code=' + esc(code) + '" data-px="full" title="In Paratexts, where it can be edited, rated and commented on">Go to ' + esc(code) + ' in Paratexts →</a></div>';
       showFile(it, SW.$('.px-view', d), SW.$('[data-a="dl"]', d));
+    citedIn(code, SW.$('.px-cited', d));
     }, function (e) { d.innerHTML = head('Could not open') + '<p class="badge err">' + esc(e.message) + '</p>'; });
   };
   document.addEventListener('click', function (e) {

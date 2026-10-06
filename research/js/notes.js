@@ -713,6 +713,52 @@
       N.follow({ v: n.vid, a: n.id });
     });
   };
+  // Tracings from Art's gizmo, shared with the group: a title, a note, the versions, and the names and
+  // marks given to their blocks and routines. Each is an annotation of its own (tag sw:tracing, on the
+  // address ?tracings, never on a version), its data in a closing comment.
+  function b64e(o) { var b = new TextEncoder().encode(JSON.stringify(o)), t = ''; for (var i = 0; i < b.length; i++) t += String.fromCharCode(b[i]); return btoa(t); }
+  function b64d(s) { var t = atob(s), b = new Uint8Array(t.length); for (var i = 0; i < t.length; i++) b[i] = t.charCodeAt(i); return JSON.parse(new TextDecoder().decode(b)); }
+  N.tracings = {
+    list: function () {
+      if (!N.configured()) return Promise.resolve([]);
+      return hx('GET', '/search?limit=200&sort=created&order=desc&tag=sw:tracing&group=' + encodeURIComponent(cfg().group)).then(function (r) {
+        return (r.rows || []).map(function (a) {
+          var m = /<!-- sw:tracing ([A-Za-z0-9+\/=]+) -->/.exec(a.text || ''), d = null;
+          try { d = m ? b64d(m[1]) : null; } catch (e) { d = null; }
+          return d && { id: a.id, by: tagVal(a.tags || [], 'sw:by:') || '', date: a.created, user: a.user, title: d.title || 'A tracing', note: d.note || '', mode: d.mode, v: d.v, cmp: d.cmp || null, split: !!d.split, vids: d.vids || [], names: d.names || {}, marks: d.marks || {} };
+        }).filter(Boolean);
+      });
+    },
+    save: function (t) {
+      var me = SW.me(); if (!me.initials) { SW.toast('Please set your initials first (⚙).', 4000); return Promise.reject(new Error('no initials')); }
+      if (!N.configured()) return Promise.reject(new Error('Tracings are shared through the annotation group: join it first (Help ▸ Joining the annotation group).'));
+      var uri = SW.BASE_URI + '?tracings';
+      var text = '**Tracing: ' + t.title + '**' + (t.note ? '\n\n' + t.note : '') + '\n\nArt’s Dynamic Profile Gizmo, ' + t.vids.map(function (v) { return SW.refOf(v); }).join(' against ') + '.\n\n<!-- sw:tracing ' + b64e(t) + ' -->';
+      return hx('POST', '/annotations', { uri: uri, group: cfg().group, text: text, tags: ['sw:tracing', 'sw:by:' + me.initials], permissions: { read: ['group:' + cfg().group] }, document: { title: ['Spacewar! research bench: tracings'] }, target: [{ source: uri }] })
+        .then(function (r) { return r.id; });
+    },
+    remove: function (id) { return hx('DELETE', '/annotations/' + encodeURIComponent(id)); },
+    mine: function (t) { return !!t && (N.me ? t.user === N.me : t.by === SW.me().initials); }
+  };
+  // Where a code is cited: the group's annotations, replies and findings (a search of the group for the
+  // code's five characters, then the exact code checked in each text), the bench's findings, and My notes.
+  // Each as {code, what, by, date, where, text}.
+  N.citing = function (code) {
+    var tail = String(code).slice(-5), re = new RegExp('(^|[^\\w-])' + code.replace(/[-]/g, '\\-') + '(?![\\w-])');
+    function cut(t) { t = SW.noteHistory ? SW.noteHistory.visible(t) : t; t = String(t || '').replace(/<!--[\s\S]*?-->/g, '').replace(/\s+/g, ' ').trim(); return t.length > 110 ? t.slice(0, 109) + '…' : t; }
+    var out = [];
+    (SW.findings && SW.findings.list || []).forEach(function (f) { if (re.test(f.text || '') || re.test(f.title || '')) out.push({ code: f.no, what: 'bench finding', by: 'bench', date: '', where: f.title || '', text: cut(f.text) }); });
+    try { (SW.tray.data().items || []).forEach(function (it) { var t = JSON.stringify(it); if (re.test(t)) out.push({ code: it.ref || '', what: 'My notes', by: SW.me().initials, date: it.added || '', where: it.title || '', text: '' }); }); } catch (e) { /* none */ }
+    if (!N.configured()) return Promise.resolve(out);
+    return hx('GET', '/search?limit=200&group=' + encodeURIComponent(cfg().group) + '&any=' + encodeURIComponent(tail)).then(function (r) {
+      (r.rows || []).map(fromH).filter(function (n) { return n.vid && !deleted[n.id] && !isBinned(n) && !N.isReaction(n) && re.test(n.text || ''); }).forEach(function (n) {
+        var fnd = !n.parent && (n.tags || []).some(function (g) { return /^findings?$/i.test(g); });
+        out.push({ code: fnd ? 'C-' + N.code(n).slice(2) : N.code(n), what: fnd ? 'finding' : n.parent ? 'reply' : 'annotation', by: n.by, date: n.date,
+                   where: n.anchor ? SW.refOf(n.vid, n.anchor.p, n.anchor.n0, n.anchor.n1, SW.nparts ? SW.nparts(n.vid) : 1) : SW.refOf(n.vid), text: cut(n.text) });
+      });
+      return out;
+    }, function () { return out; });
+  };
   N.renderNote = function (n, isReply, reactions) {
     var who = n.source === 'buildlog' ? 'build log' : (n.name || '');
     return '<div class="note' + (isReply ? ' reply' : '') + (n.source === 'buildlog' ? ' buildlog' : '') + '" data-id="' + SW.esc(n.id) + '">' +

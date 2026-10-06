@@ -42,7 +42,8 @@
       ['Linking to one', ul([
         'In an annotation, note or finding, write its code, as <span class="mono">P-MJH2M</span>. It shows as a link, <b>Paratext:</b> and its title.',
         'Clicking the link opens the paratext read-only, over whatever you were doing, and closes back to it. At its foot, <b>Go to P-… in Paratexts →</b> opens its full box.',
-        '<b>Share</b> sends a link that opens the bench at the paratext; whoever opens it needs access to see it.'])],
+        '<b>Share</b> sends a link that opens the bench at the paratext; whoever opens it needs access to see it.',
+        'Its box lists where it is <b>Cited in</b>: the group’s annotations, replies and findings, the bench’s findings and your notes that write its code, each a link.'])],
       ['Speed and privacy', '<p>The catalogue and each file are kept in this browser’s cache after the first time, so the list appears at once and pictures load from here; the bench checks GitHub behind them and redraws if anything has changed. Taking your token out of ⚙ Settings clears the cache.</p>']
     ]],
     gizmo: ['Art’s Dynamic Profile Gizmo', [
@@ -60,6 +61,10 @@
         'In a block’s or routine’s box, give it a <b>Name</b>. The graph shows your name, with its own label beneath (the box’s heading shows it in grey brackets). Names are kept in this browser, per version; a routine’s name in Compare goes on both versions.',
         'Mark it in a colour for tracing: the swatches beside the name (orange, blue, pink, teal, brown) put a bar down the box’s left edge; ✕ takes it off.',
         k('⇧') + '-click a box in the graph to mark it in the last colour chosen, or to take its mark off, without opening it. <b>Clear marks</b> in the bar takes them all off (it asks first).'])],
+      ['Sharing a tracing', ul([
+        '<b>⑂ Tracings</b> in the bar (Profile and Compare): give your names and marks for the versions shown a title and a note, and <b>Share with the crew</b>. They go to the annotation group, so everyone in it can open them.',
+        'The same list holds the crew’s tracings, those for the versions shown first. Opening one shows its names and marks in place of yours, read-only, with a chip in the bar: <b>Keep as mine</b> copies them into yours, the share button sends a link that opens it, ✕ closes it.',
+        'You can delete your own tracings from the list.'])],
       ['Keeping it', '<p>Each graph saves as SVG or PNG; the tables export to Word and Markdown (Export, top right); a block or routine goes into My notes with its name, figures and code.</p>']
     ]],
     codes: ['Codes, links and sharing', [
