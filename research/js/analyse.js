@@ -275,6 +275,9 @@
   // names a reader gives to blocks and routines, kept in this browser: version -> address -> name
   function gzName(vid, a0) { return ((SW.store.get('gz.names', {}) || {})[vid] || {})[a0] || ''; }
   function gzSetName(vid, a0, name) { var all = SW.store.get('gz.names', {}) || {}; all[vid] = all[vid] || {}; if (name) all[vid][a0] = name; else delete all[vid][a0]; SW.store.set('gz.names', all); }
+  // A block or routine's heading: your name for it, its own label beside it in grey brackets
+  function gzTitle(nm, real) { return nm ? SW.esc(nm) + ' <span class="gz-real">(' + SW.esc(real) + ')</span>' : SW.esc(real); }
+  function gzSvgName(nm, real) { return nm ? SW.esc(nm) + '<tspan font-weight="400" fill="var(--text-faint)"> (' + SW.esc(real) + ')</tspan>' : SW.esc(real); }
   function gzNameField(cur, label) { return '<label class="gz-name" title="Your name for it, kept in this browser and shown in the graph in place of ' + SW.esc(label) + '">Name <input type="text" maxlength="40" value="' + SW.esc(cur) + '" placeholder="' + SW.esc(label) + '"></label>'; }
   function gzN(n) { return Math.round(n || 0).toLocaleString('en-GB'); }
   function gzMs(cycles) { var ms = (cycles || 0) * 5 / 1000; return (ms >= 100 ? Math.round(ms).toLocaleString('en-GB') : ms >= 10 ? ms.toFixed(1) : ms.toFixed(2)) + ' ms'; }
@@ -453,9 +456,9 @@
         o.push('<g class="gz-node" data-b="' + id + '" style="cursor:pointer"><title>' + SW.esc(bl.name + ' (' + SW.oct(bl.a0, 4) + '–' + SW.oct(bl.a1, 4) + '), ' + (bl.a1 - bl.a0 + 1) + ' instructions; entered ' + bl.entries.toLocaleString('en-GB') + ' times; ' + (100 * sh).toFixed(2) + '% of the time') + '</title>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--surface)"/>' +
           '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (id === F.entry ? 14 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="var(--text-dim)" stroke-width="1"/>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + SW.esc(gzName(b.v.id, bl.a0) || bl.name) + '</text>' +
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 18) + '" font-family="monospace" font-size="12" font-weight="700" fill="var(--text)">' + gzSvgName(gzName(b.v.id, bl.a0), bl.name) + '</text>' +
           '<text x="' + (p.x + NW - 8) + '" y="' + (p.y + 18) + '" text-anchor="end" font-family="sans-serif" font-size="11.5" fill="var(--text)"><tspan font-weight="700">' + gzMs(bl.cyc) + '</tspan> (' + (100 * sh).toFixed(1) + '%)</text>' +
-          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc((gzName(b.v.id, bl.a0) ? bl.name + ' · ' : '') + lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
+          '<text x="' + (p.x + 8) + '" y="' + (p.y + 36) + '" font-family="sans-serif" font-size="10.5" fill="var(--text-dim)">' + SW.esc(lines) + ' · ×' + bl.entries.toLocaleString('en-GB') + '</text></g>');
       });
       o.push('</svg>');
       lastSVG = o.join('');
@@ -481,6 +484,7 @@
         dlg.addEventListener('change', function (e) {
           if (!e.target.closest('.gz-name')) return;
           var bl0 = B[+dlg.dataset.b]; gzSetName(b.v.id, bl0.a0, e.target.value.trim()); draw();
+          dlg.querySelector('.tray-bighead b').innerHTML = gzTitle(e.target.value.trim(), bl0.name);
           SW.toast(e.target.value.trim() ? 'Named ' + e.target.value.trim() : 'Name cleared');
         });
         dlg.addEventListener('close', function () { dlg.remove(); dlg = null; });
@@ -501,7 +505,7 @@
         }).join(' ') : '<span class="faint">none</span>';
       }
       var ins = F.edges.filter(function (e) { return e.t === id && e.f !== id; }), outs = F.edges.filter(function (e) { return e.f === id && e.t !== id; }), self = F.edges.filter(function (e) { return e.f === id && e.t === id; })[0];
-      dlg.innerHTML = '<div class="tray-bighead"><b>' + esc(bl.name) + '</b> <span class="faint mono">' + esc(ref) + '</span>' + gzNameField(gzName(b.v.id, bl.a0), bl.name) + '<span class="refhelp-acts">' +
+      dlg.innerHTML = '<div class="tray-bighead"><b>' + gzTitle(gzName(b.v.id, bl.a0), bl.name) + '</b> <span class="faint mono">' + esc(ref) + '</span>' + gzNameField(gzName(b.v.id, bl.a0), bl.name) + '<span class="refhelp-acts">' +
         '<button class="btn ghost" data-keep title="This block, with its name, figures and code, in My notes (private)">＋ My notes</button>' +
         (bl.src ? '<button class="btn" data-read title="This code in Read, in its context">Read in context ↗</button>' : '') +
         '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
@@ -769,7 +773,7 @@
           o.push('<g class="gz-node" data-r="' + k + '" style="cursor:pointer"><title>' + esc(r.name + ', ' + linesOf(r) + ', ' + r.blocks.length + ' blocks; ' + gzMs(SH['c' + r.i]) + ' (' + (100 * sh).toFixed(1) + '% of the time) in the 5 s sample run; ' + row.kind) + '</title>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--surface)"/>' +
             '<rect x="' + p.x + '" y="' + p.y + '" width="' + NW + '" height="' + NH + '" rx="' + (k === entryRow ? 12 : 4) + '" fill="var(--amber)" fill-opacity="' + (heat / 100).toFixed(2) + '" stroke="' + (ring || 'var(--text-faint)') + '" stroke-width="' + (ring ? 2 : 1) + '"/>' +
-            '<text x="' + (p.x + 7) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + esc(nm || r.name) + '</text>' +
+            '<text x="' + (p.x + 7) + '" y="' + (p.y + 17) + '" font-family="monospace" font-size="11.5" font-weight="700" fill="var(--text)">' + gzSvgName(nm, r.name) + '</text>' +
             '<text x="' + (p.x + NW - 7) + '" y="' + (p.y + 17) + '" text-anchor="end" font-family="sans-serif" font-size="11" fill="var(--text)"><tspan font-weight="700">' + gzMs(SH['c' + r.i]) + '</tspan> (' + (100 * sh).toFixed(1) + '%)</text>' +
             '<text x="' + (p.x + 7) + '" y="' + (p.y + 33) + '" font-family="sans-serif" font-size="10" fill="var(--text-dim)">' + esc((nm ? r.name + ' · ' : '') + linesOf(r)) + '</text></g>');
         });
@@ -845,7 +849,7 @@
         items.sort(function (p, q) { return p.ord - q.ord; });
         function cell(x, d) { return x ? '<b class="mono">' + esc(x.name) + '</b> <span class="faint">' + esc(linesOf(x)) + '</span>' + (d ? '<span class="gz-t">' + gzMs(blockMs(d, x)) + '</span>' : '') : ''; }
         var label = r.a && r.b && r.a.name !== r.b.name ? r.a.name + ' → ' + r.b.name : (r.b || r.a).name, figs = routineFigures(r);
-        var dlg = dialog('<div class="tray-bighead"><b>' + esc(label) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span>' + gzNameField(rName(r), label) + '<span class="refhelp-acts"><button class="btn ghost" data-keep title="This routine in both versions, with its name and figures, in My notes (private)">＋ My notes</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+        var dlg = dialog('<div class="tray-bighead"><b>' + gzTitle(rName(r), label) + '</b> <span class="gz-k gz-k-' + r.kind + '">' + r.kind + '</span>' + gzNameField(rName(r), label) + '<span class="refhelp-acts"><button class="btn ghost" data-keep title="This routine in both versions, with its name and figures, in My notes (private)">＋ My notes</button><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
           '<div class="gz-view"><span class="seg-btns"><button class="btn on" data-view="blocks" title="The routine’s figures and its blocks">Blocks</button><button class="btn" data-view="code" title="One block’s code in both versions">Code</button></span>' +
           '<span class="gz-step" hidden><button class="btn ghost" data-step="-1" title="The block before">‹</button><span class="gz-stepn faint"></span><button class="btn ghost" data-step="1" title="The block after">›</button></span></div>' +
           '<div class="gz-pane" data-pane="blocks">' +
@@ -885,6 +889,7 @@
           if (r.b) gzSetName(b.v.id, r.b.a0, v);
           if (r.a) gzSetName(bo.v.id, r.a.a0, v);
           SW.toast(v ? 'Named ' + v : 'Name cleared');
+          dlg.querySelector('.tray-bighead b').innerHTML = gzTitle(v, label);
           render();
         });
       }

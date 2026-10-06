@@ -2006,3 +2006,4 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .sw-stars i { color: var(--line); font-style: normal; }
 .px-s .sw-stars { font-size: 13px; }
 .pxlink { font-style: normal; }
+.gz-real { color: var(--text-faint); font-weight: 400; }
