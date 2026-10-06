@@ -456,6 +456,16 @@
     });
     return o;
   }
+  function showFile(it, pv, dl) {
+    var esc = SW.esc;
+    blobOf(it).then(function (u) {
+      if (dl) dl.href = u;
+      if (it.kind === 'image') pv.innerHTML = '<img class="px-img" alt="' + esc(it.title) + '" src="' + u + '">';
+      else if (it.kind === 'pdf') pv.innerHTML = '<iframe class="px-pdf" title="' + esc(it.title) + '" src="' + u + '"></iframe>';
+      else if (/^text\//.test(it.mime || '')) fetch(u).then(function (r) { return r.text(); }).then(function (t) { pv.innerHTML = '<pre class="px-text">' + esc(t) + '</pre>'; });
+      else pv.innerHTML = '<p class="hint">No preview for this kind of file: ⤓ Download to open it.</p>';
+    }, function (e) { pv.innerHTML = '<p class="badge err">' + esc(e.message) + '</p>'; });
+  }
   function openItem(code) {
     var it = byCode(code); if (!it) { SW.toast(code + ' is not in the catalogue.', 4000); return; }
     var esc = SW.esc, d = SW.el('dialog', { class: 'tray-big px-dlg' });
@@ -472,14 +482,7 @@
     document.body.appendChild(d);
     d.addEventListener('close', function () { d.remove(); });
     d.showModal();
-    var pv = SW.$('.px-view', d);
-    blobOf(it).then(function (u) {
-      SW.$('[data-a="dl"]', d).href = u;
-      if (it.kind === 'image') pv.innerHTML = '<img class="px-img" alt="' + esc(it.title) + '" src="' + u + '">';
-      else if (it.kind === 'pdf') pv.innerHTML = '<iframe class="px-pdf" title="' + esc(it.title) + '" src="' + u + '"></iframe>';
-      else if (/^text\//.test(it.mime || '')) fetch(u).then(function (r) { return r.text(); }).then(function (t) { pv.innerHTML = '<pre class="px-text">' + esc(t) + '</pre>'; });
-      else pv.innerHTML = '<p class="hint">No preview for this kind of file: ⤓ Download to open it.</p>';
-    }, function (e) { pv.innerHTML = '<p class="badge err">' + esc(e.message) + '</p>'; });
+    showFile(it, SW.$('.px-view', d), SW.$('[data-a="dl"]', d));
     function talk(label, change) {   // a rating, emoji or comment: saved, then the talk redrawn
       var who = me();
       if (who === '?') { SW.toast('Please set your initials first (⚙).', 4000); return Promise.resolve(); }
@@ -600,6 +603,42 @@
     });
   }
 
+  // A paratext read where you are (a link in an annotation, note or finding, a code, ?code=): the file
+  // and its record, read-only, in a box that closes back to what you were doing. Paratexts has the rest.
+  P.peek = function (code) {
+    if (SW.state.tab === 'paratexts' && cat) { openItem(code); return; }
+    var esc = SW.esc, d = SW.el('dialog', { class: 'tray-big px-dlg px-peek' });
+    function head(title, acts) { return '<div class="tray-bighead"><span class="px-code mono" data-copy="' + esc(code) + '" title="Its code: click to copy">' + esc(code) + '</span> <b>' + esc(title) + '</b><span class="refhelp-acts">' + (acts || '') + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>'; }
+    document.body.appendChild(d);
+    d.addEventListener('close', function () { d.remove(); });
+    d.addEventListener('click', function (e) {
+      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); return; }
+      if (e.target.closest('[data-px="full"]')) { e.preventDefault(); d.close(); d.remove(); P.reveal(code); return; }
+      if (e.target.closest('[data-px="join"]')) { d.close(); d.remove(); if (SW.notes) SW.notes.joinHelp(); }
+    });
+    if (!P.configured()) {
+      d.innerHTML = head('A paratext') + '<p>' + esc(code) + ' is one of the paratexts, kept for the crew in a private repository. To read it here, the bench needs a GitHub token of your own.</p><p><button class="btn" data-px="join">How to get access</button></p>';
+      d.showModal(); return;
+    }
+    d.innerHTML = head('Opening…'); d.showModal();
+    P.load().then(function () {
+      var it = byCode(code);
+      if (!it) { d.innerHTML = head('Not found') + '<p>' + esc(code) + ' is not in the catalogue.</p>'; return; }
+      var rows = FIELDS.filter(function (f) { return f[0] !== 'title'; }).map(function (f) { var v = it[f[0]]; return [f[1], Array.isArray(v) ? v.join(', ') : v || '']; });
+      var cs = inColl(it); if (cs.length) rows.push(['Collections', cs.map(pathName).join('; ')]);
+      rows = rows.filter(function (r) { return r[1]; });
+      var nc = (it.comments || []).length;
+      d.innerHTML = head(it.title, '<a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a>') +
+        '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' +
+        (it.withdrawn ? '<p class="badge">Withdrawn from the list' + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
+        '<dl class="px-ro">' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[0] === 'Description' ? SW.md(r[1]) : esc(r[1])) + '</dd>'; }).join('') + '</dl>' +
+        '<div class="px-tags">' + summary(it) + '</div>' +
+        (nc ? '<details class="px-cfold"><summary class="fd-rh">Comments <span class="faint">' + nc + '</span></summary>' + it.comments.map(function (c) { return '<div class="fd-reply"><div class="fd-rhead"><b>' + esc(c.by) + '</b> <span class="faint">' + esc(SW.fmtDate(c.date)) + '</span></div><div class="note-md">' + SW.md(c.text) + '</div></div>'; }).join('') + '</details>' : '') +
+        '</div></div>' +
+        '<div class="px-peekfoot"><a href="?tab=paratexts&code=' + esc(code) + '" data-px="full" title="In Paratexts, where it can be edited, rated and commented on">Go to ' + esc(code) + ' in Paratexts →</a><a href="https://github.com/' + REPO + '/blob/main/' + it.file.split('/').map(encodeURIComponent).join('/') + '" target="_blank" rel="noopener">The file on GitHub ↗</a></div>';
+      showFile(it, SW.$('.px-view', d), SW.$('[data-a="dl"]', d));
+    }, function (e) { d.innerHTML = head('Could not open') + '<p class="badge err">' + esc(e.message) + '</p>'; });
+  };
   // To a paratext by its code (P-XXXXX): Paratexts opened, the item shown
   P.reveal = function (code) {
     SW.setTab('paratexts');

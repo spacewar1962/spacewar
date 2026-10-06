@@ -1995,3 +1995,9 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 @media (max-width: 520px) { .joinhelp .js-form label { grid-template-columns: 1fr; gap: 2px; } }
 .px-cfold > summary { cursor: pointer; list-style: revert; margin: 8px 0 4px; }
 .px-cfold > summary .faint { font-weight: 400; }
+.px-ro { display: grid; grid-template-columns: 7em 1fr; gap: 4px 10px; margin: 0 0 8px; font-size: 13px; }
+.px-ro dt { color: var(--text-dim); }
+.px-ro dd { margin: 0; overflow-wrap: anywhere; }
+.px-ro dd p { margin: 0 0 4px; }
+.px-peekfoot { display: flex; flex-wrap: wrap; gap: 6px 20px; justify-content: flex-end; border-top: 1px solid var(--line-soft); margin-top: 12px; padding-top: 10px; font-size: 13.5px; }
+.px-peekfoot a { color: var(--beam); }
