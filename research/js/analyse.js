@@ -285,6 +285,15 @@
     return '<span class="gz-marks" title="Mark it in a colour, for tracing (kept in this browser)">' + GZ_MARKS.map(function (c) { return '<button class="gz-mk' + (cur === c[0] ? ' on' : '') + '" data-mark="' + c[0] + '" style="--mk:' + c[1] + '" title="' + c[0] + '" aria-pressed="' + (cur === c[0]) + '"></button>'; }).join('') +
       '<button class="gz-mk gz-mk-none' + (cur ? '' : ' on') + '" data-mark="" title="No mark" aria-pressed="' + !cur + '">✕</button></span>';
   }
+  // The pen: the colour a ⇧-click puts on a box (or takes off it), chosen in any box's swatches
+  function gzPen() { var m = SW.store.get('gz.pen', 'orange'); return gzMarkHex(m) ? m : 'orange'; }
+  function gzMarkCount(vids) { var all = SW.store.get('gz.marks', {}) || {}; return vids.reduce(function (t, v) { return t + Object.keys(all[v] || {}).length; }, 0); }
+  function gzClearMarks(vids) { var all = SW.store.get('gz.marks', {}) || {}; vids.forEach(function (v) { delete all[v]; }); SW.store.set('gz.marks', all); }
+  function gzMarkTool(vids) {   // (in Compare a routine's mark is on both versions: counted once)
+    var n = Math.max.apply(null, vids.map(function (v) { return gzMarkCount([v]); }));
+    return '<span class="sep"></span><span class="gz-pen" title="⇧-click a box to mark it in this colour, or to take its mark off. Choose the colour in any box (click a box, then a swatch)"><i class="gz-mk on" style="--mk:' + gzMarkHex(gzPen()) + '"></i> ⇧-click to mark</span>' +
+      '<button class="btn ghost gz-clear" title="Take every mark off ' + SW.esc(vids.map(function (v) { return SW.refOf(v); }).join(' and ')) + '"' + (n ? '' : ' disabled') + '>Clear marks' + (n ? ' (' + n + ')' : '') + '</button>';
+  }
   function gzMarkSet(box, m) { SW.$$('.gz-mk', box).forEach(function (x) { var on = x.dataset.mark === m; x.classList.toggle('on', on); x.setAttribute('aria-pressed', on); }); }
   // the mark's bar, clipped to the box's own outline (rounded for the start)
   var gzMkN = 0;
@@ -381,6 +390,7 @@
       '<select class="gz-runs" title="How many runs to average (the computer pilot flies a little differently each time); the times show their range over the runs">' + [1, 3, 5].map(function (n) { return '<option value="' + n + '"' + (n === runs ? ' selected' : '') + '>× ' + n + '</option>'; }).join('') + '</select>' +
       '<span class="gz-ai' + (useAI ? '' : ' off') + '" title="Lensman AI, the bench’s computer pilot, flies both ships in the sample run. Off, no one is at the controls: the ships only drift under gravity"><label class="check"><input type="checkbox" class="gz-ai-on"' + (useAI ? ' checked' : '') + '> Lensman AI</label>' + styleSel(0) + styleSel(1) + '</span>' +
       (prof ? '<span class="sep"></span><label class="check" title="The busiest blocks that together take this share of the time">Show <select class="gz-cover">' + [[0.8, '80%'], [0.9, '90%'], [0.95, '95%'], [0.99, '99%'], [1, '100%']].map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === cover ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select> of the time</label>' : '') +
+      (prof ? gzMarkTool([b.v.id]) : '') +
       '<span class="gz-src hint">' + (prof ? B.length + ' blocks · ' + F.edges.length + ' edges · ' + (prof.cycles / 200000).toFixed(2) + ' s · ' + prof.instructions.toLocaleString('en-GB') + ' instructions · ' + from : 'Press ▶ Sample run, or play the game in Run and come back.') + '</span>' +
       (prof ? '<details class="gz-about"><summary title="What the graph shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>' : '');
     c.appendChild(bar);
@@ -496,7 +506,7 @@
         document.body.appendChild(dlg);
         dlg.addEventListener('click', function (e) {
           if (e.target === dlg || e.target.closest('[data-x]')) { dlg.close(); return; }
-          var mk = e.target.closest('[data-mark]'); if (mk) { gzSetMark(b.v.id, B[+dlg.dataset.b].a0, mk.dataset.mark); gzMarkSet(dlg, mk.dataset.mark); draw(); return; }
+          var mk = e.target.closest('[data-mark]'); if (mk) { gzSetMark(b.v.id, B[+dlg.dataset.b].a0, mk.dataset.mark); if (mk.dataset.mark) SW.store.set('gz.pen', mk.dataset.mark); gzMarkSet(dlg, mk.dataset.mark); draw(); penShow(); return; }
           var j = e.target.closest('[data-gb]'); if (j) { openBlock(+j.dataset.gb); return; }
           if (e.target.closest('[data-read]')) { dlg.close(); inRead(B[+dlg.dataset.b]); }
           if (e.target.closest('[data-keep]')) keepBlock(B[+dlg.dataset.b]);
@@ -551,9 +561,21 @@
         blocks: [SW.tableBlock('The figures', ['', ''], blockFigures(bl))].concat(bl.src ? [{ type: 'code', caption: ref, lines: b.lines[bl.src.p].slice(bl.src.n0 - 1, bl.src.n1).map(function (L) { return { n: L.n, text: L.raw }; }) }] : []) },
         { vid: b.v.id, anchor: bl.src ? { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1, src: b.parts[bl.src.p].src } : null, tags: ['profile'] });
     }
+    box.addEventListener('mousedown', function (e) { if (e.shiftKey && e.target.closest('[data-b]')) e.preventDefault(); });
     box.addEventListener('click', function (e) {
       var g = e.target.closest('[data-b]'); if (!g) return;
+      if (e.shiftKey) { var a0 = B[+g.dataset.b].a0; gzSetMark(b.v.id, a0, gzMark(b.v.id, a0) ? '' : gzPen()); draw(); penShow(); return; }
       openBlock(+g.dataset.b);
+    });
+    function penShow() {   // the bar's pen and count, after a change
+      var t = SW.el('div'); t.innerHTML = gzMarkTool([b.v.id]);
+      var p0 = bar.querySelector('.gz-pen'), c0 = bar.querySelector('.gz-clear');
+      if (p0) p0.replaceWith(t.querySelector('.gz-pen')); if (c0) c0.replaceWith(t.querySelector('.gz-clear'));
+    }
+    bar.addEventListener('click', function (e) {
+      if (!e.target.closest('.gz-clear')) return;
+      var n = gzMarkCount([b.v.id]); if (!n || !confirm('Take the ' + n + ' mark' + (n > 1 ? 's' : '') + ' off ' + SW.refOf(b.v.id) + '?')) return;
+      gzClearMarks([b.v.id]); draw(); penShow();
     });
     ctl.querySelector('.gz-cover').addEventListener('change', function (e) { cover = +e.target.value; SW.store.set('an.gizmoCover', cover); draw(); });
     draw();
@@ -686,7 +708,7 @@
       vs.map(function (v) { return '<option value="' + esc(v.id) + '"' + (v.id === other ? ' selected' : '') + '>' + esc(SW.refOf(v.id) + '  ' + v.label) + '</option>'; }).join('') + '</select></label>' +
       '<button class="btn ghost gz-link" title="Copy a link that opens the bench on this comparison (and the routine open, if one is)">🔗 Link</button>' +
       '<button class="btn ghost gz-swap" title="Swap the two versions round: ' + esc(SW.refOf(other || '') + ' on the right, ' + SW.refOf(b.v.id) + ' on the left') + '">⇄ Swap</button>' +
-      '<label class="check" title="Draw the largest routine, the main loop, as its labelled parts: each label a branch arrives at begins a part"><input type="checkbox" class="gz-split"' + (split ? ' checked' : '') + '> Split the main loop</label>' +
+      '<label class="check" title="Draw the largest routine, the main loop, as its labelled parts: each label a branch arrives at begins a part"><input type="checkbox" class="gz-split"' + (split ? ' checked' : '') + '> Split the main loop</label>' + gzMarkTool([b.v.id].concat(other ? [other] : [])) +
       '<span class="gz-src hint">Reading both versions…</span>' +
       '<details class="gz-about"><summary title="What the comparison shows and how to read it">About</summary><div class="gz-about-b"><p>' + lede + '</p><p>' + legend + '</p></div></details>';
     c.appendChild(bar);
@@ -695,6 +717,11 @@
     bar.querySelector('.gz-link').addEventListener('click', function () { SW.copyText(location.href.replace(/&nc=\d+/, ''), 'the link to this comparison'); });
     bar.querySelector('.gz-swap').addEventListener('click', function () { if (!other) return; keep(other, b.v.id); SW.select(other); });
     bar.querySelector('.gz-split').addEventListener('change', function (e) { SW.store.set('an.gizmoSplit', e.target.checked); render(); });
+    bar.querySelector('.gz-clear').addEventListener('click', function () {
+      var vv = [b.v.id].concat(other ? [other] : []), n = Math.max.apply(null, vv.map(function (v) { return gzMarkCount([v]); }));
+      if (!n || !confirm('Take the marks off ' + vv.map(function (v) { return SW.refOf(v); }).join(' and ') + '?')) return;
+      gzClearMarks(vv); render();
+    });
     var src = bar.querySelector('.gz-src'), body = SW.el('div', { class: 'gz-sbs' }), more = SW.el('div', { class: 'gz-more' });
     c.appendChild(body); c.appendChild(more);
     var out = { rrows: [], rows: [], erows: [], summary: '' };
@@ -809,7 +836,13 @@
       fb.appendChild(SW.figureButtons(function () { return svgA; }, 'spacewar-' + bo.v.id + '-flow', ra));
       fb.appendChild(document.createTextNode(' '));
       fb.appendChild(SW.figureButtons(function () { return svgB; }, 'spacewar-' + b.v.id + '-flow', rb));
-      body.onclick = function (e) { var g = e.target.closest('[data-r]'); if (g) openRoutine(R.rows[+g.dataset.r]); };
+      body.onmousedown = function (e) { if (e.shiftKey && e.target.closest('[data-r]')) e.preventDefault(); };
+      body.onclick = function (e) {
+        var g = e.target.closest('[data-r]'); if (!g) return;
+        var row = R.rows[+g.dataset.r];
+        if (e.shiftKey) { var m = rMark(row) ? '' : gzPen(); if (row.b) gzSetMark(b.v.id, row.b.a0, m); if (row.a) gzSetMark(bo.v.id, row.a.a0, m); render(); return; }
+        openRoutine(row);
+      };
       // a routine named in the link (?rt=), opened once drawn
       if (SW.state.gzRoutine) {
         var want = SW.state.gzRoutine; SW.state.gzRoutine = null;
@@ -899,7 +932,7 @@
         dlg.addEventListener('click', function (e) {
           if (e.target === dlg || e.target.closest('[data-x]')) { gzWrite({ gz: 'compare', cmp: other, split: split ? 1 : null }); dlg.close(); return; }
           if (e.target.closest('[data-keep]')) { keepRoutine(r, items, figs); return; }
-          var mk = e.target.closest('[data-mark]'); if (mk) { if (r.b) gzSetMark(b.v.id, r.b.a0, mk.dataset.mark); if (r.a) gzSetMark(bo.v.id, r.a.a0, mk.dataset.mark); gzMarkSet(dlg, mk.dataset.mark); render(); return; }
+          var mk = e.target.closest('[data-mark]'); if (mk) { if (r.b) gzSetMark(b.v.id, r.b.a0, mk.dataset.mark); if (r.a) gzSetMark(bo.v.id, r.a.a0, mk.dataset.mark); if (mk.dataset.mark) SW.store.set('gz.pen', mk.dataset.mark); gzMarkSet(dlg, mk.dataset.mark); render(); return; }
           var vb = e.target.closest('[data-view]'); if (vb) { view(vb.dataset.view); return; }
           var st = e.target.closest('[data-step]'); if (st) { var ids = items.map(function (it) { return it.id; }), at = ids.indexOf(cur); showBlock(ids[(at + +st.dataset.step + ids.length) % ids.length]); return; }
           var it = e.target.closest('[data-id]'); if (it) { showBlock(it.dataset.id); view('code'); }

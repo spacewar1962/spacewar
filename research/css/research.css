@@ -2013,3 +2013,5 @@ dialog.px-wdbox { width: min(94vw, 520px); }
 .gz-mk.on { border-color: var(--text); }
 .gz-mk-none { background: none; color: var(--text-faint); font-size: 10px; line-height: 12px; }
 .gz-mk:focus-visible { outline: 2px solid var(--beam); outline-offset: 1px; }
+.gz-pen { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text-dim); }
+.gz-pen .gz-mk { width: 12px; height: 12px; cursor: default; display: inline-block; }
