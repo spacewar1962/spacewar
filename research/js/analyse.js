@@ -2473,20 +2473,16 @@
   SW.views.graphics = { show: function (b) { gfxBuild = b; renderGfx(); } };
 
   // ---------- drop-downs in the tab row, as on the main site ----------
-  // Text ▾, Program ▾, Graphics ▾, Versions ▾ and Help ▾ open a menu under the tab (click; a click outside
-  // or Esc closes it); choosing an item goes to that lens or graphic.
-  var tabMenu = null;
-  function closeTabMenu() { if (!tabMenu) return; tabMenu.el.remove(); tabMenu.btn.setAttribute('aria-expanded', 'false'); tabMenu = null; }
-  var VERS = [['about', 'This version', 'Its record, sources, build log and annotations'],
+  // ---------- the menus in the tab row (bench-kit's kit/menus.js) ----------
+  // Text ▾ and Program ▾ list the lenses, Graphics ▾ the graphics; Versions ▾ and Help ▾ are the
+  // kit's, with this bench's items.
+  SW.BENCH.menus = {
+    versions: [['about', 'This version', 'Its record, sources, build log and annotations'],
               ['compare', 'Compare', 'Two versions side by side'],
               ['genealogy', 'Genealogy', 'How the versions descend'],
               ['tape', 'Tape', 'The paper tapes, frame by frame'],
-              ['absence', 'Absence', 'Gaps in the record, and what fills them']];
-  function menuHTML(which) {
-    if (which === 'help') {
-      var dm = document.querySelector('meta[name="bench-date"]');
-      // Grouped, with a divider and a small heading between the groups; About the bench stays last.
-      var HELP = [['Getting started', [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
+              ['absence', 'Absence', 'Gaps in the record, and what fills them']],
+    help: [['Getting started', [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
                                        ['refs', 'Referencing and versions', 'How the bench cites a source, as [REF: SW3.1T, 2.141]'],
                                        ['join', 'Joining the annotation group', 'An invitation, a Hypothesis account and your tokens, step by step'],
                                        ['reading', 'What you should read', 'A short bibliography: repairing old code, critical code studies, Spacewar!'],
@@ -2501,73 +2497,30 @@
                                   ['restore', 'Restore from a backup…', 'Brings back notes and drafts beside those here']]],
                   ['The project', [['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
                                    ['issue', 'Report a problem ↗', 'GitHub issues'],
-                                   ['about', 'About the bench', 'Version, sources, citation']]]];
-      return HELP.map(function (g, i) {
-        return (i ? '<hr class="menu-rule">' : '') + '<div class="menu-group">' + SW.esc(g[0]) + '</div>' + g[1].map(function (h) {
-          return '<button data-pick="' + h[0] + '"><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
-        }).join('');
-      }).join('') + '<div class="help-ver hint">Spacewar! Research Bench ' + SW.esc(SW.VERSION) + (dm ? ', ' + SW.esc(SW.fmtDate(dm.content)) : '') + '</div>';
+                                   ['about', 'About the bench', 'Version, sources, citation']]]],
+    menu: function (which) {
+      if (which === 'graphics') return gfxList('data-pick', SW.state.tab === 'graphics' ? gfx : null);
+      return MENUS[which] ? lensItems(MENUS[which], 'data-pick', SW.state.tab === 'analyse' ? lens : 0) : null;
+    },
+    on: function (which, p) { return p === 'absence' ? SW.state.tab === 'analyse' && lens === 7 : null; },
+    pick: function (which, p) {
+      if (which === 'help') return false;
+      if (which === 'versions' && p !== 'absence') return false;
+      if (which === 'versions') { lens = 7; SW.store.set('an.lens', 7); SW.forget('analyse'); SW.setTab('analyse'); return true; }
+      if (which === 'graphics' && p === 'tapesim') {   // opens over the Tape view, on its tape
+        SW.setTab('tape');
+        var tries = 0;
+        (function go() { if (SW.tape && SW.tape.openSim && SW.tape.simV === SW.state.v && SW.tape.openSim()) return; if (++tries < 50) setTimeout(go, 100); else SW.toast('No tape to load for this version.', 4000); })();
+        return true;
+      }
+      if (which === 'graphics') { gfx = p; SW.store.set('gfx.item', gfx); SW.forget('graphics'); SW.setTab('graphics'); return true; }
+      // a lens: the one already open is shown as it was left
+      var nl = +p;
+      if (nl !== lens) { lens = nl; SW.store.set('an.lens', lens); SW.forget('analyse'); }
+      SW.setTab('analyse');
+      return true;
     }
-    if (which === 'graphics') return gfxList('data-pick', SW.state.tab === 'graphics' ? gfx : null);
-    if (which === 'versions') return VERS.map(function (h) {
-      var on = h[0] === 'absence' ? SW.state.tab === 'analyse' && lens === 7 : SW.state.tab === h[0];
-      return '<button data-pick="' + h[0] + '"' + (on ? ' class="on"' : '') + '><b>' + SW.esc(h[1]) + '</b><span>' + SW.esc(h[2]) + '</span></button>';
-    }).join('');
-    return lensItems(MENUS[which], 'data-pick', SW.state.tab === 'analyse' ? lens : 0);
-  }
-  SW.$$('#tabs [data-menu]').forEach(function (btn) {
-    btn.addEventListener('click', function (e) {
-      e.stopPropagation();   // the menu, not the tab: choosing an item goes there
-      var which = btn.dataset.menu;
-      if (tabMenu && tabMenu.btn === btn) { closeTabMenu(); return; }
-      closeTabMenu();
-      var r = btn.getBoundingClientRect(), el = SW.el('div', { class: 'tab-menu lens-list', role: 'menu', 'data-w': which }, menuHTML(which));
-      document.body.appendChild(el);
-      el.style.top = r.bottom + 'px';
-      el.style.left = Math.max(6, Math.min(r.left, window.innerWidth - el.offsetWidth - 6)) + 'px';
-      btn.setAttribute('aria-expanded', 'true');
-      tabMenu = { el: el, btn: btn };
-      el.addEventListener('click', function (ev) {
-        var t = ev.target.closest('[data-pick]');
-        if (!t) return;
-        closeTabMenu();
-        if (which === 'help') {
-          var p = t.dataset.pick;
-          if (p === 'tour') { SW.tours.start('welcome'); return; }
-          if (p === 'refs') { SW.refHelp(); return; }
-          if (p === 'anno') { SW.notes.help(); return; }
-          if (p === 'join') { SW.notes.joinHelp(); return; }
-          if (p === 'codes' || p === 'paratexts' || p === 'gizmo') { SW.guide(p); return; }
-          if (p === 'reading') { SW.readingHelp(); return; }
-          if (p === 'cards') { SW.cardsHelp(); return; }
-          if (p === 'sitemap') { location.href = 'sitemap.html'; return; }
-          if (p === 'backup') { SW.backup.save(); return; }
-          if (p === 'restore') { SW.backup.restore(); return; }
-          if (p === 'about') SW.$('#btn-about').click();
-          else if (p === 'settings') SW.$('#btn-settings').click();
-          else window.open(p === 'code' ? 'https://github.com/spacewar1962/spacewar' : 'https://github.com/spacewar1962/spacewar/issues', '_blank', 'noopener');
-          return;
-        }
-        if (which === 'versions' && t.dataset.pick !== 'absence') { SW.setTab(t.dataset.pick); return; }
-        if (which === 'versions') { lens = 7; SW.store.set('an.lens', 7); SW.forget('analyse'); SW.setTab('analyse'); return; }
-        if (which === 'graphics' && t.dataset.pick === 'tapesim') {   // opens over the Tape view, on its tape
-          SW.setTab('tape');
-          var tries = 0;
-          (function go() { if (SW.tape && SW.tape.openSim && SW.tape.simV === SW.state.v && SW.tape.openSim()) return; if (++tries < 50) setTimeout(go, 100); else SW.toast('No tape to load for this version.', 4000); })();
-          return;
-        }
-        if (which === 'graphics') { gfx = t.dataset.pick; SW.store.set('gfx.item', gfx); SW.forget('graphics'); SW.setTab('graphics'); }
-        else {   // the lens already open is shown as it was left
-          var nl = +t.dataset.pick;
-          if (nl !== lens) { lens = nl; SW.store.set('an.lens', lens); SW.forget('analyse'); }
-          SW.setTab('analyse');
-        }
-      });
-    });
-  });
-  document.addEventListener('mousedown', function (e) { if (tabMenu && !tabMenu.el.contains(e.target) && !tabMenu.btn.contains(e.target)) closeTabMenu(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeTabMenu(); });
-  window.addEventListener('resize', closeTabMenu);
+  };
   // Open a lens or a graphic from elsewhere (the welcome tour).
   SW.openLens = function (n) { lens = n; SW.store.set('an.lens', n); SW.forget('analyse'); SW.setTab('analyse'); };
   // From a link (?lens=14, ?g=gravity): set before the first view is drawn.

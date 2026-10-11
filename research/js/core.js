@@ -272,21 +272,6 @@
     '4.1t': 'read by the bench from the dfw source tape',
     '4.3m': 'fixed by Norbert Landsteiner, 28 February 2015; not an authentic program', '4.4m': 'reassembled by Norbert Landsteiner', '4.4f': 'fixed by Norbert Landsteiner, 2015',
     '4.1d': 'reconstructed by Peter Samson, June 2005', '4.1f': 'reconstructed by Peter Samson, 2005 to 2008', '2015': 'written by Norbert Landsteiner, 2015' };
-  // A source file's SWHID (swh:1:cnt:, its git blob hash; js/swhid.js); with the
-  // repository as origin, its path, and lines where they are lines of the file.
-  SW.SWHID_ORIGIN = 'https://github.com/spacewar1962/spacewar';
-  SW.swhidOf = function (path) { var h = SW.SWHID && SW.SWHID[path]; return h ? 'swh:1:cnt:' + h[0] : ''; };
-  // a link that works now: GitHub, at the last commit that changed the file, to the lines
-  SW.permalinkOf = function (path, n0, n1) {
-    var h = SW.SWHID && SW.SWHID[path]; if (!h) return '';
-    return SW.SWHID_ORIGIN + '/blob/' + h[1] + '/sources/' + path.split('/').map(encodeURIComponent).join('/') + (n0 != null ? '#L' + n0 + (n1 && n1 !== n0 ? '-L' + n1 : '') : '');
-  };
-  SW.swhidURL = function (id) { return 'https://archive.softwareheritage.org/' + id; };
-  SW.swhidCite = function (path, n0, n1) {
-    var id = SW.swhidOf(path); if (!id) return '';
-    return id + ';origin=' + SW.SWHID_ORIGIN + ';path=/sources/' + path + (n0 != null ? ';lines=' + n0 + (n1 && n1 !== n0 ? '-' + n1 : '') : '');
-  };
-  SW.filesOf = function (v) { var seen = {}, out = []; (v.build || []).forEach(function (b) { var f = b.src || b.tape; if (f && !seen[f]) { seen[f] = 1; out.push(f); } }); return out; };
   // The options for a version's emulated PDP-1. The CHM builds of 4.1 (2005 to 2008)
   // were made for the Computer History Museum's PDP-1, which draws intensity codes 4
   // to 7 otherwise than DEC's PDP-35-2 (as Landsteiner's emulator maps them: 4 as 7,
@@ -301,25 +286,6 @@
   // As an opacity, 0 for s = -4; 0.62 for s = 0, as the bench drew normal points before.
   var BEAM = [0, 0.12, 0.22, 0.34, 0.62, 0.75, 0.88, 1];
   SW.beam = function (s) { s = s == null ? 0 : s; return BEAM[Math.max(-4, Math.min(3, s)) + 4]; };
-  // A version's own texts: its build less the macro tape and star table supplied to it
-  SW.ownFilesOf = function (v) {
-    var seen = {}, out = [];
-    (v.build || []).forEach(function (b) { var f = b.src || b.tape; if (!f || seen[f] || (b.role && /^(macro fio-dec system|Expensive Planetarium star table)/.test(b.role))) return; seen[f] = 1; out.push(f); });
-    return out.length ? out : SW.filesOf(v);
-  };
-  // Tiny SWHIDs, one per file, each copying on a click, its file named on hover
-  SW.swhidTiny = function (files) {
-    return files.map(function (f) { var id = SW.swhidOf(f); return id ? '<div class="swhid-row tiny"><button class="swhid mono" title="' + SW.esc(f.split('/').pop()) + ': copy ' + SW.esc(id) + '" data-copy="' + SW.esc(id) + '">' + SW.esc(id.slice(10, 22)) + '…</button> <a class="swhid-go" href="' + SW.esc(SW.swhidURL(id)) + '" target="_blank" rel="noopener" title="Open in the Software Heritage archive (once the repository is archived there)">↗</a></div>' : '<div class="swhid-row tiny faint">none</div>'; }).join('');
-  };
-  SW.swhidList = function (files) {
-    return files.map(function (f) { var id = SW.swhidOf(f); return '<div class="swhid-row"><a class="mono" href="' + SW.esc(SW.permalinkOf(f)) + '" target="_blank" rel="noopener" title="The file on GitHub, at its last change">' + SW.esc(f.split('/').pop()) + '</a> ' + (id ? '<button class="swhid mono" title="Copy ' + SW.esc(id) + '" data-copy="' + SW.esc(id) + '">' + SW.esc(id.slice(0, 17)) + '…</button> <a class="swhid-go" href="' + SW.esc(SW.swhidURL(id)) + '" target="_blank" rel="noopener" title="Open in the Software Heritage archive (once the repository is archived there)">↗</a>' : '<span class="faint">no SWHID (not in the repository)</span>') + '</div>'; }).join('');
-  };
-  SW.refOf = function (vid, p, n0, n1, nparts) {
-    var r = SW.REF[vid] || ('SW' + vid);
-    if (p == null || (nparts <= 1 && n0 == null)) return r;   // a single tape, no lines: the text itself
-    var tape = nparts > 1 ? (p + 1) + (n0 != null ? '.' : '') : '';
-    return r + ', ' + tape + (n0 != null ? n0 + (n1 && n1 !== n0 ? '–' + n1 : '') : '');
-  };
   // ---------- assembly errors, explained (the badges in Read open this) ----------
   // MACRO's error codes, as DEC's manual gives them (F-36, 1962, pp. 26-28)
   var MACRO_ERR = { us: 'an undefined symbol (its value taken as zero)', mdt: 'a tag defined twice, differently', mdd: 'a multiple definition in a dimension statement', mdm: 'a macro defined twice', zpa: 'an illegal parameter assignment', mdv: 'a variable defined twice', ilp: 'a parity error (the character ignored)', ipi: 'an illegal pseudo-instruction', ilr: 'an illegal repeat', ids: 'an illegal dummy symbol', sce: 'storage capacity exceeded', ilf: 'an illegal format', tmc: 'too many constants', tmv: 'too many variables', tmp: 'too many parameters' };
@@ -572,22 +538,6 @@
             rows: SW.PORTS.map(function (r, n) { return [String(n + 1), r[0], r[1], r[2], r[3], r[4], r[5] ? ids(r[5].split(/,\s*/)) : r[6] ? 'no source; catalogue entry only: ' + r[6][0] : 'none held']; }) }
         ] };
     }
-  };
-  // the number of tapes (parts) a version's text is built from, without building it
-  SW.nparts = function (vid) { var v = root.SWVersions.byId(vid); return v && v.build ? v.build.length : 1; };
-  SW.refText = function (vid, p, n0, n1, nparts) { return '[REF: ' + SW.refOf(vid, p, n0, n1, nparts) + ']'; };
-  SW.refTag = function (vid, p, n0, n1, nparts) { var t = SW.refText(vid, p, n0, n1, nparts); return '<span class="swref" data-copy="' + SW.esc(t) + '" title="Click to copy. The bench’s reference to this source (Help ▸ Referencing and versions)">' + SW.esc(t) + '</span>'; };
-  SW.cite = function (b, p, n0, n1) {
-    var part = b.parts[p];
-    var range = n1 && n1 !== n0 ? 'll. ' + n0 + '–' + n1 : 'l. ' + n0;
-    return b.v.label + ' (' + b.v.date + '), ' + part.src + ', ' + range + ' ' + SW.refText(b.v.id, p, n0, n1, b.parts.length);
-  };
-  // A file in sources/, opened in a new tab on GitHub (tape images are binary,
-  // so the browser cannot show them itself; GitHub shows size, history, raw).
-  SW.REPO = 'https://github.com/spacewar1962/spacewar/blob/main/sources/';
-  SW.sourceURL = function (path) { return SW.REPO + path.split('/').map(encodeURIComponent).join('/'); };
-  SW.sourceLink = function (path, text) {
-    return '<a href="' + SW.esc(SW.sourceURL(path)) + '" target="_blank" rel="noopener" title="Open ' + SW.esc(path) + ' in a new tab">' + SW.esc(text || path) + ' ↗</a>';
   };
 
   // Instruction glosses (the project's PDP-1 instruction reference).

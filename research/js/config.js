@@ -7,6 +7,18 @@
     title: 'Spacewar! Research Bench',
     slug: 'spacewar',
     store: 'swbench.',
+    // references to the sources (kit/refs.js; the short names are SW.REF, in js/core.js): the tape
+    // and lines, [REF: SW3.1L, 2.141]; a single tape, its lines alone; no lines, the text itself
+    refs: { repo: 'https://github.com/spacewar1962/spacewar', dir: 'sources', supplied: /^(macro fio-dec system|Expensive Planetarium star table)/,
+      refOf: function (vid, p, n0, n1, nparts) {
+        var r = root.SW.REF[vid] || ('SW' + vid);
+        if (p == null || (nparts <= 1 && n0 == null)) return r;   // a single tape, no lines: the text itself
+        var tape = nparts > 1 ? (p + 1) + (n0 != null ? '.' : '') : '';
+        return r + ', ' + tape + (n0 != null ? n0 + (n1 && n1 !== n0 ? '–' + n1 : '') : '');
+      } },
+    // the version picker's groups, and the version shown first (kit/shell.js)
+    forks: [['early', '1961–62'], ['data', 'Data tapes'], ['ddp', '1963 · ddp fork (Preonas)'], ['dfw', '1963 · dfw fork'], ['later', 'Later']],
+    start: '3.1',
     // the About box (kit/about.js); purpose, inside and sources are HTML
     about: {
       icon: '<img src="img/tape-icon.svg" alt="" width="40" height="40">',
