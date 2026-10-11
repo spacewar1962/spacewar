@@ -2364,16 +2364,10 @@
     if (lens === 15) {   // one version at a time: recorded on the emulator, or read from the source (bench-kit's view)
       SW.$$('[data-mode]', head).forEach(function (x) { x.style.display = 'none'; });
       if (!b.asm) { cards.innerHTML = '<p class="hint">No source survives for this version.</p>'; return; }
-      var foMode = SW.store.get('an.foMode', 'run');
-      head.insertAdjacentHTML('beforeend', '<span class="seg-btns"><button class="btn' + (foMode !== 'src' ? ' on' : '') + '" data-fo="run" title="The program run on the emulator: each frame, each object’s routine, the time, the data">Recorded run</button><button class="btn' + (foMode === 'src' ? ' on' : '') + '" data-fo="src" title="Read from the assembled words, without running: the routines called, the calls between the tapes (bench-kit’s Functional overview)">Read from the source</button></span>');
-      head.addEventListener('click', function (e) { var f = e.target.closest('[data-fo]'); if (f) { SW.store.set('an.foMode', f.dataset.fo); render(); } });
-      if (foMode === 'src') {
-        var fb = SW.functionalOverview.render(b, cards, { inline: true });
-        head.appendChild(expMenu(SW.exportButtons(function () { return { title: b.v.label + ': functional overview, read from the source', subtitle: L[2], meta: SW.docMeta(b), blocks: fb ? fb() : [] }; }, 'spacewar-' + b.v.id + '-functional-overview')));
-        return;
-      }
-      var ov = SW.el('div', { class: 'ov', style: 'grid-column:1/-1' }); cards.appendChild(ov);
-      SW.overview.render(b, ov);
+      // bench-kit's Functional overview: the recording (js/overview.js) or the reading of the source (js/functional.js)
+      var sw = SW.functionalOverview.switchEl(render); if (sw) head.appendChild(sw);
+      var fb = SW.functionalOverview.render(b, cards, { inline: true });
+      if (fb) head.appendChild(expMenu(SW.exportButtons(function () { return { title: b.v.label + ': functional overview, read from the source', subtitle: L[2], meta: SW.docMeta(b), blocks: fb() }; }, 'spacewar-' + b.v.id + '-functional-overview')));
       return;
     }
     if (lens === 14) {

@@ -71,7 +71,16 @@
     return { rs: rs, load: load };
   }
 
+  // the choice of mode was kept as an.foMode before bench-kit 0.16.0
+  try { var was = SW.store.get('an.foMode', null); if (was) { SW.store.set('fo.mode', was); SW.store.set('an.foMode', null); } } catch (e) { /* ignore */ }
+
   SW.BENCH.functional = {
+    // the program run on the emulator, each frame followed (js/overview.js)
+    recorded: {
+      label: 'Recorded run',
+      title: 'The program run on the emulator: each frame, each object’s routine, the time and the data.',
+      render: function (b, el) { var ov = SW.el('div', { class: 'ov', style: 'grid-column:1/-1' }); el.appendChild(ov); SW.overview.render(b, ov); return null; }
+    },
     entry: entryName,
     analyse: analyse,
     // a tape by its file's name, or by its number where several tapes come from one file
