@@ -1,4 +1,4 @@
-/* config.js - this bench's settings for bench-kit (research/kit). Loaded after core.js, before the kit. */
+/* config.js - this bench's settings for bench-kit (research/kit). Loaded after kit/base.js, before the rest of the kit and the bench's own scripts. */
 (function (root) {
   'use strict';
   var SW = root.SW;
@@ -7,6 +7,20 @@
     title: 'Spacewar! Research Bench',
     slug: 'spacewar',
     store: 'swbench.',
+    // the default colour theme's name, and the accent of figures exported on black and on white
+    theme: { label: 'Phosphor', note: 'blue-white on near black, after the PDP-1’s display (the default)' },
+    accent: { dark: '#ffce7a', light: '#9a5b00' },
+    // the people whose initials or names are written into the text (Analyse ▸ Hands and dates, Compare)
+    hands: [
+      { k: 'prs', who: 'Peter R. Samson', re: /\bprs\b/i, colour: '#2a9d6f' },
+      { k: 'adams', who: 'Adams Associates', re: /\badams associates\b/i, colour: '#c0622d' },
+      { k: 'ddp', who: 'D. D. “Monty” Preonas', re: /\bddp\b/i, colour: '#d99a1e' },
+      { k: 'dfw', who: '“dfw” (not yet identified)', re: /\bdfw\b/i, colour: '#3f8fd0' },
+      { k: 'jcm', who: 'Joe C. Morris', re: /\bjcm\b/i, colour: '#c05a93' },
+      { k: 'dje', who: 'Dan Edwards', re: /\bdje\b/i, colour: '#8f7a1a' },
+      { k: 'jmg', who: 'J. Martin Graetz', re: /\bjmg\b/i, colour: '#7d5a45' },
+      { k: 'nl', who: 'Norbert Landsteiner (2014–21)', re: /\bn\.\s?l\.|\bnl\b|\blandsteiner\b/i, colour: '#8a7ae0' }
+    ],
     group: '',
     relation: 'Spacewar! ',
     topShare: true,
