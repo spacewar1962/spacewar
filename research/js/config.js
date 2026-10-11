@@ -7,6 +7,16 @@
     title: 'Spacewar! Research Bench',
     slug: 'spacewar',
     store: 'swbench.',
+    // the About box (kit/about.js); purpose, inside and sources are HTML
+    about: {
+      icon: '<img src="img/tape-icon.svg" alt="" width="40" height="40">',
+      author: 'David M. Berry', citeAuthor: 'Berry, D. M.',
+      purpose: 'A bench for the critical reading of the Spacewar! source code, made for the Spacewar! book project.',
+      inside: 'The macro1 assembler (from SIMH) with the 1962–63 MACRO rules; a PDP-1 emulator with the Type 30 display; a FIO-DEC tape reader.',
+      sources: 'Code by Russell, Samson, Edwards, Graetz, Kotok and others at MIT; later versions by Preonas (“ddp”), “dfw” and Morris; tapes from Russell’s box (bitsavers); transcriptions by Landsteiner and the Computer History Museum. Details under Version.',
+      code: 'https://github.com/spacewar1962/spacewar',
+      catalogue: { skip: ['stars'], held: 'assembled from source' }
+    },
     // the default colour theme's name, and the accent of figures exported on black and on white
     theme: { label: 'Phosphor', note: 'blue-white on near black, after the PDP-1’s display (the default)' },
     accent: { dark: '#ffce7a', light: '#9a5b00' },

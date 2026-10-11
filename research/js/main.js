@@ -91,22 +91,8 @@
   SW.select = select;
 
 
-  // The About box: author, version and date, what it holds, how to cite it.
-  function about() {
-    var dm = document.querySelector('meta[name="bench-date"]'), date = dm ? dm.content : '';
-    var url = SW.BASE_URI || location.href.split('?')[0];
-    var vs = V.VERSIONS.filter(function (v) { return v.id !== 'stars'; });
-    SW.$('#about-v').textContent = SW.VERSION;
-    SW.$('#about-date').textContent = date ? SW.fmtDate(date) : '';
-    SW.$('#about-ver').textContent = 'Version ' + SW.VERSION + (date ? ', ' + SW.fmtDate(date) : '');
-    SW.$('#about-cat').textContent = vs.length + ' versions: ' + vs.filter(function (v) { return v.build; }).length + ' assembled from source, ' + vs.filter(function (v) { return v.status === 'lost'; }).length + ' lost.';
-    var cite = 'Berry, D. M. (' + (date ? date.slice(0, 4) : new Date().getFullYear()) + ') Spacewar! Research Bench (version ' + SW.VERSION + '). Available at: ' + url + ' (Accessed: ' + SW.fmtDate(SW.today()) + ').';
-    SW.$('#about-cite').textContent = cite;
-    SW.$('#about-copy').onclick = function () {
-      (navigator.clipboard ? navigator.clipboard.writeText(cite) : Promise.reject()).then(function () { SW.toast('Citation copied'); }, function () { window.prompt('Copy:', cite); });
-    };
-    SW.$('#dlg-about').showModal();
-  }
+  // The About box (kit/about.js, its rows in js/config.js)
+  function about() { SW.about.open(); }
 
   function theme(t) {
     t = SW.themeInfo(t).id;   // an unknown or retired name falls back to phosphor
@@ -200,7 +186,6 @@
       inp.addEventListener('keydown', function (k) { if (k.key === 'Enter' && inp.value.trim()) { SW.unpop(); SW.notes.goCode(inp.value); } });
     };
     // The welcome tour: from a link (?tour=welcome), from Settings or About, or offered on a first visit.
-    SW.$('#about-tour').onclick = function () { SW.$('#dlg-about').close(); SW.tours.start('welcome'); };
     // a Help item named in the link
     var HELP = { codes: function () { SW.guide('codes'); }, paratexts: function () { SW.guide('paratexts'); }, gizmo: function () { SW.guide('gizmo'); }, refs: function () { SW.refHelp(); }, anno: function () { SW.notes.help(); }, join: function () { SW.notes.joinHelp(); }, reading: function () { SW.readingHelp(); }, cards: function () { SW.cardsHelp(); }, about: about, settings: function () { SW.settings.open(); } };
     if (HELP[q.help]) setTimeout(HELP[q.help], 700);
