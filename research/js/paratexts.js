@@ -72,6 +72,7 @@
   }
   function blobOf(it) {
     if (urls[it.code]) return Promise.resolve(urls[it.code]);
+    if (!it.file) return Promise.reject(new Error('A linked item: nothing held here.'));
     var key = 'files/' + it.file + '?' + (it.size || 0);
     return cacheGet(key).then(function (hit) { return hit ? hit.blob() : null; }).then(function (b) {
       if (b) return b;
@@ -224,14 +225,14 @@
       if (F.tag && (it.tags || []).indexOf(F.tag) < 0) return false;
       if (F.v && (it.versions || []).indexOf(F.v) < 0) return false;
       if (F.kind && it.kind !== F.kind) return false;
-      if (F.q) { var t = [it.code, it.title, it.date, it.creator, it.source, it.archive, it.archiveId, it.publisher, (it.contributor || []).join(' '), it.coverage, it.description, (it.tags || []).join(' '), it.name, inColl(it).map(pathName).join(' ')].join(' ').toLowerCase(); if (t.indexOf(F.q.toLowerCase()) < 0) return false; }
+      if (F.q) { var t = [it.code, it.title, it.date, it.creator, it.source, it.archive, it.archiveId, it.publisher, (it.contributor || []).join(' '), it.coverage, it.url, it.description, (it.tags || []).join(' '), it.name, inColl(it).map(pathName).join(' ')].join(' ').toLowerCase(); if (t.indexOf(F.q.toLowerCase()) < 0) return false; }
       return true;
     }).sort(function (a, b) {
       var x = sortKey(a, k), y = sortKey(b, k); if (x < y) return -d; if (x > y) return d;
       var t = String(a.title).toLowerCase(), u = String(b.title).toLowerCase(); return t < u ? -1 : t > u ? 1 : 0;
     });
   }
-  var ICON = { pdf: '📄', image: '🖼', text: '📝', file: '📎' };
+  var ICON = { pdf: '📄', image: '🖼', text: '📝', audio: '🔊', video: '🎞', link: '🔗', file: '📎' };
   function thumb(it) { return it.kind === 'image' && urls[it.code] ? '<img alt="" src="' + urls[it.code] + '">' : ICON[it.kind] || ICON.file; }
   function fmtSize(n) { return !n ? '' : n < 1e6 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1048576).toFixed(1) + ' MB'; }
   function render() {
@@ -474,11 +475,11 @@
   // elements, folds away under More metadata; the archive fields say where the original is kept.
   var DCMI = ['Collection', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'MovingImage', 'PhysicalObject', 'Service', 'Software', 'Sound', 'StillImage', 'Text'];
   var FIELDS = [['title', 'Title'], ['date', 'Date made', '', 'e.g. 1963-05-17, or 1963'], ['creator', 'Creator'], ['source', 'Source', '', 'where this copy came from'],
-    ['archive', 'Held at', '', 'the archive with the original, e.g. Computer History Museum'], ['archiveId', 'Archive ref', '', 'its catalogue number, or box and folder'], ['archiveUrl', 'Archive link', 'url', 'https://… the original in its archive’s catalogue'],
+    ['archive', 'Held at', '', 'the archive with the original, e.g. Computer History Museum'], ['archiveId', 'Archive ref', '', 'its catalogue number, or box and folder'], ['archiveUrl', 'Archive link', 'url', 'https://… the original in its archive’s catalogue'], ['url', 'Online at', 'url', 'https://… a recording or page to play or show here'],
     ['rights', 'Rights'], ['accessioned', 'Accession date', '', 'the day it came into the collection'], ['description', 'Description', 'area'],
     ['tags', 'Tags', 'list', 'comma separated'], ['versions', 'Versions', 'list', 'e.g. 4.3, 4.4'], ['refs', 'References', 'list', 'e.g. [REF: SW4.3L, 2.10–20]'],
     ['type', 'Type', 'dcmi', '', 'dc'], ['publisher', 'Publisher', '', 'e.g. Rolling Stone', 'dc'], ['contributor', 'Contributors', 'list', 'comma separated', 'dc'],
-    ['language', 'Language', '', 'e.g. en', 'dc'], ['coverage', 'Coverage', '', 'a place or a period', 'dc'], ['identifier', 'Identifiers', 'list', 'DOI, ISBN, URL; comma separated', 'dc']];
+    ['language', 'Language', '', 'e.g. en', 'dc'], ['extent', 'Extent', '', 'a duration or size, e.g. 1 h 12 min, 34 pp.', 'dc'], ['coverage', 'Coverage', '', 'a place or a period', 'dc'], ['identifier', 'Identifiers', 'list', 'DOI, ISBN, URL; comma separated', 'dc']];
   function okURL(u) { return /^https?:\/\/\S+$/i.test(String(u || '').trim()); }
   function fieldsHTML(it) {
     function one(f) {
@@ -499,8 +500,8 @@
     function el(n, v) { return (Array.isArray(v) ? v : [v]).filter(function (y) { return y; }).map(function (y) { return '  <dc:' + n + '>' + x(String(y)) + '</dc:' + n + '>\n'; }).join(''); }
     return '<?xml version="1.0" encoding="UTF-8"?>\n<records xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/">\n' + items.map(function (it) {
       return '<oai_dc:dc>\n' + el('title', it.title) + el('creator', it.creator) + el('subject', it.tags) + el('description', it.description) + el('publisher', it.publisher) + el('contributor', it.contributor) +
-        el('date', it.date) + el('type', it.type || (it.kind === 'image' ? 'StillImage' : it.kind === 'pdf' || it.kind === 'text' ? 'Text' : '')) + el('format', it.mime) +
-        el('identifier', [it.code, SW.BASE_URI + '?code=' + it.code].concat(it.identifier || [], okURL(it.archiveUrl) ? [it.archiveUrl] : [])) +
+        el('date', it.date) + el('type', dcType(it)) + el('format', [it.mime, it.extent]) +
+        el('identifier', [it.code, SW.BASE_URI + '?code=' + it.code].concat(it.identifier || [], okURL(it.url) ? [it.url] : [], okURL(it.archiveUrl) ? [it.archiveUrl] : [])) +
         el('source', [it.source, [it.archive, it.archiveId].filter(Boolean).join(', ')]) + el('language', it.language) +
         el('relation', (it.refs || []).concat((it.versions || []).map(function (v) { return 'Spacewar! ' + vShort(v); }))) + el('coverage', it.coverage) + el('rights', it.rights) + '</oai_dc:dc>\n';
     }).join('') + '</records>\n';
@@ -515,13 +516,15 @@
     });
   }
   function dateParts(d) { var m = /^(\d{4})(?:-(\d{1,2})(?:-(\d{1,2}))?)?/.exec(String(d || '')); return m ? [m.slice(1).filter(Boolean).map(Number)] : null; }
-  function dcType(it) { return it.type || (it.kind === 'image' ? 'StillImage' : it.kind === 'pdf' || it.kind === 'text' ? 'Text' : ''); }
+  function dcType(it) { return it.type || ({ image: 'StillImage', pdf: 'Text', text: 'Text', video: 'MovingImage', audio: 'Sound' })[it.kind] || ''; }
+  function isInterview(it) { return (it.tags || []).some(function (g) { return /^(oral history|interview)$/i.test(g); }); }
   function benchLink(it) { return SW.BASE_URI + '?code=' + it.code; }
   function ids(it) { var o = {}; (it.identifier || []).forEach(function (x) { x = String(x).trim(); if (/^(doi:)?10\.\d{4,}\//i.test(x)) o.DOI = x.replace(/^doi:/i, ''); else if (/^(isbn:)?[\d-]{10,17}X?$/i.test(x)) o.ISBN = x.replace(/^isbn:/i, ''); else if (/^https?:/.test(x) && !o.URL) o.URL = x; }); return o; }
   function cslJSON(items) {
     var T = { StillImage: 'graphic', Image: 'graphic', MovingImage: 'motion_picture', Sound: 'song', Software: 'software', Dataset: 'dataset', Text: 'document' };
     return JSON.stringify(items.map(function (it) {
-      var o = { id: it.code, type: T[dcType(it)] || 'document', title: it.title }, x = ids(it), dp;
+      var o = { id: it.code, type: isInterview(it) ? 'interview' : T[dcType(it)] || (it.kind === 'link' ? 'webpage' : 'document'), title: it.title }, x = ids(it), dp;
+      if (it.extent) o.dimensions = it.extent;
       var au = people(it.creator); if (au.length) o.author = au;
       if ((dp = dateParts(it.date))) o.issued = { 'date-parts': dp };
       if ((dp = dateParts(it.accessioned))) o.accessed = { 'date-parts': dp };
@@ -533,7 +536,7 @@
       if (it.rights) o.license = it.rights;
       if (it.mime) o.medium = it.mime;
       if (x.DOI) o.DOI = x.DOI; if (x.ISBN) o.ISBN = x.ISBN;
-      o.URL = okURL(it.archiveUrl) ? it.archiveUrl.trim() : x.URL || benchLink(it);
+      o.URL = okURL(it.url) ? it.url.trim() : okURL(it.archiveUrl) ? it.archiveUrl.trim() : x.URL || benchLink(it);
       if ((it.tags || []).length) o.keyword = it.tags.join(', ');
       o.note = 'Spacewar! paratext ' + it.code + ' (' + benchLink(it) + ')' + (it.source ? '. Source: ' + it.source : '');
       return o;
@@ -544,11 +547,11 @@
     var T = { StillImage: 'ART', Image: 'ART', MovingImage: 'VIDEO', Sound: 'SOUND', Software: 'COMP', Dataset: 'DATA', Text: 'GEN' };
     return items.map(function (it) {
       var x = ids(it), dp = dateParts(it.date), da = dp ? dp[0].map(function (n, i) { return i ? ('0' + n).slice(-2) : n; }).join('/') + '/'.repeat(4 - dp[0].length) : '';
-      return line('TY', T[dcType(it)] || 'GEN') + line('ID', it.code) + line('TI', it.title) +
+      return line('TY', T[dcType(it)] || (it.kind === 'link' ? 'ELEC' : 'GEN')) + line('ID', it.code) + line('TI', it.title) +
         people(it.creator).map(function (p) { return line('AU', p.literal || p.family + ', ' + p.given); }).join('') +
         line('PY', dp ? dp[0][0] : '') + line('DA', da) + line('PB', it.publisher) + line('AB', it.description) +
         (it.tags || []).map(function (g) { return line('KW', g); }).join('') + line('LA', it.language) + line('DO', x.DOI) + line('SN', x.ISBN) +
-        line('UR', okURL(it.archiveUrl) ? it.archiveUrl.trim() : x.URL || benchLink(it)) + line('AV', [it.archive, it.archiveId].filter(Boolean).join(', ')) +
+        line('UR', okURL(it.url) ? it.url.trim() : okURL(it.archiveUrl) ? it.archiveUrl.trim() : x.URL || benchLink(it)) + line('AV', [it.archive, it.archiveId].filter(Boolean).join(', ')) +
         line('N1', 'Spacewar! paratext ' + it.code + ' (' + benchLink(it) + ')' + (it.source ? '. Source: ' + it.source : '')) + 'ER  - \r\n';
     }).join('\r\n');
   }
@@ -585,11 +588,28 @@
     SW.$$('dialog.px-dlg[open]').forEach(function (d) { d.close(); d.remove(); });
     SW.notes.goCode(b.dataset.go);
   });
+  // A linked item played or shown where it lives: YouTube, Vimeo and the Internet Archive in their own
+  // players; a direct audio or video file in the browser's; anything else as a link to it.
+  function embedHTML(url, kind, title) {
+    var esc = SW.esc, m;
+    if ((m = /(?:youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/.exec(url))) {
+      var t = /[?&]t=(\d+)/.exec(url);
+      return '<iframe class="px-embed" src="https://www.youtube-nocookie.com/embed/' + m[1] + (t ? '?start=' + t[1] : '') + '" title="' + esc(title) + '" allow="fullscreen; picture-in-picture" allowfullscreen loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>';
+    }
+    if ((m = /vimeo\.com\/(?:video\/)?(\d+)/.exec(url))) return '<iframe class="px-embed" src="https://player.vimeo.com/video/' + m[1] + '" title="' + esc(title) + '" allow="fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+    if ((m = /archive\.org\/(?:details|embed)\/([^/?#]+)/.exec(url))) return '<iframe class="px-embed' + (kind === 'audio' ? ' px-embed-audio' : '') + '" src="https://archive.org/embed/' + m[1] + '" title="' + esc(title) + '" allow="fullscreen" allowfullscreen loading="lazy"></iframe>';
+    if (/\.(mp3|m4a|wav|ogg|oga|flac|aac)(\?|$)/i.test(url) || kind === 'audio' && /\.(mp4|webm)(\?|$)/i.test(url)) return '<audio class="px-audio" controls preload="metadata" src="' + esc(url) + '"></audio>';
+    if (/\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(url)) return '<video class="px-video" controls preload="metadata" src="' + esc(url) + '"></video>';
+    return '<p class="px-linkout">' + (ICON[kind] || ICON.link) + ' Held at its source: <a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(url.replace(/^https?:\/\//, '').slice(0, 80)) + ' ↗</a></p>';
+  }
   function showFile(it, pv, dl) {
     var esc = SW.esc;
+    if (!it.file) { pv.innerHTML = okURL(it.url) ? embedHTML(it.url.trim(), it.kind, it.title) : '<p class="hint">Nothing held here, and no link.</p>'; return; }
     blobOf(it).then(function (u) {
       if (dl) dl.href = u;
-      if (it.kind === 'image') pv.innerHTML = '<img class="px-img" alt="' + esc(it.title) + '" src="' + u + '">';
+      if (it.kind === 'audio' || /^audio\//.test(it.mime || '')) pv.innerHTML = '<audio class="px-audio" controls preload="metadata" src="' + u + '"></audio>';
+      else if (it.kind === 'video' || /^video\//.test(it.mime || '')) pv.innerHTML = '<video class="px-video" controls preload="metadata" src="' + u + '"></video>';
+      else if (it.kind === 'image') pv.innerHTML = '<img class="px-img" alt="' + esc(it.title) + '" src="' + u + '">';
       else if (it.kind === 'pdf') pv.innerHTML = '<iframe class="px-pdf" title="' + esc(it.title) + '" src="' + u + '"></iframe>';
       else if (/^text\//.test(it.mime || '')) fetch(u).then(function (r) { return r.text(); }).then(function (t) { pv.innerHTML = '<pre class="px-text">' + esc(t) + '</pre>'; });
       else pv.innerHTML = '<p class="hint">No preview for this kind of file: ⤓ Download to open it.</p>';
@@ -598,9 +618,9 @@
   function openItem(code) {
     var it = byCode(code); if (!it) { SW.toast(code + ' is not in the catalogue.', 4000); return; }
     var esc = SW.esc, d = SW.el('dialog', { class: 'tray-big px-dlg' });
-    var gh0 = 'https://github.com/' + REPO + '/blob/main/' + it.file.split('/').map(encodeURIComponent).join('/');
+    var gh0 = it.file ? 'https://github.com/' + REPO + '/blob/main/' + it.file.split('/').map(encodeURIComponent).join('/') : '';
     d.innerHTML = '<div class="tray-bighead"><span class="px-code mono" data-copy="' + esc(it.code) + '" title="Its code: click to copy">' + esc(it.code) + '</span> <b>' + esc(it.title) + '</b>' +
-      '<span class="refhelp-acts"><button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button><button class="btn ghost" data-a="keep" title="This paratext, with its details, in My notes (private)">＋ My notes</button><a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a><a class="btn ghost" href="' + esc(gh0) + '" target="_blank" rel="noopener" title="On GitHub, with its history">GitHub ↗</a>' + (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">In the archive ↗</a>' : '') + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
+      '<span class="refhelp-acts"><button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button><button class="btn ghost" data-a="keep" title="This paratext, with its details, in My notes (private)">＋ My notes</button>' + (it.file ? '<a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a><a class="btn ghost" href="' + esc(gh0) + '" target="_blank" rel="noopener" title="On GitHub, with its history">GitHub ↗</a>' : okURL(it.url) ? '<a class="btn ghost" href="' + esc(it.url.trim()) + '" target="_blank" rel="noopener" title="Where it is held">Open ↗</a>' : '') + (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">Source ↗</a>' : '') + '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
       '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' + fieldsHTML(it) +
       '<div class="px-colls">' + collsHTML(it) + '</div>' +
       '<p class="hint">Catalogued by ' + esc(it.addedBy || '?') + (it.updated && it.updated !== it.added ? '; changed ' + esc(SW.fmtDate(it.updated)) + ' by ' + esc(it.updatedBy || '?') : '') + '.</p>' +
@@ -658,7 +678,7 @@
       } else if (a.dataset.a === 'keep') {
         if (!SW.tray) return;
         var rows = FIELDS.map(function (f) { var v = it[f[0]]; return [f[1], Array.isArray(v) ? v.join(', ') : v || '']; }).filter(function (r) { return r[1]; });
-        SW.tray.addDoc({ title: 'Paratext ' + it.code + ': ' + it.title, subtitle: REPO + ', ' + it.file, blocks: [SW.tableBlock('The paratext', ['', ''], rows)] }, { tags: ['paratext'], vid: (it.versions || [])[0] || SW.state.v });
+        SW.tray.addDoc({ title: 'Paratext ' + it.code + ': ' + it.title, subtitle: it.file ? REPO + ', ' + it.file : it.url || REPO, blocks: [SW.tableBlock('The paratext', ['', ''], rows)] }, { tags: ['paratext'], vid: (it.versions || [])[0] || SW.state.v });
       }
     });
   }
@@ -695,12 +715,27 @@
     var blank = { title: '', date: '', creator: '', source: '', rights: '', accessioned: now().slice(0, 10), description: '', tags: [], versions: SW.state.v ? [SW.state.v] : [], refs: [] };
     var into = coll(F.c);
     d.innerHTML = '<div class="tray-bighead"><b>Add an item</b><span class="refhelp-acts"><button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
-      '<label class="px-drop"><input type="file" class="px-file"><span>Choose a file, or drop one here: a scan, photograph, PDF or text (up to 50 MB).</span></label>' +
+      '<div class="px-seg px-addmode"><button class="on" data-mode="file">A file</button><button data-mode="link">A link</button></div>' +
+      '<label class="px-drop"><input type="file" class="px-file"><span>Choose a file, or drop one here: a scan, photograph, PDF, text, audio or video (up to 50 MB).</span></label>' +
+      '<div class="px-linkin" hidden><label><span>Link</span><input class="px-url" type="url" placeholder="https://… a YouTube, Vimeo or Internet Archive recording, an audio or video file, or a page"></label>' +
+      '<label><span>Kind</span><select class="px-lkind"><option value="video">Video</option><option value="audio">Audio</option><option value="link">Web page or document</option></select></label>' +
+      '<p class="hint">Catalogued with nothing copied: it plays or shows here from where it is held.</p></div>' +
       fieldsHTML(blank) + (into ? '<label class="check px-into"><input type="checkbox" class="px-intoc" checked> Into the collection “' + esc(into.name) + '”</label>' : '') + '<div class="px-acts"><button class="btn" data-a="up">Upload</button> <span class="hint px-msg"></span></div>';
     document.body.appendChild(d);
     d.addEventListener('close', function () { d.remove(); });
     d.showModal();
-    var inp = SW.$('.px-file', d), drop = SW.$('.px-drop', d), file = null;
+    var inp = SW.$('.px-file', d), drop = SW.$('.px-drop', d), file = null, mode = 'file';
+    SW.$('.px-addmode', d).addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mode]'); if (!b) return; e.preventDefault(); mode = b.dataset.mode;
+      SW.$$('.px-addmode button', d).forEach(function (x) { x.classList.toggle('on', x === b); });
+      drop.hidden = mode !== 'file'; SW.$('.px-linkin', d).hidden = mode !== 'link';
+      SW.$('[data-a="up"]', d).textContent = mode === 'file' ? 'Upload' : 'Add';
+    });
+    SW.$('.px-url', d).addEventListener('change', function (e) {   // the kind guessed from the address
+      var u = e.target.value, k = SW.$('.px-lkind', d);
+      if (/\.(mp3|m4a|wav|ogg|oga|flac|aac)(\?|$)/i.test(u)) k.value = 'audio';
+      else if (/youtube\.com|youtu\.be|vimeo\.com|\.(mp4|webm|mov|m4v)(\?|$)/i.test(u)) k.value = 'video';
+    });
     function pick(f) {
       file = f; if (!f) return;
       SW.$('.px-drop span', d).textContent = f.name + ' (' + Math.round(f.size / 1024).toLocaleString('en-GB') + ' KB)';
@@ -716,13 +751,26 @@
       var msg = SW.$('.px-msg', d), o = readFields(d), ic = SW.$('.px-intoc', d);
       if (ic && ic.checked) o.collections = [into.id];
       if (!o.accessioned) o.accessioned = now().slice(0, 10);
+      if (mode === 'link') {
+        var url = SW.$('.px-url', d).value.trim(), lk = SW.$('.px-lkind', d).value;
+        if (!okURL(url)) { msg.textContent = 'Give the link (https://…).'; return; }
+        if (!o.title) { msg.textContent = 'Give it a title.'; return; }
+        o.url = url; a.disabled = true; msg.textContent = 'Recording it in the catalogue…';
+        P.load(true).then(function () {
+          var code = newCode();
+          return save('Paratext ' + code + ': ' + o.title + ' (a link), catalogued by ' + me(), function (c) {
+            c.items.push(Object.assign({ code: code, kind: lk }, o, { added: now(), addedBy: me(), updated: now(), updatedBy: me() }));
+          }).then(function () { return code; });
+        }).then(function (code) { d.close(); refresh(); SW.toast(code + ' added'); openItem(code); }, function (err) { a.disabled = false; msg.textContent = err.message; });
+        return;
+      }
       if (!file) { msg.textContent = 'Choose a file first.'; return; }
       if (file.size > 50e6) { msg.textContent = 'Too large for the repository (50 MB at most).'; return; }
       if (!o.title) { msg.textContent = 'Give it a title.'; return; }
       a.disabled = true; msg.textContent = 'Uploading…';
       P.load(true).then(function () {
         var code = newCode(), ext = (file.name.match(/\.[A-Za-z0-9]+$/) || [''])[0].toLowerCase(), path = 'files/' + code + ext;
-        var mime = file.type || '', kind = mime === 'application/pdf' ? 'pdf' : /^image\//.test(mime) ? 'image' : /^text\//.test(mime) ? 'text' : 'file';
+        var mime = file.type || '', kind = mime === 'application/pdf' ? 'pdf' : /^image\//.test(mime) ? 'image' : /^text\//.test(mime) ? 'text' : /^audio\//.test(mime) ? 'audio' : /^video\//.test(mime) ? 'video' : 'file';
         return fileB64(file).then(function (b64) {
           return gh('PUT', '/contents/' + path, { message: 'Paratext ' + code + ': ' + o.title + ', added by ' + me(), content: b64 });
         }).then(function () {
@@ -761,7 +809,7 @@
       var cs = inColl(it); if (cs.length) rows.push(['Collections', cs.map(pathName).join('; ')]);
       rows = rows.filter(function (r) { return r[1]; });
       var nc = (it.comments || []).length;
-      d.innerHTML = head(it.title, (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">In the archive ↗</a>' : '') + '<button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button>' + exportMenu('data-xp') + '<a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a>') +
+      d.innerHTML = head(it.title, (okURL(it.archiveUrl) ? '<a class="btn ghost" href="' + esc(it.archiveUrl.trim()) + '" target="_blank" rel="noopener" title="The original, in ' + esc(it.archive || 'its archive') + '">Source ↗</a>' : '') + '<button class="btn ghost" data-share="' + esc(it.code) + '" title="Send it to someone: a link that opens the bench at this paratext">' + SW.SHARE_ICON + ' Share</button>' + exportMenu('data-xp') + (it.file ? '<a class="btn ghost" data-a="dl" download="' + esc(it.name || it.code) + '">⤓ Download</a>' : '')) +
         '<div class="px-cols"><div class="px-view"><p class="hint">Opening…</p></div><div class="px-side">' +
         (it.withdrawn ? '<p class="badge">Withdrawn from the list' + (it.withdrawnWhy ? ': ' + esc(it.withdrawnWhy) : '') + '</p>' : '') +
         '<dl class="px-ro">' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + (r[0] === 'Description' ? SW.md(r[1]) : r[0] === 'Archive link' && okURL(r[1]) ? '<a href="' + esc(r[1].trim()) + '" target="_blank" rel="noopener">' + esc(r[1]) + ' ↗</a>' : esc(r[1])) + '</dd>'; }).join('') + '</dl>' +

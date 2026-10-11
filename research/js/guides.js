@@ -17,7 +17,7 @@
         'Help ▸ Joining the annotation group, step 5: open the token form (its name, owner, expiry and permission are filled in), choose <b>Only select repositories</b> and <b>sw_paratexts</b>, generate the token, paste it in, and <b>Save and test</b>. ⚙ Settings has the same box.',
         'The token stays in this browser. On another computer, paste it there too.'])],
       ['The left panel', ul([
-        '<b>＋ Add an item</b>: choose or drop a file (up to 50 MB), give it a title and what else you know, and Upload. It goes into the collection you are in, unless you untick it.',
+        '<b>＋ Add an item</b>: <b>A file</b> (a scan, photograph, PDF, text, audio or video, up to 50 MB), or <b>A link</b> (a YouTube, Vimeo or Internet Archive recording, an audio or video file online, or a page), catalogued with nothing copied, which plays or shows in the item’s box from where it is held. Give it a title and what else you know, and Upload (or Add). It goes into the collection you are in, unless you untick it.',
         '<b>All</b>, <b>Not in a collection</b>, your <b>collections</b>, and <b>Withdrawn</b>, each with its count.',
         'Collections nest like folders, and an item can be in several. ＋ beside Collections makes one; on a collection, ＋ makes one inside it, ✎ renames it and ✕ deletes it (its items stay in the catalogue; the collections inside it move up a level).',
         'Drag items onto a collection to put them in it. From inside a collection a drag moves them; hold ' + k('⌥') + ' to add them instead. Drag one collection onto another to nest it, or onto All to bring it to the top.'])],
@@ -32,8 +32,8 @@
         'With two selected, <b>Side by side</b> shows them in one box. Pictures zoom (wheel, pinch, ＋ −, double-click) and pan (drag); with <b>Together</b> on, both follow, matched by their place on the page, for comparing two printings or copies. Fit (' + k('0') + ') puts them back; ⇄ Swap turns them round.'])],
       ['One item', ul([
         'Click a card for its box: the file (a picture, a PDF, a text), its record, its collections, the crew’s ratings, reactions and comments.',
-        'The record: title, date made, creator, source (where this copy came from), <b>Held at</b>, <b>Archive ref</b> and <b>Archive link</b> (the original, in its archive: an <b>In the archive ↗</b> button appears), rights, accession date (the day it came into the collection, set on upload), description, tags, versions and references. <b>Save changes</b> keeps them.',
-        '<b>More metadata</b> folds out the rest of Dublin Core: type (from DCMI’s list), publisher, contributors, language, coverage, identifiers (DOI, ISBN, URL), and the file’s format.',
+        'The record: title, date made, creator, source (where this copy came from), <b>Held at</b>, <b>Archive ref</b> and <b>Archive link</b> (the original, in its archive: a <b>Source ↗</b> button appears), rights, accession date (the day it came into the collection, set on upload), description, tags, versions and references. <b>Save changes</b> keeps them.',
+        '<b>More metadata</b> folds out the rest of Dublin Core: type (from DCMI’s list; video and audio are set as MovingImage and Sound), publisher, contributors, language, coverage, extent (a duration or size), identifiers (DOI, ISBN, URL), and the file’s format. Tag an interview <i>oral history</i> and it exports to Zotero as an interview.',
         'Rate it with one to three stars (gold up to the crew’s average), react with an emoji, and comment; comments fold away until you open them.',
         'At the top: <b>Share</b>, ＋ My notes, ⤓ Download, the file on GitHub with its history.',
         '<b>⤓ Export</b> saves its record: <b>CSL-JSON</b> or <b>RIS</b> to import into Zotero (File ▸ Import; creators as Family, Given, separated by semicolons; the archive and its reference go to Zotero’s Archive and Loc. in Archive), or <b>Dublin Core</b> (oai_dc XML). The read-only box has it too.',
