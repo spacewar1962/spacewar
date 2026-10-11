@@ -1391,7 +1391,7 @@ li.fd.folded { padding-bottom: 2px; }
 .orb-duals figcaption { text-align: center; font-size: 11px; color: var(--text-dim); margin-top: 4px; }
 
 /* assembly errors, explained */
-button.badge.err { cursor: pointer; font: inherit; background: none; }
+button.badge.err { cursor: pointer; font: 11px/1.4 var(--mono); background: none; vertical-align: middle; white-space: nowrap; }
 button.badge.err:hover { filter: brightness(1.2); }
 .asmerrs { width: min(96vw, 900px); }
 .asmerr { border-top: 1px solid var(--line); padding: 8px 0 4px; }
