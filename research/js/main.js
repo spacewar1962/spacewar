@@ -24,8 +24,7 @@
     onSelect: function (b) { if (SW.tape) SW.tape.strip(b); },
     onTheme: function () { if (SW.tape && SW.state.v) SW.build(SW.state.v).then(function (b) { SW.tape.strip(b); }).catch(function () {}); },
     query: function (q) {
-      // a view named in the link (the site map links to each): its lens or graphic
-      if (q.lens) { SW.setLens(q.lens); if (!q.tab) q.tab = 'analyse'; }
+      // a view named in the link (the site map links to each): its graphic (a lens is kit/lenses.js's)
       // Art's gizmo as a link left it: its mode, the version compared with, the split, a routine to open
       if (q.gz === 'profile' || q.gz === 'compare' || q.gz === 'across') SW.store.set('an.gizmoMode', q.gz);
       if (q.cmp && q.v) { var cb = SW.store.get('an.gizmoCmpBy', {}) || {}; cb[q.v] = q.cmp; SW.store.set('an.gizmoCmpBy', cb); }
