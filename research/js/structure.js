@@ -41,7 +41,9 @@
   // The graph of one build. dyn: a profile from a run of it (or null).
   S.graph = function (b, dyn) {
     var mem = b.asm.memory, entry = b.asm.start, reach = {}, work = [entry], branchy = {};
-    var dynOut = {};
+    var dynOut = {}, E = S.entries(b), begins = [];   // every routine's code, run or not (a torpedo never fired)
+    E.list.forEach(function (a) { begins.push(E.enter[a] || a); });
+    work = work.concat(begins);
     if (dyn && dyn.branches) dyn.branches.forEach(function (n, k) {
       var f = Math.floor(k / 4096), t = k % 4096;
       if (mem[f] && mem[t]) (dynOut[f] = dynOut[f] || []).push(t);
@@ -56,7 +58,7 @@
       (fl ? fl.to.map(function (x) { return x[0]; }) : [(a + 1) & 0o7777]).concat(dynOut[a] || []).forEach(function (t) { if (!reach[t]) work.push(t); });
     }
     // block starts: the entry, every target of a transfer, the word after a branch
-    var lead = {}; lead[entry] = 1;
+    var lead = {}; lead[entry] = 1; begins.forEach(function (a) { lead[a] = 1; });
     Object.keys(branchy).forEach(function (k) {
       var a = +k; lead[(a + 1) & 0o7777] = 1;
       branchy[a].to.forEach(function (x) { if (x[1] !== 'next' && x[1] !== 'return') lead[x[0]] = 1; });
@@ -307,11 +309,16 @@
   //   or one reached from the start (a macro's: mult is jda mpy), so that a table of numbers that
   //   happen to read as calls (the stars) begins nothing;
   //   at a labelled instruction whose address is loaded (law x) and stored where the code calls
-  //   through it: law cwr, dac cwg, then jsp i cwg.
-  // A jump, indirect or set by a dap (law fys, dap frt, frt jmp .), does not begin one: it returns,
-  // or turns within a routine. A routine called through a table the code reads at run time (the
-  // objects' table, mtb) is not seen here.
-  // Returns { list: [addresses, sorted], why: {address: 'start' | 'call' | 'pointer'},
+  //   through it: law cwr, dac cwg, then jsp i cwg;
+  //   at a labelled instruction whose address is stored in a table the program dispatches through:
+  //   Spacewar!'s objects' table, mtb, each word the routine of one object. init ml1, mtb points
+  //   ml1 at the table; the main loop takes a word through it and transfers to what it holds
+  //   (1R to 3.1: lac i ml1, dap . 1, jsp .; 4.x: ml1, lac ., then dap . 1, jmp .; 4.8: dap mjm,
+  //   mjm, jmp .); the routines are the addresses stored into it, directly or through any pointer
+  //   set to it (law ss1, dac mtb; lac (mex 400000, dac i ml1; init sr1, mtb nob-1, lac (tcr, dac i sr1).
+  // Otherwise a jump, indirect or set by a dap (law fys, dap frt, frt jmp .), does not begin one:
+  // it returns, or turns within a routine.
+  // Returns { list: [addresses, sorted], why: {address: 'start' | 'call' | 'pointer' | 'table'},
   // enter: {address: where its code begins, for a jda routine} }.
   S.entries = function (b) {
     var mem = b.asm.memory, why = {}, enter = {}, reach = {}, work = [b.asm.start], viaI = {};
@@ -330,6 +337,33 @@
       if ((md >> 12) !== 0o70 || !nx || !(x in b.labelAt) || !code(x)) return;
       var op = nx.val >> 12;
       if ((op === 0o24 || op === 0o26) && viaI[nx.val & 0o7777]) { add(x, 'pointer'); work.push(x); }
+    });
+    // the tables dispatched through: init p, T (law T, dap p), and a transfer to itself (jsp ., jmp .)
+    // whose address a dap sets from a word taken through p a few words before (lac i p, or p, lac .)
+    var o6 = function (a) { return mem[a] ? mem[a].val >> 12 : -1; }, ad = function (a) { return mem[a].val & 0o7777; };
+    var disp = {}, inits = [], tables = {};
+    Object.keys(mem).forEach(function (k) {
+      var s = +k, d = o6(s) === 0o26 ? ad(s) : -1;
+      if (d < 0 || (o6(d) !== 0o62 && o6(d) !== 0o60) || ad(d) !== d) return;
+      for (var w = s - 1; w >= s - 6; w--) {
+        if (o6(w) === 0o21) disp[ad(w)] = 1;   // lac i p
+        else if (o6(w) === 0o20 && ad(w) === w) disp[w] = 1;   // p, lac .
+      }
+    });
+    Object.keys(mem).forEach(function (k) {
+      var a = +k;
+      if (o6(a) === 0o70 && o6(a + 1) === 0o26) { inits.push({ base: ad(a), p: ad(a + 1) }); if (disp[ad(a + 1)]) tables[ad(a)] = 1; }
+    });
+    Object.keys(tables).forEach(function (t) {   // what is stored in one: law x, or lac of a constant holding x, then dac
+      t = +t; var ptr = {};
+      inits.forEach(function (q) { if (q.base >= t && q.base < t + 64) ptr[q.p] = 1; });   // every pointer set into it (init sr1, mtb nob-1)
+      Object.keys(mem).forEach(function (k) {
+        var st = +k, op = o6(st), y = mem[st].val & 0o7777, x = -1;
+        if (!((op === 0o24 && y >= t && y < t + 64) || (op === 0o25 && ptr[y]))) return;
+        if (o6(st - 1) === 0o70) x = ad(st - 1);
+        else if (o6(st - 1) === 0o20 && mem[ad(st - 1)] && !(ad(st - 1) in b.labelAt)) x = ad(ad(st - 1));
+        if (x > 0 && x in b.labelAt && code(x)) { add(x, 'table'); work.push(x); }
+      });
     });
     while (work.length) {   // what the code reaches, as the machine would go
       var a = work.pop() & 0o7777;

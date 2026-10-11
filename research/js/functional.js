@@ -3,14 +3,13 @@
  * (kit/functional.js), drawn in Program ▸ Functional overview when Read from the source is
  * chosen (beside the recording, js/overview.js). From the assembled words, without running. The
  * routines are the bench's one definition of them, SW.structure.entries (js/structure.js), which
- * the Dynamic Profile uses too, without a run: the start, what a jsp or jda reached from it
- * calls, and a labelled instruction whose address the code loads (law x) to jump to through it
- * later; each named by its label, or the label before it and how far on. Each is followed through its words as the machine would go, not into the routines it
+ * the Dynamic Profile uses too, without a run: the start, what a jsp or jda calls, what is called
+ * through a word set by law, and what is stored in the objects' table the main loop runs; each
+ * named by its label, or the label before it and how far on. Each is followed through its words as the machine would go, not into the routines it
  * calls: on after a word, to the target of a jmp, both ways after a skip (isp, sad, sas, the skip
  * group), on after a call (and the word after, which a jda may take as an argument); it stops at
  * a jmp i (a return), and where it reaches another routine. Its calls are the jsp and jda words
- * reached (from macros too: mult is jda mpy), in the order of their lines. A call through a
- * table the program reads as it runs is not seen: the recording has it.
+ * reached (from macros too: mult is jda mpy), in the order of their lines.
  * Each tape is shown with what it assembles to.
  */
 (function (root) {
@@ -87,6 +86,6 @@
     startLede: function (b, e) {
       return 'The program from its start address, ' + SW.oct(b.asm.start, 4) + ' (' + SW.esc(entryName(b)) + ')' + ', followed through its words as the machine would go (jumps, both ways after a skip, not into the routines it calls): the routines it calls (jsp, jda), in the order of their lines, and what each of those calls in turn. Read from the assembled words; Recorded run follows the program as it runs (each frame, each object’s routine). Click a name to read it.';
     },
-    note: function () { return '<p class="hint">The routines are those the Dynamic Profile draws. A routine the program calls through a table it reads as it runs (each object’s, ss1 and ss2 among them) is not seen here; Recorded run has them.</p>'; }
+    note: function () { return '<p class="hint">The routines are those the Dynamic Profile draws: the start, what a jsp or jda calls, what is called through a word set by law (cwr), and what is put in the objects’ table for the main loop to run (ss1, ss2, tcr, mex). A table routine’s place in the loop is in Recorded run.</p>'; }
   };
 })(this);
