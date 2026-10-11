@@ -602,6 +602,85 @@
     if (/\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(url)) return '<video class="px-video" controls preload="metadata" src="' + esc(url) + '"></video>';
     return '<p class="px-linkout">' + (ICON[kind] || ICON.link) + ' Held at its source: <a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(url.replace(/^https?:\/\//, '').slice(0, 80)) + ' ↗</a></p>';
   }
+  // Zoom in a single item's box. A picture: a bar (− ＋ Fit 1:1 and the scale), the wheel or a
+  // pinch zooming where the pointer is, a double-click zooming in, a drag moving it, and the keys
+  // + − 0 while the pointer is over it. A PDF: − ＋ and Fit page or width, given to the browser's
+  // own viewer by the address (#zoom=, #view=), the frame made again at each step.
+  function zoomBar(extra) {
+    return '<div class="px-zbar"><button class="btn ghost" data-zz="out" title="Zoom out (−)">−</button><span class="px-zpc mono">100%</span><button class="btn ghost" data-zz="in" title="Zoom in (+)">＋</button>' +
+      extra + '</div>';
+  }
+  function zoomImage(it, pv, u) {
+    var esc = SW.esc;
+    pv.classList.add('px-zwrap');
+    pv.innerHTML = zoomBar('<button class="btn ghost" data-zz="fit" title="Fit (0)">Fit</button><button class="btn ghost" data-zz="one" title="Actual size, a pixel of the scan to a pixel of the screen">1:1</button>') +
+      '<div class="px-zoom px-zone"><img alt="' + esc(it.title) + '" draggable="false"></div><p class="hint px-zhint">Drag to move; wheel or pinch to zoom where the pointer is; double-click to zoom in.</p>';
+    var box = SW.$('.px-zone', pv), img = SW.$('img', box), pc = SW.$('.px-zpc', pv), w = 0, h = 0, st = { z: 1, cx: 0.5, cy: 0.5 };
+    function fitSc() { return Math.min(box.clientWidth / w, box.clientHeight / h); }
+    function place() {
+      if (!w || !box.clientWidth) return;
+      var W = box.clientWidth, H = box.clientHeight, sc = fitSc() * st.z;
+      img.style.width = w * sc + 'px'; img.style.height = h * sc + 'px';
+      img.style.transform = 'translate(' + (W / 2 - st.cx * w * sc) + 'px,' + (H / 2 - st.cy * h * sc) + 'px)';
+      pc.textContent = Math.round(sc * 100) + '%';
+    }
+    function zoomAt(f, mx, my) {
+      if (!w) return;
+      var W = box.clientWidth, H = box.clientHeight, sc = fitSc() * st.z;
+      if (mx == null) { mx = W / 2; my = H / 2; }
+      var px = st.cx + (mx - W / 2) / (w * sc), py = st.cy + (my - H / 2) / (h * sc);
+      st.z = Math.max(0.5, Math.min(40, st.z * f)); var sc2 = fitSc() * st.z;
+      st.cx = px - (mx - W / 2) / (w * sc2); st.cy = py - (my - H / 2) / (h * sc2);
+      place();
+    }
+    function fit() { st = { z: 1, cx: 0.5, cy: 0.5 }; place(); }
+    img.onload = function () { w = img.naturalWidth; h = img.naturalHeight; place(); };
+    img.src = u;
+    pv.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-zz]'); if (!b) return;
+      var k = b.dataset.zz;
+      if (k === 'fit') fit(); else if (k === 'one') zoomAt(1 / (fitSc() * st.z)); else zoomAt(k === 'in' ? 1.5 : 1 / 1.5);
+    });
+    box.addEventListener('wheel', function (e) { e.preventDefault(); var rc = box.getBoundingClientRect(); zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0025)), e.clientX - rc.left, e.clientY - rc.top); }, { passive: false });
+    box.addEventListener('dblclick', function (e) { var rc = box.getBoundingClientRect(); zoomAt(2, e.clientX - rc.left, e.clientY - rc.top); });
+    var drag = null, over = false;
+    box.addEventListener('pointerdown', function (e) { if (e.button) return; drag = { x: e.clientX, y: e.clientY }; box.setPointerCapture(e.pointerId); box.classList.add('dragging'); });
+    box.addEventListener('pointermove', function (e) {
+      if (!drag || !w) return;
+      var sc = fitSc() * st.z; st.cx -= (e.clientX - drag.x) / (w * sc); st.cy -= (e.clientY - drag.y) / (h * sc);
+      drag = { x: e.clientX, y: e.clientY }; place();
+    });
+    box.addEventListener('pointerup', function () { drag = null; box.classList.remove('dragging'); });
+    box.addEventListener('pointerenter', function () { over = true; });
+    box.addEventListener('pointerleave', function () { over = false; });
+    var dlg = pv.closest('dialog');
+    function key(e) {
+      if (!over || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+      if (e.key === '+' || e.key === '=') { e.preventDefault(); zoomAt(1.5); } else if (e.key === '-') { e.preventDefault(); zoomAt(1 / 1.5); } else if (e.key === '0') { e.preventDefault(); fit(); }
+    }
+    if (dlg) { dlg.addEventListener('keydown', key); dlg.addEventListener('close', function () { window.removeEventListener('resize', place); }); }
+    window.addEventListener('resize', place);
+  }
+  function zoomPdf(it, pv, u) {
+    var esc = SW.esc, z = 0, steps = [50, 67, 80, 100, 125, 150, 200, 300, 400], mode = 'page';
+    pv.classList.add('px-zwrap');
+    pv.innerHTML = zoomBar('<button class="btn ghost" data-zz="page" title="The whole page">Fit page</button><button class="btn ghost" data-zz="width" title="The page across the width">Fit width</button><a class="btn ghost" href="' + u + '" target="_blank" rel="noopener" title="In a tab of its own, with the browser\'s own tools">Open ↗</a>') +
+      '<div class="px-pdfbox"></div>';
+    var box = SW.$('.px-pdfbox', pv), pc = SW.$('.px-zpc', pv);
+    function frame() {
+      var frag = mode === 'page' ? '#view=Fit' : mode === 'width' ? '#view=FitH' : '#zoom=' + steps[z];
+      box.innerHTML = '<iframe class="px-pdf" title="' + esc(it.title) + '" src="' + u + frag + '"></iframe>';
+      pc.textContent = mode === 'page' ? 'page' : mode === 'width' ? 'width' : steps[z] + '%';
+    }
+    pv.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-zz]'); if (!b) return;
+      var k = b.dataset.zz;
+      if (k === 'page' || k === 'width') mode = k;
+      else { if (mode !== 'zoom') { z = 3; mode = 'zoom'; } z = Math.max(0, Math.min(steps.length - 1, z + (k === 'in' ? 1 : -1))); }
+      frame();
+    });
+    frame();
+  }
   function showFile(it, pv, dl) {
     var esc = SW.esc;
     if (!it.file) { pv.innerHTML = okURL(it.url) ? embedHTML(it.url.trim(), it.kind, it.title) : '<p class="hint">Nothing held here, and no link.</p>'; return; }
@@ -609,8 +688,8 @@
       if (dl) dl.href = u;
       if (it.kind === 'audio' || /^audio\//.test(it.mime || '')) pv.innerHTML = '<audio class="px-audio" controls preload="metadata" src="' + u + '"></audio>';
       else if (it.kind === 'video' || /^video\//.test(it.mime || '')) pv.innerHTML = '<video class="px-video" controls preload="metadata" src="' + u + '"></video>';
-      else if (it.kind === 'image') pv.innerHTML = '<img class="px-img" alt="' + esc(it.title) + '" src="' + u + '">';
-      else if (it.kind === 'pdf') pv.innerHTML = '<iframe class="px-pdf" title="' + esc(it.title) + '" src="' + u + '"></iframe>';
+      else if (it.kind === 'image') zoomImage(it, pv, u);
+      else if (it.kind === 'pdf') zoomPdf(it, pv, u);
       else if (/^text\//.test(it.mime || '')) fetch(u).then(function (r) { return r.text(); }).then(function (t) { pv.innerHTML = '<pre class="px-text">' + esc(t) + '</pre>'; });
       else pv.innerHTML = '<p class="hint">No preview for this kind of file: ⤓ Download to open it.</p>';
     }, function (e) { pv.innerHTML = '<p class="badge err">' + esc(e.message) + '</p>'; });
