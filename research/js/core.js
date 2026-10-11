@@ -1051,7 +1051,7 @@
   function unb64(s) { try { return decodeURIComponent(escape(atob(s))); } catch (e) { return ''; } }
   var WAS = /\n*<!-- sw:was (\S+) ([A-Za-z0-9+\/=]+) -->/g;
   SW.noteHistory = {
-    visible: function (t) { return String(t || '').replace(/\n*<!-- sw:[\s\S]*?-->/g, '').replace(/\s+$/, ''); },
+    visible: function (t) { return String(t || '').replace(/\n*<!-- (?:sw|bk):[\s\S]*?-->/g, '').replace(/\s+$/, ''); },
     list: function (t) { var out = [], m; WAS.lastIndex = 0; while ((m = WAS.exec(String(t || '')))) out.push({ date: m[1], text: unb64(m[2]) }); return out; },
     wasLines: function (t) { return (String(t || '').match(WAS) || []).map(function (x) { return '\n\n' + x.replace(/^\n+/, ''); }).join(''); },
     was: function (text, date) { return '\n\n<!-- sw:was ' + (date || new Date().toISOString()) + ' ' + b64(text) + ' -->'; },
@@ -1128,7 +1128,7 @@
   };
   SW.md = function (text) {
     var fences = [];
-    var src = String(text == null ? '' : text).replace(/\n*<!-- sw:[\s\S]*?-->/g, '').replace(/\r\n?/g, '\n')
+    var src = String(text == null ? '' : text).replace(/\n*<!-- (?:sw|bk):[\s\S]*?-->/g, '').replace(/\r\n?/g, '\n')
       .replace(/^```[^\n]*\n([\s\S]*?)\n?```[ \t]*$/gm, function (m, code) { fences.push(code); return '\n\u0001' + (fences.length - 1) + '\u0001\n'; });
     return mdBlocks(src.split('\n'), fences);
   };
@@ -1152,7 +1152,7 @@
   // The same text without its marks, for a line of news or a Word export:
   // links kept as "text (url)".
   SW.mdPlain = function (text) {
-    return String(text == null ? '' : text).replace(/\n*<!-- sw:[\s\S]*?-->/g, '')
+    return String(text == null ? '' : text).replace(/\n*<!-- (?:sw|bk):[\s\S]*?-->/g, '')
       .replace(/^```[^\n]*\n?|```$/gm, '')
       .replace(/\[([^\]\n]+)\]\(([^)\s]+)\)/g, '$1 ($2)')
       .replace(/\*\*([^*]+)\*\*|__([^_]+)__/g, '$1$2').replace(/~~([^~]+)~~/g, '$1')

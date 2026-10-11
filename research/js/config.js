@@ -16,6 +16,17 @@
       groupPlaceholder: 'https://hypothes.is/groups/Ab12Cd34/name',
       themeHint: 'The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.'
     },
+    tag: 'sw:',   // the prefix of this bench's tags in Hypothesis before bench-kit 0.5.0 (sw:v:3.1 …): still read; new tags are bk:
+    // the worked examples in Help ▸ Advanced annotation
+    annoHelp: {
+      manual: 'https://bitsavers.org/pdf/dec/pdp1/F36_MACRO_Nov62.pdf', manualName: 'MACRO manual',
+      start: 'The gravity calculation starts here', search: 'gravity',
+      refA: 'CD, SW3.1L, 2.141–146', refB: 'EF, SW4.1L, 1.120–134',
+      noteA: 'A note on the gravity calculation…', noteB: 'The same calculation in 4.1…', quoteA: 'A note on the gravity…',
+      boxA: 'Version 3.1, lines 141–146', boxB: 'Version 4.1, lines 120–134',
+      tryText: 'The **sun** is placed from `nx1` and `ny1`', code: '`lac nx1`',
+      caption: 'A link from an annotation on 4.1 to one on 3.1. The 3.1 annotation lists it under Linked from'
+    },
     figureNum: { print: '#9a5b00', paper: '#9a5b00', phosphor: '#ffce7a' },
     paratexts: { org: 'spacewar1962', repo: 'sw_paratexts', cache: 'sw-paratexts', tokenName: 'Spacewar research bench' },
     examples: { date: 'e.g. 1963-05-17, or 1963', archive: 'e.g. Computer History Museum', versions: 'e.g. 4.3, 4.4',
