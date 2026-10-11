@@ -2328,73 +2328,56 @@
   // the Graphics menu in groups, with a small heading over each
   var GFXG = [['What it draws', ['sky', 'ships', 'sun', 'hyper']], ['The pull of the star', ['gravity', 'orbits', 'moves']],
               ['The rules at work', ['torps', 'collision', 'roulette', 'random']], ['The machine', ['tapesim']]];
-  function gfxList(attr, onId, skip) {
-    return GFXG.map(function (grp) {
-      var items = grp[1].filter(function (id) { return id !== skip; }).map(function (id) { return GFX.filter(function (g) { return g[0] === id; })[0]; }).filter(Boolean);
-      return items;
-    }).map(function (items, i) {
-      if (!items.length) return '';
-      return '<div class="gfx-grp"><div class="menu-group">' + SW.esc(GFXG[i][0]) + '</div>' +
-        items.map(function (g) { return '<button ' + attr + '="' + g[0] + '"' + (g[0] === onId ? ' class="on"' : '') + '><b>' + SW.esc(g[1]) + '</b><span>' + SW.esc(g[2]) + '</span></button>'; }).join('') + '</div>';
-    }).join('');
-  }
-  var gfx = SW.store.get('gfx.item', 'sky'); if (gfx === 'memory') gfx = 'sky';
-  var gfxStop = null, gfxBuild = null;
-  function renderGfx() {
-    var el = SW.$('#view-graphics'), b = gfxBuild;
-    if (gfxStop) { gfxStop(); gfxStop = null; }
-    el.innerHTML = '';
-    var G = GFX.filter(function (x) { return x[0] === gfx; })[0] || GFX[0];
-    var pad = SW.el('div', { class: 'pad gfx-page', style: 'max-width:none' });
-    var head = SW.el('div', { class: 'toolbar an-head', style: 'position:static;padding:0 0 10px' });
-    head.innerHTML = '<details class="menu lens-menu"><summary class="btn" title="Choose a graphic">' + SW.esc(G[1]) + ' ▾</summary><div class="menu-body lens-list">' +
-      gfxList('data-g', G[0], 'tapesim') +
-      '</div></details><span class="hint an-desc">' + SW.esc(G[2]) + '.</span>';
-    head.addEventListener('click', function (e) { var t = e.target.closest('[data-g]'); if (t) { gfx = t.dataset.g; SW.store.set('gfx.item', gfx); SW.writeQuery(); renderGfx(); } });
-    pad.appendChild(head);
-    el.appendChild(pad);
-    if (!b.lines || !b.asm) { pad.appendChild(SW.el('p', { class: 'hint' }, 'No source survives for ' + SW.esc(b.v.label) + ', so there is nothing to draw.')); return; }
-    if (G[0] === 'sky') {
-      var host = SW.el('div'); pad.appendChild(host); gfxStop = SW.skyMap(b, host);
-      var sk = SW.el('div', { class: 'cards', style: 'margin-top:14px' }), svs = selected();
-      pad.appendChild(sk);
-      Promise.all(svs.map(function (v) { return SW.build(v.id); })).then(function (bs) { if (svs.length && sk.isConnected) XFNS[12](svs, bs, sk, renderGfx); });
-      return;
-    }
-    var cards = SW.el('div', { class: 'cards' });
-    pad.appendChild(cards);
-    if (G[0] === 'gravity') { gfxStop = SW.gravity.draw(b, cards); return; }
-    if (G[0] === 'orbits') { gfxStop = SW.orbits.draw(b, cards); return; }
-    if (G[0] === 'moves') { gfxStop = SW.orbits.plates(b, cards); return; }
-    if (G[0] === 'torps') { gfxStop = SW.orbits.torpedoes(b, cards); return; }
-    if (G[0] === 'random') { gfxStop = SW.random.draw(b, cards); return; }
-    if (G[0] === 'collision') { gfxStop = SW.lab.drawCollision(b, cards); return; }
-    if (G[0] === 'roulette') { gfxStop = SW.lab.drawRoulette(b, cards); return; }
-    if (G[0] === 'sun' || G[0] === 'hyper') {
-      var wait = SW.el('p', { class: 'hint' }, 'Running ' + b.v.label + ' on the emulator…');
+  // each drawn for bench-kit's Graphics tab (kit/graphics.js), into the page under its heading;
+  // an animation returns the function that stops it
+  function cardsIn(el, style) { var c = SW.el('div', style ? { class: 'cards', style: style } : { class: 'cards' }); el.appendChild(c); return c; }
+  function drawIn(fn) { return function (b, el) { return fn(b, cardsIn(el)); }; }
+  function emulated(which) {
+    return function (b, el) {
+      var cards = cardsIn(el), wait = SW.el('p', { class: 'hint' }, 'Running ' + b.v.label + ' on the emulator…');
       cards.appendChild(wait);
-      setTimeout(function () { wait.remove(); SW.draws[G[0] === 'sun' ? 'sun' : 'hyperspace'](b, cards); }, 30);
-      return;
-    }
-    var blocks = FNS[13](b, cards);
-    if (blocks) head.appendChild(SW.lenses.expMenu(SW.exportButtons(function () {
-      return { title: b.v.label + ': ' + G[1].toLowerCase(), subtitle: G[2], meta: SW.docMeta(b), blocks: blocks() };
-    }, 'spacewar-' + b.v.id + '-' + G[0])));
-    if (G[0] === 'ships') {
-      var hold = SW.el('div', { style: 'grid-column:1/-1' }, '<p class="hint">Running ' + SW.esc(b.v.label) + ' on the emulator…</p>');
-      cards.insertBefore(hold, cards.firstChild);
-      setTimeout(function () { var tmp = SW.el('div'); SW.draws.ships(b, tmp); while (tmp.firstChild) cards.insertBefore(tmp.firstChild, hold); hold.remove(); }, 30);
-      var vs = selected(), wait = SW.el('p', { class: 'hint', style: 'grid-column:1/-1' }, 'Drawing the ships of ' + vs.length + ' versions…');
-      cards.appendChild(wait);
-      Promise.all(vs.map(function (v) { return SW.build(v.id); })).then(function (bs) { wait.remove(); if (vs.length) XFNS[13](vs, bs, cards); });
-    }
+      setTimeout(function () { wait.remove(); SW.draws[which](b, cards); }, 30);
+    };
   }
-  SW.views.graphics = { show: function (b) { gfxBuild = b; renderGfx(); } };
+  SW.BENCH.graphics = {
+    list: GFX, groups: GFXG, start: 'sky', store: 'gfx.item',
+    menuOnly: ['tapesim'],   // opens over the Tape view (SW.BENCH.menus.pick)
+    noSource: function (b) { return !b.lines || !b.asm ? 'No source survives for ' + SW.esc(b.v.label) + ', so there is nothing to draw.' : null; },
+    draw: {
+      // the star map, with the star tables across the versions
+      sky: function (b, el) {
+        var host = SW.el('div'); el.appendChild(host);
+        var stop = SW.skyMap(b, host), sk = cardsIn(el, 'margin-top:14px'), svs = selected();
+        Promise.all(svs.map(function (v) { return SW.build(v.id); })).then(function (bs) { if (svs.length && sk.isConnected) XFNS[12](svs, bs, sk, SW.graphics.render); });
+        return stop;
+      },
+      gravity: drawIn(function (b, c) { return SW.gravity.draw(b, c); }),
+      orbits: drawIn(function (b, c) { return SW.orbits.draw(b, c); }),
+      moves: drawIn(function (b, c) { return SW.orbits.plates(b, c); }),
+      torps: drawIn(function (b, c) { return SW.orbits.torpedoes(b, c); }),
+      random: drawIn(function (b, c) { return SW.random.draw(b, c); }),
+      collision: drawIn(function (b, c) { return SW.lab.drawCollision(b, c); }),
+      roulette: drawIn(function (b, c) { return SW.lab.drawRoulette(b, c); }),
+      sun: emulated('sun'),
+      hyper: emulated('hyperspace'),
+      // the ships: their outline codes (exported), drawn as the game draws them, and across the versions
+      ships: function (b, el) {
+        var cards = cardsIn(el), blocks = FNS[13](b, cards);
+        var hold = SW.el('div', { style: 'grid-column:1/-1' }, '<p class="hint">Running ' + SW.esc(b.v.label) + ' on the emulator…</p>');
+        cards.insertBefore(hold, cards.firstChild);
+        setTimeout(function () { var tmp = SW.el('div'); SW.draws.ships(b, tmp); while (tmp.firstChild) cards.insertBefore(tmp.firstChild, hold); hold.remove(); }, 30);
+        var vs = selected(), wait = SW.el('p', { class: 'hint', style: 'grid-column:1/-1' }, 'Drawing the ships of ' + vs.length + ' versions…');
+        cards.appendChild(wait);
+        Promise.all(vs.map(function (v) { return SW.build(v.id); })).then(function (bs) { wait.remove(); if (vs.length) XFNS[13](vs, bs, cards); });
+        return blocks ? { blocks: blocks } : null;
+      }
+    }
+  };
 
   // ---------- drop-downs in the tab row, as on the main site ----------
   // ---------- the menus in the tab row (bench-kit's kit/menus.js) ----------
-  // Graphics ▾ lists the graphics; Versions ▾ and Help ▾ are the kit's, with this bench's items;
-  // the lens menus are kit/lenses.js's.
+  // Versions ▾ and Help ▾ are the kit's, with this bench's items; the lens menus are
+  // kit/lenses.js's, Graphics ▾ kit/graphics.js's (Tape Load Simulator opens here, over Tape).
   SW.BENCH.menus = {
     versions: [['about', 'This version', 'Its record, sources, build log and annotations'],
               ['compare', 'Compare', 'Two versions side by side'],
@@ -2417,9 +2400,6 @@
                   ['The project', [['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
                                    ['issue', 'Report a problem ↗', 'GitHub issues'],
                                    ['about', 'About the bench', 'Version, sources, citation']]]],
-    menu: function (which) {
-      return which === 'graphics' ? gfxList('data-pick', SW.state.tab === 'graphics' ? gfx : null) : null;
-    },
     pick: function (which, p) {
       if (which === 'graphics' && p === 'tapesim') {   // opens over the Tape view, on its tape
         SW.setTab('tape');
@@ -2427,14 +2407,9 @@
         (function go() { if (SW.tape && SW.tape.openSim && SW.tape.simV === SW.state.v && SW.tape.openSim()) return; if (++tries < 50) setTimeout(go, 100); else SW.toast('No tape to load for this version.', 4000); })();
         return true;
       }
-      if (which === 'graphics') { gfx = p; SW.store.set('gfx.item', gfx); SW.forget('graphics'); SW.setTab('graphics'); return true; }
       return false;
     }
   };
-  // Open a graphic from elsewhere (the welcome tour), or from a link (?g=gravity) before the first view is drawn.
-  SW.setGraphic = function (g) { if (GFX.some(function (x) { return x[0] === g; }) && g !== 'tapesim') { gfx = g; SW.store.set('gfx.item', g); } };
-  SW.gfxItem = function () { return gfx; };
-  SW.openGraphic = function (g) { gfx = g; SW.store.set('gfx.item', g); SW.forget('graphics'); SW.setTab('graphics'); };
   // Open a biography from elsewhere (the symbol pop-up in Read).
   SW.biography = function (name) { bioName = name; SW.store.set('an.bio', name); SW.forget('analyse'); SW.openLens(14); };
   SW.on('profile', function () { var n = SW.anLens(); if (n === 5 || n === 6 || n === 9) render(); });

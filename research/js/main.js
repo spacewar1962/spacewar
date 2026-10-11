@@ -2,7 +2,7 @@
  * main.js - this bench's parts of the frame (bench-kit's kit/shell.js, loaded after it is set):
  * its views in the order of the tabs, the language and assembler shown beside the picker, the
  * window's title naming the version, the tape strip drawn for each version, the links that open
- * a lens, a graphic or Art's gizmo as left, and its own Help items. The picker's groups and the
+ * Art's gizmo as left (a lens and a graphic are the kit's), and its own Help items. The picker's groups and the
  * version shown first are in js/config.js (forks, start).
  */
 (function (root) {
@@ -24,13 +24,11 @@
     onSelect: function (b) { if (SW.tape) SW.tape.strip(b); },
     onTheme: function () { if (SW.tape && SW.state.v) SW.build(SW.state.v).then(function (b) { SW.tape.strip(b); }).catch(function () {}); },
     query: function (q) {
-      // a view named in the link (the site map links to each): its graphic (a lens is kit/lenses.js's)
       // Art's gizmo as a link left it: its mode, the version compared with, the split, a routine to open
       if (q.gz === 'profile' || q.gz === 'compare' || q.gz === 'across') SW.store.set('an.gizmoMode', q.gz);
       if (q.cmp && q.v) { var cb = SW.store.get('an.gizmoCmpBy', {}) || {}; cb[q.v] = q.cmp; SW.store.set('an.gizmoCmpBy', cb); }
       if (q.gz === 'compare') SW.store.set('an.gizmoSplit', q.split === '1');
       if (q.rt) SW.state.gzRoutine = q.rt;
-      if (q.g) { SW.setGraphic(q.g); if (!q.tab) q.tab = 'graphics'; }
     },
     help: { gizmo: function () { SW.guide('gizmo'); } }
   };
