@@ -597,23 +597,6 @@ a.ov-nm:hover { text-decoration: underline; }
 
 h2 .swref { font-size: 11.5px; vertical-align: middle; }
 
-.refhelp { max-width: 860px; }
-.refhelp-ex { font-size: 18px; margin: 6px 0 10px; color: var(--beam); }
-.refhelp h4 { margin: 14px 0 6px; }
-
-.refhelp { max-width: 1180px; }
-.refhelp-t td { vertical-align: top; }
-.refhelp-t a.ref-more { font-size: 10.5px; white-space: nowrap; }
-.refhelp-t .swhid-row.tiny { font-size: 10px; white-space: nowrap; }
-.refhelp-t .swhid-row.tiny .swhid { font-size: 10px; padding: 0 3px; }
-.swref, .swref-c { cursor: pointer; }
-.swref:hover, .swref-c:hover { color: var(--beam); text-decoration: underline dotted; text-underline-offset: 2px; }
-.refhelp-ports > summary { list-style: none; cursor: pointer; }
-.refhelp-ports > summary::-webkit-details-marker { display: none; }
-.refhelp-ports > summary h4 { display: inline-block; margin: 14px 0 6px; }
-.refhelp-ports > summary h4::before { content: '▸'; display: inline-block; margin-right: 6px; color: var(--text-dim); transition: transform .15s; }
-.refhelp-ports[open] > summary h4::before { transform: rotate(90deg); }
-
 .tray-sync.sync-ok { color: #3f9a62; }
 .tray-sync.sync-err { color: var(--amber); }
 .tray-sync.sync-off, .tray-sync.sync-busy { color: var(--text-faint); }
@@ -623,8 +606,6 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 .tour-row { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; }
 .tour-row .hint { font-size: 12px; }
 
-.refhelp .tray-bighead { display: flex; align-items: center; gap: 8px; }
-.refhelp .tray-bighead > b { flex: 1; white-space: nowrap; }
 .grav-ctl { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 6px 0 8px; font-size: 13px; }
 .grav-ctl .grav-exp { margin-left: auto; }
 .grav-plot { min-height: 60px; }
@@ -811,24 +792,10 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 .listing.no-repairs .ln.rp-fix .n::before, .listing.no-repairs .ln.rp-kake .n::before { display: none; }
 .listing.no-repairs .rp-chip { display: none; }
 /* What you should read; Reconstruction cards */
-.readhelp .rh-ref { margin: 0 0 10px; padding-left: 1.6em; text-indent: -1.6em; font-family: var(--serif); font-size: 14.5px; line-height: 1.5; }
-.readhelp .rh-note { display: block; text-indent: 0; margin-top: 3px; font: 12px var(--sans); color: var(--kin); }
-.readhelp .rh-ref a { overflow-wrap: anywhere; }
-.kin-card { border: 1px solid var(--kin); border-left-width: 3px; border-radius: 4px; padding: 10px 14px; margin: 16px 0; background: color-mix(in srgb, var(--kin) 10%, transparent); }
-.kin-card h3 { color: var(--kin); margin: 0 0 6px; }
-.kin-card h3 .swref-sm { font-size: 11px; font-weight: 400; color: var(--text-faint); margin-left: 6px; }
-.kin-card .hint { margin: 0 0 8px; }
-.kin-card .kin-t td { font-size: 12.5px; }
-.kin-card .kin-t td:first-child { white-space: nowrap; }
-.kin-card .rp-chip, .cardshelp .keylist .rp-chip { margin-left: 0; white-space: nowrap; }
 .rp-chip.rp-m-yobitsugi { background: color-mix(in srgb, var(--kin) 14%, transparent); }
 .rp-chip.rp-m-kake { background: color-mix(in srgb, var(--kin) 22%, transparent); }
 .rp-chip.rp-m-mount { border-color: color-mix(in srgb, var(--kin) 50%, transparent); color: color-mix(in srgb, var(--kin) 70%, var(--text-faint)); }
 .rp-chip.rp-m-unc { border-color: var(--text-faint); color: var(--text-faint); }
-.cardshelp .kin-key { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0 16px; font-size: 12.5px; margin: 6px 0 12px; }
-.kin-pick { display: flex; gap: 6px; align-items: center; margin: 10px 0 0; }
-.kin-pick select { flex: 1; min-width: 0; max-width: 36em; font: 13px var(--mono); padding: 4px 6px; background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 4px; }
-.kin-pick + .kin-one .kin-card { margin-top: 10px; }
 /* ◆ ‹ ›: the repairs in the text */
 .toolbar .kin-nav { display: inline-flex; gap: 2px; margin-left: 4px; }
 .toolbar .kin-nav[hidden] { display: none; }

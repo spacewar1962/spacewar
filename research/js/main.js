@@ -33,6 +33,6 @@
       if (q.rt) SW.state.gzRoutine = q.rt;
       if (q.g) { SW.setGraphic(q.g); if (!q.tab) q.tab = 'graphics'; }
     },
-    help: { gizmo: function () { SW.guide('gizmo'); }, refs: function () { SW.refHelp(); }, reading: function () { SW.readingHelp(); }, cards: function () { SW.cardsHelp(); } }
+    help: { gizmo: function () { SW.guide('gizmo'); } }
   };
 })(this);

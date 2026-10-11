@@ -90,6 +90,36 @@
       },
       words: true,
       files: ['supplied tapes', 'Include the macro and star tapes supplied so the version assembles']
+    },
+    // Help ▸ What you should read (kit/helppages.js): a short bibliography, every entry checked
+    // against the project's Zotero library
+    reading: {
+      intro: 'Where to begin: on repairing old code, on reading code as a cultural text, and on Spacewar! itself. Links open in a new tab.',
+      menu: 'A short bibliography: repairing old code, critical code studies, Spacewar!',
+      groups: [
+        ['Repairing old code', [
+          'Berry, D. M. (2025) ‘Digital Ruins and Critical Code Studies: Towards an Ethics of Historical Software Reconstruction’, <i>Stunlaw: Philosophy and Critique for a Digital Age</i>. Available at: <a href="https://stunlaw.blogspot.com/2025/01/digital-ruins-and-critical-code-studies.html" target="_blank" rel="noopener noreferrer">https://stunlaw.blogspot.com/2025/01/digital-ruins-and-critical-code-studies.html</a>. <span class="faint">The approach behind the bench’s repair marks (gold, in Read) and its reconstruction cards.</span>']],
+        ['Critical code studies', [
+          'Marino, M. C. (2020) <i>Critical Code Studies</i>. Cambridge, MA: The MIT Press.',
+          'Berry, D. M. and Marino, M. C. (2024) ‘Reading ELIZA: Critical Code Studies in Action’, <i>Electronic Book Review</i>. Available at: <a href="https://electronicbookreview.com/essay/reading-eliza-critical-code-studies-in-action/" target="_blank" rel="noopener noreferrer">https://electronicbookreview.com/essay/reading-eliza-critical-code-studies-in-action/</a>.',
+          'Marino, M. C., Weil, P., Shrager, J., Schwarz, A., Hay, A., Ciston, S., Berry, D. M. and Millican, P. (2026) ‘Conversations about conversational code: on the collaborative critical code studies reading of ELIZA’, <i>AI &amp; Society</i>. <a href="https://doi.org/10.1007/s00146-026-03086-7" target="_blank" rel="noopener noreferrer">https://doi.org/10.1007/s00146-026-03086-7</a>.',
+          'Montfort, N., Baudoin, P., Bell, J., Bogost, I., Douglass, J., Marino, M. C., Mateas, M., Reas, C., Sample, M. and Vawter, N. (2014) <i>10 PRINT CHR$(205.5+RND(1)); : GOTO 10</i>. Cambridge, MA: MIT Press.']],
+        ['Spacewar!', [
+          'Graetz, J. M. (1981) ‘The Origin of Spacewar’. Available at: <a href="https://www.masswerk.at/spacewar/SpacewarOrigin.html" target="_blank" rel="noopener noreferrer">https://www.masswerk.at/spacewar/SpacewarOrigin.html</a>.',
+          'Monnens, D. and Goldberg, M. (2015) ‘Space Odyssey: The Long Journey of Spacewar! from MIT to Computer Labs Around the World’, <i>Kinephanos</i>. Available at: <a href="https://www.kinephanos.ca/2015/space-odyssey-the-long-journey-of-spacewar-from-mit-to-computer-labs-around-the-world/" target="_blank" rel="noopener noreferrer">https://www.kinephanos.ca/2015/space-odyssey-the-long-journey-of-spacewar-from-mit-to-computer-labs-around-the-world/</a>.',
+          'Landsteiner, N. (n.d.) <i>Spacewar! – video games 60s style</i>. Available at: <a href="https://www.masswerk.at/spacewar/" target="_blank" rel="noopener noreferrer">https://www.masswerk.at/spacewar/</a>.']]
+      ]
+    },
+    // Help ▸ Referencing and versions (kit/helppages.js); the ports are SW.PORTS, in js/core.js
+    refHelp: {
+      example: '[REF: SW3.1T, 2.141–146]',
+      about: '<p>SW, then the version (<b>3.1</b>), then a letter for the witness, the particular surviving text of that version (<b>T</b>); then the tape (<b>2</b>, as the assembler read them in) and the lines (<b>141–146</b>).</p>',
+      letters: [['T', 'machine-read from the punched source tape'], ['L', 'a transcription: typed text of a listing or a tape'], ['M', 'a modern reassembly or edited source'], ['R', 'a reconstruction'], ['B', 'an object tape (binary), cited by address only']],
+      more: '<p>Shorter forms: the version and witness alone, <span class="mono">[REF: SW3.1T]</span>; a whole tape, <span class="mono">[REF: SW3.1T, 2]</span>. The tape is left out when a text has only one: <span class="mono">[REF: SW4.3M, 141]</span>. By core address, <span class="mono">[REF: SW3.1L, @0402–0407]</span>: an address holds across texts of a version that assemble to the same words, and is the only way to cite an object tape. Two texts of one version with the same letter take a lower-case qualifier: <span class="mono">SW4.4Mf</span>. A newly found text takes its version and the next letter or qualifier; a new version, its own number.</p><p>A port, a program for another machine, is not a text of any PDP-1 version and has a namespace of its own: <b>SWP</b>, the machine, the program, and its own version number, or its year when it has none: <span class="mono">[REF: SWP-PDP6-WAR44, 76]</span>. Several files of one program are its parts: <span class="mono">[REF: SWP-PDP10-SW71, 2.14]</span> is line 14 of SHIPS.SAI. A port has no witness letter unless it survives in more than one text.</p><p>A SWHID opens through Software Heritage’s resolver, <span class="mono">archive.softwareheritage.org/swh:1:cnt:…</span>, once the repository is archived there; the part after the first semicolon (origin, path, lines) qualifies it and is not a web address. For a link that works meanwhile, Copy citation also gives the file on GitHub at its last change, to the lines.</p><p>For the exact bytes of a file, cite its <a href="https://www.swhid.org/" target="_blank" rel="noopener">SWHID</a> (<a href="https://www.softwareheritage.org/software-hash-identifier-swhid/" target="_blank" rel="noopener">Software Heritage</a>, <a href="https://www.iso.org/standard/89985.html" target="_blank" rel="noopener">ISO/IEC 18670:2025</a>) alongside.</p>',
+      form: 'Form: [REF: SW<version><witness>, <tape>.<lines>], e.g. [REF: SW3.1T, 2.141–146]. Ports: [REF: SWP-<machine>-<program><version or year>].',
+      versions: { title: 'Source code versions', hint: 'The version’s date is the program’s; the text we hold may be later: a transcription, a reassembly, a reconstruction. Each version’s name opens its text on GitHub (a text in several files has a link for each further part); SWHIDs copy on a click (hover for the file), for the version’s own texts, not the macro tape and star table supplied to many builds.' },
+      ports: { title: 'Ports', head: ['Reference', 'Program', 'Machine', 'Where and by whom', 'Date'], fold: true,
+               hint: 'Named whether or not a text is held, so that a port can be cited as a program. A port takes a witness letter only when it survives in more than one text, or when the text held is not its own (SWP-CDC3100-SPACEWAR66R, a reconstruction). BBN’s copy of the PDP-1 program is a copy, not a port: found, it would be a witness of a PDP-1 version.' }
     }
   };
 })(typeof window !== 'undefined' ? window : globalThis);

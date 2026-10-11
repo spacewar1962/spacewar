@@ -329,34 +329,6 @@
     d.addEventListener('close', function () { d.remove(); });
     d.showModal();
   };
-  // ---------- Help ▸ What you should read ----------
-  // A short bibliography, every entry checked against the project's Zotero library.
-  SW.readingHelp = function () {
-    function a(url, t) { return '<a href="' + url + '" target="_blank" rel="noopener noreferrer">' + (t || url) + '</a>'; }
-    var groups = [
-      ['Repairing old code', [
-        'Berry, D. M. (2025) ‘Digital Ruins and Critical Code Studies: Towards an Ethics of Historical Software Reconstruction’, <i>Stunlaw: Philosophy and Critique for a Digital Age</i>. Available at: ' + a('https://stunlaw.blogspot.com/2025/01/digital-ruins-and-critical-code-studies.html') + '. <span class="rh-note">The approach behind the bench’s repair marks (gold, in Read) and its reconstruction cards.</span>']],
-      ['Critical code studies', [
-        'Marino, M. C. (2020) <i>Critical Code Studies</i>. Cambridge, MA: The MIT Press.',
-        'Berry, D. M. and Marino, M. C. (2024) ‘Reading ELIZA: Critical Code Studies in Action’, <i>Electronic Book Review</i>. Available at: ' + a('https://electronicbookreview.com/essay/reading-eliza-critical-code-studies-in-action/') + '.',
-        'Marino, M. C., Weil, P., Shrager, J., Schwarz, A., Hay, A., Ciston, S., Berry, D. M. and Millican, P. (2026) ‘Conversations about conversational code: on the collaborative critical code studies reading of ELIZA’, <i>AI &amp; Society</i>. ' + a('https://doi.org/10.1007/s00146-026-03086-7', 'https://doi.org/10.1007/s00146-026-03086-7') + '.',
-        'Montfort, N., Baudoin, P., Bell, J., Bogost, I., Douglass, J., Marino, M. C., Mateas, M., Reas, C., Sample, M. and Vawter, N. (2014) <i>10 PRINT CHR$(205.5+RND(1)); : GOTO 10</i>. Cambridge, MA: MIT Press.']],
-      ['Spacewar!', [
-        'Graetz, J. M. (1981) ‘The Origin of Spacewar’. Available at: ' + a('https://www.masswerk.at/spacewar/SpacewarOrigin.html') + '.',
-        'Monnens, D. and Goldberg, M. (2015) ‘Space Odyssey: The Long Journey of Spacewar! from MIT to Computer Labs Around the World’, <i>Kinephanos</i>. Available at: ' + a('https://www.kinephanos.ca/2015/space-odyssey-the-long-journey-of-spacewar-from-mit-to-computer-labs-around-the-world/') + '.',
-        'Landsteiner, N. (n.d.) <i>Spacewar! – video games 60s style</i>. Available at: ' + a('https://www.masswerk.at/spacewar/') + '.']]
-    ];
-    var d = SW.el('dialog', { class: 'tray-big annohelp readhelp' });
-    d.innerHTML = '<div class="tray-bighead"><b>What you should read</b><button class="icon-btn" data-x title="Close (Esc)">✕</button></div><div class="ah">' +
-      '<p>Where to begin: on repairing old code, on reading code as a cultural text, and on Spacewar! itself. Links open in a new tab.</p>' +
-      groups.map(function (g) { return '<h3>' + g[0] + '</h3><div class="rh-list">' + g[1].map(function (r) { return '<p class="rh-ref">' + r + '</p>'; }).join('') + '</div>'; }).join('') +
-      '</div>';
-    document.body.appendChild(d);
-    d.showModal();
-    d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); } });
-    d.addEventListener('close', function () { d.remove(); });
-  };
-
   // ---------- Reconstruction cards (as on the SHRDLU bench) ----------
   // A card per version the bench builds: every repair made to read and run it,
   // with its line, kind, evidence and author. Gold in Read; the held files are
@@ -370,7 +342,6 @@
     norm: ['rp-m-mount', 'For assembly', 'How the assembler reads the text, not the reading itself'],
     unc: ['rp-m-unc', 'Uncertain', 'A reading marked uncertain in the transcription, left as found']
   };
-  function kchip(k) { var c = KCHIP[k]; return '<span class="rp-chip ' + c[0] + '" title="' + SW.esc(c[2]) + '">' + c[1] + '</span>'; }
   // the card as data: one row per repair, [where, kind, what, evidence, by]
   function cardRows(b) {
     var V = root.SWVersions, v = b.v, rows = [], n = b.parts.length;
@@ -392,152 +363,20 @@
     unc.forEach(function (u) { rows.push([SW.refOf(v.id, u[0], u[1].n, u[1].n, n), 'unc', u[1].raw.trim(), 'the transcription', '']); });
     return rows;
   }
-  SW.reconstructionCard = function (b) {
-    var v = b.v, esc = SW.esc, rows = cardRows(b);
-    return '<div class="kin-card"><h3>Reconstruction card: ' + esc(v.label) + ' <span class="swref-sm mono">' + esc(SW.refText(v.id)) + '</span></h3>' +
-      (SW.MADE[v.id] ? '<p class="hint">This text: ' + esc(SW.MADE[v.id].replace(/read by the bench/, 'read by the project')) + '.</p>' : '') +
-      (rows.length ? '<table class="ov-sub kin-t"><thead><tr><th>Where</th><th>Kind</th><th>What</th><th>Evidence</th><th>By</th></tr></thead><tbody>' +
-        rows.map(function (r) { return '<tr><td class="mono">' + esc(r[0]) + '</td><td>' + kchip(r[1]) + '</td><td' + (r[1] === 'norm' || r[1] === 'rec' || r[1] === 'sup' ? '' : ' class="mono"') + '>' + esc(r[2]) + '</td><td class="faint">' + esc(r[3]) + '</td><td class="faint">' + esc(r[4]) + '</td></tr>'; }).join('') +
-        '</tbody></table>' : '<p>No repairs: the text is read and assembled as held.</p>') + '</div>';
-  };
-  // for Copy, export and My notes
-  SW.cardText = function (b) {
-    var rows = cardRows(b);
-    return 'Reconstruction card: ' + b.v.label + ' ' + SW.refText(b.v.id) + ' (Spacewar! Research Bench ' + SW.VERSION + ')\n' +
-      (SW.MADE[b.v.id] ? 'This text: ' + SW.MADE[b.v.id] + '.\n' : '') +
-      (rows.length ? rows.map(function (r) { return r[0] + '  ' + KCHIP[r[1]][1] + ': ' + r[2] + (r[3] ? '. Evidence: ' + r[3] : '') + (r[4] ? '. By ' + r[4] : '') + '.'; }).join('\n') : 'No repairs.');
-  };
-  function cardBlocks(b) {
-    var rows = cardRows(b);
-    return [{ type: 'h2', text: 'Reconstruction card: ' + b.v.label + ' ' + SW.refText(b.v.id) }]
-      .concat(SW.MADE[b.v.id] ? [{ type: 'p', text: 'This text: ' + SW.MADE[b.v.id] + '.' }] : [])
-      .concat(rows.length ? [{ type: 'table', head: ['Where', 'Kind', 'What', 'Evidence', 'By'], rows: rows.map(function (r) { return [r[0], KCHIP[r[1]][1], r[2], r[3], r[4]]; }) }] : [{ type: 'p', text: 'No repairs.' }]);
-  }
-  SW.cardDoc = function (bs) {
-    return { title: bs.length === 1 ? 'Reconstruction card: ' + bs[0].v.label : 'Spacewar! reconstruction cards',
-      subtitle: 'What was done to each surviving text to read and run it',
-      meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION], ['Bench', SW.BASE_URI]],
-      blocks: [{ type: 'p', text: 'After the principles for repairing digital ruins (Berry 2025): minimum intervention, reversible, recorded, and marked in gold in Read. The held files are never altered.' }]
-        .concat([].concat.apply([], bs.map(cardBlocks))) };
-  };
-  // One card at a time, chosen from a list of the versions the bench builds
-  function cardDialog(id) {
-    var V = root.SWVersions, vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; });
-    var cur = V.byId(id) && V.byId(id).build ? id : vs[0].id, esc = SW.esc;
-    var d = SW.el('dialog', { class: 'tray-big annohelp cardshelp' });
-    d.innerHTML = '<div class="tray-bighead"><b>Reconstruction cards</b><span class="refhelp-acts">' +
-      '<button class="btn ghost" data-cx="copy" title="This card as plain text, with its references">⧉ Copy</button>' +
-      '<details class="menu more-menu"><summary class="btn ghost" title="This card, or every card, as a file">⤓ Export ▾</summary><div class="menu-body">' +
-      '<button class="btn ghost" data-cx="docx">⤓ This card, Word</button><button class="btn ghost" data-cx="md">⤓ This card, Markdown</button>' +
-      '<button class="btn ghost" data-cx="docx-all">⤓ All cards, Word</button><button class="btn ghost" data-cx="md-all">⤓ All cards, Markdown</button></div></details>' +
-      '<button class="btn ghost" data-cx="keep" title="Put this card in My notes (private), to gather with others for a chapter">＋ My notes</button>' +
-      '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div><div class="ah">' +
-      '<p>What was done to each surviving text to read and run it, after the principles for repairing digital ruins (Berry 2025): minimum intervention, reversible, recorded, and marked in gold in Read. The held files are never altered.</p>' +
-      '<div class="keylist kin-key">' + ['fix', 'rebuilt', 'sup', 'norm', 'unc'].map(function (k) { return '<div>' + kchip(k) + ' ' + KCHIP[k][2].charAt(0).toLowerCase() + KCHIP[k][2].slice(1) + '</div>'; }).join('') + '</div>' +
-      '<div class="kin-pick"><button class="btn ghost" data-cx="prev" title="The previous version">‹</button><select aria-label="Version">' +
-      vs.map(function (v) { return '<option value="' + esc(v.id) + '"' + (v.id === cur ? ' selected' : '') + '>' + esc(SW.refOf(v.id) + '  ' + v.label) + '</option>'; }).join('') +
-      '</select><button class="btn ghost" data-cx="next" title="The next version">›</button></div><div class="kin-one"></div></div>';
-    document.body.appendChild(d);
-    var sel = d.querySelector('select'), box = d.querySelector('.kin-one');
-    function show(vid) {
-      cur = vid; sel.value = vid;
-      box.innerHTML = '<div class="kin-card"><h3>Reconstruction card: ' + esc(V.byId(vid).label) + '</h3><p class="faint">…</p></div>';
-      SW.build(vid).then(function (b) { if (cur === vid) box.innerHTML = SW.reconstructionCard(b); }, function () {});
-    }
-    function all() { return vs.reduce(function (p, v) { return p.then(function (acc) { return SW.build(v.id).then(function (b) { return acc.concat([b]); }, function () { return acc; }); }); }, Promise.resolve([])); }
-    sel.addEventListener('change', function () { show(sel.value); });
-    d.addEventListener('click', function (e) {
-      var c = e.target.closest('[data-cx]');
-      if (c) {
-        var k = c.dataset.cx, m = c.closest('details'); if (m) m.open = false;
-        var i = vs.findIndex(function (v) { return v.id === cur; });
-        if (k === 'prev' || k === 'next') { show(vs[(i + (k === 'next' ? 1 : -1) + vs.length) % vs.length].id); return; }
-        if (/-all$/.test(k)) { SW.toast('Assembling every version…'); all().then(function (bs) { SW.exportDoc(SW.cardDoc(bs), 'spacewar-reconstruction-cards', k.replace('-all', '')); }); return; }
-        SW.build(cur).then(function (b) {
-          if (k === 'copy') SW.copyText(SW.cardText(b), 'the reconstruction card');
-          else if (k === 'keep') { if (SW.tray) SW.tray.addDoc(SW.cardDoc([b]), { vid: b.v.id, tags: ['repair', 'reconstruction card'] }); }
-          else SW.exportDoc(SW.cardDoc([b]), 'reconstruction-card-' + SW.refOf(b.v.id), k);
-        });
-        return;
-      }
-      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); }
-    });
-    d.addEventListener('close', function () { d.remove(); });
-    d.showModal();
-    show(cur);
-  }
-  SW.cardsOne = function (id) { cardDialog(id); };
-  // Help ▸ Reconstruction cards: opens on the version in view
-  SW.cardsHelp = function () { cardDialog(SW.state && SW.state.v); };
-
-  // Help ▸ Referencing and versions: the convention, and every source's reference
-  SW.refHelp = function () {
-    var V = root.SWVersions, vs = V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; });
-    var d = SW.el('dialog', { class: 'tray-big refhelp' });
-    d.innerHTML = '<div class="tray-bighead"><b>Referencing and versions</b><span class="refhelp-acts">' +
-      '<button class="btn ghost" data-rx="copy" title="The references of every version and port, as plain text to paste into an email">⧉ Copy the list</button>' +
-      '<details class="menu more-menu"><summary class="btn ghost" title="The convention and every reference, with SWHIDs, as a file to share">⤓ Export ▾</summary><div class="menu-body">' +
-      '<button class="btn ghost" data-rx="docx">⤓ Word</button><button class="btn ghost" data-rx="md">⤓ Markdown</button></div></details>' +
-      '<button class="icon-btn" data-x title="Close (Esc)">✕</button></span></div>' +
-      '<p>The bench names each source text in one form, shown in small type beside its name across the bench, in citations and in exports:</p>' +
-      '<p class="refhelp-ex mono">[REF: SW3.1T, 2.141–146]</p>' +
-      '<p>SW, then the version (<b>3.1</b>), then a letter for the witness, the particular surviving text of that version (<b>T</b>); then the tape (<b>2</b>, as the assembler read them in) and the lines (<b>141–146</b>).</p>' +
-      '<table class="ov-sub"><thead><tr><th>Letter</th><th>The witness</th></tr></thead><tbody>' +
-      [['T', 'machine-read from the punched source tape'], ['L', 'a transcription: typed text of a listing or a tape'], ['M', 'a modern reassembly or edited source'], ['R', 'a reconstruction'], ['B', 'an object tape (binary), cited by address only']].map(function (r) { return '<tr><td class="mono">' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('') + '</tbody></table>' +
-      '<p>Shorter forms: the version and witness alone, <span class="mono">[REF: SW3.1T]</span>; a whole tape, <span class="mono">[REF: SW3.1T, 2]</span>. The tape is left out when a text has only one: <span class="mono">[REF: SW4.3M, 141]</span>. By core address, <span class="mono">[REF: SW3.1L, @0402–0407]</span>: an address holds across texts of a version that assemble to the same words, and is the only way to cite an object tape. Two texts of one version with the same letter take a lower-case qualifier: <span class="mono">SW4.4Mf</span>. A newly found text takes its version and the next letter or qualifier; a new version, its own number.</p>' +
-      '<p>A port, a program for another machine, is not a text of any PDP-1 version and has a namespace of its own: <b>SWP</b>, the machine, the program, and its own version number, or its year when it has none: <span class="mono">[REF: SWP-PDP6-WAR44, 76]</span>. Several files of one program are its parts: <span class="mono">[REF: SWP-PDP10-SW71, 2.14]</span> is line 14 of SHIPS.SAI. A port has no witness letter unless it survives in more than one text.</p>' +
-      '<p>A SWHID opens through Software Heritage’s resolver, <span class="mono">archive.softwareheritage.org/swh:1:cnt:…</span>, once the repository is archived there; the part after the first semicolon (origin, path, lines) qualifies it and is not a web address. For a link that works meanwhile, Copy citation also gives the file on GitHub at its last change, to the lines.</p>' +
-      '<p>For the exact bytes of a file, cite its <a href="https://www.swhid.org/" target="_blank" rel="noopener">SWHID</a> (<a href="https://www.softwareheritage.org/software-hash-identifier-swhid/" target="_blank" rel="noopener">Software Heritage</a>, <a href="https://www.iso.org/standard/89985.html" target="_blank" rel="noopener">ISO/IEC 18670:2025</a>) alongside.</p>' +
-      '<h4>Source code versions</h4><p class="hint">The version’s date is the program’s; the text we hold may be later: a transcription, a reassembly, a reconstruction. Each version’s name opens its text on GitHub (a text in several files has a link for each further part); SWHIDs copy on a click (hover for the file), for the version’s own texts, not the macro tape and star table supplied to many builds.</p><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Version</th><th>Author</th><th>Version dated</th><th>This text</th><th>SWHID</th></tr></thead><tbody>' +
-      vs.map(function (v, n) { var own = SW.ownFilesOf(v); return '<tr><td class="num">' + (n + 1) + '</td><td class="mono"><span class="swref-c" data-copy="' + SW.esc(SW.refText(v.id)) + '" title="Click to copy">' + SW.esc(SW.refOf(v.id)) + '</span></td><td>' + own.map(function (f, k) { var nm = f.split('/').pop(); return '<a href="' + SW.esc(SW.permalinkOf(f)) + '" target="_blank" rel="noopener" title="' + SW.esc(nm) + ' on GitHub, at its last change"' + (k ? ' class="ref-more"' : '') + '>' + (k ? 'part ' + (k + 1) : SW.esc(v.label)) + ' ↗</a>'; }).join(' ') +
-        '</td><td>' + SW.esc(v.authors || '') + '</td><td>' + SW.esc(v.date || '') + '</td><td>' + SW.esc(SW.MADE[v.id] || (v.medium || '')) + '</td><td>' + SW.swhidTiny(own) + '</td></tr>'; }).join('') + '</tbody></table>' +
-      '<details class="refhelp-ports"><summary><h4>Ports <span class="faint">' + SW.PORTS.length + '</span></h4></summary><table class="ov-sub refhelp-t"><thead><tr><th>No.</th><th>Reference</th><th>Program</th><th>Machine</th><th>Where and by whom</th><th>Date</th><th>SWHID</th></tr></thead><tbody>' +
-      SW.PORTS.map(function (r, n) { return '<tr><td class="num">' + (n + 1) + '</td><td class="mono"><span class="swref-c" data-copy="[REF: ' + SW.esc(r[0]) + ']" title="Click to copy">' + SW.esc(r[0]) + '</span></td><td>' + (r[5] ? r[5].split(/,\s*/).map(function (f, k) { return '<a href="' + SW.esc(SW.permalinkOf(f)) + '" target="_blank" rel="noopener" title="' + SW.esc(f.split('/').pop()) + ' on GitHub, at its last change"' + (k ? ' class="ref-more"' : '') + '>' + (k ? 'part ' + (k + 1) : SW.esc(r[1])) + ' ↗</a>'; }).join(' ')
-          : SW.esc(r[1]) + (r[6] ? ' <a class="ref-more" href="../' + SW.esc(r[6][1]) + '" target="_blank" rel="noopener" title="No source held; the catalogue entry">' + SW.esc(r[6][0]) + ' ↗</a>' : ' <span class="faint ref-more">none held</span>')) +
-        '</td><td>' + SW.esc(r[2]) + '</td><td>' + SW.esc(r[3]) + '</td><td>' + SW.esc(r[4]) + '</td><td>' + (r[5] ? SW.swhidTiny(r[5].split(/,\s*/)) : '') + '</td></tr>'; }).join('') + '</tbody></table>' +
-      '<p class="hint">Named whether or not a text is held, so that a port can be cited as a program. A port takes a witness letter only when it survives in more than one text, or when the text held is not its own (SWP-CDC3100-SPACEWAR66R, a reconstruction). BBN’s copy of the PDP-1 program is a copy, not a port: found, it would be a witness of a PDP-1 version.</p></details>';
-    document.body.appendChild(d);
-    d.addEventListener('click', function (e) {
-      if (e.target === d || e.target.closest('[data-x]')) { d.close(); d.remove(); return; }
-      var rx = e.target.closest('[data-rx]'); if (!rx) return;
-      var dm = rx.closest('details'); if (dm) dm.open = false;
-      if (rx.dataset.rx === 'copy') SW.copyText(SW.refList.text(), 'the list of references');
-      else SW.exportDoc(SW.refList.doc(), 'spacewar-source-references', rx.dataset.rx);
-    });
-    d.addEventListener('close', function () { d.remove(); });
-    d.showModal();
-  };
-  // Every version's and port's reference, for sharing: plain text to paste, or
-  // a document (Word, Markdown) that adds the SWHIDs.
-  SW.refList = {
-    versions: function () { var V = root.SWVersions; return V.VERSIONS.filter(function (v) { return v.build; }).sort(function (a, b) { return a.sort - b.sort; }); },
-    head: function () { return 'Spacewar! source references (Spacewar! Research Bench ' + SW.VERSION + ', ' + SW.fmtDate(SW.today()) + ')'; },
-    text: function () {
-      var L = [SW.refList.head(), '',
-        'Form: [REF: SW<version><witness>, <tape>.<lines>], e.g. [REF: SW3.1T, 2.141–146]. Ports: [REF: SWP-<machine>-<program><version or year>].',
-        'Witness letters: T punched source tape; L transcription; M modern reassembly or edited source; R reconstruction; B object tape (cited by address).', '',
-        'Source code versions'];
-      SW.refList.versions().forEach(function (v, n) { L.push((n + 1) + '. ' + SW.refOf(v.id) + '  ' + v.label + ' (' + (v.date || '') + ')' + (SW.MADE[v.id] ? '; this text: ' + SW.MADE[v.id] : '')); });
-      L.push('', 'Ports');
-      SW.PORTS.forEach(function (r, n) { L.push((n + 1) + '. ' + r[0] + '  ' + r[1] + ', ' + r[2] + '; ' + r[3] + ', ' + r[4]); });
-      L.push('', 'Full table with SWHIDs: ' + SW.BASE_URI + ' (Help ▸ Referencing and versions)');
-      return L.join('\n');
+  // for the kit's cards (kit/helppages.js): each repair as a row, from the version as built
+  SW.BENCH.cards = {
+    about: 'What was done to each surviving text to read and run it, after the principles for repairing digital ruins (Berry 2025): minimum intervention, reversible, recorded, and marked in gold in Read. The held files are never altered.',
+    subtitle: 'What was done to each surviving text to read and run it',
+    menu: 'What was done to each text to read and run it; repairs in gold in Read',
+    kinds: KCHIP,
+    legend: ['fix', 'rebuilt', 'sup', 'norm', 'unc'],
+    rows: function (v) {
+      return SW.build(v.id).then(function (b) {
+        return cardRows(b).map(function (r) { return { where: r[0], kind: r[1], what: r[2], evidence: r[3], by: r[4], mono: ['norm', 'rec', 'sup'].indexOf(r[1]) < 0 }; });
+      });
     },
-    doc: function () {
-      function ids(files) { return (files || []).map(function (f) { var h = SW.swhidOf(f); return f + (h ? ': ' + h : ''); }).join('; '); }
-      return { title: 'Spacewar! source references', subtitle: 'The referencing convention of the Spacewar! Research Bench',
-        meta: [['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION], ['Bench', SW.BASE_URI]],
-        blocks: [
-          { type: 'p', text: 'Form: [REF: SW<version><witness>, <tape>.<lines>], e.g. [REF: SW3.1T, 2.141–146]: SW, the version, a letter for the witness (the surviving text), then the tape and the lines. Shorter forms: [REF: SW3.1T] (version and witness), [REF: SW3.1T, 2] (a whole tape); the tape is left out when a text has only one. By core address: [REF: SW3.1L, @0402–0407]. Ports: [REF: SWP-<machine>-<program><version or year>].' },
-          { type: 'table', caption: 'Witness letters', head: ['Letter', 'The witness'], rows: [['T', 'machine-read from the punched source tape'], ['L', 'a transcription: typed text of a listing or a tape'], ['M', 'a modern reassembly or edited source'], ['R', 'a reconstruction'], ['B', 'an object tape (binary), cited by address only']] },
-          { type: 'h2', text: 'Source code versions' },
-          { type: 'table', head: ['No.', 'Reference', 'Version', 'Version dated', 'This text', 'SWHID of each file'],
-            rows: SW.refList.versions().map(function (v, n) { return [String(n + 1), SW.refOf(v.id), v.label, v.date || '', SW.MADE[v.id] || v.medium || '', ids(SW.filesOf(v))]; }) },
-          { type: 'h2', text: 'Ports' },
-          { type: 'table', head: ['No.', 'Reference', 'Program', 'Machine', 'Where and by whom', 'Date', 'SWHID of each file'],
-            rows: SW.PORTS.map(function (r, n) { return [String(n + 1), r[0], r[1], r[2], r[3], r[4], r[5] ? ids(r[5].split(/,\s*/)) : r[6] ? 'no source; catalogue entry only: ' + r[6][0] : 'none held']; }) }
-        ] };
-    }
+    note: function (v) { return SW.MADE[v.id] ? 'This text: ' + SW.MADE[v.id].replace(/read by the bench/, 'read by the project') + '.' : ''; },
+    empty: 'No repairs: the text is read and assembled as held.'
   };
 
   // Instruction glosses (the project's PDP-1 instruction reference).
