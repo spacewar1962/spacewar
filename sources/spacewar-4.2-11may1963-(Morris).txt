@@ -902,7 +902,7 @@ tc1,	lac i mx1
 	sar 3s
 	add i mx1
 	dac i mx1
-	dispt 1, i my1, 1
+	dispt i, i my1, 1	/ scan p. 21 reads dispt i (transcribed as dispt 1 until 12 Oct 2026)
 	jmp mb1
 / hyperspace routines
 / this routine handles a non-colliding ship invisibly
