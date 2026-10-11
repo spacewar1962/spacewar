@@ -27,6 +27,11 @@
       tryText: 'The **sun** is placed from `nx1` and `ny1`', code: '`lac nx1`',
       caption: 'A link from an annotation on 4.1 to one on 3.1. The 3.1 annotation lists it under Linked from'
     },
+    lang: 'macro',   // the language of the texts, for Compare and Genealogy (kit/lang-macro.js)
+    compare: { comment: '/', normalised: true, reading: 'Assembling',
+               supplied: ['supplied tapes', 'Include the tapes supplied to make a version assemble (the macro definitions and the star table), not only the version’s own program text'] },
+    comparePrefix: 'Spacewar! ',
+    genealogy: { set: ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'], line: 'dfw', lineNames: { ddp: 'ddp line', dfw: 'dfw line', chm: 'CHM line' } },
     figureNum: { print: '#9a5b00', paper: '#9a5b00', phosphor: '#ffce7a' },
     paratexts: { org: 'spacewar1962', repo: 'sw_paratexts', cache: 'sw-paratexts', tokenName: 'Spacewar research bench' },
     examples: { date: 'e.g. 1963-05-17, or 1963', archive: 'e.g. Computer History Museum', versions: 'e.g. 4.3, 4.4',
