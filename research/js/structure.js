@@ -25,8 +25,8 @@
     var op = md >> 13, ib = (md >> 12) & 1, y = md & 0o7777, nx = (a + 1) & 0o7777, sk = (a + 2) & 0o7777;
     switch (op) {
       case 0o30: return ib ? { to: [], open: true } : { to: [[y, 'jump']] };                  // jmp
-      case 0o31: return ib ? { to: [[nx, 'return']], open: true } : { to: [[y, 'call'], [nx, 'return']] };   // jsp, and back
-      case 0o07: var t = ((ib ? y : 0o100) + 1) & 0o7777; return { to: [[t, 'call'], [nx, 'return']] };    // jda, cal
+      case 0o31: return ib ? { to: [[nx, 'return'], [sk, 'return']], open: true } : { to: [[y, 'call'], [nx, 'return'], [sk, 'return']] };   // jsp, and back (or back a word on: a skip return, as col's)
+      case 0o07: var t = ((ib ? y : 0o100) + 1) & 0o7777; return { to: [[t, 'call'], [nx, 'return'], [sk, 'return']] };    // jda, cal
       case 0o23: case 0o24: case 0o25: case 0o27: case 0o32: return { to: [[nx, 'next'], [sk, 'skip']] }; // isp, sad, sas, div, skips
       case 0o04: return { to: [[nx, 'next']], open: true };                                    // xct: what it runs may branch
       default: return null;                                                                     // on to the next word
@@ -34,7 +34,7 @@
   }
   // a line's code, for matching: as the assembler reads it, without label, comment
   // or spacing, and with the transcriptions' marks for a variable (\x, ~x, .x) dropped
-  function codeKey(L) { return SW.lineKey(L.norm || L.raw).replace(/^[^\s,]+,\s*/, '').replace(/[\\~]/g, ''); }
+  function codeKey(L) { return SW.lineKey(L.norm || L.raw).replace(/^[^\s,]+,\s*/, '').replace(/[\\~]/g, '').replace(/(^|[\s,(+-])\.(?=[a-z])/gi, '$1'); }
   // the operation a word assembles to, without its address (which moves between versions)
   function opOf(md) { var o = (root.PDP1CPU.disasm(md, null) || '').split(/\s/)[0]; return /^-?[0-7]+$/.test(o) ? 'data' : o; }   // a word with no operation is a number
 
