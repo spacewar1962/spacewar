@@ -10,6 +10,12 @@
     group: '',
     relation: 'Spacewar! ',
     topShare: true,
+    settings: {
+      tour: 'Twelve stops through reading, running, comparing and annotating; about three minutes.',
+      groupHint: 'Annotations are shared through a private Hypothesis group. Paste the group’s link (hypothes.is/groups/<b>ID</b>/…) or just its ID, and a personal API token (hypothes.is/account/developer). Without them, annotations are kept as drafts in this browser and can be exported or published later.',
+      groupPlaceholder: 'https://hypothes.is/groups/Ab12Cd34/name',
+      themeHint: 'The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.'
+    },
     figureNum: { print: '#9a5b00', paper: '#9a5b00', phosphor: '#ffce7a' },
     paratexts: { org: 'spacewar1962', repo: 'sw_paratexts', cache: 'sw-paratexts', tokenName: 'Spacewar research bench' },
     examples: { date: 'e.g. 1963-05-17, or 1963', archive: 'e.g. Computer History Museum', versions: 'e.g. 4.3, 4.4',

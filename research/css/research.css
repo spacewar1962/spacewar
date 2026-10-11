@@ -1895,9 +1895,6 @@ a.swcode { font-size: .92em; }
 .gz-tro:hover { border-color: var(--text-dim); }
 .gz-tro .faint { display: block; font-size: 11.5px; }
 .gz-trsub { margin: 6px 0 2px; }
-dialog.ini-dlg { width: min(92vw, 380px); }
-dialog.ini-dlg .ini-in { text-transform: uppercase; letter-spacing: .08em; }
-dialog.ini-dlg .ini-in::placeholder { text-transform: none; letter-spacing: 0; }
 /* paratexts: audio, video and linked items */
 
 /* zoom in a single item's box */

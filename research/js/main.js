@@ -90,87 +90,6 @@
   }
   SW.select = select;
 
-  function settings() {
-    var dlg = SW.$('#dlg-settings');
-    SW.$('#set-initials').value = SW.store.get('initials', '');
-    SW.$('#set-name').value = SW.store.get('name', '');
-    var grp = SW.$('#set-group'), tok = SW.$('#set-token'), show = SW.$('#set-token-show');
-    grp.value = SW.notes.groupId(SW.store.get('group', ''));
-    tok.value = SW.store.get('token', '');
-    tok.type = 'password'; show.textContent = 'Show'; show.setAttribute('aria-pressed', 'false');
-    var gtok = SW.$('#set-ghtoken'), gshow = SW.$('#set-ghtoken-show');
-    gtok.value = SW.store.get('gh.token', ''); gtok.type = 'password'; gshow.textContent = 'Show'; gshow.setAttribute('aria-pressed', 'false');
-    gshow.onclick = function () { var hid = gtok.type === 'password'; gtok.type = hid ? 'text' : 'password'; gshow.textContent = hid ? 'Hide' : 'Show'; gshow.setAttribute('aria-pressed', String(hid)); };
-    SW.$('#set-check').textContent = '';
-    dlg.returnValue = '';
-    dlg.showModal();
-    // A pasted group link is reduced to its ID, so what is stored is visible.
-    grp.onchange = function () { grp.value = SW.notes.groupId(grp.value); };
-    show.onclick = function () {
-      var hidden = tok.type === 'password';
-      tok.type = hidden ? 'text' : 'password';
-      show.textContent = hidden ? 'Hide' : 'Show';
-      show.setAttribute('aria-pressed', String(hidden));
-    };
-    SW.$('#set-join').onclick = function () { SW.notes.joinHelp(); };
-    SW.$('#set-test').onclick = function () {
-      SW.store.set('group', SW.notes.groupId(grp.value));
-      SW.store.set('token', tok.value.trim());
-      SW.$('#set-check').textContent = 'Checking…';
-      SW.notes.test().then(function (r) {
-        SW.$('#set-check').textContent = 'Connected as ' + r.user + (r.group ? '; group “' + r.group + '” found.' : '; but that group was not found for this account.');
-      }, function (e) { SW.$('#set-check').textContent = e.message; });
-    };
-    // Colour theme: previewed live, put back on Cancel.
-    var themeSel = SW.$('#set-theme'), wasTheme = SW.theme();
-    themeSel.innerHTML = ['Dark', 'Light'].map(function (g) {
-      return '<optgroup label="' + g + '">' + SW.THEMES.filter(function (t) { return t.dark === (g === 'Dark'); }).map(function (t) {
-        return '<option value="' + t.id + '"' + (t.id === wasTheme ? ' selected' : '') + ' title="' + SW.esc(t.note) + '">' + SW.esc(t.label) + '</option>';
-      }).join('') + '</optgroup>';
-    }).join('');
-    function swatches() {
-      var t = SW.themeInfo(themeSel.value), sw = SW.$('#set-theme-sw');
-      sw.innerHTML = '<span class="hint">' + SW.esc(t.note) + '</span>' + ['--bg', '--surface', '--text', '--beam', '--amber', '--green', '--violet', '--red', '--g-retained', '--g-edited'].map(function (n) {
-        return '<i style="background:' + SW.cssVar(n) + '" title="' + n.slice(2) + '"></i>';
-      }).join('');
-    }
-    themeSel.onchange = function () { theme(themeSel.value); swatches(); };
-    swatches();
-    SW.$('#set-figbg').value = SW.figBg();
-    SW.$('#set-noteshade').checked = SW.store.get('noteShade', true);
-    SW.$('#set-chmbright').checked = SW.store.get('chmBright', true);
-    SW.$('#set-dev').checked = SW.dev();
-    SW.$('#set-dev-box').open = SW.dev();   // folded away unless it is on
-    var fontSel = SW.$('#set-font'), size = SW.$('#set-size'), sizeOut = SW.$('#set-size-out');
-    var was = { font: SW.codeFont(), size: SW.codeSize() };
-    fontSel.value = was.font; size.value = was.size; sizeOut.textContent = was.size + ' px';
-    // Preview live; Cancel puts them back.
-    fontSel.onchange = function () { SW.store.set('codeFont', fontSel.value); SW.applyCodeText(); };
-    size.oninput = function () { sizeOut.textContent = size.value + ' px'; SW.store.set('codeSize', +size.value); SW.applyCodeText(); };
-    dlg.onclose = function () {
-      if (dlg.returnValue !== 'save') { SW.store.set('codeFont', was.font); SW.store.set('codeSize', was.size); SW.applyCodeText(); if (SW.theme() !== wasTheme) theme(wasTheme); return; }
-      SW.store.set('figbg', SW.$('#set-figbg').value);
-      SW.store.set('noteShade', SW.$('#set-noteshade').checked);
-      if (SW.store.get('chmBright', true) !== SW.$('#set-chmbright').checked) { SW.store.set('chmBright', SW.$('#set-chmbright').checked); SW.forget('graphics'); if (SW.state.v === '4.1d' || SW.state.v === '4.1f') SW.toast('CHM brightness ' + (SW.$('#set-chmbright').checked ? 'on' : 'off') + ': Run shows it from the next Reset', 4000); }
-      SW.applyNoteShade();
-      if (SW.dev() !== SW.$('#set-dev').checked) {
-        SW.store.set('dev', SW.$('#set-dev').checked); SW.applyDev();
-        if (SW.dev()) SW.toast('Developer mode on', 3000);
-        else SW.notes.myDevCount().then(function (k) {
-          SW.toast('Developer mode off' + (k ? '. ' + k + ' of your annotations ' + (k === 1 ? 'is' : 'are') + ' marked Developer only and now hidden: to share ' + (k === 1 ? 'it' : 'them') + ', turn the mode on, Edit, and untick Developer only.' : ''), k ? 9000 : 3000);
-        });
-      }
-      SW.store.set('initials', SW.$('#set-initials').value.trim().toUpperCase());
-      SW.store.set('name', SW.$('#set-name').value.trim());
-      SW.store.set('group', SW.notes.groupId(grp.value));
-      SW.store.set('token', tok.value.trim());
-      var gwas = SW.store.get('gh.token', ''); SW.store.set('gh.token', gtok.value.trim());
-      if (gwas !== gtok.value.trim() && SW.paratexts) SW.paratexts.reset();
-      SW.notes.forget();
-      SW.notes.invalidate(SW.state.v);
-      SW.toast('Saved');
-    };
-  }
 
   // The About box: author, version and date, what it holds, how to cite it.
   function about() {
@@ -203,6 +122,7 @@
       if (SW.tape) SW.build(SW.state.v).then(function (b) { SW.tape.strip(b); }).catch(function () {});
     }
   }
+  SW.setTheme = theme;   // for the kit's Settings
 
   function init() {
     theme(SW.store.get('theme', 'phosphor'));
@@ -211,7 +131,7 @@
       var b = e.target.closest('button[data-tab]');
       if (b) SW.setTab(b.dataset.tab);
     });
-    SW.$('#btn-settings').onclick = settings;
+    SW.$('#btn-settings').onclick = function () { SW.settings.open(); };
     SW.$('#btn-about').onclick = about;
     SW.$('.brand').addEventListener('click', function (e) { e.preventDefault(); about(); });
     // The side panel opens below the top bar, so the bar's buttons stay in reach.
@@ -280,10 +200,9 @@
       inp.addEventListener('keydown', function (k) { if (k.key === 'Enter' && inp.value.trim()) { SW.unpop(); SW.notes.goCode(inp.value); } });
     };
     // The welcome tour: from a link (?tour=welcome), from Settings or About, or offered on a first visit.
-    SW.$('#set-tour').onclick = function () { SW.$('#dlg-settings').close('cancel'); SW.tours.start('welcome'); };
     SW.$('#about-tour').onclick = function () { SW.$('#dlg-about').close(); SW.tours.start('welcome'); };
     // a Help item named in the link
-    var HELP = { codes: function () { SW.guide('codes'); }, paratexts: function () { SW.guide('paratexts'); }, gizmo: function () { SW.guide('gizmo'); }, refs: function () { SW.refHelp(); }, anno: function () { SW.notes.help(); }, join: function () { SW.notes.joinHelp(); }, reading: function () { SW.readingHelp(); }, cards: function () { SW.cardsHelp(); }, about: about, settings: settings };
+    var HELP = { codes: function () { SW.guide('codes'); }, paratexts: function () { SW.guide('paratexts'); }, gizmo: function () { SW.guide('gizmo'); }, refs: function () { SW.refHelp(); }, anno: function () { SW.notes.help(); }, join: function () { SW.notes.joinHelp(); }, reading: function () { SW.readingHelp(); }, cards: function () { SW.cardsHelp(); }, about: about, settings: function () { SW.settings.open(); } };
     if (HELP[q.help]) setTimeout(HELP[q.help], 700);
     if (q.tour) setTimeout(function () { SW.tours.start(q.tour); }, 900);
     else if (!SW.store.get('tour.seen', false)) setTimeout(SW.tours.offer, 1200);

@@ -28,8 +28,9 @@
        below to the day of the release; the About box shows both. -->
   <meta name="bench-date" content="2026-09-29">
   <link rel="icon" href="img/tape-icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="css/research.css?v=1.18.41">
-  <link rel="stylesheet" href="kit/paratexts.css?v=1.18.41">
+  <link rel="stylesheet" href="css/research.css?v=1.18.42">
+  <link rel="stylesheet" href="kit/paratexts.css?v=1.18.42">
+  <link rel="stylesheet" href="kit/kit.css?v=1.18.42">
 </head>
 <body>
   <header class="bar">
@@ -95,61 +96,6 @@
     <div class="drawer-body" id="drawer-body"></div>
   </aside>
 
-  <dialog id="dlg-settings">
-    <form method="dialog" class="settings">
-      <div class="tour-row"><button type="button" class="btn" id="set-tour">Take the welcome tour</button><span class="hint">Twelve stops through reading, running, comparing and annotating; about three minutes.</span></div>
-      <h2>Your details</h2>
-      <p class="hint">Initials and a date are attached to every annotation, so discussions can be followed. They are kept in this browser.</p>
-      <label>Initials <input id="set-initials" maxlength="6" placeholder="DMB" autocomplete="off"></label>
-      <label>Name <input id="set-name" placeholder="David M. Berry" autocomplete="off"></label>
-      <h2>Shared annotations</h2>
-      <p class="hint">Annotations are shared through a private Hypothesis group. Paste the group's link (hypothes.is/groups/<b>ID</b>/…) or just its ID, and a personal API token (hypothes.is/account/developer). Without them, annotations are kept as drafts in this browser and can be exported or published later.</p>
-      <label>Group link or ID <input id="set-group" placeholder="https://hypothes.is/groups/Ab12Cd34/name" autocomplete="off"></label>
-      <label for="set-token">API token</label>
-      <div class="token-row"><input id="set-token" type="password" placeholder="6879-…" autocomplete="off" spellcheck="false"><button id="set-token-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
-      <p class="hint" id="set-check"></p>
-      <p class="hint"><button type="button" class="btn ghost" id="set-join">New to this? How to join the group</button> An account, the group and your token, step by step.</p>
-      <h2>Paratexts</h2>
-      <p class="hint">The paratexts are kept in a private GitHub repository shared with the crew (spacewar1962/sw_paratexts). Paste a fine-grained token limited to that repository, with Contents read and write (Paratexts, in the menu, says how). It is kept in this browser only.</p>
-      <label for="set-ghtoken">GitHub token</label>
-      <div class="token-row"><input id="set-ghtoken" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false"><button id="set-ghtoken-show" type="button" class="btn ghost" aria-pressed="false">Show</button></div>
-      <h2>Colour theme</h2>
-      <p class="hint">The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.</p>
-      <label>Theme <select id="set-theme"></select></label>
-      <div class="theme-swatches" id="set-theme-sw"></div>
-      <h2>Reading code</h2>
-      <p class="hint">Applies wherever code is shown: listings, comparisons, traces, tables. The A− and A+ buttons in the top bar change the size too.</p>
-      <label>Code font <select id="set-font">
-        <option value="system">System monospace</option>
-        <option value="JetBrains Mono">JetBrains Mono</option>
-        <option value="IBM Plex Mono">IBM Plex Mono</option>
-        <option value="Source Code Pro">Source Code Pro</option>
-        <option value="Fira Code">Fira Code</option>
-        <option value="Courier Prime">Courier Prime (typewriter)</option>
-        <option value="Courier New">Courier New</option>
-      </select></label>
-      <label class="check-row"><span><input type="checkbox" id="set-chmbright"> CHM brightness for the CHM builds</span><span class="hint">Show 4.1 CHM rev. d and 4.1f as the Computer History Museum’s PDP-1 draws them, for which they were made: its intensities 4 to 7 differ from DEC’s (under DEC’s their faintest star group is invisible).</span></label>
-      <label class="check-row"><span><input type="checkbox" id="set-noteshade"> Tint annotated lines</span><span class="hint">A faint ground on every line an annotation covers, in the listings.</span></label>
-      <label>Code size <span class="token-row"><input id="set-size" type="range" min="9" max="24" step="1"><span id="set-size-out" class="mono" style="min-width:3.5em"></span></span></label>
-      <h2>Figures</h2>
-      <p class="hint">The background given to exported figures (PNG and SVG). On a white or paper background figures are drawn in dark ink; on black, in phosphor. Transparent leaves the background empty, for layering in other software.</p>
-      <label>Background for exported figures <select id="set-figbg">
-        <option value="white">White (for print and Word)</option>
-        <option value="paper">Listing paper</option>
-        <option value="black">Black (phosphor)</option>
-        <option value="transparent">Transparent</option>
-        <option value="theme">The current colour theme</option>
-      </select></label>
-      <details class="dev-set" id="set-dev-box"><summary><h2>Developer</h2> <span class="dev-warn">Only use if you are developing this software.</span></summary>
-      <label class="check-row"><span><input type="checkbox" id="set-dev"> Developer mode</span><span class="hint">Shows annotations marked Developer only, and features still being built. This allows you to see Beta software and may affect your ability to use the software.</span></label>
-      </details>
-      <div class="row">
-        <button value="cancel" class="btn ghost">Cancel</button>
-        <button id="set-test" type="button" class="btn ghost">Test connection</button>
-        <button value="save" id="set-save" class="btn">Save</button>
-      </div>
-    </form>
-  </dialog>
 
   <dialog id="dlg-note" data-keep>
     <form method="dialog" class="settings" id="note-form">
@@ -192,41 +138,44 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="js/pdp1asm.js?v=1.18.41"></script>
-  <script src="js/pdp1cpu.js?v=1.18.41"></script>
-  <script src="js/fiodec.js?v=1.18.41"></script>
-  <script src="js/versions.js?v=1.18.41"></script>
-  <script src="kit/export.js?v=1.18.41"></script>
-  <script src="js/genealogy.js?v=1.18.41"></script>
-  <script src="js/core.js?v=1.18.41"></script>
-  <script src="js/config.js?v=1.18.41"></script>
-  <script src="js/swhid.js?v=1.18.41"></script>
-  <script src="js/notes.js?v=1.18.41"></script>
-  <script src="kit/tray.js?v=1.18.41"></script>
-  <script src="kit/figures.js?v=1.18.41"></script>
-  <script src="js/read.js?v=1.18.41"></script>
-  <script src="js/ai.js?v=1.18.41"></script>
-  <script src="js/run.js?v=1.18.41"></script>
-  <script src="js/analyse.js?v=1.18.41"></script>
-  <script src="js/structure.js?v=1.18.41"></script>
-  <script src="kit/paratexts.js?v=1.18.41"></script>
-  <script src="kit/guides.js?v=1.18.41"></script>
-  <script src="js/gizmo-guide.js?v=1.18.41"></script>
-  <script src="js/draws.js?v=1.18.41"></script>
-  <script src="js/gravity.js?v=1.18.41"></script>
-  <script src="js/orbits.js?v=1.18.41"></script>
-  <script src="js/random.js?v=1.18.41"></script>
-  <script src="js/lab.js?v=1.18.41"></script>
-  <script src="js/overview.js?v=1.18.41"></script>
-  <script src="js/compare.js?v=1.18.41"></script>
-  <script src="kit/stemma.js?v=1.18.41"></script>
-  <script src="js/tape.js?v=1.18.41"></script>
-  <script src="js/reader.js?v=1.18.41"></script>
-  <script src="js/about.js?v=1.18.41"></script>
-  <script src="kit/edition.js?v=1.18.41"></script>
-  <script src="js/findings.js?v=1.18.41"></script>
-  <script src="js/tour.js?v=1.18.41"></script>
-  <script src="kit/tours.js?v=1.18.41"></script>
-  <script src="js/main.js?v=1.18.41"></script>
+  <script src="js/pdp1asm.js?v=1.18.42"></script>
+  <script src="js/pdp1cpu.js?v=1.18.42"></script>
+  <script src="js/fiodec.js?v=1.18.42"></script>
+  <script src="js/versions.js?v=1.18.42"></script>
+  <script src="kit/export.js?v=1.18.42"></script>
+  <script src="js/genealogy.js?v=1.18.42"></script>
+  <script src="js/core.js?v=1.18.42"></script>
+  <script src="js/config.js?v=1.18.42"></script>
+  <script src="kit/initials.js?v=1.18.42"></script>
+  <script src="kit/settings.js?v=1.18.42"></script>
+  <script src="js/settings-chm.js?v=1.18.42"></script>
+  <script src="js/swhid.js?v=1.18.42"></script>
+  <script src="js/notes.js?v=1.18.42"></script>
+  <script src="kit/tray.js?v=1.18.42"></script>
+  <script src="kit/figures.js?v=1.18.42"></script>
+  <script src="js/read.js?v=1.18.42"></script>
+  <script src="js/ai.js?v=1.18.42"></script>
+  <script src="js/run.js?v=1.18.42"></script>
+  <script src="js/analyse.js?v=1.18.42"></script>
+  <script src="js/structure.js?v=1.18.42"></script>
+  <script src="kit/paratexts.js?v=1.18.42"></script>
+  <script src="kit/guides.js?v=1.18.42"></script>
+  <script src="js/gizmo-guide.js?v=1.18.42"></script>
+  <script src="js/draws.js?v=1.18.42"></script>
+  <script src="js/gravity.js?v=1.18.42"></script>
+  <script src="js/orbits.js?v=1.18.42"></script>
+  <script src="js/random.js?v=1.18.42"></script>
+  <script src="js/lab.js?v=1.18.42"></script>
+  <script src="js/overview.js?v=1.18.42"></script>
+  <script src="js/compare.js?v=1.18.42"></script>
+  <script src="kit/stemma.js?v=1.18.42"></script>
+  <script src="js/tape.js?v=1.18.42"></script>
+  <script src="js/reader.js?v=1.18.42"></script>
+  <script src="js/about.js?v=1.18.42"></script>
+  <script src="kit/edition.js?v=1.18.42"></script>
+  <script src="js/findings.js?v=1.18.42"></script>
+  <script src="js/tour.js?v=1.18.42"></script>
+  <script src="kit/tours.js?v=1.18.42"></script>
+  <script src="js/main.js?v=1.18.42"></script>
 </body>
 </html>
