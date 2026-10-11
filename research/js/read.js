@@ -1,29 +1,20 @@
 /*
- * read.js - the listing: source as held, with what the assembler made of it.
+ * read.js - Read for Spacewar!: bench-kit's Read view (kit/read.js) with what is this bench's:
+ * PDP-1 MACRO highlighting, the tapes a version is assembled from, the addresses and words each
+ * line became (with their disassembly), normalised text and run heat, breakpoints from the
+ * selection, the Key, the pop-up on a symbol (with the instruction glosses), and the repairs in
+ * gold (kintsugi).
  */
 (function (root) {
   'use strict';
-  var SW = root.SW, N = SW.notes;
-  var view = SW.$('#view-read');
-  var R = SW.views.read = {};
-  var build = null, notes = [], counts = {}, noted = {}, anchorSel = null;
-  // tapes: which of the version's tapes to show: 'all', or a single tape's index.
-  var opts = { words: SW.store.get('read.words', true), norm: false, tapes: 'all', heat: false, onlyNoted: false, by: '', notes: SW.store.get('read.notes', 'inline'), onlyRepaired: false, kinNorm: SW.store.get('read.kinNorm', false), kinBar: SW.store.get('read.kinBar', false), show: SW.store.get('read.show', 'all'), ghosts: SW.store.get('read.ghosts', true), repairs: SW.store.get('read.repairs', true) };
-  // show: whose annotations Read shows: 'all', 'mine' (those you started) or 'none';
-  // cycled from the chevron on the Annotations heading.
-  var SHOW = { all: '▾ All', mine: '▾ Mine', open: '▾ Open', none: '▸ None' }, SHOW_NEXT = { all: 'mine', mine: 'open', open: 'none', none: 'all' };
-  function isMine(n) { var me = SW.me().initials; return N.mine(n) || (!!me && n.by === me); }
-  // notes: 'inline' (each thread under its lines, the default), 'margin' (cards
-  // beside the lines) or 'off' (initials at the line end); chosen from the ▴ Notes button.
-  function marginOn() { return opts.notes === 'margin'; }
-
-  // Annotations in Read (threads, ghosts, the margin, the selection, export): bench-kit's readnotes.js
-  var K = SW.readNotes({ view: view, R: R, opts: opts, isMine: isMine, showsTape: showsTape, filtering: filtering,
-    keptLines: keptLines, tapeInfo: tapeInfo, kinBar: kinBar, selActs: function () { return [['● Breakpoint', bpSel], ['▶ Run to here', runToSel]]; } });
-  var paintNotes = K.paintNotes, paintMargin = K.paintMargin, layoutMargin = K.layoutMargin, wireMargin = K.wireMargin,
-    threadClick = K.threadClick, threadFor = K.threadFor, loadGhosts = K.loadGhosts, MODES = K.MODES, modeOf = K.modeOf,
-    setNotes = K.setNotes, modeBtn = K.modeBtn, live = K.live, paintSel = K.paintSel, annotateSel = K.annotateSel,
-    selLines = K.selLines, copy = K.copy, listingDoc = K.listingDoc, ro = null;
+  var SW = root.SW;
+  var ctx = null, view = null, opts = null, build = null;
+  // the Read view's own, from bench-kit (set once SW.readView has made it)
+  function paintSel() { ctx.paintSel(); }
+  function applyFilter() { ctx.applyFilter(); }
+  function listingDoc(b, sel, o) { return ctx.listingDoc(b, sel, o); }
+  function selLines() { return ctx.selLines(); }
+  function render() { ctx.render(); }
 
   // ---------- the tapes a version is read from ----------
   // A version is assembled from its tapes read one after another as one
@@ -47,11 +38,6 @@
       return { pi: pi, supplied: supplied, star: star, title: tapeTitle(b, pi).trim(), label: label + (supplied ? ' (supplied' + when + ')' : '') };
     });
   }
-  function showsTape(pi) { return opts.tapes === 'all' || +opts.tapes === pi; }
-  function tapeOptions(b, info) {
-    var o = [['all', 'All ' + info.length + ' tapes']].concat(info.map(function (t) { return [String(t.pi), (t.pi + 1) + '. ' + t.label]; }));
-    return o.map(function (x) { return '<option value="' + x[0] + '"' + (x[0] === String(opts.tapes) ? ' selected' : '') + '>' + SW.esc(x[1]) + '</option>'; }).join('');
-  }
   // The hover explanation on the Tape menu: why one version has several files.
   function tapeHelp(info) {
     var progParts = info.filter(function (t) { return !t.supplied && !t.star; }).length;
@@ -67,7 +53,6 @@
                  text: 1, decimal: 1, octal: 1, flexo: 1, 'char': 1, character: 1, noinput: 1, expunge: 1 };
 
   // ---------- highlighting ----------
-  SW.hlLine = function (raw, b) { return hl(raw, b); };   // also used by the Functional overview
   function hl(raw, b) {
     var p = SW.parseLine(raw), h = '';
     if (p.loc) h += '<span class="num">' + SW.esc(p.loc) + '</span>';
@@ -99,133 +84,6 @@
     if (p.comment) h += '<span class="cm">' + SW.esc(p.comment) + '</span>';
     void lead;
     return h;
-  }
-
-  // ---------- rendering ----------
-  function rowHTML(b, L) {
-    var k = L.p + ':' + L.n, cls = 'ln';
-    var words = b.asm && b.asm.byLine[L.p] && b.asm.byLine[L.p][L.n];
-    if (L.skipped) cls += ' skip';
-    if (b.errorsAt[k]) cls += ' err';
-    if (L.raw !== L.norm && !L.skipped) cls += ' norm';
-    if (b.kind && b.kind[k]) cls += ' k' + b.kind[k];
-    if (SW.breakpoints && words && words.some(function (w) { return SW.breakpoints[w.loc]; })) cls += ' bp';
-    var a = '', w = '', wTitle = '';
-    if (words && words.length) {
-      a = SW.oct(words[0].loc, 4);
-      w = SW.oct(words[0].val) + (words.length > 1 ? ' <span class="faint">+' + (words.length - 1) + '</span>' : '');
-      var last = words[words.length - 1].loc;
-      wTitle = words.length === 1 ? '1 word, at ' + a
-        : words.length + ' words, at ' + (last - words[0].loc === words.length - 1 ? a + '–' + SW.oct(last, 4) : words.map(function (x) { return SW.oct(x.loc, 4); }).join(', ')) +
-          (b.kind && b.kind[k] === 'call' ? ' (the macro expanded)' : '');
-      wTitle += words.length === 1 ? '. Click to see it.' : '. Click to see them all.';
-    }
-    var text = opts.norm ? L.norm : L.raw;
-    var mk = N.marginMark(k, counts[k]);
-    if (noted[k]) cls += ' noted';
-    var heat = '';
-    if (opts.heat && SW.profile && SW.profile.build === b && words) {
-      var ex = 0;
-      words.forEach(function (x) { ex += SW.profile.exec[x.loc] || 0; });
-      if (ex) heat = 'background:color-mix(in srgb, var(--amber) ' + (100 * Math.min(0.5, 0.06 + Math.log10(1 + ex) / 12)).toFixed(1) + '%, transparent)';
-    }
-    var title = '';
-    if (b.errorsAt[k]) title = b.errorsAt[k].map(function (e) { return e.message + (e.symbol ? ' "' + e.symbol + '"' : ''); }).join('; ');
-    else if (L.raw !== L.norm && !L.skipped) title = 'Normalised for assembly: ' + L.norm;
-    else if (L.skipped) title = 'Not assembled (transcription header or outside this tape segment)';
-    return '<div class="' + cls + '" id="L' + L.p + '-' + L.n + '" data-p="' + L.p + '" data-n="' + L.n + '"' +
-      (title ? ' title="' + SW.esc(title) + '"' : '') + '>' +
-      '<span class="n" style="--d:' + String(L.n).length + ';' + heat + '"><button class="qa" tabindex="-1" title="Annotate this">+A</button>' + L.n + '</span><span class="a"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + a + '</span>' +
-      '<span class="w"' + (wTitle ? ' title="' + SW.esc(wTitle) + '"' : '') + '>' + w + '</span>' +
-      '<span class="t">' + (text ? hl(text, b).replace(/\f/g, '<span class="pgbrk" title="Page break: a stop code on the tape, or a form feed in the listing">↡</span>') : ' ') + '</span><span class="mk">' + mk + '</span></div>';
-  }
-
-  function render() {
-    var b = build;
-    view.innerHTML = '';
-    var tb = SW.el('div', { class: 'toolbar' });
-    tb.innerHTML =
-      '<input type="search" id="rd-find" placeholder="Find text or /regex/ …">' +
-      '<button class="btn" id="rd-prev" title="Previous match">↑</button><button class="btn" id="rd-next" title="Next match">↓</button>' +
-      '<span class="hint" id="rd-hits"></span><span class="sep"></span>' +
-      '<details class="menu"><summary class="btn" title="What the listing shows">View ▾</summary><div class="menu-body">' +
-      '<label class="check" title="Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly"><input type="checkbox" id="rd-words"' + (opts.words ? ' checked' : '') + '> Addresses &amp; words</label>' +
-      '<label class="check" title="Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers."><input type="checkbox" id="rd-norm"' + (opts.norm ? ' checked' : '') + '> Normalised text</label>' +
-      '<label class="check" title="Hide every line that no annotation covers, so the listing reads as the discussion so far. A dashed rule marks where lines are left out. Exports of the whole listing follow the filter."><input type="checkbox" id="rd-noted"' + (opts.onlyNoted ? ' checked' : '') + '> Only annotated lines</label>' +
-      '<label class="check" title="Show only annotations (and the lines they cover) in which these initials take part, as author or in a reply">Annotations by <select id="rd-by"><option value="">anyone</option></select></label>' +
-      '<label class="check" title="Shade each line by how often it ran, from the profile collected in the Run view (run the program there first)"><input type="checkbox" id="rd-heat"' + (opts.heat ? ' checked' : '') + '> Run heat</label>' +
-      '<label class="check" title="Mark in gold where the text had to be changed to read or run (kintsugi): readings corrected against the scan, lines remade, lines normalised for the assembler (paler), uncertain readings (grey). Hover a mark for what was there and why."><input type="checkbox" id="rd-repairs"' + (opts.repairs ? ' checked' : '') + '> Repairs (gold)</label>' +
-      '</div></details><span class="hint" id="rd-nf"></span>' +
-      '<span class="undo-pair"><button class="btn" id="rd-undo" disabled title="Undo">↶</button><button class="btn" id="rd-redo" disabled title="Redo">↷</button></span>' +
-      '<span class="kin-nav" hidden><button class="btn" id="rd-kprev" title="The previous repair">‹</button>' +
-      '<button class="btn kin-tog" id="rd-klist" aria-expanded="false" title="Repairs: where this text had to be changed to read or run (kintsugi). Click to show or hide the repairs bar"><span class="kin-dia">◆</span> <span class="kin-n"></span> <span class="kin-chev" aria-hidden="true">⌄</span></button>' +
-      '<button class="btn" id="rd-knext" title="The next repair">›</button></span>';
-    tb.appendChild(SW.el('button', { class: 'btn', title: 'What the colours and marks in the listing mean', onclick: function (e) {
-      SW.pop(e.clientX, e.clientY, '<h4>Key</h4><div class="keylist">' +
-        '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
-        '<div><i class="kx kcall"></i>a macro called here (hover the word column for how many words it made; “+5” means five more)</div>' +
-        '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
-        '<div><i class="kx kcom"></i>a line of comment only</div>' +
-        '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
-        '<div class="faint" style="margin-top:6px">Repairs, in gold (kintsugi; View ▸ Repairs):</div>' +
-        '<div><span style="color:var(--kin)">●</span> <span class="rp-line">jmp <span class="rp-c rp-c-fix">srt</span></span> a reading corrected against the scan: the line’s code underlined in gold, the changed characters shaded (hover for what was there, and the evidence)</div>' +
-        '<div><span style="color:var(--kin)">■</span> <span class="rp-line"><span class="rp-c rp-c-kake">cma</span></span> a line remade where none can be read</div>' +
-        '<div><span class="rp-c rp-c-norm">~ssn</span> normalised for assembly, in paler gold: a change for running, not to the reading</div>' +
-        '<div><span style="text-decoration:underline wavy var(--text-faint);text-underline-offset:4px">ior (4</span> an uncertain reading, left as found</div>' +
-        '<div><span class="rp-chip rp-sup">supplied</span> a tape from another text; <span class="rp-chip rp-rec">reconstruction</span> a text rebuilt, not transcribed</div>' +
-        '<div><i class="kx knoted"></i>covered by an annotation (initials at the right; click them)</div>' +
-        '<div><span class="errs">lac x</span> an assembly error (hover for the message)</div>' +
-        '<div><span style="color:var(--red)">●</span> a breakpoint (set from the selection bar)</div>' +
-        '<div><span class="faint"><i>italic grey</i></span> not assembled (a transcription header, or outside this tape segment)</div>' +
-        '<div class="faint flow" style="margin-top:6px">Text: <span class="lab">labels</span>, <b>instructions</b>, <span class="mac">macros</span>, <span class="ps">pseudo-instructions</span>, <span class="num">numbers</span>, <span class="cm">comments</span>.</div></div>');
-    } }, 'Key'));
-    if (b.v.build && b.parts.length > 1) {
-      var ti = tapeInfo(b);
-      tb.appendChild(SW.el('label', { class: 'check tape-pick', title: tapeHelp(ti) },
-        'Tape <select id="rd-tape">' + tapeOptions(b, ti) + '</select> <span class="help-dot">?</span>'));
-    }
-    // Only assembly errors are flagged here; the word count and start address
-    // are on the Version & notes page.
-    if (b.asm && b.asm.errorCount) {
-      var eb = SW.el('button', { class: 'badge err', title: 'What the error' + (b.asm.errorCount > 1 ? 's are' : ' is') + ', explained (' + b.asm.words.length + ' words; start ' + SW.oct(b.asm.start, 4) + ')' },
-        b.asm.errorCount + ' assembly error' + (b.asm.errorCount > 1 ? 's' : ''));
-      eb.onclick = function () { SW.asmErrors(b); };
-      tb.appendChild(eb);
-    } else if (!b.asm) tb.appendChild(SW.el('span', { class: 'hint' }, 'No source survives.'));
-    tb.appendChild(SW.el('span', { class: 'sep' }));
-    if (b.v.build && SW.edition) tb.appendChild(SW.edition.menu(function () { return build; }));
-    // one Export menu: the listing (as shown, or the annotated lines only) to Word or
-    // Markdown, or the annotations with their lines into My notes
-    var exm = SW.el('details', { class: 'menu more-menu' });
-    exm.innerHTML = '<summary class="btn" title="Export this version’s listing, or put its annotations in My notes">⤓ Export ▾</summary><div class="menu-body">' +
-      '<p class="hint">The listing, as shown</p><button class="btn ghost" data-ex="all:docx">⤓ Word</button><button class="btn ghost" data-ex="all:md">⤓ Markdown</button>' +
-      '<p class="hint">The annotated lines only</p><button class="btn ghost" data-ex="noted:docx">⤓ Word</button><button class="btn ghost" data-ex="noted:md">⤓ Markdown</button>' +
-      '<p class="hint">Private</p><button class="btn ghost" data-ex="noted:tray" title="Each annotation with the lines it covers, as one excerpt in My notes">＋ My notes: the annotations</button></div>';
-    exm.addEventListener('click', function (e) {
-      var x = e.target.closest('[data-ex]'); if (!x) return;
-      exm.open = false;
-      var k = x.dataset.ex.split(':'), noted = k[0] === 'noted';
-      var dp = listingDoc(b, null, { onlyNoted: noted });
-      if (k[1] === 'tray') { dp.then(function (d) { if (!d.blocks.some(function (bl) { return bl.type === 'code'; })) { SW.toast('No annotations on this version yet.'); return; } SW.tray.addDoc(d); }); return; }
-      Promise.resolve(dp).then(function (d) { SW.exportDoc(d, 'spacewar-' + b.v.id + (noted ? '-annotations' : '-listing'), k[1]); });
-    });
-    tb.appendChild(exm);
-    tb.appendChild(SW.el('button', { class: 'btn notes-mode', id: 'rd-notes-mode', onclick: function () {
-      var i = MODES.indexOf(modeOf(opts.notes));
-      setNotes(MODES[(i + 1) % MODES.length][0]);
-    } }));
-    view.appendChild(tb);
-
-    if (!b.v.build) {
-      var lost = SW.el('div', { class: 'pad prose' });
-      lost.innerHTML = '<h2>' + SW.esc(b.v.label) + '</h2><p>' + SW.esc(b.v.summary) + '</p><p class="muted">What is absent is also part of the record. Annotations on this version can still be kept under “Versions”.</p>';
-      view.appendChild(lost);
-      return;
-    }
-    view.appendChild(SW.el('div', { class: 'selbar', id: 'rd-selbar' }));
-    renderListing();
-    wireTb(tb);
-    modeBtn();
   }
 
   // ---------- repairs, in gold (kintsugi) ----------
@@ -445,59 +303,6 @@
     });
   }
 
-  // The listing alone, so choosing a tape keeps the toolbar (and a search) as it is.
-  function renderListing() {
-    var b = build, info = tapeInfo(b), bar = SW.$('#rd-selbar', view);
-    SW.$$('.rd-body', view).forEach(function (x) { x.remove(); });
-    var wrap = SW.el('div', { class: 'rd-body' + (marginOn() ? ' with-margin' : '') });
-    var box = SW.el('div', { class: 'listing' + (opts.words ? '' : ' hide-words') });
-    var margin = SW.el('div', { class: 'note-margin', 'aria-label': 'Annotations' });
-    wrap.addEventListener('click', function (e) { if (e.target.closest('[data-asmerrs]')) { e.stopPropagation(); SW.asmErrors(b); } });
-    b.parts.forEach(function (part, pi) {
-      if (!showsTape(pi)) return;
-      var t = info[pi], sec = SW.el('div', { class: 'part' });
-      var errs = b.asm.errors.filter(function (e) { return e.file === pi; }).length;
-      var span = part.end ? 'lines ' + part.title + '–' + part.end : part.title > 1 ? 'from line ' + part.title : 'whole file';
-      sec.innerHTML = '<div class="part-head" data-p="' + pi + '">' +
-        '<div class="ph-main">' + (b.parts.length > 1 ? '<span class="ph-num">Tape ' + (pi + 1) + ' of ' + b.parts.length + '</span>' : '') +
-        '<span class="ph-title">' + SW.esc(t.label) + '</span> ' + SW.refTag(b.v.id, pi, null, null, b.parts.length) +
-        (part.role && part.role !== 'program' ? ' <span class="rp-chip rp-sup" title="Kintsugi · Supplied (yobitsugi): this tape is not part of this version’s surviving text. It comes from another: ' + SW.esc(part.role) + '. Like a piece from another vessel set into a mended bowl (yobitsugi).">supplied</span>' :
-         /R$/.test(SW.REF[b.v.id] || '') ? ' <span class="rp-chip rp-rec" title="Kintsugi · A reconstruction: this text was rebuilt, not transcribed from a surviving listing or tape (the R of its reference). ' + SW.esc(SW.MADE[b.v.id] || '') + '">reconstruction</span>' : '') +
-        (errs ? '<button class="badge err" data-asmerrs title="What the error' + (errs > 1 ? 's are' : ' is') + ', explained">' + errs + ' assembly error' + (errs > 1 ? 's' : '') + '</button>' : '') + '</div>' +
-        '<div class="ph-sub">' + SW.sourceLink(part.src, part.src.split('/').pop()) +
-        ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
-        (t.title ? ' · <span title="The tape’s own title line">“' + SW.esc(t.title) + '”</span>' : '') + '</div>' +
-        '<div class="lncols"><span class="n" title="The line’s number in the source file">Line</span>' +
-        '<span class="a" title="Where the line’s first word was placed in core memory, in octal (0000–7777)">Address</span>' +
-        '<span class="w" title="The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)">Word <button class="colfold" data-cf="0" title="Fold away Address and Word, for more room (View ▸ Addresses &amp; words brings them back too)">‹</button></span>' +
-        '<span class="t" title="The source as written (or as the assembler read it, with Normalised text on in View)"><button class="colfold cf-show" data-cf="1" title="Show Address and Word">›</button>Source</span>' +
-        '<span class="mk" title="Initials of anyone who has annotated the line; click them to read">Annotations<button class="ann-cyc" data-ann title="Show all annotations, only yours, only open questions, or none (click to change)">' + SHOW[opts.show] + '</button><button class="ann-cyc ghost-sw' + (opts.ghosts ? ' on' : '') + '" data-ghosts aria-pressed="' + !!opts.ghosts + '" title="Ghosts: annotations made on other versions, shown faintly on the lines here that match">Ghosts</button></span></div></div>';
-      sec.insertAdjacentHTML('beforeend', b.lines[pi].filter(function (L) { return !L.away; }).map(function (L) { return rowHTML(b, L); }).join(''));
-      box.appendChild(sec);
-    });
-    wrap.appendChild(box);
-    wrap.appendChild(margin);
-    view.insertBefore(wrap, bar);
-    paintRepairs();
-    kinMeasure();
-    if (root.ResizeObserver && SW.$('.ln.rp-sq', box)) new ResizeObserver(function () { kinMeasure(); }).observe(box);   // measured again once shown (Read opened from another tab)
-    box.classList.toggle('no-repairs', !opts.repairs);
-    setTimeout(kinPaint, 0);
-    wireBox(box);
-    wireMargin(margin);
-    applyFilter();
-    paintSel();
-    // Cards placed while Read was hidden all measure 0: place them again when it shows.
-    if (ro) ro.disconnect();
-    if (root.ResizeObserver) {
-      ro = new ResizeObserver(function () {
-        if (!marginOn() || !wrap.getClientRects().length) return;
-        K.refit();
-      });
-      ro.observe(wrap);
-    }
-  }
-
   // ---------- the selection: the assembler's (on the bar, with the kit's) ----------
   function bpSel() {
     var ws = [];
@@ -517,149 +322,9 @@
     SW.emit('runTo', build.asm.byLine[L.p][L.n][0].loc);
   }
 
-  function wireBox(box) {
-    K.wireLit(box, '.ithread'); K.wireDrop(box);
-    box.addEventListener('click', function (e) {
-      var cf = e.target.closest('[data-cf]');
-      if (cf) { setWords(cf.dataset.cf === '1'); return; }
-      if (e.target.closest('[data-ghosts]')) {
-        opts.ghosts = !opts.ghosts; SW.store.set('read.ghosts', opts.ghosts);
-        SW.$$('[data-ghosts]', view).forEach(function (b) { b.classList.toggle('on', opts.ghosts); b.setAttribute('aria-pressed', String(opts.ghosts)); });
-        if (opts.ghosts) SW.toast('Looking for annotations on the other versions…', 2500);
-        loadGhosts().then(function () {
-          paintNotes();
-          if (opts.ghosts) SW.toast(K.ghostCount() ? K.ghostCount() + ' ghost annotation' + (K.ghostCount() === 1 ? '' : 's') + ' from other versions' : 'No annotations on other versions match lines here', 3500);
-        });
-        return;
-      }
-      if (e.target.closest('[data-ann]')) {
-        opts.show = SHOW_NEXT[opts.show] || 'all'; SW.store.set('read.show', opts.show);
-        SW.$$('[data-ann]', view).forEach(function (b) { b.textContent = SHOW[opts.show]; });
-        paintNotes();
-        SW.toast(opts.show === 'all' ? 'Showing all annotations' : opts.show === 'mine' ? 'Showing only your annotations' : opts.show === 'open' ? 'Showing only open questions' : 'Annotations hidden', 2500);
-        return;
-      }
-      if (e.target.closest('.part-head')) return;   // tape headers only label (their source link opens GitHub)
-      if (e.target.closest('.inote')) { threadClick(e); return; }   // note buttons are wired by N.wire
-      // +A by a line number: a quick annotation on that line, or on the selection it is in
-      var qa = e.target.closest('.qa');
-      if (qa) {
-        var qr = qa.closest('.ln'), qp = +qr.dataset.p, qn = +qr.dataset.n, s0 = SW.state.sel;
-        var r0 = s0 && s0.p === qp && qn >= s0.n0 && qn <= s0.n1 ? s0 : { p: qp, n0: qn, n1: qn };
-        SW.state.sel = r0; paintSel(); SW.writeQuery();
-        annotateSel();
-        return;
-      }
-      var dot = e.target.closest('.note-dot');
-      if (dot) { showNotesFor(dot.dataset.k); return; }
-      var sym = e.target.closest('.sym');
-      if (sym) { symbolPop(sym.dataset.s, e.clientX, e.clientY); return; }
-      var row = e.target.closest('.ln');
-      if (!row) return;
-      var p = +row.dataset.p, n = +row.dataset.n;
-      if (e.target.closest('.a') || e.target.closest('.w')) { toggleExpansion(row, p, n); return; }
-      if (e.shiftKey && anchorSel && anchorSel.p === p) {
-        SW.state.sel = { p: p, n0: Math.min(anchorSel.n, n), n1: Math.max(anchorSel.n, n) };
-      } else {
-        anchorSel = { p: p, n: n };
-        SW.state.sel = { p: p, n0: n, n1: n };
-      }
-      paintSel();
-      SW.writeQuery();
-      var k = p + ':' + n;
-      if (counts[k] && opts.notes !== 'hide') {
-        var card = opts.notes !== 'off' && threadFor(k);
-        if (card) { card.scrollIntoView({ block: 'nearest' }); card.classList.add('flash'); setTimeout(function () { card.classList.remove('flash'); }, 900); }
-        else showNotesFor(k);
-      }
-    });
-  }
-
-  // Address and Word shown or folded away: from View, or the chevron in the column headings
-  function setWords(on) {
-    opts.words = on; SW.store.set('read.words', on);
-    var box = SW.$('.listing', view), cb = SW.$('#rd-words', view);
-    if (box) box.classList.toggle('hide-words', !on);
-    if (cb) cb.checked = on;
-    kinMeasure();
-    if (build && SW.$('.rd-body', view)) paintNotes();
-  }
-  // ↶ ↷: undo and redo what was done to annotations (notes.js keeps the steps)
-  function paintUndo() {
-    var u = SW.$('#rd-undo', view), r = SW.$('#rd-redo', view); if (!u) return;
-    var h = N.history();
-    u.disabled = !h.undo || h.busy; r.disabled = !h.redo || h.busy;
-    u.title = h.undo ? 'Undo ' + h.undo + ' (⌘Z)' : 'Undo: nothing to undo yet';
-    r.title = h.redo ? 'Redo ' + h.redo + ' (⇧⌘Z)' : 'Redo: nothing to redo';
-  }
-  SW.on('notes-history', paintUndo);
-  function wireTb(tb) {
-    SW.$('#rd-repairs', tb).onchange = function (e) { opts.repairs = e.target.checked; SW.store.set('read.repairs', opts.repairs); var bx = SW.$('.listing', view); if (bx) bx.classList.toggle('no-repairs', !opts.repairs); kinPaint(); };
-    SW.$('#rd-kprev', tb).onclick = function () { kinStep(-1); };
-    SW.$('#rd-knext', tb).onclick = function () { kinStep(1); };
-    var kb = SW.el('div', { class: 'kin-bar', role: 'toolbar', 'aria-label': 'Repairs' }); kb.hidden = true;
-    tb.appendChild(kb);
-    SW.$('#rd-klist', tb).onclick = function () { opts.kinBar = !opts.kinBar; SW.store.set('read.kinBar', opts.kinBar); kinBar(); };
-    kb.addEventListener('click', function (e) { var b = e.target.closest('[data-km]'); if (b && b.tagName !== 'INPUT' && !b.disabled) { e.preventDefault(); kinAct(b.dataset.km, b); if (!/^(close|list|about|card|cards)$/.test(b.dataset.km)) kinBar(); } });
-    kb.addEventListener('change', function (e) { var b = e.target.closest('[data-km]'); if (b) { kinAct(b.dataset.km, b); kinBar(); } });
-    SW.$('#rd-undo', tb).onclick = function () { N.undo(); };
-    SW.$('#rd-redo', tb).onclick = function () { N.redo(); };
-    setTimeout(paintUndo, 0);
-    SW.$('#rd-words', tb).onchange = function (e) { setWords(e.target.checked); };
-    SW.$('#rd-norm', tb).onchange = function (e) { opts.norm = e.target.checked; render(); };
-    var tapeSel = SW.$('#rd-tape', tb);
-    if (tapeSel) tapeSel.onchange = function () { opts.tapes = tapeSel.value; renderListing(); view.scrollTop = 0; };
-    SW.$('#rd-noted', tb).onchange = function (e) { opts.onlyNoted = e.target.checked; applyFilter(); view.scrollTop = 0; };
-    SW.$('#rd-by', tb).onchange = function (e) { opts.by = e.target.value; applyFilter(); view.scrollTop = 0; };
-    fillBy();
-    SW.$('#rd-heat', tb).onchange = function (e) {
-      opts.heat = e.target.checked;
-      if (opts.heat && !(SW.profile && SW.profile.build === build)) SW.toast('Run the program in the Run view to collect a profile.');
-      render();
-    };
-    var find = SW.$('#rd-find', tb), hits = [], hi = -1;
-    function search() {
-      SW.$$('.ln.cur', view).forEach(function (e) { e.classList.remove('cur'); });
-      hits = [];
-      var q = find.value;
-      if (!q) { SW.$('#rd-hits', tb).textContent = ''; return; }
-      var re;
-      try { re = /^\/.*\/$/.test(q) ? new RegExp(q.slice(1, -1), 'i') : new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'); }
-      catch (err) { SW.$('#rd-hits', tb).textContent = 'bad pattern'; return; }
-      var keep = filtering() ? keptLines() : null;
-      build.lines.forEach(function (ls, pi) { ls.forEach(function (L) { if (!L.away && re.test(L.raw) && (!keep || keep[L.p + ':' + L.n])) hits.push(L); }); });
-      SW.$('#rd-hits', tb).textContent = hits.length + ' match' + (hits.length === 1 ? '' : 'es');
-      hi = -1; step(1);
-    }
-    function step(d) {
-      if (!hits.length) return;
-      hi = (hi + d + hits.length) % hits.length;
-      R.goto(hits[hi].p, hits[hi].n, true);
-    }
-    find.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.shiftKey ? step(-1) : (hits.length && find.dataset.q === find.value ? step(1) : (find.dataset.q = find.value, search())); } });
-    SW.$('#rd-next', tb).onclick = function () { if (find.dataset.q !== find.value) { find.dataset.q = find.value; search(); } else step(1); };
-    SW.$('#rd-prev', tb).onclick = function () { step(-1); };
-  }
-
-  function toggleExpansion(row, p, n) {
-    var nx = row.nextElementSibling;
-    if (nx && nx.classList.contains('expansion')) { nx.remove(); return; }
-    var ws = (build.asm.byLine[p] || [])[n];
-    if (!ws) return;
-    var h = ws.map(function (w) {
-      var ex = SW.profile && SW.profile.build === build ? SW.profile.exec[w.loc] : null;
-      return SW.oct(w.loc, 4) + '  ' + SW.oct(w.val) + '  ' + SW.esc(root.PDP1CPU.disasm(w.val, build.symAt)) +
-        (w.macro ? '  <span class="faint">(macro ' + SW.esc(w.macro) + ')</span>' : '') +
-        (w.kind ? '  <span class="faint">(' + w.kind + ')</span>' : '') +
-        (ex ? '  <span class="num">×' + ex + '</span>' : '');
-    }).join('\n');
-    var d = SW.el('div', { class: 'expansion' }, h);
-    d.style.whiteSpace = 'pre';
-    row.insertAdjacentElement('afterend', d);
-  }
-
-  function symbolPop(name, x, y) {
-    var b = build, s = b.sym[name];
+  // ---------- the pop-up on a symbol ----------
+  function symbol(name, b) {
+    var s = b.sym[name];
     var g = SW.glosses && SW.glosses[name];
     var h = '<h4>' + SW.esc(name) + '</h4>';
     if (g) {
@@ -684,165 +349,92 @@
     }
     if (!g && !s && !b.macros[name]) h += '<div class="faint">No symbol of this name in this build.</div>';
     else if (s || b.macros[name]) h += '<div style="margin-top:6px"><a href="#" data-bio="' + SW.esc(name) + '" title="Follow this name through every version: when it appears, changes and goes (Text ▾ Symbol histories)">Its history across the versions →</a></div>';
-    var pop = SW.pop(x, y, h);
-    pop.addEventListener('click', function (e) {
-      var bio = e.target.closest('a[data-bio]');
-      if (bio) { e.preventDefault(); SW.unpop(); SW.biography(bio.dataset.bio); return; }
-      var a = e.target.closest('a[data-n]');
-      if (!a) return;
-      e.preventDefault();
-      SW.unpop();
-      R.goto(+a.dataset.p, +a.dataset.n, true);
-    });
+    return h;
   }
 
-  var openNotesKey = null, binInPanel = false;
-  function showNotesFor(k, quiet) {
-    var parts = k.split(':'), p = +parts[0], n = +parts[1];
-    var ts = N.threads(notes).filter(function (t) { return t.note.anchor && t.note.anchor.p === p && t.note.anchor.n0 === n; });
-    var c = counts[k], n1 = c ? c.n1 : n;
-    // No citation here: the version and file are in the page title and part
-    // header, and every thread in this panel is on the line just clicked.
-    void n1;
-    var html = '<p style="margin-top:0"><button class="btn" data-act="new">✎ Annotate this line</button> ' +
-      '<button class="btn" data-act="bin" title="Deleted annotations on this version: restore them, or delete them for good">🗑 Bin</button></p>' +
-      (ts.map(function (t) { return N.renderThread(t, null); }).join('') || '<p class="hint">No annotations yet.</p>') +
-      '<div class="panel-bin"' + (binInPanel ? '' : ' hidden') + '><h4>Deleted annotations</h4><div></div></div>';
-    var body = SW.drawer('Annotations', html);
-    body.dataset.notes = k;
-    openNotesKey = k;
-    N.wire(body, build.v.id, notes);
-    var pb = body.querySelector('.panel-bin'), binBtn = body.querySelector('[data-act="bin"]');
-    function openBin() { N.showBin(pb.lastChild, { vid: build.v.id }); }
-    if (binInPanel) openBin();
-    binBtn.classList.toggle('on', binInPanel);
-    binBtn.onclick = function (e) {
-      e.stopPropagation();
-      binInPanel = pb.hidden;
-      pb.hidden = !binInPanel;
-      binBtn.classList.toggle('on', binInPanel);
-      if (binInPanel) { openBin(); pb.scrollIntoView({ block: 'nearest' }); }
-    };
-    body.querySelector('[data-act="new"]').onclick = function () {
-      var L = build.lines[p][n - 1];
-      N.dialog({ vid: build.v.id, kind: 'line', anchor: { p: p, n0: n, n1: n, src: build.parts[p].src }, quote: L ? L.raw : '',
-                 heading: 'Annotate', anchorText: SW.cite(build, p, n, n) });
-    };
-    void quiet;
-  }
-
-  R.goto = function (p, n, flash) {
-    // A line on a tape not shown (a search hit, a note, a link): show every tape.
-    if (build.parts[p] && !showsTape(p)) {
-      opts.tapes = 'all';
-      var ts = SW.$('#rd-tape', view);
-      if (ts) ts.value = 'all';
-      renderListing();
-    }
-    var el = SW.$('#L' + p + '-' + n, view);
-    if (!el) return;
-    el.scrollIntoView({ block: 'center' });
-    if (flash) {
-      SW.$$('.ln.cur', view).forEach(function (e) { e.classList.remove('cur'); });
-      el.classList.add('cur');
-    }
-  };
-
-  // ---------- notes filter ----------
-  // Lines covered by notes, limited to those in which the chosen initials take part.
-  function keptLines() {
-    var keep = {};
-    if (opts.onlyRepaired) {
-      kinRows(true).forEach(function (r) { var p = +r.dataset.p, n = +r.dataset.n; for (var k = n - 2; k <= n + 2; k++) keep[p + ':' + k] = true; });
-      return keep;
-    }
-    Object.keys(counts).forEach(function (k) {
-      var c = counts[k];
-      if (opts.by && c.by.indexOf(opts.by) < 0) return;
-      for (var n = c.n0; n <= c.n1; n++) keep[c.p + ':' + n] = true;
-    });
-    return keep;
-  }
-  function filtering() { return opts.onlyNoted || !!opts.by || opts.onlyRepaired; }
-  function fillBy() {
-    var sel = SW.$('#rd-by', view);
-    if (!sel) return;
-    var who = {};
-    Object.keys(counts).forEach(function (k) { counts[k].by.forEach(function (x) { who[x] = 1; }); });
-    if (opts.by) who[opts.by] = 1;
-    sel.innerHTML = '<option value="">anyone</option>' + Object.keys(who).sort().map(function (x) {
-      return '<option value="' + SW.esc(x) + '"' + (x === opts.by ? ' selected' : '') + '>' + SW.esc(x) + '</option>';
-    }).join('');
-  }
-  function applyFilter() {
-    var on = filtering(), keep = on ? keptLines() : null, shown = 0, gap = false;
-    SW.$$('.listing .ln', view).forEach(function (row) {
-      var k = row.dataset.p + ':' + row.dataset.n, hide = on && !keep[k];
-      row.classList.toggle('nf-hide', hide);
-      row.classList.toggle('nf-jump', on && !hide && gap);
-      if (hide) gap = true; else { gap = false; shown++; }
-    });
-    SW.$$('.listing .part', view).forEach(function (sec) {
-      sec.classList.toggle('nf-empty', on && !SW.$('.ln:not(.nf-hide)', sec));
-    });
-    var out = SW.$('#rd-nf', view);
-    if (out) out.textContent = !on ? '' : opts.onlyRepaired ? shown + ' lines: the repairs, two either side' : shown + ' annotated line' + (shown === 1 ? '' : 's') + (opts.by ? ' with ' + opts.by : '');
-    var box = SW.$('.listing', view);
-    if (box) {
-      var none = SW.$('.nf-none', box);
-      if (on && !shown && !none) box.insertBefore(SW.el('p', { class: 'hint nf-none pad' }, opts.by ? 'No annotations by ' + opts.by + ' on this version' + (opts.tapes === 'all' ? '' : ' and tape') + '.' : 'No annotated lines on this version' + (opts.tapes === 'all' ? '' : ' and tape') + ' yet.'), box.firstChild);
-      else if ((!on || shown) && none) none.remove();
-    }
-    if (build && SW.$('.rd-body', view)) paintNotes();   // the notes follow the lines left showing
-  }
-
-  function refreshNotes() {
-    if (!build) return;
-    N.list(build.v.id).then(function (all) {
-      notes = all; K.set({ notes: all });
-      counts = N.countsByLine(all);
-      noted = {};
-      Object.keys(counts).forEach(function (k) {
-        var c = counts[k];
-        for (var n = c.n0; n <= c.n1; n++) noted[c.p + ':' + n] = true;
-      });
-      SW.$$('.ln', view).forEach(function (row) {
-        var k = row.dataset.p + ':' + row.dataset.n, mk = row.querySelector('.mk');
-        if (mk) mk.innerHTML = N.marginMark(k, counts[k]);
-        row.classList.toggle('noted', !!noted[k]);
-      });
-      fillBy();
-      applyFilter();
-      if (opts.ghosts) loadGhosts(true).then(paintNotes);
-      // keep an open panel current; a closed one stays closed (the refresh runs every 20 seconds)
-      if (openNotesKey && SW.$('#drawer-body').dataset.notes === openNotesKey && document.body.classList.contains('drawer-open')) showNotesFor(openNotesKey, true);
-    });
-  }
-
-  R.show = function (b) {
-    if (build !== b) opts.tapes = 'all';
-    build = b; K.set({ build: b });
-    R.build = b;
-    SW.loadGlosses();
-    render();
-    refreshNotes();
-    live();
-    var s = SW.state.sel;
-    if (s) setTimeout(function () { R.goto(s.p, s.n0, false); }, 0);
-  };
-  // a note added, edited or binned: look again (ghosts too), now if Read is open, else when it is next opened
-  var readStale = false;
-  SW.on('notes', function (vid) { if (build && vid === build.v.id) { if (SW.state.tab === 'read') refreshNotes(); else readStale = true; } });
-  R.enter = function () { if (readStale && build) { readStale = false; refreshNotes(); } };
-  SW.on('goto', function (g) {
-    if (g.tab !== 'read') return;
-    // Read not drawn yet this visit: opening it goes to the selection (R.show)
-    if (!build) { var s = SW.state.sel; if (!s || s.p !== g.p || s.n0 !== g.n) SW.state.sel = { p: g.p, n0: g.n, n1: g.n }; SW.setTab('read'); return; }
-    SW.setTab('read'); setTimeout(function () { R.goto(g.p, g.n, true); paintSel(); }, 0);
+  ctx = SW.readView({
+    hl: hl,
+    mark: function (html) { return html.replace(/\f/g, '<span class="pgbrk" title="Page break: a stop code on the tape, or a form feed in the listing">↡</span>'); },
+    files: {
+      word: 'Tape', info: tapeInfo, help: tapeHelp, jump: 'all',
+      chips: function (b, pi) { var part = b.parts[pi]; return (part.role && part.role !== 'program' ? ' <span class="rp-chip rp-sup" title="Kintsugi · Supplied (yobitsugi): this tape is not part of this version’s surviving text. It comes from another: ' + SW.esc(part.role) + '. Like a piece from another vessel set into a mended bowl (yobitsugi).">supplied</span>' :
+         /R$/.test(SW.REF[b.v.id] || '') ? ' <span class="rp-chip rp-rec" title="Kintsugi · A reconstruction: this text was rebuilt, not transcribed from a surviving listing or tape (the R of its reference). ' + SW.esc(SW.MADE[b.v.id] || '') + '">reconstruction</span>' : ''); },
+      sub: function (b, pi, t) {
+        var part = b.parts[pi], span = part.end ? 'lines ' + part.title + '–' + part.end : part.title > 1 ? 'from line ' + part.title : 'whole file';
+        return '' + SW.sourceLink(part.src, part.src.split('/').pop()) +
+        ' · ' + (part.tape ? 'punched tape, decoded from FIO-DEC' : 'text file') + ' · ' + span +
+        (t.title ? ' · <span title="The tape’s own title line">“' + SW.esc(t.title) + '”</span>' : '');
+      }
+    },
+    errors: { word: 'assembly error', title: function (b) { return 'What the error' + (b.asm.errorCount > 1 ? 's are' : ' is') + ', explained (' + b.asm.words.length + ' words; start ' + SW.oct(b.asm.start, 4) + ')'; } },
+    words: function (b, L) { return b.asm && b.asm.byLine[L.p] && b.asm.byLine[L.p][L.n]; },
+    expand: function (b, p, n) {
+      var ws = (b.asm.byLine[p] || [])[n]; if (!ws) return '';
+      return ws.map(function (w) {
+        var ex = SW.profile && SW.profile.build === b ? SW.profile.exec[w.loc] : null;
+        return SW.oct(w.loc, 4) + '  ' + SW.oct(w.val) + '  ' + SW.esc(root.PDP1CPU.disasm(w.val, b.symAt)) +
+          (w.macro ? '  <span class="faint">(macro ' + SW.esc(w.macro) + ')</span>' : '') +
+          (w.kind ? '  <span class="faint">(' + w.kind + ')</span>' : '') +
+          (ex ? '  <span class="num">×' + ex + '</span>' : '');
+      }).join('\n');
+    },
+    norm: true, heat: true,
+    titles: { words: 'Show the address each line was assembled to (octal) and the 18-bit word it became; click either to see every word a line made, with its disassembly', norm: 'Normalised: the text as the assembler read it, after the documented normalisations for this version (for example a transcription&#39;s &quot;.sx1&quot; read as the overlined variable &quot;~sx1&quot;, or modern &quot;//&quot; comments read as MACRO comments). Unticked: the source exactly as held in sources/. Normalised lines are marked with a violet rule by their line numbers.' , address: 'Where the line’s first word was placed in core memory, in octal (0000–7777)', word: 'The 18-bit machine word the line assembled to, in octal; “+N” means N more words followed (hover a row for the count)', source: 'The source as written (or as the assembler read it, with Normalised text on in View)' },
+    rowTitle: function (b, L, k, title) {
+      if (title) return title;
+      if (L.raw !== L.norm && !L.skipped) return 'Normalised for assembly: ' + L.norm;
+      if (L.skipped) return 'Not assembled (transcription header or outside this tape segment)';
+      return '';
+    },
+    key: function () {
+      return '<h4>Key</h4><div class="keylist">' +
+        '<div><i class="kx kdef"></i>inside a macro definition (define … term)</div>' +
+        '<div><i class="kx kcall"></i>a macro called here (hover the word column for how many words it made; “+5” means five more)</div>' +
+        '<div><i class="kx keq"></i>a symbol set with “=”</div>' +
+        '<div><i class="kx kcom"></i>a line of comment only</div>' +
+        '<div><i class="kx knorm"></i>normalised for assembly (hover the line to see how)</div>' +
+        '<div class="faint" style="margin-top:6px">Repairs, in gold (kintsugi; View ▸ Repairs):</div>' +
+        '<div><span style="color:var(--kin)">●</span> <span class="rp-line">jmp <span class="rp-c rp-c-fix">srt</span></span> a reading corrected against the scan: the line’s code underlined in gold, the changed characters shaded (hover for what was there, and the evidence)</div>' +
+        '<div><span style="color:var(--kin)">■</span> <span class="rp-line"><span class="rp-c rp-c-kake">cma</span></span> a line remade where none can be read</div>' +
+        '<div><span class="rp-c rp-c-norm">~ssn</span> normalised for assembly, in paler gold: a change for running, not to the reading</div>' +
+        '<div><span style="text-decoration:underline wavy var(--text-faint);text-underline-offset:4px">ior (4</span> an uncertain reading, left as found</div>' +
+        '<div><span class="rp-chip rp-sup">supplied</span> a tape from another text; <span class="rp-chip rp-rec">reconstruction</span> a text rebuilt, not transcribed</div>' +
+        '<div><i class="kx knoted"></i>covered by an annotation (initials at the right; click them)</div>' +
+        '<div><span class="errs">lac x</span> an assembly error (hover for the message)</div>' +
+        '<div><span style="color:var(--red)">●</span> a breakpoint (set from the selection bar)</div>' +
+        '<div><span class="faint"><i>italic grey</i></span> not assembled (a transcription header, or outside this tape segment)</div>' +
+        '<div class="faint flow" style="margin-top:6px">Text: <span class="lab">labels</span>, <b>instructions</b>, <span class="mac">macros</span>, <span class="ps">pseudo-instructions</span>, <span class="num">numbers</span>, <span class="cm">comments</span>.</div></div>';
+    },
+    symbol: symbol,
+    selActs: function () { return [['● Breakpoint', bpSel], ['▶ Run to here', runToSel]]; },
+    lost: 'What is absent is also part of the record. Annotations on this version can still be kept under “Versions”.',
+    repairs: {
+      nav: '<span class="kin-nav" hidden><button class="btn" id="rd-kprev" title="The previous repair">‹</button>' +
+      '<button class="btn kin-tog" id="rd-klist" aria-expanded="false" title="Repairs: where this text had to be changed to read or run (kintsugi). Click to show or hide the repairs bar"><span class="kin-dia">◆</span> <span class="kin-n"></span> <span class="kin-chev" aria-hidden="true">⌄</span></button>' +
+      '<button class="btn" id="rd-knext" title="The next repair">›</button></span>',
+      view: function () { return '<label class="check" title="Mark in gold where the text had to be changed to read or run (kintsugi): readings corrected against the scan, lines remade, lines normalised for the assembler (paler), uncertain readings (grey). Hover a mark for what was there and why."><input type="checkbox" id="rd-repairs"' + (opts.repairs ? ' checked' : '') + '> Repairs (gold)</label>'; },
+      wire: function (tb) {
+    SW.$('#rd-repairs', tb).onchange = function (e) { opts.repairs = e.target.checked; SW.store.set('read.repairs', opts.repairs); var bx = SW.$('.listing', view); if (bx) bx.classList.toggle('no-repairs', !opts.repairs); kinPaint(); };
+    SW.$('#rd-kprev', tb).onclick = function () { kinStep(-1); };
+    SW.$('#rd-knext', tb).onclick = function () { kinStep(1); };
+    var kb = SW.el('div', { class: 'kin-bar', role: 'toolbar', 'aria-label': 'Repairs' }); kb.hidden = true;
+    tb.appendChild(kb);
+    SW.$('#rd-klist', tb).onclick = function () { opts.kinBar = !opts.kinBar; SW.store.set('read.kinBar', opts.kinBar); kinBar(); };
+    kb.addEventListener('click', function (e) { var b = e.target.closest('[data-km]'); if (b && b.tagName !== 'INPUT' && !b.disabled) { e.preventDefault(); kinAct(b.dataset.km, b); if (!/^(close|list|about|card|cards)$/.test(b.dataset.km)) kinBar(); } });
+    kb.addEventListener('change', function (e) { var b = e.target.closest('[data-km]'); if (b) { kinAct(b.dataset.km, b); kinBar(); } });
+      },
+      paint: function (box) {
+        paintRepairs();
+        kinMeasure();
+        if (root.ResizeObserver && SW.$('.ln.rp-sq', box)) new ResizeObserver(function () { kinMeasure(); }).observe(box);   // measured again once shown (Read opened from another tab)
+        box.classList.toggle('no-repairs', !opts.repairs);
+        setTimeout(kinPaint, 0);
+      },
+      bar: function () { kinBar(); },
+      kept: function () { var keep = {}; kinRows(true).forEach(function (r) { var p = +r.dataset.p, n = +r.dataset.n; for (var k = n - 2; k <= n + 2; k++) keep[p + ':' + k] = true; }); return keep; },
+      relayout: function () { kinMeasure(); }
+    },
+    onShow: function (b) { build = b; }
   });
-  SW.on('profile', function () { if (opts.heat && build) render(); });
-  // Lines change height with the window or the code size: the cards follow.
-  var relay = null;
-  window.addEventListener('resize', function () { clearTimeout(relay); relay = setTimeout(function () { if (build && marginOn()) layoutMargin(); }, 120); });
-  SW.on('codetext', function () { if (build && marginOn()) setTimeout(function () { layoutMargin(); }, 50); });
+  view = ctx.view; opts = ctx.opts;
 })(this);

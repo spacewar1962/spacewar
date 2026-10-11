@@ -211,9 +211,6 @@
 
 /* ---------- listing ---------- */
 
-.ln.bp .n { color: var(--red); font-weight: 700; }
-.ln.bp .n::before { content: "● "; }
-
 /* ---------- run view ---------- */
 
 .run-left { overflow: auto; padding: 12px; min-width: 0; }
@@ -301,17 +298,12 @@
 
 /* Macro calls: a dotted cyan rule, unlike the solid violet of definitions and normalised lines. */
 .ln.kcall .t { background-image: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px); background-size: 2px 100%; background-repeat: no-repeat; padding-left: 5px; }
-.keylist div { margin: 3px 0; display: flex; align-items: center; gap: 8px; }
-.keylist .lab { color: var(--beam); } .keylist .mac { color: var(--violet); font-weight: 600; } .keylist .ps { color: var(--green); }
-.keylist .num { color: var(--amber); } .keylist .cm { color: var(--text-dim); font-style: italic; }
-
+.keylist .lab { color: var(--beam); } .keylist .mac { color: var(--violet); font-weight: 600; } .keylist .num { color: var(--amber); } 
 .kx.kdef { background: linear-gradient(to right, var(--violet) 0, var(--violet) 2px, transparent 2px); border: 1px solid var(--line); }
 .kx.keq { background: linear-gradient(to right, var(--green) 0, var(--green) 2px, transparent 2px); border: 1px solid var(--line); }
 .kx.kcall { background: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px) left / 3px 100% no-repeat; border: 1px solid var(--line); }
 .kx.knorm { background: linear-gradient(to left, var(--violet) 0, var(--violet) 3px, transparent 3px); border: 1px solid var(--line); }
 .kx.knoted { background: linear-gradient(to right, var(--amber) 0, var(--amber) 2px, transparent 2px); border: 1px solid var(--line); }
-.keylist .errs { text-decoration: underline wavy var(--red); text-underline-offset: 3px; font-family: var(--code-font); }
-.keylist div.flow { display: block; }
 
 .dl-pick { display: inline-flex; gap: 4px; margin-left: 2px; }
 .dl-pick[hidden] { display: none; }
@@ -737,15 +729,6 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 .settings .dev-set[open] summary::before { content: '▾'; }
 .settings .dev-set summary h2 { display: inline; margin: 0; }
 .settings .dev-set .dev-warn { color: var(--red); font-size: 12px; font-weight: 600; }
-
-.lncols .colfold { position: absolute; top: 50%; transform: translateY(-50%); font: 11px/1 var(--sans); letter-spacing: 0; text-transform: none; padding: 1px 4px; color: var(--text-faint); background: none; border: 1px solid var(--line); border-radius: 3px; cursor: pointer; }
-.lncols .w .colfold { right: 0; }
-.lncols .colfold:hover { color: var(--text); border-color: var(--text-faint); }
-.lncols .cf-show { display: none; left: -21px; }
-.hide-words .lncols .cf-show { display: block; }
-@media (max-width: 860px) { .lncols .colfold { display: none !important; } }
-
-.mc-where button:focus-visible, .frag-q button:focus-visible, .card-fold:focus-visible, .lncols .ann-cyc:focus-visible, .lncols .colfold:focus-visible { outline: 2px solid var(--beam); outline-offset: 1px; border-radius: 2px; }
 
 .mem-legend span[title], .legend span[title] { cursor: help; }
 /* the collision shape in three steps */
