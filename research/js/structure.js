@@ -1,6 +1,6 @@
 /*
  * structure.js - the static structure of a version's code, and a comparison
- * of two versions by it (Art's Dynamic Profile Gizmo, ⇄ Compare).
+ * of two versions by it (the Dynamic Profile, ⇄ Compare).
  *
  * After Art Schwarz: rather than compare listings line by line, take the code
  * without its comments, cut it into blocks between branches, and compare the

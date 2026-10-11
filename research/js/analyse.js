@@ -33,7 +33,7 @@
     [13, 'The ships', 'The ship outlines'],
     [14, 'Symbol histories', 'One symbol across the versions'],
     [15, 'Functional overview', 'Start-up, the main loop, each object’s routine, the calls'],
-    [16, 'Art’s Dynamic Profile Gizmo', 'The code as a graph of blocks']
+    [16, 'Dynamic Profile', 'The code as a graph of blocks, after Art Schwarz']
   ];
 
   function progLines(b) {
@@ -229,7 +229,7 @@
     return function () { return [SW.tableBlock('Share of executed instructions by routine', ['Routine', 'Instructions', '%'], rows.map(function (r) { return [r[0], r[1], (100 * r[1] / tot).toFixed(2)]; }))]; };
   }
 
-  // ---------- 16 Art's Dynamic Profile Gizmo ----------
+  // ---------- 16 Dynamic Profile (after Art Schwarz's gizmo) ----------
   // A profile in the professional sense (after a letter from Art Schwarz): the
   // run as a graph whose nodes are blocks of sequential code and whose edges are
   // the branches taken between them, with the time spent in each block. A block
@@ -632,7 +632,7 @@
     function keepBlock(bl) {
       if (!SW.tray) return;
       var nm = gzName(b.v.id, bl.a0), ref = bl.src ? SW.refText(b.v.id, bl.src.p, bl.src.n0, bl.src.n1, b.parts.length) : SW.refText(b.v.id);
-      SW.tray.addDoc({ title: 'Block ' + (nm ? nm + ' (' + bl.name + ')' : bl.name) + ' ' + ref, subtitle: 'Art’s Dynamic Profile Gizmo, ' + b.v.label,
+      SW.tray.addDoc({ title: 'Block ' + (nm ? nm + ' (' + bl.name + ')' : bl.name) + ' ' + ref, subtitle: 'Dynamic Profile, ' + b.v.label,
         blocks: [SW.tableBlock('The figures', ['', ''], blockFigures(bl))].concat(bl.src ? [{ type: 'code', caption: ref, lines: b.lines[bl.src.p].slice(bl.src.n0 - 1, bl.src.n1).map(function (L) { return { n: L.n, text: L.raw }; }) }] : []) },
         { vid: b.v.id, anchor: bl.src ? { p: bl.src.p, n0: bl.src.n0, n1: bl.src.n1, src: b.parts[bl.src.p].src } : null, tags: ['profile'] });
     }
@@ -1028,7 +1028,7 @@
       function keepRoutine(r, items, figs) {
         if (!SW.tray) return;
         var nm = rName(r), label = (r.b || r.a).name;
-        SW.tray.addDoc({ title: 'Routine ' + (nm ? nm + ' (' + label + ')' : label) + ', ' + ra + ' and ' + rb, subtitle: 'Art’s Dynamic Profile Gizmo, ⇄ Compare: ' + r.kind,
+        SW.tray.addDoc({ title: 'Routine ' + (nm ? nm + ' (' + label + ')' : label) + ', ' + ra + ' and ' + rb, subtitle: 'Dynamic Profile, ⇄ Compare: ' + r.kind,
           blocks: [SW.tableBlock('The figures', ['', ra + (r.a ? ' ' + ref(GA, r.a) : ''), rb + (r.b ? ' ' + ref(GB, r.b) : '')], figs),
                    SW.tableBlock('Its blocks', [ra, 'Change', rb], items.map(function (it) { return [it.a ? it.a.name + ' ' + linesOf(it.a) + ' ' + gzMs(blockMs(dA, it.a)) : '', kindOf(it.id), it.b ? it.b.name + ' ' + linesOf(it.b) + ' ' + gzMs(blockMs(dB, it.b)) : '']; }))] },
           { vid: b.v.id, anchor: r.b && r.b.src ? { p: r.b.src.p, n0: r.b.src.n0, n1: r.b.src.n1, src: b.parts[r.b.src.p].src } : null, tags: ['profile', 'compare'] });
@@ -2582,7 +2582,7 @@
                                        ['anno', 'Advanced annotation', 'Rich text, and links between annotations across versions'],
                                        ['codes', 'Codes, links and sharing', 'Every item’s code, links in annotations, Share, Findings and My notes'],
                                        ['paratexts', 'Paratexts', 'The crew’s scans and documents: collections, views, metadata, links'],
-                                       ['gizmo', 'Art’s Dynamic Profile Gizmo', 'Profiling a run, comparing versions, naming and marking blocks'],
+                                       ['gizmo', 'Dynamic Profile', 'Profiling a run, comparing versions, naming and marking blocks'],
                                        ['sitemap', 'Site map', 'Every view and version as a plain link']]],
                   ['Your bench', [['settings', 'Settings', 'Initials, group, theme, fonts'],
                                   ['backup', 'Back up everything', 'Notes, drafts, settings and findings in one file'],

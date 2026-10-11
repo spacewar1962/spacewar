@@ -1,5 +1,5 @@
 /*
- * gizmo-guide.js - the Help guide to Art's Dynamic Profile Gizmo (?help=gizmo), this bench's own,
+ * gizmo-guide.js - the Help guide to the Dynamic Profile (?help=gizmo), this bench's own,
  * added to bench-kit's guides (kit/guides.js).
  */
 (function (root) {
@@ -7,8 +7,8 @@
   var SW = root.SW;
   function ul(items) { return '<ul class="ah-steps">' + items.filter(Boolean).map(function (t) { return '<li>' + t + '</li>'; }).join('') + '</ul>'; }
   function k(t) { return '<kbd>' + t + '</kbd>'; }
-  SW.guideAdd('gizmo', ['Art’s Dynamic Profile Gizmo', [
-      ['What it is', '<p>Program ▸ The machine ▸ Art’s Dynamic Profile Gizmo, after Art Schwarz: the code as a graph of blocks, each a run of instructions between branches, joined by the branches taken. Three modes, in the bar: <b>Profile</b>, <b>⇄ Compare</b> and <b>☰ Across the versions</b>.</p>'],
+  SW.guideAdd('gizmo', ['Dynamic Profile', [
+      ['What it is', '<p>Program ▸ The machine ▸ Dynamic Profile, after Art Schwarz’s gizmo: the code as a graph of blocks, each a run of instructions between branches, joined by the branches taken. Three modes, in the bar: <b>Profile</b>, <b>⇄ Compare</b> and <b>☰ Across the versions</b>.</p>'],
       ['Profile', ul([
         '<b>▶ Sample run</b> runs the version here for 5 to 60 s of machine time, averaged over 1, 3 or 5 runs, with both ships flown by Lensman AI (a style for each), or with no one at the controls. Or play the game in Run and come back for the profile of your run.',
         'Each box is a block, shaded by its share of the time, with its time in milliseconds; edges are branches, thicker for more often. <b>Show</b> keeps the busiest blocks that make up 80% to 100% of the time.',
