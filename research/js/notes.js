@@ -326,9 +326,8 @@
   // note: {vid, kind, anchor, quote, text, tags, parent}
   N.create = function (note) {
     var me = SW.me(), by = note.by || me.initials;   // a note from My notes keeps the initials it was signed with
-    if (!by) {
-      SW.toast('Please set your initials first (⚙).', 4000);
-      return Promise.reject(new Error('no initials'));
+    if (!by) {   // asked for, then on with the saving
+      return SW.askInitials('This is signed with your initials, and none are set.').then(function (ini) { return ini ? N.create(note) : Promise.reject(new Error('no initials')); });
     }
     var tags = ['sw:v:' + note.vid, 'sw:kind:' + (note.kind || 'line'), 'sw:by:' + by]
       .concat(note.anchor ? ['sw:lines:' + note.anchor.p + ':' + note.anchor.n0 +
@@ -730,7 +729,7 @@
       });
     },
     save: function (t) {
-      var me = SW.me(); if (!me.initials) { SW.toast('Please set your initials first (⚙).', 4000); return Promise.reject(new Error('no initials')); }
+      var me = SW.me(); if (!me.initials) return SW.askInitials('A tracing is signed with your initials, and none are set.').then(function (ini) { return ini ? N.tracings.save(t) : Promise.reject(new Error('no initials')); });
       if (!N.configured()) return Promise.reject(new Error('Tracings are shared through the annotation group: join it first (Help ▸ Joining the annotation group).'));
       var uri = SW.BASE_URI + '?tracings';
       var text = '**Tracing: ' + t.title + '**' + (t.note ? '\n\n' + t.note : '') + '\n\nArt’s Dynamic Profile Gizmo, ' + t.vids.map(function (v) { return SW.refOf(v); }).join(' against ') + '.\n\n<!-- sw:tracing ' + b64e(t) + ' -->';
@@ -1353,7 +1352,7 @@
     var box = SW.el('div', { class: 'reply-box' });
     box.innerHTML = '<textarea rows="3" placeholder="Reply to ' + SW.esc(note.by) + '…"></textarea>' +
       '<div class="reply-foot"><span class="hint">' + (me.initials ? 'Signed <b>' + SW.esc(me.initials) + '</b> · ' + SW.fmtDate(SW.today()) +
-      (N.configured() ? '' : ' · draft') : '<span style="color:var(--red)">Set your initials first (⚙).</span>') + '</span>' +
+      (N.configured() ? '' : ' · draft') : '<span style="color:var(--red)">No initials set: you will be asked for them when you reply.</span>') + '</span>' +
       '<span><button class="btn ghost" data-r="cancel">Cancel</button> <button class="btn" data-r="save">Reply</button></span></div>';
     noteEl.insertAdjacentElement('afterend', box);
     var ta = box.querySelector('textarea');
@@ -1407,7 +1406,9 @@
     SW.$('#note-who').innerHTML = me.initials
       ? 'Signed <b>' + SW.esc(me.initials) + '</b> · ' + SW.fmtDate(SW.today()) +
         (N.configured() ? ' · shared with the group' : ' · kept as a draft (no group set)')
-      : '<span style="color:var(--red)">Set your initials first (⚙).</span>';
+      : '<span style="color:var(--red)">No initials set.</span> <button type="button" class="btn ghost ini-now">Set your initials</button>';
+    var iniNow = SW.$('#note-who .ini-now');
+    if (iniNow) iniNow.onclick = function () { SW.askInitials().then(function (ini) { if (ini) SW.$('#note-who').innerHTML = 'Signed <b>' + SW.esc(ini) + '</b> · ' + SW.fmtDate(SW.today()) + (N.configured() ? ' · shared with the group' : ' · kept as a draft (no group set)'); }); };
     dlg.returnValue = '';
     var hint = SW.$('.keep-hint', dlg), ta = SW.$('#note-text'), tgs = SW.$('#note-tags');
     hint.textContent = 'Unsaved annotation. Save it, or Cancel to discard it.'; hint.hidden = true;

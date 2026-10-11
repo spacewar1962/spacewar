@@ -121,7 +121,7 @@
   function busy(d) { busyN += d; var el = view && SW.$('.px-busy', view); if (el) el.textContent = busyN ? 'Saving…' : ''; }
   function prep(c) { c.items = c.items || []; c.collections = c.collections || []; }
   function change(label, fn) {
-    if (me() === '?') { SW.toast('Please set your initials first (⚙).', 4000); return Promise.resolve(false); }
+    if (me() === '?') return SW.askInitials('Changes to the paratexts are signed with your initials, and none are set.').then(function (ini) { return ini ? change(label, fn) : false; });
     try { prep(cat); fn(cat); } catch (e) { /* shown again after the save */ }
     refresh(); busy(1);
     return save(label + ', by ' + me(), function (c) { prep(c); fn(c); }).then(function () { busy(-1); refresh(); return true; }, function (e) {
@@ -615,7 +615,7 @@
     citedIn(code, SW.$('.px-cited', d));
     function talk(label, change) {   // a rating, emoji or comment: saved, then the talk redrawn
       var who = me();
-      if (who === '?') { SW.toast('Please set your initials first (⚙).', 4000); return Promise.resolve(); }
+      if (who === '?') return SW.askInitials('Ratings, reactions and comments are signed with your initials, and none are set.').then(function (ini) { return ini ? talk(label, change) : null; });
       return save('Paratext ' + it.code + ': ' + label + ', by ' + who, function (c) { c.items.forEach(function (x) { if (x.code === it.code) change(x, who); }); })
         .then(function () { it = byCode(code); var t = SW.$('.px-talk', d), op = SW.$('.px-cfold', t) && SW.$('.px-cfold', t).open; t.innerHTML = talkHTML(it); if (op) SW.$('.px-cfold', t).open = true; SW.mdTools(SW.$('.px-cbox textarea', t)); refresh(); }, function (err) { SW.toast(err.message, 5000); });
     }

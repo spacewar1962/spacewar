@@ -287,7 +287,7 @@
     if (HELP[q.help]) setTimeout(HELP[q.help], 700);
     if (q.tour) setTimeout(function () { SW.tours.start(q.tour); }, 900);
     else if (!SW.store.get('tour.seen', false)) setTimeout(SW.tours.offer, 1200);
-    else if (!SW.store.get('initials', '')) setTimeout(function () { SW.toast('Welcome. Set your initials (⚙) so your annotations are signed.', 5000); }, 800);
+    else if (!SW.store.get('initials', '') && Date.now() - (+SW.store.get('ini.later', 0) || 0) > 7 * 864e5) setTimeout(function () { if (!document.querySelector('dialog[open]')) SW.askInitials('Welcome. Annotations, notes and findings are signed with your initials.'); }, 1200);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 })(this);

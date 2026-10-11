@@ -157,6 +157,38 @@
   // ---------- toast / status ----------
   var toastTimer;
   // act: {label, fn}, a button in the toast (Undo)
+  // Your initials, asked for in a box when something needs signing and none are set: the box stays
+  // until you save or choose Not now. Resolves with the initials saved, or null.
+  var iniAsk = null;
+  SW.askInitials = function (why) {
+    if (iniAsk) return iniAsk;
+    iniAsk = new Promise(function (done) {
+      var d = SW.el('dialog', { class: 'ini-dlg' });
+      d.innerHTML = '<form method="dialog" class="settings"><h2>Your initials</h2>' +
+        '<p>' + SW.esc(why || 'Annotations, notes and findings are signed with your initials.') + ' They are kept in this browser (⚙ Settings has them too).</p>' +
+        '<label>Initials <input class="ini-in" maxlength="4" autocomplete="off" placeholder="e.g. AB" required></label>' +
+        '<label>Name <input class="ini-name" autocomplete="name" placeholder="optional" value="' + SW.esc(SW.store.get('name', '')) + '"></label>' +
+        '<p class="hint ini-msg"></p><div class="row"><button value="later" class="btn ghost" formnovalidate>Not now</button><button value="save" class="btn">Save</button></div></form>';
+      document.body.appendChild(d);
+      var inp = SW.$('.ini-in', d), saved = null;
+      inp.addEventListener('input', function () { var p = inp.selectionStart; inp.value = inp.value.toUpperCase().replace(/[^A-Z]/g, ''); inp.setSelectionRange(p, p); });
+      SW.$('form', d).addEventListener('submit', function (e) {
+        if (e.submitter && e.submitter.value === 'later') return;
+        var v = inp.value.trim();
+        if (!/^[A-Z]{2,4}$/.test(v)) { e.preventDefault(); SW.$('.ini-msg', d).textContent = 'Two to four letters, please.'; inp.focus(); return; }
+        SW.store.set('initials', v); SW.store.set('name', SW.$('.ini-name', d).value.trim()); saved = v;
+      });
+      d.addEventListener('close', function () {
+        d.remove(); iniAsk = null;
+        if (saved) { SW.toast('Saved: you sign as ' + saved, 3000); SW.emit('me', saved); } else SW.store.set('ini.later', Date.now());
+        done(saved);
+      });
+      d.showModal(); inp.focus();
+    });
+    return iniAsk;
+  };
+  // the initials, asked for first if there are none
+  SW.withInitials = function (why) { var i = SW.me().initials; return i ? Promise.resolve(i) : SW.askInitials(why); };
   SW.toast = function (msg, ms, act) {
     var t = SW.$('#toast');
     t.textContent = msg;
