@@ -38,7 +38,7 @@
       var steps = [
         ['3.1', '4.0', function (P) {
           ['imp', 'mpy', 'idv'].forEach(function (n) { var r = routine(P.R, n); ok('3.1→4.0: ' + n + ' (software arithmetic) removed', r && r.kind === 'removed', r ? r.kind : 'not found'); });
-          var a3 = routine(P.R, 'a3+16'); ok('3.1→4.0: a3+16 moved (its code in another routine in 3.1)', a3 && a3.kind === 'moved', a3 ? a3.kind : 'not found');
+          var a3 = routine(P.R, 'mg1'); ok('3.1→4.0: mg1 moved (its code in another routine in 3.1; 4.0 defines mg1 twice)', a3 && a3.kind === 'moved', a3 ? a3.kind : 'not found');
           var q = blockPair(P, 'sqx+8'); ok('3.1→4.0: sqx+8 altered, paired with its namesake', q.kind === 'altered' && q.to === 'sqx+8', JSON.stringify(q));
           var s15 = blockPair(P, 'sqx+15'); ok('3.1→4.0: sqx+15 the same, not paired with a lookalike', s15.kind === 'same' && s15.to === 'sqx+15', JSON.stringify(s15));
           var sq = routine(P.R, 'sqt'); ok('3.1→4.0: sqt altered (one block)', sq && sq.kind === 'altered' && sq.t.altered === 1 && !sq.t.inserted && !sq.t.removed, sq ? JSON.stringify(sq.t) : 'not found');

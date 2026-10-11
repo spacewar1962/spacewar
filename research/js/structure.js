@@ -289,20 +289,67 @@
   };
 
   // ---------- routines: the high level ----------
-  // A routine runs from an entry point to the next: the start, anything called
-  // (jsp, jda, cal), and anything reached by a jump the code does not name
-  // (jmp i, from the sample run: the main loop's dispatch to each object).
+  // A name for an address: its label (or the one written on its line, where the label is
+  // defined twice, as 4.0's mg1), or the label before it and how far on (fs+1), or octal.
+  S.nameOf = function (b, a) {
+    if (a in b.labelAt) return b.labelAt[a];
+    var s = b.srcOf(a), p = b.srcOf(a - 1), L = s && b.lines[s.p][s.n - 1];
+    if (L && !(p && p.p === s.p && p.n === s.n)) { var lb = SW.parseLine(L.raw).labels; if (lb && lb.length) return lb[0]; }
+    var l = -1; Object.keys(b.labelAt).forEach(function (k) { k = +k; if (k <= a && k > l) l = k; });
+    return l < 0 ? SW.oct(a, 4) : b.labelAt[l] + '+' + (a - l);
+  };
+  // The bench's one definition of a routine, used by the Dynamic Profile (its graphs, Compare and
+  // Across the versions) and by the Functional overview read from the source. From the assembled
+  // words, without a run, a routine begins:
+  //   at the start address;
+  //   at the address a jsp or jda names (a jda x routine begins at x, which holds its argument;
+  //   its code at x+1), unless the call is to itself, where the word is a call written in its line
+  //   or one reached from the start (a macro's: mult is jda mpy), so that a table of numbers that
+  //   happen to read as calls (the stars) begins nothing;
+  //   at a labelled instruction whose address is loaded (law x) and stored where the code calls
+  //   through it: law cwr, dac cwg, then jsp i cwg.
+  // A jump, indirect or set by a dap (law fys, dap frt, frt jmp .), does not begin one: it returns,
+  // or turns within a routine. A routine called through a table the code reads at run time (the
+  // objects' table, mtb) is not seen here.
+  // Returns { list: [addresses, sorted], why: {address: 'start' | 'call' | 'pointer'},
+  // enter: {address: where its code begins, for a jda routine} }.
+  S.entries = function (b) {
+    var mem = b.asm.memory, why = {}, enter = {}, reach = {}, work = [b.asm.start], viaI = {};
+    function code(a) { return mem[a] && b.srcOf(a); }
+    function add(a, k) { a &= 0o7777; if (!why[a] && b.srcOf(a)) why[a] = k; }
+    function says(a) { var s = b.srcOf(a), L = s && b.lines[s.p][s.n - 1]; return !!L && /\b(jsp|jda)\b/i.test(SW.parseLine(L.raw).code); }
+    function call(md) { var op = md >> 13, ib = (md >> 12) & 1; return (op === 0o31 && !ib) || (op === 0o07 && ib); }   // jsp y, jda y
+    add(b.asm.start, 'start');
+    Object.keys(mem).forEach(function (k) {   // what is called through: jsp i v, or v a call whose address is set
+      var md = mem[k].val;
+      if ((md >> 13) === 0o31 && (md >> 12) & 1) viaI[md & 0o7777] = 1;
+      if (call(md) && (md & 0o7777) === +k) viaI[+k] = 1;
+    });
+    Object.keys(mem).forEach(function (k) {   // law x, then dac v or dap v
+      var a = +k, md = mem[a].val, nx = mem[(a + 1) & 0o7777], x = md & 0o7777;
+      if ((md >> 12) !== 0o70 || !nx || !(x in b.labelAt) || !code(x)) return;
+      var op = nx.val >> 12;
+      if ((op === 0o24 || op === 0o26) && viaI[nx.val & 0o7777]) { add(x, 'pointer'); work.push(x); }
+    });
+    while (work.length) {   // what the code reaches, as the machine would go
+      var a = work.pop() & 0o7777;
+      if (reach[a] || !code(a)) continue;
+      reach[a] = 1;
+      var md = mem[a].val, fl = flow(md, a);
+      if (call(md)) work.push(md >> 13 === 0o07 ? ((md & 0o7777) + 1) & 0o7777 : md & 0o7777, (a + 2) & 0o7777);
+      (fl ? fl.to.map(function (x) { return x[0]; }) : [(a + 1) & 0o7777]).forEach(function (t) { work.push(t); });
+    }
+    Object.keys(mem).forEach(function (k) {
+      var a = +k, md = mem[a].val, y = md & 0o7777;
+      if (!call(md) || y === a || !(reach[a] || says(a))) return;
+      add(y, 'call'); if (md >> 13 === 0o07) enter[y] = (y + 1) & 0o7777;
+    });
+    return { list: Object.keys(why).map(Number).sort(function (x, y) { return x - y; }), why: why, enter: enter };
+  };
+  // A routine runs from where one begins (S.entries) to where the next does.
   // opts.split: the largest routine (the main loop) cut at each label a branch arrives at
   S.routines = function (G, opts) {
-    var ent = {}, called = {}; if (G.entry != null) ent[G.blocks[G.entry].a0] = 1;
-    // where a call comes back to is not an entry: the word after a call
-    // (a call may be followed by its arguments, so up to three words after it)
-    var back = {}; G.edges.forEach(function (e) { if (e.kind === 'call') { var c = G.blocks[e.f].a1; back[c + 1] = back[c + 2] = back[c + 3] = 1; } });
-    G.edges.forEach(function (e) {
-      var t = G.blocks[e.t].a0;
-      if (e.kind === 'call') { ent[t] = 1; called[t] = 1; }
-      else if (e.kind === 'branch' && G.blocks[e.f].open && !back[t]) ent[t] = 1;
-    });
+    var ent = {}; S.entries(G.b).list.forEach(function (a) { ent[a] = 1; });
     if (opts && opts.split) {
       var st0 = Object.keys(ent).map(Number).sort(function (x, y) { return x - y; }), size = {};
       G.blocks.forEach(function (bl) { var s0 = st0[0]; for (var i = 0; i < st0.length && st0[i] <= bl.a0; i++) s0 = st0[i]; size[s0] = (size[s0] || 0) + 1; });
@@ -315,8 +362,7 @@
       var s0 = -1; for (var i = 0; i < starts.length && starts[i] <= bl.a0; i++) s0 = starts[i];
       var key = s0 < 0 ? bl.a0 : s0, r = rs.filter(function (q) { return q.a0 === key; })[0];
       if (!r) {
-        var nm = s0 < 0 ? bl.name : G.blocks[G.at[key]].name;
-        if (called[key] && /\+1$/.test(nm) && (key - 1) in G.b.labelAt) nm = G.b.labelAt[key - 1];   // jda x enters at x+1: the routine is x
+        var nm = s0 < 0 ? bl.name : S.nameOf(G.b, key);
         r = { i: rs.length, a0: key, name: nm, blocks: [], words: 0 }; rs.push(r);
       }
       r.blocks.push(bl.i); r.words += bl.a1 - bl.a0 + 1; of[bl.i] = r.i;
