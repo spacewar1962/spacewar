@@ -166,7 +166,7 @@
     if (q.cmp && q.v) { var cb = SW.store.get('an.gizmoCmpBy', {}) || {}; cb[q.v] = q.cmp; SW.store.set('an.gizmoCmpBy', cb); }
     if (q.gz === 'compare') SW.store.set('an.gizmoSplit', q.split === '1');
     if (q.rt) SW.state.gzRoutine = q.rt;
-    if (q.tr) SW.state.gzTrace = q.tr;
+    if (q.tr) SW.state.trace = q.tr;   // a shared tracing to open (kit/tracings.js)
     if (q.g) { SW.setGraphic(q.g); if (!q.tab) q.tab = 'graphics'; }
     SW.state.tab = ORDER.indexOf(q.tab) >= 0 ? q.tab : 'read';
     document.body.dataset.tab = SW.state.tab;
