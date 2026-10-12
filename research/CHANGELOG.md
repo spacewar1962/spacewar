@@ -2,6 +2,59 @@
 
 Changes to the _Spacewar!_ research bench (`research/`). The bench keeps its own version numbers, raised by 0.0.1 with each change; this file records the minor versions. The website's changes are in the `CHANGELOG.md` at the root of the repository.
 
+## 1.19.0 (2026-10-12)
+
+Everything from 1.18.1 to 1.18.95.
+
+### Paratexts
+
+- **The crew's archive.** Scans, clippings, photographs, recordings and documents, kept in the private `sw_paratexts` repository and read and written through GitHub with each member's own token. Collections, grid and list views, selection, accession dates, ratings in gold, and a safer Withdraw kept in a submenu.
+- **Catalogued.** Archive fields (Held at, Archive ref, Source ↗) and Dublin Core (type, publisher, contributors, language, coverage, identifiers, extent), exported as Dublin Core XML, CSL-JSON and RIS for Zotero. Files cached in the browser once fetched.
+- **Media.** Audio and video play in place; linked items from YouTube, Vimeo, the Internet Archive or a web page.
+- **Reading them.** Pictures and PDF pages zoom, drag and page through alike (PDFs drawn by PDF.js); two paratexts side by side, moving together.
+- **In annotations.** A paratext's code (P-…) in an annotation reads as Paratext: and its title, and opens the paratext read-only where you are. Cited in on each paratext lists the annotations that cite it.
+- **Joining.** Invitation links set the annotation group; the joining guide is a form; Share buttons give a link to the current view.
+
+### Dynamic Profile (Program ▸ The machine)
+
+Art's Dynamic Profile Gizmo, renamed.
+
+- **One definition of a routine**, shared with the Functional overview: a routine begins at the start address, at what a jsp or jda calls, at an address called through a word set by law (cwr), and at what is stored in the objects' table the main loop runs (ss1, ss2, mex, tcr, hp1, hp3). Each version now gives the same routines in both views.
+- **Compare** matches blocks by like code before place, matches macros by their operations, and counts a block matched into another routine as moved out or in. Checked by `tests/compare.html` (20 checks on pairs whose changes are known).
+- **☰ Across the versions**: every routine followed from parent to child through the descent.
+- **Names, marks and tracings.** A named block keeps its own label beside it; shift-click marks a box in a colour; tracings are shared with the crew through the annotation group.
+- The state of the view is in the address, with a Link button; sample runs are repeated and averaged.
+
+### Functional overview
+
+- **Read from the source**, beside the recorded run: the program from its start address, the routines each tape holds and what it assembles to, read from the assembled words without running.
+
+### Findings and notes
+
+- **F49–F52.** Sense switch 2 and the star's pull (heavy or light by default, and none in 4.3 and 4.4); explosions that collide in Spacewar! 1 and 2B; 4.1's jump dispatch and per-object collision test; the torpedo's `dispt i`, misread in 4.0, 4.0TS and 4.2.
+- My notes as cards, coloured by kind; codes (#, ?code=) go to an annotation, reply, finding or note.
+
+### Annotations
+
+- Unsaved annotations, replies and edits are kept through Esc, Cancel and leaving the page.
+- A box asks for your initials when they are needed, and the action carries on once they are saved.
+
+### Genealogy
+
+- Flow ribbons drawn from the lines themselves, forking and joining where code was re-cut, with a Detail control.
+
+### bench-kit
+
+- The bench shares its frame and most of its views with the SHRDLU bench through `research/kit` (critical-code-studies/bench-kit, now 0.32.0): the shell and menus, Read and its repairs, annotations, paratexts, Findings, Compare and Genealogy, the Analyse and Graphics frames, builds, the version list, themes and styles, Help pages, tests (94) and the release and site-map tools. The bench keeps its own lenses, pictures, emulator, assembler and the Spacewar! texts.
+- Licence: GPL-3.0, with the oversigma emulator files, the assembler (macro1.c's terms) and the multiply and divide (simh) credited under their own terms.
+
+### Fixes
+
+- The bench drew no torpedoes in 4.0, 4.0TS and 4.2: the transcriptions read `dispt 1` where the scans read `dispt i` (F52).
+- Compare follows a skip return after a call, and leaves out 4.1's `.x` variable marks.
+- Error badges in Read sized and worded as the toolbar's.
+- Phones: the tape strip gives way in the header, and the tab row fades where there is more to scroll.
+
 ## 1.18.0 (2026-10-05)
 
 Everything from 1.17.1 to 1.17.40.
