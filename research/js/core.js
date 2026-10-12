@@ -244,11 +244,6 @@
   SW.cpuOpts = function (v) {
     return { mdv: v.mdv, ctlLoad: v.ctlLoad, intenMap: SW.chmInten(v) };
   };
-  // The beam's brightness for a display intensity s (-4 to 3: DEC's order 4 5 6 7 0 1 2 3,
-  // PDP-35-2): 4 is seen by a photomultiplier only, 7 barely, 0 is normal, 3 brightest.
-  // As an opacity, 0 for s = -4; 0.62 for s = 0, as the bench drew normal points before.
-  var BEAM = [0, 0.12, 0.22, 0.34, 0.62, 0.75, 0.88, 1];
-  SW.beam = function (s) { s = s == null ? 0 : s; return BEAM[Math.max(-4, Math.min(3, s)) + 4]; };
   // ---------- assembly errors, explained (the badges in Read open this) ----------
   // MACRO's error codes, as DEC's manual gives them (F-36, 1962, pp. 26-28)
   var MACRO_ERR = { us: 'an undefined symbol (its value taken as zero)', mdt: 'a tag defined twice, differently', mdd: 'a multiple definition in a dimension statement', mdm: 'a macro defined twice', zpa: 'an illegal parameter assignment', mdv: 'a variable defined twice', ilp: 'a parity error (the character ignored)', ipi: 'an illegal pseudo-instruction', ilr: 'an illegal repeat', ids: 'an illegal dummy symbol', sce: 'storage capacity exceeded', ilf: 'an illegal format', tmc: 'too many constants', tmv: 'too many variables', tmp: 'too many parameters' };

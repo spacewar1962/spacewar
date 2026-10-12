@@ -53,6 +53,7 @@
       themeHint: 'The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.'
     },
     tag: 'sw:',   // the prefix of this bench's tags in Hypothesis before bench-kit 0.5.0 (sw:v:3.1 …): still read; new tags are bk:
+    tagsHint: 'e.g. gravity, labour, provenance',   // examples of tags, in the annotate dialog
     // the worked examples in Help ▸ Advanced annotation
     annoHelp: {
       manual: 'https://bitsavers.org/pdf/dec/pdp1/F36_MACRO_Nov62.pdf', manualName: 'MACRO manual',

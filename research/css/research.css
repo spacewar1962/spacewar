@@ -85,8 +85,6 @@
 .sunhelp-t td { white-space: nowrap; } .sunhelp-t td:nth-child(3) { white-space: pre; }
 @media (max-width: 760px) { .sunhelp-cols { grid-template-columns: minmax(0, 1fr); } }
 
-/* ---------- listing ---------- */
-
 /* ---------- run view ---------- */
 
 .run-left { overflow: auto; padding: 12px; min-width: 0; }
@@ -113,19 +111,6 @@
 
 .console h4 { margin: 8px 0 2px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; opacity: 0.8; }
 
-/* ---------- analysis ---------- */
-
-.kwic { font-family: var(--code-font); font-size: calc(var(--code-size) - 1px); }
-.kwic .kw { display: grid; grid-template-columns: minmax(3.5em, max-content) minmax(0, 1fr) auto minmax(0, 1fr); column-gap: 6px; padding: 1px 4px; white-space: pre; }
-.kwic .kn { color: var(--text-faint); text-align: right; padding-right: 8px; }
-.kwic .kl { text-align: right; overflow: hidden; text-overflow: ellipsis; direction: rtl; unicode-bidi: plaintext; }
-.kwic .kr { overflow: hidden; text-overflow: ellipsis; }
-.kwic .k { color: var(--amber); font-weight: 700; }
-.kwic div { cursor: pointer; }
-.kwic div:hover { background: var(--surface-2); }
-
-/* ---------- compare ---------- */
-
 /* Tape on listing paper is white, with an edge, so it stands off the page. */
 .tape-roll canvas, .tape-strip canvas, .tape-title-img svg { box-shadow: 0 0 0 1px var(--line); }
 
@@ -139,44 +124,20 @@
 
 /* ---------- small screens ---------- */
 @media (max-width: 860px) {
-  body { overflow: auto; }
-  .bar { flex-wrap: wrap; }
   .tape-strip { order: 5; flex-basis: 100%; }
-  .brand-name b { display: none; }
-  .run { grid-template-columns: 1fr !important; height: auto; }
   .run-left { border-right: 0; }
   .run-split { display: none; }
-  body.drawer-open main { margin-right: 0; }
-  .drawer { width: 100%; }
-  .ln, .lncols { grid-template-columns: 3.2em 1fr 2em; }
-  .ln .a, .ln .w, .lncols .a, .lncols .w { display: none; }
-  .diff .row { grid-template-columns: 3em 1fr; }
-  .diff .row > span:nth-child(3), .diff .row > span:nth-child(4) { display: none; }
-  .meta { grid-template-columns: 1fr; }
 }
-
-/* An annotated line: a faint ground, not a rule, so its text keeps its column (off in ⚙ Settings) */
-:root:not(.no-note-shade) .rd-body:not(.notes-hidden) .ln.noted:not(.sel):not(.cur):not(.mlit):not(:hover) { background: var(--noted-bg); }
-
-/* Kinds of line, in the syntax colours. */
-/* definitions marked by a thin rule at the left of the line number, not a ground (a ground was distracting) */
 
 /* Macro calls: a dotted cyan rule, unlike the solid violet of definitions and normalised lines. */
 .ln.kcall .t { background-image: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px); background-size: 2px 100%; background-repeat: no-repeat; padding-left: 5px; }
-.keylist .lab { color: var(--beam); } .keylist .mac { color: var(--violet); font-weight: 600; } .keylist .num { color: var(--amber); } 
+
 .kx.kcall { background: repeating-linear-gradient(to bottom, var(--beam) 0 3px, transparent 3px 5px) left / 3px 100% no-repeat; border: 1px solid var(--line); }
 .kx.knorm { background: linear-gradient(to left, var(--violet) 0, var(--violet) 3px, transparent 3px); border: 1px solid var(--line); }
 
 .dl-pick { display: inline-flex; gap: 4px; margin-left: 2px; }
 .dl-pick[hidden] { display: none; }
 .dl-pick button { border: 1px solid var(--line) !important; border-radius: 4px; padding: 0 6px !important; }
-
-/* ---------- findings ---------- */
-
-.pgbrk { color: var(--text-faint); font-size: 0.85em; margin-right: 2px; }
-
-/* ---------- Read: notes inline (the default), under the last line each covers, on the right,
-   in type a little smaller than the code ---------- */
 
 /* Tape: wrapped rows, each with its first frame's number; or one strip to scroll along */
 .tape-roll.wrapped { overflow-x: hidden; }
@@ -333,8 +294,6 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-calls { list-style: none; margin: 3px 0 0 4px; padding-left: 12px; border-left: 1px solid var(--line); font-size: 12.5px; }
 .ov-calls li { margin: 2px 0; }
 
-/* line kinds: a vertical strip at the left of the number, drawn as a background so
-   consecutive lines join into one line (a shadow per cell could show seams) */
 /* functional overview: chart, budget, inspector */
 .ov-scope canvas { width: 100%; max-width: 300px; aspect-ratio: 1; display: block; margin: 0 auto; }
 .ov-scap { text-align: center; font-size: 12px; margin: 4px 0 0; }
@@ -354,8 +313,6 @@ a.ov-nm:hover { text-decoration: underline; }
 .ov-budget { display: grid; gap: 3px; }
 .ov-brow { display: grid; grid-template-columns: 8em minmax(80px, 1fr) 4em 16em; gap: 8px; align-items: center; font-size: 12.5px; cursor: pointer; padding: 1px 4px; border-radius: 4px; }
 .ov-brow:hover, .ov-brow.on { background: color-mix(in srgb, var(--beam) 16%, transparent); }
-.ov-bar { height: 10px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
-.ov-bar i { display: block; height: 100%; }
 .ov-bv { text-align: right; white-space: nowrap; }
 .ov-bv.faint { text-align: left; }
 @media (max-width: 700px) { .ov-brow { grid-template-columns: 6em 1fr 3.5em; } .ov-brow .ov-bv.faint { display: none; } }
@@ -572,8 +529,6 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 :root, :root[data-theme] { --kin: light-dark(#a8801c, #e2bb52); }
 .rp-c { text-decoration-line: underline; text-underline-offset: 3px; cursor: help; }
 /* the squiggle, as under a misspelt word, under the code and comment: gold for a repair, grey for an uncertain reading */
-.ln.rp-sq::after { content: ''; position: absolute; z-index: 1; pointer-events: none; left: var(--k0, 6px); width: var(--kw, calc(100% - 20px)); bottom: -1px; height: 4px; background: var(--kin);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4'%3E%3Cpath d='M0 2 Q1.5 -0.4 3 2 T6 2' fill='none' stroke='black' stroke-width='1.3'/%3E%3C/svg%3E") repeat-x 0 0 / 6px 4px; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='4'%3E%3Cpath d='M0 2 Q1.5 -0.4 3 2 T6 2' fill='none' stroke='black' stroke-width='1.3'/%3E%3C/svg%3E") repeat-x 0 0 / 6px 4px; }
 .ln.rp-sq-unc::after { background: color-mix(in srgb, var(--text-faint) 85%, transparent); }
 .rp-c-fix, .rp-c-kake { text-decoration-line: none; border-radius: 2px; }
 .rp-c-fix { background: color-mix(in srgb, var(--kin) 24%, transparent); }
@@ -589,21 +544,11 @@ body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 /* What you should read; Reconstruction cards */
 .rp-chip.rp-m-yobitsugi { background: color-mix(in srgb, var(--kin) 14%, transparent); }
 .rp-chip.rp-m-kake { background: color-mix(in srgb, var(--kin) 22%, transparent); }
-.rp-chip.rp-m-mount { border-color: color-mix(in srgb, var(--kin) 50%, transparent); color: color-mix(in srgb, var(--kin) 70%, var(--text-faint)); }
 .rp-chip.rp-m-unc { border-color: var(--text-faint); color: var(--text-faint); }
 /* ◆ ‹ ›: the repairs in the text */
 .toolbar .kin-nav .kin-dia { color: var(--kin); }
-@keyframes kin-flash { 0%, 35% { background: color-mix(in srgb, var(--kin) 26%, transparent); } 100% { background: transparent; } }
-@media (prefers-reduced-motion: reduce) { .ln.kin-flash { animation: none; background: color-mix(in srgb, var(--kin) 18%, transparent); } }
-.kin-k { font: 600 9.5px/1.6 var(--sans); text-transform: uppercase; letter-spacing: .05em; padding: 0 5px; border-radius: 3px; border: 1px solid var(--kin); color: var(--kin); }
 .kin-k.kin-uncertain { border-color: var(--text-faint); color: var(--text-faint); }
 .toolbar .kin-tog.open { background: var(--surface-2, var(--surface)); }
-/* the repairs bar: a second row of the toolbar, folded down from ◆ */
-.kin-bar .kb { display: inline-flex; align-items: center; gap: 3px; height: 24px; min-width: 24px; justify-content: center; padding: 0 5px; font: 12px var(--sans); color: var(--kin); background: none; border: 1px solid transparent; border-radius: 4px; cursor: pointer; flex: none; }
-.kin-bar .kb:hover:not([disabled]) { border-color: color-mix(in srgb, var(--kin) 50%, var(--line)); }
-.kin-bar .kb[aria-pressed="true"] { background: color-mix(in srgb, var(--kin) 18%, transparent); border-color: color-mix(in srgb, var(--kin) 55%, transparent); }
-.kin-bar .kb-x { margin-left: auto; color: var(--text-faint); }
-.kin-bar .kin-cur .mono { color: var(--kin); }
 
 /* Art's Dynamic Profile Gizmo */
 .gz-ctl { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin: 4px 0 8px; }
@@ -730,8 +675,3 @@ dialog.fd-big { width: min(92vw, 780px); padding: 10px 14px; }
   .tabs.more-right { -webkit-mask-image: linear-gradient(to right, #000 82%, transparent); mask-image: linear-gradient(to right, #000 82%, transparent); }
 }
 
-/* a rating as a row of three stars */
-/* paratexts side by side */
-/* paratexts: audio, video and linked items */
-
-/* zoom in a single item's box */
