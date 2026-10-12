@@ -3,34 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Annotation tests · Spacewar! Research Bench</title>
-<style>
-  :root { --bg: #0a0e15; --text: #dde8f3; --dim: #8ea3b8; --ok: #7be3a0; --bad: #ff8a8a; }
-  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) { --bg: #f7f4ec; --text: #1d2430; --dim: #5d6a78; --ok: #1f7a45; --bad: #b3261e; } }
-  body { background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 16px; }
-  h1 { font-size: 18px; margin: 0 0 4px; }
-  p { color: var(--dim); margin: 0 0 12px; max-width: 70ch; }
-  #sum { font-weight: 600; margin: 8px 0 12px; }
-  .ok { color: var(--ok); } .bad { color: var(--bad); }
-  ol { padding-left: 1.4em; margin: 0; }
-  li { margin: 2px 0; }
-  pre { white-space: pre-wrap; font: 12px ui-monospace, monospace; color: var(--dim); margin: 2px 0 6px; }
-</style>
+<title>Tests · Spacewar! Research Bench</title>
 </head>
 <body>
-<h1>Annotation tests</h1>
-<p>Checks of the annotation system's pure parts: the Markdown renderer, rich text back to Markdown, plain text for print, earlier wordings, bench links, ghost matching, open and resolved, and mentions. Nothing here reads or writes Hypothesis. Open this page from the bench's folder (research/tests/annotations.html); the result is also in window.__results.</p>
-<div id="sum">Running…</div>
-<ol id="out"></ol>
-<script>
-  // the bench's own scripts, fresh each time (no cached copy), then the tests
-  (function load(list) {
-    if (!list.length) return;
-    var el = document.createElement('script');
-    el.src = list[0] + '?t=' + Date.now();
-    el.onload = function () { load(list.slice(1)); };
-    document.body.appendChild(el);
-  })(['../js/pdp1asm.js', '../js/pdp1cpu.js', '../js/fiodec.js', '../kit/versionlist.js', '../js/versions.js', '../kit/export.js', '../kit/lang-macro.js', '../kit/genealogy.js', '../kit/base.js', '../js/config.js', '../kit/md.js', '../kit/themes.js', '../kit/refs.js', '../kit/builds.js', '../js/core.js', '../kit/initials.js', '../kit/notes.js', 'annotations.test.js', '../kit/tests/run.js']);
-</script>
+<!-- bench-kit's tests (kit/tests/run.js loads the bench's scripts from index.html, then the
+     tests), after this bench's values for them -->
+<script src="annotations.test.js"></script>
+<script src="../kit/tests/run.js"></script>
 </body>
 </html>
