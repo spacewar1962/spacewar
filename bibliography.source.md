@@ -46,6 +46,10 @@ Crawford, K. (2021) *Atlas of AI*. Yale University Press.
 
 D'Ignazio, C. & Klein, L. F. (2020) *Data Feminism*. MIT Press.
 
+Digital Equipment Corporation (1961) *PDP-1 Handbook*. Maynard, MA: Digital Equipment Corporation (F-15B). Available at: http://bitsavers.org/pdf/dec/pdp1/F15B_PDP1_Handbook_1961.pdf.
+
+Edwards, D. J. & Graetz, J. M. (1962) 'PDP-1 Plays at Spacewar', *DECUSCOPE* 1(1): 2-3. Maynard, MA: Digital Equipment Computer Users Society. Available at: http://bitsavers.org/pdf/dec/decus/decuscope/Decuscope_Vol01_No1_Apr62.pdf.
+
 Ensmenger, N. (2010) *The Computer Boys Take Over*. MIT Press.
 
 Ernst, W. (2013) *Digital Memory and the Archive*. Ed. Parikka, J. Minneapolis: University of Minnesota Press.
