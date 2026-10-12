@@ -230,12 +230,7 @@
     if (s) {
       h += '<div>' + (s.variable ? 'Variable' : s.label ? 'Label' : 'Symbol') + ' = <span class="num mono">' + SW.oct(s.val) + '</span>' +
         (!s.defined ? ' <span class="badge err">undefined</span>' : '') + '</div>';
-      var list = s.defs.map(function (d) { return ['def', d]; }).concat(s.refs.map(function (r) { return ['ref', r]; }));
-      h += '<div class="refs">' + list.slice(0, 200).map(function (x) {
-        var L = b.lines[x[1].file][x[1].line - 1];
-        return '<a href="#" data-p="' + x[1].file + '" data-n="' + x[1].line + '">' + (x[0] === 'def' ? '◆ ' : '· ') +
-          x[1].line + '  ' + SW.esc((L ? L.raw : '').trim().slice(0, 44)) + '</a>';
-      }).join('') + '</div><div class="faint">' + s.defs.length + ' definition(s), ' + s.refs.length + ' reference(s)</div>';
+      h += SW.symbolRefs(b, s) + '<div class="faint">' + s.defs.length + ' definition(s), ' + s.refs.length + ' reference(s)</div>';
     }
     if (!g && !s && !b.macros[name]) h += '<div class="faint">No symbol of this name in this build.</div>';
     else if (s || b.macros[name]) h += '<div style="margin-top:6px"><a href="#" data-bio="' + SW.esc(name) + '" title="Follow this name through every version: when it appears, changes and goes (Text ▾ Symbol histories)">Its history across the versions →</a></div>';

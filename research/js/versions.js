@@ -14,6 +14,8 @@
   'use strict';
 
   var SRC = '../sources/';
+  // the list's machinery (links, descent, loading) is bench-kit's kit/versionlist.js
+  var L = root.SWVersionList || require('../kit/versionlist.js');
 
   // Named, documented normalisations.
   var TRANSFORMS = {
@@ -264,13 +266,7 @@
       return { by: 'log', who: 'Claude Code (build log)', date: '2026-09-25', text: t };
     });
     if (v.runnable === undefined) v.runnable = !!v.build && v.id !== 'stars';
-    v.url = function () { return '#v=' + encodeURIComponent(v.id); };
   });
-
-  function byId(id) {
-    for (var i = 0; i < VERSIONS.length; i++) if (VERSIONS[i].id === id) return VERSIONS[i];
-    return null;
-  }
 
   // ---------- descent ----------
   // After 4.0 the program forks: ddp (4.0TS, 4.2 to 4.4) and dfw (4.1, 4.8). ddp's
@@ -293,22 +289,6 @@
   var WITNESS = { '3.1t': '3.1', '4.1t': '4.1', '4.4m': '4.4' };
   var ALSO = { '4.1f': ['4.8'], '2015': ['4.8', '4.3m'] };
   var INFLUENCE = { '4.8': ['4.4'] };
-  VERSIONS.forEach(function (v) {
-    v.parent = PARENT[v.id] || null;
-    v.witnessOf = WITNESS[v.id] || null;
-    v.also = ALSO[v.id] || [];
-    v.influence = INFLUENCE[v.id] || [];
-  });
-  // The chain from the first version to this one, following parents (a witness
-  // stands in for the version it reads).
-  function ancestry(id) {
-    var v = byId(id), chain = [];
-    if (!v) return chain;
-    var cur = v.witnessOf || v.id;
-    while (cur) { chain.unshift(cur); var p = byId(cur); cur = p && p.parent; }
-    if (v.witnessOf) chain[chain.length - 1] = v.id;
-    return chain;
-  }
   // The lines of descent, each a straight chain the genealogy can follow.
   var LINES = [
     { id: 'ddp', label: 'ddp line (4.0 → 4.1 → 4.2 → 4.3 → 4.4)', tip: '4.4' },
@@ -316,7 +296,6 @@
     { id: 'dfw', label: 'dfw line (4.0 → 4.1 → 4.8)', tip: '4.8' },
     { id: 'chm', label: 'CHM line (4.1 → 4.1d → 4.1f → 2015)', tip: '2015' }
   ];
-  LINES.forEach(function (l) { l.ids = ancestry(l.tip); });
 
   // Find the "spacewar ..." title line of a modern transcription.
   function findTitle(lines) {
@@ -354,8 +333,9 @@
     });
   }
 
-  var api = { VERSIONS: VERSIONS, TRANSFORMS: TRANSFORMS, DIALECTS: DIALECTS, REPAIRS: REPAIRS, byId: byId, load: load,
-              findTitle: findTitle, SRC: SRC, LINES: LINES, ancestry: ancestry };
+  var api = L({ versions: VERSIONS, src: SRC, dialects: DIALECTS, transforms: TRANSFORMS, lines: LINES,
+                 parent: PARENT, witness: WITNESS, also: ALSO, influence: INFLUENCE,
+                 load: load, findTitle: findTitle, extra: { REPAIRS: REPAIRS } });
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.SWVersions = api;
 })(this);
