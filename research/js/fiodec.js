@@ -10,6 +10,9 @@
  * code (a page break on the tape). Object tapes (binary) fail the parity
  * test on roughly a third of their frames, which is how the two are told
  * apart.
+ *
+ * The FIO-DEC table below is macro1.c's (Messenbrink, Supnik, Budne),
+ * inverted, and is under macro1.c's terms, quoted in pdp1asm.js.
  */
 (function (root) {
   'use strict';

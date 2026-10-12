@@ -93,6 +93,8 @@ _Spacewar!_ was created in 1961–62 by Steve Russell, Martin Graetz, Wayne Wiit
 
 The original game is in the public domain; its credit paragraph (in `readme.html`) goes with every copy. The emulator, the assembler and the files that came with them are Barry Silverman, Brian Silverman and Vadim Gerasimov's, from `spacewar.oversigma.com`, uploaded here in February 2024 and included with their credit: `spacewar.js`, `spacewar.bin.js`, `macro.pl`, `pass12.pl`, `spacewar.mac`, `spacewar.lst`, `originsources.zip`, `readme.html`, `nocanvas.html` and `spacewar.css`. Their authors stated no licence for them, and the licence below does not cover them.
 
+The bench's assembler, `research/js/pdp1asm.js`, is a port of macro1.c (Gary A. Messenbrink, Bob Supnik and Phil Budne, in simh's tools), and the FIO-DEC table in `research/js/fiodec.js` is taken from it: both stay under macro1.c's own terms, quoted at the head of `pdp1asm.js`. The hardware multiply and divide in `research/js/pdp1cpu.js` are translated from simh's `pdp1_cpu.c`, and Robert M. Supnik's notice (a permissive licence, compatible with the GPL) is kept with them.
+
 Everything else, the research bench (`research/`, with bench-kit in `research/kit`) and the site, is distributed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)).
 
 ## Acknowledgements

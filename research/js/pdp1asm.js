@@ -26,6 +26,16 @@
  *  - a file marked pass1Only is read on pass 1 and passed over on pass 2, as
  *    the short tapes of assignments fed in after pass 1 of 4.3 and 4.4 were
  *    (their pass logs; F33).
+ *
+ * As a port of macro1.c this file is under macro1.c's terms, not the
+ * repository's GPL. macro1.c: Gary A. Messenbrink (macro8); MACRO7 and MACRO1
+ * modifications, Bob Supnik; made more like MACRO by Phil Budne. Its notice:
+ *    This is free software.  There is no fee for using it.  You may make
+ *    any changes that you wish and also give it away.  If you can make
+ *    a commercial product out of it, fine, but do not put any limits on
+ *    the purchaser's right to do the same.  If you improve it or fix any
+ *    bugs, it would be nice if you told me and offered me a copy of the
+ *    new version.
  */
 (function (root) {
   'use strict';
