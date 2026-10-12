@@ -93,6 +93,7 @@
     },
     // Help ▸ What you should read (kit/helppages.js): a short bibliography, every entry checked
     // against the project's Zotero library
+    sitemap: true,   // sitemap.html: Help ▸ Site map
     reading: {
       intro: 'Where to begin: on repairing old code, on reading code as a cultural text, and on Spacewar! itself. Links open in a new tab.',
       menu: 'A short bibliography: repairing old code, critical code studies, Spacewar!',

@@ -2384,22 +2384,12 @@
               ['genealogy', 'Genealogy', 'How the versions descend'],
               ['tape', 'Tape', 'The paper tapes, frame by frame'],
               ['absence', 'Absence', 'Gaps in the record, and what fills them']],
-    help: [['Getting started', [['tour', 'Take the welcome tour', 'Twelve stops through the bench; about three minutes'],
-                                       ['refs', 'Referencing and versions', 'How the bench cites a source, as [REF: SW3.1T, 2.141]'],
-                                       ['join', 'Joining the annotation group', 'An invitation, a Hypothesis account and your tokens, step by step'],
-                                       ['reading', 'What you should read', 'A short bibliography: repairing old code, critical code studies, Spacewar!'],
-                                       ['cards', 'Reconstruction cards', 'What was done to each text to read and run it; repairs in gold in Read'],
-                                       ['anno', 'Advanced annotation', 'Rich text, and links between annotations across versions'],
-                                       ['codes', 'Codes, links and sharing', 'Every item’s code, links in annotations, Share, Findings and My notes'],
-                                       ['paratexts', 'Paratexts', 'The crew’s scans and documents: collections, views, metadata, links'],
-                                       ['gizmo', 'Dynamic Profile', 'Profiling a run, comparing versions, naming and marking blocks'],
-                                       ['sitemap', 'Site map', 'Every view and version as a plain link']]],
-                  ['Your bench', [['settings', 'Settings', 'Initials, group, theme, fonts'],
-                                  ['backup', 'Back up everything', 'Notes, drafts, settings and findings in one file'],
-                                  ['restore', 'Restore from a backup…', 'Brings back notes and drafts beside those here']]],
-                  ['The project', [['code', 'Source code on GitHub ↗', 'github.com/spacewar1962/spacewar'],
-                                   ['issue', 'Report a problem ↗', 'GitHub issues'],
-                                   ['about', 'About the bench', 'Version, sources, citation']]]],
+    // Help ▾: the kit's list, with these lines changed, joining the group second, and the
+    // Dynamic Profile's guide added
+    help: { text: { tour: 'Twelve stops through the bench; about three minutes',
+                    refs: 'How the bench cites a source, as [REF: SW3.1T, 2.141]',
+                    paratexts: 'The crew’s scans and documents: collections, views, metadata, links' },
+            add: [['refs', 'join'], ['paratexts', ['gizmo', 'Dynamic Profile', 'Profiling a run, comparing versions, naming and marking blocks']]] },
     pick: function (which, p) {
       if (which === 'graphics' && p === 'tapesim') {   // opens over the Tape view, on its tape
         SW.setTab('tape');
