@@ -567,7 +567,9 @@ h2 .swref { font-size: 11.5px; vertical-align: middle; }
 body[data-tab="read"] .vlang, body[data-tab="run"] .vlang { display: inline; }
 @media (max-width: 860px) { body[data-tab] .vlang { display: none; } }
 /* repairs, in gold (kintsugi): corrected, remade, normalised, uncertain */
-:root { --kin: light-dark(#a8801c, #e2bb52); }
+/* the bench's own gold, deeper on light grounds (each theme sets color-scheme); [data-theme], so it
+   holds over kit/themes.css's gold in the light themes */
+:root, :root[data-theme] { --kin: light-dark(#a8801c, #e2bb52); }
 .rp-c { text-decoration-line: underline; text-underline-offset: 3px; cursor: help; }
 /* the squiggle, as under a misspelt word, under the code and comment: gold for a repair, grey for an uncertain reading */
 .ln.rp-sq::after { content: ''; position: absolute; z-index: 1; pointer-events: none; left: var(--k0, 6px); width: var(--kw, calc(100% - 20px)); bottom: -1px; height: 4px; background: var(--kin);
