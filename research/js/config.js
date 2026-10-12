@@ -94,7 +94,11 @@
     },
     // Help ▸ What you should read (kit/helppages.js): a short bibliography, every entry checked
     // against the project's Zotero library
-    sitemap: true,   // sitemap.html: Help ▸ Site map
+    // sitemap.html (Help ▸ Site map), written by kit/tools/sitemap.js
+    sitemap: { site: ['../index.html', 'The Spacewar! site'], opens: 'Spacewar! 3.1', lost: 'lost: no source survives',
+               sitePages: [['../ports.html', 'ports'], ['../people.html', 'people'], ['../timeline.html', 'timeline'], ['../bibliography.html', 'bibliography']],
+               intro: 'Every view of the Spacewar! Research Bench as a plain link, for when a menu will not open. The bench itself runs in JavaScript: the emulator, the listings and the annotations all need it. Without JavaScript, the source files below open on GitHub.',
+               files: 'The source files are the version’s own; where the bench supplies a macro tape or star table to assemble a version, that is in its record.' },
     reading: {
       intro: 'Where to begin: on repairing old code, on reading code as a cultural text, and on Spacewar! itself. Links open in a new tab.',
       menu: 'A short bibliography: repairing old code, critical code studies, Spacewar!',
