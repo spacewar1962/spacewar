@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://spacewar1962.github.io/spacewar/"><img alt="Live site" src="https://img.shields.io/badge/live-spacewar1962.github.io-6cf2ff"></a>
   <a href="https://github.com/spacewar1962/spacewar/releases"><img alt="Release" src="https://img.shields.io/github/v/release/spacewar1962/spacewar"></a>
-  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-AGPL--3.0-blue"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPL--3.0-blue"></a>
 </p>
 
 A critical code reading of **_Spacewar!_**, the space-combat game written for the DEC PDP-1 at MIT in 1961–62. We read the original Macro assembly source as a cultural text, in the tradition of Critical Code Studies: at once literature, mechanism, spatial form, and a repository of the social formation that produced it.
@@ -89,7 +89,11 @@ python3 build-bibliography.py    # rewrites bibliography.html
 
 ## Provenance and licence
 
-_Spacewar!_ was created in 1961–62 by Steve Russell, Martin Graetz, Wayne Wiitanen, and others in the circle around MIT's Tech Model Railroad Club, with the Expensive Planetarium by Peter Samson, gravity by Dan Edwards, and control boxes by Alan Kotok and Bob Saunders. The source and emulator preserved here descend from the canonical PDP-1 emulator by Barry Silverman, Brian Silverman, and Vadim Gerasimov (`spacewar.oversigma.com`), forked into this organisation for the reading. The original game is in the public domain; the emulator and surrounding code are distributed under the **GNU Affero General Public License v3.0** (see [`LICENSE`](LICENSE)).
+_Spacewar!_ was created in 1961–62 by Steve Russell, Martin Graetz, Wayne Wiitanen, and others in the circle around MIT's Tech Model Railroad Club, with the Expensive Planetarium by Peter Samson, gravity by Dan Edwards, and control boxes by Alan Kotok and Bob Saunders. The source and emulator preserved here descend from the canonical PDP-1 emulator by Barry Silverman, Brian Silverman, and Vadim Gerasimov (`spacewar.oversigma.com`), forked into this organisation for the reading.
+
+The original game is in the public domain; its credit paragraph (in `readme.html`) goes with every copy. The emulator, the assembler and the files that came with them are Barry Silverman, Brian Silverman and Vadim Gerasimov's, from `spacewar.oversigma.com`, uploaded here in February 2024 and included with their credit: `spacewar.js`, `spacewar.bin.js`, `macro.pl`, `pass12.pl`, `spacewar.mac`, `spacewar.lst`, `originsources.zip`, `readme.html`, `nocanvas.html` and `spacewar.css`. Their authors stated no licence for them, and the licence below does not cover them.
+
+Everything else, the research bench (`research/`, with bench-kit in `research/kit`) and the site, is distributed under the **GNU General Public License v3.0** (see [`LICENSE`](LICENSE)).
 
 ## Acknowledgements
 
