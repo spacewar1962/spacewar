@@ -1,11 +1,9 @@
 /*
- * core.js - this bench's own state and helpers: its texts fetched, assembled and indexed, its
- * references, repairs and reconstruction cards. The helpers every bench shares are in
- * bench-kit (kit/base.js, kit/md.js, kit/themes.js), loaded before this file.
- *
- * A "build" is one version fetched, normalised and assembled: the unit that
- * every view reads from. Builds are cached, so moving between views or
- * comparing versions never reassembles needlessly.
+ * core.js - this bench's own state and helpers: how a version is normalised, assembled (by
+ * the bench's MACRO, js/pdp1asm.js) and indexed, its references, repairs and reconstruction
+ * cards. Fetching, the cache of builds and opening a version at a line are bench-kit's
+ * (kit/builds.js), as are the helpers every bench shares (kit/base.js, kit/md.js,
+ * kit/themes.js), loaded before this file.
  */
 (function (root) {
   'use strict';
@@ -80,26 +78,7 @@
   SW.scopeCount = function (b) { return b && b.sym && b.sym.dj6 ? 2 : 1; };
   SW.scopeOf = function (b, md) { return SW.scopeCount(b) === 2 && md != null && (md & 0o777) === 0o407 ? 2 : 1; };
 
-  // ---------- fetching and building ----------
-  var textCache = {};
-  SW.fetchText = function (path) {
-    if (textCache[path]) return textCache[path];
-    var url = V.SRC + path.split('/').map(encodeURIComponent).join('/');
-    // revalidated, so a corrected transcription is not served from an old cache
-    textCache[path] = fetch(url, { cache: 'no-cache' }).then(function (r) {
-      if (!r.ok) throw new Error('Could not fetch ' + path + ' (' + r.status + ')');
-      return r.text();
-    });
-    return textCache[path];
-  };
-  SW.fetchBytes = function (path) {
-    var url = V.SRC + path.split('/').map(encodeURIComponent).join('/');
-    return fetch(url).then(function (r) {
-      if (!r.ok) throw new Error('Could not fetch ' + path);
-      return r.arrayBuffer();
-    }).then(function (b) { return new Uint8Array(b); });
-  };
-
+  // ---------- reading a line ----------
   // Parse one MACRO source line into label, code and comment fields.
   SW.parseLine = function (raw) {
     var s = raw.replace(/\n$/, '');
@@ -118,27 +97,21 @@
     return out;
   };
 
-  // Build = fetch + normalise + assemble + index. Cached per version/dialect.
-  var buildCache = {};
-  SW.build = function (id, dialect) {
-    var v = V.byId(id);
-    if (!v) return Promise.reject(new Error('Unknown version ' + id));
-    dialect = dialect || v.dialect;
-    var key = id + '|' + dialect;
-    if (buildCache[key]) return buildCache[key];
-    buildCache[key] = V.load(v, SW.fetchText, A.splitLines, SW.fetchBytes).then(function (L) {
-      var t0 = performance.now();
+  // A build: the tapes assembled in a dialect of MACRO and indexed (kit/builds.js caches it, by
+  // version and dialect)
+  SW.builds({
+    split: A.splitLines,
+    key: function (v, dialect) { return v.id + '|' + (dialect || v.dialect); },
+    read: function (v, L, dialect) {
+      dialect = dialect || v.dialect;
       // the pass-1 tape (4.3, 4.4): read on pass 1 only, unless the dialect leaves it out
       var files = L.files.concat(v.pass1 && !V.DIALECTS[dialect].noPass1 ? [{ name: v.pass1.name, text: v.pass1.text, pass1Only: true }] : []);
-      var asm = v.build ? A.assemble(files, V.DIALECTS[dialect].options) : null;
-      var b = { v: v, dialect: dialect, parts: L.parts, asm: asm, ms: 0 };
+      var b = { v: v, dialect: dialect, parts: L.parts, asm: v.build ? A.assemble(files, V.DIALECTS[dialect].options) : null };
       index(b);
-      b.ms = Math.round(performance.now() - t0);
       return b;
-    });
-    buildCache[key].catch(function () { delete buildCache[key]; });
-    return buildCache[key];
-  };
+    },
+    meta: function (b) { return [['Assembler', V.DIALECTS[b.dialect].label]]; }
+  });
 
   function index(b) {
     b.lines = b.parts.map(function (p, pi) {
@@ -215,16 +188,6 @@
     };
   }
 
-  // Open a version at a line range (or its notes page when there is none).
-  SW.openAt = function (vid, a) {
-    var same = !vid || vid === SW.state.v;
-    if (!same) SW.select(vid);
-    if (!a) { SW.setTab('about'); return; }
-    SW.state.sel = { p: a.p, n0: a.n0, n1: a.n1 != null ? a.n1 : a.n0 };
-    SW.setTab('read');   // draws Read at the selection if it was not yet showing this version
-    if (same) SW.emit('goto', { p: a.p, n: a.n0, tab: 'read' });
-  };
-  SW.current = function () { return SW.state.v ? SW.build(SW.state.v) : Promise.reject(new Error('no version')); };
 
   // Citation for a line range of a build.
   // The bench's references to its sources (Help ▸ Referencing and versions): SW, the
@@ -404,12 +367,4 @@
     return g;
   };
 
-  SW.docMeta = function (b) {
-    return [
-      ['Version', b.v.label], ['Reference', SW.refText(b.v.id)], ['Date', b.v.date], ['Authors', b.v.authors],
-      ['Sources', b.parts.map(function (p) { return p.src + (p.role !== 'program' ? ' (' + p.role + ')' : ''); }).join('; ')],
-      ['Assembler', V.DIALECTS[b.dialect].label],
-      ['Generated', SW.fmtDate(SW.today()) + ', Spacewar! research bench v' + SW.VERSION]
-    ];
-  };
 })(this);
