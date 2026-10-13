@@ -48,8 +48,8 @@
     topShare: true,
     settings: {
       tour: 'Twelve stops through reading, running, comparing and annotating; about three minutes.',
-      groupHint: 'Annotations are shared through a private Hypothesis group. Paste the group’s link (hypothes.is/groups/<b>ID</b>/…) or just its ID, and a personal API token (hypothes.is/account/developer). Without them, annotations are kept as drafts in this browser and can be exported or published later.',
-      groupPlaceholder: 'https://hypothes.is/groups/Ab12Cd34/name',
+      groupHint: 'Annotations are shared through a private Hypothesis group. Opening your invitation link fills in the group here; or paste the group’s link from the invitation. Add a personal API token (hypothes.is/account/developer). Without them, annotations are kept as drafts in this browser and can be exported or published later.',
+      groupPlaceholder: 'The group link from your invitation',
       themeHint: 'The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.'
     },
     tag: 'sw:',   // the prefix of this bench's tags in Hypothesis before bench-kit 0.5.0 (sw:v:3.1 …): still read; new tags are bk:
