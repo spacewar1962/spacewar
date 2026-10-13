@@ -203,7 +203,8 @@
       { n: 1130, kind: 'fix', was: 'jmp sr1', now: 'jmp srt', ev: 'scan p. 27', by: 'the project', date: '29 Sep 2026' },
       { n: 831, kind: 'fix', was: 'dispt 1', now: 'dispt i', ev: 'scan p. 20 (the torpedo routine; dispt 1 assembled iot 06, so no torpedo was drawn)', by: 'the project', date: '12 Oct 2026' },
       { n: 1130, kind: 'fix', was: 'jmp sr1', now: 'jmp srt', ev: 'scan p. 27', by: 'the project', date: '29 Sep 2026' },
-      { n: 1135, kind: 'fix', was: 'jmp sr1', now: 'jmp srt', ev: 'scan p. 27', by: 'the project', date: '29 Sep 2026' }],
+      { n: 1135, kind: 'fix', was: 'jmp sr1', now: 'jmp srt', ev: 'scan p. 27', by: 'the project', date: '29 Sep 2026' },
+      { n: 1201, kind: 'fix', was: 'ppb-1', now: 'ppb-i', ev: 'scan p. 29 (the game saver patch; ppb-1 assembled ppa, the wrong punch for the last frame of ran)', by: 'the project', date: '13 Oct 2026' }],
     'spacewar-4.0ts-4may1963.txt': [
       { n: 862, kind: 'fix', was: 'dispt 1', now: 'dispt i', ev: 'scan p. 21 (the torpedo routine; dispt 1 assembled iot 06, so no torpedo was drawn)', by: 'the project', date: '12 Oct 2026' }],
     'spacewar-4.2-11may1963-(Morris).txt': [

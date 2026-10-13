@@ -65,6 +65,19 @@
 /* ---------- main + views ---------- */
 
 .controls .r-sym { margin-left: 6px; white-space: nowrap; }
+/* ☰ in Run: where the program starts, 4.0's game saver patch, the run's other settings */
+.run-left .controls { position: relative; }
+.controls .r-more { position: static; }
+.controls .r-more > summary { list-style: none; display: inline-block; }
+.controls .r-more > summary::-webkit-details-marker { display: none; }
+.controls .r-more[open] > summary { border-color: var(--beam); }
+.controls .r-more > .menu-body { position: absolute; top: calc(100% + 4px); left: 0; z-index: 30; display: grid; gap: 6px; width: min(380px, 100%); max-height: 70vh; overflow-y: auto;
+  padding: 10px 12px; background: var(--menu-bg); border: 1px solid var(--menu-line); border-radius: 6px; box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5); font-size: 12.5px; }
+.r-more .menu-group { font-size: 10.5px; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-faint); margin-top: 4px; }
+.r-more .check { white-space: normal; align-items: flex-start; margin: 0; }
+.r-more .hint { margin: 0; }
+.r-more .r-tape-acts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.r-more .r-tape-acts .btn { font-size: 12px; padding: 3px 8px; }
 .run-left .r-ddd { display: inline-flex; margin: 2px 0 4px; font-size: 12px; }
 .run-left .r-score { margin: 2px 0 0; font-size: 11px; color: var(--text-dim); text-align: center; font-variant-numeric: tabular-nums; letter-spacing: .02em; cursor: pointer; }
 .run-left .r-score b { font-weight: 600; color: var(--text); }

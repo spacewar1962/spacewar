@@ -1198,7 +1198,7 @@ pu,	law i 200
 	lio ran
 	ppb	ril 6s
 	ppb	ril 6s
-	ppb-1
+	ppb-i		/ scan p. 29 reads ppb-i (transcribed as ppb-1 until 13 Oct 2026)
 	jmp 4
 	variables
 	start go

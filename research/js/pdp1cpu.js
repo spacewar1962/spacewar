@@ -396,6 +396,39 @@
     // the ships unasked, so for them the device loads IO (ctlLoad)
     if (dev === 0o11) { this.io = this.ctlLoad ? this.control : this.io | this.control; return 1; }
     if (dev === 0o04) { this.io = 0; return 1; }              // tyi: nothing typed
+    // Perforated tape, for the 4.0 game saver patch: the reader takes frames from
+    // tapeIn, the punch adds them to tapeOut, each frame eight holes, the eighth
+    // marking a binary frame. rpa reads a frame into the reader's buffer, rpb three
+    // binary frames (frames without the eighth hole are passed over), six bits each;
+    // with the i bit (rpa, rpb) the computer waits and IO gets the buffer, without it
+    // (rpa-i) the reader's flag is set, shown by cks in status bit 1, and rrb takes
+    // the buffer. ppa punches IO's low eight bits, ppb its high six as a binary frame;
+    // the punch is always ready (cks bit 4). Past the end of the tape a read without
+    // the wait starts and never finishes, as on the reader; the machine stops when the
+    // program waits for it (rpa or rpb, or cks with the reader not done), where the
+    // real machine would have waited for tape to be put in.
+    if (dev === 0o01 || dev === 0o02) {
+      var tin = this.tapeIn || [], need = dev === 0o02 ? 3 : 1, got = 0, w = 0;
+      while (got < need) {
+        if ((this.tapePos | 0) >= tin.length) {
+          if (md & 0o10000) { this.halted = true; this.fault = 'The reader has come to the end of the tape.'; }
+          else { this.tapeEnd = true; this.rdrFlag = false; }
+          return 1;
+        }
+        var f = tin[this.tapePos | 0]; this.tapePos = (this.tapePos | 0) + 1;
+        if (dev === 0o02) { if (!(f & 0o200)) continue; w = (w << 6) | (f & 0o77); } else w = f & 0o377;
+        got++;
+      }
+      this.rdrBuf = w;
+      if (md & 0o10000) { this.io = w; this.rdrFlag = false; } else this.rdrFlag = true;
+      return 1;
+    }
+    if (dev === 0o30) { this.io = this.rdrBuf | 0; this.rdrFlag = false; return 1; }                                   // rrb
+    if (dev === 0o05 || dev === 0o06) { (this.tapeOut = this.tapeOut || []).push(dev === 0o05 ? this.io & 0o377 : ((this.io >> 12) & 0o77) | 0o200); return 1; }   // ppa, ppb
+    if (dev === 0o33) {                                                                                               // cks
+      if (this.tapeEnd && !this.rdrFlag) { this.halted = true; this.fault = 'The reader has come to the end of the tape.'; }
+      this.io = (this.rdrFlag ? 0o200000 : 0) | 0o020000; return 1;
+    }
     return 1;
   };
 

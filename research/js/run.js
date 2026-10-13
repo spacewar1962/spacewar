@@ -16,6 +16,10 @@
   var tempBreak = null, stepOverTo = null;
   var paneTab = 'source';
   SW.breakpoints = SW.breakpoints || {};
+  // ☰: where Reset starts the program, and a patch read in after it. 4.0's listing ends
+  // with a game saver patch (scan p. 29), assembled here on its own, as a patch tape was
+  var PATCHES = { '4.0': { from: /spacewar game saver patch/, to: /^\s*start go\b/, scan: 'scan p. 29' } };
+  var patchCache = {}, saver = { punched: [], reader: [] }, twMode = false, twRot = false;
 
   // W A S D fly the Needle (ship 1) and I J K L the Wedge (ship 2): W/I fire, S/K rocket, A/J turn left, D/L turn right.
   // The bits differ by version (4.4 and 4.8 rotate the control word), so they come from SW.controlMap.
@@ -38,7 +42,44 @@
   function compose() {
     var mine = 0xffffffff;
     aiShips().forEach(function (j) { if (pilots[j]) mine &= ~shipMask(j); });
-    if (cpu) cpu.control = (keyBits & mine) | aiBits;
+    if (!cpu) return;
+    var w = (keyBits & mine) | aiBits;
+    // started at 5 (test word control) the program reads the console's test word, not
+    // the control boxes: the keys and the computer pilot set its switches instead
+    // (where mg1 turns the boxes' word round, rir 4s in 4.4, the switches are as it leaves it)
+    if (twMode) {
+      var m = shipMask(0) | shipMask(1); cpu.tw = (cpu.tw & ~rot4(m)) | rot4(w); cpu.control = 0;
+      SW.$$('#console [data-tw]', view).forEach(function (x) { x.checked = !!((cpu.tw >> +x.dataset.tw) & 1); });
+    }
+    else cpu.control = w;
+  }
+  function rot4(x) { return twRot ? ((x >>> 4) | ((x & 0o17) << 14)) & 0o777777 : x; }
+
+  function startKey() { return 'run.start.' + build.v.id; }
+  function saverOn() { return !!PATCHES[build.v.id] && !!SW.store.get('run.saver.' + build.v.id, false); }
+  function saverMode() { return SW.store.get('run.saverMode', 'record'); }
+  // a patch assembled on its own, with the macro tape before it, as a tape read in after the program
+  function patchOf(b) {
+    var P = PATCHES[b.v.id], key = b.v.id + '|' + b.dialect;
+    if (!P) return null;
+    if (key in patchCache) return patchCache[key];
+    var out = null, part = b.parts.filter(function (pt) { return P.from.test(pt.raw); })[0], A = root.PDP1Asm;
+    if (part) {
+      var L = A.splitLines(part.raw), i0 = L.findIndex(function (l) { return P.from.test(l); }), i1 = L.findIndex(function (l, i) { return i > i0 && P.to.test(l); });
+      var mac = b.parts[0], r = A.assemble([{ name: 'macros', text: A.splitLines(mac.text).slice(0, mac.end || undefined).join('') }, { name: 'patch', text: L.slice(i0, i1 + 1).join('') }],
+        root.SWVersions.DIALECTS[b.dialect].options);
+      if (!(r.errors || []).length) out = { words: r.words.filter(function (w) { return w.file === 1; }), start: r.start };
+    }
+    return (patchCache[key] = out);
+  }
+  // where Reset starts: the tape's start (with the patch read in, the patch's), or the one chosen
+  function startAt() {
+    var s = String(SW.store.get(startKey(), '') || '').trim(), P = saverOn() ? patchOf(build) : null;
+    if (s === 'go' || (!s && P)) return P ? P.start : build.asm.start;
+    if (!s) return build.asm.start;
+    if (/^[0-7]+$/.test(s)) return parseInt(s, 8) & 0o7777;
+    var y = build.sym[s];
+    return y && y.defined ? y.val & 0o7777 : build.asm.start;
   }
   // The game keys work anywhere on Run except in a menu or text box, so that
   // choosing who flies, or clicking a button, does not take the ships away from you.
@@ -90,6 +131,74 @@
     return h + '</span>';
   }
 
+  // ☰: where the program starts, 4.0's game saver patch, and the run's other settings
+  function moreMenu() {
+    var b = build, esc = SW.esc, P = PATCHES[b.v.id], on = saverOn();
+    var cur = String(SW.store.get(startKey(), '') || ''), eff = cur || (on ? 'go' : '4'), a1 = b.sym.a1, m5 = b.asm.memory[5];
+    var tw5 = !!a1 && !!m5 && (m5.val >> 12) === 0o60 && (m5.val & 0o7777) === a1.val, other = /^(4|5|go)?$/.test(cur) ? '' : cur;
+    function radio(v, label, title) { return '<label class="check" title="' + esc(title) + '"><input type="radio" name="r-start" value="' + v + '"' + ((other ? 'other' : eff) === v ? ' checked' : '') + '> ' + label + '</label>'; }
+    return '<details class="menu r-more"><summary class="btn" title="Where the program starts, the 4.0 game saver, and the run’s other settings">☰</summary><div class="menu-body">' +
+      '<div class="menu-group">Start at</div>' +
+      radio('4', '4: the game', 'jmp a40: the usual start, the ships flown from the control boxes (here, the keys or the computer pilot)') +
+      (tw5 ? radio('5', '5: test word control', 'jmp a1: the ships flown from the console’s test word switches, as on a machine without control boxes; the bench sets the switches from the keys and the computer pilot. A start at 5 also clears the scores (F43).') : '') +
+      (on ? radio('go', '6000: go, the game saver', 'The patch’s own start: it punches the random number (Record) or reads it from the tape (Replay), then jumps to 4') : '') +
+      radio('other', 'Another address <input id="r-start-at" class="mono" size="7" placeholder="octal or label" value="' + esc(other) + '">', 'Any address, in octal, or a label: the console’s address switches and START. The machine holds what the tape left in memory, not what a game in progress would.') +
+      '<p class="hint">Taken at Reset.</p>' +
+      (P ? '<div class="menu-group">4.0: the game saver patch</div>' +
+        '<label class="check" title="The last page of the 4.0 listing (' + P.scan + '): a patch read in after the program. It replaces cwr at 40 and starts at 6000 (go). With test word bit 0 off (+) it punches the random number and then every control word the ships read; with it on (−) it reads them back from the tape, so the game plays again as it was."><input type="checkbox" id="r-saver"' + (on ? ' checked' : '') + '> Read in the game saver patch</label>' +
+        (on ? '<label class="check"><input type="radio" name="r-saver-mode" value="record"' + (saverMode() === 'record' ? ' checked' : '') + '> Record: punch the game (test word +)</label>' +
+          '<label class="check"><input type="radio" name="r-saver-mode" value="replay"' + (saverMode() === 'replay' ? ' checked' : '') + '> Replay: read the tape (test word −)</label>' +
+          '<p class="hint" id="r-tape"></p><p class="r-tape-acts"><button class="btn" data-tape="reader" title="Take the punched tape to the reader, ready for Replay">Punched tape to the reader</button> <button class="btn" data-tape="save">Save the tape</button> <button class="btn" data-tape="open">Open a tape…</button> <button class="btn ghost" data-tape="clear">Clear</button><input type="file" id="r-tape-file" accept=".bin,.pt,.rim,application/octet-stream" hidden></p>' : '') : '') +
+      ((b.v.pass1 || b.sym.ddd) ? '<div class="menu-group">Other</div>' : '') +
+      (b.v.pass1 ? '<label class="check r-sym" title="The sun routine uses nx1 and ny1 before the line that assigns them. The pass log at the end of the listing (scan p. 31) shows that after pass 1 a short tape, “' + build.v.pass1.name + '”, was fed in with nx1=mtb nob and ny1=nx1 nob, so pass 2 had their final values and the sun was placed correctly. Ticked, the bench assembles with that tape, as MIT did. Unticked, without it, the sun is misplaced (F33). The kcb jump fault on the Needle’s console is a separate coding error and stays either way; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Fix Sun Rendering Bug</label><button class="icon-btn r-symhelp" id="r-symhelp" title="What the fix is, with the pass log and the code">?</button>' : '') +
+      (b.sym.ddd ? '<label class="check r-ddd" title="The constant ddd, “0 to save space for ddt”: at 0 the Needle’s outline is not compiled and both ships are drawn as Wedges (F47). Changing it resets the run."><input type="checkbox" id="r-ddd"' + (SW.store.get('run.ddd', false) ? ' checked' : '') + '> Both ships as Wedges (ddd = 0)</label>' : '') +
+      '</div></details>';
+  }
+  function tapeInfo() {
+    var el = SW.$('#r-tape', view); if (!el) return;
+    var n = function (k) { return k + (k === 1 ? ' frame' : ' frames'); };
+    el.textContent = 'Punched: ' + n((cpu && cpu.tapeOut || saver.punched).length) + '. In the reader: ' + n(saver.reader.length) + (cpu && cpu.tapeIn === saver.reader && cpu.tapePos ? ', ' + cpu.tapePos + ' read' : '') + '.';
+  }
+  function restart() { pause(); load(true); updateAll(); renderConsole(); tapeInfo(); }
+  function wireMore() {
+    var more = SW.$('.r-more', view); if (!more) return;
+    more.addEventListener('toggle', function () { if (more.open) tapeInfo(); });
+    more.addEventListener('change', function (e) {
+      var t = e.target;
+      if (t.name === 'r-start') {
+        if (t.value === 'other') { var f = SW.$('#r-start-at', view); if (!f.value.trim()) { f.focus(); return; } SW.store.set(startKey(), f.value.trim()); }
+        else SW.store.set(startKey(), t.value);
+        restart();
+      } else if (t.id === 'r-start-at') {
+        var v = t.value.trim(); if (!v) return;
+        if (!/^[0-7]+$/.test(v) && !(build.sym[v] && build.sym[v].defined)) { SW.toast('No address or label “' + v + '” in this version.'); return; }
+        SW.store.set(startKey(), v); var o = more.querySelector('input[name="r-start"][value="other"]'); if (o) o.checked = true;
+        restart();
+      } else if (t.id === 'r-saver') {
+        SW.store.set('run.saver.' + build.v.id, t.checked); SW.store.set(startKey(), '');
+        if (!t.checked && cpu) cpu.tw &= ~0o400000;   // the patch's bit 0, set for Replay, cleared with it
+        pause(); load(true); R.show(build);
+      }
+      else if (t.name === 'r-saver-mode') { SW.store.set('run.saverMode', t.value); restart(); }
+      else if (t.id === 'r-tape-file' && t.files[0]) {
+        t.files[0].arrayBuffer().then(function (ab) { saver.reader = Array.prototype.slice.call(new Uint8Array(ab)); restart(); SW.toast('Tape in the reader: ' + saver.reader.length + ' frames.'); });
+      }
+    });
+    more.addEventListener('click', function (e) {
+      var t = e.target.closest('[data-tape]'); if (!t) return;
+      var k = t.dataset.tape;
+      if (k === 'reader') { saver.reader = (cpu.tapeOut || saver.punched).slice(); SW.toast('The punched tape is in the reader: choose Replay and Reset.'); }
+      else if (k === 'clear') { saver.punched = []; saver.reader = []; if (cpu) { cpu.tapeOut = saver.punched; cpu.tapeIn = []; cpu.tapePos = 0; } }
+      else if (k === 'open') SW.$('#r-tape-file', view).click();
+      else if (k === 'save') {
+        var fr = cpu.tapeOut || saver.punched; if (!fr.length) { SW.toast('Nothing has been punched yet.'); return; }
+        var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([new Uint8Array(fr)], { type: 'application/octet-stream' }));
+        a.download = 'spacewar-' + build.v.id + '-game.bin'; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      }
+      tapeInfo();
+    });
+  }
+
   function render() {
     view.innerHTML = '';
     if (!build.v.runnable || !build.asm) {
@@ -113,15 +222,14 @@
       '<div class="controls">' +
       '<button class="btn" id="r-run">▶ Run</button><button class="btn" id="r-step">Step</button>' +
       '<button class="btn" id="r-over" title="Step over a subroutine call (jsp, jda)">Step over</button>' +
-      '<button class="btn" id="r-reset">Reset</button>' +
+      '<button class="btn" id="r-reset">Reset</button>' + moreMenu() +
       '<select id="r-speed" class="btn" title="Speed relative to the PDP-1 (5 µs memory cycle)">' +
       [0.01, 0.05, 0.25, 0.5, 1, 2, 4].map(function (s) { return '<option value="' + s + '"' + (s === speed ? ' selected' : '') + '>' + s + '×</option>'; }).join('') +
       '</select>' +
       (dual ? '<button class="btn" id="r-fig" title="Save scope 1 at print resolution">▣ Scope 1</button><button class="btn" id="r-fig2" title="Save scope 2 at print resolution">▣ Scope 2</button>'
             : '<button class="btn" id="r-fig" title="Save the scope at print resolution">▣ Screenshot</button>') +
-      (build.v.pass1 ? '<label class="check r-sym" title="The sun routine uses nx1 and ny1 before the line that assigns them. The pass log at the end of the listing (scan p. 31) shows that after pass 1 a short tape, “' + build.v.pass1.name + '”, was fed in with nx1=mtb nob and ny1=nx1 nob, so pass 2 had their final values and the sun was placed correctly. Ticked, the bench assembles with that tape, as MIT did. Unticked, without it, the sun is misplaced (F33). The kcb jump fault on the Needle’s console is a separate coding error and stays either way; 4.4f fixes it."><input type="checkbox" id="r-sym"' + (fixedSyms ? ' checked' : '') + '> Fix Sun Rendering Bug</label><button class="icon-btn r-symhelp" id="r-symhelp" title="What the fix is, with the pass log and the code">?</button>' : '') + '</div>' +
+      '</div>' +
       '<div class="r-players" id="r-players"></div>' +
-      (build.sym.ddd ? '<label class="check r-ddd" title="The constant ddd, “0 to save space for ddt”: at 0 the Needle’s outline is not compiled and both ships are drawn as Wedges (F47). Changing it resets the run."><input type="checkbox" id="r-ddd"' + (SW.store.get('run.ddd', false) ? ' checked' : '') + '> Both ships as Wedges (ddd = 0)</label>' : '') +
       '<div class="keys">Controls: <kbd>A</kbd>/<kbd>D</kbd> rotate, <kbd>S</kbd> thrust, <kbd>W</kbd> fire (Needle); <kbd>J</kbd>/<kbd>L</kbd>, <kbd>K</kbd>, <kbd>I</kbd> (Wedge). Hyperspace is both rotate keys together.</div>' +
       '<div class="console" id="console"></div>';
     var right = SW.el('div', { class: 'run-right' });
@@ -158,6 +266,7 @@
     var sym = SW.$('#r-sym', view);
     if (sym) sym.onchange = function () { SW.store.set('run.sunfix', sym.checked); R.show(build); };
     renderPlayers();
+    wireMore();
     var ddd = SW.$('#r-ddd', view); if (ddd) ddd.onchange = function () { SW.store.set('run.ddd', ddd.checked); pause(); load(true); updateAll(); };
     var symh = SW.$('#r-symhelp', view); if (symh) symh.onclick = function () { sunHelp(build); };
     SW.$('#r-fig', view).onclick = function () { SW.figures.scopeFigureDialog(dual ? pts.filter(function (p) { return p.sc !== 2; }) : pts, cpu.cycles, build); };
@@ -266,6 +375,20 @@
     if (build.sym.ddd && SW.store.get('run.ddd', false)) cpu.mem[build.sym.ddd.val] = 0;
     cpu.srcMap = new Uint8Array(4096);
     for (var k in build.asm.memory) cpu.srcMap[+k] = 1;
+    // the game saver read in: test word bit 0 off (+) punches the game, on (−) reads it back
+    var P = saverOn() ? patchOf(build) : null;
+    if (P) {
+      P.words.forEach(function (w) { cpu.mem[w.loc] = w.val; cpu.srcMap[w.loc] = 1; });
+      var rec = saverMode() === 'record';
+      cpu.tw = rec ? cpu.tw & ~0o400000 : cpu.tw | 0o400000;
+      if (rec) saver.punched = [];
+      cpu.tapeOut = saver.punched; cpu.tapeIn = rec ? [] : saver.reader; cpu.tapePos = 0;
+    }
+    var st = startAt(), a1 = build.sym.a1, m5 = build.asm.memory[5];
+    cpu.pc = st;
+    twMode = st === 5 && !!a1 && !!m5 && (m5.val >> 12) === 0o60 && (m5.val & 0o7777) === a1.val;
+    twRot = false;
+    if (twMode && build.sym.mg1) for (var q = 0; q < 8; q++) { var mw = build.asm.memory[build.sym.mg1.val + q]; if (mw && mw.val === 0o672017) twRot = true; }
     cpu.lastSrcPc = -1;
     cpu.onDisplay = plot;
     ml0At = build.sym.ml0 ? build.sym.ml0.val : -1;
