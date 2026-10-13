@@ -43,13 +43,13 @@
       { k: 'jmg', who: 'J. Martin Graetz', re: /\bjmg\b/i, colour: '#7d5a45' },
       { k: 'nl', who: 'Norbert Landsteiner (2014–21)', re: /\bn\.\s?l\.|\bnl\b|\blandsteiner\b/i, colour: '#8a7ae0' }
     ],
-    group: '',
+    group: 'edGMeapN',                                     // the project's Hypothesis group (hypothes.is/groups/edGMeapN/spacewar)
     relation: 'Spacewar! ',
     topShare: true,
     settings: {
       tour: 'Twelve stops through reading, running, comparing and annotating; about three minutes.',
-      groupHint: 'Annotations are shared through a private Hypothesis group. Opening your invitation link fills in the group here; or paste the group’s link from the invitation. Add a personal API token (hypothes.is/account/developer). Without them, annotations are kept as drafts in this browser and can be exported or published later.',
-      groupPlaceholder: 'The group link from your invitation',
+      groupHint: 'Annotations are shared through the project’s private Hypothesis group, <b>edGMeapN</b> (set for you). Paste another group’s link or ID only to use a different one, and a personal API token (hypothes.is/account/developer). Without them, annotations are kept as drafts in this browser and can be exported or published later.',
+      groupPlaceholder: 'https://hypothes.is/groups/edGMeapN/spacewar',
       themeHint: 'The colours of the whole bench: listings, annotations, figures and tapes. The ◐ button in the top bar switches between your last light and dark themes. The scope in Run keeps the PDP-1’s own phosphor.'
     },
     tag: 'sw:',   // the prefix of this bench's tags in Hypothesis before bench-kit 0.5.0 (sw:v:3.1 …): still read; new tags are bk:
