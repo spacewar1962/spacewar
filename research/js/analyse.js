@@ -2326,8 +2326,8 @@
              ['roulette', 'Hyperspace roulette', 'The odds of exploding at each breakout, and where the ship comes out'],
              ['tapesim', 'Tape Load Simulator', 'The tape read into core: Read-In, then the loader']];
   // the Graphics menu in groups, with a small heading over each
-  var GFXG = [['What it draws', ['sky', 'ships', 'sun', 'hyper']], ['The pull of the star', ['gravity', 'orbits', 'moves']],
-              ['The rules at work', ['torps', 'collision', 'roulette', 'random']], ['The machine', ['tapesim']]];
+  var GFXG = [['Main Game Graphics', ['sky', 'ships', 'sun', 'hyper']], ['Graphics Logic', ['gravity', 'orbits', 'moves']],
+              ['Spacewar Mechanics', ['torps', 'collision', 'roulette', 'random']], ['The machine', ['tapesim']]];
   // each drawn for bench-kit's Graphics tab (kit/graphics.js), into the page under its heading;
   // an animation returns the function that stops it
   function cardsIn(el, style) { var c = SW.el('div', style ? { class: 'cards', style: style } : { class: 'cards' }); el.appendChild(c); return c; }
