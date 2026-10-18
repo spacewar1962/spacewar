@@ -10,3 +10,4 @@ sources/sw/
 
 # messy-named original downloads (normalised copies are in sources/ports/)
 sources/*GORIN*
+_tmp/
