@@ -2,6 +2,10 @@
 
 Changes to the _Spacewar!_ research bench (`research/`). The bench keeps its own version numbers, raised by 0.0.1 with each change; this file records the minor versions. The website's changes are in the `CHANGELOG.md` at the root of the repository.
 
+## 1.19.53 (2026-10-19)
+
+- The legal Type now comes from the kit (0.63.0); the bench's own entry for it is removed.
+
 ## 1.19.0 (2026-10-12)
 
 Everything from 1.18.1 to 1.18.95.
