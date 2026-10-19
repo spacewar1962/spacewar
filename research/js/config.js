@@ -71,6 +71,8 @@
     genealogy: { set: ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'], line: 'dfw', lineNames: { ddp: 'ddp line', dfw: 'dfw line', chm: 'CHM line' } },
     figureNum: { print: '#9a5b00', paper: '#9a5b00', phosphor: '#ffce7a' },
     paratexts: { org: 'spacewar1962', repo: 'sw_paratexts', cache: 'sw-paratexts', tokenName: 'Spacewar research bench' },
+    // the Implementations tab (kit/implementations.js): copies, ports and re-creations, with their descent
+    implementations: { url: 'implementations/catalogue.json' },
     examples: { date: 'e.g. 1963-05-17, or 1963', archive: 'e.g. Computer History Museum', versions: 'e.g. 4.3, 4.4',
                 refs: 'e.g. [REF: SW4.3L, 2.10–20]', publisher: 'e.g. Rolling Stone', finding: 'F33' },
     // 2a and 4.5 are lost, drawn between the versions around them; the star map is data, not a version of the game

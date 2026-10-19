@@ -9,7 +9,7 @@
   'use strict';
   var SW = root.SW;
   SW.BENCH.shell = {
-    views: ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'graphics', 'about', 'findings', 'notes', 'paratexts'],
+    views: ['read', 'run', 'analyse', 'compare', 'genealogy', 'tape', 'graphics', 'about', 'findings', 'notes', 'paratexts', 'implementations'],
     alias: { sky: 'graphics' },   // the Star map tab became Graphics
     redraw: ['analyse', 'compare', 'genealogy', 'tape', 'findings'],
     versionTitle: true,

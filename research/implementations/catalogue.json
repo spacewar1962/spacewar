@@ -1,0 +1,3180 @@
+{
+ "schema": 1,
+ "kind": "implementations",
+ "prefix": "I-",
+ "relations": [
+  "port",
+  "adaptation",
+  "translation",
+  "revision",
+  "copy",
+  "reimplementation",
+  "inspired-by",
+  "recovery"
+ ],
+ "via": [
+  "publication",
+  "print listing",
+  "tape",
+  "DECUS",
+  "network",
+  "disk"
+ ],
+ "note": "Implementations of Spacewar!: copies, ports, adaptations and re-creations, with declared descent and a feature record. The record format is the paratext archive’s, plus progLanguage, machine, family, parents, features, status, publish and paratexts. Parents name an I-code or a variorum version (v:<id>).",
+ "families": [
+  {
+   "id": "mit",
+   "name": "The MIT PDP-1 program",
+   "note": "Spacewar! as written on the MIT PDP-1 (1961-63), its tape copies, the later PDP-1 patches, and re-creations that run its code."
+  },
+  {
+   "id": "its",
+   "name": "MIT AI Lab",
+   "note": "The PDP-6/10 line at the MIT AI Lab (WAR, SWAR, SUPER, STAR, SPACE, SPACE4, NSPACE, SPCWAR) and the lab’s versions for its other displays."
+  },
+  {
+   "id": "sail",
+   "name": "Stanford AI Lab",
+   "note": "Ralph Gorin’s SAIL PDP-10 Space War (revised 1971-78), and programs ported or adapted from it."
+  },
+  {
+   "id": "seiler",
+   "name": "Bryant and Seiler",
+   "note": "Larry Bryant and Bill Seiler’s PDP-11 Space War (1974, DECUS 11-192), and Seiler’s later IBM PC SPACEWAR."
+  },
+  {
+   "id": "other",
+   "name": "Independent or undetermined",
+   "note": "Implementations whose descent is independent of the families above, or not yet established."
+  }
+ ],
+ "features": [
+  {
+   "id": "sun",
+   "label": "Sun",
+   "note": "A central star whose gravity acts on the ships."
+  },
+  {
+   "id": "stars",
+   "label": "Star field",
+   "note": "Background stars (the PDP-1 program’s Expensive Planetarium)."
+  },
+  {
+   "id": "hyperspace",
+   "label": "Hyperspace",
+   "note": "A jump that removes a ship and returns it elsewhere."
+  },
+  {
+   "id": "ships",
+   "label": "Ships",
+   "note": "Number of ships or players."
+  }
+ ],
+ "variorum": {
+  "v:2b": {
+   "label": "Spacewar! 2B",
+   "version": "2b",
+   "date": "2 Apr 1962"
+  },
+  "v:3.1": {
+   "label": "Spacewar! 3.1",
+   "version": "3.1",
+   "date": "24 Sep 1962"
+  },
+  "v:4.1d": {
+   "label": "Spacewar! 4.1 CHM rev. d",
+   "version": "4.1d",
+   "date": "base 20 Feb 1963; mod. Jun 2005"
+  },
+  "v:4.8": {
+   "label": "Spacewar! 4.8",
+   "version": "4.8",
+   "date": "24 Jul 1963"
+  }
+ },
+ "statuses": [
+  {
+   "id": "held",
+   "note": "A machine-readable copy is held (published here, or privately until cleared)."
+  },
+  {
+   "id": "linked",
+   "note": "A public copy exists at a stable place this archive does not hold."
+  },
+  {
+   "id": "printed",
+   "note": "The complete program text survives in print; the scan is a paratext named in paratexts; no machine-readable copy is held."
+  },
+  {
+   "id": "attested",
+   "note": "Known only from mentions, adverts, catalogues or papers."
+  },
+  {
+   "id": "lost",
+   "note": "Known to have existed; no copy and no complete text survives."
+  }
+ ],
+ "collections": [],
+ "sequences": [],
+ "items": [
+  {
+   "title": "SPACE WAR SA-5 (DEC-labelled 2B binary), tape image read 8 April 2003",
+   "date": "1962",
+   "source": "bitsavers.org, papertapeImages/20030408/spaceWar.bin",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20030408/spaceWar.bin"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "2b",
+    "dec-distribution",
+    "sa-5",
+    "chm-restoration"
+   ],
+   "description": "A DEC-labelled Spacewar! tape (\"SPACE WAR SA-5 SSW 6=SUN SSW 5=GRAW SSW3+4=STARS\"), read at CHM for the restoration. Decoded, it loads the 2,297 words of 2B (2,295 match; one bad block), so the tape DEC labelled and handed out was the 2B program. Its punched leader reads SPACE WAR. Which CHM object it came from is not recorded.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-95UU0",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (binary tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:2b",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "Decoded, the tape loads the words of 2B (I-95UU0)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-NDG7U",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-95UU0.bin",
+   "name": "spaceWar.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 8843,
+   "sha1": "c97a9d33aa30fe9fc08db766bb351120408e3ae0",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACE WAR SA-5 (2B), copy 1 from the box found inside the PDP-1 (\"80s\" box 3)",
+   "date": "1962",
+   "source": "bitsavers.org, papertapeImages/20031202/InsidePDP1_80s_box3.zip",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20031202/InsidePDP1_80s_box3.zip"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "2b",
+    "dec-distribution",
+    "sa-5"
+   ],
+   "description": "Read 2 December 2003 from the box shipped inside the restored PDP-1; loads the same 2,297 words as the held 2B tape (100% match).",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-Z7SRL",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (binary tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:2b",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "Label and contents give 2B (I-Z7SRL)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-GDQU9",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-Z7SRL.bin",
+   "name": "spaceWar_SA-5.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 8431,
+   "sha1": "61747832e4fb17b7e729bf7d27e482bb07ea3d0b",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACE WAR SA-5 (2B), copy 2 (\"80s\" box 3)",
+   "date": "1962",
+   "source": "bitsavers.org, papertapeImages/20031202/InsidePDP1_80s_box3.zip",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20031202/InsidePDP1_80s_box3.zip"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "2b",
+    "dec-distribution",
+    "sa-5"
+   ],
+   "description": "A second DEC-labelled copy from the same box; identical program to the 2B tape.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-YCW52",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (binary tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:2b",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "Label and contents give 2B (I-YCW52)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-XVDF5",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-YCW52.bin",
+   "name": "spaceWar_SA-5_copy2.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 8342,
+   "sha1": "f9faca8053f55a7f2312aacdf9fa73800949c809",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACEWAR 3.1 24 SEP 62 PT. 1, tape image with its punched leader (read 8 April 2003)",
+   "date": "1962-09-24",
+   "source": "bitsavers.org, papertapeImages/20030408/spaceWar3.1.bin",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20030408/spaceWar3.1.bin"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "3.1",
+    "punched-leader",
+    "russell-deposition"
+   ],
+   "description": "Loads 2,510 words identical to Russell's 3.1 tape (held in the bench), but the file differs byte for byte, so it is a separate reading and probably a separate tape. The punched leader reads \"SPACEWAR 3.1 24 SEP 62 PT. 1\"; matching it to CHM 102649467 (Russell deposition exhibit 6, P-H0QUI) is an inference.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-16Y1O",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 tape (3.1, part 1)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:3.1",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "Leader punched SPACEWAR 3.1 24 SEP 62 PT. 1 (I-16Y1O)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-SJUTR",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-16Y1O.bin",
+   "name": "spaceWar3.1.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 9366,
+   "sha1": "c0e3e46f53a23ec6c03b134f234c1ef9eb60093a",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar 3.1 binary, a further copy (\"80s\" box 3)",
+   "date": "1962-09-24",
+   "source": "bitsavers.org, papertapeImages/20031202/InsidePDP1_80s_box3.zip",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20031202/InsidePDP1_80s_box3.zip"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "3.1"
+   ],
+   "description": "Another reading of a 3.1 tape from the box inside the PDP-1; same program as Russell's.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-6OX58",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (binary tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:3.1",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "A further copy of the 3.1 binary (I-6OX58)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-NHWL2",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-6OX58.bin",
+   "name": "spacewV3.1.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 8967,
+   "sha1": "e72a5cc29d96c7892b785c64fc8c94b9f54b3b59",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACE WAR TS DEBUGGED: a core image of a 4.8-type Spacewar! (tape image)",
+   "date": "1966",
+   "source": "bitsavers.org, papertapeImages/20040106/disassembler/spaceWarTSdebugged.bin",
+   "archive": "Computer History Museum",
+   "archiveId": "102649862",
+   "archiveUrl": "https://www.computerhistory.org/collections/catalog/102649862",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20040106/disassembler/spaceWarTSdebugged.bin"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "4.8",
+    "core-image",
+    "time-sharing",
+    "verify"
+   ],
+   "description": "The tape held as a CHM record (102649862, P-06KIT). Decoded it is a dump of core 0000-7677 with start 1245 and a value in the random-number cell, so punched from a running machine; its layout matches 4.8, not 4.0TS (nop at 5, maa 40, sbf at 62), without the 4.8 scorer. \"TS\" may mean the time-sharing system; inference, to be checked on the emulator. Date inferred from the DDT-6000 tapes of August 1966 beside it.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-O1MX5",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (core image)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:4.8",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "probable",
+     "evidence": "Decoded layout matches 4.8, not 4.0TS, without the 4.8 scorer (I-O1MX5)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [
+    "P-06KIT"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-J1W28",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-O1MX5.bin",
+   "name": "spaceWarTSdebugged.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 13773,
+   "sha1": "f8462aa677708727e9b3676f89d4b37f7a76d641",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar! 4.8 pt 1, FIO-DEC source tape image",
+   "date": "1963-07-24",
+   "source": "bitsavers.org, papertapeImages/20040817/spacewar4.8part1_engl.bin",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20040817/spacewar4.8part1_engl.bin"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "4.8",
+    "source-tape",
+    "fio-dec"
+   ],
+   "description": "The raw tape from which the held 4.8 pt 1 text was made (the texts are duplicates; the image is new).",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-GLYY8",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 MACRO source (FIO-DEC tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:4.8",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "The tape from which the variorum 4.8 part 1 text was made (I-GLYY8)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-YERA2",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-GLYY8.bin",
+   "name": "spacewar4.8part1_engl.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 7891,
+   "sha1": "eea82b128d53c121865b9df9375bad0192995267",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar! 4.8 pt 2, FIO-DEC source tape image",
+   "date": "1963-07-24",
+   "source": "bitsavers.org, papertapeImages/20040817/spacewar4.8part2_engl.bin",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20040817/spacewar4.8part2_engl.bin"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "4.8",
+    "source-tape",
+    "fio-dec"
+   ],
+   "description": "The raw tape of the 4.8 pt 2 text.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-YOEXS",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 MACRO source (FIO-DEC tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:4.8",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "The 4.8 part 2 source tape (I-YOEXS)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-18NAU",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-YOEXS.bin",
+   "name": "spacewar4.8part2_engl.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 9736,
+   "sha1": "dd845a09f74aa2f7f5f9f492f8c088c05c9857a4",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SW4.1d: spacewar 4.1 mod for CHM, 2005-06-01 - 2005-06-28 --prs. (source and RIM binary)",
+   "creator": "Samson, Peter R.",
+   "contributor": [
+    "dfw (unidentified; Spacewar 4.1, 2/20/63, and 4.2, 2/22/63)"
+   ],
+   "date": "2005-06",
+   "publisher": "bitsavers.org",
+   "source": "bitsavers.org, pdf/mit/rle_pdp1/spacewar/sw41d.mac, sw41d.txt (identical) and sw41d.rim, posted 1-2 July 2005",
+   "identifier": [
+    "http://www.bitsavers.org/pdf/mit/rle_pdp1/spacewar/sw41d.mac",
+    "http://www.bitsavers.org/pdf/mit/rle_pdp1/spacewar/sw41d.txt",
+    "http://www.bitsavers.org/pdf/mit/rle_pdp1/spacewar/sw41d.rim"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "source-code",
+    "pdp-1",
+    "chm-restoration",
+    "samson",
+    "dfw",
+    "spacewar-4.1",
+    "rim"
+   ],
+   "description": "Machine-readable PDP-1 assembler source, with its RIM-format binary, of Spacewar 4.1 as modified by Peter Samson ('--prs.') between 1 and 28 June 2005 for the Computer History Museum PDP-1 restoration. The header reads 'SW4.1d / spacewar 4.1 mod for CHM, 2005-06-01 - 2005-06-28 --prs.' followed by the original section headings '/spacewar 4.1 2/20/63 dfw ; pt1' (line 6), '/spacewar 4.2 2/22/63 dfw ; pt .2' (line 597), '/background display ; 3/13/62, prs.' and '/stars by prs for s/w 2b'. The first instructions route control through a test word instead of iot 11 (line 8 comment: 'use test word for control, not iot 11'). This is the version prepared to run on the restored CHM machine; the dfw headings date dfw's 4.1 and 4.2 to 20 and 22 February 1963.",
+   "extent": "source 29,191 bytes (ASCII, CR line ends; .mac and .txt identical); RIM paper-tape image 8,406 bytes",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T09:32:26Z",
+   "addedBy": "DMB",
+   "code": "I-GDYVR",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 MACRO source, with RIM binary",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:4.1d",
+     "relation": "copy",
+     "via": "disk",
+     "confidence": "established",
+     "evidence": "Header: spacewar 4.1 mod for CHM, June 2005, --prs (I-GDYVR)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-LH7JZ",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-GDYVR.mac",
+   "name": "bitsavers_rle_sw41d.mac",
+   "mime": "image/x-macpaint",
+   "kind": "text",
+   "size": 29191,
+   "sha1": "b0ac1466814676a6081b858aea22093bf1935c08",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACEWAR AUTO-RESTART PATCH (Graetz, 1987), tape image",
+   "creator": "Graetz, J. M.",
+   "date": "1987-10-31",
+   "source": "bitsavers.org, papertapeImages/20030408/spaceWarRstrt.bin",
+   "archive": "Computer History Museum",
+   "archiveId": "102631133",
+   "archiveUrl": "https://www.computerhistory.org/collections/catalog/102631133",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20030408/spaceWarRstrt.bin"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "graetz",
+    "patch",
+    "1987"
+   ],
+   "description": "Leader reads \"SPACEWAR AUTO-RESTART PATCH\"; loads 18 words (5544: jmp 5610, and 5610-5630). The image of the tape catalogued at CHM 102631133 (P-8T5W0).",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-KATHE",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (patch tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [
+    "P-8T5W0"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-P6ND2",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-KATHE.bin",
+   "name": "spaceWarRstrt.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 655,
+   "sha1": "139672182d3eda83cced3738147b25be5e1ce379",
+   "children": [
+    "I-OQAJU"
+   ],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACEWAR AUTO-RESTART PATCH (Graetz, 1987), second copy",
+   "creator": "Graetz, J. M.",
+   "date": "1987-10-31",
+   "source": "bitsavers.org, papertapeImages/20031202/InsidePDP1_80s_box3.zip",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20031202/InsidePDP1_80s_box3.zip"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "graetz",
+    "patch",
+    "1987"
+   ],
+   "description": "A second reading; the same 18 words.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-OQAJU",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (patch tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "I-KATHE",
+     "relation": "copy",
+     "via": "tape",
+     "confidence": "established",
+     "evidence": "Second copy of the auto-restart patch tape (I-OQAJU)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-34EQR",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-OQAJU.bin",
+   "name": "spacewAutoRestartPatch.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 359,
+   "sha1": "640b8bd1061b680b7f07f796780c1a9e173f072c",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "HYPERSPACE '85 binary (Graetz, 25 October 1985), tape image",
+   "creator": "Graetz, J. M.",
+   "date": "1985-10-25",
+   "source": "bitsavers.org, papertapeImages/20031202/InsidePDP1_80s_box3.zip",
+   "identifier": [
+    "https://bitsavers.org/bits/DEC/pdp1/papertapeImages/20031202/InsidePDP1_80s_box3.zip"
+   ],
+   "rights": "None stated on bitsavers",
+   "language": "en",
+   "tags": [
+    "tape-image",
+    "paper-tape",
+    "graetz",
+    "patch",
+    "hyperspace",
+    "1985"
+   ],
+   "description": "Graetz's 1985 hyperspace patch, from the box inside the PDP-1.",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T23:02:00Z",
+   "addedBy": "DMB",
+   "code": "I-QTEMB",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-1 machine code (patch tape)",
+   "machine": "DEC PDP-1, Type 30 display",
+   "family": "mit",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-0C559",
+   "clearance": {
+    "basis": "public-domain",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "David M. Berry, 19 October 2026: Spacewar! is in the public domain.",
+    "note": "Covers the MIT PDP-1 program, its tape copies and the later PDP-1 patches."
+   },
+   "file": "files/I-QTEMB.bin",
+   "name": "hyperspace85.bin",
+   "mime": "application/octet-stream",
+   "kind": "file",
+   "size": 3023,
+   "sha1": "5953c8a08d6f6d83e5cfbf27ec51c07dbde28df9",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "PDP-9/GRAPHIC II VERSION OF SPACEWAR (source and listing; binary found at Dartmouth College)",
+   "creator": "Unknown",
+   "contributor": [
+    "Walker, Chris (reconstruction and posting)"
+   ],
+   "source": "GitHub, chriswalker-ge635/PDP9-SPACEWAR",
+   "identifier": [
+    "https://github.com/chriswalker-ge635/PDP9-SPACEWAR"
+   ],
+   "rights": "Repository LICENSE: The Unlicense (public-domain dedication by the repository's authors)",
+   "language": "en",
+   "tags": [
+    "pdp-9",
+    "graphic-ii",
+    "dartmouth",
+    "bell-labs",
+    "source-code",
+    "github"
+   ],
+   "description": "Assembly source and listing titled \".TITLE PDP-9/GRAPHIC II VERSION OF SPACEWAR\", for a PDP-9 with the Bell Labs-designed Graphic II display; the README describes it as \"Source code for PDP-9 SPACEWAR! binary found at Dartmouth College in the early 1970s\", which implies the source was reconstructed from the binary (inferred; the README does not say how). The program defines three ships and twenty-one bullets and has \"DAMAGED VERSION\" ship shapes. Lars Brinkhoff mentioned a file with this title on the TUHS list in January 2020 in connection with Ritchie's account of a Spacewar copy on the Bell Labs PDP-7. No author or date is given in the source, and it does not name MIT or Russell.",
+   "extent": "spacewar_pdp9_graphics2.src (77 KB) and .lst (269 KB), README, LICENSE; held in files/pdp9_spacewar_dartmouth/",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T00:04:47Z",
+   "addedBy": "DMB",
+   "code": "I-74PEF",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-9 MACRO-9 assembly",
+   "machine": "DEC PDP-9 with Graphic II display",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-FDB8V",
+   "clearance": {
+    "basis": "licence",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "The repository LICENSE is The Unlicense, a public-domain dedication by the repository’s authors (as recorded on I-74PEF)."
+   },
+   "file": "files/I-74PEF.src",
+   "name": "spacewar_pdp9_graphics2.src",
+   "mime": "application/x-wais-source",
+   "kind": "text",
+   "size": 76625,
+   "sha1": "4838d32adf5aec7bec32c6a6ee4e1f891da6bc79",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar for the MIT CADR Lisp Machine (LMIO1; SWAR 2, with LOAD SWAR), System 46 source",
+   "creator": "MIT Artificial Intelligence Laboratory, Lisp Machine group",
+   "date": "1980/1981",
+   "publisher": "Massachusetts Institute of Technology",
+   "source": "GitHub mietek/mit-cadr-system-software, src/lmio1/swar.2 at commit 8e978d7d1704096a63edd4386a3b8326a2e584af (from ITS backup tapes released by Brad Parker); identical copy in GitHub PDP-10/its-vault files/lmio1/swar.2, with files/lmio1/load.swar (commit ff207a2773e3, 3 November 2018)",
+   "identifier": [
+    "https://github.com/mietek/mit-cadr-system-software/blob/8e978d7d1704096a63edd4386a3b8326a2e584af/src/lmio1/swar.2",
+    "https://github.com/PDP-10/its-vault/blob/master/files/lmio1/swar.2",
+    "https://github.com/PDP-10/its-vault/blob/master/files/lmio1/load.swar"
+   ],
+   "rights": "Copyright (c) 1980, Massachusetts Institute of Technology. All rights reserved. Redistribution permitted under the BSD-style terms in src/LICENSE (described as the MIT license in the repository README)",
+   "language": "en",
+   "tags": [
+    "source",
+    "lisp-machine",
+    "cadr",
+    "lisp",
+    "mit-ai",
+    "its",
+    "port",
+    "1980"
+   ],
+   "description": "A two-player Spacewar written in Lisp Machine Lisp for the MIT CADR, in package SPACEWAR, drawing ships as characters of the SHIP font. Tunable parameters include ship acceleration and turning rate, a supply of 40 torpedoes, torpedo lifetime, a sun (\"SUN-FLAG\", \"MASS-OF-SUN\", fatal or harmless collision) and walls that bounce or wrap. LOAD SWAR loads \"lmio1;swar\" and \"lmfont;ship\" and starts the game, printing \"Type (spacewar:stop-spacewar) to stop\". The file carries no author or date; the tape README (13 October 2004) gives the tape label \"Lisp Machine System Software Reel 1,2,3,4 10/17/81\" and system version 46, while the GitHub mirror README says the tapes are dated 17 October 1980. A later version for the LMI Lambda is in jrm-code-project/LISP-Machine, lambda/io1/swar.lisp (not copied).",
+   "extent": "Lisp source, 24,006 bytes; loader 165 bytes",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-A2UAC",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "Lisp Machine Lisp",
+   "machine": "MIT CADR Lisp Machine",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "files",
+   "movedFrom": "P-JNESQ",
+   "clearance": {
+    "basis": "licence",
+    "by": "DMB",
+    "date": "2026-10-19",
+    "evidence": "\"Copyright (c) 1980, Massachusetts Institute of Technology. All rights reserved.\" Redistribution permitted under the BSD-style terms in src/LICENSE of the source repository (as recorded on I-A2UAC)."
+   },
+   "file": "files/I-A2UAC.2",
+   "name": "swar.2",
+   "mime": "application/octet-stream",
+   "kind": "text",
+   "size": 24006,
+   "sha1": "88dd679b219e6bd9d86f1f2c4461292cadc97d0c",
+   "alts": [
+    {
+     "lang": "en",
+     "label": "LOAD SWAR loader from PDP-10/its-vault files/lmio1/load.swar",
+     "file": "files/I-A2UAC-a1.swar",
+     "mime": "text/plain",
+     "size": 165,
+     "by": "Source"
+    }
+   ],
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "WAR 44: PDP-6 Spacewar! (from Peter Samson's DECtape \"PSampsonIV\")",
+   "creator": "MIT AI Lab",
+   "date": "1968",
+   "source": "GitHub PDP-10/its, src/spcwar/war.44",
+   "identifier": [
+    "https://github.com/PDP-10/its/blob/master/src/spcwar/war.44"
+   ],
+   "rights": "None stated in the file",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-6",
+    "its",
+    "samson",
+    "port",
+    "verify"
+   ],
+   "description": "The earliest of the PDP-6 line in the ITS reconstruction, recovered from Samson's DECtape; the 1968 date is the repository maintainers' inference from another file on the tape.",
+   "extent": "16,710 bytes",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T22:59:47Z",
+   "addedBy": "DMB",
+   "code": "I-CNKR7",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "MIDAS (PDP-6 assembly)",
+   "machine": "DEC PDP-6, Type 340 display",
+   "family": "its",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-2JA7C",
+   "kind": "text",
+   "children": [
+    "I-C0PVC"
+   ],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "AR69 SPCWAR: ITS archive file with SPCWAR 163 and NEWWAR 164, earlier versions of the MIT-AI PDP-6/10 Space-War (November 1976)",
+   "creator": "MIT AI Lab (maintainers KLH, GMP, CBF)",
+   "contributor": [
+    "Harrenstein, Ken (KLH)",
+    "GMP",
+    "CBF",
+    "Hunter, Kevin (KH, consoles)",
+    "Parks, Lee (LSP)",
+    "Brinkhoff, Lars (extraction and upload, 2019)"
+   ],
+   "date": "1976-11",
+   "publisher": "MIT Artificial Intelligence Laboratory",
+   "source": "GitHub PDP-10/Spacewar, MIT/1976/ar69.spcwar and MIT/1976/extracted/ (added 19 April 2019, commits 8ec3693fb79e and 3151d72e42e1; copied at 84e7955e0adf)",
+   "identifier": [
+    "https://github.com/PDP-10/Spacewar/tree/84e7955e0adf/MIT/1976",
+    "https://github.com/PDP-10/Spacewar/blob/84e7955e0adf/MIT/1976/ar69.spcwar"
+   ],
+   "rights": "\"(c) Copyright 1976 Massachusetts Institute of Technology. All rights reserved.\" (in NEWWAR 164 and SPCLRC 163); repository has no licence",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-6",
+    "pdp-10",
+    "its",
+    "mit-ai",
+    "type-340",
+    "port",
+    "archive-file",
+    "1976"
+   ],
+   "description": "An ITS archive (AR) file holding several states of the MIT-AI PDP-6/10 Space-War for the Type 340 display. The repository README lists its members with ITS dates: SPCWAR 163 (5 November 1976), NEWWAR 164 (13 November 1976), SPCLRC 163, SPCWAR PEOPLE (10 July 1977), TVWAR 20 and five include files. SPCWAR 163 and NEWWAR 164 carry the same \"History of Space War\" header as the held SPCWAR 166 (lineage \"WAR -> SWAR -> SUPER -> STAR -> SPACE -> SPACE4 -> NSPACE -> SPCWAR\"); a diff shows NEWWAR 164 differs from 166 only in the collision loop, and SPCWAR 163 lacks the version-print line and section index. SPCWAR PEOPLE is the ITS mailing list naming principal maintainers GMP and KLH and fourteen interested parties (among them GLS, MOON, DLW, CBF). The include files and TVWAR 20 are already held and were not copied.",
+   "extent": "ITS archive file 246,638 bytes; SPCWAR 163 source 3,991 lines; NEWWAR 164 source 4,013 lines; zip of 5 files plus manifest, 171,796 bytes",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-C0PVC",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "MIDAS (PDP-6/10 assembly)",
+   "machine": "DEC PDP-6/10 (ITS), Type 340 display",
+   "family": "its",
+   "parents": [
+    {
+     "code": "I-CNKR7",
+     "relation": "revision",
+     "via": null,
+     "confidence": "probable",
+     "evidence": "The History of Space War header gives the lineage from WAR to SPCWAR (P-0S35J)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-S6EIU"
+   ],
+   "paratexts": [
+    "P-PKEWW"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-0S35J",
+   "kind": "file",
+   "children": [
+    "I-S6EIU"
+   ],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SPCWAR 166: the MIT-AI PDP-6/10 Space-War (ITS source)",
+   "creator": "MIT AI Lab (maintainers KLH, GMP, CBF)",
+   "contributor": [
+    "Harrenstein, Ken"
+   ],
+   "date": "1976",
+   "source": "GitHub PDP-10/its, src/spcwar/spcwar.166",
+   "identifier": [
+    "https://github.com/PDP-10/its/blob/master/src/spcwar/spcwar.166"
+   ],
+   "rights": "None stated in the file; repository licences do not name it",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-6",
+    "pdp-10",
+    "its",
+    "mit-ai",
+    "port",
+    "type-340"
+   ],
+   "description": "Its header gives the lineage WAR, SWAR, SUPER, STAR, SPACE, SPACE4, NSPACE, SPCWAR, and a change log to April 1976. The PDP-6/10 line of which the archive held only a CHM record of a printout (P-DB2ZQ). Its include files (340def, arith, math, setmac, stars, frgmts) are in the same repository.",
+   "extent": "105,849 bytes",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T22:59:47Z",
+   "addedBy": "DMB",
+   "code": "I-S6EIU",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "MIDAS (PDP-6/10 assembly)",
+   "machine": "DEC PDP-6/10 (ITS), Type 340 display",
+   "family": "its",
+   "parents": [
+    {
+     "code": "I-C0PVC",
+     "relation": "revision",
+     "via": null,
+     "confidence": "established",
+     "evidence": "SPCWAR 166 follows SPCWAR 163 and NEWWAR 164 under the same header (P-0S35J, P-GWP7E)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-C0PVC"
+   ],
+   "paratexts": [
+    "P-PKEWW"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-GWP7E",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SWR, \"Space War for TVs\": the AI Lab TV-terminal version (ITS source)",
+   "creator": "MIT AI Lab",
+   "source": "GitHub PDP-10/its, src/spcwar/tvwar.20",
+   "identifier": [
+    "https://github.com/PDP-10/its/blob/master/src/spcwar/tvwar.20"
+   ],
+   "rights": "None stated in the file",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-10",
+    "its",
+    "tv-terminal",
+    "port"
+   ],
+   "description": "Space War for the AI Lab's Knight TV raster terminals: up to three ships and two suns. Undated.",
+   "extent": "16,742 bytes",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T22:59:47Z",
+   "addedBy": "DMB",
+   "code": "I-P6KU9",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "MIDAS (PDP-10 assembly)",
+   "machine": "DEC PDP-10 (ITS), Knight TV terminals",
+   "family": "its",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-RMM18",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "Spacewar for the Imlac PDS-1 (ITS source, swar.8)",
+   "creator": "MIT AI Lab",
+   "source": "GitHub PDP-10/its, src/imsrc/swar.8",
+   "identifier": [
+    "https://github.com/PDP-10/its/blob/master/src/imsrc/swar.8"
+   ],
+   "rights": "None stated in the file",
+   "language": "en",
+   "tags": [
+    "source",
+    "imlac",
+    "pds-1",
+    "its",
+    "port"
+   ],
+   "description": "Three ships (stubby, needle, triangle) on the console switches, with spin, gravity off, warp and invisibility; the ITS INFO page (sw.info, in the same repository) gives the switch map. Undated.",
+   "extent": "37,605 bytes",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T22:59:47Z",
+   "addedBy": "DMB",
+   "code": "I-3X84H",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "Imlac assembly",
+   "machine": "Imlac PDS-1",
+   "family": "its",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-0WUZW",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SPACE WAR BY RCW & MAB: GT40 and PDP-11/45 Space War for the MIT AI Lab Mini-Robot group (ITS source src/mini/space.mac, with SPACE WAR information by Meyer A. Billmers)",
+   "creator": "Billmers, Meyer A.",
+   "contributor": [
+    "Waters, R. C. (RCW; initials only in the file, surname from doc/mini/-read-.-this-)"
+   ],
+   "date": "1976-03-29",
+   "publisher": "MIT Artificial Intelligence Laboratory",
+   "source": "GitHub PDP-10/its, src/mini/space.mac and doc/mini/space.inf (added in commit 8a9a2047d047332ec4d3757f3972f8c9f10fa979, 9 March 2022, Lars Brinkhoff)",
+   "identifier": [
+    "https://github.com/PDP-10/its/blob/8a9a2047d047332ec4d3757f3972f8c9f10fa979/src/mini/space.mac",
+    "https://github.com/PDP-10/its/blob/8a9a2047d047332ec4d3757f3972f8c9f10fa979/doc/mini/space.inf"
+   ],
+   "rights": "None stated in the files; the repository LICENSE does not list src/mini",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-11",
+    "gt40",
+    "its",
+    "mit-ai",
+    "mini-robot",
+    "port",
+    "macro-11",
+    "1976"
+   ],
+   "description": "PDP-11 assembly source titled \".TITLE SPACE WAR BY RCW & MAB\", a two-player Space War for the DEC GT40 display driven from a PDP-11/45 and 11/05, with a central sun, stars, missiles, shields and a cloaking device; the ITS build timestamps file dates space.mac 29 March 1976 and space.inf 3 December 1976. The companion file \"SPACE WAR information, by Meyer A. Billmers\" gives the rules: the terminet keyboard flies the U.S.S. ENTERPRISE, the GT40 keyboard a Klingon ship; the sun \"exerts a 1/r gravitational field\" and destroys ships that hit it; the screen wraps toroidally. The directory note doc/mini/-read-.-this- says it was created on 17 September 1973 by Berthold K. P. Horn for the mini-robot users \"BILLIMERS (MAB) AND WATERS (RCW)\". A Spacewar! derivative with Star Trek dressing; the file does not name the PDP-1 original.",
+   "extent": "PDP-11 MACRO source, 1,684 lines (24,691 bytes); information file 113 lines (6,571 bytes)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-N0108",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-11 assembly",
+   "machine": "DEC GT40, driven from a PDP-11/45",
+   "family": "its",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-77JIJ"
+   ],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-1FGYT",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SW: Space War Program for Stanford A.I. Project (SAIL file SW[SW,BGB]), file date 18 September 1973",
+   "creator": "Gorin, Ralph E.",
+   "contributor": [
+    "Taylor, R.",
+    "Baumgart, Bruce G. (file owner, BGB)"
+   ],
+   "date": "1973-09-18",
+   "publisher": "Stanford Artificial Intelligence Laboratory",
+   "source": "Wayback Machine copy of saildart.org (11 September 2016)",
+   "identifier": [
+    "https://saildart.org/SW[SW,BGB]",
+    "http://web.archive.org/web/20160911221220id_/http://saildart.org/SW%5BSW,BGB%5D"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "software",
+    "sail",
+    "stanford",
+    "pdp-10",
+    "pdp-6",
+    "gorin",
+    "source-code",
+    "1973"
+   ],
+   "description": "An earlier state of the SAIL Spacewar source than SW.OLD[CSP,SYS]: same title, \"SW SPACE WAR PROGRAM FOR STANFORD A.I. PROJECT\", with the revision comment \"REVISED SEPTEMBER 5,1971 R.E. GORIN / FEB 1972 R TAYLOR\" and the line \"THIS PROGRAM IS BASED UPON A TRADITIONAL PROGRAM WRITTEN FOR THE PDP-1\", but without the 1977 revision by D. Woods, and with line-numbered text (SOS format). Held in the [SW,BGB] area (programmer code BGB, presumed Bruce G. Baumgart) with SHIPS.SAI, a SAIL routine drawing ship outlines, dated 17 September 1973. Its page directory includes a PDP-6 Space War module, mines, and \"INSERT LOSER INTO NEW HYPERSPACE\".",
+   "extent": "22 pages of PDP-10 assembly source (HTML, 68470 bytes)",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T09:07:03Z",
+   "addedBy": "DMB",
+   "code": "I-YMNO5",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-10 assembly",
+   "machine": "DEC PDP-10 at the Stanford AI Lab",
+   "family": "sail",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-E1S02"
+   ],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-6Q9XI",
+   "kind": "text",
+   "children": [
+    "I-QEU5Y"
+   ],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SW: Space War Program for Stanford A.I. Project (SAIL file SW[SW,REG]), sixteen versions, November 1972 to September 1977",
+   "creator": "Gorin, Ralph E.",
+   "contributor": [
+    "Taylor, R.",
+    "Woods, D."
+   ],
+   "date": "1972-11-04/1977-09-22",
+   "publisher": "Stanford Artificial Intelligence Laboratory",
+   "source": "Wayback Machine copies (14 January 2024) of saildart.org SW[SW,REG]1 to SW[SW,REG]16",
+   "identifier": [
+    "https://saildart.org/SW[SW,REG]1",
+    "http://web.archive.org/web/20240114151528id_/https://saildart.org/SW[SW,REG]1",
+    "http://web.archive.org/web/20240114151535id_/https://saildart.org/SW[SW,REG]16"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-10",
+    "pdp-6",
+    "sail",
+    "waits",
+    "stanford",
+    "gorin",
+    "port",
+    "version-series",
+    "1972"
+   ],
+   "description": "The SAIL Space War source as kept in the [SW,REG] disk area, in sixteen dated versions from 4 November 1972 to 22 September 1977 (version 11, dated 11 November 1975, is a binary shown as octal). Each text version opens \"TITLE SW SPACE WAR PROGRAM FOR STANFORD A.I. PROJECT\" with the revision comment \"REVISED SEPTEMBER 5,1971 R.E. GORIN\" and \"FEB 1972 R TAYLOR\"; versions 15 and 16 (August and September 1977) add a D. Woods revision line. The page directory includes \"THE PDP-6 SPACE WAR MODULE\", \"THE MINE CALCULATIONS\" and \"INSERT LOSER INTO NEW HYPERSPACE\". The series runs between the held SW[SW,BGB] (18 September 1973) and SW.OLD[CSP,SYS] (29 September 1977) and records the program's changes over five years in the area that also holds Maurer's Fortran SPCWAR.F4[SW,REG] (held). A SRCCOM file, SW.DIF[ACT,REG] (1 February 1976), compares SW[SW,REG] with DF[1,LIS], a \"DOG FIGHT PROGRAM FOR STANFORD A.I. PROJECT\" derived from it.",
+   "extent": "16 SAILDART pages, 56,778 to 175,090 bytes each; zip 351,733 bytes",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-E1S02",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-10 assembly",
+   "machine": "DEC PDP-10 at the Stanford AI Lab",
+   "family": "sail",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-YMNO5",
+    "I-2TBBE"
+   ],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-HRLWZ",
+   "kind": "file",
+   "children": [
+    "I-2TBBE",
+    "I-77JIJ"
+   ],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SW: Space War Program for Stanford A.I. Project (SAIL file SW.OLD[CSP,SYS]), revised by R. E. Gorin, 5 September 1971 (file date 29 September 1977)",
+   "creator": "Gorin, Ralph E.",
+   "contributor": [
+    "Taylor, R.",
+    "Woods, D."
+   ],
+   "date": "1971-09-05",
+   "publisher": "Stanford Artificial Intelligence Laboratory",
+   "source": "Wayback Machine copy of saildart.org (12 September 2016)",
+   "identifier": [
+    "https://saildart.org/SW.OLD[CSP,SYS]",
+    "http://web.archive.org/web/20160912111828id_/http://saildart.org/SW.OLD%5BCSP,SYS%5D"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "software",
+    "sail",
+    "stanford",
+    "pdp-10",
+    "pdp-6",
+    "gorin",
+    "source-code",
+    "1971"
+   ],
+   "description": "The SAIL PDP-10 Spacewar source, as preserved in the SAIL file system (SAILDART \"blob sn#366981\", file date 1977-09-29). Header: \"TITLE SW SPACE WAR PROGRAM FOR STANFORD A.I. PROJECT\", with the comment \"REVISED SEPTEMBER 5,1971 R.E. GORIN / FEB 1972 R TAYLOR / AUG 1977 D WOODS. THIS PROGRAM IS BASED UPON A TRADITIONAL PROGRAM WRITTEN FOR THE PDP-1. ANY RESEMBLENCE TO OTHER PROGRAMS, LIVING OR DEAD, IS PURELY COINCIDENTAL\". The page directory lists modules for the PDP-10 and a PDP-6 \"space war module\" (the computation could be run on SAIL's PDP-6), stars and won counts, mines, torpedoes, gravity, collisions, self-destruction, hyperspace for the loser, and runtime parameter modification. This is the Gorin program that Eross's 1973 GT40 version (held, SW.P11[11,BO]) names as its inspiration.",
+   "extent": "23 pages of PDP-10 assembly source (HTML, 71751 bytes)",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T09:07:03Z",
+   "addedBy": "DMB",
+   "code": "I-QEU5Y",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-10 assembly",
+   "machine": "DEC PDP-10 at the Stanford AI Lab",
+   "family": "sail",
+   "parents": [
+    {
+     "code": "I-YMNO5",
+     "relation": "revision",
+     "via": null,
+     "confidence": "established",
+     "evidence": "Same header and revision lines, with the August 1977 revision by D. Woods added (P-K569D)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-4RDUW"
+   ],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-K569D",
+   "kind": "text",
+   "children": [
+    "I-4RDUW"
+   ],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SW: Space War Program for Stanford A.I. Project (SAIL file SW[CSP,SYS]), M. LeBrun and Tovar revision of July 1978, with later states to March 1983",
+   "creator": "Gorin, Ralph E.",
+   "contributor": [
+    "Taylor, R.",
+    "Woods, D.",
+    "LeBrun, M.",
+    "Tovar"
+   ],
+   "date": "1978-07-06",
+   "publisher": "Stanford Artificial Intelligence Laboratory",
+   "source": "GitHub PDP-10/Spacewar, SAIL/1978/sw.mac (commit 84e7955e0adf); Wayback Machine copies of saildart.org SW[CSP,SYS] and SW[CSP,SYS]2 to 6 (12 September 2016)",
+   "identifier": [
+    "https://github.com/PDP-10/Spacewar/blob/84e7955e0adf/SAIL/1978/sw.mac",
+    "https://saildart.org/SW[CSP,SYS]",
+    "http://web.archive.org/web/20160912111827id_/http://saildart.org/SW%5BCSP,SYS%5D",
+    "http://web.archive.org/web/20160912111822id_/http://saildart.org/SW%5BCSP,SYS%5D2"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-10",
+    "pdp-6",
+    "sail",
+    "waits",
+    "stanford",
+    "triple-i-display",
+    "gorin",
+    "port",
+    "1978"
+   ],
+   "description": "Later states of the Stanford AI Lab Space War than the held SW.OLD[CSP,SYS] (1977) and SW[SW,BGB] (1973). The header comment adds \"jul 1978 M LeBrun & Tovar\" to the revisions by R. E. Gorin (5 September 1971), R. Taylor (February 1972) and D. Woods (August 1977), and keeps the line \"THIS PROGRAM IS BASED UPON A TRADITIONAL PROGRAM WRITTEN FOR THE PDP-1\"; a new section \"new kahan SQRT\" credits a square-root routine to Kahan. SAILDART holds the file under SW[CSP,SYS] in versions dated 6 July 1978 (two), 2 December 1978 (two), 25 November 1980 and 27 March 1983 (the last on the system); version 1, dated 29 September 1977, matches the held SW.OLD and was not copied. The GitHub copy (SAIL/1978/sw.mac, added by Lars Brinkhoff in 2019) carries the 1978 header; a line comparison does not match it exactly to any one SAILDART version. Program for the III vector display with PDP-6 and PDP-10 modules, mines, torpedoes and hyperspace.",
+   "extent": "PDP-10 assembly source, about 2,300 lines (sw.mac 73,267 bytes); six SAILDART pages of 73,730 to 74,555 bytes; zip 188,482 bytes",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-4RDUW",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-10 assembly",
+   "machine": "DEC PDP-10 at the Stanford AI Lab",
+   "family": "sail",
+   "parents": [
+    {
+     "code": "I-QEU5Y",
+     "relation": "revision",
+     "via": null,
+     "confidence": "established",
+     "evidence": "Header adds \"jul 1978 M LeBrun & Tovar\" to the same revision lines (P-KQAQP)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-QEU5Y"
+   ],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-KQAQP",
+   "kind": "file",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SW.DIF[ACT,REG]: SRCCOM comparison of DF, \"DOG FIGHT PROGRAM FOR STANFORD A.I. PROJECT\" (Lou Steinberg, 1975), with the SAIL Space War SW[SW,REG]",
+   "creator": "Steinberg, Lou",
+   "contributor": [
+    "Gorin, Ralph E.",
+    "Taylor, R."
+   ],
+   "date": "1976-02-01",
+   "publisher": "Stanford Artificial Intelligence Laboratory",
+   "source": "Wayback Machine copy (14 January 2024) of saildart.org SW.DIF[ACT,REG]",
+   "identifier": [
+    "https://saildart.org/SW.DIF[ACT,REG]",
+    "http://web.archive.org/web/20240114151306id_/https://saildart.org/SW.DIF[ACT,REG]"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-10",
+    "sail",
+    "waits",
+    "stanford",
+    "dogfight",
+    "plato",
+    "derivative",
+    "srccom",
+    "1975"
+   ],
+   "description": "A source-comparison (SRCCOM) file dated 1 February 1976, \"DF[1,LIS] vs. SW[SW,REG]\", that preserves the parts of the Dog Fight program differing from the SAIL Space War. The DF header keeps the Gorin and Taylor revision lines and adds: \"THIS PROGRAM WAS INSPIRED BY THE DOG FIGHT GAME ON THE PLATO SYSTEM. IT USES MUCH CODE FROM THE AI LAB SPACE WAR PROGRAM\" and \"LAST HACKED JUNE, 1975 BY LOU STEINBERG\". The startup message changes from \"WELCOME TO SPACEWAR.\" to \"WELCOME TO DOGFIGHT. HOW MANY SHIPS?\". The source DF[1,LIS] itself was not found on SAILDART or in the Wayback Machine; DF.DMP[1,3] and DF.DMP[1,DWP] (binaries) are listed there.",
+   "extent": "SRCCOM output, 1,135 lines (HTML 34,423 bytes), 388 lines from DF",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-2TBBE",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-10 assembly (comparison file)",
+   "machine": "DEC PDP-10 at the Stanford AI Lab",
+   "family": "sail",
+   "parents": [
+    {
+     "code": "I-E1S02",
+     "relation": "adaptation",
+     "via": null,
+     "confidence": "established",
+     "evidence": "DF header: \"IT USES MUCH CODE FROM THE AI LAB SPACE WAR PROGRAM\"; compared against SW[SW,REG] (P-BQ7LF)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-E1S02"
+   ],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-BQ7LF",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SPCWAR: GT40 Spacewar Program (SAIL SW.P11[11,BO])",
+   "creator": "Eross, Botond G.",
+   "date": "1973",
+   "publisher": "Stanford Artificial Intelligence Project",
+   "source": "Wayback Machine copy of saildart.org (13 January 2024)",
+   "identifier": [
+    "https://saildart.org/SW.P11[11,BO]",
+    "http://web.archive.org/web/20240113035241id_/https://saildart.org/SW.P11[11,BO]"
+   ],
+   "rights": "COPYRIGHT 1973 by Botond G. Eross, Stanford University (as in the file)",
+   "language": "en",
+   "tags": [
+    "source",
+    "gt40",
+    "pdp-11",
+    "sail",
+    "stanford",
+    "eross",
+    "gorin",
+    "port",
+    "1973"
+   ],
+   "description": "The GT40 / Graphic-11 port with its operating instructions, rules and a \"Description of the universe\" (mines, torpedoes, gravity); the header credits the SAIL PDP-10 Spacewar to Ralph Gorin. File date 11 April 1975.",
+   "extent": "51 pp. of PDP-11 MACRO",
+   "accessioned": "2026-10-13",
+   "added": "2026-10-13T22:59:47Z",
+   "addedBy": "DMB",
+   "code": "I-77JIJ",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-11 assembly",
+   "machine": "DEC GT40 / Graphic-11",
+   "family": "sail",
+   "parents": [
+    {
+     "code": "I-E1S02",
+     "relation": "port",
+     "via": null,
+     "confidence": "probable",
+     "evidence": "The header credits the SAIL PDP-10 Spacewar to Ralph Gorin (P-KPVOJ)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [
+    "I-N0108"
+   ],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-KPVOJ",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SPACE WAR, by Hank Maurer \"with spiritual guidance from Mario de Nobili\" (SAIL file SPCWAR.F4[SW,REG]), Fortran, file date 5 January 1973",
+   "creator": "Maurer, Hank",
+   "contributor": [
+    "de Nobili, Mario"
+   ],
+   "date": "1973-01-05",
+   "publisher": "Stanford Artificial Intelligence Laboratory",
+   "source": "Wayback Machine copy of saildart.org (14 January 2024)",
+   "identifier": [
+    "https://saildart.org/SPCWAR.F4[SW,REG]",
+    "http://web.archive.org/web/20240114151536id_/https://saildart.org/SPCWAR.F4[SW,REG]"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "software",
+    "sail",
+    "stanford",
+    "fortran",
+    "maurer",
+    "source-code",
+    "port",
+    "1973"
+   ],
+   "description": "A Fortran version of Space War kept in Ralph Gorin's [SW,REG] area at SAIL. The banner reads \"S P A C E   W A R / BY: HANK MAURER / WITH SPIRITUAL GUIDANCE FROM MARIO DE NOBILI\". The code defines two ships with torpedo, rotate and thrust controls, a sun, moons, scores and an optional wall (the player is asked whether to have one). Authorship and date are as stated in the file; nothing else about Maurer or de Nobili was established here.",
+   "extent": "Fortran IV source, about 650 lines (HTML, 14381 bytes)",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T09:07:03Z",
+   "addedBy": "DMB",
+   "code": "I-P2YDQ",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "Fortran",
+   "machine": "DEC PDP-10 at the Stanford AI Lab",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-CQENX",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SPACE WAR: \"Interplanetary death and destruction on your LAB-8\" (PAL8 source and listing, 1/11/71), from an Indiana University DECtape",
+   "creator": "Suits, Evan",
+   "date": "1971-01-11",
+   "source": "bitsavers.org, bits/DEC/pdp8/papertapeImages/russ.ucs.indiana.edu/Games/SpaceWar/ (file FROM reads \"From DECTAPE/DT13\")",
+   "identifier": [
+    "http://www.bitsavers.org/bits/DEC/pdp8/papertapeImages/russ.ucs.indiana.edu/Games/SpaceWar/"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "pdp-8",
+    "lab-8",
+    "decus-8-395",
+    "suits",
+    "source-code",
+    "dectape",
+    "indiana-university"
+   ],
+   "description": "Machine-readable PAL8 source of Evan Suits's PDP-8/LAB-8 Space War (the program published as DECUS 8-395), recovered from a DECtape (DT13) at russ.ucs.indiana.edu and posted to bitsavers in 2001. The listing header reads \"SPACE WAR PAL8-V7 1/11/71\", the opening comments \"INTERPLANETARY DEATH AND DESTRUCTION ON YOUR LAB-8 / EVAN SUITS\", with control by the switch register or the AX08 \"blue ribbon connector\", hyperspace by turning both ways at once, and the comment \"DRINK LEADEN DEATH, NUMBER ONE!\" (line 651). The catalogue holds the DECUS 8-395 write-up and the printed listing PDF; this is the text and binary of the program itself. It does not name MIT or Russell.",
+   "extent": "space.pa 45 KB (2,261 lines), space.cf 126 KB; OS/8 images SPACE.PA, SPACE.bin (64 KB each), SPACE.CF (172 KB); all held in files/pdp8_spacewar_indiana/",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T00:04:47Z",
+   "addedBy": "DMB",
+   "code": "I-JSQQX",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PAL8 (PDP-8 assembly)",
+   "machine": "DEC LAB-8 (PDP-8 with AX08)",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [
+    "P-26YIF",
+    "P-FHH9Z"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-ATC0A",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SPCWAR by D.E. Wrege, Version 3 (SPCWR3.PA, PAL8 source for the PDP-12, PDP-8/E VC8E, AX08 and Type 30G displays), copyright 1974",
+   "creator": "Wrege, D. E.",
+   "date": "1974",
+   "publisher": "D.E. Wrege & Assoc.",
+   "source": "Wayback Machine copy (29 December 2015) of pdp8.net's OS/8 file viewer, SPCWR3.PA from the DECtape image images/jby/jbyos8.tu56 (blocks 510-640); pdp8.net is now offline",
+   "identifier": [
+    "http://web.archive.org/web/20151229065023id_/http://www.pdp8.net/pdp8cgi/os8_html/SPCWR3.PA?act=file;fn=images/jby/jbyos8.tu56;to=ascii;blk=510,131,0;plain=1",
+    "https://github.com/spacewar1962/spacewar/blob/99bfae8324fb0d590ecc9879a46ef1ad5573aaf1/sources/ports/spacewar-linc8-pdp12-gtech-wrege-1974.txt",
+    "https://classiccmp.org/pipermail/cctech/2018-September/034429.html"
+   ],
+   "rights": "\"COPYRIGHT (C) 1974 BY D.E. WREGE & ASSOC.\"; licensed to Georgia Tech \"for use on a single computer system\" (as in the file)",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-12",
+    "pdp-8",
+    "pal8",
+    "os-8",
+    "vc8e",
+    "ax08",
+    "georgia-tech",
+    "wrege",
+    "port",
+    "1974"
+   ],
+   "description": "PDP-8 family assembly source headed \"/SPCWAR BY D.E. WREGE / VERSION 3\" and \"SPACE WAR. V3\", with a copyright notice for D.E. Wrege & Assoc. and a licence clause stating the software \"IS FURNISHED TO GEORGIA TECH. UNDER A LICENSE FOR USE ON A SINGLE COMPUTER SYSTEM\". Conditional assembly selects the display: AX08 (LAB-8), Type 30G, PDP-8/E VC8E, or by default the PDP-12 VR12 in LINC mode (\"/PDP-12 - VR12 IS DEFAULT\"). Variables and routines include gravity (QGRAV), the sun (SUN, DSUN) and hyperspace (HYPERS). The copy was read from an OS/8 DECtape image (jbyos8.tu56) on pdp8.net; in 2018 the Rhode Island Computer Museum reported modifying this source to read PDP-12 GPIO switch boxes (cctech, 23 September 2018). The same text is in the spacewar1962/spacewar repository, labelled LINC-8/PDP-12; the file itself is PAL8, not LAP6.",
+   "extent": "PAL8 source, 2,498 lines (47,723 bytes)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-CD835",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PAL8 (PDP-8 family assembly)",
+   "machine": "DEC PDP-12 (VR12), PDP-8/E (VC8E), LAB-8 (AX08) or Type 30G",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-XCXZU",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "DUEL: two-ship display game for the PDP-15 (MACRO-15 source DUEL SRC and DUELOK SRC), University of Waterloo DECtape 102",
+   "creator": "Unknown",
+   "date": "1977-03-17",
+   "publisher": "University of Waterloo",
+   "source": "bitsavers.org, bits/DEC/pdp15/dectape/UnivWaterloo/_textfiles/102/DUEL___SRC.txt and DUELOK_SRC.txt (posted 3 December 2004)",
+   "identifier": [
+    "https://www.bitsavers.org/bits/DEC/pdp15/dectape/UnivWaterloo/_textfiles/102/DUEL___SRC.txt",
+    "https://www.bitsavers.org/bits/DEC/pdp15/dectape/UnivWaterloo/_textfiles/102/DUELOK_SRC.txt"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "source",
+    "pdp-15",
+    "pdp-9",
+    "pdp-7",
+    "macro-15",
+    "waterloo",
+    "duel",
+    "derivative",
+    "1977"
+   ],
+   "description": "Assembly source headed \".TITLE DUEL\" for a PDP-7/9/15 family machine with a vector display (display IOTs such as IDLA=700606), found on a University of Waterloo DECtape whose label reads \"102 17-MAR-77\" (the label date, not a date in the file). Two ships, each with a rotating turret, move forward and backward with drift, turn left and right, and fire (routines FOR1/FOR2, REV1/REV2, LEFT1/LEFT2, RT1/RT2, FIRE1/FIRE2, DRIFT; comment \"ESTABLISH DIRECTION COMPONENTS OF TURRET OF SHIP 1\"), with fire single, continuous and stop on switches and an A/D converter input. No sun or gravity code was found. The name matches DECUS 7-40 DUEL (Peterson and Viner, Cambridge, PDP-7 and 340, catalogued as \"very similar to SPACE-WAR\"), but nothing in the file names its authors, so the identification is unconfirmed. The rest of the tape holds music files (carols, TUNE, HARMON) and a MOON program.",
+   "extent": "DUEL 1,151 lines (11,931 bytes); DUELOK 1,003 lines (10,291 bytes); zip with directory, tape labels and manifest",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-FTJEP",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "MACRO-15 assembly",
+   "machine": "DEC PDP-7/9/15 with vector display",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-MGVKQ",
+   "kind": "file",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "Galaxy Game: PDP-11 source code (GalaxyGame_compile11.mac, OCR transcription version 1.2.2)",
+   "creator": "Pitts, Bill",
+   "contributor": [
+    "Tuck, Hugh",
+    "\"Quantum Leaper\" (transcriber)"
+   ],
+   "date": "1971",
+   "source": "bitsavers.org, pdf/stanford/galaxyGame/GalaxyGame_compile11.mac (posted 2011-09-19)",
+   "identifier": [
+    "http://www.bitsavers.org/pdf/stanford/galaxyGame/GalaxyGame_compile11.mac"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "galaxy-game",
+    "pitts",
+    "tuck",
+    "stanford",
+    "pdp-11",
+    "coin-operated",
+    "source-code"
+   ],
+   "description": "Assembly source for Galaxy Game, the coin-operated PDP-11 version of Spacewar! that Bill Pitts and Hugh Tuck installed at Stanford's Tresidder Union in 1971. The header comments say it is \"one of the first Arcade games\", \"Created by Bill Pitts and Hugh Tuck in 1971\", written for the PDP-11 in machine language, and \"OCR and Typed By Quantum Leaper\" with help from \"Rob and Gatinho\" (version 1.2.2); the code defines the coin accumulator (COINAC), display X and Y registers and two terminals (NTERM = 2). The date of the original printout behind the transcription is not stated. It does not name MIT or Russell.",
+   "extent": "27 KB, 2,270 lines of MACRO-11",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T00:04:47Z",
+   "addedBy": "DMB",
+   "code": "I-SGVVK",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "PDP-11 assembly (OCR transcription)",
+   "machine": "DEC PDP-11/20, coin-operated (Galaxy Game)",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-ZFJEH",
+   "kind": "text",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "cromemco_spacewar.ptp: Cromemco Dazzler SPACEWAR paper-tape image",
+   "creator": "Cromemco, Inc.",
+   "source": "bitsavers.org, bits/Cromemco/paperTapes/cromemco_spacewar.ptp (posted 2004-04-02)",
+   "identifier": [
+    "http://www.bitsavers.org/bits/Cromemco/paperTapes/cromemco_spacewar.ptp"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "cromemco",
+    "dazzler",
+    "paper-tape",
+    "binary",
+    "microcomputer"
+   ],
+   "description": "Binary image of a Cromemco paper tape of SPACEWAR for the Dazzler, one of a set of Cromemco game tapes (Chase, Tankwar, Track, Magenta Martini, 4D Tic Tac Toe and others) read for bitsavers in 2004. Cromemco advertised SPACEWAR on $15 paper tape in Creative Computing in early 1977 (P-XA8X4) and the NMAH holds a 1976 Cromemco SPACEWAR tape with documentation (P-0G3ZP). The image begins with leader and Z-80/8080 code (a jump instruction at offset 0x41); no text identifies an author. Date of the tape not stated (1976-77 by the related records).",
+   "extent": "3,906 bytes (binary paper-tape image)",
+   "accessioned": "2026-10-14",
+   "added": "2026-10-14T00:04:47Z",
+   "addedBy": "DMB",
+   "code": "I-3I10H",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "Z-80 machine code (paper tape)",
+   "machine": "Cromemco Z-1 with Dazzler",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "medium": "papertape",
+   "related": [],
+   "paratexts": [
+    "P-0G3ZP"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-E4UB8",
+   "kind": "file",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "orbit: \"Spacewar on the Sun\", by Bob Bane (C and 68000 assembly source for the Sun workstation, files dated 22 August 1983)",
+   "creator": "Bane, Bob",
+   "contributor": [
+    "Seagraves, Daniel (recovered the tape, 2019)",
+    "Brinkhoff, Lars (upload, 2019)"
+   ],
+   "date": "1983-08-22",
+   "publisher": "University of Maryland, Computer Science (inferred from the README address bane.umcp-cs)",
+   "source": "GitHub PDP-10/Spacewar, branch not-pdp10, orbit.tar.gz (commit 3781a0e22b7a, 15 October 2019, \"Spacewar for Unix.\")",
+   "identifier": [
+    "https://github.com/PDP-10/Spacewar/blob/not-pdp10/orbit.tar.gz",
+    "https://classiccmp.org/pipermail/cctalk/2019-October/050039.html",
+    "https://www.tuhs.org/pipermail/tuhs/2019-October/019119.html"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "source",
+    "unix",
+    "sun-1",
+    "c",
+    "68000",
+    "bane",
+    "university-of-maryland",
+    "re-creation",
+    "1983"
+   ],
+   "description": "A Spacewar for the Sun workstation under Berkeley 4.2-derived Unix, recovered in 2019 from a Lisp Machine tape labelled in masking tape \"SPACEWAR FOR VAX (Unix?)\" (Daniel Seagraves, cctalk, 15 October 2019). The manual page reads \"orbit - Spacewar on the Sun ... The classic game of interplanetary death and destruction. Mostly written in C; an assembler package does fast single-precision floating-point for orbital calculations and collision detection\", with adjustable parameters (Gravity, Thrust, TurnSpeed, RateBomb, LifeTimeBomb) saved in option files and a ship designer (prepship). The README, signed \"Bob Bane (bane.umcp-cs@UDel-Relay)\", says it \"should work with no changes on Berkeley 4.2\"; updown.c includes the Sun ROM-vector header. All files are dated 22 August 1983 in the tar listing.",
+   "extent": "gzip tar, 30,405 bytes (136,192 bytes unpacked); 53 files including orbit.man, README, C sources, fp.s, sorbit.s and ship designs",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-UGUDQ",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "C and 68000 assembly",
+   "machine": "Sun workstation (4.2BSD-derived Unix)",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-D7ESR",
+   "kind": "file",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "Spacewar! PDP-1 emulator Java applet, with retyped Spacewar 3.1 source and Perl PDP-1 assembler (Silverman, Silverman and Gerasimov, MIT Media Lab), sources dated 18 December 1996",
+   "creator": "Silverman, Barry",
+   "contributor": [
+    "Silverman, Brian",
+    "Gerasimov, Vadim",
+    "Graetz, Martin (supplied the printed source)"
+   ],
+   "date": "1996-12-18",
+   "publisher": "MIT Media Laboratory, Epistemology and Learning group",
+   "source": "Wayback Machine captures of http://lcs.www.media.mit.edu/groups/el/projects/spacewar/ (page 6 December 1998, readme 24 February 1999, sources directory 15 July 2001)",
+   "identifier": [
+    "http://web.archive.org/web/19981206153512/http://lcs.www.media.mit.edu:80/groups/el/projects/spacewar/",
+    "http://web.archive.org/web/19990224084058/http://lcs.www.media.mit.edu:80/groups/el/projects/spacewar/readme.html",
+    "http://web.archive.org/web/20010715100858/http://lcs.www.media.mit.edu:80/groups/el/projects/spacewar/sources/?M=A"
+   ],
+   "rights": "\"Spacewar! is in the public domain, but this credit paragraph must accompany all distributed versions of the program.\" (readme); no separate statement for the Java and Perl code",
+   "language": "en",
+   "tags": [
+    "java",
+    "applet",
+    "emulator",
+    "pdp-1",
+    "perl",
+    "mit-media-lab",
+    "silverman",
+    "gerasimov",
+    "re-creation",
+    "1996"
+   ],
+   "description": "A web re-creation that runs the PDP-1 Spacewar! binary on a PDP-1 emulator written as a Java applet. The readme, signed Barry Silverman, Brian Silverman and Vadim Gerasimov, says: \"Martin Graetz provided us with a printed version of the source. We typed in in again - it was about 40 pages long - and re-assembled it with a PDP-1 assembler written in PERL\", with two changes (bigger ships and special-cased timing), and gives the keys for the two players. The sources directory lists all files dated 18 December 1996; the retyped source is headed \"/spacewar 3.1 24 sep 62\". The applet page (pdp1b.class) is captured from 6 December 1998. Compiled class files and spacewar.bin were not copied.",
+   "extent": "zip 77,733 bytes: applet page, readme, directory listing and 10 source files (Java applet and front panel, Perl assembler passes, spacewar.mac 31,991 bytes, spacewar.lst 233,062 bytes)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-5QU81",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "Java (PDP-1 emulator), with PDP-1 MACRO source",
+   "machine": "Java applet in a web browser",
+   "family": "mit",
+   "parents": [
+    {
+     "code": "v:3.1",
+     "relation": "copy",
+     "via": "print listing",
+     "confidence": "established",
+     "evidence": "Readme: Graetz provided a printed source, which was typed in again and re-assembled (P-3XRMR)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "held",
+   "publish": "entry",
+   "heldAt": "P-3XRMR",
+   "kind": "file",
+   "children": [],
+   "os": null,
+   "runsOn": null
+  },
+  {
+   "title": "SPACEWAR for the IBM PC and PCjr, by Bill Seiler, versions 1.50 (1985) and 1.70 (1986)",
+   "creator": "Seiler, Bill",
+   "date": "1985/1986",
+   "source": "Internet Archive, SPACEWAR_1020 (collection classicpcgames), files SpacewarV1.50sw1985billSeileraction.zip, SpacewarV1.50a1sw1985billSeileraction.zip, SpacewarV1.50o1sw1985billSeileraction.zip, SpacewarV1.70sw1986billSeileraction.zip",
+   "archive": "Internet Archive",
+   "identifier": [
+    "https://archive.org/details/SPACEWAR_1020",
+    "https://archive.org/details/msdos_Spacewar_1985",
+    "https://archive.org/details/Spacewar_dos"
+   ],
+   "rights": "\"SPACEWAR COPYRIGHT 1985,1986 B SEILER.\" Distributed as user-supported software: \"You are encouraged to copy and share this program with other users. Please do not remove the copyright or the user-supported notice.\" (SPACEWAR.DOC, version 1.70)",
+   "language": "en",
+   "tags": [
+    "ibm-pc",
+    "pcjr",
+    "ms-dos",
+    "shareware",
+    "seiler",
+    "re-creation",
+    "1985"
+   ],
+   "description": "A two-player Spacewar for the IBM PC Color Graphics Card (640 x 200) and PCjr by Bill Seiler, co-author of the 1974 PDP-11 Space War (DECUS 11-192, held). SPACEWAR.DOC (version 1.70, read inside the IA zip) gives photon torpedoes, phasers, impulse engines, cloak and hyperspace, shield and weapon energy recharged from \"Dilithium crystals\", left and right \"Auto Robot\" players, and function keys that place \"a Gravity hole\" or \"a Planet at the center of the screen\". It offered the source code on floppy for a $30 contribution. Also on IA as msdos_Spacewar_1985 (MobyGames-derived record, \"a shareware Spacewar! variant\") and Spacewar_dos (an Italian-language version, SWC.EXE, described there as based on Seiler's 1985 original). Held as a link; binaries not downloaded.",
+   "extent": "DOS program; version 1.70 zip holds SPACEWAR.EXE (22,528 bytes, 6 May 1986) and SPACEWAR.DOC (6,832 bytes, 16 August 1986)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-GVVB9",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "IBM PC and PCjr",
+   "family": "seiler",
+   "parents": [
+    {
+     "code": "I-MBYDW",
+     "relation": "reimplementation",
+     "via": null,
+     "confidence": "possible",
+     "evidence": "Seiler co-wrote the 1974 PDP-11 Space War (P-6H9SS); the PC program does not state a link."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [
+    "P-6H9SS"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-XHCGV",
+   "kind": "link",
+   "url": "https://archive.org/details/SPACEWAR_1020",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACE WAR 1.0, by Jay R. Jaeger (Atari Program Exchange APX-20224, Atari 8-bit disk)",
+   "creator": "Jaeger, Jay R.",
+   "date": "1983",
+   "publisher": "Atari Program Exchange",
+   "source": "Internet Archive, a8b_Space_War_1983_APX_US_k_file (collection atari_8bit_library_games)",
+   "archive": "Internet Archive",
+   "archiveId": "APX-20224",
+   "identifier": [
+    "https://archive.org/details/a8b_Space_War_1983_APX_US_k_file"
+   ],
+   "rights": "None stated on the IA page",
+   "language": "en",
+   "tags": [
+    "atari-8bit",
+    "atari-800",
+    "apx",
+    "jaeger",
+    "re-creation",
+    "1983"
+   ],
+   "description": "A Spacewar re-creation for the Atari 400/800 family sold through the Atari Program Exchange. The disk label photographed on the IA page reads \"SPACE WAR 1.0 / by: JAY R. JAEGER / APX-20224\". The IA description, credited there to MobyGames, says two ships fly around a sun with Newtonian thrust, the sun's gravity can be positive, negative or off in five strengths, the field can wrap or bounce, and the point limit can be 10, 21 or none. Date 1983 per IA. Held as a link; the disk image was not downloaded.",
+   "extent": "ATR disk image, 8,848 bytes (not downloaded)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-C8Y9W",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "Atari 400/800",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [
+    "P-C8HAH"
+   ],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-UVHLI",
+   "kind": "link",
+   "url": "https://archive.org/details/a8b_Space_War_1983_APX_US_k_file",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Space Wars (Vectrex cartridge, GCE, 1982)",
+   "date": "1982",
+   "publisher": "General Consumer Electronics (GCE)",
+   "source": "Internet Archive, vectrex-spacewars (collection vectrex)",
+   "archive": "Internet Archive",
+   "identifier": [
+    "https://archive.org/details/vectrex-spacewars"
+   ],
+   "rights": "None stated on the IA page",
+   "language": "en",
+   "tags": [
+    "vectrex",
+    "console",
+    "cinematronics",
+    "gce",
+    "vector-display",
+    "re-creation",
+    "1982"
+   ],
+   "description": "The Vectrex home version of Space Wars, the vector-display two-player game with a central star that Cinematronics released in the arcade in 1977 (arcade material on that game is already held as paratexts). The box art on the IA page reads \"Vectrex Arcade System Cartridge / SPACE WARS\", shows two ships, their trails and a central star, labels \"PLAYER ONE\" and \"PLAYER TWO\", and is credited to GCE. The IA item gives the date 1982 and no creator. A cartridge image, not an arcade ROM; held as a link without downloading.",
+   "extent": "two cartridge images, SpaceWars-1982.vec (4,096 bytes) and SpaceWars-1982-b1.vec (4,122 bytes), not downloaded",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-6OWIU",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "GCE Vectrex",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-1Q9GH",
+   "kind": "link",
+   "url": "https://archive.org/details/vectrex-spacewars",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Space War / Space Combat (Atari 2600 cartridge CX2604), the game program",
+   "creator": "Shepard, Ian (programmer, per the IA identifier)",
+   "date": "1978",
+   "publisher": "Atari, Inc.",
+   "source": "Internet Archive, atari_2600_space_war_-_space_combat_1978_atari_ian_shepard_-_sears_cx2604_-_6-998 (collection atari_2600_library)",
+   "archive": "Internet Archive",
+   "archiveId": "CX2604",
+   "identifier": [
+    "https://archive.org/details/atari_2600_space_war_-_space_combat_1978_atari_ian_shepard_-_sears_cx2604_-_6-998"
+   ],
+   "rights": "None stated on the IA page",
+   "language": "en",
+   "tags": [
+    "atari-2600",
+    "atari-vcs",
+    "console",
+    "sears",
+    "port",
+    "1978"
+   ],
+   "description": "The playable Atari VCS / 2600 Space War of 1978, also sold by Sears as Space Combat. The IA description calls it \"an Atari 2600 port of Spacewar!, the famous 1962 computer game by Steve Russell\" with 17 variations, 1 to 13 being two-ship duels, some \"near a planet which has gravitational attraction\". The programmer's name (Ian Shepard) and Sears number appear only in the IA identifier. The archive already holds the instruction booklet and box and cartridge scans; this record adds the game program itself as a link. A home-console cartridge image, not an arcade ROM; not downloaded.",
+   "extent": "cartridge image, 2,048 bytes (not downloaded)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-Z9H94",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "Atari 2600 (VCS)",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-IBXZ4",
+   "kind": "link",
+   "url": "https://archive.org/details/atari_2600_space_war_-_space_combat_1978_atari_ian_shepard_-_sears_cx2604_-_6-998",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Classic SPACE WARS (The Plastic Factory, Peter Hirschberg), version 1.0 (1997) and 1.01 with modifications by Josh Coglaiti (1998), Windows freeware",
+   "creator": "Hirschberg, Peter",
+   "contributor": [
+    "Coglaiti, Josh"
+   ],
+   "date": "1997/1998",
+   "publisher": "The Plastic Factory",
+   "source": "Internet Archive, SPACEWAR.zip (1997 release, files dated 24 September 1997) and SpaceWars98_1020 (sw101.zip, version 1.01, files dated April 1998), collection classicpcgames",
+   "archive": "Internet Archive",
+   "identifier": [
+    "https://archive.org/details/SPACEWAR.zip",
+    "https://archive.org/details/SpaceWars98_1020"
+   ],
+   "rights": "\"Copyright 1997 The Plastic Factory / Modififications Copyright 1998 Josh Coglaiti\"; \"This product is FREEWARE. You are free to distribute this program as long as: it is not altered in any way ... no charge is made\" (SPACEWAR.TXT, v1.01)",
+   "language": "en",
+   "tags": [
+    "windows",
+    "freeware",
+    "space-wars",
+    "hirschberg",
+    "re-creation",
+    "1997"
+   ],
+   "description": "A Windows re-creation of the 1970s Space Wars arcade game. SPACEWAR.TXT (version 1.01, read inside the IA zip) says it \"reproduces the arcade classic of the 1970s\", is \"a TWO PLAYER ONLY game\", and lists a \"True gravitational sun\", orbital capabilities, partial destruction, ship debris, \"stellar constellations\" and configurable parameters; its history credits the original program to Peter Hirschberg. The two IA items hold the 1997 release and the 1998 version 1.01. Held as a link; executables not downloaded.",
+   "extent": "Windows program; v1.0 zip: SPACEWAR.EXE 107,008 bytes and SPACEWAR.TXT; v1.01 zip: spacewar.exe 122,880 bytes and SPACEWAR.TXT 3,298 bytes",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-C3XDX",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "Microsoft Windows PC",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-4G4R4",
+   "kind": "link",
+   "url": "https://archive.org/details/SpaceWars98_1020",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "spacewar.lha: Spacewar for the Amiga by B. Bowles (Aminet game/shoot, 8 August 1992)",
+   "creator": "Bowles, B. (BBowles@iusmail.ius.indiana.edu)",
+   "contributor": [
+    "Berg, Stefan G. (uploader)"
+   ],
+   "date": "1992-08-08",
+   "source": "Aminet, game/shoot/spacewar.lha (91K) and spacewar.readme",
+   "archive": "Aminet",
+   "identifier": [
+    "https://aminet.net/package/game/shoot/spacewar",
+    "https://aminet.net/game/shoot/spacewar.readme"
+   ],
+   "rights": "None stated",
+   "language": "en",
+   "tags": [
+    "amiga",
+    "aminet",
+    "re-creation",
+    "1992"
+   ],
+   "description": "An Amiga (m68k AmigaOS) Spacewar on the Aminet archive, dated 8 August 1992 in the Aminet listing. The readme calls it \"a really cool version of the first head to head arcade game\" with \"lots of options like Asteroids, Blackholes, gravity\". The author's address is at Indiana University Southeast. Held as a link; the archive (a binary distribution) was not downloaded. Aminet's 1996 Spacewars.lha by Nigel Hughes is recorded separately.",
+   "extent": "LHA archive, 91K per the Aminet listing (not downloaded)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-C6NON",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "Commodore Amiga",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-J8SHS",
+   "kind": "link",
+   "url": "https://aminet.net/package/game/shoot/spacewar",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewars.lha 1.0: \"2 Player Space Game\" for the Amiga by Nigel Hughes (Aminet game/2play, 21 August 1996)",
+   "creator": "Hughes, Nigel",
+   "date": "1996-08-21",
+   "source": "Aminet, game/2play/Spacewars.lha (65K) and Spacewars.readme",
+   "archive": "Aminet",
+   "identifier": [
+    "https://aminet.net/package/game/2play/Spacewars",
+    "https://aminet.net/game/2play/Spacewars.readme"
+   ],
+   "rights": "None stated; the readme says \"Source can be acquired from the author\"",
+   "language": "en",
+   "tags": [
+    "amiga",
+    "aminet",
+    "two-player",
+    "re-creation",
+    "1996"
+   ],
+   "description": "An Amiga two-player Spacewar, version 1.0, uploaded by its author from Aberystwyth (ngh94@aber.ac.uk) and dated 21 August 1996 in the Aminet listing. The readme describes it as \"Just a nice and simple space war game orbiting a black hole with nice pyro-technic effects\", requiring OS 1.3 and 0.5 MB, and says it replaces game/2play/spacewar.lha. Held as a link; not downloaded.",
+   "extent": "LHA archive, 65K per the Aminet listing (not downloaded)",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-CUJX6",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "Commodore Amiga",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-R17U1",
+   "kind": "link",
+   "url": "https://aminet.net/package/game/2play/Spacewars",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SpaceWar 1.0.4 for the Macintosh, by Dan Frohlich (freeware, 1994)",
+   "creator": "Frohlich, Dan",
+   "date": "1994",
+   "source": "Macintosh Repository, item 44989 (file SpaceWar1.0.4.sit, 202,370 bytes, SHA-1 2ec7fb7925ed443829ac732bb21e8a43d0e0c276)",
+   "archive": "Macintosh Repository",
+   "archiveId": "44989",
+   "identifier": [
+    "https://www.macintoshrepository.org/44989-spacewar"
+   ],
+   "rights": "\"This is a FREEWARE release version of SpaceWar\" (description on the repository page)",
+   "language": "en",
+   "tags": [
+    "macintosh",
+    "68k",
+    "freeware",
+    "re-creation",
+    "1994"
+   ],
+   "description": "A Macintosh SpaceWar for one or two players, year given as 1994 on the Macintosh Repository page. The quoted description reads: \"In SpaceWar each player, attempts to destroy the other by blasting him with energy torpedos. While avoiding the various hazzards common in a space arcade game\", with rendered graphics, one- and two-player modes, configurable controls and \"Many Game Options\". The page does not mention the PDP-1 original, so the lineage rests on the name and the two-player torpedo duel. Not found in the Info-Mac archive mirror at the University of Michigan (game/war and game/space directories). Held as a link; not downloaded.",
+   "extent": "StuffIt archive, 197.63 KiB (not downloaded); 68K Macintosh, System 7.1 or later",
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T01:16:40Z",
+   "addedBy": "DMB",
+   "code": "I-C85PW",
+   "type": "Software",
+   "genre": "software",
+   "progLanguage": "",
+   "machine": "Apple Macintosh",
+   "family": "other",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "paratexts": [],
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "status": "linked",
+   "publish": "entry",
+   "movedFrom": "P-AMSKI",
+   "kind": "link",
+   "url": "https://www.macintoshrepository.org/44989-spacewar",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Space War Version 5B, by Larry Bryant and Bill Seiler (PDP-11), 1974",
+   "creator": "Bryant, Larry; Seiler, Bill",
+   "date": "1974-07-21",
+   "family": "seiler",
+   "progLanguage": "PDP-11 assembly",
+   "machine": "DEC PDP-11",
+   "status": "printed",
+   "paratexts": [
+    "P-6H9SS",
+    "P-Y7KAP",
+    "P-M1M3O"
+   ],
+   "description": "The PDP-11 Space War by Larry Bryant and Bill Seiler, distributed by DECUS as 11-192. The listing of version 5B, dated 21 July 1974, survives as a scan (P-6H9SS); no machine-readable copy is held.",
+   "code": "I-MBYDW",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [
+    "I-GVVB9"
+   ],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "PDP-6 Spacewar! source code and star atlas, printout (CHM)",
+   "date": "1963",
+   "family": "its",
+   "progLanguage": "PDP-6 assembly",
+   "machine": "DEC PDP-6",
+   "status": "printed",
+   "paratexts": [
+    "P-DB2ZQ"
+   ],
+   "description": "A printout of a PDP-6 version of Spacewar! with its star atlas, gift of Peter Samson to the Computer History Museum, catalogued as 34 pages with a PDF on the museum’s record (P-DB2ZQ). The date is the museum’s. Its relation to WAR 44 and the later SPCWAR line has not been checked.",
+   "code": "I-7020P",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACEWAR for EduSystem 50 (BASIC listing), People’s Computer Company, 1975",
+   "date": "1975-01",
+   "family": "other",
+   "progLanguage": "BASIC (EduSystem 50)",
+   "machine": "DEC EduSystem 50 (PDP-8)",
+   "status": "printed",
+   "paratexts": [
+    "P-PS74S"
+   ],
+   "description": "A BASIC listing titled SPACEWAR FOR EDUSYSTEM 50, printed in People’s Computer Company vol. 3 no. 3, January 1975 (P-PS74S).",
+   "code": "I-DXD3E",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar in Tiny BASIC, by David J. Beard, BYTE, May 1979",
+   "creator": "Beard, David J.",
+   "date": "1979-05",
+   "family": "other",
+   "progLanguage": "Tiny BASIC (integer)",
+   "machine": "Microcomputer",
+   "status": "printed",
+   "paratexts": [
+    "P-H9ZE9"
+   ],
+   "description": "Listings for the navigation routines of a three-dimensional spacewar game in integer Tiny BASIC, BYTE vol. 4 no. 5, pp. 110-115 (P-H9ZE9). Beard dates the scenario to 1972.",
+   "code": "I-LMM1S",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar for the VIC-20, by David Malmberg (type-in), 1981-82",
+   "creator": "Malmberg, David",
+   "date": "1982",
+   "family": "other",
+   "progLanguage": "Commodore BASIC",
+   "machine": "Commodore VIC-20",
+   "status": "printed",
+   "paratexts": [
+    "P-I64SS"
+   ],
+   "description": "A type-in Spacewar for the VIC-20 with joystick control, printed in COMPUTE!’s First Book of VIC (1982); first published in Home and Educational COMPUTING!, Fall 1981 (P-I64SS).",
+   "code": "I-A37KB",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar on the Data General Nova, 1968-69",
+   "creator": "Data General Corporation",
+   "date": "1968-12",
+   "family": "other",
+   "machine": "Data General Nova (4K)",
+   "status": "attested",
+   "paratexts": [
+    "P-SUZPZ",
+    "P-Z1QEC"
+   ],
+   "description": "Data General demonstrated Spacewar on a 4K Nova at the Fall Joint Computer Conference, San Francisco, December 1968 (Computerworld, P-SUZPZ). A pamphlet, How to Play Spacewar on the NOVA (1969), is known from citation only (P-Z1QEC).",
+   "code": "I-HIMER",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [
+    "I-3J5AO"
+   ],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Space war on the Rolm 1601 (rugged Nova)",
+   "creator": "Rolm Corporation",
+   "family": "other",
+   "machine": "Rolm 1601",
+   "status": "attested",
+   "paratexts": [
+    "P-4SG1X"
+   ],
+   "description": "An undated Rolm sales leaflet describes a Spacewar program for the Rolm 1601 in 4096 words, with a Spacewar console interface (P-4SG1X).",
+   "code": "I-3J5AO",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [
+    {
+     "code": "I-HIMER",
+     "relation": "port",
+     "via": null,
+     "confidence": "possible",
+     "evidence": "The leaflet describes the Rolm 1601 as a severe-environment Data General Nova built under licence (P-4SG1X)."
+    }
+   ],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar on the SEL 840MP, 1969",
+   "creator": "Systems Engineering Laboratories",
+   "date": "1969-05",
+   "family": "other",
+   "machine": "SEL 840MP with SEL 816 display",
+   "status": "attested",
+   "paratexts": [
+    "P-TSI8F"
+   ],
+   "description": "Systems Engineering Laboratories ran Spacewar on a SEL 840MP with a SEL 816 display at the Spring Joint Computer Conference, Boston, 1969, with a doomsday device that destroys a ship after two minutes (Computerworld, P-TSI8F).",
+   "code": "I-C2HZ8",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPCWAR for the LINC-8 (DECUS L-39), modifications by E. Duffin",
+   "creator": "Duffin, E.",
+   "date": "1968-08-12",
+   "family": "other",
+   "progLanguage": "LAP6",
+   "machine": "DEC LINC-8",
+   "status": "attested",
+   "paratexts": [
+    "P-T47VW",
+    "P-VLQS4"
+   ],
+   "description": "A two-pilot game with cannon for the LINC-8, anonymous with modifications by E. Duffin (University of Pennsylvania), distributed by DECUS as L-39. The write-up (P-T47VW) and catalogue entry (P-VLQS4) are held; the program is not.",
+   "code": "I-HJ2RB",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "DUEL for the PDP-7 and 340 display (DECUS 7-40), by Peterson and Viner",
+   "creator": "Peterson, M. S.; Viner, J. C.",
+   "date": "1968-06",
+   "family": "other",
+   "machine": "DEC PDP-7, Type 340 display",
+   "status": "attested",
+   "paratexts": [
+    "P-87QOL"
+   ],
+   "description": "Listed by DECUS as \"a program very similar to SPACE-WAR for the PDP-1\", from Cambridge University (P-87QOL). Whether the PDP-15 DUEL held from Waterloo (P-MGVKQ) is this program is unconfirmed.",
+   "code": "I-UFZYG",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "SPACEWAR in FORTRAN IV, in Assorted Routines for DOS-11 (DECUS 11-106), by Glenn and Craig Everhart",
+   "creator": "Everhart, Glenn; Everhart, Craig",
+   "family": "other",
+   "progLanguage": "FORTRAN IV",
+   "machine": "DEC PDP-11 (DOS-11)",
+   "status": "attested",
+   "paratexts": [
+    "P-C0LB5"
+   ],
+   "description": "DECUS 11-106, \"Assorted Routines for use with DOS-11\", includes \"Two games, DOTS and SPACEWAR, both written in FORTRAN IV\" (DECUS PDP-11 catalogue, February 1974, PDF p. 39, P-C0LB5).",
+   "code": "I-EJIEM",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Spacewar on PLATO (University of Illinois)",
+   "family": "other",
+   "machine": "PLATO (University of Illinois)",
+   "status": "attested",
+   "paratexts": [
+    "P-Z4WVQ",
+    "P-QX5WB"
+   ],
+   "description": "PLATO Curricular Materials lists \"Spacewar\", an inter-terminal battle between two spaceships with limited fuel, among the recreational programs (P-Z4WVQ, printed pp. 123-124).",
+   "code": "I-UG6WW",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Relativistic space war for physics instruction (PDP-15), by Burton N. Kendall",
+   "creator": "Kendall, Burton N.",
+   "date": "1972/1973",
+   "family": "other",
+   "machine": "DEC PDP-15 with Graphic-15",
+   "status": "attested",
+   "paratexts": [
+    "P-CGAGH"
+   ],
+   "description": "A two-player game \"based upon the game of ‘space war’\", written at UC Santa Barbara for undergraduate physics, adding relativistic effects to the sun’s gravity. Known from citation; the program is not located (P-CGAGH).",
+   "code": "I-P510E",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  },
+  {
+   "title": "Space War Computer Game for Heathkit Computers, 1977",
+   "creator": "Heath Company",
+   "date": "1977",
+   "family": "other",
+   "machine": "Heathkit computer",
+   "status": "attested",
+   "paratexts": [
+    "P-09Y9D",
+    "P-45JUJ"
+   ],
+   "description": "Two cassettes held by the National Museum of American History, catalogue records only (P-09Y9D, P-45JUJ). Which Heathkit computer it ran on is not stated in the records.",
+   "code": "I-PBC2X",
+   "type": "Software",
+   "genre": "software",
+   "publish": "entry",
+   "language": "en",
+   "parents": [],
+   "features": {
+    "sun": null,
+    "stars": null,
+    "hyperspace": null,
+    "ships": null
+   },
+   "related": [],
+   "accessioned": "2026-10-19",
+   "added": "2026-10-19T14:42:49Z",
+   "addedBy": "DMB",
+   "updated": "2026-10-19T14:42:49Z",
+   "updatedBy": "DMB",
+   "children": [],
+   "os": null,
+   "runsOn": null,
+   "heldAt": null
+  }
+ ]
+}
