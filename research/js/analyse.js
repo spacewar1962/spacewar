@@ -2380,7 +2380,7 @@
   // kit/lenses.js's, Graphics ▾ kit/graphics.js's (Tape Load Simulator opens here, over Tape).
   SW.BENCH.menus = {
     versions: [['about', 'This version', 'Its record, sources, build log and annotations'],
-              ['compare', 'Compare', 'Two versions side by side'],
+              ['compare', 'Collate', 'Two versions set out together: line by line, constants and symbols, routines'],
               ['genealogy', 'Genealogy', 'How the versions descend'],
               ['tape', 'Tape', 'The paper tapes, frame by frame'],
               ['absence', 'Absence', 'Gaps in the record, and what fills them']],

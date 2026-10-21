@@ -1,5 +1,5 @@
 /*
- * compare-defs.js - this bench's second mode in Compare (bench-kit's kit/compare.js): the
+ * compare-defs.js - this bench's second mode in Collate (bench-kit's kit/compare.js): the
  * "interesting and often changed constants", the macros, and the defined symbols that differ.
  */
 (function (root) {

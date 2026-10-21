@@ -34,7 +34,7 @@
     // the default colour theme's name, and the accent of figures exported on black and on white
     theme: { label: 'Phosphor', note: 'blue-white on near black, after the PDP-1’s display (the default)' },
     accent: { dark: '#ffce7a', light: '#9a5b00' },
-    // the people whose initials or names are written into the text (Analyse ▸ Hands and dates, Compare)
+    // the people whose initials or names are written into the text (Analyse ▸ Hands and dates, Collate)
     hands: [
       { k: 'prs', who: 'Peter R. Samson', re: /\bprs\b/i, colour: '#2a9d6f' },
       { k: 'adams', who: 'Adams Associates', re: /\badams associates\b/i, colour: '#c0622d' },
@@ -66,7 +66,7 @@
       tryText: 'The **sun** is placed from `nx1` and `ny1`', code: '`lac nx1`',
       caption: 'A link from an annotation on 4.1 to one on 3.1. The 3.1 annotation lists it under Linked from'
     },
-    lang: 'macro',   // the language of the texts, for Compare and Genealogy (kit/lang-macro.js)
+    lang: 'macro',   // the language of the texts, for Collate and Genealogy (kit/lang-macro.js)
     compare: { comment: '/', normalised: true, reading: 'Assembling',
                supplied: ['supplied tapes', 'Include the tapes supplied to make a version assemble (the macro definitions and the star table), not only the version’s own program text'] },
     comparePrefix: 'Spacewar! ',
