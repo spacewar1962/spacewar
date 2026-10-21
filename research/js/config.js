@@ -23,6 +23,8 @@
     about: {
       icon: '<img src="img/tape-icon.svg" alt="" width="40" height="40">',
       author: 'David M. Berry', citeAuthor: 'Berry, D. M.',
+      cite: { authors: 'Berry, D. M. and Marino, M. C.', title: 'Spacewar! Research Bench' },   // the bench cited as the project's work
+      project: 'The <a href="https://spacewar1962.github.io/spacewar/" target="_blank" rel="noopener">Critical Code Studies <i>Spacewar!</i> project</a>, led by David M. Berry and Mark C. Marino.',
       purpose: 'A bench for the critical reading of the Spacewar! source code, made for the Spacewar! book project.',
       inside: 'The macro1 assembler (from SIMH) with the 1962–63 MACRO rules; a PDP-1 emulator with the Type 30 display; a FIO-DEC tape reader.',
       sources: 'Code by Russell, Samson, Edwards, Graetz, Kotok and others at MIT; later versions by Preonas (“ddp”), “dfw” and Morris; tapes from Russell’s box (bitsavers); transcriptions by Landsteiner and the Computer History Museum. Details under Version.',
