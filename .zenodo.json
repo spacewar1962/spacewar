@@ -3,7 +3,7 @@
   "upload_type": "software",
   "description": "<p>A website and research bench for the critical reading of <i>Spacewar!</i>, the game written in 1961-63 for the DEC PDP-1 at MIT, in its versions: the source listings and paper tapes of 2B, 3.1, 4.0 to 4.8 and the later Computer History Museum revisions, assembled in the browser with the 1962-63 MACRO rules and run on a PDP-1 emulator with the Type 30 display. The bench sets the versions side by side and traces their descent, hands and dates, and catalogues the implementations of the program on other machines. A Critical Code Studies project of David M. Berry (University of Sussex) and Mark C. Marino (University of Southern California), built on bench-kit. The original game is in the public domain; the emulator files from spacewar.oversigma.com are Barry Silverman, Brian Silverman and Vadim Gerasimov's and are included with their credit, outside the licence of this record.</p>",
   "creators": [
-    { "name": "Berry, David M.", "affiliation": "University of Sussex" },
+    { "name": "Berry, David M.", "affiliation": "University of Sussex", "orcid": "0000-0002-7737-5586" },
     { "name": "Marino, Mark C.", "affiliation": "University of Southern California" }
   ],
   "license": "GPL-3.0",
