@@ -29,6 +29,7 @@
       inside: 'The macro1 assembler (from SIMH) with the 1962–63 MACRO rules; a PDP-1 emulator with the Type 30 display; a FIO-DEC tape reader.',
       sources: 'Code by Russell, Samson, Edwards, Graetz, Kotok and others at MIT; later versions by Preonas (“ddp”), “dfw” and Morris; tapes from Russell’s box (bitsavers); transcriptions by Landsteiner and the Computer History Museum. Details under Version.',
       code: 'https://github.com/spacewar1962/spacewar',
+      doi: '10.5281/zenodo.23762884', doiBadge: 'https://zenodo.org/badge/1264421409.svg',   // Zenodo's concept DOI, every release
       catalogue: { skip: ['stars'], held: 'assembled from source' }
     },
     // the default colour theme's name, and the accent of figures exported on black and on white

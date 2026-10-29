@@ -100,3 +100,5 @@ Everything else, the research bench (`research/`, with bench-kit in `research/ki
 ## Acknowledgements
 
 This reading builds on the Critical Code Studies tradition developed by Mark C. Marino and David M. Berry, and on the work of the historians and preservationists who recovered and ran this code. We are especially indebted to the remarkable work of **Norbert Landsteiner**, whose emulations, reconstructions, source listings, and software-archaeological analyses of _Spacewar!_ and the Minskytron at [masswerk.at/spacewar](https://www.masswerk.at/spacewar/) this project draws on throughout.
+
+[![DOI](https://zenodo.org/badge/1264421409.svg)](https://doi.org/10.5281/zenodo.23762884)
