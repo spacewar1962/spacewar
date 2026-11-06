@@ -630,7 +630,7 @@
   {
    "id": "L-1ADB04",
    "title": "Final Fantasy VII, Tomb Raider, And Others Inducted To World Video Game Hall Of Fame",
-   "author": "Imran Khan",
+   "author": "Khan, Imran",
    "date": "2018-05-03",
    "kind": "news",
    "lang": "en",
@@ -1299,7 +1299,7 @@
   {
    "id": "L-47590C",
    "title": "Da Spacewar! a Gears of War, o come l'immagine videoludica è diventata più cinematografica",
-   "author": "Perron, Bernard; Therrien, ­Carl",
+   "author": "Perron, Bernard; Therrien, Carl",
    "date": "2009-01-01",
    "kind": "article",
    "lang": "it",
@@ -2431,7 +2431,7 @@
   {
    "id": "L-636258",
    "title": "Video gaming industry in the US",
-   "author": "JYOTHIRADITYA PERI",
+   "author": "Peri, Jyothiraditya",
    "date": "2024-02-28",
    "kind": "article",
    "lang": "en",
@@ -2569,7 +2569,7 @@
   {
    "id": "L-27454D",
    "title": "Gravity in Computer Space",
-   "author": "Wardrip–Fruin, Noah",
+   "author": "Wardrip-Fruin, Noah",
    "date": "2019-12-05",
    "kind": "article",
    "lang": "en",
@@ -2965,7 +2965,7 @@
   {
    "id": "L-310D1F",
    "title": "The Game Freaks Who Play With Bugs: In Praise of the Video Game Xevious",
-   "author": "Nakazawa, Shin'ichi; Pelletier-Gagnon, Jeremie; Okabe, Tsugumi",
+   "author": "Nakazawa, Shin'ichi; Pelletier-Gagnon, Jérémie; Okabe, Tsugumi",
    "date": "2015-12",
    "kind": "article",
    "lang": "en",
@@ -2982,7 +2982,7 @@
   {
    "id": "L-01CDE8",
    "title": "Looking at the history of video games through the prism of ludicisation processes",
-   "author": "Genvo, Sebastien",
+   "author": "Genvo, Sébastien",
    "date": "2014-01",
    "kind": "article",
    "lang": "en",
@@ -3621,7 +3621,7 @@
   {
    "id": "L-50E0E3",
    "title": "In the realm of the circuit",
-   "author": "Charles H Traub",
+   "author": "Traub, Charles H",
    "date": "2004",
    "kind": "book",
    "lang": "en",
@@ -4078,7 +4078,7 @@
   {
    "id": "L-9FC603",
    "title": "Phoenix: The Fall & Rise of Videogames",
-   "author": "Leonard Herman",
+   "author": "Herman, Leonard",
    "date": "1997",
    "kind": "book",
    "lang": "en",
@@ -4557,7 +4557,7 @@
   {
    "id": "L-AFD8DB",
    "title": "Atari Inc.: business is fun",
-   "author": "Goldberg, Marty (Computer programmer)",
+   "author": "Goldberg, Marty",
    "date": "2012",
    "kind": "book",
    "lang": "en",
@@ -4831,7 +4831,7 @@
   {
    "id": "L-750FBD",
    "title": "Inventing modern America",
-   "author": "Brown, David E",
+   "author": "Brown, David E.",
    "date": "2002",
    "kind": "book",
    "lang": "en",
@@ -5141,7 +5141,7 @@
   {
    "id": "L-DA06FE",
    "title": "The big idea",
-   "author": "Steven D. Strauss",
+   "author": "Strauss, Steven D.",
    "date": "2002",
    "kind": "book",
    "lang": "en",
@@ -5883,7 +5883,7 @@
   {
    "id": "L-705188",
    "title": "Idea man",
-   "author": "Paul Allen",
+   "author": "Allen, Paul",
    "date": "2011",
    "kind": "book",
    "lang": "en",
@@ -9373,7 +9373,7 @@
   {
    "id": "L-63E3A5",
    "title": "Worlds First Video Game Tournament Spacewar! & the Rise of Pong",
-   "author": "Retro Resurfaced",
+   "author": "Resurfaced, Retro",
    "date": "2025-04-18",
    "kind": "documentary",
    "lang": "en",
@@ -9416,7 +9416,7 @@
   {
    "id": "L-938E14",
    "title": "SpaceWar! (1962-1978) - Stu's Game Reviews #1",
-   "author": "Stu's Game Reviews",
+   "author": "Reviews, Stu's Game",
    "date": "2017-06-15",
    "kind": "talk",
    "lang": "en",
@@ -10721,6 +10721,112 @@
    "url": "https://radar.gsa.ac.uk/id/eprint/9485",
    "tags": [
     "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-124636",
+   "title": "Communication in videogames: editorial note",
+   "author": "Sicart, Miguel; Zagalo, Nelson; Ferreira, Emmanoel",
+   "date": "2015-01-01",
+   "kind": "article",
+   "lang": "pt",
+   "publisher": "Universidade do Minho. Centro de Estudos de Comunicação e Sociedade (CECS)",
+   "doi": "10.17231/comsoc.27(2015).2085",
+   "note": "Editorial's abstract says Spacewar!, by Russell and others on a DEC PDP-1 at MIT in 1961-62, points to issues of its period, including the arms race.",
+   "licence": "CC BY 4.0",
+   "url": "https://doi.org/10.17231/comsoc.27(2015).2085",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-923DC7",
+   "title": "Aaron Trammell: The Privilege of Play. A History of Hobby Games, Race, and Geek Culture.: New York: NYU Press 2023. ISBN: 9781479818402. 240 Seiten, 30,00 $",
+   "author": "Sulzenbacher, Stefan",
+   "date": "2025-11-12",
+   "kind": "article",
+   "lang": "de",
+   "publisher": "tfm | Institut für Theater-, Film- und Medienwissenschaft an der Universität Wie",
+   "note": "Review of Trammell: says he reframes MIT's TMRC, often treated as the cradle of gaming and hacking because of Spacewar!, through white male privilege and hobbyism.",
+   "url": "https://core.ac.uk/works/316262053",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-79EFF8",
+   "title": "Dalla “uscita di Spacewar! dai laboratori del MIT” a Gears of War, o come l'immagine videoludica è divenuta più cinematografica",
+   "author": "C, Tognolotti",
+   "date": "2009-01-01",
+   "kind": "article",
+   "lang": "it",
+   "note": "Title takes Spacewar!'s exit from the MIT labs as the start of a line to Gears of War on the videogame image becoming more cinematic. Text not seen.",
+   "url": "https://core.ac.uk/works/52827100",
+   "tags": [
+    "title only, not read"
+   ]
+  },
+  {
+   "id": "L-9C0184",
+   "title": "A history of United States military simulation",
+   "author": "Hill, Raymond R.; Miller, J. O.",
+   "date": "2017-12",
+   "kind": "conference paper",
+   "in": "2017 Winter Simulation Conference (WSC)",
+   "pages": "346-364",
+   "doi": "10.1109/WSC.2017.8247799",
+   "note": "Places Spacewar at MIT as a two-person competitive game in a survey of military simulation, and reports Shaban (2013) on its development.",
+   "url": "https://doi.org/10.1109/WSC.2017.8247799",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-D6F7AC",
+   "title": "On the Liberation of Space in Computer Games",
+   "author": "Babic, Edvin",
+   "date": "2007-05-17",
+   "kind": "article",
+   "lang": "en",
+   "in": "Eludamos: Journal for Computer Game Culture 1(1)",
+   "doi": "10.7557/23.5959",
+   "note": "Uses Spacewar as a classical one-screener: two players navigate a star's gravitational field, and the first challenge is avoiding absorption rather than shooting.",
+   "licence": "CC BY 4.0",
+   "url": "https://eludamos.org/index.php/eludamos/article/view/vol1no1-3",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-515583",
+   "title": "Epistemic Disobedience in Digital Games: Mega Man X8 16-bit case",
+   "author": "Wajsfeld, Pedro",
+   "date": "2026-06-16",
+   "kind": "conference paper",
+   "lang": "en",
+   "in": "Proceedings of DiGRA 2026",
+   "doi": "10.26503/dl.v2026i3.2821",
+   "note": "Quotes Christiansen on Spacewar! as a group effort by unpaid hackers and the first modded game, and treats that collective work as a precedent for fangames.",
+   "licence": "Copyright Authors & DiGRA; personal and educational classroom use allowed, commercial use requires author permission",
+   "url": "https://dl.digra.org/index.php/dl/article/view/2821",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-4BC6BD",
+   "title": "FINAL BOSS: Video games as a Technology of Geopolitical Cultural Power",
+   "author": "Lima, Thiago Masetto",
+   "date": "2026-06-16",
+   "kind": "conference paper",
+   "lang": "en",
+   "in": "Proceedings of DiGRA 2026",
+   "doi": "10.26503/dl.v2026i3.2827",
+   "note": "Dates Spacewar! to 1962 at MIT under Russell and links its making to Cold War military-industrial funding, citing Dyer-Witheford and de Peuter.",
+   "licence": "Copyright Authors & DiGRA; personal and educational classroom use allowed, commercial use requires author permission",
+   "url": "https://dl.digra.org/index.php/dl/article/view/2827",
+   "tags": [
+    "passing discussion"
    ]
   }
  ]
