@@ -173,6 +173,1113 @@
    "lang": "en",
    "note": "Slide lecture on early computer display hardware. The chapter on the PDP-1, vector graphics and Spacewar! runs 3:31 to 6:48. 50:46.",
    "url": "https://www.youtube.com/watch?v=7xtqLJH1z10&t=211"
+  },
+  {
+   "id": "L-AFA3B6",
+   "title": "Spacewar: Collaborative Coding and the Rise of Gaming Culture",
+   "author": "Daemmrich, Arthur",
+   "date": "2022-11-15",
+   "kind": "chapter",
+   "in": "\"You Are Not Expected to Understand This\": How Six Lines of Code Changed the World (ed. Bosch, Torie)",
+   "publisher": "Princeton University Press",
+   "pages": "31-37",
+   "doi": "10.1515/9780691230818-006",
+   "isbn": "9780691230818",
+   "note": "Short chapter on Spacewar! as collaborative coding and as a starting point for gaming culture. Spacewar! at 31-37.",
+   "url": "https://doi.org/10.1515/9780691230818-006",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-CA8575",
+   "title": "Spacewar!: It's Rocket Science",
+   "author": "Barton, Matt",
+   "date": "2019-05-08",
+   "kind": "chapter",
+   "in": "Vintage Games 2.0: An Insider Look at the Most Influential Games of All Time",
+   "publisher": "A K Peters/CRC Press",
+   "pages": "5-12",
+   "doi": "10.1201/9780429280542-2",
+   "isbn": "9780429280542",
+   "note": "Chapter 2 of a survey of influential games, given over to Spacewar!. Spacewar! at 5-12.",
+   "url": "https://doi.org/10.1201/9780429280542-2",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-128F7B",
+   "title": "Monopoly and the Logic of Sensation in Spacewar!",
+   "kind": "chapter",
+   "in": "Fun and Software: Exploring Pleasure, Paradox and Pain in Computing",
+   "publisher": "Bloomsbury Academic",
+   "doi": "10.5040/9781501300240.ch-009",
+   "isbn": "9781623567569",
+   "note": "Essay reading Spacewar! through monopoly and a logic of sensation.",
+   "url": "https://doi.org/10.5040/9781501300240.ch-009",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-2CCD70",
+   "title": "Vom Spacewar!-en",
+   "author": "Nohr, Rolf F.",
+   "date": "2025-11-27",
+   "kind": "chapter",
+   "lang": "de",
+   "in": "Spielgeschichte(n): Games und Game Studies in medienkulturgeschichtlicher Perspektive (ed. Lyapova, Yana; Unterhuber, Tobias)",
+   "publisher": "transcript Verlag",
+   "pages": "103-122",
+   "doi": "10.14361/9783839400593-007",
+   "isbn": "9783837666403",
+   "note": "German-language chapter titled with a play on Spacewar!, in a volume on games from a media-cultural history perspective. Spacewar! at 103-122.",
+   "url": "https://doi.org/10.14361/9783839400593-007",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-C285B6",
+   "title": "Happy 50th to computer game Spacewar",
+   "author": "LaMonica, Martin",
+   "date": "2012-02-11",
+   "kind": "news",
+   "lang": "en",
+   "in": "CBS News (CNET)",
+   "note": "Reports the game's fiftieth anniversary and MIT's GAMBIT celebration, with the origin of the program on the PDP-1 and a replica for players.",
+   "url": "https://www.cbsnews.com/news/happy-50th-to-computer-game-spacewar/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-3E4FFE",
+   "title": "Moving Image Celebrates 50th Anniversary of SPACEWAR! Video Game with Exhibition, 12/15-3/3",
+   "author": "BWW News Desk",
+   "date": "2012-11-28",
+   "kind": "news",
+   "lang": "en",
+   "in": "BroadwayWorld",
+   "note": "Press notice for the Museum of the Moving Image exhibition marking the game's fiftieth anniversary, December 2012 to March 2013.",
+   "url": "https://www.broadwayworld.com/article/Moving-Image-Celebrates-50th-Anniversary-of-SPACEWAR-Video-Game-with-Exhibition-1215-33-20121128",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-5EAC82",
+   "title": "Spacewar! Turns 50: GAMBIT Celebrates The First Video Game With Two Special Events",
+   "author": "Fierro, Generoso",
+   "date": "2012-01-24",
+   "kind": "news",
+   "lang": "en",
+   "in": "GAMBIT Updates (Singapore-MIT GAMBIT Game Lab)",
+   "note": "Announces the MIT anniversary events, including a playable version on a mock PDP-1 monitor and a panel with Martin Graetz.",
+   "url": "https://gambit.mit.edu/updates/2012/01/spacewar_turns_50_gambit_celeb.php",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-F80DF4",
+   "title": "Video: Spacewar! Turns 50: MIT Celebrates Its First Computer Game at the MIT Museum",
+   "author": "Fierro, Generoso",
+   "date": "2012-03-13",
+   "kind": "news",
+   "lang": "en",
+   "in": "GAMBIT Updates (Singapore-MIT GAMBIT Game Lab)",
+   "note": "Post carrying video of the MIT Museum anniversary celebration of the game.",
+   "url": "https://gambit.mit.edu/updates/2012/03/video_spacewar_turns_50mit_cel.php",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-A6DD02",
+   "title": "Spacewar: Profile of a Cultural Earthquake",
+   "author": "Edwards, Benj",
+   "date": "2017-10-16",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "Vintage Computing and Gaming",
+   "note": "Long commissioned history of the game, its making at MIT and its influence on later games, written for an anniversary fifty-five years after first release.",
+   "url": "https://www.vintagecomputing.com/index.php/archives/1863/spacewar-profile-of-a-cultural-earthquake",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-8C5ADA",
+   "title": "Fifty years later, video game pioneer Steve Russell shows off Spacewar! (video interview)",
+   "author": "Takahashi, Dean",
+   "date": "2011-01-12",
+   "kind": "news",
+   "lang": "en",
+   "in": "GamesBeat",
+   "note": "Video interview with Russell demonstrating the game on the Computer History Museum PDP-1 at the opening of its Revolution exhibition.",
+   "url": "https://gamesbeat.com/fifty-years-later-video-game-pioneer-steve-russell-demos-spacewar-video-interview/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-A8213D",
+   "title": "Spacewar! Creators Didn't Know They Were Making History",
+   "author": "Jackson, Gita",
+   "date": "2018-12-05",
+   "kind": "news",
+   "lang": "en",
+   "in": "Kotaku",
+   "note": "Report from the November 2018 Smithsonian Video Game Pioneers event, based on a sit-down with the seven surviving members of the team.",
+   "url": "https://kotaku.com/spacewar-creators-didnt-know-they-were-making-history-1830887504",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-B5210C",
+   "title": "Smithsonian and AIAS Will Honor 'Spacewar!' Creators With Pioneer Awards",
+   "author": "Vincent, Brittany",
+   "date": "2018-11-26",
+   "kind": "news",
+   "lang": "en",
+   "in": "Variety",
+   "note": "Announces the AIAS Pioneer Awards to the creators at a Smithsonian National Museum of American History event.",
+   "url": "https://variety.com/2018/gaming/news/smithsonian-aias-honor-spacewar-pioneer-awards-1203036239/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-1065EA",
+   "title": "Weaver, Video Game Legends Gather to Honor \"Spacewar!\"",
+   "author": "Camerota, Christian",
+   "date": "2019-01-24",
+   "kind": "news",
+   "lang": "en",
+   "in": "Wesleyan University News",
+   "note": "Campus report on Christopher Weaver's part in the 2018 Smithsonian event honouring the game's creators.",
+   "url": "https://newsletter.blogs.wesleyan.edu/2019/01/24/weaver-video-game-legends-gather-to-honor-spacewar/",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-687EF3",
+   "title": "SpaceWar! devs to receive Pioneer Awards from The AIAS",
+   "author": "Game Developer",
+   "date": "2018-11-26",
+   "kind": "news",
+   "lang": "en",
+   "in": "Game Developer",
+   "note": "News item on the AIAS Pioneer Awards to be given to the creators at the Smithsonian event.",
+   "url": "https://www.gamedeveloper.com/design/-i-spacewar-i-devs-to-receive-pioneer-awards-from-the-aias",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-B87021",
+   "title": "Spacewar!, one of the world's first digital games, is a primer on creative design",
+   "author": "Zarembsky, Ilya",
+   "date": "2013-02-05",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "Kill Screen",
+   "note": "Feature reading the game's development as a lesson in creative design and in the future of game design.",
+   "url": "https://www.killscreen.com/behind-spacewar-one-worlds-first-digital-games-primer-creative-design/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-0E0C4B",
+   "title": "Alan Kotok, 64, created joystick",
+   "date": "2006",
+   "kind": "news",
+   "lang": "en",
+   "in": "MIT News",
+   "note": "MIT obituary mentioning Kotok's work on the Tech Model Railroad Club systems and the game, with his DEC and W3C career.",
+   "url": "https://news.mit.edu/2006/obit-kotok",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-2FDFE9",
+   "title": "In Memoriam: Alan Kotok",
+   "date": "2006",
+   "kind": "news",
+   "lang": "en",
+   "in": "W3C News",
+   "publisher": "World Wide Web Consortium",
+   "note": "W3C notice of Kotok's death, naming his Tech Model Railroad Club membership and his part in building the game.",
+   "url": "https://www.w3.org/news/2006/in-memoriam-alan-kotok/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-8B2D78",
+   "title": "Obituary: Spacewar Innovator Alan Kotok",
+   "author": "Dobson, Jason",
+   "date": "2006-06-06",
+   "kind": "news",
+   "lang": "en",
+   "in": "Gamasutra (now Game Developer)",
+   "note": "Short games-press obituary, citing the New York Times, framing Kotok as co-developer of the game.",
+   "url": "https://www.gamedeveloper.com/game-platforms/obituary-i-spacewar-i-innovator-alan-kotok",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-5C4B41",
+   "title": "Legendary computer scientist Alan Kotok has died",
+   "author": "Quilty-Harper, Conrad",
+   "date": "2006-06-02",
+   "kind": "news",
+   "lang": "en",
+   "in": "Engadget",
+   "note": "Obituary retelling Kotok's role, including the anecdote of his fetching sine and cosine routines to remove Russell's excuse for delaying the program.",
+   "url": "https://www.engadget.com/2006-06-02-legendary-computer-scientist-alan-kotok-has-died.html",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-330523",
+   "title": "The pioneers of video games found little fame",
+   "date": "2002-03-01",
+   "kind": "news",
+   "lang": "en",
+   "in": "Taipei Times",
+   "note": "Syndicated fortieth-anniversary feature on Russell's group, the PDP-1 reunion and the limited recognition its makers received.",
+   "url": "https://www.taipeitimes.com/News/bizfocus/archives/2002/03/01/0000125947",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-F4A48A",
+   "title": "Computer's Screen Inspired First Video Game, 'Space War'",
+   "date": "2013-07-01",
+   "kind": "news",
+   "lang": "en",
+   "in": "All Things Considered, NPR",
+   "publisher": "NPR",
+   "note": "Transcript of Robert Siegel's radio interview with Russell on how the program came about at MIT.",
+   "url": "https://www.npr.org/transcripts/197713661",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-4DD1C1",
+   "title": "The Start of Computer Games",
+   "author": "Lok, Corie",
+   "date": "2005-06-01",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "MIT Technology Review",
+   "note": "Short history of the 1962 program at MIT, its features and its influence on later game makers.",
+   "url": "https://www.technologyreview.com/2005/06/01/230884/the-start-of-computer-games/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-72515A",
+   "title": "Made by MIT",
+   "author": "White, Mackenzie",
+   "date": "2026-10-20",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "MIT Technology Review",
+   "note": "Survey of MIT inventions with an entry on the game and its control boxes as forerunners of the joystick and game pad.",
+   "url": "https://www.technologyreview.com/2026/10/20/1145649/made-by-mit/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-B8FCB6",
+   "title": "Game Theory",
+   "author": "Naone, Erica",
+   "date": "2009-02-24",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "MIT Technology Review",
+   "note": "Feature on MIT and games opening with the Tech Model Railroad Club origins of the game, its joystick and its modelling of stars and gravity.",
+   "url": "https://www.technologyreview.com/2009/02/24/32135/game-theory/",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-9BE041",
+   "title": "A Revolution At the Computer History Museum",
+   "date": "2011-01-11",
+   "kind": "news",
+   "lang": "en",
+   "in": "IEEE Spectrum",
+   "note": "Report on the Computer History Museum's Revolution opening, noting Russell playing the game on the PDP-1.",
+   "url": "https://spectrum.ieee.org/a-revolution-at-the-computer-history-museum",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-57BD3F",
+   "title": "50 anos de Spacewar!, el primer videojuego de ordenador",
+   "author": "Cabacas, Tomás",
+   "date": "2012-02-13",
+   "kind": "news",
+   "lang": "es",
+   "in": "MuyComputer",
+   "note": "Spanish news piece marking the game's fiftieth anniversary and retelling its creation.",
+   "url": "https://www.muycomputer.com/2012/02/13/50-anos-de-spacewar-el-primer-videojuego/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-B080E6",
+   "title": "This Super Mario Nation",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "American Heritage",
+   "note": "History of video games with several paragraphs from Russell on the program, the Expensive Planetarium and the awkward console switches.",
+   "url": "https://www.americanheritage.com/super-mario-nation",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-BFA134",
+   "title": "Happy Birthday to the Xbox's great-great-great-great-great-granddaddy",
+   "author": "The Telos Alliance Team",
+   "date": "2012-01-31",
+   "kind": "news",
+   "lang": "en",
+   "in": "Telos Alliance blog",
+   "note": "Short anniversary post on Russell, Graetz and Wiitanen and the PDP-1 program of 1962.",
+   "url": "https://blogs.telosalliance.com/happy-birthday-to-the-xboxs-great-great-great-great-great-granddaddy",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-5C4DE2",
+   "title": "Today is the 40th Anniversary of the World's First Known Video Gaming Tournament",
+   "author": "Good, Owen",
+   "date": "2012-10-19",
+   "kind": "news",
+   "lang": "en",
+   "in": "Kotaku",
+   "note": "Marks forty years since the Intergalactic Spacewar Olympics at Stanford in October 1972, reported by Stewart Brand for Rolling Stone.",
+   "url": "https://kotaku.com/today-is-the-40th-anniversary-of-the-worlds-first-known-5953371",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-67B191",
+   "title": "Spacewar!, Tomb Raider, and others join World Video Game Hall of Fame",
+   "author": "McAloon, Alissa",
+   "date": "2018-05-03",
+   "kind": "news",
+   "lang": "en",
+   "in": "Game Developer",
+   "note": "Reports the game's 2018 induction into the World Video Game Hall of Fame at The Strong.",
+   "url": "https://www.gamedeveloper.com/game-platforms/-i-spacewar-tomb-raider-i-and-others-join-world-video-game-hall-of-fame",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-661EE3",
+   "title": "Video game hall of fame inductees: Tomb Raider, FFVII, Madden, Spacewar",
+   "author": "Takahashi, Dean",
+   "date": "2018-05-03",
+   "kind": "news",
+   "lang": "en",
+   "in": "GamesBeat",
+   "note": "Announcement of the 2018 Hall of Fame class with an entry on the 1962 game.",
+   "url": "https://gamesbeat.com/video-game-hall-of-fame-inductees-tomb-raider-ffvii-madden-spacewar/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-42075F",
+   "title": "VIDEO: Museum of Play inducts four games into Video Game Hall of Fame",
+   "author": "Indovina, Kurt",
+   "date": "2018-05-02",
+   "kind": "news",
+   "lang": "en",
+   "in": "CITY Magazine (Rochester)",
+   "note": "Local report on the induction, with a paragraph introducing the game as less familiar than Pong or Space Invaders.",
+   "url": "https://www.roccitymag.com/news-opinion/video-museum-of-play-inducts-four-games-into-video-game-hall-of-fame-6349464/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-1ADB04",
+   "title": "Final Fantasy VII, Tomb Raider, And Others Inducted To World Video Game Hall Of Fame",
+   "author": "Imran Khan",
+   "date": "2018-05-03",
+   "kind": "news",
+   "lang": "en",
+   "in": "Game Informer",
+   "note": "Induction news noting the game as the oldest on the list, 1962, developed at MIT.",
+   "url": "https://gameinformer.com/b/news/archive/2018/05/03/final-fantasy-vii-tomb-raider-and-others-inducted-to-world-video-game-hall-of-fame",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-C081BE",
+   "title": "Spacewar! (World Video Game Hall of Fame, Inducted Year: 2018)",
+   "date": "2021-08-20",
+   "kind": "news",
+   "lang": "en",
+   "in": "The Strong National Museum of Play",
+   "publisher": "The Strong",
+   "note": "The Hall of Fame's induction citation crediting the game with inspiring the modern video game industry.",
+   "url": "https://www.museumofplay.org/games/spacewar/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-3613BF",
+   "title": "The Analogue Pocket Now Runs Some Third-Party Games, Including One From 1962",
+   "author": "Price, Emily",
+   "date": "2022-08-02",
+   "kind": "news",
+   "lang": "en",
+   "in": "AV Club",
+   "note": "Reports an FPGA core simulating the game and PDP-1 released for the Analogue Pocket.",
+   "url": "https://www.avclub.com/analogue-pocket",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-F617B7",
+   "title": "Analogue Reveals new \"openFPGA\" For Their Pocket Handheld",
+   "author": "Wallace, Anthony",
+   "date": "2022-07-29",
+   "kind": "news",
+   "lang": "en",
+   "in": "Retro Dodo",
+   "note": "Describes the PDP-1 and Spacewar! core as the launch title for Analogue's openFPGA programme.",
+   "url": "https://retrododo.com/analogue-pocket-openfpga/",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-A09397",
+   "title": "Analogue Launches OpenFPGA Program for Video Game Preservation, Turns Every Pocket Into a Dev Kit",
+   "author": "Halfacree, Gareth",
+   "date": "2022-08-02",
+   "kind": "news",
+   "lang": "en",
+   "in": "Hackster.io",
+   "note": "Reports the FPGA emulation of the PDP-1 with the 1962 game by Russell and colleagues.",
+   "url": "https://www.hackster.io/news/analogue-launches-openfpga-program-for-video-game-preservation-turns-every-pocket-into-a-dev-kit-9a7e1a5ce568",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-E6FAA5",
+   "title": "Analogue Pocket's 1.1 Update Beta Brings Game Libraries, Better Save States, and 3rd Party Cores",
+   "author": "Ehrhardt, Michelle",
+   "date": "2022-07-29",
+   "kind": "news",
+   "lang": "en",
+   "in": "Gizmodo",
+   "note": "Covers the Pocket firmware and the third-party Spacewar! core shipped with it.",
+   "url": "https://gizmodo.com/analogue-pocket-os-v1-1-beta-release-memories-library-1849345505",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-DEE954",
+   "title": "First Video Game Ever Available On Handheld",
+   "author": "Ballat, Lukas",
+   "date": "2022-08-01",
+   "kind": "news",
+   "lang": "en",
+   "in": "EarlyGame",
+   "note": "News item on the release of the 1962 game for the Analogue Pocket.",
+   "url": "https://earlygame.com/gaming/analogue-pocket-spacewar",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-8BAA38",
+   "title": "Analogue Releases Video Game From 1962 On the Pocket",
+   "date": "2022-07-29",
+   "kind": "news",
+   "lang": "en",
+   "in": "Slashdot",
+   "note": "Quotes a Verge report on the Pocket core, with reader discussion of the game and the PDP-1.",
+   "url": "https://games.slashdot.org/story/22/07/29/2025201/analogue-releases-video-game-from-1962-on-the-pocket",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-61231D",
+   "title": "Remembering Alan Kotok",
+   "date": "2006-07-12",
+   "kind": "news",
+   "lang": "en",
+   "in": "Slashdot",
+   "note": "Notice of Kotok's death naming the game and joystick, pointing to reflections at MIT and Ars Technica.",
+   "url": "https://slashdot.org/story/06/07/12/1740247/remembering-alan-kotok",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-37237C",
+   "title": "In Memoriam: Alan Kotok (ERCIM News 66)",
+   "kind": "news",
+   "lang": "en",
+   "in": "ERCIM News 66",
+   "note": "Memorial notice saying Kotok and classmates created the game for the PDP-1 in 1962 and worked on the joystick.",
+   "url": "https://www.ercim.eu/publication/Ercim_News/enw66/w3c_2.html",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-C2293B",
+   "title": "News Update :: Tuesday, June 13, 2006",
+   "date": "2006-06-13",
+   "kind": "news",
+   "lang": "en",
+   "in": "Campus Technology",
+   "note": "Includes a notice of Kotok's death with the game and joystick named among his undergraduate work.",
+   "url": "https://campustechnology.com/articles/2006/06/news-update--tuesday-june-13-2006.aspx",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-7413AF",
+   "title": "A Long Time Ago, in a Lab Far Away . . .",
+   "author": "Markoff, John",
+   "date": "2002-02-28",
+   "kind": "news",
+   "lang": "en",
+   "in": "New York Times",
+   "note": "Fortieth-anniversary feature centred on Russell, the group at MIT and the game's cultural moment, with the makers' limited financial reward.",
+   "url": "https://jr.co.il/articles/videogam.txt",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-5820C1",
+   "title": "Spacewar pioneers: First video game programmers had a blast but didn't cash in",
+   "author": "Markoff, John",
+   "date": "2002-03-07",
+   "kind": "news",
+   "lang": "en",
+   "in": "San Jose Mercury News",
+   "pages": "3E",
+   "note": "Syndicated version of Markoff's New York Times feature, with Peter DaSilva's photograph, on Russell and the game's fortieth anniversary.",
+   "url": "https://www.ed-thelen.org/comp-hist/PDP-1-SpaceWar-Article.html",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-799EE9",
+   "title": "PDP-1 Restored At the Computer History Museum",
+   "author": "VandeWettering, Mark",
+   "date": "2006-05-15",
+   "kind": "news",
+   "lang": "en",
+   "in": "Brainwagon",
+   "note": "Blog report from the May 2006 PDP-1 celebration by an emulator author, on the machine as the host of the game.",
+   "url": "https://brainwagon.org/blog/2006-05-15-pdp-1-restored-at-the-computer-history-museum.html",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-51DE71",
+   "title": "The Computer History Museum",
+   "date": "2013-04",
+   "kind": "news",
+   "lang": "en",
+   "in": "KingAnt.net",
+   "note": "Visitor's account of Russell and Samson demonstrating the PDP-1, loading programs from paper tape and running the game with arcade buttons.",
+   "url": "https://kingant.net/2013/04/the-computer-history-museum/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-8F3495",
+   "title": "PDP-1 SpaceWar!",
+   "author": "Porcino, Nick",
+   "date": "2008-09-21",
+   "kind": "news",
+   "lang": "en",
+   "in": "Spaces Between (meshula.net archive)",
+   "note": "Short personal account of playing the game on the PDP-1 at the Computer History Museum.",
+   "url": "https://nickporcino.com/meshula-net-archive/posts/post204.html",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-90C7C3",
+   "title": "Commemorating SpaceWar! And Its Pioneering Developers",
+   "author": "Mullich, David",
+   "date": "2018-12-03",
+   "kind": "news",
+   "lang": "en",
+   "in": "David Mullich (blog)",
+   "note": "Game designer's first-hand report on the 2018 Smithsonian event honouring the team.",
+   "url": "https://davidmullich.com/2018/12/03/commemorating-spacewar-and-its-pioneering-developers/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-BB8665",
+   "title": "The Spacewar Reunion",
+   "kind": "news",
+   "lang": "en",
+   "in": "Atari Archive",
+   "note": "Post sharing an audio recording of the creators at the 2018 Smithsonian reunion, with context on the panel.",
+   "url": "https://www.atariarchive.org/the-spacewar-reunion/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-9258BB",
+   "title": "Spacewar! is 60 Today!",
+   "author": "Landsteiner, Norbert",
+   "date": "2022-04-02",
+   "kind": "news",
+   "lang": "en",
+   "in": "Now Go Bang! (mass:werk blog)",
+   "note": "Short anniversary post on the sixtieth birthday and the update of the author's in-browser emulation of the game on a virtual PDP-1.",
+   "url": "https://masswerk.at/nowgobang/2022/spacewar-60",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-FC30B3",
+   "title": "Spacewar! The Story of the First Video Game Created by Hackers at MIT",
+   "author": "Brolli, Massimiliano",
+   "date": "2022-07-07",
+   "kind": "news",
+   "lang": "en",
+   "in": "Red Hot Cyber",
+   "note": "Popular retelling of the making of the game among MIT hackers on the PDP-1.",
+   "url": "https://www.redhotcyber.com/en/post/spacewar-the-story-of-the-first-video-game-created-by-hackers-at-mit/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-E5B6F2",
+   "title": "Inside Spacewar! A Software Archeological Approach to the First Video Game",
+   "author": "Landsteiner, Norbert",
+   "date": "2014",
+   "kind": "web page",
+   "lang": "en",
+   "in": "mass:werk (masswerk.at)",
+   "note": "Multi-part code analysis of Spacewar! covering the Expensive Planetarium, stars, the outline compiler, ship movement, gravity, torpedoes, hyperspace, version 4 hacks and the 2B preservation project.",
+   "url": "https://www.masswerk.at/spacewar/inside/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-09CF21",
+   "title": "One, Two, Three, Four I Declare a Space War",
+   "date": "2014-08-07",
+   "kind": "web page",
+   "lang": "en",
+   "in": "They Create Worlds (videogamehistorian.wordpress.com)",
+   "note": "Origins from Wiitanen's proposal to Russell's coding, TMRC additions, the 1962 open house debut, spread to Stanford and Minnesota, with corrections to earlier histories such as Russell's affiliations.",
+   "url": "https://videogamehistorian.wordpress.com/2014/08/07/one-two-three-four-i-declare-a-space-war/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-7B7614",
+   "title": "Worldly Wednesdays: A Timeline of Spacewar!",
+   "date": "2021-03-17",
+   "kind": "web page",
+   "lang": "en",
+   "in": "They Create Worlds (videogamehistorian.wordpress.com)",
+   "note": "Revises the chronology using Landsteiner's dating of 2B and McKenzie's deposition logs; dates programming to January 1962 and questions whether hyperspace was present at the Parents' Weekend debut.",
+   "url": "https://videogamehistorian.wordpress.com/2021/03/17/worldly-wednesdays-a-timeline-of-spacewar/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-4135D4",
+   "title": "Spacewar!: A Spin Around the Sun",
+   "author": "Hunter, William",
+   "date": "2014-04-16",
+   "kind": "web page",
+   "lang": "en",
+   "in": "The Dot Eaters",
+   "note": "History of the MIT group and Russell's slowness, the 9K paper tape program, the central star, MIT's ban on daytime play, DEC's distribution, and influence on Computer Space, Space Wars and Asteroids.",
+   "url": "https://thedoteaters.com/?p=7329",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-904831",
+   "title": "Feature: 'Spacewar and the Birth of Digital Game Culture'",
+   "author": "Dobson, Jason",
+   "date": "2007-06-01",
+   "kind": "web page",
+   "lang": "en",
+   "in": "Gamasutra / Game Developer",
+   "note": "Announcement quoting Jeffrey Fleming's feature, the first in a Gamasutra and IGDA Preservation SIG series on the Digital Game Canon; covers the Hingham group and Jack Dennis's terms for computer time.",
+   "url": "https://www.gamedeveloper.com/game-platforms/feature-i-spacewar-i-and-the-birth-of-digital-game-culture-",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-8D19B0",
+   "title": "The History of Spacewar!: The Best Waste of Time in the History of the Universe",
+   "author": "Loguidice, Bill",
+   "date": "2009-06-10",
+   "kind": "web page",
+   "lang": "en",
+   "in": "Gamasutra / Game Developer",
+   "note": "Origins at MIT, gameplay, and legacy through Computer Space, Cinematronics Space Wars, Asteroids, Lunar Lander and Gravitar, crediting the game with real-time action, physics and a virtual world.",
+   "url": "https://www.gamedeveloper.com/design/the-history-of-spacewar-the-best-waste-of-time-in-the-history-of-the-universe",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-D7D816",
+   "title": "32 Dots Per Spaceship (Or, the video game that changed tech history)",
+   "author": "Johnson, Steven",
+   "date": "2016-09-23",
+   "kind": "podcast",
+   "lang": "en",
+   "in": "Wonderland Podcast, Episode 2 (How We Get To Next)",
+   "note": "Episode and transcript with Stewart Brand and Steve Russell, on the game, hackers' additions, the Rolling Stone piece and links between computing and the counterculture, through to Atari and Jobs.",
+   "url": "https://howwegettonext.com/32-dots-per-spaceship-or-the-videogame-that-changed-tech-history/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-040DDD",
+   "title": "[Aug. 14, 1963] Engineers at Play (Spacewars!, hacking, and the PDP-1)",
+   "author": "Moya, Ida",
+   "date": "2018-08-14",
+   "kind": "web page",
+   "lang": "en",
+   "in": "Galactic Journey",
+   "note": "Starts from Pohl's 1963 Galaxy editorial on playing the game at MIT, describes hacker culture around the PDP-1, contrasts batch work at Los Alamos, and profiles Cecilia Larsen at Lawrence Radiation Laboratory.",
+   "url": "https://galacticjourney.org/aug-14-1963-engineers-at-play-spacewars-hacking-and-the-pdp-1/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-0E2B0E",
+   "title": "The Origin of Spacewar (MIT 150 Books entry)",
+   "date": "2011-05-07",
+   "kind": "web page",
+   "lang": "en",
+   "in": "MIT Libraries, 150 Books",
+   "publisher": "MIT Libraries",
+   "note": "Library exhibit entry on Graetz's 1981 Creative Computing article, summarising the Hingham Institute, the aims for the PDP-1, Samson's star map and the showing at MIT's Science Open House.",
+   "licence": "CC BY-NC unless otherwise noted (MIT Libraries content)",
+   "url": "https://libraries.mit.edu/150books/2011/05/07/1981/",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-5A14A7",
+   "title": "Episode 11 Notes: Spacewar! Lives!",
+   "author": "Haas, Sean",
+   "date": "2019-08-28",
+   "kind": "podcast",
+   "lang": "en",
+   "in": "Advent of Computing",
+   "note": "Show notes supplementing the Spacewar! episode: circulation of source and paper tape, surviving PDP-1s at the Computer History Museum, and running the game through SIMH, MESS or JavaScript emulators.",
+   "url": "https://adventofcomputing.libsyn.com/episode-11-notes-spacewar-lives",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-CC0ED5",
+   "title": "Computer Space",
+   "date": "2023-03-13",
+   "kind": "web page",
+   "lang": "en",
+   "in": "World Video Game Hall of Fame, The Strong National Museum of Play",
+   "publisher": "The Strong",
+   "note": "Hall of Fame entry describing Spacewar! as the most popular early lab game, Bushnell's encounter with it, the cost of the hardware, and how Computer Space differed.",
+   "url": "https://www.museumofplay.org/games/computer-space/",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-E970D2",
+   "title": "Retrochallenge 2016/10: Ironic Computer Space Simulator",
+   "author": "Landsteiner, Norbert",
+   "date": "2016-10",
+   "kind": "web page",
+   "lang": "en",
+   "in": "mass:werk (masswerk.at)",
+   "note": "Project log for bringing Computer Space to the PDP-1, with an account of Spacewar! as the 1961 showpiece, its 1962 open house showing and its influence on Computer Space.",
+   "url": "https://masswerk.at/rc2016/10/",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-F944F7",
+   "title": "A Kilobit of History Episode 1: The DotA of the 1960s, Spacewar! (PDP-1, 1962)",
+   "author": "Behind the Couch",
+   "date": "2024-10-08",
+   "kind": "documentary",
+   "lang": "en",
+   "in": "YouTube, Behind the Couch",
+   "note": "Thirteen-minute video essay on the 1962 game and the complexity of its space battles; description lists Levy's Hackers as further reading and links the masswerk emulator.",
+   "url": "https://www.youtube.com/watch?v=yZPhj-CKH3Y",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-C070ED",
+   "title": "VG 101 Ep. 2: Spacewar!",
+   "author": "VG Academy",
+   "date": "2019-04-21",
+   "kind": "documentary",
+   "lang": "en",
+   "in": "YouTube, VG Academy",
+   "note": "Short educational episode in which the presenter travels to play the game with Steve Russell.",
+   "url": "https://www.youtube.com/watch?v=mdD6Zx5T3r0",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-20DA41",
+   "title": "Spacewar! (1962) Why this game is the most important game in video game history.",
+   "author": "James, Matt",
+   "date": "2020-02-01",
+   "kind": "talk",
+   "lang": "en",
+   "in": "YouTube, Matt James",
+   "note": "Video essay arguing for the game's place in video game history, citing its strategies and its controllers.",
+   "url": "https://www.youtube.com/watch?v=XfQrKvo9JYU",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-71C67A",
+   "title": "Spacewar Keynote at California Extreme 2013 (Spacewar Part 1, SpaceWar2, Spacewar6)",
+   "author": "Russell, Steve; Pitts, Bill; Tuck, Hugh",
+   "date": "2013-07-14",
+   "kind": "talk",
+   "lang": "en",
+   "in": "YouTube, orion1052003",
+   "note": "Keynote with Russell, Pitts and Tuck at California Extreme, San Jose, in uploaded parts. Russell attributes the theme to the space race. Parts seen: jtYgOFcNaH4 and WfAAlFkxa4Q; parts 3 to 5 not checked.",
+   "url": "https://www.youtube.com/watch?v=HWBEN7HDI_c",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-1FAD55",
+   "title": "Spacewar | 1962",
+   "author": "VG Archive",
+   "date": "2023-05-31",
+   "kind": "documentary",
+   "lang": "en",
+   "in": "YouTube, VG Archive",
+   "note": "Video entry on the game's creation and later expansion by other students and employees, including Dan Edwards.",
+   "url": "https://www.youtube.com/watch?v=YgPcwuZdyqM",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-A86197",
+   "title": "The History of Gaming. Part Two. Spacewar!",
+   "author": "Joystix Gaming Station",
+   "date": "2025-03-31",
+   "kind": "talk",
+   "lang": "en",
+   "in": "YouTube, Joystix Gaming Station",
+   "note": "Short video on Spacewar! as a milestone in a history-of-gaming series.",
+   "url": "https://www.youtube.com/watch?v=T8OflktXD6A",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-7DF154",
+   "title": "La rhétorique scientifique des jeux vidéo. Spacewar! et la translation visuelle des algorithmes",
+   "author": "Careri, Angelo",
+   "date": "2021-06-30",
+   "kind": "article",
+   "lang": "fr",
+   "in": "Images Re-vues, no. 19",
+   "doi": "10.4000/imagesrevues.10058",
+   "note": "The scientific rhetoric of video games. Reads Spacewar! images through radar screens, star maps and planetariums, including Expensive Planetarium, and argues they display the algorithm's power within Cold War and hacker contexts. Spacewar! at Sections 1 and 2 and conclusion.",
+   "licence": "CC BY-NC 4.0 (text only; illustrations and annexes may carry their own conditions)",
+   "url": "https://doi.org/10.4000/imagesrevues.10058",
+   "tags": [
+    "about Spacewar!"
+   ]
+  },
+  {
+   "id": "L-339A52",
+   "title": "Entretien avec Mathieu Triclot",
+   "author": "Barnabé, Fanny; Triclot, Mathieu",
+   "date": "2018-12-19",
+   "kind": "article",
+   "lang": "fr",
+   "in": "ReS Futurae, no. 12",
+   "doi": "10.4000/resf.1749",
+   "note": "Interview with Mathieu Triclot. His opening answer explains Spacewar!'s science-fiction theme through creators' taste, SAGE-derived display hardware, claims to Newtonian simulation, and fiction covering technical shortcuts such as photon torpedoes. Spacewar! at Opening answer, about six paragraphs.",
+   "licence": "CC BY-NC-ND 4.0 (text only; illustrations and annexes may carry their own conditions)",
+   "url": "https://doi.org/10.4000/resf.1749",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-289A99",
+   "title": "L'espace science-fictionnel (au sein) du jeu vidéo",
+   "author": "Delbouille, Julie; Dozo, Björn-Olav; Jousten, Lison",
+   "date": "2018-12-19",
+   "kind": "article",
+   "lang": "fr",
+   "in": "ReS Futurae, no. 12",
+   "doi": "10.4000/resf.2124",
+   "note": "Science-fictional space in the video game. Opens with Spacewar! as a 1962 MIT student project whose setting suited the technology, then treats it as the starting point of space combat games. Spacewar! at Paragraphs 1 and 5.",
+   "licence": "CC BY-NC-ND 4.0 (text only; illustrations and annexes may carry their own conditions)",
+   "url": "https://doi.org/10.4000/resf.2124",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-50F3EF",
+   "title": "Science-fiction et jeu vidéo (issue page)",
+   "author": "Delbouille, Julie; Dozo, Björn-Olav; Jousten, Lison",
+   "date": "2018",
+   "kind": "web page",
+   "lang": "fr",
+   "in": "ReS Futurae, no. 12",
+   "doi": "10.4000/resf.855",
+   "note": "Science fiction and video games. Issue blurb presents Spacewar (1962) as one of the earliest video games and the start of a long relation between games and science fiction; image caption names it.",
+   "url": "https://doi.org/10.4000/resf.855",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-41E604",
+   "title": "Jeux vidéo et informatique",
+   "author": "Djaouti, Damien",
+   "date": "2023",
+   "kind": "chapter",
+   "lang": "fr",
+   "in": "Introduction aux théories des jeux vidéo, ed. Genvo and Philippette",
+   "publisher": "Presses universitaires de Liège",
+   "pages": "127-138",
+   "doi": "10.4000/books.pulg.26214",
+   "note": "Video games and computing. Says Spacewar! ran on the PDP-1 in 1962, was not technically the first video game but the first influential one, and inspired Nolan Bushnell and Silas Warner. Spacewar! at Introduction, paragraph 2; paragraph 12.",
+   "url": "https://doi.org/10.4000/books.pulg.26214",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-44FADF",
+   "title": "Amérique du Nord",
+   "author": "Guay-Belanger, Dany; Lefloic Lebel, Adam; Therrien, Carl",
+   "date": "2023",
+   "kind": "chapter",
+   "lang": "fr",
+   "in": "Introduction aux théories des jeux vidéo, ed. Genvo and Philippette",
+   "publisher": "Presses universitaires de Liège",
+   "pages": "335-351",
+   "doi": "10.4000/books.pulg.26374",
+   "note": "North America. Describes Russell and MIT hackers building Spacewar! in 1962 to test the PDP-1, and its spread and modification across university networks; cites Monnens and Goldberg 2015. Spacewar! at Section 2.1; clause in 2.2.",
+   "url": "https://doi.org/10.4000/books.pulg.26374",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-5F7210",
+   "title": "Les formes d'espaces du jeu vidéo",
+   "author": "Grandjean, Guillaume",
+   "date": "2023",
+   "kind": "chapter",
+   "lang": "fr",
+   "in": "Introduction aux théories des jeux vidéo, ed. Genvo and Philippette",
+   "publisher": "Presses universitaires de Liège",
+   "pages": "225-239",
+   "doi": "10.4000/books.pulg.26294",
+   "note": "Forms of video game space. Contrasts OXO's rule grid with Spacewar!'s construction of a fictional other space around a star, and links Bushnell and Dabney's Computer Space to it. Spacewar! at Paragraphs 8 and 14.",
+   "url": "https://doi.org/10.4000/books.pulg.26294",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-BBA4E2",
+   "title": "Game Over?",
+   "author": "Cadalbert, Remo",
+   "date": "2017",
+   "kind": "article",
+   "lang": "de",
+   "in": "Werkstücke, no. 9",
+   "doi": "10.60135/werkstuecke.09.2017.12",
+   "note": "Game over? On Zurich arcades. Calls MIT's Spacewar! the first computer game, restricted to technicians, and credits it for prompting Nolan Bushnell and inspiring Computer Space. Spacewar! at PDF pp. 5, 9.",
+   "licence": "CC BY-NC 4.0",
+   "url": "https://doi.org/10.60135/werkstuecke.09.2017.12",
+   "tags": [
+    "passing discussion"
+   ]
   }
  ]
 }
