@@ -26,7 +26,14 @@
    "licence": "None stated",
    "file": "library/files/P-KQ8PL.m4a",
    "url": "https://www.youtube.com/watch?v=yW-iispPreA",
-   "source": "YouTube, Walter Isaacson channel, uploaded 2020-11-21"
+   "source": "YouTube, Walter Isaacson channel, uploaded 2020-11-21",
+   "alts": [
+    {
+     "label": "Transcript",
+     "lang": "en",
+     "file": "library/files/P-KQ8PL-t1.md"
+    }
+   ]
   },
   {
    "id": "P-LQ3SG",
@@ -39,7 +46,14 @@
    "licence": "None stated",
    "file": "library/files/P-LQ3SG.m4a",
    "url": "https://www.youtube.com/watch?v=Q8xkCYvwiPA",
-   "source": "YouTube, The Long Now Foundation, uploaded 2018-02-15"
+   "source": "YouTube, The Long Now Foundation, uploaded 2018-02-15",
+   "alts": [
+    {
+     "label": "Transcript",
+     "lang": "en",
+     "file": "library/files/P-LQ3SG-t1.md"
+    }
+   ]
   },
   {
    "id": "P-X51IS",
@@ -52,7 +66,14 @@
    "licence": "None stated",
    "file": "library/files/P-X51IS.m4a",
    "url": "https://www.youtube.com/watch?v=rxsswrW-aLU",
-   "source": "YouTube, Codex Rex channel, uploaded 2021-04-19"
+   "source": "YouTube, Codex Rex channel, uploaded 2021-04-19",
+   "alts": [
+    {
+     "label": "Transcript",
+     "lang": "en",
+     "file": "library/files/P-X51IS-t1.md"
+    }
+   ]
   },
   {
    "id": "P-J4ELY",
@@ -65,7 +86,14 @@
    "licence": "None stated",
    "file": "library/files/P-J4ELY.mp3",
    "url": "https://podcasts.apple.com/us/podcast/spacewar-the-game/id1459202600?i=1000447784948",
-   "source": "Advent of Computing RSS feed"
+   "source": "Advent of Computing RSS feed",
+   "alts": [
+    {
+     "label": "Transcript",
+     "lang": "en",
+     "file": "library/files/P-J4ELY-t1.md"
+    }
+   ]
   },
   {
    "id": "P-WEMEP",
@@ -78,7 +106,14 @@
    "licence": "None stated",
    "file": "library/files/P-WEMEP.mp3",
    "url": "https://www.wshu.org/podcast/off-the-path/2025-05-29/spacewar-or-the-rise-of-the-computer-bums",
-   "source": "WSHU"
+   "source": "WSHU",
+   "alts": [
+    {
+     "label": "Transcript",
+     "lang": "en",
+     "file": "library/files/P-WEMEP-t1.md"
+    }
+   ]
   },
   {
    "id": "P-1Q37V",
