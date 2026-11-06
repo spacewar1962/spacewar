@@ -1,0 +1,143 @@
+{
+ "title": "Library",
+ "intro": "Secondary literature on Spacewar!: the work the group reads and cites.",
+ "items": [
+  {
+   "id": "P-WCNIW",
+   "title": "Space Odyssey: The Long Journey of Spacewar! from MIT to Computer Labs Around the World",
+   "author": "Monnens, Devin; Goldberg, Martin",
+   "date": "2015-06",
+   "kind": "article",
+   "lang": "en",
+   "note": "Kinephanos, Cultural History of Video Games special issue, pp. 124-147. Surveys how Spacewar! spread from the MIT PDP-1 to other laboratories and machines between 1962 and 1972, from DECUS records, questionnaires and correspondence with programmers. Table 1 lists known versions.",
+   "licence": "None stated",
+   "file": "library/files/P-WCNIW.pdf",
+   "url": "https://archive.org/details/2015MonnensGoldberg",
+   "source": "Internet Archive, 2015MonnensGoldberg"
+  },
+  {
+   "id": "P-KQ8PL",
+   "title": "12. Video games 1: Spacewar",
+   "author": "Isaacson, Walter",
+   "date": "2020-11-21",
+   "kind": "talk",
+   "lang": "en",
+   "note": "Recorded lecture for a Tulane University course on the digital revolution, the first of two on video games. The whole lecture is on Spacewar!. 12:46.",
+   "licence": "None stated",
+   "file": "library/files/P-KQ8PL.m4a",
+   "url": "https://www.youtube.com/watch?v=yW-iispPreA",
+   "source": "YouTube, Walter Isaacson channel, uploaded 2020-11-21"
+  },
+  {
+   "id": "P-LQ3SG",
+   "title": "Steven Johnson on \"Spacewar!\"",
+   "author": "Johnson, Steven",
+   "date": "2017-01-04",
+   "kind": "talk",
+   "lang": "en",
+   "note": "Clip from the Q&A after the Long Now seminar \"Wonderland: How Play Made the Modern World\", with Stewart Brand as questioner. 3:15.",
+   "licence": "None stated",
+   "file": "library/files/P-LQ3SG.m4a",
+   "url": "https://www.youtube.com/watch?v=Q8xkCYvwiPA",
+   "source": "YouTube, The Long Now Foundation, uploaded 2018-02-15"
+  },
+  {
+   "id": "P-X51IS",
+   "title": "Episode 8: The PDP-1 and Spacewar!",
+   "author": "Codex Rex: The Video Game History Podcast",
+   "date": "2020-12-24",
+   "kind": "podcast",
+   "lang": "en",
+   "note": "Dachz tells co-host Tyler the story of DEC, Ben Gurley, the PDP-1 and Spacewar!. Spacewar! begins at 36:28. 56:12.",
+   "licence": "None stated",
+   "file": "library/files/P-X51IS.m4a",
+   "url": "https://www.youtube.com/watch?v=rxsswrW-aLU",
+   "source": "YouTube, Codex Rex channel, uploaded 2021-04-19"
+  },
+  {
+   "id": "P-J4ELY",
+   "title": "Episode 11 - Spacewar! (the Game)",
+   "author": "Advent of Computing",
+   "date": "2019-08-25",
+   "kind": "podcast",
+   "lang": "en",
+   "note": "Computing-history podcast episode on Spacewar! as an answer to when and how video games started. 24:45.",
+   "licence": "None stated",
+   "file": "library/files/P-J4ELY.mp3",
+   "url": "https://podcasts.apple.com/us/podcast/spacewar-the-game/id1459202600?i=1000447784948",
+   "source": "Advent of Computing RSS feed"
+  },
+  {
+   "id": "P-WEMEP",
+   "title": "Spacewar! Or, the Rise of the Computer Bums",
+   "author": "Dunavin, Davis",
+   "date": "2025-05-29",
+   "kind": "radio",
+   "lang": "en",
+   "note": "Public-radio feature for WSHU's Off the Path, in a season on the origins of things that are ubiquitous. 16:53.",
+   "licence": "None stated",
+   "file": "library/files/P-WEMEP.mp3",
+   "url": "https://www.wshu.org/podcast/off-the-path/2025-05-29/spacewar-or-the-rise-of-the-computer-bums",
+   "source": "WSHU"
+  },
+  {
+   "id": "P-1Q37V",
+   "title": "The Meeting of Spacewar",
+   "author": "They Create Worlds (podcast)",
+   "date": "2019-01-01",
+   "kind": "podcast",
+   "lang": "en",
+   "note": "Episode 081, with Alexander Smith, on the history of Spacewar!, the people involved and the 2018 Smithsonian reunion of its makers. 81:57.",
+   "url": "https://mcdn.podbean.com/mf/web/t2y8ic/TCW081.mp3"
+  },
+  {
+   "id": "P-0O4BI",
+   "title": "Ep. 31: Spacewar!: Dual to the Death",
+   "author": "Video Game History Hour (podcast)",
+   "date": "2021-05-12",
+   "kind": "podcast",
+   "lang": "en",
+   "note": "With Alexander Smith as guest, on who wrote Spacewar!, who modified it, who played it and who made the first controllers. 93:31.",
+   "url": "https://podcasts.apple.com/us/podcast/ep-31-spacewar-dual-to-the-death/id1536393630?i=1000524021895"
+  },
+  {
+   "id": "P-28TEU",
+   "title": "Thumb Candy - The history of computer games",
+   "author": "Talkback (for Channel 4)",
+   "date": "2000",
+   "kind": "documentary",
+   "lang": "en",
+   "note": "Channel 4 documentary presented by Iain Lee. The Spacewar! segment opens the programme, 1:49 to 5:43, with Steve Russell. 48:34.",
+   "url": "https://www.youtube.com/watch?v=UAo4CZTGFQQ"
+  },
+  {
+   "id": "P-KHA2V",
+   "title": "Video Game Invasion: The History of a Global Obsession",
+   "author": "Hawk, Tony (host)",
+   "date": "2004",
+   "kind": "documentary",
+   "lang": "en",
+   "note": "Television documentary on the history of video games. Spacewar! and Steve Russell at 3:21 to 4:11. 1:30:25.",
+   "url": "https://www.youtube.com/watch?v=O4dPSOncwVQ"
+  },
+  {
+   "id": "P-J2PB6",
+   "title": "Video Games: The Movie, clip: Spacewars",
+   "date": "2014",
+   "kind": "documentary",
+   "lang": "en",
+   "note": "Promotional clip from the documentary, on the 1972 Intergalactic Spacewar Olympics at the Stanford Artificial Intelligence Laboratory. 1:49.",
+   "url": "https://www.youtube.com/watch?v=OedCvvnNIM4"
+  },
+  {
+   "id": "P-GWSQX",
+   "title": "Personal Computer Graphics of the 60s and 70s",
+   "author": "Edwards, Stephen",
+   "date": "2021-10-08",
+   "kind": "talk",
+   "lang": "en",
+   "note": "Slide lecture on early computer display hardware. The chapter on the PDP-1, vector graphics and Spacewar! runs 3:31 to 6:48. 50:46.",
+   "url": "https://www.youtube.com/watch?v=7xtqLJH1z10&t=211"
+  }
+ ]
+}
