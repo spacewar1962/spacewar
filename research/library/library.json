@@ -10100,6 +10100,628 @@
    "tags": [
     "passing discussion"
    ]
+  },
+  {
+   "id": "L-1C4BC6",
+   "title": "Spacewars and Beyond: How the Tech Model Railroad Club Changed the World",
+   "author": "Jenkins, Henry",
+   "date": "2007-10-09",
+   "kind": "web page",
+   "lang": "en",
+   "in": "Confessions of an Aca-Fan (henryjenkins.org)",
+   "note": "Credits Graetz, Russell and Wiitanen and the TMRC with Spacewar as a demonstration inviting audience participation, says it shipped with the PDP-1 for DEC testing, and ties it to play outside commerce and to the GAMBIT lab.",
+   "url": "https://henryjenkins.org/blog/2007/10/spacewars_and_beyond_how_the_t.html",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-9F5D50",
+   "title": "Facts and ideas from anywhere",
+   "author": "Roberts, William Clifford",
+   "date": "2018-02-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "Proceedings (Baylor University Medical Center)",
+   "pages": "141-151",
+   "doi": "10.1080/08998280.2017.1401850",
+   "note": "One paragraph, Video games, in a list of inventions: Slug Russell and friends at MIT, readers of science fiction, dreamed of a space war game on the PDP-1 with its video screen. The game is not named. Spacewar! at \"Video games\" entry.",
+   "url": "https://doi.org/10.1080/08998280.2017.1401850",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-5D11A3",
+   "title": "Game Sound: An Introduction to the History, Theory, and Practice of Video Game Music and Sound Design",
+   "author": "Collins, Karen",
+   "date": "2008",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "Names Spacewar! beside Tennis for Two among the first games, and mentions a two-person version written for PLATO by 1969. Spacewar! at 8, 60 (index).",
+   "url": "https://ieeexplore.ieee.org/document/6284547/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-D0BA00",
+   "title": "Spam: A Shadow History of the Internet",
+   "author": "Brunton, Finn",
+   "date": "2013",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "Parenthetical on early hackers: the first graphical video game, Spacewar!, made on a PDP-1 by MIT students.",
+   "url": "https://ieeexplore.ieee.org/document/6504692/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-7898A2",
+   "title": "Coding Literacy: How Computer Programming Is Changing Writing",
+   "author": "Vee, Annette",
+   "date": "2017",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "A single clause listing playing Spacewar among early computer uses, before Alan Kay's 1972 Dynabook.",
+   "url": "https://ieeexplore.ieee.org/document/8026996/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-D56245",
+   "title": "For Fun and Profit: A History of the Free and Open Source Software Revolution",
+   "author": "Tozzi, Christopher; Zittrain, Jonathan",
+   "date": "2017",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "States that Thompson's Space Travel is unrelated to Spacewar, which some writers have wrongly linked to it, with an endnote on the game's 1960s origin.",
+   "url": "https://ieeexplore.ieee.org/document/8047077/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-0938A1",
+   "title": "Portraits In Silicon",
+   "author": "Slater, Robert",
+   "date": "1989",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "Bushnell chapter: Spacewar as the most popular game he played as a student, and Computer Space as its first commercially oriented spinoff. Spacewar! at 299, 301 (index).",
+   "url": "https://ieeexplore.ieee.org/document/6300950/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-6D3690",
+   "title": "The Computer Age: A Twenty-Year View",
+   "author": "Dertouzos, Michael L.; Moses, Joel",
+   "date": "1980",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "Describes Space-War as a two-person game with rockets, invented in Cambridge around 1960, among home computer games; a separate essay lists spacewar among programmers' games of killing and destroying.",
+   "url": "https://ieeexplore.ieee.org/document/6281095/",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-16E052",
+   "title": "The Microelectronics Revolution",
+   "author": "Forester, Tom",
+   "date": "1981",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "One reprinted essay lists spacewar with battleship and tank battles as games whose aim is to destroy, and recalls a student deep in a game of spacewar.",
+   "url": "https://ieeexplore.ieee.org/document/6277279/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-33A9BD",
+   "title": "10 PRINT CHR$(205.5+RND(1)); : GOTO 10",
+   "author": "Montfort, Nick; Baudoin, Patsy; Bell, John; Bogost, Ian; Douglass, Jeremy; Marino, Mark C.; Mateas, Michael; Reas, Casey; Sample, Mark; Vawter, Noah",
+   "date": "2012",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "Names Tennis for Two and Spacewar, crediting Russell, Graetz, Kotok and others, as early videogames in the modern sense. Spacewar! at 87 (index).",
+   "url": "https://ieeexplore.ieee.org/document/6462115/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-899456",
+   "title": "Debugging Game History: A Critical Lexicon",
+   "author": "Lowood, Henry; Guins, Raiford",
+   "date": "2016",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "note": "Several entries: Russell's reported pinball remark, a passage headed The Watershed of Spacewar! in the AI entry, Bushnell's failure to commercialise it, and its addictive popularity citing Minsky.",
+   "url": "https://ieeexplore.ieee.org/document/7580252/",
+   "tags": [
+    "section on Spacewar!"
+   ],
+   "thumb": "library/thumbs/L-899456.jpg"
+  },
+  {
+   "id": "L-7DB59E",
+   "title": "Development of a computer technology lecture",
+   "author": "Harmer, Don S.",
+   "date": "1973",
+   "kind": "report",
+   "lang": "en",
+   "publisher": "Georgia Institute of Technology",
+   "note": "Contains Wrege and Harmer, Teaching Assembler Programming via SPACEWAR: a modular spacewar program, with gravity and interrupt-driven options, used to teach assembler and real-time programming in a ten-week Georgia Tech course. Spacewar! at PDF pp. 13-20.",
+   "url": "https://hdl.handle.net/1853/38891",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-54F103",
+   "title": "The future of tabletop games",
+   "author": "Borenstein, Greg",
+   "date": "2015",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "Massachusetts Institute of Technology",
+   "note": "Opens with Russell programming Spacewar! at MIT in 1962, about 200 hours of coding, its spread and Brand's Rolling Stone article, then treats it as the start of a split between video games and tabletop play. Spacewar! at PDF pp. 9-10.",
+   "url": "https://hdl.handle.net/1721.1/98650",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-EDF9B2",
+   "title": "Advertising in computer games",
+   "author": "Vedrashko, Ilya",
+   "date": "2006",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "Massachusetts Institute of Technology",
+   "note": "History section describes Spacewar! as a two-ship duel against an accurate night sky, turned out for fun by MIT programmers, then its influence on Nolan Bushnell at Utah. Spacewar! at PDF pp. 27, 69.",
+   "url": "https://hdl.handle.net/1721.1/39144",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-5533A2",
+   "title": "EGGG : The extensible graphical game generator",
+   "author": "Orwant, Jon",
+   "date": "2000",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "Massachusetts Institute of Technology",
+   "note": "Opens and closes on a Russell quotation that his pride in Spacewar is that it got people hooked on programming; also proposes Spacewar-like arcade games for teaching Maxwell's equations. Spacewar! at PDF pp. 8, 152, 161.",
+   "url": "https://hdl.handle.net/1721.1/9164",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-A07868",
+   "title": "Digitaalisen kilpapelaamisen esihistoriaa Suomessa 1980-luvulta 1990-luvun puoliväliin",
+   "author": "Suominen, Jaakko; Saarikoski, Petri; Reunanen, Markku",
+   "date": "2018-12-19",
+   "kind": "article",
+   "lang": "fi",
+   "note": "Starts Finnish esports prehistory from the 1972 Intergalactic Spacewar Olympics at Stanford, describing Russell's 1962 PDP-1 game, why it suited cup-style contests, Rolling Stone's sponsorship and Brand's role. Spacewar! at PDF pp. 3-4, 27.",
+   "url": "https://aaltodoc.aalto.fi/handle/123456789/35687",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-93A9FD",
+   "title": "Tila kertojana",
+   "author": "Maalismaa, Matti",
+   "date": "2024",
+   "kind": "thesis",
+   "lang": "fi",
+   "publisher": "Aalto University",
+   "note": "Bachelor's thesis on game space. Takes Spacewar! as a leading candidate for the first represented game space, discusses the star map as both mechanical and narrative via Graetz, and tells Samson's Game Transfer anecdote. Spacewar! at PDF pp. 14, 35.",
+   "url": "https://aaltodoc.aalto.fi/handle/123456789/132145",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-9E5A08",
+   "title": "ARCAD: Augmented Reality Computer Aided Design",
+   "author": "Costello, Martin Joseph",
+   "date": "2019-02-22",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Washington",
+   "note": "Research history of CAD pairs Spacewar! with Sketchpad as the first programs resembling present computer use, describing two ships around a black hole controlled by switches. Spacewar! at PDF pp. 14-17.",
+   "url": "http://hdl.handle.net/1773/43258",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-56589B",
+   "title": "Esports no Brasil de 2022: o que torna grande uma organização?",
+   "author": "Oliveira, Gabriel Celestino de",
+   "date": "2022",
+   "kind": "thesis",
+   "lang": "pt",
+   "publisher": "Universidade de São Paulo",
+   "doi": "10.11606/003131596",
+   "note": "Undergraduate thesis. Names Spacewar! with Tennis for Two as the first entertainment video games, and tells the Intergalactic Spacewar Olympics at Stanford as the start of esports, with Baumgart's photograph as winner. Spacewar! at PDF pp. 8, 12, 14.",
+   "url": "https://doi.org/10.11606/003131596",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-B117D2",
+   "title": "Um modelo tipológico da ação dos videojogos",
+   "author": "Cardoso, Pedro Jorge Couto",
+   "date": "2008-10-20",
+   "kind": "thesis",
+   "lang": "pt",
+   "publisher": "Universidade do Porto",
+   "note": "Uses Spacewar! as an example of Crawford's combat skill games and of expressive-act games, and reports Laurel's reading of it as the natural thing to build with computers. Spacewar! at PDF pp. 20, 54, 96.",
+   "licence": "CC BY-NC 4.0",
+   "url": "https://hdl.handle.net/10216/73723",
+   "tags": [
+    "passing discussion"
+   ],
+   "file": "library/files/L-B117D2.pdf",
+   "source": "https://repositorio-aberto.up.pt/bitstream/10216/73723/2/23809.pdf"
+  },
+  {
+   "id": "L-82F946",
+   "title": "Interatividade e Storytelling: Desenvolvimentos narrativos em videojogos",
+   "author": "Costeira, Ana Raquel Cosme",
+   "date": "2016-07-15",
+   "kind": "thesis",
+   "lang": "pt",
+   "publisher": "Universidade do Porto",
+   "note": "Follows Juul in naming Spacewar (1962) as probably the first video game, describes its two ships and Russell's authorship, with a figure of the game. Spacewar! at PDF p. 30.",
+   "licence": "CC BY-NC 4.0",
+   "url": "https://hdl.handle.net/10216/85231",
+   "tags": [
+    "passing discussion"
+   ],
+   "file": "library/files/L-82F946.pdf",
+   "source": "https://repositorio-aberto.up.pt/bitstream/10216/85231/3/140753.pdf"
+  },
+  {
+   "id": "L-E0D749",
+   "title": "A criação de um Artbook através de boas práticas de pesquisa e contextualização",
+   "author": "Abreu, Patrícia Carolina Popper de",
+   "date": "2025-11-02",
+   "kind": "thesis",
+   "lang": "pt",
+   "note": "Treats Spacewar! (1962) as a precursor of the shooter genre, connects its inspiration to E. E. Smith's Triplanetary via Lasar, and reproduces a photograph of it running on the Computer History Museum PDP-1. Spacewar! at PDF pp. 9, 18.",
+   "url": "https://hdl.handle.net/11110/3521",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-25B712",
+   "title": "Gamic Race: Logics of Difference in Videogame Culture",
+   "author": "Higgin, Tanner",
+   "date": "2012",
+   "kind": "thesis",
+   "lang": "en",
+   "note": "Reads Space War! as introducing the trope of attacking alien others (dating it 1959), as indirectly linked to military funding, and its triangle as a simple graphical player proxy. Spacewar! at PDF pp. 33, 121.",
+   "url": "https://escholarship.org/uc/item/5811b3gv",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-30E519",
+   "title": "At Home Everywhere: Empowerment Fantasies in the Domestication of Videogames",
+   "author": "Goetz, Christopher",
+   "date": "2016",
+   "kind": "thesis",
+   "lang": "en",
+   "note": "Cites Haddon on Spacewar paralleling pinball in strategy and speed, and treats the game as an early tether fantasy built to experience Skylark's space-opera adventure once cinema was ruled out. Spacewar! at PDF pp. 23, 137.",
+   "url": "http://www.escholarship.org/uc/item/2xz3k527",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-6EA9C2",
+   "title": "The design of indie games, a different paradigm",
+   "author": "Pérez Domínguez, Enrique Alejandro",
+   "date": "2019",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Bayreuth",
+   "doi": "10.15495/epub_ubt_00004330",
+   "note": "Places Spacewar! within academic hacking culture of the 1950s-60s and reports Freyermuth's view of its production as handcraft manufacture by an individual. Spacewar! at PDF p. 51.",
+   "licence": "CC BY-NC 4.0 and CC BY-NC-ND 4.0 both listed",
+   "url": "https://doi.org/10.15495/epub_ubt_00004330",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-737AF5",
+   "title": "Playing With Culture: Reframing Video Game Localization Discourse and Issues of Censorship",
+   "author": "Bourbonniere, Mathieu",
+   "date": "2019-12",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "Concordia University",
+   "note": "Mentions Spacewar! (1961) among early games via Dillon, then describes the 1972 Intergalactic Spacewar Olympics at Stanford as the first known tournament, with a Rolling Stone subscription as prize. Spacewar! at PDF pp. 15, 57.",
+   "url": "https://spectrum.library.concordia.ca/986309/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-89894F",
+   "title": "Video games and Japaneseness: an analysis of localization and circulation of Japanese video games in North America",
+   "author": "Pelletier-Gagnon, Jérémie",
+   "date": "2011",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "McGill University",
+   "doi": "10.82308/49507",
+   "note": "Background history: Russell and colleagues created SpaceWar!, described as a two-player starship duel on a starry background. Spacewar! at PDF p. 7.",
+   "url": "https://doi.org/10.82308/49507",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-A7B973",
+   "title": "Arts du son et jeux vidéo : la recherche-création dans New Atlantis",
+   "author": "Postel, Ludmila",
+   "date": "2022-03-26",
+   "kind": "thesis",
+   "lang": "fr",
+   "publisher": "Aix-Marseille Université",
+   "doi": "10.70675/5454e0eaz4d63z4febzb6c6zb2cac49ac628",
+   "note": "Credits competition for the best hack at university with producing Spacewar!, and quotes Goodavage's 1972 Saga article on the machine's magical effect, comparing it to playing New Atlantis. Spacewar! at PDF pp. 35, 40, 207.",
+   "url": "https://doi.org/10.70675/5454e0eaz4d63z4febzb6c6zb2cac49ac628",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-BD1D2E",
+   "title": "Persuasive Kommunikation in Computerspielen",
+   "author": "Valtin, Georg; Pietschmann, Daniel",
+   "date": "2008-10-27",
+   "kind": "report",
+   "lang": "de",
+   "note": "Names Spacewar! as the first true computer game, by MIT students around Russell in 1961, with a footnote quoting Russell on earlier interactive programs. Spacewar! at PDF pp. 16, 37.",
+   "url": "https://monarch.qucosa.de/id/qucosa%3A18983",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-49B1E3",
+   "title": "History of Logo",
+   "author": "Solomon, C; Harvey, B; Kahn, K; Lieberman, H; Miller, ML; Minsky, M",
+   "date": "2020-06-12",
+   "kind": "article",
+   "lang": "en",
+   "in": "Proceedings of the ACM on Programming Languages 4 (HOPL), article 79",
+   "publisher": "Association for Computing Machinery (ACM)",
+   "note": "Says the MIT PDP-1 was home to the original Space War, that Solomon played no other video game for years, and that Minsky banned games in his lab, with a photograph of Edwards and Samson playing. Spacewar! at 79:11, fig. 2.",
+   "licence": "CC BY-SA 4.0",
+   "url": "https://hdl.handle.net/1721.1/133952",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-4F4B8E",
+   "title": "Playing at Narratology: Digital Media as Narrative Theory",
+   "author": "Punday, Daniel",
+   "date": "2019",
+   "kind": "book",
+   "lang": "en",
+   "publisher": "The Ohio State University Press",
+   "note": "Introduction sets Russell's Spacewar against narratology's founding moment, calling it the first game that looks modern, then reports Laurel's account of why Spacewar was the natural thing to build and Klevjer on its ship as avatar. Spacewar! at PDF pp. 17-18 and later.",
+   "url": "https://hdl.handle.net/1811/88267",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-DA0E6A",
+   "title": "The New King of the Entertainment Industry? The Unlikely Story of Video Games and the First Amendment",
+   "author": "Walters, Ryan M.",
+   "date": "2022",
+   "kind": "article",
+   "lang": "en",
+   "publisher": "Ohio State University. Moritz College of Law",
+   "note": "Law article. Dates the start of its Two-Dimensional Era from Spacewar! in 1962, describes MIT's creators, the ship duel, four switches and the lack of computing power for a computer opponent, then the space shooter genre. Spacewar! at PDF pp. 34-35.",
+   "url": "https://hdl.handle.net/1811/102568",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-4CB0C1",
+   "title": "A Player’s Sense of Place: Computer Games as Anatopistic Medium",
+   "author": "Purzycki, Kristopher John",
+   "date": "2019",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Wisconsin-Milwaukee",
+   "note": "Ph.D. Treats Spacewar! and Tennis for Two as spaces described in technoscientific terms, built in leisure time in university labs, and reads play around the PDP-1 terminal as a social event of watching a technical feat. Spacewar! at PDF pp. 43, 85-86.",
+   "url": "https://hdl.handle.net/1793/92155",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-1C42EB",
+   "title": "A META-MODAL APPROACH TO ANALYZING VIDEOGAMES AS CULTURAL FORMS OF SOCIAL PRACTICE IN THE LUDIC CENTURY",
+   "author": "House, Ryan Nicholas",
+   "date": "2024",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Wisconsin-Milwaukee",
+   "note": "Ph.D. Gives Spacewar! as a contender for first videogame via Donovan: Russell at MIT, the PDP-1, dodging debris and the gravity well, and spread to other institutions as an accessibility advantage over Tennis for Two. Spacewar! at PDF p. 26.",
+   "url": "https://hdl.handle.net/1793/93532",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-64477C",
+   "title": "The College Esports Experience: Gaming, Identity, And Development",
+   "author": "Kauweloa, Nyle Sky",
+   "date": "2022",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Hawaii at Manoa",
+   "note": "Ph.D. Starts college esports from the 1972 Stanford event, drawing on Brand and Monnens and Goldberg, including Brand's contrast between Spacewar play as low-rent research and robotics and language work as high-rent. Spacewar! at PDF p. 16.",
+   "url": "https://hdl.handle.net/10125/102211",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-A96D72",
+   "title": "'This Game Plays You as Much as You Play It': Self Reflexivity and Technology in Video Games",
+   "author": "Lawlor, Shannon",
+   "date": "2020",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University College Dublin. School of English, Drama and Film",
+   "note": "Doctoral thesis. Mentions Spacewar! through Levy as made by hacking a PDP-1, as an early two-player game, and as a case excluded from the video game canon by definitions separating computer games. Spacewar! at PDF pp. 25, 37, 61.",
+   "licence": "CC BY-NC-ND 3.0 IE",
+   "url": "https://hdl.handle.net/10197/12852",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-FE35B8",
+   "title": "Check Your Inventory: A Critique of Hypermasculinity and Creative Potential in Video Games",
+   "author": "Kincaid, Kevin",
+   "date": "2021",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Oregon",
+   "note": "Background history: Spacewar! built by Russell on an MIT computer, never patented or sold but inspiring adaptations and later games, before Baer started the industry. Spacewar! at PDF pp. 15, 47.",
+   "licence": "CC BY-NC-ND 4.0",
+   "url": "https://hdl.handle.net/1794/26535",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-0FF23C",
+   "title": "Press Start: Narrative Integration in 16-bit Video Game Music",
+   "author": "Sextro, Justin Daniel",
+   "date": "2015",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Missouri--Kansas City",
+   "note": "M.M. thesis. Notes that Spacewar! of 1962 had no sound, describes its two ships and gravity well, and says the title of first video game wavers between it and Tennis for Two. Spacewar! at PDF p. 11.",
+   "url": "https://hdl.handle.net/10355/46700",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-8EE1B8",
+   "title": "The Self-Perception of Video Game Journalism: Interviews With Games Writers Regarding The State of the Profession",
+   "author": "Poirot, Severin Justin",
+   "date": "2019",
+   "kind": "thesis",
+   "lang": "en",
+   "note": "Opens its history with Spacewar, via Graetz, as a PDP-1 technical demo with two ships around a black hole. Spacewar! at PDF p. 10.",
+   "licence": "CC BY-SA 4.0",
+   "url": "https://hdl.handle.net/11244/319649",
+   "tags": [
+    "passing discussion"
+   ],
+   "file": "library/files/L-8EE1B8.pdf",
+   "source": "https://shareok.org/server/api/core/bitstreams/f3440132-e671-4707-9e97-05a21cda5e4c/content"
+  },
+  {
+   "id": "L-C25A2C",
+   "title": "Ludic Cyborgism: Game Studies, Cyborgization, and the Legacy of Military Simulation in Videogames",
+   "author": "Jansen, Dennis",
+   "date": "2020",
+   "kind": "article",
+   "lang": "en",
+   "note": "Quotes a passage calling Spacewar, on a military-grade PDP-1, the product of a culture contemplating nuclear megadeath, using it to link videogames to the military-industrial complex. Spacewar! at PDF p. 8.",
+   "url": "https://hdl.handle.net/1874/408865",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-8CB3FC",
+   "title": "Rules of Engagement: How Video Games Justify State Violence",
+   "author": "Michalson, Kevin Curtis",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of Washington",
+   "note": "Quotes Wolf that Spacewar!, on MIT mainframes in the 1960s, was a by-product of strategic R&D, in tracing the partnership between military and video games. Spacewar! at PDF p. 5.",
+   "url": "https://hdl.handle.net/1773/56703",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-BCDABA",
+   "title": "Into the social factory: an investigation into labour & value in the video-games industry",
+   "author": "Rodgers, Thomas Arthur",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "University of York",
+   "note": "Ph.D. Places Spacewar! at the intersection of the hacker ethic and military-funded Cold War research, via Kline et al., and explains that the $120,000 PDP-1 ruled out commercial sale. Spacewar! at PDF pp. 102-103.",
+   "licence": "CC BY-NC-ND 2.5",
+   "url": "https://etheses.whiterose.ac.uk/id/eprint/17634/",
+   "tags": [
+    "section on Spacewar!"
+   ],
+   "file": "library/files/L-BCDABA.pdf",
+   "source": "https://etheses.whiterose.ac.uk/id/eprint/17634/1/TOM_RODGERS_THESIS_FINAL%202.pdf"
+  },
+  {
+   "id": "L-3DF61F",
+   "title": "Rewiring the Text: Adaptation and Translation in the Digital Heteroglossia.",
+   "author": "Berger, Richard",
+   "date": "2005-03",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "Bournemouth University",
+   "note": "Doctoral thesis on adaptation. Calls Spacewar (1962) the first distinct videogame, by Russell at MIT, describes its monochrome ships and gravity, and links Computer Space to it, comparing this with early cinema's borrowing of genres. Spacewar! at PDF pp. 145-146.",
+   "url": "https://eprints.bournemouth.ac.uk/id/eprint/13283",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-3F73D9",
+   "title": "Creating Worlds: Exploring Participatory Behaviour in Gaming Communities",
+   "author": "Welisch, Gaston",
+   "date": "2019-06",
+   "kind": "thesis",
+   "lang": "en",
+   "publisher": "Glasgow School of Art",
+   "note": "Brief history of games describes Spacewar! as developed at MIT in 1961 on the PDP-1, with simple rules showing the computer's potential; later contrasted, as a game with a set goal, with participatory games. Spacewar! at PDF pp. 8, 14, 38.",
+   "url": "https://radar.gsa.ac.uk/id/eprint/9485",
+   "tags": [
+    "section on Spacewar!"
+   ]
   }
  ]
 }
