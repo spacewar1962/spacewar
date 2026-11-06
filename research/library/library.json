@@ -1427,10 +1427,10 @@
    "publisher": "The MIT Press",
    "doi": "10.7551/mitpress/9780262029513.001.0001",
    "isbn": "9780262330091",
-   "note": "Tung-Hui Hu presents the game Spacewar as an exemplar of time-sharing computers in the prehistory of the cloud.",
+   "note": "Chapter 2 opens on Brand's Rolling Stone visit to watch Spacewar, with a figure of it on a PDP-1. Hu treats the article as read by later critics as a turn toward personal computing. Spacewar! at 38.",
    "url": "https://doi.org/10.7551/mitpress/9780262029513.001.0001",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ]
   },
   {
@@ -3242,10 +3242,10 @@
    "lang": "en",
    "publisher": "MIT Press",
    "isbn": "9780262034197",
-   "note": "Several lexicon entries touch Spacewar!: Russell's reported pinball remark, gravity as a physics showcase, how players were represented, and the Tech Model Railroad Club.",
+   "note": "Edited by Guins and Lowood. Several entries touch it: Russell's reported pinball remark, a subsection 'The Watershed of Spacewar!' after the rise of AI, Bushnell's failure to commercialise it, and how it represented players.",
    "url": "https://archive.org/details/isbn_9780262034197",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-2F4EE5.jpg"
   },
@@ -3258,10 +3258,10 @@
    "lang": "en",
    "publisher": "Reaktion Books",
    "isbn": "9781861891433",
-   "note": "Describes Spacewar as designed for the DEC PDP-1 at MIT by Russell and others, used to show the machine to customers, and seen by Bushnell.",
+   "note": "Names Spacewar as the first recorded digital computer game and first video game, by Russell and others at MIT, used to demonstrate the PDP-1 to customers and encountered by Bushnell; also cites Brand's 1972 article.",
    "url": "https://archive.org/details/digitalculture0000gere",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-54E98D.jpg"
   },
@@ -3290,10 +3290,10 @@
    "lang": "en",
    "publisher": "Routledge",
    "isbn": "9780415977203",
-   "note": "Introductory history with an account of the creation of Spacewar, its space-battle theme, and Bushnell's adaptation; the game also appears among its worked examples.",
+   "note": "History chapter: the PDP-1 led to the game, its resemblance to space battle films, its wraparound space, and Bushnell seeing financial possibilities in it. Cites Graetz.",
    "url": "https://archive.org/details/understandingvid0000egen",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-FD0E3B.jpg"
   },
@@ -3305,10 +3305,10 @@
    "lang": "en",
    "publisher": "Greenwood Press",
    "isbn": "9780313338687",
-   "note": "Timeline and history chapters: Spacewar! written at MIT, copied and adapted to other computers, translated by Bushnell into Computer Space; also the 1977 arcade Space Wars. Spacewar! at 40, 67.",
+   "note": "Edited by Wolf. Calls it the most famous mainframe game, by Russell, Graetz and Kotok at MIT around 1962, with hyperspace, copied and adapted across computers; also relates Cinematronics' and Vectorbeam's 1977 arcade games to it.",
    "url": "https://archive.org/details/videogameexplosi0000unse",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-8BFC08.jpg"
   },
@@ -3321,10 +3321,10 @@
    "lang": "en",
    "publisher": "McGraw-Hill/Osborne",
    "isbn": "0072224282",
-   "note": "Illustrated history: Russell bringing Spacewar! to the PDP-1, Kotok's work at the same time, a photograph of the machine, and Computer Space as a single-player version.",
+   "note": "Prologue on Spacewar!: Graetz's account of the brainstorm, E. E. Smith's novels as source, two rocket ships, Kotok's concurrent project, and a photograph of a PDP-1 at the Computer History Museum. Bushnell is named as an heir. Spacewar! at 12.",
    "url": "https://archive.org/details/highscoreillustr0000dema",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-8B37CD.jpg"
   },
@@ -3353,10 +3353,10 @@
    "lang": "en",
    "publisher": "Penguin Books",
    "isbn": "9780143036760",
-   "note": "Treats Spacewar as collaborative software at MIT, with Brand finding it at Stanford and Bushnell meeting it as a student; cites Graetz and Brand.",
+   "note": "Describes the game at MIT as a classic collaborative hack, Russell's departure and the cult following, Bushnell's encounter with it, and Brand's Rolling Stone article on the computer scene. Cites Graetz.",
    "url": "https://archive.org/details/whatdormousesaid0000mark",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-7F74BD.jpg"
   },
@@ -3414,10 +3414,10 @@
    "lang": "en",
    "publisher": "Riverhead Books",
    "isbn": "9780399184482",
-   "note": "Recounts Russell and colleagues designing Spacewar! on the PDP-1, its rules, and Alan Kay's remark on its spread; draws on Brand and Graetz. Spacewar! at 198-201, 13.",
+   "note": "Tells how students used the PDP-1 for a game of cosmic conflict, gives its two-player rules, cites Brand's Rolling Stone piece and Graetz, and includes a plate of Edwards and Samson playing. Spacewar! at 198-201.",
    "url": "https://archive.org/details/wonderlandhowpla0000john_k1e0",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-EA5FFE.jpg"
   },
@@ -3459,10 +3459,10 @@
    "lang": "en",
    "publisher": "MIT Press",
    "isbn": "0262524201",
-   "note": "Includes a Graetz essay on the origin of Spacewar! with material on TX-0 hackers, the programming team, and the Stanford session behind Galaxy Game.",
+   "note": "Reprints Graetz's 'The Origin of Spacewar!' (copyright 1981, with permission), including 'The Hackers Meet Spacewar!' and the control boxes, beside a Montfort piece on TMRC and a Spacewar! game entry.",
    "url": "https://archive.org/details/supercadevisualh0000burn",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-783417.jpg"
   },
@@ -3504,10 +3504,10 @@
    "lang": "en",
    "publisher": "The MIT Press",
    "isbn": "9780262012577",
-   "note": "Refers to Spacewar as written by Russell at MIT, met by Bushnell at Utah, and the target of later attempts to run it on cheaper hardware; links Star Castle to it. Spacewar! at 5, 7, 8, 31, 51-52, 84-86.",
+   "note": "Recurrent comparison: Bushnell discovering it at Utah, its 1962 PDP-1 display, two-player structure against Atari VCS design, and its relation to Star Castle and Space Wars. A ludography credits Russell, Graetz and Wiitanen. Spacewar! at 5, 7, 8, 31, 51-52, 84-86.",
    "url": "https://archive.org/details/racingbeamatariv0000mont",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-B65A12.jpg"
   },
@@ -3519,10 +3519,10 @@
    "lang": "en",
    "publisher": "University of Texas Press",
    "isbn": "0292791488",
-   "note": "Historical chapters describe Spacewar! by Russell, Graetz and others on the PDP-1, its two ships, and Bushnell's translation into Computer Space.",
+   "note": "Wolf's history describes the game by Russell, Graetz and others on the PDP-1, its two ships, drawing on Graetz. A note on Baer's preface says PDP-1s cost $120,000 and few had access; another discusses patents.",
    "url": "https://archive.org/details/mediumofvideogam0000unse_b7m6",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-2F447C.jpg"
   },
@@ -3595,10 +3595,10 @@
    "lang": "en",
    "publisher": "Yellow Ant",
    "isbn": "9780956507204",
-   "note": "Opening chapter on the TMRC, Russell and the PDP-1, the switch problem and hand controllers, completion in spring 1962, and spread to other labs; gameography entry.",
+   "note": "Opening history: Graetz on choosing spaceships, the two-player duel, control boxes replacing the PDP-1's 18 switches, completion by spring 1962, and Tuck's coin-operated Galaxy Game; also a gameography entry.",
    "url": "https://archive.org/details/replayhistoryofv0000dono",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-68D535.jpg"
   },
@@ -3611,10 +3611,10 @@
    "lang": "en",
    "publisher": "Prima Publishing",
    "isbn": "0761536434",
-   "note": "Early chapter on Russell, the TMRC and Spacewar on the PDP-1, the control boxes, and Bushnell's thesis and Computer Space; timeline entry for 1961.",
+   "note": "Chapter 'Forgotten Fathers' opens with a Russell epigraph, then covers TMRC members revising Spacewar, dedicated control boxes on the PDP-1, and earlier interactive programs. A timeline dates the game to 1961. Spacewar! at 16.",
    "url": "https://archive.org/details/ultimatehistoryo0000kent",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-351E6D.jpg"
   },
@@ -3686,10 +3686,10 @@
    "lang": "en",
    "publisher": "University of Chicago Press",
    "isbn": "9783035800135",
-   "note": "Calls Spacewar hacker-made and unplanned, notes Kotok's thesis, quotes Brand's Rolling Stone article, and discusses Computer Space as more than a clone.",
+   "note": "Contents list a section 'Spacewar' between the TX-0 and Sensorama in the chapter on action games. It credits Kotok, Samson and Russell, quotes Brand that hackers made it, and has a figure of 1960s hackers playing in 1983.",
    "url": "https://archive.org/details/computergameworl0000pias",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-3BF390.jpg"
   },
@@ -3717,10 +3717,10 @@
    "lang": "en",
    "publisher": "Routledge",
    "isbn": "9780415533324",
-   "note": "Several chapters set Spacewar! beside Tennis for Two as origin points, credit its programmers, and contrast its overhead view with Higinbotham's side view.",
+   "note": "Edited by Wolf and Perron. Chapters on origins set Tennis for Two beside Spacewar!, compare their viewpoints, discuss naming it the first digital game, and contrast player-versus-player with Pong.",
    "url": "https://archive.org/details/routledgecompani0000unse_r0r6",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-0F2FBC.jpg"
   },
@@ -3733,10 +3733,10 @@
    "lang": "en",
    "publisher": "A K Peters/CRC Press",
    "isbn": "9781439873236",
-   "note": "Opens Part 1 with Spacewar! on the PDP-1, a match described, Stanford's machine and the Dutch Goose players; points to emulators and the Computer History Museum.",
+   "note": "Part 1 'The Beginning' shows a match and tells of Russell and friends programming it, improvements by Kotok and Saunders, Bushnell among its players, and Dutch Goose customers who had played it at Stanford.",
    "url": "https://archive.org/details/goldenageofvideo0000dill",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-49DCA8.jpg"
   },
@@ -3778,10 +3778,10 @@
    "lang": "en",
    "publisher": "MIT Press",
    "isbn": "0262182408",
-   "note": "Historical chapters discuss Russell's work at MIT in January 1962 on PDP-1s, Spacewar as a playful hack inspired by space opera, and the question of the first game.",
+   "note": "Edited by Raessens and Goldstein. Chapters treat it as a playful hack on the PDP-1 and debate whether it was the first video game; a chapter epigraph and anecdote on Russell's pinball remark.",
    "url": "https://archive.org/details/handbookofcomput0000unse_e5o6",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-EAFE21.jpg"
   },
@@ -3808,10 +3808,10 @@
    "lang": "en",
    "publisher": "Running Press",
    "isbn": "9780762456154",
-   "note": "Section on Spacewar!: the ships called the needle and the wedge, gravity and slingshot tricks, and play on an emulated PDP-1. Spacewar! at 33-35.",
+   "note": "Pages on Spacewar!: conceived in 1961 by MIT students, the Needle and Wedge, gravity and moving in on the star, exposure limited by the PDP-1; photographs of Russell and of emulated play. Spacewar! at 33-35.",
    "url": "https://archive.org/details/briefhistoryofvi0000stan_g2z1",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-092B78.jpg"
   },
@@ -3824,10 +3824,10 @@
    "lang": "en",
    "publisher": "Pantheon Books",
    "isbn": "9781101871553",
-   "note": "Compares PLATO space games with MIT's Spacewar! on the PDP-1 and its console display. Spacewar! at 226, 227-229.",
+   "note": "Separates PLATO's Spacewar from MIT's 1962 program, says what puts MIT's version in the histories, and contrasts its PDP-1 console display with PLATO's graphics constraint. Spacewar! at 226-229.",
    "url": "https://archive.org/details/friendlyorangegl0000dear",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-0C861F.jpg"
   },
@@ -4163,9 +4163,10 @@
    "isbn": "9780415281911",
    "url": "https://archive.org/details/videogames0000newm",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-E24231.jpg"
+   "thumb": "library/thumbs/L-E24231.jpg",
+   "note": "Discusses the debated birth of videogames with Russell's Spacewar as the most cited modern case, players contending with inertia and gravity, and lists a Java version and Graetz."
   },
   {
    "id": "L-87378D",
@@ -4267,10 +4268,10 @@
    "lang": "en",
    "publisher": "Computer Book Division/Simon & Schuster",
    "isbn": "0671492926",
-   "note": "Mentions hackers holding late-night Spacewar sessions on a PDP-1 rigged to fly simulated spacecraft.",
+   "note": "Late-night hackers run Spacewar on a rigged PDP-1 using a control panel made from a cigar box; it spreads from MIT to other campus computers, and a figure falls when it is banned and recovers when reinstated.",
    "url": "https://archive.org/details/toolsforthoughtp0000rhei",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-23025C.jpg"
   },
@@ -4373,9 +4374,10 @@
    "isbn": "9780262019095",
    "url": "https://archive.org/details/movinginnovation0000sito",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-115CA4.jpg"
+   "thumb": "library/thumbs/L-115CA4.jpg",
+   "note": "In a history of animation: Russell and classmates create the game, the naming, DEC shipping it as a free demo, Bushnell unable to afford a $120,000 PDP-1 for his version, and terms its inventors recorded."
   },
   {
    "id": "L-B3AD16",
@@ -4447,9 +4449,10 @@
    "isbn": "9780544031562",
    "url": "https://archive.org/details/warplayvideogame0000mead",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-EE2DFB.jpg"
+   "thumb": "library/thumbs/L-EE2DFB.jpg",
+   "note": "Section 'Spacewar! and Beyond' traces military game roots to it: invented in 1962 by 23-year-old Russell and colleagues, E. E. Smith as his main influence, its star charts and PDP-1 interface; includes a photograph. Spacewar! at 14."
   },
   {
    "id": "L-4B831C",
@@ -4547,10 +4550,10 @@
    "lang": "en",
    "publisher": "Little, Brown, and Co",
    "isbn": "0316360074",
-   "note": "Includes a recollection of Stanford's PDP-1 with its copy of Spacewar on the console, and describes the game's spread.",
+   "note": "Calls it the ur-videogame, tells of Russell's friends polishing it on study breaks and the first joypad, copies on every research computer by the mid-1960s, and Computer Space as a variation on it.",
    "url": "https://archive.org/details/joysticknationho0000herz",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-7982AD.jpg"
   },
@@ -4563,10 +4566,10 @@
    "lang": "en",
    "publisher": "Syzygy Co",
    "isbn": "9780985597405",
-   "note": "Company history: Bushnell and Dabney, a PDP-1 left running Spacewar! at Utah, and the route to Computer Space.",
+   "note": "DEC left it running on delivered PDP-1s; by 1969 hackers had taken it far beyond MIT. Bushnell plans to charge players for it, and Ampex colleagues saw it at Stanford's AI lab. Separate from Cinematronics Space War mentions.",
    "url": "https://archive.org/details/atariincbusiness0000gold",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-AFD8DB.jpg"
   },
@@ -4656,10 +4659,10 @@
    "lang": "en",
    "publisher": "The MIT Press",
    "isbn": "9780262013437",
-   "note": "Discusses Spacewar! (Russell, Samson, Edwards et al., 1962) as an influential game created on a PDP-1 at MIT.",
+   "note": "One passage: widely considered the first modern video game, custom controllers at MIT, gravity and navigation compared with Pong's single-line movement. A ludography entry credits Russell, Samson, Edwards, Graetz, Kotok, Piner and Saunders.",
    "url": "https://archive.org/details/expressiveproces0000ward",
    "tags": [
-    "found by full-text search, not read"
+    "passing discussion"
    ],
    "thumb": "library/thumbs/L-6F2B8D.jpg"
   },
@@ -4700,10 +4703,10 @@
    "lang": "en",
    "publisher": "Thunder's Mouth Press",
    "isbn": "9781560256816",
-   "note": "Has a passage on Spacewar! and early hackers in a history of war and video games; notes cite Brand.",
+   "note": "Calls it the mainframe-era ancestor of the video game, describes the Hingham Institute fellows, Graetz's history and DECUS note, and Brand's Rolling Stone article and First Intergalactic Spacewar Olympics. Spacewar! at 141.",
    "url": "https://archive.org/details/fromsuntzutoxbox0000halt",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-C2F012.jpg"
   },
@@ -4731,10 +4734,10 @@
    "lang": "en",
    "publisher": "The MIT Press",
    "isbn": "9780262633185",
-   "note": "Describes the 1962 Spacewar! by Russell and others among early hacks and as an ancestor of later work; cites Levy and Graetz.",
+   "note": "Sets the 1962 program by Russell and others beside early interactive programs, citing Levy pages 59-69 and Graetz; also mentions an Imlac version and a count of web pages naming it.",
    "url": "https://archive.org/details/twistylittlepass0000mont",
    "tags": [
-    "found by full-text search, not read"
+    "passing discussion"
    ],
    "thumb": "library/thumbs/L-91A439.jpg"
   },
@@ -4777,10 +4780,10 @@
    "lang": "en",
    "publisher": "University of Minnesota Press",
    "isbn": "9780816666102",
-   "note": "Describes Russell's Spacewar on a DEC PDP-1 minicomputer as background to a critique of game capitalism.",
+   "note": "Treats Russell's game, made on a PDP-1, as the ur-video game over Higinbotham's and Baer's, and quotes Brand on it being 'part of no one's grand scheme' and on computer power to the people.",
    "url": "https://archive.org/details/gamesofempireglo0000dyer",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-61C46E.jpg"
   },
@@ -4910,10 +4913,10 @@
    "lang": "en",
    "publisher": "McGraw-Hill",
    "isbn": "0070115435",
-   "note": "Rise-and-fall history of Atari that begins Bushnell's story with Russell's Spacewar program from MIT. Spacewar! at 16, 17, 18.",
+   "note": "Early pages: Russell at MIT writes the program, and a reference to Bushnell. Bill Pitts, who played at Stanford, uses a DEC machine for a commercial version of his own, Galaxy Game, very like it. Spacewar! at 16-18.",
    "url": "https://archive.org/details/zaprisefall00cohe",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-323EEA.jpg"
   },
@@ -5131,10 +5134,10 @@
    "lang": "en",
    "publisher": "Unreason Press",
    "isbn": "9780615642048",
-   "note": "Places Spacewar! (1962) and its hobbyist origins on the DEC PDP-1 in a history of simulation games.",
+   "note": "Traces 1960s wargame hobbyist discussion: Andrews's inquiry in Gamesman about its origins, a March 1968 reply from MIT on difficulty of mainframe gaming, and Computer Space as its adaptation by Bushnell and Dabney.",
    "url": "https://archive.org/details/playingatworldhi0000pete",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-0F6AFF.jpg"
   },
@@ -5283,10 +5286,10 @@
    "lang": "en",
    "publisher": "Viking",
    "isbn": "9780670899760",
-   "note": "Biography of Licklider with a passage and photograph of MIT hackers playing Spacewar on the PDP-1.",
+   "note": "A section headed for 'MIT hackers play Spacewar on the PDP-1' under interactivity for the masses; Spacewar as an on-screen sci-fi adventure and a stockholder demonstration; later notes Rolling Stone's headline.",
    "url": "https://archive.org/details/dreammachinejcrl00wald",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-73A0D0.jpg"
   },
@@ -5330,9 +5333,10 @@
    "isbn": "9781478001348",
    "url": "https://archive.org/details/respawngamershac00milb",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-BB66E3.jpg"
+   "thumb": "library/thumbs/L-BB66E3.jpg",
+   "note": "Figure 1.1 and opening discussion of Brand on hackers making Spacewar; notes cite Graetz, Levy and Turkle on its role in hacking, list its authors and address its public-domain status."
   },
   {
    "id": "L-BBE5F8",
@@ -5582,10 +5586,10 @@
    "lang": "en",
    "publisher": "Focal Press/Elsevier",
    "isbn": "9780240811468",
-   "note": "Links later titles to Spacewar! and refers readers to a bonus chapter, SpaceWar! (1962): The Best Waste of Time.",
+   "note": "Bonus chapter 'Spacewar! (1962): The Best Waste of Time in the History of the Universe'. The text compares Adventure's PDP-10 authors with its hackers on the PDP-1 and links Asteroids and Omega Race to its physics.",
    "url": "https://archive.org/details/vintagegamesinsi0000logu",
    "tags": [
-    "found by full-text search, not read"
+    "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-B8F654.jpg"
   },
@@ -5600,9 +5604,10 @@
    "isbn": "0744004241",
    "url": "https://archive.org/details/poweruphowjapane0000kohl",
    "tags": [
-    "found by full-text search, not read"
+    "passing discussion"
    ],
-   "thumb": "library/thumbs/L-683C6E.jpg"
+   "thumb": "library/thumbs/L-683C6E.jpg",
+   "note": "Says Computer Space was almost an exact copy of the game written by TMRC members in 1961 for the PDP-1, with a screen rendering. Spacewar! at 14."
   },
   {
    "id": "L-7A27D6",
@@ -11318,7 +11323,8 @@
    "url": "https://archive.org/details/dealersoflightni00hiltrich",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9DF0B5.jpg"
   },
   {
    "id": "L-9C11CA",
@@ -11332,7 +11338,8 @@
    "url": "https://archive.org/details/riseofmachinescy0000ridt",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9C11CA.jpg"
   },
   {
    "id": "L-CC94D6",
@@ -11346,7 +11353,8 @@
    "url": "https://archive.org/details/cyberneticsmomen0000klin",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-CC94D6.jpg"
   },
   {
    "id": "L-00C5FA",
@@ -11360,7 +11368,8 @@
    "url": "https://archive.org/details/misunderstanding0000wins",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "thumb": "library/thumbs/L-00C5FA.jpg"
   },
   {
    "id": "L-23442E",
@@ -11374,7 +11383,8 @@
    "url": "https://archive.org/details/mediatechnologys0000wins",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "thumb": "library/thumbs/L-23442E.jpg"
   },
   {
    "id": "L-EE7994",
@@ -11388,7 +11398,8 @@
    "url": "https://archive.org/details/triggerhappyinne0000pool",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EE7994.jpg"
   },
   {
    "id": "L-18A428",
@@ -11402,7 +11413,8 @@
    "url": "https://archive.org/details/screenplaystoryo0000sull",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-18A428.jpg"
   },
   {
    "id": "L-8C2174",
@@ -11416,7 +11428,8 @@
    "url": "https://archive.org/details/genesisiicreatio0000pete",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-8C2174.jpg"
   },
   {
    "id": "L-2220D8",
@@ -11431,7 +11444,8 @@
    "url": "https://archive.org/details/lasagadesjeuxvid0000ichb",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2220D8.jpg"
   },
   {
    "id": "L-761F0A",
@@ -11446,7 +11460,8 @@
    "url": "https://archive.org/details/luniversdesjeuxv0000ledi",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-761F0A.jpg"
   },
   {
    "id": "L-4D9449",
@@ -11460,7 +11475,8 @@
    "url": "https://archive.org/details/fumblingfutureho0000smit",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-4D9449.jpg"
   },
   {
    "id": "L-9AF940",
@@ -11474,7 +11490,8 @@
    "url": "https://archive.org/details/freeasinfreedomr00will",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9AF940.jpg"
   },
   {
    "id": "L-D25FA0",
@@ -11488,7 +11505,8 @@
    "url": "https://archive.org/details/historyofmodernc00ceru_0",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-D25FA0.jpg"
   },
   {
    "id": "L-88BD23",
@@ -11502,7 +11520,8 @@
    "url": "https://archive.org/details/fromcountercultu0000turn",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "thumb": "library/thumbs/L-88BD23.jpg"
   },
   {
    "id": "L-1FB486",
@@ -11516,7 +11535,8 @@
    "url": "https://archive.org/details/neteffectromanti0000stre",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "thumb": "library/thumbs/L-1FB486.jpg"
   },
   {
    "id": "L-E4818E",
@@ -11530,7 +11550,8 @@
    "url": "https://archive.org/details/newhackersdictio00raym",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E4818E.jpg"
   }
  ]
 }
