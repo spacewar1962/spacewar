@@ -1736,11 +1736,13 @@
    "pages": "389-397",
    "doi": "10.32782/2415-8151.2025.36.38",
    "note": "Ukrainian thesis whose history of computer games describes Spacewar! on the PDP-1 by Russell, Graetz and Wiitanen, with the additions by Edwards, and its wide distribution. Spacewar! at p. 186 (PDF p. 2).",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc/4.0",
+   "licence": "CC BY-NC 4.0",
    "url": "https://dspace.nuft.edu.ua/handle/123456789/50588",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-DBC26A.pdf",
+   "source": "https://dspace.nuft.edu.ua/bitstreams/9615c166-ccf4-4234-ae83-f97d8f03e219/download"
   },
   {
    "id": "L-7FF5BA",
@@ -1789,11 +1791,13 @@
    "pages": "72-87",
    "doi": "10.37536/ecozona.2017.8.2.1352",
    "note": "Reports Christiansen's argument that Spacewar! (1962) was the first game mod and describes Russell and the MIT hackers in that light.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/3.0",
+   "licence": "CC BY 3.0",
    "url": "https://doi.org/10.37536/ecozona.2017.8.2.1352",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-C0BBBE.pdf",
+   "source": "http://ecozona.eu/article/download/1352/2061"
   },
   {
    "id": "L-A10599",
@@ -1820,11 +1824,13 @@
    "in": "Electronic Kharkiv National University Institutional Repository (Kharkiv National University)",
    "publisher": "V. N. Karazin Kharkiv National University",
    "note": "Ukrainian thesis on cybersport giving the 1972 Intergalactic Spacewar Olympics as first esports event and the origin of the game with Russell in 1962. Spacewar! at PDF pp. 16-19.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc/4.0",
+   "licence": "CC BY-NC 4.0",
    "url": "https://ekhnuir.karazin.ua/handle/123456789/21323",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-7A4879.pdf",
+   "source": "https://ekhnuir.karazin.ua/bitstreams/7ace1bcb-5c7c-42be-b29f-958509a52543/download"
   },
   {
    "id": "L-071F0A",
@@ -1854,11 +1860,13 @@
    "publisher": "Universidade Federal de Goias",
    "doi": "10.5216/vis.v8i1.18213",
    "note": "Portuguese article on interface and video game semiotics, arguing Spacewar by Russell is properly the first video game because of how it represents and allows interaction. Spacewar! at PDF pp. 4, 5, 8.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/4.0",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.5216/vis.v8i1.18213",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-76019F.pdf",
+   "source": "https://revistas.ufg.br/VISUAL/article/download/18213/10881"
   },
   {
    "id": "L-B08AFF",
@@ -1869,11 +1877,13 @@
    "lang": "es",
    "in": "Argumentos de razón técnica: Revista española de ciencia, tecnología y sociedad, y filosofía de la tecnología",
    "note": "Spanish article on cultural origins of the internet covering Russell's Spacewar, its display of two ships, and Bushnell meeting it at Utah before Computer Space.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-sa/4.0, creativecommons.org/publicdomain/zero/1.0",
+   "licence": "CC BY-NC-SA 4.0",
    "url": "https://revistascientificas.us.es/index.php/argumentos/article/view/22638",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-B08AFF.pdf",
+   "source": "https://revistascientificas.us.es/index.php/argumentos/article/download/22638/19844"
   },
   {
    "id": "L-499C35",
@@ -1887,11 +1897,13 @@
    "pages": "68",
    "doi": "10.7195/ri14.v4i2.388",
    "note": "Spanish historical account of video game origins with a passage on Spacewar: Russell and friends at MIT in 1961, the PDP-1, and an image of the original. Spacewar! at PDF pp. 5-6.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/4.0",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.7195/ri14.v4i2.388",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-499C35.pdf",
+   "source": "https://icono14.net/ojs/index.php/icono14/article/download/388/264"
   },
   {
    "id": "L-F9C2C0",
@@ -1904,11 +1916,13 @@
    "publisher": "Cornell University",
    "doi": "10.48550/arxiv.2301.03373",
    "note": "Asks ChatGPT to explain the PDP-1 assembly of Spacewar as its first task, with a code excerpt and the model's description of the needle and the wedge.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-sa/4.0",
+   "licence": "CC BY-SA 4.0",
    "url": "https://doi.org/10.48550/arxiv.2301.03373",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-F9C2C0.pdf",
+   "source": "https://arxiv.org/pdf/2301.03373"
   },
   {
    "id": "L-5B3FA6",
@@ -1922,11 +1936,13 @@
    "pages": "10",
    "doi": "10.51919/revista_sh.v1i1.134",
    "note": "Portuguese paper on a 2D shooter that treats Spacewar and Space Invaders as exemplars of the shoot-em-up, describing Russell's game at MIT. Spacewar! at PDF p. 2.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/4.0",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.51919/revista_sh.v1i1.134",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-5B3FA6.pdf",
+   "source": "http://revistas.hcte.ufrj.br/index.php/RevistaSH/article/download/134/123"
   },
   {
    "id": "L-51CA16",
@@ -1939,11 +1955,13 @@
    "publisher": "Universidad Camilo Jose Cela",
    "doi": "10.57087/edupsykhe.v13i1.3886",
    "note": "Spanish history of violence and psychology in games that describes Russell's Spacewar! on the PDP-1 as first video game in the strict sense.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-nd/4.0",
+   "licence": "CC BY-NC-ND 4.0",
    "url": "https://doi.org/10.57087/edupsykhe.v13i1.3886",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-51CA16.pdf",
+   "source": "https://journals.ucjc.edu/EDU/article/download/3886/2832"
   },
   {
    "id": "L-BC3475",
@@ -1972,11 +1990,13 @@
    "pages": "87-108",
    "doi": "10.22305/ict-unpa.v5i3.83",
    "note": "Spanish report on change impact analysis using Spacewar, the example program shipped with AspectJ for Eclipse, as a study case. Not the 1962 code.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-nd/4.0",
+   "licence": "CC BY-NC-ND 4.0",
    "url": "https://doi.org/10.22305/ict-unpa.v5i3.83",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-B7E693.pdf",
+   "source": "https://publicaciones.unpa.edu.ar/index.php/ICTUNPA/article/download/464/443"
   },
   {
    "id": "L-0E099D",
@@ -2025,11 +2045,13 @@
    "pages": "97-115",
    "doi": "10.53463/inda.20220135",
    "note": "Turkish article on game spaces with a paragraph on Spacewar! by Russell (1962) and its black-space representation.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-sa/4.0",
+   "licence": "CC BY-NC-SA 4.0",
    "url": "https://doi.org/10.53463/inda.20220135",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-9CC717.pdf",
+   "source": "https://sekizgenacademy.com/journals/index.php/inda/article/download/135/85"
   },
   {
    "id": "L-841F5D",
@@ -2073,11 +2095,13 @@
    "pages": "193-212",
    "doi": "10.14746/hl.2019.12.10",
    "note": "Polish journal article with a paragraph on Spacewar! on the PDP-1, the hyperspace feature and the scoring Russell added in May 1962, and Bushnell.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-nd/4.0",
+   "licence": "CC BY-NC-ND 4.0",
    "url": "https://doi.org/10.14746/hl.2019.12.10",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-CDA935.pdf",
+   "source": "https://pressto.amu.edu.pl/index.php/hl/article/download/20926/20267"
   },
   {
    "id": "L-0B01A6",
@@ -2106,11 +2130,13 @@
    "pages": "125-144",
    "doi": "10.7557/23.6359",
    "note": "Media philosophy of early action games arguing Spacewar and its peers came from abuse of army equipment, following Kittler.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/4.0",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.7557/23.6359",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-CE43D1.pdf",
+   "source": "https://www.eludamos.org/index.php/eludamos/article/download/vol11no1-8/11-1-8"
   },
   {
    "id": "L-2615D4",
@@ -2178,11 +2204,13 @@
    "pages": "110-127",
    "doi": "10.19195/quart.2022.3.94115",
    "note": "Polish journal article on exhibiting digital games citing the exhibition Spacewar! Video Games Blast Off and John Sharp on its making.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-nd/4.0",
+   "licence": "CC BY-NC-ND 4.0",
    "url": "https://doi.org/10.19195/quart.2022.3.94115",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-ECB488.pdf",
+   "source": "https://czasopisma.uwr.edu.pl/quart/article/download/16525/14875"
   },
   {
    "id": "L-06410E",
@@ -2196,11 +2224,13 @@
    "pages": "e198043",
    "doi": "10.11606/issn.1984-5057.v14i2e198043",
    "note": "Portuguese article describing Spacewar by Russell on a PDP-1 in 1962 as first computer game, a battle between two rockets. Spacewar! at PDF p. 3.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-sa/4.0",
+   "licence": "CC BY-NC-SA 4.0",
    "url": "https://doi.org/10.11606/issn.1984-5057.v14i2e198043",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-06410E.pdf",
+   "source": "https://www.revistas.usp.br/signosdoconsumo/article/download/198043/190297"
   },
   {
    "id": "L-630701",
@@ -2231,11 +2261,13 @@
    "pages": "462-466",
    "doi": "10.54097/cyd0yy78",
    "note": "Overview of AI in games noting Spacewar! (1962) as an early popular example, with mutual play between humans.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc/4.0",
+   "licence": "CC BY-NC 4.0",
    "url": "https://doi.org/10.54097/cyd0yy78",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-CDEEF3.pdf",
+   "source": "https://drpress.org/ojs/index.php/HSET/article/download/16033/15558"
   },
   {
    "id": "L-809D89",
@@ -2249,11 +2281,13 @@
    "pages": "204-212",
    "doi": "10.54254/2977-3903/2026.34221",
    "note": "Game technology overview saying Spacewar! of MIT spread among universities and Computer Space was a simplified version of it.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/4.0",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.54254/2977-3903/2026.34221",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-809D89.pdf",
+   "source": "https://aei.ewapub.com/article/view/34221.pdf"
   },
   {
    "id": "L-F16189",
@@ -2280,11 +2314,13 @@
    "in": "Tampere University Institutional Repository (Tampere University)",
    "publisher": "Tampere University of Applied Sciences",
    "note": "Mayra on player agency, using Spacewar! as an example of appropriating mainframes, with a figure of Edwards and Samson.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc/4.0",
+   "licence": "CC BY-NC 4.0",
    "url": "https://www.gamejournal.it/the-player-as-a-hybrid-agency-in-digital-game-cultures/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-E61975.pdf",
+   "source": "https://www.gamejournal.it/wp-content/uploads/2020/12/I8_GAME_02_MAYRA.pdf"
   },
   {
    "id": "L-B4E599",
@@ -2298,11 +2334,13 @@
    "pages": "1400-1415",
    "doi": "10.7456/tojdac.1736126",
    "note": "Turkish article on game film adaptation describing Spacewar (1962) on the PDP-1 as a forerunner, and its influence on Bushnell.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nd/4.0",
+   "licence": "CC BY-ND 4.0",
    "url": "https://doi.org/10.7456/tojdac.1736126",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-B4E599.pdf",
+   "source": "https://dergipark.org.tr/tr/download/article-file/5028635"
   },
   {
    "id": "L-407213",
@@ -2313,11 +2351,13 @@
    "lang": "es",
    "in": "Agenda Cultural",
    "note": "Colombian article setting Noughts and Crosses, Tennis for Two and Spacewar as the first video games, with Spacewar credited for programming complexity and distribution. Spacewar! at PDF p. 1.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-sa/4.0",
+   "licence": "CC BY-NC-SA 4.0",
    "url": "https://revistas.udea.edu.co/index.php/almamater/article/view/361666",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-407213.pdf",
+   "source": "https://revistas.udea.edu.co/index.php/almamater/article/download/361666/20819210"
   },
   {
    "id": "L-476B63",
@@ -2380,11 +2420,13 @@
    "publisher": "The Association for Computers and the Humanities",
    "doi": "10.63744/6xhpzx59p3sq",
    "note": "DHQ essay locating the origin of the avatar in the moment Russell created a controllable blip of light in Spacewar!, comparing its controls with later games.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nd/4.0",
+   "licence": "CC BY-ND 4.0",
    "url": "https://doi.org/10.63744/6xhpzx59p3sq",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-C8E2CF.pdf",
+   "source": "https://dhq-static.digitalhumanities.org/pdf/000066.pdf"
   },
   {
    "id": "L-636258",
@@ -2398,11 +2440,13 @@
    "pages": "1257-1265",
    "doi": "10.30574/ijsra.2024.11.1.0194",
    "note": "Industry overview with a paragraph on Russell inventing Spacewar! at MIT in 1962 on the PDP-1.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/4.0",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.30574/ijsra.2024.11.1.0194",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-636258.pdf",
+   "source": "https://ijsra.net/sites/default/files/IJSRA-2024-0194.pdf"
   },
   {
    "id": "L-C60779",
@@ -2416,11 +2460,13 @@
    "pages": "e29118",
    "doi": "10.15448/1980-3729.2019.1.29118",
    "note": "Portuguese article on digital culture treating Russell and the creation of Spacewar! to test the PDP-1 as an emblematic case of hacker origins.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by/4.0",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.15448/1980-3729.2019.1.29118",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-C60779.pdf",
+   "source": "https://revistaseletronicas.pucrs.br/ojs/index.php/revistafamecos/article/download/29118/17961"
   },
   {
    "id": "L-BD7EC8",
@@ -2653,11 +2699,13 @@
    "lang": "es",
    "in": "DeustoTeka",
    "note": "Spanish thesis on games for social change, with a figure and passage on Spacewar! as what most specialists take as the first modern video game. Spacewar! at PDF pp. 20, 90-92.",
-   "licence": "Creative Commons, page links creativecommons.org/licenses/by-nc-nd/4.0",
+   "licence": "CC BY-NC-ND 4.0",
    "url": "https://hdl.handle.net/20.500.14454/503",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-3EED71.pdf",
+   "source": "https://deustoteka.deusto.es/bitstreams/bc7d8f65-8700-4292-8f5a-edde1963044d/download"
   },
   {
    "id": "L-005F4D",
@@ -2747,11 +2795,13 @@
    "publisher": "Frontiers Media SA",
    "doi": "10.3389/fcomm.2020.580965",
    "note": "Says Spacewar! invoked military themes reminiscent of the Cold War, in a paper on games as tools for peace.",
-   "licence": "Creative Commons, Crossref record gives https://creativecommons.org/licenses/by/4.0/",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.3389/fcomm.2020.580965",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-14EEE8.pdf",
+   "source": "https://www.frontiersin.org/articles/10.3389/fcomm.2020.580965/pdf"
   },
   {
    "id": "L-2B6A7E",
@@ -2894,7 +2944,9 @@
    "url": "http://ojs.kinephanos.ca/index.php/revue/en/article/view/160",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-DE2248.pdf",
+   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/160/117"
   },
   {
    "id": "L-EB80FA",
@@ -2923,7 +2975,9 @@
    "url": "http://ojs.kinephanos.ca/index.php/revue/en/article/view/123",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-310D1F.pdf",
+   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/123/79"
   },
   {
    "id": "L-01CDE8",
@@ -2938,7 +2992,9 @@
    "url": "http://ojs.kinephanos.ca/index.php/revue/en/article/view/132",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-01CDE8.pdf",
+   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/132/89"
   },
   {
    "id": "L-D7A2B1",
@@ -2953,7 +3009,9 @@
    "url": "https://dhq.digitalhumanities.org/vol/17/2/000696/000696.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-D7A2B1.pdf",
+   "source": "https://dhq-static.digitalhumanities.org/pdf/000696.pdf"
   },
   {
    "id": "L-8488C5",
@@ -2968,7 +3026,9 @@
    "url": "https://dhq.digitalhumanities.org/vol/4/2/000089/000089.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-8488C5.pdf",
+   "source": "https://dhq-static.digitalhumanities.org/pdf/000089.pdf"
   },
   {
    "id": "L-6902E3",
@@ -3142,7 +3202,8 @@
    "url": "https://archive.org/details/hackersheroesofc00levy",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E5A593.jpg"
   },
   {
    "id": "L-BC21FE",
@@ -3157,7 +3218,8 @@
    "url": "https://archive.org/details/innovatorshowgro0000isaa_r4w5",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-BC21FE.jpg"
   },
   {
    "id": "L-C5542B",
@@ -3184,7 +3246,8 @@
    "url": "https://archive.org/details/isbn_9780262034197",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2F4EE5.jpg"
   },
   {
    "id": "L-54E98D",
@@ -3199,7 +3262,8 @@
    "url": "https://archive.org/details/digitalculture0000gere",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-54E98D.jpg"
   },
   {
    "id": "L-47E00F",
@@ -3214,7 +3278,8 @@
    "url": "https://archive.org/details/introductiontoma0000bara_u3y8",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-47E00F.jpg"
   },
   {
    "id": "L-FD0E3B",
@@ -3229,7 +3294,8 @@
    "url": "https://archive.org/details/understandingvid0000egen",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-FD0E3B.jpg"
   },
   {
    "id": "L-8BFC08",
@@ -3243,7 +3309,8 @@
    "url": "https://archive.org/details/videogameexplosi0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-8BFC08.jpg"
   },
   {
    "id": "L-8B37CD",
@@ -3258,7 +3325,8 @@
    "url": "https://archive.org/details/highscoreillustr0000dema",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-8B37CD.jpg"
   },
   {
    "id": "L-854087",
@@ -3273,7 +3341,8 @@
    "url": "https://archive.org/details/entertainmentind0000voge",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-854087.jpg"
   },
   {
    "id": "L-7F74BD",
@@ -3288,7 +3357,8 @@
    "url": "https://archive.org/details/whatdormousesaid0000mark",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-7F74BD.jpg"
   },
   {
    "id": "L-06D6BD",
@@ -3303,7 +3373,8 @@
    "url": "https://archive.org/details/smartbombquestfo0000chap",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-06D6BD.jpg"
   },
   {
    "id": "L-F8A44F",
@@ -3316,7 +3387,8 @@
    "url": "https://archive.org/details/bookoffirsts0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-F8A44F.jpg"
   },
   {
    "id": "L-AEC497",
@@ -3330,7 +3402,8 @@
    "url": "https://archive.org/details/playingvideogame0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-AEC497.jpg"
   },
   {
    "id": "L-EA5FFE",
@@ -3345,7 +3418,8 @@
    "url": "https://archive.org/details/wonderlandhowpla0000john_k1e0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EA5FFE.jpg"
   },
   {
    "id": "L-EBC9F5",
@@ -3359,7 +3433,8 @@
    "url": "https://archive.org/details/computerslifesto0000swed_l9t6",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EBC9F5.jpg"
   },
   {
    "id": "L-F98944",
@@ -3372,7 +3447,8 @@
    "url": "https://archive.org/details/unclejohnsextral0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-F98944.jpg"
   },
   {
    "id": "L-783417",
@@ -3387,7 +3463,8 @@
    "url": "https://archive.org/details/supercadevisualh0000burn",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-783417.jpg"
   },
   {
    "id": "L-168AF5",
@@ -3415,7 +3492,8 @@
    "url": "https://archive.org/details/medianowundersta0000stra_a3h4",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-84D998.jpg"
   },
   {
    "id": "L-B65A12",
@@ -3430,7 +3508,8 @@
    "url": "https://archive.org/details/racingbeamatariv0000mont",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-B65A12.jpg"
   },
   {
    "id": "L-2F447C",
@@ -3444,7 +3523,8 @@
    "url": "https://archive.org/details/mediumofvideogam0000unse_b7m6",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2F447C.jpg"
   },
   {
    "id": "L-A3629A",
@@ -3459,7 +3539,8 @@
    "url": "https://archive.org/details/computersastheat0000laur",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-A3629A.jpg"
   },
   {
    "id": "L-352A8C",
@@ -3474,7 +3555,8 @@
    "url": "https://archive.org/details/innovatorshowgro0000isaa_r9i3",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-352A8C.jpg"
   },
   {
    "id": "L-C38410",
@@ -3501,7 +3583,8 @@
    "url": "https://archive.org/details/isbn_9781442278141",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-25A3B3.jpg"
   },
   {
    "id": "L-68D535",
@@ -3516,7 +3599,8 @@
    "url": "https://archive.org/details/replayhistoryofv0000dono",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-68D535.jpg"
   },
   {
    "id": "L-351E6D",
@@ -3531,7 +3615,8 @@
    "url": "https://archive.org/details/ultimatehistoryo0000kent",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-351E6D.jpg"
   },
   {
    "id": "L-50E0E3",
@@ -3545,7 +3630,8 @@
    "url": "https://archive.org/details/inrealmofcircuit00trau",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-50E0E3.jpg"
   },
   {
    "id": "L-945041",
@@ -3573,7 +3659,8 @@
    "url": "https://archive.org/details/comicbookstoryof0000henn_t9q4",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-41D88B.jpg"
   },
   {
    "id": "L-E75C54",
@@ -3587,7 +3674,8 @@
    "url": "https://archive.org/details/howcomputerswork00ronw_0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E75C54.jpg"
   },
   {
    "id": "L-3BF390",
@@ -3602,7 +3690,8 @@
    "url": "https://archive.org/details/computergameworl0000pias",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-3BF390.jpg"
   },
   {
    "id": "L-266196",
@@ -3617,7 +3706,8 @@
    "url": "https://archive.org/details/computingunivers0000heya",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-266196.jpg"
   },
   {
    "id": "L-0F2FBC",
@@ -3631,7 +3721,8 @@
    "url": "https://archive.org/details/routledgecompani0000unse_r0r6",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-0F2FBC.jpg"
   },
   {
    "id": "L-49DCA8",
@@ -3646,7 +3737,8 @@
    "url": "https://archive.org/details/goldenageofvideo0000dill",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-49DCA8.jpg"
   },
   {
    "id": "L-505F6C",
@@ -3660,7 +3752,8 @@
    "url": "https://archive.org/details/unclejohnsahhins00bath",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-505F6C.jpg"
   },
   {
    "id": "L-2877E5",
@@ -3674,7 +3767,8 @@
    "url": "https://archive.org/details/originofeveryday0000acto_e0a2",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2877E5.jpg"
   },
   {
    "id": "L-EAFE21",
@@ -3688,7 +3782,8 @@
    "url": "https://archive.org/details/handbookofcomput0000unse_e5o6",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EAFE21.jpg"
   },
   {
    "id": "L-48D0B0",
@@ -3701,7 +3796,8 @@
    "url": "https://archive.org/details/historyofinterne0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-48D0B0.jpg"
   },
   {
    "id": "L-092B78",
@@ -3716,7 +3812,8 @@
    "url": "https://archive.org/details/briefhistoryofvi0000stan_g2z1",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-092B78.jpg"
   },
   {
    "id": "L-0C861F",
@@ -3731,7 +3828,8 @@
    "url": "https://archive.org/details/friendlyorangegl0000dear",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-0C861F.jpg"
   },
   {
    "id": "L-FC2D7B",
@@ -3746,7 +3844,8 @@
    "url": "https://archive.org/details/gamedevelopmente0000nova",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-FC2D7B.jpg"
   },
   {
    "id": "L-66BF3A",
@@ -3760,7 +3859,8 @@
    "url": "https://archive.org/details/videogames0000marc",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-66BF3A.jpg"
   },
   {
    "id": "L-CC60AF",
@@ -3774,7 +3874,8 @@
    "url": "https://archive.org/details/wherewereyouwhen0000harr_w0w5",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-CC60AF.jpg"
   },
   {
    "id": "L-34AD39",
@@ -3787,7 +3888,8 @@
    "url": "https://archive.org/details/gamingfromatarit0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-34AD39.jpg"
   },
   {
    "id": "L-C50379",
@@ -3802,7 +3904,8 @@
    "url": "https://archive.org/details/bitbybithowvideo0000ervi_e5w5",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-C50379.jpg"
   },
   {
    "id": "L-6184B5",
@@ -3817,7 +3920,8 @@
    "url": "https://archive.org/details/funincwhygamingw0000chat_q1i8",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-6184B5.jpg"
   },
   {
    "id": "L-CA7E33",
@@ -3832,7 +3936,8 @@
    "url": "https://archive.org/details/americanlifevide0000huli",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-CA7E33.jpg"
   },
   {
    "id": "L-E2D23B",
@@ -3846,7 +3951,8 @@
    "url": "https://archive.org/details/unset0000unse_t1x0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E2D23B.jpg"
   },
   {
    "id": "L-9DC464",
@@ -3861,7 +3967,8 @@
    "url": "https://archive.org/details/inventingmoderna0000brow",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9DC464.jpg"
   },
   {
    "id": "L-35EEB9",
@@ -3874,7 +3981,8 @@
    "url": "https://archive.org/details/digitalgameplaye0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-35EEB9.jpg"
   },
   {
    "id": "L-2A1A6F",
@@ -3888,7 +3996,8 @@
    "url": "https://archive.org/details/guinnessworldrec00guin_0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2A1A6F.jpg"
   },
   {
    "id": "L-2C1FC7",
@@ -3902,7 +4011,8 @@
    "url": "https://archive.org/details/electronicameric0000weie",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2C1FC7.jpg"
   },
   {
    "id": "L-48A85D",
@@ -3930,7 +4040,8 @@
    "url": "https://archive.org/details/artofatari0000lape",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-80EABC.jpg"
   },
   {
    "id": "L-3F1A69",
@@ -3945,7 +4056,8 @@
    "url": "https://archive.org/details/historyofinterne0000ryan_b6x9",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-3F1A69.jpg"
   },
   {
    "id": "L-0AD155",
@@ -3960,7 +4072,8 @@
    "url": "https://archive.org/details/networkedgraphic0000stee",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-0AD155.jpg"
   },
   {
    "id": "L-9FC603",
@@ -3974,7 +4087,8 @@
    "url": "https://archive.org/details/phoenixfallriseo0000leon",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9FC603.jpg"
   },
   {
    "id": "L-B73BDF",
@@ -3989,7 +4103,8 @@
    "url": "https://archive.org/details/lelivredesinnova0000harr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-B73BDF.jpg"
   },
   {
    "id": "L-7D7231",
@@ -4003,7 +4118,8 @@
    "url": "https://archive.org/details/historyofvideoga0000bjor",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-7D7231.jpg"
   },
   {
    "id": "L-A619C4",
@@ -4017,7 +4133,8 @@
    "url": "https://archive.org/details/gamedesignessent0000mitc",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-A619C4.jpg"
   },
   {
    "id": "L-01316E",
@@ -4032,7 +4149,8 @@
    "url": "https://archive.org/details/mentoboysmakingo0000cros",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-01316E.jpg"
   },
   {
    "id": "L-E24231",
@@ -4046,7 +4164,8 @@
    "url": "https://archive.org/details/videogames0000newm",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E24231.jpg"
   },
   {
    "id": "L-87378D",
@@ -4061,7 +4180,8 @@
    "url": "https://archive.org/details/9780262134958",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-87378D.jpg"
   },
   {
    "id": "L-37208E",
@@ -4076,7 +4196,8 @@
    "url": "https://archive.org/details/gamedesignworksh0000full_u1f4",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-37208E.jpg"
   },
   {
    "id": "L-BBC169",
@@ -4089,7 +4210,8 @@
    "url": "https://archive.org/details/guinnessworldrec0000unse_x9q9",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-BBC169.jpg"
   },
   {
    "id": "L-B935F0",
@@ -4104,7 +4226,8 @@
    "url": "https://archive.org/details/deathbyvideogame0000park_u2v4",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-B935F0.jpg"
   },
   {
    "id": "L-7113A9",
@@ -4117,7 +4240,8 @@
    "url": "https://archive.org/details/futurevisionsnew0000unse_t1m8",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-7113A9.jpg"
   },
   {
    "id": "L-0931AF",
@@ -4131,7 +4255,8 @@
    "url": "https://archive.org/details/wirwarenspaceinv0000mert",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-0931AF.jpg"
   },
   {
    "id": "L-23025C",
@@ -4146,7 +4271,8 @@
    "url": "https://archive.org/details/toolsforthoughtp0000rhei",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-23025C.jpg"
   },
   {
    "id": "L-B229FF",
@@ -4160,7 +4286,8 @@
    "url": "https://archive.org/details/jamesdysonshisto0000dyso",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-B229FF.jpg"
   },
   {
    "id": "L-DF6714",
@@ -4173,7 +4300,8 @@
    "url": "https://archive.org/details/johnshopkinsguid0000unse_p1l5",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-DF6714.jpg"
   },
   {
    "id": "L-86E840",
@@ -4186,7 +4314,8 @@
    "url": "https://archive.org/details/communicationtec0000unse_j3y9",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-86E840.jpg"
   },
   {
    "id": "L-50EB62",
@@ -4200,7 +4329,8 @@
    "url": "https://archive.org/details/digitalyouthinno0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-50EB62.jpg"
   },
   {
    "id": "L-558182",
@@ -4214,7 +4344,8 @@
    "url": "https://archive.org/details/myfriends0000open",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-558182.jpg"
   },
   {
    "id": "L-F5177E",
@@ -4228,7 +4359,8 @@
    "url": "https://archive.org/details/thinkingaboutvid0000hein",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-F5177E.jpg"
   },
   {
    "id": "L-115CA4",
@@ -4242,7 +4374,8 @@
    "url": "https://archive.org/details/movinginnovation0000sito",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-115CA4.jpg"
   },
   {
    "id": "L-B3AD16",
@@ -4256,7 +4389,8 @@
    "url": "https://archive.org/details/magicofinteracti0000morr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-B3AD16.jpg"
   },
   {
    "id": "L-5ADEE1",
@@ -4269,7 +4403,8 @@
    "url": "https://archive.org/details/computertechnolo0000unse_o6f2",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-5ADEE1.jpg"
   },
   {
    "id": "L-813446",
@@ -4283,7 +4418,8 @@
    "url": "https://archive.org/details/seventiesunplugg0000degr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-813446.jpg"
   },
   {
    "id": "L-49F543",
@@ -4297,7 +4433,8 @@
    "url": "https://archive.org/details/introductiontoga0000moor",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-49F543.jpg"
   },
   {
    "id": "L-EE2DFB",
@@ -4311,7 +4448,8 @@
    "url": "https://archive.org/details/warplayvideogame0000mead",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EE2DFB.jpg"
   },
   {
    "id": "L-4B831C",
@@ -4324,7 +4462,8 @@
    "url": "https://archive.org/details/gameprogrammingf0000unse_n6h2",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-4B831C.jpg"
   },
   {
    "id": "L-3D2FAD",
@@ -4338,7 +4477,8 @@
    "url": "https://archive.org/details/howtoplayvideoga0000barr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-3D2FAD.jpg"
   },
   {
    "id": "L-A279A9",
@@ -4352,7 +4492,8 @@
    "url": "https://archive.org/details/computer0000frau",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-A279A9.jpg"
   },
   {
    "id": "L-61E111",
@@ -4365,7 +4506,8 @@
    "url": "https://archive.org/details/introductiontoga0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-61E111.jpg"
   },
   {
    "id": "L-9E6FD9",
@@ -4379,7 +4521,8 @@
    "url": "https://archive.org/details/electronicameric0000meye",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9E6FD9.jpg"
   },
   {
    "id": "L-6B2E23",
@@ -4392,7 +4535,8 @@
    "url": "https://archive.org/details/playtimevideogam0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-6B2E23.jpg"
   },
   {
    "id": "L-7982AD",
@@ -4407,7 +4551,8 @@
    "url": "https://archive.org/details/joysticknationho0000herz",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-7982AD.jpg"
   },
   {
    "id": "L-AFD8DB",
@@ -4422,7 +4567,8 @@
    "url": "https://archive.org/details/atariincbusiness0000gold",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-AFD8DB.jpg"
   },
   {
    "id": "L-24F8E2",
@@ -4436,7 +4582,8 @@
    "url": "https://archive.org/details/gameongamingatli0000gall",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-24F8E2.jpg"
   },
   {
    "id": "L-0C06BB",
@@ -4451,7 +4598,8 @@
    "url": "https://archive.org/details/invisibleengines0000evan",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-0C06BB.jpg"
   },
   {
    "id": "L-1C8C8B",
@@ -4465,7 +4613,8 @@
    "url": "https://archive.org/details/awesomegamecreat0000ahea",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-1C8C8B.jpg"
   },
   {
    "id": "L-EDE9CB",
@@ -4479,7 +4628,8 @@
    "url": "https://archive.org/details/gamebelievesinyo0000topp",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EDE9CB.jpg"
   },
   {
    "id": "L-63FFDD",
@@ -4494,7 +4644,8 @@
    "url": "https://archive.org/details/digitalillusion00clar",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-63FFDD.jpg"
   },
   {
    "id": "L-6F2B8D",
@@ -4509,7 +4660,8 @@
    "url": "https://archive.org/details/expressiveproces0000ward",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-6F2B8D.jpg"
   },
   {
    "id": "L-C5A1E6",
@@ -4522,7 +4674,8 @@
    "url": "https://archive.org/details/livingvirtuallyr0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-C5A1E6.jpg"
   },
   {
    "id": "L-755741",
@@ -4535,7 +4688,8 @@
    "url": "https://archive.org/details/introductiontoga0000unse_h8i2",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-755741.jpg"
   },
   {
    "id": "L-C2F012",
@@ -4550,7 +4704,8 @@
    "url": "https://archive.org/details/fromsuntzutoxbox0000halt",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-C2F012.jpg"
   },
   {
    "id": "L-D53308",
@@ -4564,7 +4719,8 @@
    "url": "https://archive.org/details/introductiontoga0000fern",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-D53308.jpg"
   },
   {
    "id": "L-91A439",
@@ -4579,7 +4735,8 @@
    "url": "https://archive.org/details/twistylittlepass0000mont",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-91A439.jpg"
   },
   {
    "id": "L-92AE54",
@@ -4593,7 +4750,8 @@
    "url": "https://archive.org/details/videogameseducat0000brow",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-92AE54.jpg"
   },
   {
    "id": "L-57E3C1",
@@ -4607,7 +4765,8 @@
    "url": "https://archive.org/details/videogamewriting0000suck",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-57E3C1.jpg"
   },
   {
    "id": "L-61C46E",
@@ -4622,7 +4781,8 @@
    "url": "https://archive.org/details/gamesofempireglo0000dyer",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-61C46E.jpg"
   },
   {
    "id": "L-827258",
@@ -4636,7 +4796,8 @@
    "url": "https://archive.org/details/infoculturesmith00luba",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-827258.jpg"
   },
   {
    "id": "L-7DC8A3",
@@ -4680,7 +4841,8 @@
    "url": "https://archive.org/details/inventingmoderna00brow_0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-750FBD.jpg"
   },
   {
    "id": "L-53F17F",
@@ -4693,7 +4855,8 @@
    "url": "https://archive.org/details/digitaldelicompr0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-53F17F.jpg"
   },
   {
    "id": "L-DD98D2",
@@ -4707,7 +4870,8 @@
    "url": "https://archive.org/details/careersinfocus00newy",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-DD98D2.jpg"
   },
   {
    "id": "L-8128FD",
@@ -4720,7 +4884,8 @@
    "url": "https://archive.org/details/careersinfocusco0000unse_b4h5",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-8128FD.jpg"
   },
   {
    "id": "L-DF9316",
@@ -4733,7 +4898,8 @@
    "url": "https://archive.org/details/careersinfocusan0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-DF9316.jpg"
   },
   {
    "id": "L-323EEA",
@@ -4748,7 +4914,8 @@
    "url": "https://archive.org/details/zaprisefall00cohe",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-323EEA.jpg"
   },
   {
    "id": "L-BE398E",
@@ -4762,7 +4929,8 @@
    "url": "https://archive.org/details/wherewereyouwhen0000harr_r7p9",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-BE398E.jpg"
   },
   {
    "id": "L-396A3A",
@@ -4803,7 +4971,8 @@
    "url": "https://archive.org/details/fiftythingsthatm0000harf_k2f0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-58F28A.jpg"
   },
   {
    "id": "L-8FD139",
@@ -4817,7 +4986,8 @@
    "url": "https://archive.org/details/gamedevelopmente00unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-8FD139.jpg"
   },
   {
    "id": "L-4D0252",
@@ -4831,7 +5001,8 @@
    "url": "https://archive.org/details/tomorrowmakersbr0000fjer_d8c0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-4D0252.jpg"
   },
   {
    "id": "L-591C4B",
@@ -4845,7 +5016,8 @@
    "url": "https://archive.org/details/virtualjusticene00",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-591C4B.jpg"
   },
   {
    "id": "L-E780D8",
@@ -4859,7 +5031,8 @@
    "url": "https://archive.org/details/inventingmediump0000murr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E780D8.jpg"
   },
   {
    "id": "L-158F6F",
@@ -4872,7 +5045,8 @@
    "url": "https://archive.org/details/musicgameperspec0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-158F6F.jpg"
   },
   {
    "id": "L-EC4DDF",
@@ -4885,7 +5059,8 @@
    "url": "https://archive.org/details/isbn_9781506390444",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EC4DDF.jpg"
   },
   {
    "id": "L-3553D1",
@@ -4899,7 +5074,8 @@
    "url": "https://archive.org/details/splinternethowge0000malc",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-3553D1.jpg"
   },
   {
    "id": "L-612432",
@@ -4912,7 +5088,8 @@
    "url": "https://archive.org/details/iterationsnewima0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-612432.jpg"
   },
   {
    "id": "L-90C10D",
@@ -4926,7 +5103,8 @@
    "url": "https://archive.org/details/deathbyvideogame0000park",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-90C10D.jpg"
   },
   {
    "id": "L-CCD0C5",
@@ -4941,7 +5119,8 @@
    "url": "https://archive.org/details/languageofnewmed0000mano",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-CCD0C5.jpg"
   },
   {
    "id": "L-0F6AFF",
@@ -4956,7 +5135,8 @@
    "url": "https://archive.org/details/playingatworldhi0000pete",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-0F6AFF.jpg"
   },
   {
    "id": "L-DA06FE",
@@ -4970,7 +5150,8 @@
    "url": "https://archive.org/details/bigideahowbusine00stra",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-DA06FE.jpg"
   },
   {
    "id": "L-2C998E",
@@ -4984,7 +5165,8 @@
    "url": "https://archive.org/details/newmediareader0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2C998E.jpg"
   },
   {
    "id": "L-43CC2D",
@@ -4999,7 +5181,8 @@
    "url": "https://archive.org/details/troublemakerssil0000berl",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-43CC2D.jpg"
   },
   {
    "id": "L-D3F75C",
@@ -5026,7 +5209,8 @@
    "url": "https://archive.org/details/persuasivegamese00bogo",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-C131E1.jpg"
   },
   {
    "id": "L-D1D6B7",
@@ -5041,7 +5225,8 @@
    "url": "https://archive.org/details/dungeonsdreamers0000king",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-D1D6B7.jpg"
   },
   {
    "id": "L-6F8852",
@@ -5055,7 +5240,8 @@
    "url": "https://archive.org/details/biggestnamesofvi0000kapl",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-6F8852.jpg"
   },
   {
    "id": "L-7C3A5B",
@@ -5069,7 +5255,8 @@
    "url": "https://archive.org/details/software0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-7C3A5B.jpg"
   },
   {
    "id": "L-BD6AF2",
@@ -5084,7 +5271,8 @@
    "url": "https://archive.org/details/software00time",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-BD6AF2.jpg"
   },
   {
    "id": "L-73A0D0",
@@ -5099,7 +5287,8 @@
    "url": "https://archive.org/details/dreammachinejcrl00wald",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-73A0D0.jpg"
   },
   {
    "id": "L-933C6A",
@@ -5113,7 +5302,8 @@
    "url": "https://archive.org/details/freeforallintern0000king",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-933C6A.jpg"
   },
   {
    "id": "L-77563F",
@@ -5126,7 +5316,8 @@
    "url": "https://archive.org/details/videogametheoryr0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-77563F.jpg"
   },
   {
    "id": "L-BB66E3",
@@ -5140,7 +5331,8 @@
    "url": "https://archive.org/details/respawngamershac00milb",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-BB66E3.jpg"
   },
   {
    "id": "L-BBE5F8",
@@ -5154,7 +5346,8 @@
    "url": "https://archive.org/details/ascentofmediafro0000parr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-BBE5F8.jpg"
   },
   {
    "id": "L-E1C658",
@@ -5182,7 +5375,8 @@
    "url": "https://archive.org/details/socialsoftwarein0000fark",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-1D991A.jpg"
   },
   {
    "id": "L-C1C2EA",
@@ -5197,7 +5391,8 @@
    "url": "https://archive.org/details/digitalstorytell0000mill_u4l2",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-C1C2EA.jpg"
   },
   {
    "id": "L-80A895",
@@ -5225,7 +5420,8 @@
    "url": "https://archive.org/details/computer0000atki",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-658C95.jpg"
   },
   {
    "id": "L-49A0DD",
@@ -5239,7 +5435,8 @@
    "url": "https://archive.org/details/alphabettointern0000fang",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-49A0DD.jpg"
   },
   {
    "id": "L-996924",
@@ -5253,7 +5450,8 @@
    "url": "https://archive.org/details/virtualascendanc0000grif",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-996924.jpg"
   },
   {
    "id": "L-A2322C",
@@ -5267,7 +5465,8 @@
    "url": "https://archive.org/details/virtual0000shie",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-A2322C.jpg"
   },
   {
    "id": "L-2D7B42",
@@ -5281,7 +5480,8 @@
    "url": "https://archive.org/details/ageofspiritualma0000kurz_d9b1",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2D7B42.jpg"
   },
   {
    "id": "L-7B1BE2",
@@ -5295,7 +5495,8 @@
    "url": "https://archive.org/details/videogames0000hile",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-7B1BE2.jpg"
   },
   {
    "id": "L-AD9B15",
@@ -5310,7 +5511,8 @@
    "url": "https://archive.org/details/funincwhygamesar0000chat",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-AD9B15.jpg"
   },
   {
    "id": "L-6027C6",
@@ -5325,7 +5527,8 @@
    "url": "https://archive.org/details/funincwhygamesar0000chat_j2u0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-6027C6.jpg"
   },
   {
    "id": "L-2987DA",
@@ -5352,7 +5555,8 @@
    "url": "https://archive.org/details/nextbigthinghist0000faul",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9435A6.jpg"
   },
   {
    "id": "L-60F0C9",
@@ -5366,7 +5570,8 @@
    "url": "https://archive.org/details/3dgameprogrammin0000greb",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-60F0C9.jpg"
   },
   {
    "id": "L-B8F654",
@@ -5381,7 +5586,8 @@
    "url": "https://archive.org/details/vintagegamesinsi0000logu",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-B8F654.jpg"
   },
   {
    "id": "L-683C6E",
@@ -5395,7 +5601,8 @@
    "url": "https://archive.org/details/poweruphowjapane0000kohl",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-683C6E.jpg"
   },
   {
    "id": "L-7A27D6",
@@ -5409,7 +5616,8 @@
    "url": "https://archive.org/details/cambridgecompani0000unse_f2x4",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-7A27D6.jpg"
   },
   {
    "id": "L-76BE2D",
@@ -5423,7 +5631,8 @@
    "url": "https://archive.org/details/learningcomputer0000upto",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-76BE2D.jpg"
   },
   {
    "id": "L-5A04DF",
@@ -5437,7 +5646,8 @@
    "url": "https://archive.org/details/sciencetechnolog0000cumo",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-5A04DF.jpg"
   },
   {
    "id": "L-393911",
@@ -5452,7 +5662,8 @@
    "url": "https://archive.org/details/toysgames0000bidd",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-393911.jpg"
   },
   {
    "id": "L-2C3025",
@@ -5465,7 +5676,8 @@
    "url": "https://archive.org/details/isbn_9780199608157",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-2C3025.jpg"
   },
   {
    "id": "L-46C821",
@@ -5479,7 +5691,8 @@
    "url": "https://archive.org/details/constablecolgans0000colg",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-46C821.jpg"
   },
   {
    "id": "L-67AFB1",
@@ -5493,7 +5706,8 @@
    "url": "https://archive.org/details/artof3dcomputera0002kerl",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-67AFB1.jpg"
   },
   {
    "id": "L-19D464",
@@ -5506,7 +5720,8 @@
    "url": "https://archive.org/details/playingwithpastd0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-19D464.jpg"
   },
   {
    "id": "L-1890A8",
@@ -5532,7 +5747,8 @@
    "url": "https://archive.org/details/understandingdig0000unse_o6n6",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-FF5AB5.jpg"
   },
   {
    "id": "L-55C75D",
@@ -5546,7 +5762,8 @@
    "url": "https://archive.org/details/videogamestylegu0000thom",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-55C75D.jpg"
   },
   {
    "id": "L-3DF593",
@@ -5573,7 +5790,8 @@
    "url": "https://archive.org/details/originsofeveryth0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-A427B3.jpg"
   },
   {
    "id": "L-19ED74",
@@ -5586,7 +5804,8 @@
    "url": "https://archive.org/details/bookofunusualkno0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-19ED74.jpg"
   },
   {
    "id": "L-65F1AE",
@@ -5599,7 +5818,8 @@
    "url": "https://archive.org/details/bookofamazinghis0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-65F1AE.jpg"
   },
   {
    "id": "L-1F422A",
@@ -5612,7 +5832,8 @@
    "url": "https://archive.org/details/newcompaniontodi0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-1F422A.jpg"
   },
   {
    "id": "L-E9360F",
@@ -5626,7 +5847,8 @@
    "url": "https://archive.org/details/leveldesignproce0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E9360F.jpg"
   },
   {
    "id": "L-14ED10",
@@ -5640,7 +5862,8 @@
    "url": "https://archive.org/details/becomingcomputer0000morr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-14ED10.jpg"
   },
   {
    "id": "L-85408F",
@@ -5654,7 +5877,8 @@
    "url": "https://archive.org/details/3dartessentialsf0000chop",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-85408F.jpg"
   },
   {
    "id": "L-705188",
@@ -5669,7 +5893,8 @@
    "url": "https://archive.org/details/ideamanmemoirbyc00alle_0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-705188.jpg"
   },
   {
    "id": "L-C2945D",
@@ -5684,7 +5909,8 @@
    "url": "https://archive.org/details/ideamanmemoirbyc0000alle_a2z7",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-C2945D.jpg"
   },
   {
    "id": "L-714FB5",
@@ -5699,7 +5925,8 @@
    "url": "https://archive.org/details/softwareengineer0000ruck",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-714FB5.jpg"
   },
   {
    "id": "L-D333ED",
@@ -5713,7 +5940,8 @@
    "url": "https://archive.org/details/electronicameric0000dima_b8l2",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-D333ED.jpg"
   },
   {
    "id": "L-CEE0A9",
@@ -5727,7 +5955,8 @@
    "url": "https://archive.org/details/inmindofgame0000flyn",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-CEE0A9.jpg"
   },
   {
    "id": "L-B80448",
@@ -5741,7 +5970,8 @@
    "url": "https://archive.org/details/aibusinesscommer0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-B80448.jpg"
   },
   {
    "id": "L-245C4F",
@@ -5755,7 +5985,8 @@
    "url": "https://archive.org/details/boomershowwechan0000jord_i2s9",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-245C4F.jpg"
   },
   {
    "id": "L-076AEF",
@@ -5769,7 +6000,8 @@
    "url": "https://archive.org/details/ageofspiritualma0000kurz_s3h8",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-076AEF.jpg"
   },
   {
    "id": "L-DC8A43",
@@ -5783,7 +6015,8 @@
    "url": "https://archive.org/details/roughguidetovide0000bere",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-DC8A43.jpg"
   },
   {
    "id": "L-1E191C",
@@ -5797,7 +6030,8 @@
    "url": "https://archive.org/details/gamingrecordbrea0000giff",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-1E191C.jpg"
   },
   {
    "id": "L-81B1C4",
@@ -5810,7 +6044,8 @@
    "url": "https://archive.org/details/gamerswritersart0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-81B1C4.jpg"
   },
   {
    "id": "L-79C9B7",
@@ -5824,7 +6059,8 @@
    "url": "https://archive.org/details/fundamentalsofin0000salm",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-79C9B7.jpg"
   },
   {
    "id": "L-D2DEDB",
@@ -5839,7 +6075,8 @@
    "url": "https://archive.org/details/milestonesincomp0000reil_m9h9",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-D2DEDB.jpg"
   },
   {
    "id": "L-029834",
@@ -5853,7 +6090,8 @@
    "url": "https://archive.org/details/joyoflinuxgourme0000hall",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-029834.jpg"
   },
   {
    "id": "L-EAED8C",
@@ -5867,7 +6105,8 @@
    "url": "https://archive.org/details/10printchr3620550000mont",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-EAED8C.jpg"
   },
   {
    "id": "L-C6FEB4",
@@ -5881,7 +6120,8 @@
    "url": "https://archive.org/details/gamedevelopersma0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-C6FEB4.jpg"
   },
   {
    "id": "L-400A2B",
@@ -5894,7 +6134,8 @@
    "url": "https://archive.org/details/ibmpersonalcompu0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-400A2B.jpg"
   },
   {
    "id": "L-69CAF2",
@@ -5907,7 +6148,8 @@
    "url": "https://archive.org/details/assistivetechnol0000unse_p2m4",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-69CAF2.jpg"
   },
   {
    "id": "L-E2486C",
@@ -5921,7 +6163,8 @@
    "url": "https://archive.org/details/computergraphics0000cunn",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-E2486C.jpg"
   },
   {
    "id": "L-362AC7",
@@ -5935,7 +6178,8 @@
    "url": "https://archive.org/details/newmediadesign0000aust",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-362AC7.jpg"
   },
   {
    "id": "L-95B3B5",
@@ -5962,7 +6206,8 @@
    "url": "https://archive.org/details/cqresearcherjanu2006unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "thumb": "library/thumbs/L-9829DE.jpg"
   },
   {
    "id": "L-DE7608",
@@ -6020,7 +6265,9 @@
    "url": "https://ruc.udc.es/entities/publication/a5956c60-0f3c-476b-95a2-81d0e6ee97e4",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-72F884.pdf",
+   "source": "https://ruc.udc.es/rest/api/core/bitstreams/60fc0fe2-29c2-4abc-b232-6ec83709240f/content"
   },
   {
    "id": "L-4B4FEF",
@@ -6178,7 +6425,9 @@
    "url": "http://ir.lib.uth.gr/xmlui/handle/11615/85224",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-817EB4.pdf",
+   "source": "http://ir.lib.uth.gr/xmlui/bitstream/handle/11615/85224/30600.pdf;jsessionid=DDF5682B246AFC590F22F07D846BBE87?sequence=4"
   },
   {
    "id": "L-E8DAA6",
@@ -6232,11 +6481,13 @@
    "lang": "pt",
    "doi": "10.34019/ufjf/te/2025/00004",
    "note": "Covers Spacewar! in a history of digital games: MIT origin, space race and E. E. Smith as inspiration, inertia and gravity, its visual representation, and Computer Space by Bushnell and Dabney. Spacewar! at PDF pp. 98-101.",
-   "licence": "CC BY-SA 3.0 BR",
+   "licence": "CC BY-SA 3.0",
    "url": "https://doi.org/10.34019/ufjf/te/2025/00004",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "file": "library/files/L-70A46C.pdf",
+   "source": "https://repositorio.ufjf.br/jspui/bitstream/ufjf/20163/1/henriquearaujoperini.pdf"
   },
   {
    "id": "L-1E8747",
@@ -6323,7 +6574,9 @@
    "url": "https://doi.org/10.34626/5m6x-yn17",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-082B92.pdf",
+   "source": "https://repositorio-aberto.up.pt/bitstream/10216/6610/2/23705.pdf"
   },
   {
    "id": "L-1E2FBC",
@@ -6378,11 +6631,13 @@
    "lang": "es",
    "in": "Comillas Repository (Comillas Pontifical University)",
    "note": "Describes Spacewars as a virtual simulator of two spaceships fighting before a star map background, in a history of the games industry. Spacewar! at PDF p. 78.",
-   "licence": "CC BY-NC-ND 3.0 ES",
+   "licence": "CC BY-NC-ND 3.0",
    "url": "https://repositorio.comillas.edu/items/97063bae-ddd9-4fb9-8128-fc101f591b2f",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-A927BB.pdf",
+   "source": "https://repositorio.comillas.edu/server/api/core/bitstreams/17e146b6-b210-4c47-acd3-b2455fe5155d/content"
   },
   {
    "id": "L-81D8AF",
@@ -6454,7 +6709,9 @@
    "url": "https://idus.us.es/items/b0dfa875-3c81-482f-ae9c-89bfd3c3805d",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-8E1DA1.pdf",
+   "source": "https://idus.us.es/server/api/core/bitstreams/92738f79-b57a-4048-aabf-b5bda6f3dbac/content"
   },
   {
    "id": "L-E7FBF6",
@@ -6511,7 +6768,9 @@
    "url": "http://ir.lib.uth.gr/xmlui/handle/11615/87419",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-88D347.pdf",
+   "source": "http://ir.lib.uth.gr/xmlui/bitstream/handle/11615/87419/32879.pdf;jsessionid=8742605A438DF5AE42F787F32E79317D?sequence=4"
   },
   {
    "id": "L-13CF50",
@@ -6526,7 +6785,9 @@
    "url": "https://diposit.eina.cat/handle/20.500.12082/822",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-13CF50.pdf",
+   "source": "https://diposit.eina.cat/bitstream/handle/20.500.12082/822/2017_2018_marcuello_gallardo_irene.pdf;jsessionid=C717672847105F75F3021C193AB8F5BF?sequence=1"
   },
   {
    "id": "L-FA85C1",
@@ -6555,7 +6816,9 @@
    "url": "https://doi.org/10.24275/uami.mg74qm11q",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-2664CC.pdf",
+   "source": "https://bindani.izt.uam.mx/downloads/8623hx76t"
   },
   {
    "id": "L-23CC01",
@@ -6651,11 +6914,13 @@
    "lang": "es",
    "in": "Deposito Digital UFV (Francisco de Vitoria University)",
    "note": "Describes Spacewar's two ships, torpedoes and gravity, in a history of games for learning. Spacewar! at PDF pp. 10-11.",
-   "licence": "CC BY-NC-ND 3.0 ES",
+   "licence": "CC BY-NC-ND 3.0",
    "url": "https://ddfv.ufv.es/entities/publication/48d1322a-8f42-44b9-95f0-6e25e63de1b6",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-728130.pdf",
+   "source": "https://ddfv.ufv.es/rest/api/core/bitstreams/6a2df6a8-1bb5-499f-b77c-302ab25eb0d1/content"
   },
   {
    "id": "L-850C05",
@@ -6756,7 +7021,9 @@
    "url": "https://doi.org/10.25643/bauhaus-universitaet.3788",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-CBFBDA.pdf",
+   "source": "https://www.db-thueringen.de/servlets/MCRFileNodeServlet/dbt_derivate_00043592/Hawranke_Thomas_Modding.pdf"
   },
   {
    "id": "L-CD8C34",
@@ -6799,7 +7066,9 @@
    "url": "https://idus.us.es/items/f9359e56-758c-4c74-98d4-53fb9a200d1e",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-0BC3FC.pdf",
+   "source": "https://idus.us.es/server/api/core/bitstreams/9a35aa7a-6d61-4123-81e9-8db716922c08/content"
   },
   {
    "id": "L-29BCDF",
@@ -6828,7 +7097,9 @@
    "url": "https://repositorio.bc.ufg.br/tede/items/96abc5ab-c4d7-437b-aafb-45012897c27a",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-313A22.pdf",
+   "source": "https://repositorio.bc.ufg.br/tedeserver/api/core/bitstreams/30adda5c-0c42-4ca6-bff6-1d3109c27812/content"
   },
   {
    "id": "L-EC603D",
@@ -7009,11 +7280,13 @@
    "lang": "en",
    "in": "Dipòsit Digital de la Universitat de Barcelona (Universitat de Barcelona)",
    "note": "Introduces Spacewar! as a two-player shooter from the MIT computer lab on a PDP-1, as a reference point for a 2D space game project. Spacewar! at PDF p. 17.",
-   "licence": "CC BY-SA 3.0 ES",
+   "licence": "CC BY-SA 3.0",
    "url": "https://diposit.ub.edu/items/67e24f97-f2b5-4b0d-b08a-f02f283aa2df",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-53ABB1.pdf",
+   "source": "https://diposit.ub.edu/server/api/core/bitstreams/79e9e6ce-01f2-4661-b166-fdbfefe12fb2/content"
   },
   {
    "id": "L-C3386A",
@@ -7085,7 +7358,9 @@
    "url": "https://dspace.ups.edu.ec/handle/123456789/7469",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-4158E6.pdf",
+   "source": "https://dspace.ups.edu.ec/bitstream/123456789/7469/1/UPS-QT06021.pdf"
   },
   {
    "id": "L-FC2FAC",
@@ -7101,7 +7376,9 @@
    "url": "https://doi.org/10.5281/zenodo.4389787",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-FC2FAC.pdf",
+   "source": "https://zenodo.org/records/4389788/files/2020_mas_Gerber.pdf"
   },
   {
    "id": "L-27A6DC",
@@ -9330,11 +9607,13 @@
    "pages": "139-",
    "doi": "10.7195/ri14.v4i2.392",
    "note": "From ancient games to computer games. Links Spacewar and Tennis for Two to aerospace and weapons projectile studies, and notes Bushnell meeting Spacewar at university before Atari. Spacewar! at PDF pp. 13-14.",
-   "licence": "CC BY (per OpenAlex record; publisher page not checked)",
+   "licence": "CC BY 4.0",
    "url": "https://doi.org/10.7195/ri14.v4i2.392",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-68A73C.pdf",
+   "source": "https://icono14.net/ojs/index.php/icono14/article/download/392/268"
   },
   {
    "id": "L-26501C",
@@ -9408,11 +9687,13 @@
    "pages": "595-606",
    "doi": "10.29146/eco-ps.v26i2.28157",
    "note": "Review essay on games and mass culture. Contrasts Spacewar, made for play by MIT student Russell with hacker ideas and student revolts, against the US defence department's war simulation. Spacewar! at PDF p. 8.",
-   "licence": "CC BY-NC-ND 4.0 per Crossref; the PDF text states CC BY 4.0",
+   "licence": "CC BY-NC-ND 4.0",
    "url": "https://doi.org/10.29146/eco-ps.v26i2.28157",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-995979.pdf",
+   "source": "https://revistaecopos.eco.ufrj.br/eco_pos/article/download/28157/15411"
   },
   {
    "id": "L-7BE541",
@@ -9429,7 +9710,9 @@
    "url": "https://doi.org/10.12775/akz.2023.003",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "file": "library/files/L-7BE541.pdf",
+   "source": "https://apcz.umk.pl/AKZ/article/download/44678/38044"
   },
   {
    "id": "L-EA2E45",
