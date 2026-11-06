@@ -3,6 +3,7 @@
   'use strict';
   var SW = root.SW;
   SW.BENCH = {
+    picker: true,                    // the versions' picker in the top bar (the kit's default is off from the release after 0.98.0)
     name: 'Spacewar!',
     title: 'Spacewar! Research Bench',
     slug: 'spacewar',
