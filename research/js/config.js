@@ -74,7 +74,7 @@
     comparePrefix: 'Spacewar! ',
     genealogy: { on: true, set: ['2b', '3.1', '4.0', '4.1', '4.0ts', '4.2', '4.3', '4.4', '4.8', '4.1f', '2015'], line: 'dfw', lineNames: { ddp: 'ddp line', dfw: 'dfw line', chm: 'CHM line' } },
     figureNum: { print: '#9a5b00', paper: '#9a5b00', phosphor: '#ffce7a' },
-    library: true,                   // the Library tab; first order by each entry's relevance (library/library.json)
+    library: { snapshot: true },     // the Library tab; first order by each entry's relevance; the group's ratings, marks and tags for all readers (library/group.json)
     paratexts: { org: 'spacewar1962', repo: 'sw_paratexts', cache: 'sw-paratexts', tokenName: 'Spacewar research bench' },
     // the Implementations tab (kit/implementations.js): copies, ports and re-creations, with their descent
     implementations: { url: 'implementations/catalogue.json' },
