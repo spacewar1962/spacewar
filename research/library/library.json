@@ -20,7 +20,8 @@
      "lang": "en",
      "file": "library/files/P-WEMEP-t1.md"
     }
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-X51IS",
@@ -40,7 +41,8 @@
      "lang": "en",
      "file": "library/files/P-X51IS-t1.md"
     }
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-KQ8PL",
@@ -60,7 +62,8 @@
      "lang": "en",
      "file": "library/files/P-KQ8PL-t1.md"
     }
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-J4ELY",
@@ -80,7 +83,8 @@
      "lang": "en",
      "file": "library/files/P-J4ELY-t1.md"
     }
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-LQ3SG",
@@ -100,7 +104,8 @@
      "lang": "en",
      "file": "library/files/P-LQ3SG-t1.md"
     }
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-WCNIW",
@@ -114,7 +119,8 @@
    "file": "library/files/P-WCNIW.pdf",
    "url": "https://archive.org/details/2015MonnensGoldberg",
    "source": "Internet Archive, 2015MonnensGoldberg",
-   "in": "Kinephanos Revue d études des médias et de culture populaire"
+   "in": "Kinephanos Revue d études des médias et de culture populaire",
+   "relevance": "about"
   },
   {
    "id": "L-493678",
@@ -128,7 +134,8 @@
    "url": "https://www.youtube.com/watch?v=_TKMPxP-msU",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-BD7EC8",
@@ -144,7 +151,8 @@
    "url": "https://doi.org/10.5281/zenodo.23762884",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-266340",
@@ -158,7 +166,8 @@
    "url": "https://obsessivegamingchronology.blogspot.com/2026/09/lets-play-spacewar.html",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-ED1B2B",
@@ -172,7 +181,8 @@
    "url": "https://www.youtube.com/watch?v=Z8i646EkxIA",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-2CCD70",
@@ -190,7 +200,8 @@
    "url": "https://doi.org/10.14361/9783839400593-007",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-647A66",
@@ -203,7 +214,8 @@
    "url": "https://podcasts.apple.com/us/podcast/the-most-influential-video-game-ever-ft-jeff-grubb/id1696007649?i=1000721727896",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-63E3A5",
@@ -218,7 +230,8 @@
    "url": "https://www.youtube.com/watch?v=F28bjX-W5Gs",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-A86197",
@@ -232,7 +245,8 @@
    "url": "https://www.youtube.com/watch?v=T8OflktXD6A",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-F944F7",
@@ -246,7 +260,8 @@
    "url": "https://www.youtube.com/watch?v=yZPhj-CKH3Y",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-9759EB",
@@ -260,7 +275,8 @@
    "url": "https://www.osnews.com/story/139485/the-first-video-game-spacewar-on-the-dec-pdp-1-in-your-browser/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-D0E04F",
@@ -274,7 +290,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "author": "Imagine Publishing"
+   "author": "Imagine Publishing",
+   "relevance": "about"
   },
   {
    "id": "L-B30638",
@@ -287,7 +304,8 @@
    "url": "https://podcasts.apple.com/us/podcast/spacewars/id1723595613?i=1000640086203",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-63A7AC",
@@ -300,7 +318,8 @@
    "url": "https://podcasts.apple.com/us/podcast/living-in-the-retro-arcade-episode114-spacewar/id1526940764?i=1000629831700",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-4039DE",
@@ -315,7 +334,8 @@
    "url": "https://www.youtube.com/watch?v=IY4xzhmEPQk",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-7866A6",
@@ -329,7 +349,8 @@
    "url": "https://www.youtube.com/watch?v=0NKAUXFH0xs",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-1FAD55",
@@ -343,7 +364,8 @@
    "url": "https://www.youtube.com/watch?v=YgPcwuZdyqM",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-EDF818",
@@ -356,7 +378,8 @@
    "url": "https://podcasts.apple.com/us/podcast/spacewar/id1682891566?i=1000610424760",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-CA2B33",
@@ -369,7 +392,8 @@
    "url": "https://podcasts.apple.com/us/podcast/first-video-game-spacewar-1962/id1439741573?i=1000594650011",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-AFA3B6",
@@ -386,7 +410,8 @@
    "url": "https://doi.org/10.1515/9780691230818-006",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-60F602",
@@ -400,7 +425,8 @@
    "url": "https://www.geo.tv/amp/431519-worlds-first-video-game-can-now-be-played-on-analogue-pocket",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-DEE954",
@@ -414,7 +440,8 @@
    "url": "https://earlygame.com/gaming/analogue-pocket-spacewar",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-5A5991",
@@ -428,7 +455,8 @@
    "url": "https://www.techeblog.com/spacewar-first-video-game-analogue-pocket/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8BAA38",
@@ -441,7 +469,8 @@
    "url": "https://games.slashdot.org/story/22/07/29/2025201/analogue-releases-video-game-from-1962-on-the-pocket",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-FC30B3",
@@ -455,7 +484,8 @@
    "url": "https://www.redhotcyber.com/en/post/spacewar-the-story-of-the-first-video-game-created-by-hackers-at-mit/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-DE2F6C",
@@ -470,7 +500,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "author": "Wireframe Magazine"
+   "author": "Wireframe Magazine",
+   "relevance": "about"
   },
   {
    "id": "L-9258BB",
@@ -484,7 +515,8 @@
    "url": "https://masswerk.at/nowgobang/2022/spacewar-60",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-GWSQX",
@@ -494,7 +526,8 @@
    "kind": "talk",
    "lang": "en",
    "note": "Slide lecture on early computer display hardware. The chapter on the PDP-1, vector graphics and Spacewar! runs 3:31 to 6:48. 50:46.",
-   "url": "https://www.youtube.com/watch?v=7xtqLJH1z10&t=211"
+   "url": "https://www.youtube.com/watch?v=7xtqLJH1z10&t=211",
+   "relevance": "section"
   },
   {
    "id": "L-C081BE",
@@ -508,7 +541,8 @@
    "url": "https://www.museumofplay.org/games/spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-7DF154",
@@ -524,7 +558,8 @@
    "url": "https://doi.org/10.4000/imagesrevues.10058",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-0O4BI",
@@ -534,7 +569,8 @@
    "kind": "podcast",
    "lang": "en",
    "note": "With Alexander Smith as guest, on who wrote Spacewar!, who modified it, who played it and who made the first controllers. 93:31.",
-   "url": "https://podcasts.apple.com/us/podcast/ep-31-spacewar-dual-to-the-death/id1536393630?i=1000524021895"
+   "url": "https://podcasts.apple.com/us/podcast/ep-31-spacewar-dual-to-the-death/id1536393630?i=1000524021895",
+   "relevance": "about"
   },
   {
    "id": "L-FC3802",
@@ -547,7 +583,8 @@
    "url": "https://podcasts.apple.com/us/podcast/this-means-war-in-space-the-pdp-1-hacker-culture/id1530491729?i=1000515336809",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-1A9107",
@@ -560,7 +597,8 @@
    "url": "https://ijoc.org/index.php/ijoc/article/view/16384",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-566654",
@@ -574,7 +612,8 @@
    "url": "https://www.youtube.com/watch?v=wptcYWx5OQQ",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-7B7614",
@@ -587,7 +626,8 @@
    "url": "https://videogamehistorian.wordpress.com/2021/03/17/worldly-wednesdays-a-timeline-of-spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-920A94",
@@ -600,7 +640,8 @@
    "url": "https://podcasts.apple.com/us/podcast/%E4%B8%96%E7%95%8C%E4%B8%8A%E7%AC%AC%E4%B8%80%E6%AC%BE%E9%9B%BB%E5%AD%90%E9%81%8A%E6%88%B2-spacewar-%E5%A4%AA%E7%A9%BA%E6%88%B0%E7%88%AD-%E9%81%8A%E6%88%B2%E4%BB%8B%E7%B4%B9ep1/id1547740834?i=1000504818269",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-20DA41",
@@ -614,7 +655,8 @@
    "url": "https://www.youtube.com/watch?v=XfQrKvo9JYU",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-76BDC9",
@@ -628,7 +670,8 @@
    "url": "https://fictionphile.com/spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-5A14A7",
@@ -642,7 +685,8 @@
    "url": "https://adventofcomputing.libsyn.com/episode-11-notes-spacewar-lives",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-B8D900",
@@ -655,7 +699,8 @@
    "url": "https://podcasts.apple.com/us/podcast/%D0%B2%D1%8B%D0%BF%D1%83%D1%81%D0%BA-2-spacewar/id1449427094?i=1000438898549",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-CA8575",
@@ -672,7 +717,8 @@
    "url": "https://doi.org/10.1201/9780429280542-2",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-C070ED",
@@ -686,7 +732,8 @@
    "url": "https://www.youtube.com/watch?v=mdD6Zx5T3r0",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-157D34",
@@ -700,7 +747,8 @@
    "url": "https://www.pcgamer.com/the-story-of-the-first-esports-champion-undefeated-since-1972/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-1Q37V",
@@ -710,7 +758,8 @@
    "kind": "podcast",
    "lang": "en",
    "note": "Episode 081, with Alexander Smith, on the history of Spacewar!, the people involved and the 2018 Smithsonian reunion of its makers. 81:57.",
-   "url": "https://mcdn.podbean.com/mf/web/t2y8ic/TCW081.mp3"
+   "url": "https://mcdn.podbean.com/mf/web/t2y8ic/TCW081.mp3",
+   "relevance": "about"
   },
   {
    "id": "L-266067",
@@ -723,7 +772,8 @@
    "url": "https://hackaday.com/2018/12/21/fpga-emulates-a-pdp-1-breathes-new-life-into-classic-video-game/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-828852",
@@ -737,7 +787,8 @@
    "url": "https://www.smithsonianmag.com/smithsonian-institution/how-first-popular-video-game-kicked-off-generations-virtual-adventure-180971020/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-A8213D",
@@ -751,7 +802,8 @@
    "url": "https://kotaku.com/spacewar-creators-didnt-know-they-were-making-history-1830887504",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-90C7C3",
@@ -765,7 +817,8 @@
    "url": "https://davidmullich.com/2018/12/03/commemorating-spacewar-and-its-pioneering-developers/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-90904C",
@@ -779,7 +832,8 @@
    "url": "https://padandpixel.com/?p=1673",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-B5210C",
@@ -793,7 +847,8 @@
    "url": "https://variety.com/2018/gaming/news/smithsonian-aias-honor-spacewar-pioneer-awards-1203036239/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-687EF3",
@@ -807,7 +862,8 @@
    "url": "https://www.gamedeveloper.com/design/-i-spacewar-i-devs-to-receive-pioneer-awards-from-the-aias",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-569809",
@@ -820,7 +876,8 @@
    "url": "https://invention.si.edu/invention-stories/spacewar-creators-honored-smithsonian-innovative-lives-event-0",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-040DDD",
@@ -834,7 +891,8 @@
    "url": "https://galacticjourney.org/aug-14-1963-engineers-at-play-spacewars-hacking-and-the-pdp-1/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-DFB8D4",
@@ -848,7 +906,8 @@
    "url": "https://datadrivengamer.blogspot.com/2018/06/v-behaviorurldefaultvmlo.html",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-35B822",
@@ -863,7 +922,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "author": "Paleotronic"
+   "author": "Paleotronic",
+   "relevance": "about"
   },
   {
    "id": "L-A6DD02",
@@ -877,7 +937,8 @@
    "url": "https://www.vintagecomputing.com/index.php/archives/1863/spacewar-profile-of-a-cultural-earthquake",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-2C7AE6",
@@ -890,7 +951,8 @@
    "url": "https://podcasts.apple.com/us/podcast/episode-1-spacewar/id1168698365?i=1000377064438",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-D7D816",
@@ -904,7 +966,8 @@
    "url": "https://howwegettonext.com/32-dots-per-spaceship-or-the-videogame-that-changed-tech-history/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-FAA680",
@@ -918,7 +981,8 @@
    "url": "https://www.gamedeveloper.com/business/as-esports-rise-look-back-at-one-of-the-world-s-first-video-game-tournaments",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-783D73",
@@ -932,7 +996,8 @@
    "url": "https://www.rollingstone.com/culture/culture-news/stewart-brand-recalls-first-spacewar-video-game-tournament-187669/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-2E2616",
@@ -947,7 +1012,8 @@
    "url": "https://hdl.handle.net/20.500.12648/83522",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-26501C",
@@ -961,7 +1027,8 @@
    "url": "https://www.eldiario.es/tecnologia/diario-turing/spacewar-videojuego-cultura-hacker-mit_1_4306285.html",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-J2PB6",
@@ -970,7 +1037,8 @@
    "kind": "documentary",
    "lang": "en",
    "note": "Promotional clip from the documentary, on the 1972 Intergalactic Spacewar Olympics at the Stanford Artificial Intelligence Laboratory. 1:49.",
-   "url": "https://www.youtube.com/watch?v=OedCvvnNIM4"
+   "url": "https://www.youtube.com/watch?v=OedCvvnNIM4",
+   "relevance": "about"
   },
   {
    "id": "L-E5B6F2",
@@ -984,7 +1052,8 @@
    "url": "https://www.masswerk.at/spacewar/inside/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-09CF21",
@@ -997,7 +1066,8 @@
    "url": "https://videogamehistorian.wordpress.com/2014/08/07/one-two-three-four-i-declare-a-space-war/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-2E3A0B",
@@ -1011,7 +1081,8 @@
    "url": "https://gizmodo.com/play-spacewar-the-pentagon-funded-video-game-from-196-1611946280",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-3DA1EF",
@@ -1025,7 +1096,8 @@
    "url": "https://blog.archive.org/2014/04/28/the-internet-archive-declares-spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-4135D4",
@@ -1039,7 +1111,8 @@
    "url": "https://thedoteaters.com/?p=7329",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-C36ABC",
@@ -1053,7 +1126,8 @@
    "url": "https://www.masswerk.at/spacewar/minnesota/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-71C67A",
@@ -1067,7 +1141,8 @@
    "url": "https://www.youtube.com/watch?v=HWBEN7HDI_c",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-F4A48A",
@@ -1081,7 +1156,8 @@
    "url": "https://www.npr.org/transcripts/197713661",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-B87021",
@@ -1095,7 +1171,8 @@
    "url": "https://www.killscreen.com/behind-spacewar-one-worlds-first-digital-games-primer-creative-design/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8D570C",
@@ -1109,7 +1186,8 @@
    "url": "https://www.goodreads.com/author_blog_posts/3822179-spacewar-the-interview",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-B99832",
@@ -1123,7 +1201,8 @@
    "url": "https://arcadeheroes.com/2012/12/27/spacewar-exhibit-opens-at-the-museum-of-the-moving-image-in-astoria-ny/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-2857AB",
@@ -1137,7 +1216,8 @@
    "url": "https://www.huffingtonpost.co.uk/entry/spacewar-video-games-blast-off-momi_n_2316220",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8C2556",
@@ -1151,7 +1231,8 @@
    "url": "https://www.brownstoner.com/queens/arts-and-culture/spacewar-at-the-museum-of-the-moving-image-video-games-galore-and-you-can-play-them/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-3E09E4",
@@ -1164,7 +1245,8 @@
    "url": "https://www.killscreen.com/spacewar-coming-museum-moving-image/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-3E4FFE",
@@ -1178,7 +1260,8 @@
    "url": "https://www.broadwayworld.com/article/Moving-Image-Celebrates-50th-Anniversary-of-SPACEWAR-Video-Game-with-Exhibition-1215-33-20121128",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-5C4DE2",
@@ -1192,7 +1275,8 @@
    "url": "https://kotaku.com/today-is-the-40th-anniversary-of-the-worlds-first-known-5953371",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-F8C845",
@@ -1206,7 +1290,8 @@
    "url": "https://gamedeveloper.com/business/steve-russell-created-the-first-computer-game---and-the-first-mod-community",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-F80DF4",
@@ -1220,7 +1305,8 @@
    "url": "https://gambit.mit.edu/updates/2012/03/video_spacewar_turns_50mit_cel.php",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-AD72A2",
@@ -1234,7 +1320,8 @@
    "url": "https://gambit.mit.edu/updates/2012/02/the_peculiar_spacewar.php",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-57BD3F",
@@ -1248,7 +1335,8 @@
    "url": "https://www.muycomputer.com/2012/02/13/50-anos-de-spacewar-el-primer-videojuego/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-C285B6",
@@ -1262,7 +1350,8 @@
    "url": "https://www.cbsnews.com/news/happy-50th-to-computer-game-spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-5EAC82",
@@ -1276,7 +1365,8 @@
    "url": "https://gambit.mit.edu/updates/2012/01/spacewar_turns_50_gambit_celeb.php",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-0AFFD9",
@@ -1290,7 +1380,8 @@
    "url": "https://gambit.mit.edu/updates/2011/11/reconstructing_the_vector_grap.php",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-E74969",
@@ -1304,7 +1395,8 @@
    "url": "https://gambit.mit.edu/updates/2011/11/the_night_sky_in_spacewar.php",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8D006B",
@@ -1318,7 +1410,8 @@
    "url": "https://gambit.mit.edu/updates/2011/10/digital_archaeology_investigat.php",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-0E2B0E",
@@ -1333,7 +1426,8 @@
    "url": "https://libraries.mit.edu/150books/2011/05/07/1981/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8C5ADA",
@@ -1347,7 +1441,8 @@
    "url": "https://gamesbeat.com/fifty-years-later-video-game-pioneer-steve-russell-demos-spacewar-video-interview/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-6CD906",
@@ -1361,7 +1456,8 @@
    "url": "https://old.rhizome.org/editorial/2010/nov/26/from-the-archives/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-827FF8",
@@ -1375,7 +1471,8 @@
    "url": "https://also.kottke.org/09/10/spacewar",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8D19B0",
@@ -1389,7 +1486,8 @@
    "url": "https://www.gamedeveloper.com/design/the-history-of-spacewar-the-best-waste-of-time-in-the-history-of-the-universe",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8F3495",
@@ -1403,7 +1501,8 @@
    "url": "https://nickporcino.com/meshula-net-archive/posts/post204.html",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8B2D78",
@@ -1417,7 +1516,8 @@
    "url": "https://www.gamedeveloper.com/game-platforms/obituary-i-spacewar-i-innovator-alan-kotok",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-4DD1C1",
@@ -1431,7 +1531,8 @@
    "url": "https://www.technologyreview.com/2005/06/01/230884/the-start-of-computer-games/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-KHA2V",
@@ -1441,7 +1542,8 @@
    "kind": "documentary",
    "lang": "en",
    "note": "Television documentary on the history of video games. Spacewar! and Steve Russell at 3:21 to 4:11. 1:30:25.",
-   "url": "https://www.youtube.com/watch?v=O4dPSOncwVQ"
+   "url": "https://www.youtube.com/watch?v=O4dPSOncwVQ",
+   "relevance": "mention"
   },
   {
    "id": "L-5820C1",
@@ -1456,7 +1558,8 @@
    "url": "https://www.ed-thelen.org/comp-hist/PDP-1-SpaceWar-Article.html",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-330523",
@@ -1469,7 +1572,8 @@
    "url": "https://www.taipeitimes.com/News/bizfocus/archives/2002/03/01/0000125947",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-7413AF",
@@ -1483,7 +1587,8 @@
    "url": "https://jr.co.il/articles/videogam.txt",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-0C4E9B",
@@ -1497,7 +1602,8 @@
    "url": "https://grospixels.com/site/spacewar.php",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-8D546B",
@@ -1511,7 +1617,8 @@
    "url": "https://www.heise.de/news/Das-Computerspiel-wird-40-Jahre-alt-43287.html",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "P-28TEU",
@@ -1521,7 +1628,8 @@
    "kind": "documentary",
    "lang": "en",
    "note": "Channel 4 documentary presented by Iain Lee. The Spacewar! segment opens the programme, 1:49 to 5:43, with Steve Russell. 48:34.",
-   "url": "https://www.youtube.com/watch?v=UAo4CZTGFQQ"
+   "url": "https://www.youtube.com/watch?v=UAo4CZTGFQQ",
+   "relevance": "section"
   },
   {
    "id": "L-A2E17A",
@@ -1537,7 +1645,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "author": "Vit, Studio"
+   "author": "Vit, Studio",
+   "relevance": "about"
   },
   {
    "id": "L-DEEDAD",
@@ -1550,7 +1659,8 @@
    "url": "https://archive.org/details/MIT-Technology-Review-1988-04",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-510D99",
@@ -1563,7 +1673,8 @@
    "url": "https://archive.org/details/stx_Atari_Explorer_1988-03",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-3CB601",
@@ -1577,7 +1688,8 @@
    "url": "https://archive.org/details/Video_Arcade_Games_Vol_1_No_1_1983-09_Creative_Computing_US",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-867F0C",
@@ -1590,7 +1702,8 @@
    "url": "https://archive.org/details/197703InterfaceAge",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-128F7B",
@@ -1604,7 +1717,8 @@
    "url": "https://doi.org/10.5040/9781501300240.ch-009",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-BB8665",
@@ -1616,7 +1730,8 @@
    "url": "https://www.atariarchive.org/the-spacewar-reunion/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-38DA58",
@@ -1628,7 +1743,8 @@
    "url": "https://www.masswerk.at/spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-CBCF7E",
@@ -1641,7 +1757,8 @@
    "url": "https://filmfestivaltraveler.com/other-festivals/video-tv/2237-spacewar-1st-video-game-a-more-at-the-museum-of-the-moving-image",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-C0F585",
@@ -1653,7 +1770,8 @@
    "url": "https://www.thesilo.ca/spacewar-was-first-videogame/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-9D0FDA",
@@ -1665,7 +1783,8 @@
    "url": "https://invention.si.edu/about/events/innovative-lives-pioneers-spacewar",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-DE41F3",
@@ -1677,7 +1796,8 @@
    "url": "https://www.computerhistory.org/pdp-1/spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-000728",
@@ -1689,7 +1809,8 @@
    "url": "https://www.pcgamer.com/the-genesis-of-pc-gaming-the-pdp-1-and-spacewar/",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-1E4FED",
@@ -1702,7 +1823,8 @@
    "url": "https://fr.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-55BC14",
@@ -1715,7 +1837,8 @@
    "url": "https://it.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-F10A57",
@@ -1728,7 +1851,8 @@
    "url": "https://es.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-82C2DC",
@@ -1741,7 +1865,8 @@
    "url": "https://de.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-68D95F",
@@ -1754,7 +1879,8 @@
    "url": "https://pt.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-F5AD5E",
@@ -1767,7 +1893,8 @@
    "url": "https://ru.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-9B6C52",
@@ -1780,7 +1907,8 @@
    "url": "https://pl.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-886D55",
@@ -1793,7 +1921,8 @@
    "url": "https://sv.wikipedia.org/wiki/Spacewar!",
    "tags": [
     "about Spacewar!"
-   ]
+   ],
+   "relevance": "about"
   },
   {
    "id": "L-70A46C",
@@ -1810,7 +1939,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-70A46C.pdf",
-   "source": "https://repositorio.ufjf.br/jspui/bitstream/ufjf/20163/1/henriquearaujoperini.pdf"
+   "source": "https://repositorio.ufjf.br/jspui/bitstream/ufjf/20163/1/henriquearaujoperini.pdf",
+   "relevance": "section"
   },
   {
    "id": "L-6A5D04",
@@ -1827,7 +1957,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-6A5D04.pdf",
-   "source": "https://publish.fid-media.de/server/api/core/bitstreams/5b717314-996d-457f-8d7d-3c7776cdd357/content"
+   "source": "https://publish.fid-media.de/server/api/core/bitstreams/5b717314-996d-457f-8d7d-3c7776cdd357/content",
+   "relevance": "section"
   },
   {
    "id": "L-DBC26A",
@@ -1847,7 +1978,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-DBC26A.pdf",
-   "source": "https://dspace.nuft.edu.ua/bitstreams/9615c166-ccf4-4234-ae83-f97d8f03e219/download"
+   "source": "https://dspace.nuft.edu.ua/bitstreams/9615c166-ccf4-4234-ae83-f97d8f03e219/download",
+   "relevance": "section"
   },
   {
    "id": "L-7A4879",
@@ -1865,7 +1997,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-7A4879.pdf",
-   "source": "https://ekhnuir.karazin.ua/bitstreams/7ace1bcb-5c7c-42be-b29f-958509a52543/download"
+   "source": "https://ekhnuir.karazin.ua/bitstreams/7ace1bcb-5c7c-42be-b29f-958509a52543/download",
+   "relevance": "section"
   },
   {
    "id": "L-F9C2C0",
@@ -1884,7 +2017,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-F9C2C0.pdf",
-   "source": "https://arxiv.org/pdf/2301.03373"
+   "source": "https://arxiv.org/pdf/2301.03373",
+   "relevance": "section"
   },
   {
    "id": "L-4C33DD",
@@ -1900,7 +2034,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-4C33DD.pdf",
-   "source": "https://idus.us.es/server/api/core/bitstreams/fd419367-39f7-4ee0-8649-9008224b54e2/content"
+   "source": "https://idus.us.es/server/api/core/bitstreams/fd419367-39f7-4ee0-8649-9008224b54e2/content",
+   "relevance": "section"
   },
   {
    "id": "L-72F884",
@@ -1917,7 +2052,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-72F884.pdf",
-   "source": "https://ruc.udc.es/rest/api/core/bitstreams/60fc0fe2-29c2-4abc-b232-6ec83709240f/content"
+   "source": "https://ruc.udc.es/rest/api/core/bitstreams/60fc0fe2-29c2-4abc-b232-6ec83709240f/content",
+   "relevance": "section"
   },
   {
    "id": "L-5B3FA6",
@@ -1937,7 +2073,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-5B3FA6.pdf",
-   "source": "http://revistas.hcte.ufrj.br/index.php/RevistaSH/article/download/134/123"
+   "source": "http://revistas.hcte.ufrj.br/index.php/RevistaSH/article/download/134/123",
+   "relevance": "section"
   },
   {
    "id": "L-C0BBBE",
@@ -1957,7 +2094,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-C0BBBE.pdf",
-   "source": "http://ecozona.eu/article/download/1352/2061"
+   "source": "http://ecozona.eu/article/download/1352/2061",
+   "relevance": "section"
   },
   {
    "id": "L-D2BCD3",
@@ -1973,7 +2111,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-D2BCD3.pdf",
-   "source": "https://idus.us.es/server/api/core/bitstreams/d7dfff4b-0652-4b1c-a11a-da95a0526156/content"
+   "source": "https://idus.us.es/server/api/core/bitstreams/d7dfff4b-0652-4b1c-a11a-da95a0526156/content",
+   "relevance": "section"
   },
   {
    "id": "L-DECE27",
@@ -1990,7 +2129,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-DECE27.pdf",
-   "source": "https://publish.fid-media.de/server/api/core/bitstreams/6f6ec6f2-b647-49f2-94b4-3b52c92c8d95/content"
+   "source": "https://publish.fid-media.de/server/api/core/bitstreams/6f6ec6f2-b647-49f2-94b4-3b52c92c8d95/content",
+   "relevance": "section"
   },
   {
    "id": "L-DE2248",
@@ -2007,7 +2147,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-DE2248.pdf",
-   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/160/117"
+   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/160/117",
+   "relevance": "section"
   },
   {
    "id": "L-51CA16",
@@ -2026,7 +2167,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-51CA16.pdf",
-   "source": "https://journals.ucjc.edu/EDU/article/download/3886/2832"
+   "source": "https://journals.ucjc.edu/EDU/article/download/3886/2832",
+   "relevance": "section"
   },
   {
    "id": "L-B7E693",
@@ -2046,7 +2188,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-B7E693.pdf",
-   "source": "https://publicaciones.unpa.edu.ar/index.php/ICTUNPA/article/download/464/443"
+   "source": "https://publicaciones.unpa.edu.ar/index.php/ICTUNPA/article/download/464/443",
+   "relevance": "section"
   },
   {
    "id": "L-3EED71",
@@ -2063,7 +2206,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-3EED71.pdf",
-   "source": "https://deustoteka.deusto.es/bitstreams/bc7d8f65-8700-4292-8f5a-edde1963044d/download"
+   "source": "https://deustoteka.deusto.es/bitstreams/bc7d8f65-8700-4292-8f5a-edde1963044d/download",
+   "relevance": "section"
   },
   {
    "id": "L-22E72D",
@@ -2079,7 +2223,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-22E72D.pdf",
-   "source": "https://idus.us.es/server/api/core/bitstreams/12920f75-9bb3-4345-922c-1604fe06197d/content"
+   "source": "https://idus.us.es/server/api/core/bitstreams/12920f75-9bb3-4345-922c-1604fe06197d/content",
+   "relevance": "section"
   },
   {
    "id": "L-76019F",
@@ -2098,7 +2243,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-76019F.pdf",
-   "source": "https://revistas.ufg.br/VISUAL/article/download/18213/10881"
+   "source": "https://revistas.ufg.br/VISUAL/article/download/18213/10881",
+   "relevance": "section"
   },
   {
    "id": "L-499C35",
@@ -2118,7 +2264,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-499C35.pdf",
-   "source": "https://icono14.net/ojs/index.php/icono14/article/download/388/264"
+   "source": "https://icono14.net/ojs/index.php/icono14/article/download/388/264",
+   "relevance": "section"
   },
   {
    "id": "L-B08AFF",
@@ -2135,7 +2282,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-B08AFF.pdf",
-   "source": "https://revistascientificas.us.es/index.php/argumentos/article/download/22638/19844"
+   "source": "https://revistascientificas.us.es/index.php/argumentos/article/download/22638/19844",
+   "relevance": "section"
   },
   {
    "id": "L-5148BF",
@@ -2154,7 +2302,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-5148BF.pdf",
-   "source": "https://atheneadigital.net/article/download/n14-belli-lopez/570-pdf-es"
+   "source": "https://atheneadigital.net/article/download/n14-belli-lopez/570-pdf-es",
+   "relevance": "section"
   },
   {
    "id": "L-BCDABA",
@@ -2170,7 +2319,8 @@
     "section on Spacewar!"
    ],
    "file": "library/files/L-BCDABA.pdf",
-   "source": "https://etheses.whiterose.ac.uk/id/eprint/17634/1/TOM_RODGERS_THESIS_FINAL%202.pdf"
+   "source": "https://etheses.whiterose.ac.uk/id/eprint/17634/1/TOM_RODGERS_THESIS_FINAL%202.pdf",
+   "relevance": "section"
   },
   {
    "id": "L-BB66E3",
@@ -2186,7 +2336,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-BB66E3.jpg",
-   "note": "Figure 1.1 and opening discussion of Brand on hackers making Spacewar; notes cite Graetz, Levy and Turkle on its role in hacking, list its authors and address its public-domain status."
+   "note": "Figure 1.1 and opening discussion of Brand on hackers making Spacewar; notes cite Graetz, Levy and Turkle on its role in hacking, list its authors and address its public-domain status.",
+   "relevance": "section"
   },
   {
    "id": "L-3BF390",
@@ -2202,7 +2353,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-3BF390.jpg"
+   "thumb": "library/thumbs/L-3BF390.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-0C861F",
@@ -2218,7 +2370,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-0C861F.jpg"
+   "thumb": "library/thumbs/L-0C861F.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-EA5FFE",
@@ -2234,7 +2387,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-EA5FFE.jpg"
+   "thumb": "library/thumbs/L-EA5FFE.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-9C11CA",
@@ -2249,7 +2403,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-9C11CA.jpg"
+   "thumb": "library/thumbs/L-9C11CA.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-092B78",
@@ -2265,7 +2420,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-092B78.jpg"
+   "thumb": "library/thumbs/L-092B78.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-CC94D6",
@@ -2280,7 +2436,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-CC94D6.jpg"
+   "thumb": "library/thumbs/L-CC94D6.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-0F2FBC",
@@ -2296,7 +2453,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-0F2FBC.jpg",
-   "author": "Wolf, Mark J. P.; Perron, Bernard"
+   "author": "Wolf, Mark J. P.; Perron, Bernard",
+   "relevance": "section"
   },
   {
    "id": "L-115CA4",
@@ -2312,7 +2470,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-115CA4.jpg",
-   "note": "In a history of animation: Russell and classmates create the game, the naming, DEC shipping it as a free demo, Bushnell unable to afford a $120,000 PDP-1 for his version, and terms its inventors recorded."
+   "note": "In a history of animation: Russell and classmates create the game, the naming, DEC shipping it as a free demo, Bushnell unable to afford a $120,000 PDP-1 for his version, and terms its inventors recorded.",
+   "relevance": "section"
   },
   {
    "id": "L-EE2DFB",
@@ -2328,7 +2487,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-EE2DFB.jpg",
-   "note": "Section 'Spacewar! and Beyond' traces military game roots to it: invented in 1962 by 23-year-old Russell and colleagues, E. E. Smith as his main influence, its star charts and PDP-1 interface; includes a photograph. Spacewar! at 14."
+   "note": "Section 'Spacewar! and Beyond' traces military game roots to it: invented in 1962 by 23-year-old Russell and colleagues, E. E. Smith as his main influence, its star charts and PDP-1 interface; includes a photograph. Spacewar! at 14.",
+   "relevance": "section"
   },
   {
    "id": "L-AFD8DB",
@@ -2344,7 +2504,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-AFD8DB.jpg"
+   "thumb": "library/thumbs/L-AFD8DB.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-0F6AFF",
@@ -2360,7 +2521,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-0F6AFF.jpg"
+   "thumb": "library/thumbs/L-0F6AFF.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-49DCA8",
@@ -2376,7 +2538,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-49DCA8.jpg"
+   "thumb": "library/thumbs/L-49DCA8.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-68D535",
@@ -2392,7 +2555,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-68D535.jpg"
+   "thumb": "library/thumbs/L-68D535.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-B65A12",
@@ -2408,7 +2572,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-B65A12.jpg"
+   "thumb": "library/thumbs/L-B65A12.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-61C46E",
@@ -2424,7 +2589,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-61C46E.jpg"
+   "thumb": "library/thumbs/L-61C46E.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-B8F654",
@@ -2440,7 +2606,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-B8F654.jpg"
+   "thumb": "library/thumbs/L-B8F654.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-2220D8",
@@ -2456,7 +2623,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-2220D8.jpg"
+   "thumb": "library/thumbs/L-2220D8.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-FD0E3B",
@@ -2472,7 +2640,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-FD0E3B.jpg"
+   "thumb": "library/thumbs/L-FD0E3B.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-8BFC08",
@@ -2488,7 +2657,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-8BFC08.jpg",
-   "author": "Wolf, Mark J. P."
+   "author": "Wolf, Mark J. P.",
+   "relevance": "section"
   },
   {
    "id": "L-C2F012",
@@ -2504,7 +2674,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-C2F012.jpg"
+   "thumb": "library/thumbs/L-C2F012.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-88BD23",
@@ -2519,7 +2690,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-88BD23.jpg"
+   "thumb": "library/thumbs/L-88BD23.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-7F74BD",
@@ -2535,7 +2707,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-7F74BD.jpg"
+   "thumb": "library/thumbs/L-7F74BD.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-EAFE21",
@@ -2550,7 +2723,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-EAFE21.jpg"
+   "thumb": "library/thumbs/L-EAFE21.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-E24231",
@@ -2566,7 +2740,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-E24231.jpg",
-   "note": "Discusses the debated birth of videogames with Russell's Spacewar as the most cited modern case, players contending with inertia and gravity, and lists a Java version and Graetz."
+   "note": "Discusses the debated birth of videogames with Russell's Spacewar as the most cited modern case, players contending with inertia and gravity, and lists a Java version and Graetz.",
+   "relevance": "section"
   },
   {
    "id": "L-783417",
@@ -2582,7 +2757,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-783417.jpg"
+   "thumb": "library/thumbs/L-783417.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-D25FA0",
@@ -2597,7 +2773,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-D25FA0.jpg"
+   "thumb": "library/thumbs/L-D25FA0.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-54E98D",
@@ -2613,7 +2790,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-54E98D.jpg"
+   "thumb": "library/thumbs/L-54E98D.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-8B37CD",
@@ -2629,7 +2807,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-8B37CD.jpg"
+   "thumb": "library/thumbs/L-8B37CD.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-2F447C",
@@ -2645,7 +2824,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-2F447C.jpg",
-   "author": "Wolf, Mark J. P."
+   "author": "Wolf, Mark J. P.",
+   "relevance": "section"
   },
   {
    "id": "L-351E6D",
@@ -2661,7 +2841,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-351E6D.jpg"
+   "thumb": "library/thumbs/L-351E6D.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-73A0D0",
@@ -2677,7 +2858,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-73A0D0.jpg"
+   "thumb": "library/thumbs/L-73A0D0.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-EE7994",
@@ -2692,7 +2874,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-EE7994.jpg"
+   "thumb": "library/thumbs/L-EE7994.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-9DF0B5",
@@ -2707,7 +2890,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-9DF0B5.jpg"
+   "thumb": "library/thumbs/L-9DF0B5.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-761F0A",
@@ -2723,7 +2907,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-761F0A.jpg"
+   "thumb": "library/thumbs/L-761F0A.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-7982AD",
@@ -2739,7 +2924,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-7982AD.jpg"
+   "thumb": "library/thumbs/L-7982AD.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-4D9449",
@@ -2754,7 +2940,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-4D9449.jpg"
+   "thumb": "library/thumbs/L-4D9449.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-23025C",
@@ -2770,7 +2957,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-23025C.jpg"
+   "thumb": "library/thumbs/L-23025C.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-323EEA",
@@ -2786,7 +2974,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-323EEA.jpg"
+   "thumb": "library/thumbs/L-323EEA.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-18A428",
@@ -2801,7 +2990,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-18A428.jpg"
+   "thumb": "library/thumbs/L-18A428.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-8C2174",
@@ -2816,7 +3006,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-8C2174.jpg"
+   "thumb": "library/thumbs/L-8C2174.jpg",
+   "relevance": "section"
   },
   {
    "id": "L-F0B80E",
@@ -2830,7 +3021,8 @@
    "url": "https://podcasts.apple.com/us/podcast/ep-271-il-primo-videogame/id1825314805?i=1000752391999",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-802D9F",
@@ -2845,7 +3037,8 @@
    "url": "https://amsacta.unibo.it/id/eprint/8913/1/amsacta_tesi_rizzo_diego.pdf",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-AE6F5D",
@@ -2859,7 +3052,8 @@
    "url": "https://www.youtube.com/watch?v=M_PKGq7R4mY",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-FF55D2",
@@ -2878,7 +3072,8 @@
    "url": "https://doi.org/10.1017/9781009492379.004",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-DE7608",
@@ -2893,7 +3088,8 @@
    "url": "https://doi.org/10.58088/ac3k-9333",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-93A9FD",
@@ -2907,7 +3103,8 @@
    "url": "https://aaltodoc.aalto.fi/handle/123456789/132145",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-7FF5BA",
@@ -2925,7 +3122,8 @@
    "url": "https://doi.org/10.14361/9783839473702",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-071F0A",
@@ -2942,7 +3140,8 @@
    "url": "https://doi.org/10.1123/shr.2022-0037",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-CC0ED5",
@@ -2956,7 +3155,8 @@
    "url": "https://www.museumofplay.org/games/computer-space/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-56589B",
@@ -2971,7 +3171,8 @@
    "url": "https://doi.org/10.11606/003131596",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-DA0E6A",
@@ -2985,7 +3186,8 @@
    "url": "https://hdl.handle.net/1811/102568",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-1DC590",
@@ -3000,7 +3202,8 @@
    "url": "https://www.youtube.com/watch?v=T73XmFnB7GI",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-07F52E",
@@ -3014,7 +3217,8 @@
    "url": "https://stanforddaily.com/2022/10/21/ai-lab-celebrates-50th-anniversary-of-intergalactic-spacewar-olympics/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-F617B7",
@@ -3028,7 +3232,8 @@
    "url": "https://retrododo.com/analogue-pocket-openfpga/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-E6FAA5",
@@ -3042,7 +3247,8 @@
    "url": "https://gizmodo.com/analogue-pocket-os-v1-1-beta-release-memories-library-1849345505",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-D39F5B",
@@ -3059,7 +3265,8 @@
    "url": "https://doi.org/10.1007/978-3-030-66422-0_10",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-5123F1",
@@ -3075,7 +3282,8 @@
    "url": "https://doi.org/10.33732/ixc/11/02deport",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-99AB4A",
@@ -3089,7 +3297,8 @@
    "url": "https://www.inverse.com/gaming/what-was-the-first-video-game",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-085072",
@@ -3102,7 +3311,8 @@
    "url": "https://archive.org/details/apc-2021_08",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-CB7FC7",
@@ -3115,7 +3325,8 @@
    "url": "https://podcasts.apple.com/us/podcast/ancient-history/id1538705338?i=1000498376281",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-DAB852",
@@ -3130,7 +3341,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Wireframe Magazine"
+   "author": "Wireframe Magazine",
+   "relevance": "section"
   },
   {
    "id": "L-73DD8E",
@@ -3144,7 +3356,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Replay, Revista"
+   "author": "Replay, Revista",
+   "relevance": "section"
   },
   {
    "id": "L-E9BD78",
@@ -3157,7 +3370,8 @@
    "url": "https://podcasts.apple.com/us/podcast/1-d%C3%A9cadas-de-1940-1960-nimatron-tennis-for-two-e-os/id1513923155?i=1000474969702",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-EF8BF2",
@@ -3170,7 +3384,8 @@
    "url": "https://podcasts.apple.com/us/podcast/1-firsts-youre-the-alvin/id1514231832?i=1000475112591",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-4DD388",
@@ -3185,7 +3400,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Wireframe Magazine"
+   "author": "Wireframe Magazine",
+   "relevance": "section"
   },
   {
    "id": "L-9AA376",
@@ -3199,7 +3415,8 @@
    "url": "https://avesis.aybu.edu.tr/advisingTheses/details/41af1c8e-311f-4236-a2c2-99950ab3f140/oai",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-C7F2B1",
@@ -3213,7 +3430,8 @@
    "url": "https://archipel.uqam.ca:443/12561/1/M15949.pdf",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-4F4B8E",
@@ -3227,7 +3445,8 @@
    "url": "https://hdl.handle.net/1811/88267",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-4CB0C1",
@@ -3241,7 +3460,8 @@
    "url": "https://hdl.handle.net/1793/92155",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-27454D",
@@ -3256,7 +3476,8 @@
    "url": "https://romchip.org/index.php/index/article/view/91",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-4CF60B",
@@ -3273,7 +3494,8 @@
    "url": "https://doi.org/10.17077/etd.005230",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-E78FD4",
@@ -3287,7 +3509,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Old School Gamer Magazine"
+   "author": "Old School Gamer Magazine",
+   "relevance": "section"
   },
   {
    "id": "L-FC53C9",
@@ -3301,7 +3524,8 @@
    "url": "https://oldschoolgamermagazine.com/the-seventies-space-wars-by-kevin-butler",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-3F73D9",
@@ -3315,7 +3539,8 @@
    "url": "https://radar.gsa.ac.uk/id/eprint/9485",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-1065EA",
@@ -3329,7 +3554,8 @@
    "url": "https://newsletter.blogs.wesleyan.edu/2019/01/24/weaver-video-game-legends-gather-to-honor-spacewar/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-D88A24",
@@ -3346,7 +3572,8 @@
    "url": "https://doi.org/10.1215/9781478002789-002",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-B1794C",
@@ -3360,7 +3587,8 @@
    "url": "https://doi.org/10.71781/9132",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-1E8747",
@@ -3374,7 +3602,8 @@
    "url": "https://repositorio.unesp.br/entities/publication/9538cbef-cd4b-41d3-8a0d-b72888e676db",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-0D8D8D",
@@ -3388,7 +3617,8 @@
    "url": "https://doi.org/10.71781/9523",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-4C4CB6",
@@ -3402,7 +3632,8 @@
    "url": "https://utoronto.scholaris.ca/items/cecfcb0f-a17b-4282-8362-fa70b77afddb",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-2C42A8",
@@ -3417,7 +3648,8 @@
    "url": "https://doi.org/10.1088/2058-7058/31/12/30",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-339A52",
@@ -3433,7 +3665,8 @@
    "url": "https://doi.org/10.4000/resf.1749",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-289A99",
@@ -3449,7 +3682,8 @@
    "url": "https://doi.org/10.4000/resf.2124",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-A07868",
@@ -3462,7 +3696,8 @@
    "url": "https://aaltodoc.aalto.fi/handle/123456789/35687",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-43E67A",
@@ -3475,7 +3710,8 @@
    "url": "https://www.videogamecanon.com/adventurelog/spacewar-computer-space-and-the-magnavox-odyssey-launch-an-industry/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-C1CF9C",
@@ -3489,7 +3725,8 @@
    "url": "https://www.youtube.com/watch?v=KiYjJJyMDLw",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-BBF09F",
@@ -3506,7 +3743,8 @@
    "url": "https://doi.org/10.1007/978-3-319-53246-2_2",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-DBACEF",
@@ -3523,7 +3761,8 @@
    "url": "https://doi.org/10.1007/978-3-319-53246-2_3",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-A743C1",
@@ -3537,7 +3776,8 @@
    "url": "https://dspacecris-nc1.mandela.ac.za/entities/thesis/505c2cbe-2998-4757-93e6-52a5f1029b50",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-938E14",
@@ -3551,7 +3791,8 @@
    "url": "https://www.youtube.com/watch?v=cC-ITT4Bid0",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-E4A986",
@@ -3566,7 +3807,8 @@
    "url": "http://hdl.handle.net/1807/79526",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-AFAB50",
@@ -3580,7 +3822,8 @@
    "url": "https://www.bbc.com/mundo/noticias-39860528",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-217972",
@@ -3597,7 +3840,8 @@
    "url": "https://doi.org/10.20873/uft.2447-4266.2017v3n3p164",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-6902E3",
@@ -3611,7 +3855,8 @@
    "url": "https://ieeexplore.ieee.org/document/7580189/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-2F4EE5",
@@ -3626,7 +3871,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Lowood, Henry; Guins, Raiford"
+   "author": "Lowood, Henry; Guins, Raiford",
+   "relevance": "section"
   },
   {
    "id": "L-14816A",
@@ -3640,7 +3886,8 @@
    "url": "https://research.manchester.ac.uk/en/studentTheses/video-gaming-parlours-the-emergence-of-video-gaming-in-india/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-DF7E07",
@@ -3655,7 +3902,8 @@
    "url": "https://doi.org/10.70675/97897ebcz226cz4fedz9b40z90015346d4b4",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-F677B9",
@@ -3670,7 +3918,8 @@
    "url": "https://doi.org/10.17077/etd.82ml-fgdx",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-E970D2",
@@ -3684,7 +3933,8 @@
    "url": "https://masswerk.at/rc2016/10/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-78743A",
@@ -3698,7 +3948,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Atari Online News Etc."
+   "author": "Atari Online News Etc.",
+   "relevance": "section"
   },
   {
    "id": "L-F9ABA3",
@@ -3712,7 +3963,8 @@
    "url": "https://docta.ucm.es/entities/publication/31ec6cd7-8774-4b37-95e5-4343cfcecb58",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-C59D3F",
@@ -3725,7 +3977,8 @@
    "url": "https://archive.org/details/Retro_Collection_Vol_8_2015_UK",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-54F103",
@@ -3739,7 +3992,8 @@
    "url": "https://hdl.handle.net/1721.1/98650",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-28C7F0",
@@ -3753,7 +4007,8 @@
    "url": "https://riunet.upv.es/handle/10251/55697",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-4386D2",
@@ -3770,7 +4025,8 @@
    "url": "https://doi.org/10.7551/mitpress/9780262029513.001.0001",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-B88358",
@@ -3784,7 +4040,8 @@
    "url": "https://repositorio.ufmg.br/handle/1843/BUOS-A4RF29",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-E336B3",
@@ -3799,7 +4056,8 @@
    "url": "https://pure.coventry.ac.uk/ws/files/44603713/Binder1.pdf",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-A10599",
@@ -3814,7 +4072,8 @@
    "url": "https://handle.uba.uva.nl/personal/pure/en/publications/the-mindful-gamer-diagrammatical-strategies-on-the-biopolitical-plane-of-digital-gaming-culture(bf8ae2d4-6b8a-4bf6-833f-d8546ece608b).html",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-1F399A",
@@ -3828,7 +4087,8 @@
    "url": "https://rua.ua.es/handle/10045/40301",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-9738CB",
@@ -3843,7 +4103,8 @@
    "url": "https://loading.journals.publicknowledgeproject.org/index.php/loading/article/view/143",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-621A89",
@@ -3857,7 +4118,8 @@
    "url": "https://repositorio.unan.edu.ni/id/eprint/560/7/88x31_cc.png",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-7F536B",
@@ -3871,7 +4133,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Sandhills Publishing"
+   "author": "Sandhills Publishing",
+   "relevance": "section"
   },
   {
    "id": "L-BDF0D4",
@@ -3884,7 +4147,8 @@
    "url": "https://curatingmovingimages.blogspot.com/2013/02/attracting-audience-video-games-at.html",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-215C58",
@@ -3898,7 +4162,8 @@
    "url": "https://repositorio.ufmg.br/handle/1843/BUOS-9C4JD4",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-F6AD9B",
@@ -3911,7 +4176,8 @@
    "url": "https://www.mooshme.org/2012/12/spacewar-at-the-museum-of-the-moving-image-the-challenge-of-bringing-games-into-museums/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-027B5E",
@@ -3925,7 +4191,8 @@
    "url": "https://qns.com/2012/12/museum-explores-video-game-frontier-in-astoria/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-4A6A0E",
@@ -3939,7 +4206,8 @@
    "url": "https://www.dnainfo.com/new-york/20121212/astoria/classic-video-games-ready-for-rematch-at-new-museum-of-moving-image-exhibit/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-DDA762",
@@ -3956,7 +4224,8 @@
    "url": "https://doi.org/10.3917/res.173.0177",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-48F5C0",
@@ -3974,7 +4243,8 @@
    "url": "https://doi.org/10.1002/9781118347584.ch4",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-D47452",
@@ -3992,7 +4262,8 @@
    "url": "https://doi.org/10.1201/b12292-13",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-744A73",
@@ -4006,7 +4277,8 @@
    "url": "https://stanfordmag.org/contents/game-changers",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-E4837E",
@@ -4020,7 +4292,8 @@
    "url": "https://riunet.upv.es/handle/10251/15408",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-2B6A7E",
@@ -4033,7 +4306,8 @@
    "url": "https://core.ac.uk/works/16119011",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-024141",
@@ -4049,7 +4323,8 @@
    "url": "https://journals.openedition.org/lectures/5906",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-72BB87",
@@ -4063,7 +4338,8 @@
    "url": "https://repositorio.ufmg.br/handle/1843/JSSS-8QGLYP",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-84D2DB",
@@ -4077,7 +4353,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Retrowiki staff"
+   "author": "Retrowiki staff",
+   "relevance": "section"
   },
   {
    "id": "L-B858EC",
@@ -4091,7 +4368,8 @@
    "url": "https://gihyo.jp/dev/serial/01/software_designers/0026",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-0913C5",
@@ -4105,7 +4383,8 @@
    "url": "https://thedoteaters.com/?p=480",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-BA9F87",
@@ -4119,7 +4398,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "OLD!Gamer"
+   "author": "OLD!Gamer",
+   "relevance": "section"
   },
   {
    "id": "L-DE5B10",
@@ -4133,7 +4413,8 @@
    "url": "https://bura.brunel.ac.uk/handle/2438/4455",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-B8FCB6",
@@ -4147,7 +4428,8 @@
    "url": "https://www.technologyreview.com/2009/02/24/32135/game-theory/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-FDE724",
@@ -4165,7 +4447,8 @@
    "url": "https://doi.org/10.1057/9780230583306_7",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-422A01",
@@ -4181,7 +4464,8 @@
    "url": "https://pure.au.dk/portal/en/publications/96aa99c0-2570-11dc-bee9-02004c4f4f50",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-48317A",
@@ -4195,7 +4479,8 @@
    "url": "https://jerz.setonhill.edu/blog/2007/12/27/spacewar_by_stewart_brand_fana/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-1C4BC6",
@@ -4209,7 +4494,8 @@
    "url": "https://henryjenkins.org/blog/2007/10/spacewars_and_beyond_how_the_t.html",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-904831",
@@ -4223,7 +4509,8 @@
    "url": "https://www.gamedeveloper.com/game-platforms/feature-i-spacewar-i-and-the-birth-of-digital-game-culture-",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-BC3475",
@@ -4238,7 +4525,8 @@
    "url": "http://hdl.handle.net/10388/etd-12152006-174500",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-27A6DC",
@@ -4251,7 +4539,8 @@
    "url": "https://www.commodore-128.org/index.php?topic=23.0",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-5DB056",
@@ -4265,7 +4554,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Digit"
+   "author": "Digit",
+   "relevance": "section"
   },
   {
    "id": "L-D9F4CD",
@@ -4279,7 +4569,8 @@
    "url": "https://hypertexthero.com/spacewar/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-5C4B41",
@@ -4293,7 +4584,8 @@
    "url": "https://www.engadget.com/2006-06-02-legendary-computer-scientist-alan-kotok-has-died.html",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-62FBF1",
@@ -4307,7 +4599,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "The Gamer's Quarter"
+   "author": "The Gamer's Quarter",
+   "relevance": "section"
   },
   {
    "id": "L-E6902D",
@@ -4320,7 +4613,8 @@
    "url": "https://archive.org/details/club-nintendo-ano-14-no-01-sudamerica",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-C06210",
@@ -4338,7 +4632,8 @@
    "url": "https://doi.org/10.1007/978-1-4302-0724-5_5",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-9A2184",
@@ -4352,7 +4647,8 @@
    "url": "https://mediarep.org/handle/doc/15197",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-3BC03E",
@@ -4366,7 +4662,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Future"
+   "author": "Future",
+   "relevance": "section"
   },
   {
    "id": "L-133834",
@@ -4383,7 +4680,8 @@
    "url": "https://doi.org/10.1017/s0956796803004891",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-B2B345",
@@ -4397,7 +4695,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Gameland Publishing"
+   "author": "Gameland Publishing",
+   "relevance": "section"
   },
   {
    "id": "L-AD0162",
@@ -4411,7 +4710,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "xgamer magazine"
+   "author": "xgamer magazine",
+   "relevance": "section"
   },
   {
    "id": "L-9F32C1",
@@ -4425,7 +4725,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Atari Online News Etc."
+   "author": "Atari Online News Etc.",
+   "relevance": "section"
   },
   {
    "id": "L-946494",
@@ -4439,7 +4740,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Gi magazine"
+   "author": "Gi magazine",
+   "relevance": "section"
   },
   {
    "id": "L-C0F28E",
@@ -4452,7 +4754,8 @@
    "url": "https://archive.org/details/konsolipelaaja-2001.10-finnish",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-2EDE94",
@@ -4466,7 +4769,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Sandhills Publishing"
+   "author": "Sandhills Publishing",
+   "relevance": "section"
   },
   {
    "id": "L-30FA33",
@@ -4479,7 +4783,8 @@
    "url": "https://archive.org/details/NextGeneration23Nov1996_2400",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-6549C6",
@@ -4493,7 +4798,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Vit, Studio"
+   "author": "Vit, Studio",
+   "relevance": "section"
   },
   {
    "id": "L-24C39A",
@@ -4506,7 +4812,8 @@
    "url": "https://archive.org/details/Computer_Gaming_World_Issue_88",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-0091B7",
@@ -4519,7 +4826,8 @@
    "url": "https://TCM.ComputerHistory.org/Timeline/25ComputerGamesAnniversary1988.pdf",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-E8293C",
@@ -4532,7 +4840,8 @@
    "url": "https://archive.org/details/MacWorld_8411_November_1984",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-5FDF40",
@@ -4546,7 +4855,8 @@
    "url": "https://archive.org/details/Video_Games_Volume_2_Number_04_1984-01_Pumpkin_Press_US",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-A7E944",
@@ -4560,7 +4870,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "Update, Ic"
+   "author": "Update, Ic",
+   "relevance": "section"
   },
   {
    "id": "L-9B7D38",
@@ -4574,7 +4885,8 @@
    "url": "https://archive.org/details/Electronic_Games_Volume_01_Number_02_1982-03_Reese_Communications_US",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-6D3690",
@@ -4587,7 +4899,8 @@
    "url": "https://ieeexplore.ieee.org/document/6281095/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-7DB59E",
@@ -4601,7 +4914,8 @@
    "url": "https://hdl.handle.net/1853/38891",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-B080E6",
@@ -4613,7 +4927,8 @@
    "url": "https://www.americanheritage.com/super-mario-nation",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-7AF1F7",
@@ -4625,7 +4940,8 @@
    "url": "https://www.atariarchive.org/blog/space-war-space-combat-october-1978/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-B1E57D",
@@ -4637,7 +4953,8 @@
    "url": "https://archive.org/details/NEXT_Generation_17",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-67B364",
@@ -4650,7 +4967,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "author": "MegaMultimedia"
+   "author": "MegaMultimedia",
+   "relevance": "section"
   },
   {
    "id": "L-E34618",
@@ -4662,7 +4980,8 @@
    "url": "https://archive.org/details/NEXT_Generation_26",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-BC3EBB",
@@ -4674,7 +4993,8 @@
    "url": "https://laboralcentrodearte.org/en/artworks/spacewar-2/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-105CDB",
@@ -4686,7 +5006,8 @@
    "url": "https://computerhistory.org/profile/steve-russell/",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-C744B5",
@@ -4698,7 +5019,8 @@
    "url": "https://www.guinnessworldrecords.com/world-records/646471-first-multiplatform-videogame",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-1D73A3",
@@ -4711,7 +5033,8 @@
    "url": "https://www.encyclopedia.com/manufacturing/encyclopedias-almanacs-transcripts-and-maps/video-games-consoles",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-B3DDE7",
@@ -4723,7 +5046,8 @@
    "url": "https://siarchives.si.edu/blog/holding-virtual-worlds",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-C89E94",
@@ -4735,7 +5059,8 @@
    "url": "https://alum.mit.edu/slice/five-mit-developed-video-games-revolutionized-industry",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-5FB5F5",
@@ -4747,7 +5072,8 @@
    "url": "https://kulturinformatik.web.leuphana.de/alte_seminare/computerspiele/text.pdf",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-D19525",
@@ -4760,7 +5086,8 @@
    "url": "https://dspace.vutbr.cz/handle/11012/55761",
    "tags": [
     "section on Spacewar!"
-   ]
+   ],
+   "relevance": "section"
   },
   {
    "id": "L-A139FC",
@@ -4778,7 +5105,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-A139FC.pdf",
-   "source": "https://ojs.revistadcs.com/index.php/revista/article/download/7131/5924"
+   "source": "https://ojs.revistadcs.com/index.php/revista/article/download/7131/5924",
+   "relevance": "mention"
   },
   {
    "id": "L-809D89",
@@ -4798,7 +5126,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-809D89.pdf",
-   "source": "https://aei.ewapub.com/article/view/34221.pdf"
+   "source": "https://aei.ewapub.com/article/view/34221.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-88D347",
@@ -4815,7 +5144,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-88D347.pdf",
-   "source": "http://ir.lib.uth.gr/xmlui/bitstream/handle/11615/87419/32879.pdf;jsessionid=8742605A438DF5AE42F787F32E79317D?sequence=4"
+   "source": "http://ir.lib.uth.gr/xmlui/bitstream/handle/11615/87419/32879.pdf;jsessionid=8742605A438DF5AE42F787F32E79317D?sequence=4",
+   "relevance": "mention"
   },
   {
    "id": "L-B4E599",
@@ -4835,7 +5165,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-B4E599.pdf",
-   "source": "https://dergipark.org.tr/tr/download/article-file/5028635"
+   "source": "https://dergipark.org.tr/tr/download/article-file/5028635",
+   "relevance": "mention"
   },
   {
    "id": "L-407213",
@@ -4852,7 +5183,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-407213.pdf",
-   "source": "https://revistas.udea.edu.co/index.php/almamater/article/download/361666/20819210"
+   "source": "https://revistas.udea.edu.co/index.php/almamater/article/download/361666/20819210",
+   "relevance": "mention"
   },
   {
    "id": "L-817EB4",
@@ -4869,7 +5201,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-817EB4.pdf",
-   "source": "http://ir.lib.uth.gr/xmlui/bitstream/handle/11615/85224/30600.pdf;jsessionid=DDF5682B246AFC590F22F07D846BBE87?sequence=4"
+   "source": "http://ir.lib.uth.gr/xmlui/bitstream/handle/11615/85224/30600.pdf;jsessionid=DDF5682B246AFC590F22F07D846BBE87?sequence=4",
+   "relevance": "mention"
   },
   {
    "id": "L-BD4335",
@@ -4886,7 +5219,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-BD4335.pdf",
-   "source": "https://publish.fid-media.de/server/api/core/bitstreams/f07cf1ff-6f98-4944-a130-fa35dc00b05f/content"
+   "source": "https://publish.fid-media.de/server/api/core/bitstreams/f07cf1ff-6f98-4944-a130-fa35dc00b05f/content",
+   "relevance": "mention"
   },
   {
    "id": "L-95786D",
@@ -4904,7 +5238,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-95786D.pdf",
-   "source": "https://www.transcript-verlag.de/shopMedia/openaccess/pdf/oa9783839473702.pdf"
+   "source": "https://www.transcript-verlag.de/shopMedia/openaccess/pdf/oa9783839473702.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-7BE541",
@@ -4923,7 +5258,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-7BE541.pdf",
-   "source": "https://apcz.umk.pl/AKZ/article/download/44678/38044"
+   "source": "https://apcz.umk.pl/AKZ/article/download/44678/38044",
+   "relevance": "mention"
   },
   {
    "id": "L-636258",
@@ -4943,7 +5279,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-636258.pdf",
-   "source": "https://ijsra.net/sites/default/files/IJSRA-2024-0194.pdf"
+   "source": "https://ijsra.net/sites/default/files/IJSRA-2024-0194.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-D7A2B1",
@@ -4960,7 +5297,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-D7A2B1.pdf",
-   "source": "https://dhq-static.digitalhumanities.org/pdf/000696.pdf"
+   "source": "https://dhq-static.digitalhumanities.org/pdf/000696.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-CDEEF3",
@@ -4980,7 +5318,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-CDEEF3.pdf",
-   "source": "https://drpress.org/ojs/index.php/HSET/article/download/16033/15558"
+   "source": "https://drpress.org/ojs/index.php/HSET/article/download/16033/15558",
+   "relevance": "mention"
   },
   {
    "id": "L-995979",
@@ -4999,7 +5338,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-995979.pdf",
-   "source": "https://revistaecopos.eco.ufrj.br/eco_pos/article/download/28157/15411"
+   "source": "https://revistaecopos.eco.ufrj.br/eco_pos/article/download/28157/15411",
+   "relevance": "mention"
   },
   {
    "id": "L-9FCE2C",
@@ -5018,7 +5358,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-9FCE2C.pdf",
-   "source": "https://e-revistas.uc3m.es/index.php/HISPNOV/article/download/7621/6017"
+   "source": "https://e-revistas.uc3m.es/index.php/HISPNOV/article/download/7621/6017",
+   "relevance": "mention"
   },
   {
    "id": "L-983BB2",
@@ -5036,7 +5377,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-983BB2.pdf",
-   "source": "https://revistas.up.edu.mx/rpc/article/download/2714/2212"
+   "source": "https://revistas.up.edu.mx/rpc/article/download/2714/2212",
+   "relevance": "mention"
   },
   {
    "id": "L-BB5948",
@@ -5054,7 +5396,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-BB5948.pdf",
-   "source": "https://uet.edu.al/polis/wp-content/uploads/2023/01/The-Effects-of-New-Communication-Technologies-on-Teenagers-The-Case-Study-of-Computer-Games.pdf"
+   "source": "https://uet.edu.al/polis/wp-content/uploads/2023/01/The-Effects-of-New-Communication-Technologies-on-Teenagers-The-Case-Study-of-Computer-Games.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-06410E",
@@ -5074,7 +5417,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-06410E.pdf",
-   "source": "https://www.revistas.usp.br/signosdoconsumo/article/download/198043/190297"
+   "source": "https://www.revistas.usp.br/signosdoconsumo/article/download/198043/190297",
+   "relevance": "mention"
   },
   {
    "id": "L-9CC717",
@@ -5094,7 +5438,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-9CC717.pdf",
-   "source": "https://sekizgenacademy.com/journals/index.php/inda/article/download/135/85"
+   "source": "https://sekizgenacademy.com/journals/index.php/inda/article/download/135/85",
+   "relevance": "mention"
   },
   {
    "id": "L-ECB488",
@@ -5114,7 +5459,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-ECB488.pdf",
-   "source": "https://czasopisma.uwr.edu.pl/quart/article/download/16525/14875"
+   "source": "https://czasopisma.uwr.edu.pl/quart/article/download/16525/14875",
+   "relevance": "mention"
   },
   {
    "id": "L-CE43D1",
@@ -5134,7 +5480,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-CE43D1.pdf",
-   "source": "https://www.eludamos.org/index.php/eludamos/article/download/vol11no1-8/11-1-8"
+   "source": "https://www.eludamos.org/index.php/eludamos/article/download/vol11no1-8/11-1-8",
+   "relevance": "mention"
   },
   {
    "id": "L-FC2FAC",
@@ -5152,7 +5499,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-FC2FAC.pdf",
-   "source": "https://zenodo.org/records/4389788/files/2020_mas_Gerber.pdf"
+   "source": "https://zenodo.org/records/4389788/files/2020_mas_Gerber.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-14EEE8",
@@ -5171,7 +5519,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-14EEE8.pdf",
-   "source": "https://www.frontiersin.org/articles/10.3389/fcomm.2020.580965/pdf"
+   "source": "https://www.frontiersin.org/articles/10.3389/fcomm.2020.580965/pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-8EE1B8",
@@ -5187,7 +5536,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-8EE1B8.pdf",
-   "source": "https://shareok.org/server/api/core/bitstreams/f3440132-e671-4707-9e97-05a21cda5e4c/content"
+   "source": "https://shareok.org/server/api/core/bitstreams/f3440132-e671-4707-9e97-05a21cda5e4c/content",
+   "relevance": "mention"
   },
   {
    "id": "L-8DBFC8",
@@ -5203,7 +5553,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-8DBFC8.pdf",
-   "source": "https://idus.us.es/server/api/core/bitstreams/9919fd1d-d12b-465c-a703-c823e0bac2e4/content"
+   "source": "https://idus.us.es/server/api/core/bitstreams/9919fd1d-d12b-465c-a703-c823e0bac2e4/content",
+   "relevance": "mention"
   },
   {
    "id": "L-CDA935",
@@ -5223,7 +5574,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-CDA935.pdf",
-   "source": "https://pressto.amu.edu.pl/index.php/hl/article/download/20926/20267"
+   "source": "https://pressto.amu.edu.pl/index.php/hl/article/download/20926/20267",
+   "relevance": "mention"
   },
   {
    "id": "L-C60779",
@@ -5243,7 +5595,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-C60779.pdf",
-   "source": "https://revistaseletronicas.pucrs.br/ojs/index.php/revistafamecos/article/download/29118/17961"
+   "source": "https://revistaseletronicas.pucrs.br/ojs/index.php/revistafamecos/article/download/29118/17961",
+   "relevance": "mention"
   },
   {
    "id": "L-E61975",
@@ -5261,7 +5614,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-E61975.pdf",
-   "source": "https://www.gamejournal.it/wp-content/uploads/2020/12/I8_GAME_02_MAYRA.pdf"
+   "source": "https://www.gamejournal.it/wp-content/uploads/2020/12/I8_GAME_02_MAYRA.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-13CF50",
@@ -5278,7 +5632,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-13CF50.pdf",
-   "source": "https://diposit.eina.cat/bitstream/handle/20.500.12082/822/2017_2018_marcuello_gallardo_irene.pdf;jsessionid=C717672847105F75F3021C193AB8F5BF?sequence=1"
+   "source": "https://diposit.eina.cat/bitstream/handle/20.500.12082/822/2017_2018_marcuello_gallardo_irene.pdf;jsessionid=C717672847105F75F3021C193AB8F5BF?sequence=1",
+   "relevance": "mention"
   },
   {
    "id": "L-2664CC",
@@ -5295,7 +5650,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-2664CC.pdf",
-   "source": "https://bindani.izt.uam.mx/downloads/8623hx76t"
+   "source": "https://bindani.izt.uam.mx/downloads/8623hx76t",
+   "relevance": "mention"
   },
   {
    "id": "L-CBFBDA",
@@ -5313,7 +5669,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-CBFBDA.pdf",
-   "source": "https://www.db-thueringen.de/servlets/MCRFileNodeServlet/dbt_derivate_00043592/Hawranke_Thomas_Modding.pdf"
+   "source": "https://www.db-thueringen.de/servlets/MCRFileNodeServlet/dbt_derivate_00043592/Hawranke_Thomas_Modding.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-313A22",
@@ -5330,7 +5687,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-313A22.pdf",
-   "source": "https://repositorio.bc.ufg.br/tedeserver/api/core/bitstreams/30adda5c-0c42-4ca6-bff6-1d3109c27812/content"
+   "source": "https://repositorio.bc.ufg.br/tedeserver/api/core/bitstreams/30adda5c-0c42-4ca6-bff6-1d3109c27812/content",
+   "relevance": "mention"
   },
   {
    "id": "L-53ABB1",
@@ -5347,7 +5705,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-53ABB1.pdf",
-   "source": "https://diposit.ub.edu/server/api/core/bitstreams/79e9e6ce-01f2-4661-b166-fdbfefe12fb2/content"
+   "source": "https://diposit.ub.edu/server/api/core/bitstreams/79e9e6ce-01f2-4661-b166-fdbfefe12fb2/content",
+   "relevance": "mention"
   },
   {
    "id": "L-8E1DA1",
@@ -5364,7 +5723,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-8E1DA1.pdf",
-   "source": "https://idus.us.es/server/api/core/bitstreams/92738f79-b57a-4048-aabf-b5bda6f3dbac/content"
+   "source": "https://idus.us.es/server/api/core/bitstreams/92738f79-b57a-4048-aabf-b5bda6f3dbac/content",
+   "relevance": "mention"
   },
   {
    "id": "L-0BC3FC",
@@ -5381,7 +5741,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-0BC3FC.pdf",
-   "source": "https://idus.us.es/server/api/core/bitstreams/9a35aa7a-6d61-4123-81e9-8db716922c08/content"
+   "source": "https://idus.us.es/server/api/core/bitstreams/9a35aa7a-6d61-4123-81e9-8db716922c08/content",
+   "relevance": "mention"
   },
   {
    "id": "L-82F946",
@@ -5398,7 +5759,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-82F946.pdf",
-   "source": "https://repositorio-aberto.up.pt/bitstream/10216/85231/3/140753.pdf"
+   "source": "https://repositorio-aberto.up.pt/bitstream/10216/85231/3/140753.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-728130",
@@ -5415,7 +5777,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-728130.pdf",
-   "source": "https://ddfv.ufv.es/rest/api/core/bitstreams/6a2df6a8-1bb5-499f-b77c-302ab25eb0d1/content"
+   "source": "https://ddfv.ufv.es/rest/api/core/bitstreams/6a2df6a8-1bb5-499f-b77c-302ab25eb0d1/content",
+   "relevance": "mention"
   },
   {
    "id": "L-640273",
@@ -5433,7 +5796,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-640273.pdf",
-   "source": "https://www.sciendo.com/pdf/10.1515/pcr-2015-0011"
+   "source": "https://www.sciendo.com/pdf/10.1515/pcr-2015-0011",
+   "relevance": "mention"
   },
   {
    "id": "L-310D1F",
@@ -5450,7 +5814,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-310D1F.pdf",
-   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/123/79"
+   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/123/79",
+   "relevance": "mention"
   },
   {
    "id": "L-A927BB",
@@ -5467,7 +5832,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-A927BB.pdf",
-   "source": "https://repositorio.comillas.edu/server/api/core/bitstreams/17e146b6-b210-4c47-acd3-b2455fe5155d/content"
+   "source": "https://repositorio.comillas.edu/server/api/core/bitstreams/17e146b6-b210-4c47-acd3-b2455fe5155d/content",
+   "relevance": "mention"
   },
   {
    "id": "L-4158E6",
@@ -5484,7 +5850,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-4158E6.pdf",
-   "source": "https://dspace.ups.edu.ec/bitstream/123456789/7469/1/UPS-QT06021.pdf"
+   "source": "https://dspace.ups.edu.ec/bitstream/123456789/7469/1/UPS-QT06021.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-D9BC42",
@@ -5502,7 +5869,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-D9BC42.pdf",
-   "source": "https://timreview.ca/sites/default/files/article_PDF/LaaksoNyman_TIMReview_July2014.pdf"
+   "source": "https://timreview.ca/sites/default/files/article_PDF/LaaksoNyman_TIMReview_July2014.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-01CDE8",
@@ -5519,7 +5887,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-01CDE8.pdf",
-   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/132/89"
+   "source": "http://ojs.kinephanos.ca/index.php/revue/article/download/132/89",
+   "relevance": "mention"
   },
   {
    "id": "L-68A73C",
@@ -5538,7 +5907,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-68A73C.pdf",
-   "source": "https://icono14.net/ojs/index.php/icono14/article/download/392/268"
+   "source": "https://icono14.net/ojs/index.php/icono14/article/download/392/268",
+   "relevance": "mention"
   },
   {
    "id": "L-8488C5",
@@ -5555,7 +5925,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-8488C5.pdf",
-   "source": "https://dhq-static.digitalhumanities.org/pdf/000089.pdf"
+   "source": "https://dhq-static.digitalhumanities.org/pdf/000089.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-56E848",
@@ -5574,7 +5945,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-56E848.pdf",
-   "source": "https://septentrio.uit.no/index.php/eludamos/article/download/vol4no2-3/5974"
+   "source": "https://septentrio.uit.no/index.php/eludamos/article/download/vol4no2-3/5974",
+   "relevance": "mention"
   },
   {
    "id": "L-C8E2CF",
@@ -5593,7 +5965,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-C8E2CF.pdf",
-   "source": "https://dhq-static.digitalhumanities.org/pdf/000066.pdf"
+   "source": "https://dhq-static.digitalhumanities.org/pdf/000066.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-F16C23",
@@ -5610,7 +5983,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-F16C23.pdf",
-   "source": "https://publish.fid-media.de/server/api/core/bitstreams/d768a0b5-141e-4c54-98f0-dc1ee9bebcbe/content"
+   "source": "https://publish.fid-media.de/server/api/core/bitstreams/d768a0b5-141e-4c54-98f0-dc1ee9bebcbe/content",
+   "relevance": "mention"
   },
   {
    "id": "L-B117D2",
@@ -5627,7 +6001,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-B117D2.pdf",
-   "source": "https://repositorio-aberto.up.pt/bitstream/10216/73723/2/23809.pdf"
+   "source": "https://repositorio-aberto.up.pt/bitstream/10216/73723/2/23809.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-082B92",
@@ -5645,7 +6020,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-082B92.pdf",
-   "source": "https://repositorio-aberto.up.pt/bitstream/10216/6610/2/23705.pdf"
+   "source": "https://repositorio-aberto.up.pt/bitstream/10216/6610/2/23705.pdf",
+   "relevance": "mention"
   },
   {
    "id": "L-15FA35",
@@ -5662,7 +6038,8 @@
     "passing discussion"
    ],
    "file": "library/files/L-15FA35.pdf",
-   "source": "https://publish.fid-media.de/server/api/core/bitstreams/78c09f5b-0029-4504-a636-112ce107932a/content"
+   "source": "https://publish.fid-media.de/server/api/core/bitstreams/78c09f5b-0029-4504-a636-112ce107932a/content",
+   "relevance": "mention"
   },
   {
    "id": "L-EAED8C",
@@ -5678,7 +6055,8 @@
     "passing discussion"
    ],
    "thumb": "library/thumbs/L-EAED8C.jpg",
-   "note": "Names Tennis for Two and Spacewar, crediting Russell, Graetz, Kotok and others, as early videogames in the modern sense. Spacewar! at 87 (index)."
+   "note": "Names Tennis for Two and Spacewar, crediting Russell, Graetz, Kotok and others, as early videogames in the modern sense. Spacewar! at 87 (index).",
+   "relevance": "mention"
   },
   {
    "id": "L-1FB486",
@@ -5693,7 +6071,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-1FB486.jpg"
+   "thumb": "library/thumbs/L-1FB486.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-6F2B8D",
@@ -5709,7 +6088,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-6F2B8D.jpg"
+   "thumb": "library/thumbs/L-6F2B8D.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-91A439",
@@ -5725,7 +6105,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-91A439.jpg"
+   "thumb": "library/thumbs/L-91A439.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-683C6E",
@@ -5741,7 +6122,8 @@
     "passing discussion"
    ],
    "thumb": "library/thumbs/L-683C6E.jpg",
-   "note": "Says Computer Space was almost an exact copy of the game written by TMRC members in 1961 for the PDP-1, with a screen rendering. Spacewar! at 14."
+   "note": "Says Computer Space was almost an exact copy of the game written by TMRC members in 1961 for the PDP-1, with a screen rendering. Spacewar! at 14.",
+   "relevance": "mention"
   },
   {
    "id": "L-9AF940",
@@ -5756,7 +6138,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-9AF940.jpg"
+   "thumb": "library/thumbs/L-9AF940.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-23442E",
@@ -5771,7 +6154,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-23442E.jpg"
+   "thumb": "library/thumbs/L-23442E.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-E4818E",
@@ -5786,7 +6170,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-E4818E.jpg"
+   "thumb": "library/thumbs/L-E4818E.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-0938A1",
@@ -5800,7 +6185,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-0938A1.jpg"
+   "thumb": "library/thumbs/L-0938A1.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-00C5FA",
@@ -5815,7 +6201,8 @@
    "tags": [
     "passing discussion"
    ],
-   "thumb": "library/thumbs/L-00C5FA.jpg"
+   "thumb": "library/thumbs/L-00C5FA.jpg",
+   "relevance": "mention"
   },
   {
    "id": "L-2615D4",
@@ -5834,7 +6221,8 @@
    "url": "https://doi.org/10.65272/978-88-6977-566-6_9",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-025064",
@@ -5849,7 +6237,8 @@
    "url": "https://doi.org/10.25903/wa15-5j57",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C3386A",
@@ -5863,7 +6252,8 @@
    "url": "https://repozitorij.uni-lj.si/IzpisGradiva.php?id=189246",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-72515A",
@@ -5877,7 +6267,8 @@
    "url": "https://www.technologyreview.com/2026/10/20/1145649/made-by-mit/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8BBB9C",
@@ -5894,7 +6285,8 @@
    "url": "https://doi.org/10.4324/9781003639503",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-67052F",
@@ -5908,7 +6300,8 @@
    "url": "https://paidia.de/anatomie-der-spiele-game-design-als-angewandte-kulturtechnikforschung/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-2E8059",
@@ -5921,7 +6314,8 @@
    "url": "https://riunet.upv.es/handle/10251/241502",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-515583",
@@ -5937,7 +6331,8 @@
    "url": "https://dl.digra.org/index.php/dl/article/view/2821",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-4BC6BD",
@@ -5953,7 +6348,8 @@
    "url": "https://dl.digra.org/index.php/dl/article/view/2827",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-75DEC3",
@@ -5967,7 +6363,8 @@
    "url": "https://paidia.de/control-mechanisms-in-computer-and-video-games/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-630701",
@@ -5984,7 +6381,8 @@
    "url": "https://doi.org/10.5281/zenodo.18515970",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-335773",
@@ -5998,7 +6396,8 @@
    "url": "https://doi.org/10.14393/ufu.di.2025.113",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9D38F0",
@@ -6015,7 +6414,8 @@
    "url": "https://doi.org/10.1140/epjqt/s40507-025-00308-7",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-B0CEFB",
@@ -6034,7 +6434,8 @@
    "url": "https://doi.org/10.14361/9783839476345-016",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-E0D749",
@@ -6047,7 +6448,8 @@
    "url": "https://hdl.handle.net/11110/3521",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8D50F9",
@@ -6061,7 +6463,8 @@
    "url": "https://cdm.link/pdp-1-boards-of-canada/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-749243",
@@ -6075,7 +6478,8 @@
    "url": "https://www.engadget.com/audio/someone-programmed-a-65-year-old-computer-to-play-boards-of-canadas-olson-220857441.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-04A662",
@@ -6087,7 +6491,8 @@
    "url": "https://core.ac.uk/works/305721711",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-6C3AD3",
@@ -6101,7 +6506,8 @@
    "url": "https://app.uff.br/riuff/handle/1/33056",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8B534B",
@@ -6115,7 +6521,8 @@
    "url": "https://hdl.handle.net/11424/298125",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F8D3FC",
@@ -6129,7 +6536,8 @@
    "url": "https://avesis.yildiz.edu.tr/advisingTheses/details/448a4550-0e8e-4931-a65c-ac56407b06b2/oai",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7CDC55",
@@ -6143,7 +6551,8 @@
    "url": "https://hdl.handle.net/11424/296837",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-1C42EB",
@@ -6157,7 +6566,8 @@
    "url": "https://hdl.handle.net/1793/93532",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C30586",
@@ -6170,7 +6580,8 @@
    "url": "https://core.ac.uk/works/159833321",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9C63EB",
@@ -6183,7 +6594,8 @@
    "url": "https://gupea.ub.gu.se/handle/2077/83669",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7C7D5A",
@@ -6198,7 +6610,8 @@
    "url": "https://hdl.handle.net/2454/47476",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-41E604",
@@ -6215,7 +6628,8 @@
    "url": "https://doi.org/10.4000/books.pulg.26214",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-44FADF",
@@ -6232,7 +6646,8 @@
    "url": "https://doi.org/10.4000/books.pulg.26374",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-5F7210",
@@ -6249,7 +6664,8 @@
    "url": "https://doi.org/10.4000/books.pulg.26294",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-21AF51",
@@ -6264,7 +6680,8 @@
    "url": "https://doi.org/10.14267/phd.2023030",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F04F69",
@@ -6278,7 +6695,8 @@
    "url": "https://doi.org/10.11606/003217381",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0941F7",
@@ -6293,7 +6711,8 @@
    "url": "https://doi.org/10.26503/dl.v2023i2.1997",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-778C55",
@@ -6308,7 +6727,8 @@
    "url": "https://romchip.org/index.php/romchip-journal/article/view/175",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-6B2111",
@@ -6325,7 +6745,8 @@
    "url": "https://doi.org/10.1525/ch.2023.100.1.105",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EBCFC3",
@@ -6340,7 +6761,8 @@
    "url": "https://doi.org/10.70675/48326c33z4b93z464ez80c5z4f5d1be8f9d0",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-E7FBF6",
@@ -6354,7 +6776,8 @@
    "url": "https://doi.org/10.11606/003129283",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-09B6EA",
@@ -6368,7 +6791,8 @@
    "url": "https://doi.org/10.11606/003129289",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-B55C87",
@@ -6382,7 +6806,8 @@
    "url": "https://cyberleninka.ru/article/n/vklad-zvezdnoy-ikonografii-v-prostranstvennuyu-problematiku-kompyuternyh-igr-sluchay-igr-horrorov",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-64477C",
@@ -6396,7 +6821,8 @@
    "url": "https://hdl.handle.net/10125/102211",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-556476",
@@ -6414,7 +6840,8 @@
    "url": "https://doi.org/10.17556/erziefd.1052883",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-3613BF",
@@ -6428,7 +6855,8 @@
    "url": "https://www.avclub.com/analogue-pocket",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A09397",
@@ -6442,7 +6870,8 @@
    "url": "https://www.hackster.io/news/analogue-launches-openfpga-program-for-video-game-preservation-turns-every-pocket-into-a-dev-kit-9a7e1a5ce568",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-DFAB68",
@@ -6458,7 +6887,8 @@
    "url": "https://doi.org/10.1177/15554120211020381",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F941EA",
@@ -6472,7 +6902,8 @@
    "url": "https://www.engadget.com/analogue-pocket-openfpga-firmware-update-beta-pdp1-spacewar-150038571.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-200063",
@@ -6486,7 +6917,8 @@
    "url": "https://repositorio.uam.es/handle/10486/702938",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A7B973",
@@ -6501,7 +6933,8 @@
    "url": "https://doi.org/10.70675/5454e0eaz4d63z4febzb6c6zb2cac49ac628",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7B048F",
@@ -6513,7 +6946,8 @@
    "url": "https://core.ac.uk/works/317803780",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-E8DAA6",
@@ -6528,7 +6962,8 @@
    "url": "https://doi.org/10.34726/hss.2021.72021",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EB8799",
@@ -6543,7 +6978,8 @@
    "url": "https://doi.org/10.22024/unikent/01.02.86465",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-B8F7BB",
@@ -6557,7 +6993,8 @@
    "url": "http://eprints.bournemouth.ac.uk/35717/8/NESTOROVA%2C%20Viktoria_M.Res._2020.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-ECB4EE",
@@ -6571,7 +7008,8 @@
    "url": "https://www.museumofplay.org/app/uploads/2021/06/ConcentricCircles_052521.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-FE35B8",
@@ -6586,7 +7024,8 @@
    "url": "https://hdl.handle.net/1794/26535",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0E099D",
@@ -6604,7 +7043,8 @@
    "url": "https://doi.org/10.1515/iph-2021-2023",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-BA2FBF",
@@ -6619,7 +7059,8 @@
    "url": "https://spectrum.ieee.org/put-the-classic-pdp8-minicomputer-on-your-shelf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C0065E",
@@ -6633,7 +7074,8 @@
     "passing discussion"
    ],
    "author": "Edge magazine",
-   "date": "2021-06-05"
+   "date": "2021-06-05",
+   "relevance": "mention"
   },
   {
    "id": "L-CC6369",
@@ -6650,7 +7092,8 @@
    "url": "https://doi.org/10.1353/tech.2020.0143",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0B01A6",
@@ -6665,7 +7108,8 @@
    "url": "https://doi.org/10.20431/2349-0381.0711002",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-956D9B",
@@ -6679,7 +7123,8 @@
    "url": "https://repositorio.iscte-iul.pt/entities/publication/480807e5-334a-44c9-b9d6-da027b196329",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-158871",
@@ -6693,7 +7138,8 @@
    "url": "https://monami.hs-mittweida.de/frontdoor/index/index/docId/13682",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A96D72",
@@ -6708,7 +7154,8 @@
    "url": "https://hdl.handle.net/10197/12852",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C25A2C",
@@ -6721,7 +7168,8 @@
    "url": "https://hdl.handle.net/1874/408865",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-42000E",
@@ -6736,7 +7184,8 @@
    "url": "https://doi.org/10.14529/secur200307",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-AEA2B1",
@@ -6750,7 +7199,8 @@
    "url": "https://paidia.de/das-magische-panoptikum/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-49B1E3",
@@ -6766,7 +7216,8 @@
    "url": "https://hdl.handle.net/1721.1/133952",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-2AEAE6",
@@ -6783,7 +7234,8 @@
    "url": "https://doi.org/10.1177/1095796019893315",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-B0AA29",
@@ -6797,7 +7249,8 @@
    "url": "https://doi.org/10.17771/pucrio.acad.47592",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-3619FB",
@@ -6812,7 +7265,8 @@
    "url": "https://doi.org/10.6035/14110.2019.567953",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-6EA9C2",
@@ -6828,7 +7282,8 @@
    "url": "https://doi.org/10.15495/epub_ubt_00004330",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-AEDFBF",
@@ -6842,7 +7297,8 @@
    "url": "https://core.ac.uk/works/61748492",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-737AF5",
@@ -6856,7 +7312,8 @@
    "url": "https://spectrum.library.concordia.ca/986309/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EA2E45",
@@ -6872,7 +7329,8 @@
    "url": "https://doi.org/10.25167/sk.1396",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-E2777D",
@@ -6889,7 +7347,8 @@
    "url": "https://doi.org/10.17223/26188422/5/5",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-FB9F96",
@@ -6907,7 +7366,8 @@
    "url": "https://doi.org/10.1201/9780429280542-8",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9E5A08",
@@ -6921,7 +7381,8 @@
    "url": "http://hdl.handle.net/1773/43258",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7ADF01",
@@ -6935,7 +7396,8 @@
    "url": "https://repositorio.ufmg.br/handle/1843/EBAP-BBLNRQ",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-50F3EF",
@@ -6950,7 +7412,8 @@
    "url": "https://doi.org/10.4000/resf.855",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-E0C848",
@@ -6965,7 +7428,8 @@
    "url": "https://doi.org/10.34626/ppef-yk73",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0A9577",
@@ -6978,7 +7442,8 @@
    "url": "https://invention.si.edu/invention-stories/2018-lemelson-center-activities-report",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9C2C3D",
@@ -6992,7 +7457,8 @@
    "url": "https://mediarep.org/handle/doc/4280",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D8B5EC",
@@ -7008,7 +7474,8 @@
    "url": "https://doi.org/10.25439/rmt.27591357",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-841F5D",
@@ -7022,7 +7489,8 @@
    "url": "https://doi.org/10.71781/21630",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-67B191",
@@ -7036,7 +7504,8 @@
    "url": "https://www.gamedeveloper.com/game-platforms/-i-spacewar-tomb-raider-i-and-others-join-world-video-game-hall-of-fame",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-661EE3",
@@ -7050,7 +7519,8 @@
    "url": "https://gamesbeat.com/video-game-hall-of-fame-inductees-tomb-raider-ffvii-madden-spacewar/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-1ADB04",
@@ -7064,7 +7534,8 @@
    "url": "https://gameinformer.com/b/news/archive/2018/05/03/final-fantasy-vii-tomb-raider-and-others-inducted-to-world-video-game-hall-of-fame",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-42075F",
@@ -7078,7 +7549,8 @@
    "url": "https://www.roccitymag.com/news-opinion/video-museum-of-play-inducts-four-games-into-video-game-hall-of-fame-6349464/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-1D59AF",
@@ -7093,7 +7565,8 @@
    "url": "https://www.si.edu/media/NMAH/NMAH-AC1498_Transcript_AllanAlcorn.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9F5D50",
@@ -7109,7 +7582,8 @@
    "url": "https://doi.org/10.1080/08998280.2017.1401850",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F16189",
@@ -7124,7 +7598,8 @@
    "url": "http://digital.library.wisc.edu/1793/79673",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-BBA4E2",
@@ -7140,7 +7615,8 @@
    "url": "https://doi.org/10.60135/werkstuecke.09.2017.12",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-FA85C1",
@@ -7154,7 +7630,8 @@
    "url": "https://doi.org/10.71781/9610",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8B1B0F",
@@ -7169,7 +7646,8 @@
    "url": "https://doi.org/10.18778/7969-619-2",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7898A2",
@@ -7182,7 +7660,8 @@
    "url": "https://ieeexplore.ieee.org/document/8026996/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D56245",
@@ -7195,7 +7674,8 @@
    "url": "https://ieeexplore.ieee.org/document/8047077/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-5F916B",
@@ -7209,7 +7689,8 @@
    "url": "https://repositorium.uminho.pt/handle/1822/55883",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-80378A",
@@ -7223,7 +7704,8 @@
    "url": "https://helda.helsinki.fi/handle/10138/190997",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9C0184",
@@ -7238,7 +7720,8 @@
    "url": "https://doi.org/10.1109/WSC.2017.8247799",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A83E72",
@@ -7252,7 +7735,8 @@
    "url": "https://paidia.de/computerspiele-computerspiele-referenzen-zitate-und-rekursionen-des-computers-als-spiel/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D6EC59",
@@ -7266,7 +7750,8 @@
    "url": "https://hackaday.com/2017/06/27/the-pdp-1-the-machine-that-started-hacker-culture/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A6A39D",
@@ -7283,7 +7768,8 @@
    "url": "https://doi.org/10.1353/ahc.2016.0024",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-05A209",
@@ -7300,7 +7786,8 @@
    "url": "https://doi.org/10.1587/essfr.9.3_197",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-4B4FEF",
@@ -7314,7 +7801,8 @@
    "url": "https://www.tdx.cat/handle/10803/402478",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0E343F",
@@ -7329,7 +7817,8 @@
    "url": "https://doi.org/10.71781/10797",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-E7655B",
@@ -7343,7 +7832,8 @@
    "url": "https://dspace.zcu.cz/items/7139e8a7-48d7-46a8-957d-1524d987e3a9",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EC603D",
@@ -7357,7 +7847,8 @@
    "url": "https://doi.org/10.71781/9244",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C09218",
@@ -7371,7 +7862,8 @@
    "url": "https://research.chalmers.se/publication/231283",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-2442FD",
@@ -7384,7 +7876,8 @@
    "url": "https://publications.beeldengeluid.nl/pub/500/Eindproductv20.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-30E519",
@@ -7397,7 +7890,8 @@
    "url": "http://www.escholarship.org/uc/item/2xz3k527",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-976F7A",
@@ -7411,7 +7905,8 @@
    "url": "https://orbi.uliege.be/handle/2268/200578",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-668FFA",
@@ -7428,7 +7923,8 @@
    "url": "https://doi.org/10.1109/ceec.2016.7835909",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A8E15E",
@@ -7446,7 +7942,8 @@
    "url": "https://doi.org/10.1201/b10818-8",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7B0979",
@@ -7462,7 +7959,8 @@
    "url": "https://doi.org/10.4000/sdj.612",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-005F4D",
@@ -7477,7 +7975,8 @@
    "url": "https://eprints.lancs.ac.uk/id/eprint/78380/1/2016StobbartPhD.pdf.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-1E2FBC",
@@ -7491,7 +7990,8 @@
    "url": "https://burjcdigital.urjc.es/items/609ccf16-4611-0c23-e053-6f19a8c0ba23",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-220282",
@@ -7505,7 +8005,8 @@
    "url": "https://brocku.scholaris.ca/items/bf051191-0c1e-4351-9bf2-e01505ef6e1c",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0FF23C",
@@ -7519,7 +8020,8 @@
    "url": "https://hdl.handle.net/10355/46700",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-046683",
@@ -7532,7 +8034,8 @@
    "url": "https://repositorium.uminho.pt/handle/1822/59981",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F97712",
@@ -7547,7 +8050,8 @@
    "url": "https://riunet.upv.es/handle/10251/58693",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-78818A",
@@ -7562,7 +8066,8 @@
    "url": "https://doi.org/10.1109/MCE.2015.2421572",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EBBF9B",
@@ -7576,7 +8081,8 @@
    "url": "https://paidia.de/schwermut-und-leichtigkeit-uber-die-rolle-der-schwerkraft-in-videospielen/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7F430D",
@@ -7591,7 +8097,8 @@
    "url": "http://hdl.handle.net/2142/88061",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EB80FA",
@@ -7605,7 +8112,8 @@
    "url": "http://ojs.kinephanos.ca/index.php/revue/en/article/view/149",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0B8DB7",
@@ -7618,7 +8126,8 @@
    "url": "https://hdl.handle.net/1822/37148",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F23738",
@@ -7633,7 +8142,8 @@
    "url": "https://doi.org/10.17771/pucrio.acad.33669",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-CD87D0",
@@ -7649,7 +8159,8 @@
    "url": "https://doi.org/10.26503/dl.v2015i1.740",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-124636",
@@ -7665,7 +8176,8 @@
    "url": "https://doi.org/10.17231/comsoc.27(2015).2085",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-BBD36E",
@@ -7679,7 +8191,8 @@
    "url": "https://avesis.uludag.edu.tr/advisingTheses/details/b4f4e951-6708-4aab-a5f7-6265bd0df0a8/oai",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-CD8C34",
@@ -7693,7 +8206,8 @@
    "url": "https://doi.org/10.13140/rg.2.2.27327.32163",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-5C5A77",
@@ -7706,7 +8220,8 @@
    "url": "https://www.sbgames.org/sbgames2014/papers/industry/full/302-industryfullpages.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-994ED7",
@@ -7721,7 +8236,8 @@
    "url": "https://doi.org/10.1109/JPROC.2014.2306257",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-634819",
@@ -7734,7 +8250,8 @@
    "url": "https://openalex.org/W237373724",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D5F4AB",
@@ -7748,7 +8265,8 @@
    "url": "https://summit.sfu.ca/item/13747",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-03FE10",
@@ -7762,7 +8280,8 @@
    "url": "https://espacestemps.net/en/articles/un-reve-tisse-par-le-calcul-2/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D0BA00",
@@ -7775,7 +8294,8 @@
    "url": "https://ieeexplore.ieee.org/document/6504692/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-476B63",
@@ -7792,7 +8312,8 @@
    "url": "https://doi.org/10.1109/mc.2013.207",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F43849",
@@ -7806,7 +8327,8 @@
    "url": "https://www.museumofplay.org/blog/finding-video-game-history-in-the-archives/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-372710",
@@ -7820,7 +8342,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "www.jurassicnews.com"
+   "author": "www.jurassicnews.com",
+   "relevance": "mention"
   },
   {
    "id": "L-51DE71",
@@ -7833,7 +8356,8 @@
    "url": "https://kingant.net/2013/04/the-computer-history-museum/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D7E00B",
@@ -7847,7 +8371,8 @@
    "url": "https://www.gamesradar.com/50-most-important-games-all-time/6/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C217A5",
@@ -7860,7 +8385,8 @@
    "url": "https://www.timeout.com/newyork/things-to-do/spacewar-a-conversation-with-steve-russell-and-peter-samson",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-81D8AF",
@@ -7874,7 +8400,8 @@
    "url": "https://scholar.colorado.edu/concern/undergraduate_honors_theses/ht24wj81x",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-63CE45",
@@ -7888,7 +8415,8 @@
    "url": "https://repositorio.unesp.br/entities/publication/486617b2-e222-43b6-b9b1-39b014b7c576",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-189546",
@@ -7902,7 +8430,8 @@
    "url": "https://etheses.durham.ac.uk/id/eprint/5931/2/Recording_2.1_-_Nerdscream.mp4",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-25B712",
@@ -7915,7 +8444,8 @@
    "url": "https://escholarship.org/uc/item/5811b3gv",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-3DA780",
@@ -7929,7 +8459,8 @@
    "url": "https://hyperallergic.com/art-rx-45/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-DD2211",
@@ -7942,7 +8473,8 @@
    "url": "https://archive.org/details/CHIP_Issue_2012-03",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-042ADB",
@@ -7955,7 +8487,8 @@
    "url": "https://archive.org/details/chip-2012-02-februarie",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0B1720",
@@ -7969,7 +8502,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Society of American Archivists"
+   "author": "Society of American Archivists",
+   "relevance": "mention"
   },
   {
    "id": "L-BFA134",
@@ -7983,7 +8517,8 @@
    "url": "https://blogs.telosalliance.com/happy-birthday-to-the-xboxs-great-great-great-great-great-granddaddy",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-DC1250",
@@ -7997,7 +8532,8 @@
    "url": "https://openalex.org/W954919783",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-39D619",
@@ -8009,7 +8545,8 @@
    "url": "https://openalex.org/W2460373286",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-3072AA",
@@ -8024,7 +8561,8 @@
    "url": "https://doi.org/10.1109/MAHC.2011.48",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-2D7824",
@@ -8038,7 +8576,8 @@
    "url": "https://repository.up.ac.za/items/b7cbf8a6-4ad8-4041-806f-206a0664cc77",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-23CC01",
@@ -8052,7 +8591,8 @@
    "url": "https://archipel.uqam.ca:443/3826/1/D2109.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A4EF97",
@@ -8067,7 +8607,8 @@
    "url": "https://doi.org/10.34626/8dp7-zb61",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-89894F",
@@ -8082,7 +8623,8 @@
    "url": "https://doi.org/10.82308/49507",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EAEA87",
@@ -8096,7 +8638,8 @@
    "url": "https://mediarep.org/handle/doc/1677",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A0804E",
@@ -8109,7 +8652,8 @@
    "url": "https://archive.org/details/CHIP_Issue_2011-11",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-6729C9",
@@ -8125,7 +8669,8 @@
    "url": "https://doi.org/10.26512/emtempos.v0i12.20064",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9BE041",
@@ -8138,7 +8683,8 @@
    "url": "https://spectrum.ieee.org/a-revolution-at-the-computer-history-museum",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8E3F8A",
@@ -8150,7 +8696,8 @@
    "url": "https://core.ac.uk/works/289664421",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-43A0EF",
@@ -8164,7 +8711,8 @@
    "url": "https://era.ed.ac.uk/items/42bb2f5f-16e2-4e8b-97ff-14a6d640b6c1",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9A370C",
@@ -8179,7 +8727,8 @@
    "url": "https://doi.org/10.34626/1ctj-g914",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-29BCDF",
@@ -8193,7 +8742,8 @@
    "url": "https://doi.org/10.17771/pucrio.acad.16799",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-FFE2C9",
@@ -8207,7 +8757,8 @@
    "url": "https://repositorio.iscte-iul.pt/entities/publication/6af5c0e3-9b1e-4dc4-8352-e4570c42482b",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F03B0D",
@@ -8221,7 +8772,8 @@
    "url": "https://repositorio.unesp.br/entities/publication/d34ab8fa-d55b-4e85-a854-121ddc915c2f",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-91C806",
@@ -8235,7 +8787,8 @@
    "url": "https://mediarep.org/handle/doc/1432",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-74EEC3",
@@ -8249,7 +8802,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Cybermedia"
+   "author": "Cybermedia",
+   "relevance": "mention"
   },
   {
    "id": "L-DF8EED",
@@ -8263,7 +8817,8 @@
    "url": "https://mediarep.org/server/api/core/bitstreams/f11b97ae-6045-4a81-8e3b-797af1414137/content",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F7A28A",
@@ -8278,7 +8833,8 @@
    "url": "http://hdl.handle.net/10453/20225",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F53F94",
@@ -8296,7 +8852,8 @@
    "url": "https://doi.org/10.4018/978-1-60566-198-8.ch327",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-291968",
@@ -8313,7 +8870,8 @@
    "url": "https://doi.org/10.9762/digraj.3.2_191",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-30B0D2",
@@ -8326,7 +8884,8 @@
    "url": "https://core.ac.uk/works/66937074",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-DBF073",
@@ -8340,7 +8899,8 @@
    "url": "https://lup.lub.lu.se/student-papers/search/publication/1474481",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-850C05",
@@ -8354,7 +8914,8 @@
    "url": "https://doi.org/10.71781/10804",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-966277",
@@ -8371,7 +8932,8 @@
    "url": "https://doi.org/10.1007/978-1-84882-825-4_3",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-AAC5DA",
@@ -8385,7 +8947,8 @@
    "url": "https://edoc.hu-berlin.de/handle/18452/10128",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-811DCA",
@@ -8401,7 +8964,8 @@
    "url": "https://doi.org/10.26503/dl.v2009i1.490",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F7689E",
@@ -8415,7 +8979,8 @@
    "url": "https://repository.nwu.ac.za/items/a1812d50-d8d8-4cea-8ea8-d97dbd37ffca",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-568A3A",
@@ -8429,7 +8994,8 @@
    "url": "https://urn.fi/URN:ISBN:978-952-219-133-5",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-2FC8BD",
@@ -8444,7 +9010,8 @@
    "url": "https://doi.org/10.34626/vss1-cf92",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-385623",
@@ -8460,7 +9027,8 @@
    "url": "https://doi.org/10.4000/quaderni.282",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-5D11A3",
@@ -8473,7 +9041,8 @@
    "url": "https://ieeexplore.ieee.org/document/6284547/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-35F41E",
@@ -8486,7 +9055,8 @@
    "url": "https://publishup.uni-potsdam.de/frontdoor/index/index/docId/2555",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-1A869D",
@@ -8500,7 +9070,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "TechWeb, Ubm"
+   "author": "TechWeb, Ubm",
+   "relevance": "mention"
   },
   {
    "id": "L-F5EC4A",
@@ -8517,7 +9088,8 @@
    "url": "https://doi.org/10.5204/mcj.86",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-BD1D2E",
@@ -8530,7 +9102,8 @@
    "url": "https://monarch.qucosa.de/id/qucosa%3A18983",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8608C4",
@@ -8544,7 +9117,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Egm magazine"
+   "author": "Egm magazine",
+   "relevance": "mention"
   },
   {
    "id": "L-7C99CA",
@@ -8557,7 +9131,8 @@
    "url": "https://archive.org/details/game-pro-issue-227-august-2007",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D6F7AC",
@@ -8573,7 +9148,8 @@
    "url": "https://eludamos.org/index.php/eludamos/article/view/vol1no1-3",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7DB9E7",
@@ -8587,7 +9163,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Gi magazine"
+   "author": "Gi magazine",
+   "relevance": "mention"
   },
   {
    "id": "L-0E0C4B",
@@ -8600,7 +9177,8 @@
    "url": "https://news.mit.edu/2006/obit-kotok",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-2FDFE9",
@@ -8614,7 +9192,8 @@
    "url": "https://www.w3.org/news/2006/in-memoriam-alan-kotok/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-94E136",
@@ -8632,7 +9211,8 @@
    "url": "https://doi.org/10.1007/978-3-531-90261-6_20",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A40AF1",
@@ -8646,7 +9226,8 @@
    "url": "https://wiredspace.wits.ac.za/handle/10539/1749",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EDF9B2",
@@ -8660,7 +9241,8 @@
    "url": "https://hdl.handle.net/1721.1/39144",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-4D78FC",
@@ -8673,7 +9255,8 @@
    "url": "https://archive.org/details/Lotek64_Nr._18_2006-08_Lotek64_DE",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-61231D",
@@ -8686,7 +9269,8 @@
    "url": "https://slashdot.org/story/06/07/12/1740247/remembering-alan-kotok",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C2293B",
@@ -8699,7 +9283,8 @@
    "url": "https://campustechnology.com/articles/2006/06/news-update--tuesday-june-13-2006.aspx",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-799EE9",
@@ -8713,7 +9298,8 @@
    "url": "https://brainwagon.org/blog/2006-05-15-pdp-1-restored-at-the-computer-history-museum.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-2B2ACE",
@@ -8727,7 +9313,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Greater Tampa Bay PC User Group"
+   "author": "Greater Tampa Bay PC User Group",
+   "relevance": "mention"
   },
   {
    "id": "L-3F9B9C",
@@ -8739,7 +9326,8 @@
    "url": "https://core.ac.uk/works/298533110",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C55648",
@@ -8753,7 +9341,8 @@
    "url": "https://polen.itu.edu.tr/handle/11527/6320",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-608AB9",
@@ -8767,7 +9356,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Hobby Press"
+   "author": "Hobby Press",
+   "relevance": "mention"
   },
   {
    "id": "L-3DF61F",
@@ -8781,7 +9371,8 @@
    "url": "https://eprints.bournemouth.ac.uk/id/eprint/13283",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F21D14",
@@ -8794,7 +9385,8 @@
    "url": "https://openalex.org/W2615719628",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-65951B",
@@ -8810,7 +9402,8 @@
    "url": "https://doi.org/10.26503/dl.v2005i1.128",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-32012B",
@@ -8828,7 +9421,8 @@
    "url": "https://doi.org/10.1057/9781403981240_2",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-6995E2",
@@ -8845,7 +9439,8 @@
    "url": "https://doi.org/10.1353/crv.2004.0003",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8ABCC7",
@@ -8859,7 +9454,8 @@
    "url": "https://repository.gatech.edu/entities/publication/66554a7c-4c81-4eff-be3a-20f8ccf0984e",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-1D5016",
@@ -8873,7 +9469,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Cybermedia"
+   "author": "Cybermedia",
+   "relevance": "mention"
   },
   {
    "id": "L-7089E8",
@@ -8887,7 +9484,8 @@
    "url": "https://doi.org/10.4324/9780203642900-4",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-4DE61B",
@@ -8900,7 +9498,8 @@
    "url": "https://archive.org/details/my-c-2004-01",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-BC32B2",
@@ -8914,7 +9513,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Xenia Edizioni s.r.l."
+   "author": "Xenia Edizioni s.r.l.",
+   "relevance": "mention"
   },
   {
    "id": "L-67157C",
@@ -8928,7 +9528,8 @@
    "url": "https://mcgeesmusings.net/2003/09/14/rolling-stones-classic-coverage-on-spacewar-and-computing/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-78CD95",
@@ -8942,7 +9543,8 @@
    "url": "https://www.grospixels.com/site/history.php",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F88DB3",
@@ -8956,7 +9558,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "The Data Archivist V0.01"
+   "author": "The Data Archivist V0.01",
+   "relevance": "mention"
   },
   {
    "id": "L-1B12DD",
@@ -8969,7 +9572,8 @@
    "url": "https://archive.org/details/lastampa_2002-04-23",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-45C707",
@@ -8983,7 +9587,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Futura, Gruppo Editoriale"
+   "author": "Futura, Gruppo Editoriale",
+   "relevance": "mention"
   },
   {
    "id": "L-C2699D",
@@ -8997,7 +9602,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Ziff-Davis"
+   "author": "Ziff-Davis",
+   "relevance": "mention"
   },
   {
    "id": "L-5533A2",
@@ -9011,7 +9617,8 @@
    "url": "https://hdl.handle.net/1721.1/9164",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-880B1B",
@@ -9024,7 +9631,8 @@
    "url": "https://archive.org/details/PC_Zone_90_June_2000",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-927B56",
@@ -9036,7 +9644,8 @@
    "url": "https://core.ac.uk/works/9469481",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-FA99F8",
@@ -9049,7 +9658,8 @@
    "url": "https://archive.org/details/computerworld1999unse_9",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-FD7208",
@@ -9062,7 +9672,8 @@
    "url": "https://archive.org/details/computerworld3220unse",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-FC9F52",
@@ -9076,7 +9687,8 @@
    "tags": [
     "passing discussion"
    ],
-   "author": "Electronic gaming monthly"
+   "author": "Electronic gaming monthly",
+   "relevance": "mention"
   },
   {
    "id": "L-EAA69E",
@@ -9090,7 +9702,8 @@
    "url": "https://www.pomoculture.org/2013/09/26/play-it-again-pac-man/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-16E052",
@@ -9103,7 +9716,8 @@
    "url": "https://ieeexplore.ieee.org/document/6277279/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-B0AC3C",
@@ -9117,7 +9731,8 @@
     "passing discussion"
    ],
    "author": "Buchsbaum, Walter H.; Mauro, Robert",
-   "date": "1979"
+   "date": "1979",
+   "relevance": "mention"
   },
   {
    "id": "L-37237C",
@@ -9129,7 +9744,8 @@
    "url": "https://www.ercim.eu/publication/Ercim_News/enw66/w3c_2.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-1396C2",
@@ -9141,7 +9757,8 @@
    "url": "https://archive.org/details/NEXT_Generation_03",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-3765D3",
@@ -9153,7 +9770,8 @@
    "url": "https://archive.org/details/Computer_Game_Forum_Issue_02",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-B01464",
@@ -9166,7 +9784,8 @@
    "url": "https://adactio.com/journal/8931",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C3389E",
@@ -9178,7 +9797,8 @@
    "url": "https://archive.org/details/old-school-gamer-magazine-11",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-0F7E64",
@@ -9190,7 +9810,8 @@
    "url": "https://www.guinnessworldrecords.com/world-records/422812-first-videogame-tournament",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-F8338E",
@@ -9203,7 +9824,8 @@
    "url": "https://www.encyclopedia.com/education/culture-magazines/video-game",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-C53E82",
@@ -9216,7 +9838,8 @@
    "url": "https://www.encyclopedia.com/humanities/encyclopedias-almanacs-transcripts-and-maps/computervideo-games",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-7846E1",
@@ -9228,7 +9851,8 @@
    "url": "https://www.encyclopedia.com/science/technology-magazines/arcades-avatars-virtual-reality-art-and-entertainment",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-EEC7E0",
@@ -9241,7 +9865,8 @@
    "url": "https://www.encyclopedia.com/reference/encyclopedias-almanacs-transcripts-and-maps/electronics-internet-and-entertainment-media",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-9F4788",
@@ -9253,7 +9878,8 @@
    "url": "https://kids.britannica.com/scholars/article/electronic-game/1562",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-D25B1E",
@@ -9265,7 +9891,8 @@
    "url": "https://www.heise.de/hintergrund/Zwischen-Genie-und-Bahn-1398238.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-16AC26",
@@ -9277,7 +9904,8 @@
    "url": "https://www.telepolis.de/article/Archiv-statt-Asservatenkammer-3410614.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A0F0B9",
@@ -9289,7 +9917,8 @@
    "url": "https://www.telepolis.de/article/Das-Wort-ward-Bildpunkt-3422691.html",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-8CB3FC",
@@ -9302,7 +9931,8 @@
    "url": "https://hdl.handle.net/1773/56703",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-A1B06C",
@@ -9314,7 +9944,8 @@
    "url": "https://ruj.uj.edu.pl/handle/item/269475",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-671878",
@@ -9328,7 +9959,8 @@
    "url": "https://amodern.net/article/mission-control/",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-4D1872",
@@ -9340,7 +9972,8 @@
    "url": "https://www.museumofplay.org/app/uploads/2021/06/10-1-interview-dyson.pdf",
    "tags": [
     "passing discussion"
-   ]
+   ],
+   "relevance": "mention"
   },
   {
    "id": "L-CECEBC",
@@ -9359,7 +9992,8 @@
    "file": "library/files/L-CECEBC.pdf",
    "source": "https://rezenstfm.univie.ac.at/index.php/tfm/article/download/9546/9971",
    "publisher": "tfm | Institut für Theater-, Film- und Medienwissenschaft an der Universität Wie",
-   "note": "Review of Trammell: says he reframes MIT's TMRC, often treated as the cradle of gaming and hacking because of Spacewar!, through white male privilege and hobbyism."
+   "note": "Review of Trammell: says he reframes MIT's TMRC, often treated as the cradle of gaming and hacking because of Spacewar!, through white male privilege and hobbyism.",
+   "relevance": "unread"
   },
   {
    "id": "L-3D881D",
@@ -9376,7 +10010,8 @@
     "found by full-text search, not read"
    ],
    "file": "library/files/L-3D881D.pdf",
-   "source": "https://pressto.amu.edu.pl/index.php/pt/article/download/44469/36805"
+   "source": "https://pressto.amu.edu.pl/index.php/pt/article/download/44469/36805",
+   "relevance": "unread"
   },
   {
    "id": "L-7C4C85",
@@ -9393,7 +10028,8 @@
     "found by full-text search, not read"
    ],
    "file": "library/files/L-7C4C85.pdf",
-   "source": "https://www.jurnal.syntax-idea.co.id/index.php/syntax-idea/article/download/2100/1376"
+   "source": "https://www.jurnal.syntax-idea.co.id/index.php/syntax-idea/article/download/2100/1376",
+   "relevance": "unread"
   },
   {
    "id": "L-2BD2EC",
@@ -9410,7 +10046,8 @@
     "found by full-text search, not read"
    ],
    "file": "library/files/L-2BD2EC.pdf",
-   "source": "https://www.jostrans.org/article/download/7270/6558"
+   "source": "https://www.jostrans.org/article/download/7270/6558",
+   "relevance": "unread"
   },
   {
    "id": "L-25A3B3",
@@ -9425,7 +10062,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-25A3B3.jpg",
-   "author": "Mejia, Banks Adams; Adams, Aubrie; Banks, Jamie; Mejia, Robert"
+   "author": "Mejia, Banks Adams; Adams, Aubrie; Banks, Jamie; Mejia, Robert",
+   "relevance": "unread"
   },
   {
    "id": "L-41D88B",
@@ -9441,7 +10079,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-41D88B.jpg"
+   "thumb": "library/thumbs/L-41D88B.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-C50379",
@@ -9457,7 +10096,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-C50379.jpg"
+   "thumb": "library/thumbs/L-C50379.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-CA7E33",
@@ -9473,7 +10113,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-CA7E33.jpg"
+   "thumb": "library/thumbs/L-CA7E33.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-58F28A",
@@ -9488,7 +10129,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-58F28A.jpg"
+   "thumb": "library/thumbs/L-58F28A.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-EC4DDF",
@@ -9502,7 +10144,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-EC4DDF.jpg"
+   "thumb": "library/thumbs/L-EC4DDF.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-43CC2D",
@@ -9518,7 +10161,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-43CC2D.jpg"
+   "thumb": "library/thumbs/L-43CC2D.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-E9360F",
@@ -9533,7 +10177,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-E9360F.jpg"
+   "thumb": "library/thumbs/L-E9360F.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-80EABC",
@@ -9549,7 +10194,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-80EABC.jpg"
+   "thumb": "library/thumbs/L-80EABC.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-86E840",
@@ -9563,7 +10209,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-86E840.jpg"
+   "thumb": "library/thumbs/L-86E840.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-76BE2D",
@@ -9578,7 +10225,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-76BE2D.jpg"
+   "thumb": "library/thumbs/L-76BE2D.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-1E191C",
@@ -9593,7 +10241,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-1E191C.jpg"
+   "thumb": "library/thumbs/L-1E191C.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-266196",
@@ -9609,7 +10258,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-266196.jpg"
+   "thumb": "library/thumbs/L-266196.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-7D7231",
@@ -9624,7 +10274,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-7D7231.jpg"
+   "thumb": "library/thumbs/L-7D7231.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-B935F0",
@@ -9640,7 +10291,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-B935F0.jpg"
+   "thumb": "library/thumbs/L-B935F0.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-F5177E",
@@ -9655,7 +10307,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-F5177E.jpg"
+   "thumb": "library/thumbs/L-F5177E.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-EDE9CB",
@@ -9670,7 +10323,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-EDE9CB.jpg"
+   "thumb": "library/thumbs/L-EDE9CB.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-D53308",
@@ -9685,7 +10339,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-D53308.jpg"
+   "thumb": "library/thumbs/L-D53308.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-9435A6",
@@ -9700,7 +10355,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-9435A6.jpg"
+   "thumb": "library/thumbs/L-9435A6.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-7A27D6",
@@ -9716,7 +10372,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-7A27D6.jpg",
-   "author": "Canavan, Gerry; Link, Eric Carl"
+   "author": "Canavan, Gerry; Link, Eric Carl",
+   "relevance": "unread"
   },
   {
    "id": "L-BC21FE",
@@ -9732,7 +10389,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-BC21FE.jpg"
+   "thumb": "library/thumbs/L-BC21FE.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-DF6714",
@@ -9746,7 +10404,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-DF6714.jpg"
+   "thumb": "library/thumbs/L-DF6714.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-6F8852",
@@ -9761,7 +10420,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-6F8852.jpg"
+   "thumb": "library/thumbs/L-6F8852.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-C1C2EA",
@@ -9777,7 +10437,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-C1C2EA.jpg"
+   "thumb": "library/thumbs/L-C1C2EA.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-69CAF2",
@@ -9792,7 +10453,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-69CAF2.jpg",
-   "author": "Kouroupetroglou, Georgios"
+   "author": "Kouroupetroglou, Georgios",
+   "relevance": "unread"
   },
   {
    "id": "L-F98944",
@@ -9807,7 +10469,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-F98944.jpg",
-   "author": "Bathroom Readers' Institute"
+   "author": "Bathroom Readers' Institute",
+   "relevance": "unread"
   },
   {
    "id": "L-5ADEE1",
@@ -9822,7 +10485,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-5ADEE1.jpg",
-   "author": "The Editors of Salem Press"
+   "author": "The Editors of Salem Press",
+   "relevance": "unread"
   },
   {
    "id": "L-A279A9",
@@ -9837,7 +10501,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-A279A9.jpg"
+   "thumb": "library/thumbs/L-A279A9.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-158F6F",
@@ -9852,7 +10517,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-158F6F.jpg",
-   "author": "Moormann, Peter"
+   "author": "Moormann, Peter",
+   "relevance": "unread"
   },
   {
    "id": "L-996924",
@@ -9867,7 +10533,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-996924.jpg"
+   "thumb": "library/thumbs/L-996924.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-2C3025",
@@ -9882,7 +10549,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-2C3025.jpg",
-   "author": "Tan, Siu-Lan; Cohen, Annabel J.; Lipscomb, Scott David; Kendall, Roger A."
+   "author": "Tan, Siu-Lan; Cohen, Annabel J.; Lipscomb, Scott David; Kendall, Roger A.",
+   "relevance": "unread"
   },
   {
    "id": "L-46C821",
@@ -9897,7 +10565,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-46C821.jpg"
+   "thumb": "library/thumbs/L-46C821.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-19D464",
@@ -9911,7 +10580,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-19D464.jpg"
+   "thumb": "library/thumbs/L-19D464.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-79C9B7",
@@ -9926,7 +10596,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-79C9B7.jpg"
+   "thumb": "library/thumbs/L-79C9B7.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-E2486C",
@@ -9941,7 +10612,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-E2486C.jpg"
+   "thumb": "library/thumbs/L-E2486C.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-84D998",
@@ -9956,7 +10628,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-84D998.jpg"
+   "thumb": "library/thumbs/L-84D998.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-34AD39",
@@ -9970,7 +10643,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-34AD39.jpg"
+   "thumb": "library/thumbs/L-34AD39.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-A619C4",
@@ -9985,7 +10659,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-A619C4.jpg"
+   "thumb": "library/thumbs/L-A619C4.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-6B2E23",
@@ -9999,7 +10674,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-6B2E23.jpg"
+   "thumb": "library/thumbs/L-6B2E23.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-57E3C1",
@@ -10014,7 +10690,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-57E3C1.jpg"
+   "thumb": "library/thumbs/L-57E3C1.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-19ED74",
@@ -10029,7 +10706,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-19ED74.jpg",
-   "author": "Publications International Ltd."
+   "author": "Publications International Ltd.",
+   "relevance": "unread"
   },
   {
    "id": "L-558182",
@@ -10044,7 +10722,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-558182.jpg"
+   "thumb": "library/thumbs/L-558182.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-3D2FAD",
@@ -10059,7 +10738,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-3D2FAD.jpg"
+   "thumb": "library/thumbs/L-3D2FAD.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-9E6FD9",
@@ -10074,7 +10754,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-9E6FD9.jpg"
+   "thumb": "library/thumbs/L-9E6FD9.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-BBE5F8",
@@ -10089,7 +10770,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-BBE5F8.jpg"
+   "thumb": "library/thumbs/L-BBE5F8.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-65F1AE",
@@ -10104,7 +10786,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-65F1AE.jpg",
-   "author": "Publications International Ltd. Staff"
+   "author": "Publications International Ltd. Staff",
+   "relevance": "unread"
   },
   {
    "id": "L-85408F",
@@ -10119,7 +10802,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-85408F.jpg"
+   "thumb": "library/thumbs/L-85408F.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-705188",
@@ -10135,7 +10819,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-705188.jpg"
+   "thumb": "library/thumbs/L-705188.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-66BF3A",
@@ -10150,7 +10835,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-66BF3A.jpg"
+   "thumb": "library/thumbs/L-66BF3A.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-3F1A69",
@@ -10166,7 +10852,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-3F1A69.jpg"
+   "thumb": "library/thumbs/L-3F1A69.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-0AD155",
@@ -10182,7 +10869,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-0AD155.jpg"
+   "thumb": "library/thumbs/L-0AD155.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-813446",
@@ -10197,7 +10885,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-813446.jpg"
+   "thumb": "library/thumbs/L-813446.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-DF9316",
@@ -10211,7 +10900,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-DF9316.jpg"
+   "thumb": "library/thumbs/L-DF9316.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-8FD139",
@@ -10226,7 +10916,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-8FD139.jpg"
+   "thumb": "library/thumbs/L-8FD139.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-591C4B",
@@ -10241,7 +10932,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-591C4B.jpg"
+   "thumb": "library/thumbs/L-591C4B.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-933C6A",
@@ -10256,7 +10948,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-933C6A.jpg"
+   "thumb": "library/thumbs/L-933C6A.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-658C95",
@@ -10271,7 +10964,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-658C95.jpg"
+   "thumb": "library/thumbs/L-658C95.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-245C4F",
@@ -10286,7 +10980,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-245C4F.jpg"
+   "thumb": "library/thumbs/L-245C4F.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-BBC169",
@@ -10300,7 +10995,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-BBC169.jpg"
+   "thumb": "library/thumbs/L-BBC169.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-24F8E2",
@@ -10315,7 +11011,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-24F8E2.jpg"
+   "thumb": "library/thumbs/L-24F8E2.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-C5A1E6",
@@ -10330,7 +11027,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-C5A1E6.jpg",
-   "author": "Heider, Don"
+   "author": "Heider, Don",
+   "relevance": "unread"
   },
   {
    "id": "L-8128FD",
@@ -10344,7 +11042,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-8128FD.jpg"
+   "thumb": "library/thumbs/L-8128FD.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-7B1BE2",
@@ -10359,7 +11058,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-7B1BE2.jpg"
+   "thumb": "library/thumbs/L-7B1BE2.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-A427B3",
@@ -10373,7 +11073,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-A427B3.jpg"
+   "thumb": "library/thumbs/L-A427B3.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-D333ED",
@@ -10388,7 +11089,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-D333ED.jpg"
+   "thumb": "library/thumbs/L-D333ED.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-E2D23B",
@@ -10403,7 +11105,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-E2D23B.jpg"
+   "thumb": "library/thumbs/L-E2D23B.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-2A1A6F",
@@ -10418,7 +11121,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-2A1A6F.jpg"
+   "thumb": "library/thumbs/L-2A1A6F.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-01316E",
@@ -10434,7 +11138,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-01316E.jpg"
+   "thumb": "library/thumbs/L-01316E.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-87378D",
@@ -10450,7 +11155,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-87378D.jpg"
+   "thumb": "library/thumbs/L-87378D.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-37208E",
@@ -10466,7 +11172,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-37208E.jpg"
+   "thumb": "library/thumbs/L-37208E.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-92AE54",
@@ -10481,7 +11188,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-92AE54.jpg"
+   "thumb": "library/thumbs/L-92AE54.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-49A0DD",
@@ -10496,7 +11204,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-49A0DD.jpg"
+   "thumb": "library/thumbs/L-49A0DD.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-DC8A43",
@@ -10511,7 +11220,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-DC8A43.jpg"
+   "thumb": "library/thumbs/L-DC8A43.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-47E00F",
@@ -10527,7 +11237,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-47E00F.jpg"
+   "thumb": "library/thumbs/L-47E00F.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-EBC9F5",
@@ -10542,7 +11253,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-EBC9F5.jpg"
+   "thumb": "library/thumbs/L-EBC9F5.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-1D991A",
@@ -10557,7 +11269,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-1D991A.jpg"
+   "thumb": "library/thumbs/L-1D991A.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-5A04DF",
@@ -10572,7 +11285,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-5A04DF.jpg"
+   "thumb": "library/thumbs/L-5A04DF.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-55C75D",
@@ -10587,7 +11301,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-55C75D.jpg"
+   "thumb": "library/thumbs/L-55C75D.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-362AC7",
@@ -10602,7 +11317,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-362AC7.jpg"
+   "thumb": "library/thumbs/L-362AC7.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-9829DE",
@@ -10616,7 +11332,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-9829DE.jpg"
+   "thumb": "library/thumbs/L-9829DE.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-AEC497",
@@ -10632,7 +11349,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-AEC497.jpg",
-   "author": "Vorderer, Peter; Bryant, Jennings"
+   "author": "Vorderer, Peter; Bryant, Jennings",
+   "relevance": "unread"
   },
   {
    "id": "L-2877E5",
@@ -10647,7 +11365,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-2877E5.jpg"
+   "thumb": "library/thumbs/L-2877E5.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-CC60AF",
@@ -10662,7 +11381,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-CC60AF.jpg"
+   "thumb": "library/thumbs/L-CC60AF.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-4B831C",
@@ -10677,7 +11397,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-4B831C.jpg",
-   "author": "LaMothe, Andre"
+   "author": "LaMothe, Andre",
+   "relevance": "unread"
   },
   {
    "id": "L-0C06BB",
@@ -10693,7 +11414,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-0C06BB.jpg"
+   "thumb": "library/thumbs/L-0C06BB.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-60F0C9",
@@ -10708,7 +11430,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-60F0C9.jpg"
+   "thumb": "library/thumbs/L-60F0C9.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-393911",
@@ -10724,7 +11447,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-393911.jpg"
+   "thumb": "library/thumbs/L-393911.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-FF5AB5",
@@ -10738,7 +11462,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-FF5AB5.jpg"
+   "thumb": "library/thumbs/L-FF5AB5.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-CEE0A9",
@@ -10753,7 +11478,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-CEE0A9.jpg"
+   "thumb": "library/thumbs/L-CEE0A9.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-06D6BD",
@@ -10769,7 +11495,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-06D6BD.jpg"
+   "thumb": "library/thumbs/L-06D6BD.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-FC2D7B",
@@ -10785,7 +11512,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-FC2D7B.jpg"
+   "thumb": "library/thumbs/L-FC2D7B.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-35EEB9",
@@ -10800,7 +11528,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-35EEB9.jpg",
-   "author": "Garrelts, Nate"
+   "author": "Garrelts, Nate",
+   "relevance": "unread"
   },
   {
    "id": "L-2C1FC7",
@@ -10815,7 +11544,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-2C1FC7.jpg"
+   "thumb": "library/thumbs/L-2C1FC7.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-61E111",
@@ -10829,7 +11559,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-61E111.jpg"
+   "thumb": "library/thumbs/L-61E111.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-755741",
@@ -10844,7 +11575,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-755741.jpg",
-   "author": "Pearson Custom Publishing"
+   "author": "Pearson Custom Publishing",
+   "relevance": "unread"
   },
   {
    "id": "L-DD98D2",
@@ -10859,7 +11591,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-DD98D2.jpg"
+   "thumb": "library/thumbs/L-DD98D2.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-50E0E3",
@@ -10874,7 +11607,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-50E0E3.jpg"
+   "thumb": "library/thumbs/L-50E0E3.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-B73BDF",
@@ -10890,7 +11624,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-B73BDF.jpg"
+   "thumb": "library/thumbs/L-B73BDF.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-81B1C4",
@@ -10904,7 +11639,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-81B1C4.jpg"
+   "thumb": "library/thumbs/L-81B1C4.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-F8A44F",
@@ -10919,7 +11655,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-F8A44F.jpg",
-   "author": "Harrison, Ian"
+   "author": "Harrison, Ian",
+   "relevance": "unread"
   },
   {
    "id": "L-2C998E",
@@ -10934,7 +11671,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-2C998E.jpg"
+   "thumb": "library/thumbs/L-2C998E.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-D1D6B7",
@@ -10950,7 +11688,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-D1D6B7.jpg"
+   "thumb": "library/thumbs/L-D1D6B7.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-77563F",
@@ -10964,7 +11703,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-77563F.jpg"
+   "thumb": "library/thumbs/L-77563F.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-A2322C",
@@ -10979,7 +11719,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-A2322C.jpg"
+   "thumb": "library/thumbs/L-A2322C.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-D2DEDB",
@@ -10995,7 +11736,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-D2DEDB.jpg"
+   "thumb": "library/thumbs/L-D2DEDB.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-C6FEB4",
@@ -11010,7 +11752,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-C6FEB4.jpg"
+   "thumb": "library/thumbs/L-C6FEB4.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-E75C54",
@@ -11025,7 +11768,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-E75C54.jpg"
+   "thumb": "library/thumbs/L-E75C54.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-505F6C",
@@ -11040,7 +11784,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-505F6C.jpg"
+   "thumb": "library/thumbs/L-505F6C.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-9DC464",
@@ -11056,7 +11801,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-9DC464.jpg"
+   "thumb": "library/thumbs/L-9DC464.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-0931AF",
@@ -11071,7 +11817,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-0931AF.jpg"
+   "thumb": "library/thumbs/L-0931AF.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-CCD0C5",
@@ -11087,7 +11834,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-CCD0C5.jpg"
+   "thumb": "library/thumbs/L-CCD0C5.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-DA06FE",
@@ -11102,7 +11850,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-DA06FE.jpg"
+   "thumb": "library/thumbs/L-DA06FE.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-714FB5",
@@ -11118,7 +11867,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-714FB5.jpg"
+   "thumb": "library/thumbs/L-714FB5.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-B229FF",
@@ -11133,7 +11883,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-B229FF.jpg"
+   "thumb": "library/thumbs/L-B229FF.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-029834",
@@ -11148,7 +11899,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-029834.jpg"
+   "thumb": "library/thumbs/L-029834.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-1C8C8B",
@@ -11163,7 +11915,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-1C8C8B.jpg"
+   "thumb": "library/thumbs/L-1C8C8B.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-67AFB1",
@@ -11178,7 +11931,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-67AFB1.jpg"
+   "thumb": "library/thumbs/L-67AFB1.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-48D0B0",
@@ -11192,7 +11946,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-48D0B0.jpg"
+   "thumb": "library/thumbs/L-48D0B0.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-2D7B42",
@@ -11207,7 +11962,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-2D7B42.jpg"
+   "thumb": "library/thumbs/L-2D7B42.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-63FFDD",
@@ -11223,7 +11979,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-63FFDD.jpg"
+   "thumb": "library/thumbs/L-63FFDD.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-9FC603",
@@ -11238,7 +11995,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-9FC603.jpg"
+   "thumb": "library/thumbs/L-9FC603.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-B3AD16",
@@ -11253,7 +12011,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-B3AD16.jpg"
+   "thumb": "library/thumbs/L-B3AD16.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-14ED10",
@@ -11268,7 +12027,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-14ED10.jpg"
+   "thumb": "library/thumbs/L-14ED10.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-7113A9",
@@ -11282,7 +12042,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-7113A9.jpg"
+   "thumb": "library/thumbs/L-7113A9.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-827258",
@@ -11297,7 +12058,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-827258.jpg"
+   "thumb": "library/thumbs/L-827258.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-612432",
@@ -11311,7 +12073,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-612432.jpg"
+   "thumb": "library/thumbs/L-612432.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-A3629A",
@@ -11327,7 +12090,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-A3629A.jpg"
+   "thumb": "library/thumbs/L-A3629A.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-7C3A5B",
@@ -11342,7 +12106,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-7C3A5B.jpg"
+   "thumb": "library/thumbs/L-7C3A5B.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-854087",
@@ -11358,7 +12123,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-854087.jpg"
+   "thumb": "library/thumbs/L-854087.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-4D0252",
@@ -11373,7 +12139,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-4D0252.jpg"
+   "thumb": "library/thumbs/L-4D0252.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-BD6AF2",
@@ -11389,7 +12156,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-BD6AF2.jpg"
+   "thumb": "library/thumbs/L-BD6AF2.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-E5A593",
@@ -11404,7 +12172,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-E5A593.jpg"
+   "thumb": "library/thumbs/L-E5A593.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-53F17F",
@@ -11419,7 +12188,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-53F17F.jpg",
-   "author": "Ditlea, Steve; Group, Lunch; Thom Hartmann (contributor)"
+   "author": "Ditlea, Steve; Group, Lunch; Thom Hartmann (contributor)",
+   "relevance": "unread"
   },
   {
    "id": "L-B80448",
@@ -11434,7 +12204,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-B80448.jpg"
+   "thumb": "library/thumbs/L-B80448.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-400A2B",
@@ -11448,7 +12219,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "thumb": "library/thumbs/L-400A2B.jpg"
+   "thumb": "library/thumbs/L-400A2B.jpg",
+   "relevance": "unread"
   },
   {
    "id": "L-AEC52F",
@@ -11463,7 +12235,8 @@
    "url": "https://doi.org/10.1093/crj/claf009",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-4B4F3A",
@@ -11477,7 +12250,8 @@
    "url": "https://core.ac.uk/works/155418481",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-34B492",
@@ -11491,7 +12265,8 @@
    "url": "https://doi.org/10.7551/mitpress/11213.003.0010",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-9246EE",
@@ -11505,7 +12280,8 @@
    "url": "https://doi.org/10.62411/tcv.v1i2.2068",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-40A85A",
@@ -11518,7 +12294,8 @@
    "url": "https://core.ac.uk/works/294512379",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-8A3D24",
@@ -11532,7 +12309,8 @@
    "url": "https://doi.org/10.1215/00029831-10575246",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-CCA0D2",
@@ -11545,7 +12323,8 @@
    "url": "https://podcasts.apple.com/us/podcast/ms-dos-club-vol-22-juegos-amorosos-spacewar-y-qu%C3%A9-pas%C3%B3/id1505791079?i=1000548631710",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-08373B",
@@ -11559,7 +12338,8 @@
    "url": "https://doi.org/10.1017/9789048550623.012",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-BD4C8D",
@@ -11573,7 +12353,8 @@
    "url": "https://doi.org/10.17613/265t6-7c662",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-644DF5",
@@ -11587,7 +12368,8 @@
    "url": "https://doi.org/10.1017/9781108670289.021",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-B9D232",
@@ -11604,7 +12386,8 @@
    "url": "https://doi.org/10.1057/978-1-349-95851-1_1",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-101667",
@@ -11617,7 +12400,8 @@
    "url": "https://doi.org/10.1108/978-1-83909-037-020201006",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-ECAE6B",
@@ -11630,7 +12414,8 @@
    "url": "https://www.youtube.com/watch?v=Wg9RtyKGZeo",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-35DDB7",
@@ -11645,7 +12430,8 @@
    "url": "https://doi.org/10.17583/brac.2020.3084",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-320E3F",
@@ -11660,7 +12446,8 @@
    "url": "https://doi.org/10.14361/9783839447130-011",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-842FF6",
@@ -11675,7 +12462,8 @@
    "url": "https://doi.org/10.33015/dominican.edu/2019.hist.st.04",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-00F04D",
@@ -11689,7 +12477,8 @@
    "url": "https://doi.org/10.5325/reception.11.1.0058",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-606724",
@@ -11703,7 +12492,8 @@
    "url": "https://www.youtube.com/watch?v=CwZAKJ8Y6YU",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-8EC863",
@@ -11717,7 +12507,8 @@
    "url": "https://doi.org/10.1093/jiplp/jpx193",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-8453FE",
@@ -11731,7 +12522,8 @@
    "url": "https://depot.ceon.pl/handle/123456789/14875",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-46B83B",
@@ -11744,7 +12536,8 @@
    "url": "http://darhiv.ffzg.unizg.hr/id/eprint/9276/1/Semanti%C4%8Dki%20i%20rje%C4%8Dni%C4%8Dki%20opis%20hrvatskoga%20gejmerskog%20jezika_Tihana%20Lon%C4%8Dari%C4%87%20%28diplomski%20rad%29.pdf",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-3553D1",
@@ -11758,7 +12551,8 @@
    "url": "https://archive.org/details/splinternethowge0000malc",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-1F422A",
@@ -11771,7 +12565,8 @@
    "url": "https://archive.org/details/newcompaniontodi0000unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-CAA681",
@@ -11785,7 +12580,8 @@
    "url": "https://doaj.org/article/197d29d9db5147cdb656a2c595f7546a",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-1AD8ED",
@@ -11797,7 +12593,8 @@
    "url": "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.403.5993",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-E780D8",
@@ -11811,7 +12608,8 @@
    "url": "https://archive.org/details/inventingmediump0000murr",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-A6D5D4",
@@ -11825,7 +12623,8 @@
    "url": "https://doi.org/10.1109/iuser.2011.6150539",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-6184B5",
@@ -11840,7 +12639,8 @@
    "url": "https://archive.org/details/funincwhygamingw0000chat_q1i8",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-396A3A",
@@ -11853,7 +12653,8 @@
    "url": "https://archive.org/details/lccn_97801716601104_3",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-95B3B5",
@@ -11867,7 +12668,8 @@
    "url": "https://archive.org/details/isbn_9780313339745",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-47590C",
@@ -11882,7 +12684,8 @@
    "url": "https://doi.org/10.7371/71209",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-A52D5B",
@@ -11897,7 +12700,8 @@
    "url": "https://openalex.org/W123595591",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-79EFF8",
@@ -11910,7 +12714,8 @@
    "url": "https://core.ac.uk/works/52827100",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-B789BC",
@@ -11924,7 +12729,8 @@
    "url": "https://doi.org/10.2312/eged.20091012",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-796EF5",
@@ -11938,7 +12744,8 @@
    "url": "https://doi.org/10.1353/sym.2009.0028",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-C5542B",
@@ -11951,7 +12758,8 @@
    "url": "https://archive.org/details/encyclopediaofca0000unse_v5z0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-2987DA",
@@ -11965,7 +12773,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "author": "Donsbach, Wolfgang"
+   "author": "Donsbach, Wolfgang",
+   "relevance": "unread"
   },
   {
    "id": "L-49F543",
@@ -11979,7 +12788,8 @@
    "url": "https://archive.org/details/introductiontoga0000moor",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-C131E1",
@@ -11993,7 +12803,8 @@
    "url": "https://archive.org/details/persuasivegamese00bogo",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-B395D8",
@@ -12006,7 +12817,8 @@
    "url": "https://doi.org/10.5040/9798216032106.0006",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-945041",
@@ -12019,7 +12831,8 @@
    "url": "https://archive.org/details/internethistoric0003unse",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-48A85D",
@@ -12032,7 +12845,8 @@
    "url": "https://archive.org/details/encyclopediaof200000unse_z0c0",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-E1C658",
@@ -12046,7 +12860,8 @@
    "url": "https://archive.org/details/encyclopediaamer30scho",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-168AF5",
@@ -12060,7 +12875,8 @@
    "url": "https://archive.org/details/2005gamersalmana0000cart",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-D3F75C",
@@ -12074,7 +12890,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "author": "Bainbridge, William Sims"
+   "author": "Bainbridge, William Sims",
+   "relevance": "unread"
   },
   {
    "id": "L-1890A8",
@@ -12087,7 +12904,8 @@
    "url": "https://archive.org/details/conciseencyclope0000unse_v5u2",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-86A885",
@@ -12102,7 +12920,8 @@
    "url": "https://archive.org/details/isbn_9780816043736",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-F75C96",
@@ -12115,7 +12934,8 @@
    "url": "https://eprints.lancs.ac.uk/id/eprint/12310/1/2003-Gilleade-Videogames.pdf",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-A4A41F",
@@ -12129,7 +12949,8 @@
    "url": "https://archive.org/details/hippiedictionary00john",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-3DF593",
@@ -12143,7 +12964,8 @@
    "url": "https://archive.org/details/encyclopediaofmo0000cole",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-7DC8A3",
@@ -12157,7 +12979,8 @@
    "url": "https://archive.org/details/hackattacksencyc0000chir",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-C9303A",
@@ -12169,7 +12992,8 @@
    "url": "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.542.1402",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-C38410",
@@ -12183,7 +13007,8 @@
    "url": "https://archive.org/details/encyclopediaofco0000unse_r5p3",
    "tags": [
     "found by full-text search, not read"
-   ]
+   ],
+   "relevance": "unread"
   },
   {
    "id": "L-43F2C4",
@@ -12195,7 +13020,8 @@
    "url": "https://mitmuseum.mit.edu/collections/subject/spacewar!-1234",
    "tags": [
     "title only, not read"
-   ]
+   ],
+   "relevance": "unread"
   }
  ]
 }
