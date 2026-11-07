@@ -113,7 +113,8 @@
    "licence": "None stated",
    "file": "library/files/P-WCNIW.pdf",
    "url": "https://archive.org/details/2015MonnensGoldberg",
-   "source": "Internet Archive, 2015MonnensGoldberg"
+   "source": "Internet Archive, 2015MonnensGoldberg",
+   "in": "Kinephanos Revue d études des médias et de culture populaire"
   },
   {
    "id": "L-493678",
@@ -6036,20 +6037,6 @@
    ]
   },
   {
-   "id": "L-923DC7",
-   "title": "Aaron Trammell: The Privilege of Play. A History of Hobby Games, Race, and Geek Culture.: New York: NYU Press 2023. ISBN: 9781479818402. 240 Seiten, 30,00 $",
-   "author": "Sulzenbacher, Stefan",
-   "date": "2025-11-12",
-   "kind": "article",
-   "lang": "de",
-   "publisher": "tfm | Institut für Theater-, Film- und Medienwissenschaft an der Universität Wie",
-   "note": "Review of Trammell: says he reframes MIT's TMRC, often treated as the cradle of gaming and hacking because of Spacewar!, through white male privilege and hobbyism.",
-   "url": "https://core.ac.uk/works/316262053",
-   "tags": [
-    "passing discussion"
-   ]
-  },
-  {
    "id": "L-E0D749",
    "title": "A criação de um Artbook através de boas práticas de pesquisa e contextualização",
    "author": "Abreu, Patrícia Carolina Popper de",
@@ -8689,20 +8676,6 @@
    ]
   },
   {
-   "id": "L-8D91E5",
-   "title": "Strana Igr 2006 no. 13 (214)",
-   "date": "2006-07",
-   "kind": "magazine",
-   "lang": "ru",
-   "in": "Strana Igr",
-   "note": "Russian news item on the death of Alan Kotok, one of the game's creators, with the 1962 origin at MIT. Spacewar! at scan leaf 9.",
-   "url": "https://archive.org/details/Game_Land_2006-13-214",
-   "tags": [
-    "passing discussion"
-   ],
-   "author": "Gameland Publishing"
-  },
-  {
    "id": "L-61231D",
    "title": "Remembering Alan Kotok",
    "date": "2006-07-12",
@@ -9368,6 +9341,76 @@
    "tags": [
     "passing discussion"
    ]
+  },
+  {
+   "id": "L-CECEBC",
+   "title": "Aaron Trammell: The Privilege of Play. A History of Hobby Games, Race, and Geek Culture",
+   "author": "Sulzenbacher, Stefan",
+   "date": "2025-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "[rezens.tfm]",
+   "doi": "10.25969/mediarep/24225",
+   "licence": "CC BY-SA 4.0",
+   "url": "https://doi.org/10.25969/mediarep/24225",
+   "tags": [
+    "found by full-text search, not read"
+   ],
+   "file": "library/files/L-CECEBC.pdf",
+   "source": "https://rezenstfm.univie.ac.at/index.php/tfm/article/download/9546/9971",
+   "publisher": "tfm | Institut für Theater-, Film- und Medienwissenschaft an der Universität Wie",
+   "note": "Review of Trammell: says he reframes MIT's TMRC, often treated as the cradle of gaming and hacking because of Spacewar!, through white male privilege and hobbyism."
+  },
+  {
+   "id": "L-3D881D",
+   "title": "Militarizing and Colonizing Outer Space as a Video Game. Ender’s Game and Astroculture",
+   "author": "Kempna-Pieniążek, Magdalena",
+   "date": "2024-09-25",
+   "kind": "article",
+   "lang": "en",
+   "in": "Przestrzenie Teorii",
+   "doi": "10.14746/pt.2024.special.11",
+   "licence": "CC BY-NC-ND 4.0",
+   "url": "https://doi.org/10.14746/pt.2024.special.11",
+   "tags": [
+    "found by full-text search, not read"
+   ],
+   "file": "library/files/L-3D881D.pdf",
+   "source": "https://pressto.amu.edu.pl/index.php/pt/article/download/44469/36805"
+  },
+  {
+   "id": "L-7C4C85",
+   "title": "Game Online: Ancaman ‘Candu Digital’",
+   "author": "Khosiin, Khamam",
+   "date": "2022-12-20",
+   "kind": "article",
+   "lang": "en",
+   "in": "Syntax Idea",
+   "doi": "10.36418/syntax-idea.v4i12.2100",
+   "licence": "CC BY-SA 4.0",
+   "url": "https://doi.org/10.36418/syntax-idea.v4i12.2100",
+   "tags": [
+    "found by full-text search, not read"
+   ],
+   "file": "library/files/L-7C4C85.pdf",
+   "source": "https://www.jurnal.syntax-idea.co.id/index.php/syntax-idea/article/download/2100/1376"
+  },
+  {
+   "id": "L-2BD2EC",
+   "title": "On the Translation of Video Games",
+   "author": "Bernal, Miguel",
+   "date": "2006-07-25",
+   "kind": "article",
+   "lang": "en",
+   "in": "The Journal of Specialised Translation",
+   "doi": "10.26034/cm.jostrans.2006.736",
+   "licence": "CC BY 4.0",
+   "url": "https://doi.org/10.26034/cm.jostrans.2006.736",
+   "tags": [
+    "found by full-text search, not read"
+   ],
+   "file": "library/files/L-2BD2EC.pdf",
+   "source": "https://www.jostrans.org/article/download/7270/6558"
   },
   {
    "id": "L-25A3B3",
@@ -11408,6 +11451,21 @@
    "thumb": "library/thumbs/L-400A2B.jpg"
   },
   {
+   "id": "L-AEC52F",
+   "title": "Bayek’s promise: authentic vs. accurate Ptolemaic astronomy in Assassin’s Creed: Origins",
+   "author": "Leaning, Elizabeth",
+   "date": "2025-07-08",
+   "kind": "article",
+   "lang": "en",
+   "in": "Classical Receptions Journal",
+   "doi": "10.1093/crj/claf009",
+   "licence": "cc-by-nc",
+   "url": "https://doi.org/10.1093/crj/claf009",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
    "id": "L-4B4F3A",
    "title": "La localizzazione dei videogiochi: da Spacewar! a The Elder Scrolls Online",
    "author": "Bugnoli, Federica",
@@ -11419,6 +11477,34 @@
    "url": "https://core.ac.uk/works/155418481",
    "tags": [
     "title only, not read"
+   ]
+  },
+  {
+   "id": "L-34B492",
+   "title": "Assessing the Gimmick Factor",
+   "date": "2024-05-14",
+   "kind": "chapter",
+   "lang": "en",
+   "in": "The MIT Press eBooks",
+   "doi": "10.7551/mitpress/11213.003.0010",
+   "licence": "cc-by-nc-nd",
+   "url": "https://doi.org/10.7551/mitpress/11213.003.0010",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-9246EE",
+   "title": "Penerapan Algoritma Fuzzy Logic Tsukamoto Terhadap Perilaku NPC Pada Game 2D Shooter",
+   "author": "Kalalo, Jonathan Marcello; Haryanto, Hanny; Astuti, Erna Zuni",
+   "date": "2024-01-25",
+   "kind": "article",
+   "lang": "id",
+   "in": "TECHNO CREATIVE",
+   "doi": "10.62411/tcv.v1i2.2068",
+   "url": "https://doi.org/10.62411/tcv.v1i2.2068",
+   "tags": [
+    "found by full-text search, not read"
    ]
   },
   {
@@ -11435,6 +11521,20 @@
    ]
   },
   {
+   "id": "L-8A3D24",
+   "title": "Artificial Intelligence in Video Games",
+   "author": "Jagoda, Patrick",
+   "date": "2023-03-17",
+   "kind": "article",
+   "lang": "en",
+   "in": "American Literature",
+   "doi": "10.1215/00029831-10575246",
+   "url": "https://doi.org/10.1215/00029831-10575246",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
    "id": "L-CCA0D2",
    "title": "MS-DOS CLUB – Vol 22 – Juegos amorosos, Spacewar! y qué pasó con Nintendo",
    "date": "2022-02-27",
@@ -11445,6 +11545,48 @@
    "url": "https://podcasts.apple.com/us/podcast/ms-dos-club-vol-22-juegos-amorosos-spacewar-y-qu%C3%A9-pas%C3%B3/id1505791079?i=1000548631710",
    "tags": [
     "title only, not read"
+   ]
+  },
+  {
+   "id": "L-08373B",
+   "title": "Naturalist Tendency in European Narrative Games",
+   "author": "Zagalo, Nelson",
+   "date": "2021-11-27",
+   "kind": "chapter",
+   "lang": "en",
+   "in": "Amsterdam University Press eBooks",
+   "doi": "10.1017/9789048550623.012",
+   "url": "https://doi.org/10.1017/9789048550623.012",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-BD4C8D",
+   "title": "UFOs: History and Natural Sciences. Bibliography ger./en.",
+   "author": "Buike, Bruno",
+   "date": "2021-07-03",
+   "kind": "article",
+   "lang": "en",
+   "in": "Knowledge Commons (Lakehead University)",
+   "doi": "10.17613/265t6-7c662",
+   "url": "https://doi.org/10.17613/265t6-7c662",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-644DF5",
+   "title": "Game Music and History",
+   "author": "Cook, James",
+   "date": "2021-04-15",
+   "kind": "chapter",
+   "lang": "en",
+   "in": "Cambridge University Press eBooks",
+   "doi": "10.1017/9781108670289.021",
+   "url": "https://doi.org/10.1017/9781108670289.021",
+   "tags": [
+    "found by full-text search, not read"
    ]
   },
   {
@@ -11465,6 +11607,19 @@
    ]
   },
   {
+   "id": "L-101667",
+   "title": "Index",
+   "date": "2020-08-05",
+   "kind": "article",
+   "lang": "en",
+   "in": "Emerald Group Publishing Limited eBooks",
+   "doi": "10.1108/978-1-83909-037-020201006",
+   "url": "https://doi.org/10.1108/978-1-83909-037-020201006",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
    "id": "L-ECAE6B",
    "title": "It All Began with Spacewar!",
    "author": "Bowser, Ciara",
@@ -11475,6 +11630,36 @@
    "url": "https://www.youtube.com/watch?v=Wg9RtyKGZeo",
    "tags": [
     "title only, not read"
+   ]
+  },
+  {
+   "id": "L-35DDB7",
+   "title": "Art Games: Acción Lúdica Reflexiva",
+   "author": "Urroz, Ana",
+   "date": "2020-02-03",
+   "kind": "article",
+   "lang": "en",
+   "in": "Barcelona Investigación Arte Creación",
+   "doi": "10.17583/brac.2020.3084",
+   "licence": "cc-by",
+   "url": "https://doi.org/10.17583/brac.2020.3084",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-320E3F",
+   "title": "Conclusion",
+   "author": "Igarzábal, Federico Alvarez",
+   "date": "2019-09-08",
+   "kind": "chapter",
+   "lang": "de",
+   "in": "Bild und Bit",
+   "doi": "10.14361/9783839447130-011",
+   "licence": "cc-by",
+   "url": "https://doi.org/10.14361/9783839447130-011",
+   "tags": [
+    "found by full-text search, not read"
    ]
   },
   {
@@ -11493,6 +11678,20 @@
    ]
   },
   {
+   "id": "L-00F04D",
+   "title": "Playing with Feelings: Video Games and Affect",
+   "author": "Moberly, Kevin",
+   "date": "2019-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "Reception Texts Readers Audiences History",
+   "doi": "10.5325/reception.11.1.0058",
+   "url": "https://doi.org/10.5325/reception.11.1.0058",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
    "id": "L-606724",
    "title": "Spacewar! (1961) - First digital computer game",
    "author": "Ultimate History of Video Games",
@@ -11504,6 +11703,47 @@
    "url": "https://www.youtube.com/watch?v=CwZAKJ8Y6YU",
    "tags": [
     "title only, not read"
+   ]
+  },
+  {
+   "id": "L-8EC863",
+   "title": "Putting a face to the game: the intellectual property implications of using celebrity likenesses in videogames",
+   "author": "Lee, Yin Harn",
+   "date": "2017-09-21",
+   "kind": "article",
+   "lang": "en",
+   "in": "Journal of Intellectual Property Law & Practice",
+   "doi": "10.1093/jiplp/jpx193",
+   "url": "https://doi.org/10.1093/jiplp/jpx193",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-8453FE",
+   "title": "Gry wideo w środowisku rodzinnym. Diagnoza i rekomendacje",
+   "author": "Gałuszka, Damian",
+   "date": "2017-01-01",
+   "kind": "book",
+   "lang": "pl",
+   "in": "CeON Repository (Centre for Evaluation in Education and Science)",
+   "licence": "cc-by-nc-sa",
+   "url": "https://depot.ceon.pl/handle/123456789/14875",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-46B83B",
+   "title": "Semantički i leksikografski opis hrvatskoga gejmerskog jezika",
+   "author": "Šubaša, Tihana Lončarić",
+   "date": "2017-01-01",
+   "kind": "thesis",
+   "lang": "hr",
+   "in": "Repozitorij Filozofskog fakulteta u Zagrebu' at University of Zagreb (University of Zagreb)",
+   "url": "http://darhiv.ffzg.unizg.hr/id/eprint/9276/1/Semanti%C4%8Dki%20i%20rje%C4%8Dni%C4%8Dki%20opis%20hrvatskoga%20gejmerskog%20jezika_Tihana%20Lon%C4%8Dari%C4%87%20%28diplomski%20rad%29.pdf",
+   "tags": [
+    "found by full-text search, not read"
    ]
   },
   {
@@ -11534,6 +11774,32 @@
    ]
   },
   {
+   "id": "L-CAA681",
+   "title": "Difusión de los géneros, características, plataformas, herramientas de desarrollo que se usan en la industria de los video-juegos",
+   "author": "Sarango, Yamil Edinson Lambert",
+   "date": "2013-12-30",
+   "kind": "article",
+   "lang": "es",
+   "in": "DOAJ (DOAJ: Directory of Open Access Journals)",
+   "licence": "cc-by-sa",
+   "url": "https://doaj.org/article/197d29d9db5147cdb656a2c595f7546a",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-1AD8ED",
+   "title": "The Translator's Agency and the Ideological Manipulation in Translation: the Case of Political Texts in Translation Classrooms in Iran",
+   "author": "Afzali, Katayoon",
+   "date": "2013-09-01",
+   "kind": "article",
+   "lang": "en",
+   "url": "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.403.5993",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
    "id": "L-E780D8",
    "title": "Inventing the medium: principles of interaction design as a cultural practice",
    "author": "Murray, Janet H",
@@ -11543,6 +11809,20 @@
    "publisher": "MIT Press",
    "isbn": "9780262016148",
    "url": "https://archive.org/details/inventingmediump0000murr",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-A6D5D4",
+   "title": "Games design and integration with user's emotion",
+   "author": "Ahmad, Ibrahim; Jaafar, Azizah",
+   "date": "2011-11-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "International Conference on User Science and Engineering",
+   "doi": "10.1109/iuser.2011.6150539",
+   "url": "https://doi.org/10.1109/iuser.2011.6150539",
    "tags": [
     "found by full-text search, not read"
    ]
@@ -11633,6 +11913,34 @@
    ]
   },
   {
+   "id": "L-B789BC",
+   "title": "On the Provision of a Comprehensive Computer Graphics Education in the Context of Computer Games: An Activity-Led Instruction Approach",
+   "author": "Anderson, Eike Falk; Peters, Christopher",
+   "date": "2009-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "Bournemouth University Research Online (Bournemouth University)",
+   "doi": "10.2312/eged.20091012",
+   "url": "https://doi.org/10.2312/eged.20091012",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-796EF5",
+   "title": "Governmentality, Neoliberalism, and the Digital Game",
+   "author": "Baerg, Andrew",
+   "date": "2009-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "symplokē",
+   "doi": "10.1353/sym.2009.0028",
+   "url": "https://doi.org/10.1353/sym.2009.0028",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
    "id": "L-C5542B",
    "title": "Encyclopedia of careers and vocational guidance",
    "date": "2008",
@@ -11683,6 +11991,19 @@
    "publisher": "MIT Press",
    "isbn": "9780262026147",
    "url": "https://archive.org/details/persuasivegamese00bogo",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-B395D8",
+   "title": "A Brief Timeline Of Video Game History",
+   "date": "2007-01-01",
+   "kind": "chapter",
+   "lang": "en",
+   "in": "Greenwood Publishing Group Inc. eBooks",
+   "doi": "10.5040/9798216032106.0006",
+   "url": "https://doi.org/10.5040/9798216032106.0006",
    "tags": [
     "found by full-text search, not read"
    ]
@@ -11784,6 +12105,19 @@
    ]
   },
   {
+   "id": "L-F75C96",
+   "title": "A Toolkit for Exploring Affective Interface Adaptation in Videogames",
+   "author": "Gilleade, Kiel Mark; Allanson, Jennifer",
+   "date": "2003-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "Lancaster EPrints (Lancaster University)",
+   "url": "https://eprints.lancs.ac.uk/id/eprint/12310/1/2003-Gilleade-Videogames.pdf",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
    "id": "L-A4A41F",
    "title": "The hippie dictionary: a cultural encyclopedia of the 1960s and 1970s",
    "author": "McCleary, John Bassett; McCleary, Joan Jeffers",
@@ -11821,6 +12155,18 @@
    "publisher": "John Wiley & Sons",
    "isbn": "9780471055891",
    "url": "https://archive.org/details/hackattacksencyc0000chir",
+   "tags": [
+    "found by full-text search, not read"
+   ]
+  },
+  {
+   "id": "L-C9303A",
+   "title": "Raven: Extending HTML for Peer-to-peer Synchronous Applications",
+   "author": "Chesley, Harry R.; Kelly, Sean Uberoi; Kimberly, Greg; Regan, Tim W.",
+   "date": "2001-08-01",
+   "kind": "article",
+   "lang": "en",
+   "url": "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.542.1402",
    "tags": [
     "found by full-text search, not read"
    ]
