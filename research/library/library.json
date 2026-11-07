@@ -3582,6 +3582,23 @@
    "relevance": "medium"
   },
   {
+   "id": "L-BC471F",
+   "title": "Être et (re)devenir une gameuse de jeux vidéo : trajectoires, épreuves et tensions de genre en terrain vidéoludique",
+   "author": "Soler-Benonie, Jessica",
+   "date": "2019-09-05",
+   "kind": "thesis",
+   "lang": "fr",
+   "in": "theses.fr (ABES)",
+   "doi": "10.70675/bad65bcaz05e9z4847z8e14z5f24bdc1830f",
+   "url": "https://doi.org/10.70675/bad65bcaz05e9z4847z8e14z5f24bdc1830f",
+   "tags": [
+    "section on Spacewar!",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "medium"
+  },
+  {
    "id": "L-3F73D9",
    "title": "Creating Worlds: Exploring Participatory Behaviour in Gaming Communities",
    "author": "Welisch, Gaston",
@@ -6695,6 +6712,23 @@
    "relevance": "low"
   },
   {
+   "id": "L-BF8650",
+   "title": "Analisis elemen-elemen dasar dalam desain game My Talking Angela 2 berdasarkan kajian Ludologi",
+   "author": "Endarini, Endah Riana; Andriani, Yolanda Georgia",
+   "date": "2026-03-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "PRODUCTUM Jurnal Desain Produk (Pengetahuan dan Perancangan Produk)",
+   "doi": "10.24821/productum.v9i1.15482",
+   "url": "https://doi.org/10.24821/productum.v9i1.15482",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-DEF2C8",
    "title": "Hyper-KGGen: A Skill-Driven Knowledge Extractor for High-Quality Knowledge Hypergraph Generation",
    "author": "Huang, Rizhuo; Feng, Yifan; Xue, Rundong; Ying, Shihui; Jun‐Hai Yong; Shi, Chuan; Du, Shaoyi; Gao, Yue",
@@ -6850,6 +6884,22 @@
    "relevance": "low"
   },
   {
+   "id": "L-4E6BDC",
+   "title": "Analysis of Aspect Oriented Systems: Refactorings using AspectJ",
+   "author": "Bagade, Geeta; Joshi, Shashank",
+   "date": "2025-11-11",
+   "kind": "article",
+   "lang": "en",
+   "in": "International Journal of Computer Sciences and Engineering",
+   "url": "https://ijcseonline.org/index.php/j/article/view/976",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-E0D749",
    "title": "A criação de um Artbook através de boas práticas de pesquisa e contextualização",
    "author": "Abreu, Patrícia Carolina Popper de",
@@ -6920,6 +6970,57 @@
    "in": "Historia i Polityka",
    "doi": "10.12775/hip.2025.022",
    "url": "https://doi.org/10.12775/hip.2025.022",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-4B4964",
+   "title": "Fundamentos del diseño gráfico en los videojuegos",
+   "author": "Zapata, Camilo Fabián Rojas",
+   "date": "2025-07-30",
+   "kind": "article",
+   "lang": "es",
+   "in": "Cuadernos del Centro de Estudios de Diseño y Comunicación",
+   "doi": "10.18682/cdc.vi277.12672",
+   "url": "https://doi.org/10.18682/cdc.vi277.12672",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-965BA7",
+   "title": "Protección de los Derechos de Propiedad Intelectual de Videojuegos en la Normativa Ecuatoriana",
+   "author": "Figueroa, Verónica Vanessa Pazmiño; Carpio, Clara Elizabeth Soria",
+   "date": "2025-06-25",
+   "kind": "article",
+   "lang": "es",
+   "in": "ASCE MAGAZINE",
+   "doi": "10.70577/asce/1275.1300/2025",
+   "url": "https://doi.org/10.70577/asce/1275.1300/2025",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-14826B",
+   "title": "VIDEO GAME DEVELOPMENT AS A WAY OF PROFESSIONAL DEVELOPMENT OF PEOPLE WITH DISABILITIES AND DISABILITIES",
+   "author": "Panchuk, Ekaterina; Agafonov, Konstantin; Aksenova, Polina",
+   "date": "2025-06-24",
+   "kind": "article",
+   "lang": "en",
+   "in": "Scientific Papers Collection of the Angarsk State Technical University",
+   "doi": "10.36629/2686-7788-2025-1-313-317",
+   "url": "https://doi.org/10.36629/2686-7788-2025-1-313-317",
    "tags": [
     "passing discussion",
     "checked: names Spacewar!",
@@ -7208,6 +7309,57 @@
    "relevance": "low"
   },
   {
+   "id": "L-668E9F",
+   "title": "JOGOS PEDAGÓGICOS EM EDUCAÇÃO",
+   "author": "Silva, Jordana Romero; Antonio Guilherme da Cruz Lima; Ribeiro, Cláudia; Costa, Jessé Marques Lima; Pessanha, Joberto da Silva",
+   "date": "2024-04-10",
+   "kind": "article",
+   "lang": "pt",
+   "in": "Revista Ilustração",
+   "doi": "10.46550/ilustracao.v5i3.286",
+   "url": "https://doi.org/10.46550/ilustracao.v5i3.286",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-44746E",
+   "title": "Smart Adaptive NPC AI pada Permainan Labirin Menggunakan Algoritma A*",
+   "author": "Pratiwi, Indah",
+   "date": "2024-02-22",
+   "kind": "article",
+   "lang": "id",
+   "in": "Jurnal Pengembangan Sistem Informasi dan Informatika",
+   "doi": "10.47747/jpsii.v4i3.1658",
+   "url": "https://doi.org/10.47747/jpsii.v4i3.1658",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-BDE71A",
+   "title": "Analysis of the influence of artificial intelligence technology on the immersion of game players",
+   "author": "Lin, Hongting",
+   "date": "2024-02-20",
+   "kind": "article",
+   "lang": "en",
+   "in": "Applied and Computational Engineering",
+   "doi": "10.54254/2755-2721/40/20230648",
+   "url": "https://doi.org/10.54254/2755-2721/40/20230648",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-02750D",
    "title": "Immersive realities: a comprehensive guide from virtual reality to metaverse",
    "author": "Dhillon, Preet Kawal Singh; Tınmaz, Hasan",
@@ -7284,6 +7436,23 @@
    "in": "Advances in economics, business and management research/Advances in Economics, Business and Management Research",
    "doi": "10.2991/978-94-6463-585-0_59",
    "url": "https://doi.org/10.2991/978-94-6463-585-0_59",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-848FFC",
+   "title": "The Computer History Museum's 2023 in Review",
+   "author": "Spicer, Dag",
+   "date": "2024-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "IEEE Annals of the History of Computing",
+   "doi": "10.1109/mahc.2024.3369258",
+   "url": "https://doi.org/10.1109/mahc.2024.3369258",
    "tags": [
     "passing discussion",
     "checked: names Spacewar!",
@@ -7409,6 +7578,23 @@
    "relevance": "low"
   },
   {
+   "id": "L-2DE459",
+   "title": "An Eye-tracking Study of In-game Purchasing Behaviors of Video Games",
+   "author": "Wang, Ruida",
+   "date": "2023-08-22",
+   "kind": "article",
+   "lang": "en",
+   "in": "Journal of Humanities Arts and Social Science",
+   "doi": "10.26855/jhass.2023.07.010",
+   "url": "https://doi.org/10.26855/jhass.2023.07.010",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-C7967E",
    "title": "Enhancing the Quality of the Game with Art: A Case Study of the Game Wildfrost",
    "author": "Di’an Shi",
@@ -7468,6 +7654,23 @@
    "in": "Routledge eBooks",
    "doi": "10.4324/9781003323686-5",
    "url": "https://doi.org/10.4324/9781003323686-5",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-6CC3B5",
+   "title": "Mas afinal, é ou não é esporte? A definição acadêmica sobre os e-Sports e a ascensão de uma nova fase dos esportes",
+   "author": "Marques, Marcos Henrique Martins",
+   "date": "2023-03-17",
+   "kind": "chapter",
+   "lang": "pt",
+   "in": "Centro de Pesquisa eBooks",
+   "doi": "10.32749/nucleodoconhecimento.com.br/livros/1787",
+   "url": "https://doi.org/10.32749/nucleodoconhecimento.com.br/livros/1787",
    "tags": [
     "passing discussion",
     "checked: names Spacewar!",
@@ -7784,6 +7987,23 @@
    "relevance": "low"
   },
   {
+   "id": "L-70DEE3",
+   "title": "Marx no Fliperama",
+   "author": "Desterro, Fábio Braga Do",
+   "date": "2022-07-15",
+   "kind": "article",
+   "lang": "pt",
+   "in": "Perspectiva Sociológica A Revista de Professores de Sociologia",
+   "doi": "10.33025/rps.v0i29.3688",
+   "url": "https://doi.org/10.33025/rps.v0i29.3688",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-200063",
    "title": "La educatividad de los videojuegos y su evaluación",
    "author": "García Mejía, José Pablo",
@@ -8027,6 +8247,40 @@
    "relevance": "low"
   },
   {
+   "id": "L-96EB16",
+   "title": "E-SPORTS: DESDE LA REVISIÓN SOCIOHISTÓRICA CULTURAL HACIA SU CONCEPTUALIZACIÓN",
+   "author": "Betancourt-Fajardo, Pablo José; Zambrano, Samuel; Ordaz-Martínez, Iván Jesús; Morillo, Ana Lisbalby Riera",
+   "date": "2021-07-15",
+   "kind": "article",
+   "lang": "es",
+   "in": "Prohominum",
+   "doi": "10.47606/acven/ph0039",
+   "url": "https://doi.org/10.47606/acven/ph0039",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-BF499E",
+   "title": "ESports: a Review of Foreign and Russian Media Resources",
+   "author": "Chernyavskaya, Alina G.",
+   "date": "2021-07-02",
+   "kind": "article",
+   "lang": "en",
+   "in": "RUDN Journal of Studies in Literature and Journalism",
+   "doi": "10.22363/2312-9220-2021-26-2-325-330",
+   "url": "https://doi.org/10.22363/2312-9220-2021-26-2-325-330",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-BA2FBF",
    "title": "Put the Classic PDP-8 Minicomputer on Your Shelf",
    "author": "Cass, Stephen",
@@ -8084,6 +8338,23 @@
    "in": "Columbia Business Law Review",
    "doi": "10.52214/cblr.v2020i3.7815",
    "url": "https://doi.org/10.52214/cblr.v2020i3.7815",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-C607A7",
+   "title": "Can we predict trend in technology?",
+   "author": "Lovreković, Zoran",
+   "date": "2021-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "Journal of Process Management New Technologies",
+   "doi": "10.5937/jouproman9-32024",
+   "url": "https://doi.org/10.5937/jouproman9-32024",
    "tags": [
     "passing discussion",
     "checked: names Spacewar!",
@@ -8202,6 +8473,23 @@
    "relevance": "low"
   },
   {
+   "id": "L-3CE2FD",
+   "title": "Perancangan Game First Person Shooter 3D “Saving Islamic Kingdom” dengan Menggunakan Finite State Machine (FSM)",
+   "author": "Saputra, Muhammad Andryan Wahyu; Fadila, Juniardi Nur; Nugroho, Fresy",
+   "date": "2020-12-31",
+   "kind": "article",
+   "lang": "id",
+   "in": "Walisongo Journal of Information Technology",
+   "doi": "10.21580/wjit.2020.2.2.6981",
+   "url": "https://doi.org/10.21580/wjit.2020.2.2.6981",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-42AF09",
    "title": "WHAT IS ADVERGAMING AND WHAT IT IS NOT? RECAPPING BEHAVIOURAL THEORIES TO UNDERSTAND ADVERGAMING",
    "author": "Aktan, Murat; Koçak, Ahmet",
@@ -8299,6 +8587,39 @@
    "url": "https://doi.org/10.1177/1095796019893315",
    "tags": [
     "passing discussion"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-75EC51",
+   "title": "Terminàlia parla amb Òliver Pérez Latorre, doctor en comunicació social",
+   "author": "Redacció, Terminàlia. Consell de",
+   "date": "2020-01-01",
+   "kind": "article",
+   "lang": "ca",
+   "in": "Terminàlia/Terminàlia",
+   "url": "https://revistes.iec.cat/index.php/Terminalia/article/view/148173",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-337BEE",
+   "title": "VIDEO GAME INDUSTRY DEVELOPMENT TRENDS IN RUSSIA AND IN THE WORLD",
+   "author": "Nikolaeva, I.V.; Nikolaev, N.I.",
+   "date": "2020-01-01",
+   "kind": "article",
+   "lang": "ru",
+   "in": "Bulletin of the Altai Academy of Economics and law",
+   "doi": "10.17513/vaael.1286",
+   "url": "https://doi.org/10.17513/vaael.1286",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
    ],
    "relevance": "low"
   },
@@ -8511,6 +8832,23 @@
    "url": "https://repositorio.ufmg.br/handle/1843/EBAP-BBLNRQ",
    "tags": [
     "passing discussion"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-5B1481",
+   "title": "Entre le jeu et le joueur : écarts et médiations",
+   "author": "Dedieu, Thomas",
+   "date": "2019-01-01",
+   "kind": "article",
+   "lang": "fr",
+   "in": "InMedia",
+   "doi": "10.4000/inmedia.1812",
+   "url": "https://doi.org/10.4000/inmedia.1812",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
    ],
    "relevance": "low"
   },
@@ -9447,6 +9785,22 @@
    "relevance": "low"
   },
   {
+   "id": "L-71421F",
+   "title": "David Mitchell : The Bone Clocks",
+   "author": "Harris-Birtill, Rose",
+   "date": "2015-06-01",
+   "kind": "article",
+   "lang": "fr",
+   "in": "St Andrews Research Repository (St Andrews Research Repository)",
+   "url": "https://hdl.handle.net/10023/6973",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-F23738",
    "title": "TAXONOMIA DE GAMES EDUCATIVOS",
    "author": "TODOR, ROBERTO",
@@ -9540,6 +9894,23 @@
    "in": "Advances in computer science research",
    "doi": "10.2991/icecee-15.2015.254",
    "url": "https://doi.org/10.2991/icecee-15.2015.254",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-A9C693",
+   "title": "JEUX VIDÉO AU PORTUGAL. LISBONNE : FCA",
+   "author": "Zagalo, Liliana Costa",
+   "date": "2015-01-01",
+   "kind": "article",
+   "lang": "fr",
+   "in": "Communication technologies et développement",
+   "doi": "10.4000/ctd.2070",
+   "url": "https://doi.org/10.4000/ctd.2070",
    "tags": [
     "passing discussion",
     "checked: names Spacewar!",
@@ -9682,6 +10053,54 @@
    "in": "Lecture notes in computer science",
    "doi": "10.1007/978-3-319-07227-2_53",
    "url": "https://doi.org/10.1007/978-3-319-07227-2_53",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-53CB3D",
+   "title": "Thanatogaming: Death, Videogames, and the Biopolitical State",
+   "author": "Christiansen, Peter",
+   "date": "2014-01-01",
+   "kind": "article",
+   "lang": "en",
+   "doi": "10.26503/dl.v2014i1.634",
+   "url": "https://doi.org/10.26503/dl.v2014i1.634",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-F71C43",
+   "title": "Videojuegos: un medio recreativo",
+   "author": "Mireles, David Garza",
+   "date": "2014-01-01",
+   "kind": "article",
+   "lang": "es",
+   "in": "El Repositorio Academico Digital de la UANL (Universidad Autónoma de Nuevo León)",
+   "url": "http://eprints.uanl.mx/7346/1/videojuegosunmediorecreativo.pdf",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-42F7E5",
+   "title": "Video Gaming, Let's Plays, and Religion: The Relevance of Researching gamevironments.",
+   "author": "Radde-Antweiler, Kerstin",
+   "date": "2014-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "gamevironments",
+   "url": "https://journals.suub.uni-bremen.de/index.php/gamevironments/article/view/10",
    "tags": [
     "passing discussion",
     "checked: names Spacewar!",
@@ -9950,6 +10369,22 @@
    "relevance": "low"
   },
   {
+   "id": "L-1B153E",
+   "title": "Translation and/as Interface",
+   "author": "Mandiberg, Stephen",
+   "date": "2012-12-20",
+   "kind": "article",
+   "lang": "en",
+   "in": "Loading",
+   "url": "https://loading.journals.publicknowledgeproject.org/index.php/loading/article/view/114",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-3DA780",
    "title": "Art Rx",
    "author": "Steinhauer, Jillian",
@@ -10205,6 +10640,23 @@
    "url": "https://doi.org/10.26512/emtempos.v0i12.20064",
    "tags": [
     "passing discussion"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-4C3F36",
+   "title": "İlköğretim Öğrencilerinin Bilgisayar Oyunu Bağımlılık Düzeylerinin Çeşitli Değişkenlere Göre İncelenmesi",
+   "author": "Horzum, Mehmet Barış",
+   "date": "2011-01-23",
+   "kind": "article",
+   "lang": "tr",
+   "in": "TED EĞİTİM VE BİLİM",
+   "doi": "10.15390/es.2011.907",
+   "url": "https://doi.org/10.15390/es.2011.907",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
    ],
    "relevance": "low"
   },
@@ -10532,6 +10984,22 @@
    "url": "https://edoc.hu-berlin.de/handle/18452/10128",
    "tags": [
     "passing discussion"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-465BE8",
+   "title": "Videogames em bibliotecas: discussões em jogo",
+   "author": "Vieira, Ricardo Quintão; Passos, Jeane do Reis; Rokicki, Cristiane Camizão",
+   "date": "2009-09-01",
+   "kind": "article",
+   "lang": "pt",
+   "in": "E-LIS Repository (University of Naples Federico II)",
+   "url": "http://eprints.rclis.org/23855/1/Vieira_Passos_Rockiki.pdf",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
    ],
    "relevance": "low"
   },
@@ -10969,6 +11437,22 @@
    "relevance": "low"
   },
   {
+   "id": "L-86ABD7",
+   "title": "JOGOS ELETRÔNICOS MULTI-PLATAFORMA: COMPREENDENDO AS PLATAFORMAS DE JOGO E SEUS JOGOS ATRAVÉS DE UMA ANÁLISE EM DESIGN",
+   "author": "Leite, Leonardo Cardarelli",
+   "date": "2006-03-22",
+   "kind": "thesis",
+   "lang": "pt",
+   "doi": "10.17771/pucrio.acad.8600",
+   "url": "https://doi.org/10.17771/pucrio.acad.8600",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-3F9B9C",
    "title": "Game Over Boundaries: The Coevolution of Video Games, Media and IT",
    "author": "Ernkvist, Mirko; Jörnmark, Jan",
@@ -11247,6 +11731,22 @@
    "relevance": "low"
   },
   {
+   "id": "L-FAE743",
+   "title": "The Construction of Ludic Space",
+   "author": "Adams, Ernest",
+   "date": "2003-01-01",
+   "kind": "article",
+   "lang": "en",
+   "doi": "10.26503/dl.v2003i1.94",
+   "url": "https://doi.org/10.26503/dl.v2003i1.94",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
    "id": "L-F88DB3",
    "title": "Joypad 123 (October 2002)",
    "date": "2002-10",
@@ -11300,6 +11800,22 @@
    "in": "Ethnologies",
    "doi": "10.7202/006655ar",
    "url": "https://doi.org/10.7202/006655ar",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "low"
+  },
+  {
+   "id": "L-FAC791",
+   "title": "The Pleasure of the Playable Text: Towards an Aesthetic Theory of Computer Games",
+   "author": "Lauteren, Georg",
+   "date": "2002-01-01",
+   "kind": "article",
+   "lang": "en",
+   "doi": "10.26503/dl.v2002i1.13",
+   "url": "https://doi.org/10.26503/dl.v2002i1.13",
    "tags": [
     "passing discussion",
     "checked: names Spacewar!",
@@ -15354,22 +15870,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-BF8650",
-   "title": "Analisis elemen-elemen dasar dalam desain game My Talking Angela 2 berdasarkan kajian Ludologi",
-   "author": "Endarini, Endah Riana; Andriani, Yolanda Georgia",
-   "date": "2026-03-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "PRODUCTUM Jurnal Desain Produk (Pengetahuan dan Perancangan Produk)",
-   "doi": "10.24821/productum.v9i1.15482",
-   "url": "https://doi.org/10.24821/productum.v9i1.15482",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-10808D",
    "title": "From profession to play: hedonic and eudaimonic enjoyment in professional esports",
    "author": "Wei, Zhiyi",
@@ -16025,21 +16525,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-4E6BDC",
-   "title": "Analysis of Aspect Oriented Systems: Refactorings using AspectJ",
-   "author": "Bagade, Geeta; Joshi, Shashank",
-   "date": "2025-11-11",
-   "kind": "article",
-   "lang": "en",
-   "in": "International Journal of Computer Sciences and Engineering",
-   "url": "https://ijcseonline.org/index.php/j/article/view/976",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-959132",
    "title": "Flow-Cut Arrangements",
    "date": "2025-11-04",
@@ -16161,6 +16646,7 @@
    "url": "https://doi.org/10.5753/sbgames_estendido.2025.10118",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -16319,22 +16805,6 @@
    "in": "Corpoconsciência",
    "doi": "10.51283/rc.29.e19730",
    "url": "https://doi.org/10.51283/rc.29.e19730",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-4B4964",
-   "title": "Fundamentos del diseño gráfico en los videojuegos",
-   "author": "Zapata, Camilo Fabián Rojas",
-   "date": "2025-07-30",
-   "kind": "article",
-   "lang": "es",
-   "in": "Cuadernos del Centro de Estudios de Diseño y Comunicación",
-   "doi": "10.18682/cdc.vi277.12672",
-   "url": "https://doi.org/10.18682/cdc.vi277.12672",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -16595,22 +17065,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-965BA7",
-   "title": "Protección de los Derechos de Propiedad Intelectual de Videojuegos en la Normativa Ecuatoriana",
-   "author": "Figueroa, Verónica Vanessa Pazmiño; Carpio, Clara Elizabeth Soria",
-   "date": "2025-06-25",
-   "kind": "article",
-   "lang": "es",
-   "in": "ASCE MAGAZINE",
-   "doi": "10.70577/asce/1275.1300/2025",
-   "url": "https://doi.org/10.70577/asce/1275.1300/2025",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-69E879",
    "title": "Determinación y análisis del sistema de responsabilidad y obligaciones de las plataformas de videojuegos en el Reglamento de servicios digitales",
    "author": "Alberto José De Nova Labián",
@@ -16620,22 +17074,6 @@
    "in": "Estudios de Deusto",
    "doi": "10.18543/ed.3327",
    "url": "https://doi.org/10.18543/ed.3327",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-14826B",
-   "title": "VIDEO GAME DEVELOPMENT AS A WAY OF PROFESSIONAL DEVELOPMENT OF PEOPLE WITH DISABILITIES AND DISABILITIES",
-   "author": "Panchuk, Ekaterina; Agafonov, Konstantin; Aksenova, Polina",
-   "date": "2025-06-24",
-   "kind": "article",
-   "lang": "en",
-   "in": "Scientific Papers Collection of the Angarsk State Technical University",
-   "doi": "10.36629/2686-7788-2025-1-313-317",
-   "url": "https://doi.org/10.36629/2686-7788-2025-1-313-317",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -18552,22 +18990,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-668E9F",
-   "title": "JOGOS PEDAGÓGICOS EM EDUCAÇÃO",
-   "author": "Silva, Jordana Romero; Antonio Guilherme da Cruz Lima; Ribeiro, Cláudia; Costa, Jessé Marques Lima; Pessanha, Joberto da Silva",
-   "date": "2024-04-10",
-   "kind": "article",
-   "lang": "pt",
-   "in": "Revista Ilustração",
-   "doi": "10.46550/ilustracao.v5i3.286",
-   "url": "https://doi.org/10.46550/ilustracao.v5i3.286",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-90DDB3",
    "title": "EVOLUTION OF COMPUTER GAMES",
    "author": "Prathmesh, V",
@@ -18704,38 +19126,6 @@
    "in": "Preprints.org",
    "doi": "10.20944/preprints202403.0026.v1",
    "url": "https://doi.org/10.20944/preprints202403.0026.v1",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-44746E",
-   "title": "Smart Adaptive NPC AI pada Permainan Labirin Menggunakan Algoritma A*",
-   "author": "Pratiwi, Indah",
-   "date": "2024-02-22",
-   "kind": "article",
-   "lang": "id",
-   "in": "Jurnal Pengembangan Sistem Informasi dan Informatika",
-   "doi": "10.47747/jpsii.v4i3.1658",
-   "url": "https://doi.org/10.47747/jpsii.v4i3.1658",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-BDE71A",
-   "title": "Analysis of the influence of artificial intelligence technology on the immersion of game players",
-   "author": "Lin, Hongting",
-   "date": "2024-02-20",
-   "kind": "article",
-   "lang": "en",
-   "in": "Applied and Computational Engineering",
-   "doi": "10.54254/2755-2721/40/20230648",
-   "url": "https://doi.org/10.54254/2755-2721/40/20230648",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -18940,22 +19330,6 @@
    "in": "Springer eBooks",
    "doi": "10.1007/978-3-658-46873-6",
    "url": "https://doi.org/10.1007/978-3-658-46873-6",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-848FFC",
-   "title": "The Computer History Museum's 2023 in Review",
-   "author": "Spicer, Dag",
-   "date": "2024-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "IEEE Annals of the History of Computing",
-   "doi": "10.1109/mahc.2024.3369258",
-   "url": "https://doi.org/10.1109/mahc.2024.3369258",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -19958,6 +20332,7 @@
    "url": "https://doi.org/10.54254/2755-2721/17/20230910",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -20104,22 +20479,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-2DE459",
-   "title": "An Eye-tracking Study of In-game Purchasing Behaviors of Video Games",
-   "author": "Wang, Ruida",
-   "date": "2023-08-22",
-   "kind": "article",
-   "lang": "en",
-   "in": "Journal of Humanities Arts and Social Science",
-   "doi": "10.26855/jhass.2023.07.010",
-   "url": "https://doi.org/10.26855/jhass.2023.07.010",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-11ED29",
    "title": "Designing the XR Medium: Five Rhetorical Perspectives for the Ecology of Human+Computer Networks",
    "author": "Zakrzewski, Peter",
@@ -20207,6 +20566,7 @@
    "url": "https://doi.org/10.20396/etd.v25i00.8664937",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -20223,6 +20583,7 @@
    "url": "https://doi.org/10.55606/eksekusi.v1i3.467",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -20619,22 +20980,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-6CC3B5",
-   "title": "Mas afinal, é ou não é esporte? A definição acadêmica sobre os e-Sports e a ascensão de uma nova fase dos esportes",
-   "author": "Marques, Marcos Henrique Martins",
-   "date": "2023-03-17",
-   "kind": "chapter",
-   "lang": "pt",
-   "in": "Centro de Pesquisa eBooks",
-   "doi": "10.32749/nucleodoconhecimento.com.br/livros/1787",
-   "url": "https://doi.org/10.32749/nucleodoconhecimento.com.br/livros/1787",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-3415FB",
    "title": "Apresentação",
    "author": "Bortolotti, M. A",
@@ -20801,6 +21146,7 @@
    "url": "https://doi.org/10.48550/arxiv.2301.13479",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -21284,6 +21630,7 @@
    "url": "https://doi.org/10.54691/bcpbm.v35i.3334",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -21748,22 +22095,6 @@
    "lang": "pt",
    "in": "Revista Científica e-Locução",
    "url": "https://periodicos.faex.edu.br/index.php/e-Locucao/article/view/471",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-70DEE3",
-   "title": "Marx no Fliperama",
-   "author": "Desterro, Fábio Braga Do",
-   "date": "2022-07-15",
-   "kind": "article",
-   "lang": "pt",
-   "in": "Perspectiva Sociológica A Revista de Professores de Sociologia",
-   "doi": "10.33025/rps.v0i29.3688",
-   "url": "https://doi.org/10.33025/rps.v0i29.3688",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -23069,22 +23400,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-96EB16",
-   "title": "E-SPORTS: DESDE LA REVISIÓN SOCIOHISTÓRICA CULTURAL HACIA SU CONCEPTUALIZACIÓN",
-   "author": "Betancourt-Fajardo, Pablo José; Zambrano, Samuel; Ordaz-Martínez, Iván Jesús; Morillo, Ana Lisbalby Riera",
-   "date": "2021-07-15",
-   "kind": "article",
-   "lang": "es",
-   "in": "Prohominum",
-   "doi": "10.47606/acven/ph0039",
-   "url": "https://doi.org/10.47606/acven/ph0039",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-A5DA55",
    "title": "Quem é você no Jogo Financeiro?: O Jogo como Estratégia de Conscientização sobre Relações de Consumo e Economia",
    "author": "Santos, Osmar Vieira dos; Rodriguês, Chang Kuo; Victer, Eline das Flores",
@@ -23109,22 +23424,6 @@
    "lang": "es",
    "doi": "10.4995/thesis/10251/172545",
    "url": "https://doi.org/10.4995/thesis/10251/172545",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-BF499E",
-   "title": "ESports: a Review of Foreign and Russian Media Resources",
-   "author": "Chernyavskaya, Alina G.",
-   "date": "2021-07-02",
-   "kind": "article",
-   "lang": "en",
-   "in": "RUDN Journal of Studies in Literature and Journalism",
-   "doi": "10.22363/2312-9220-2021-26-2-325-330",
-   "url": "https://doi.org/10.22363/2312-9220-2021-26-2-325-330",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -23610,22 +23909,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-C607A7",
-   "title": "Can we predict trend in technology?",
-   "author": "Lovreković, Zoran",
-   "date": "2021-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "Journal of Process Management New Technologies",
-   "doi": "10.5937/jouproman9-32024",
-   "url": "https://doi.org/10.5937/jouproman9-32024",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-1A5705",
    "title": "THE PHENOMENON OF ESPORTS IN SCIENTIFIC RESEARCH: BIBLIOMETRIC ANALYSIS",
    "author": "Константинович, Поздняков Константин; Andreev, N.V.",
@@ -23938,22 +24221,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-3CE2FD",
-   "title": "Perancangan Game First Person Shooter 3D “Saving Islamic Kingdom” dengan Menggunakan Finite State Machine (FSM)",
-   "author": "Saputra, Muhammad Andryan Wahyu; Fadila, Juniardi Nur; Nugroho, Fresy",
-   "date": "2020-12-31",
-   "kind": "article",
-   "lang": "id",
-   "in": "Walisongo Journal of Information Technology",
-   "doi": "10.21580/wjit.2020.2.2.6981",
-   "url": "https://doi.org/10.21580/wjit.2020.2.2.6981",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-967931",
    "title": "VIDEOGAMES E PUBLICIDADE: UMA HISTORICIZAÇÃO SOBRE COMO DIVERTIR E ANUNCIAR",
    "author": "Markmann, Afonso Ernesto Gerhard",
@@ -24011,6 +24278,7 @@
    "url": "https://doi.org/10.62507/a21.v15i2.155",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -24975,37 +25243,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-75EC51",
-   "title": "Terminàlia parla amb Òliver Pérez Latorre, doctor en comunicació social",
-   "author": "Redacció, Terminàlia. Consell de",
-   "date": "2020-01-01",
-   "kind": "article",
-   "lang": "ca",
-   "in": "Terminàlia/Terminàlia",
-   "url": "https://revistes.iec.cat/index.php/Terminalia/article/view/148173",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-337BEE",
-   "title": "VIDEO GAME INDUSTRY DEVELOPMENT TRENDS IN RUSSIA AND IN THE WORLD",
-   "author": "Nikolaeva, I.V.; Nikolaev, N.I.",
-   "date": "2020-01-01",
-   "kind": "article",
-   "lang": "ru",
-   "in": "Bulletin of the Altai Academy of Economics and law",
-   "doi": "10.17513/vaael.1286",
-   "url": "https://doi.org/10.17513/vaael.1286",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-1036EC",
    "title": "Videopelien tarinat, pelimekaniikat ja teknologia : miten teknologian kehittyminen on vaikuttanut videopeleihin ja niissä kerrottaviin tarinoihin?",
    "author": "Mattila, Niko",
@@ -25482,22 +25719,6 @@
    "lang": "tr",
    "in": "DergiPark (Istanbul University)",
    "url": "https://dergipark.org.tr/tr/pub/tihek/issue/59385/852439",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-BC471F",
-   "title": "Être et (re)devenir une gameuse de jeux vidéo : trajectoires, épreuves et tensions de genre en terrain vidéoludique",
-   "author": "Soler-Benonie, Jessica",
-   "date": "2019-09-05",
-   "kind": "thesis",
-   "lang": "fr",
-   "in": "theses.fr (ABES)",
-   "doi": "10.70675/bad65bcaz05e9z4847z8e14z5f24bdc1830f",
-   "url": "https://doi.org/10.70675/bad65bcaz05e9z4847z8e14z5f24bdc1830f",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -25987,22 +26208,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-5B1481",
-   "title": "Entre le jeu et le joueur : écarts et médiations",
-   "author": "Dedieu, Thomas",
-   "date": "2019-01-01",
-   "kind": "article",
-   "lang": "fr",
-   "in": "InMedia",
-   "doi": "10.4000/inmedia.1812",
-   "url": "https://doi.org/10.4000/inmedia.1812",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-8CA96F",
    "title": "The Value of E-Sports Is in the Eye of the Beholder, But Can E-Sports Operators Influence What the Spectators See?",
    "author": "Jalonen, Harri",
@@ -26014,6 +26219,7 @@
    "url": "https://doi.org/10.4236/aasoci.2019.97023",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -27521,6 +27727,7 @@
    "url": "https://doi.org/10.25067/s.v21i2.16761",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unchecked"
@@ -29517,21 +29724,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-71421F",
-   "title": "David Mitchell : The Bone Clocks",
-   "author": "Harris-Birtill, Rose",
-   "date": "2015-06-01",
-   "kind": "article",
-   "lang": "fr",
-   "in": "St Andrews Research Repository (St Andrews Research Repository)",
-   "url": "https://hdl.handle.net/10023/6973",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-37E931",
    "title": "Videojuegos: un marco de referencia para el estudio de su influencia en el aprendizaje significativo de los jóvenes universitarios",
    "author": "Hernández, García; Francisco, Juan",
@@ -29711,22 +29903,6 @@
    "lang": "en",
    "in": "Digital Commons - CSUMB (California State University, Monterey Bay)",
    "url": "https://digitalcommons.csumb.edu/caps_thes/484",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-A9C693",
-   "title": "JEUX VIDÉO AU PORTUGAL. LISBONNE : FCA",
-   "author": "Zagalo, Liliana Costa",
-   "date": "2015-01-01",
-   "kind": "article",
-   "lang": "fr",
-   "in": "Communication technologies et développement",
-   "doi": "10.4000/ctd.2070",
-   "url": "https://doi.org/10.4000/ctd.2070",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -30552,21 +30728,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-53CB3D",
-   "title": "Thanatogaming: Death, Videogames, and the Biopolitical State",
-   "author": "Christiansen, Peter",
-   "date": "2014-01-01",
-   "kind": "article",
-   "lang": "en",
-   "doi": "10.26503/dl.v2014i1.634",
-   "url": "https://doi.org/10.26503/dl.v2014i1.634",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-BDC670",
    "title": "A simplified game engine for a game development course",
    "author": "Weimar, Rolf",
@@ -30591,36 +30752,6 @@
    "in": "Technikgeschichte",
    "doi": "10.5771/0040-117x-2014-4-371",
    "url": "https://doi.org/10.5771/0040-117x-2014-4-371",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-F71C43",
-   "title": "Videojuegos: un medio recreativo",
-   "author": "Mireles, David Garza",
-   "date": "2014-01-01",
-   "kind": "article",
-   "lang": "es",
-   "in": "El Repositorio Academico Digital de la UANL (Universidad Autónoma de Nuevo León)",
-   "url": "http://eprints.uanl.mx/7346/1/videojuegosunmediorecreativo.pdf",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-42F7E5",
-   "title": "Video Gaming, Let's Plays, and Religion: The Relevance of Researching gamevironments.",
-   "author": "Radde-Antweiler, Kerstin",
-   "date": "2014-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "gamevironments",
-   "url": "https://journals.suub.uni-bremen.de/index.php/gamevironments/article/view/10",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -31648,21 +31779,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-1B153E",
-   "title": "Translation and/as Interface",
-   "author": "Mandiberg, Stephen",
-   "date": "2012-12-20",
-   "kind": "article",
-   "lang": "en",
-   "in": "Loading",
-   "url": "https://loading.journals.publicknowledgeproject.org/index.php/loading/article/view/114",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-C58826",
    "title": "Digitaaliset pelit museossa – kokemuksia ja havaintoja näyttelyjen suunnittelusta ja toteutuksesta",
    "author": "Naskali, Tiia",
@@ -32562,22 +32678,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-4C3F36",
-   "title": "İlköğretim Öğrencilerinin Bilgisayar Oyunu Bağımlılık Düzeylerinin Çeşitli Değişkenlere Göre İncelenmesi",
-   "author": "Horzum, Mehmet Barış",
-   "date": "2011-01-23",
-   "kind": "article",
-   "lang": "tr",
-   "in": "TED EĞİTİM VE BİLİM",
-   "doi": "10.15390/es.2011.907",
-   "url": "https://doi.org/10.15390/es.2011.907",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-4B352E",
    "title": "Le droit des jeux vidéo, de la virtualité à la réalité juridique",
    "author": "Cardella, Benjamin",
@@ -33469,21 +33569,6 @@
    "in": "Wiley eBooks",
    "doi": "10.1002/9781444310177.index",
    "url": "https://doi.org/10.1002/9781444310177.index",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-465BE8",
-   "title": "Videogames em bibliotecas: discussões em jogo",
-   "author": "Vieira, Ricardo Quintão; Passos, Jeane do Reis; Rokicki, Cristiane Camizão",
-   "date": "2009-09-01",
-   "kind": "article",
-   "lang": "pt",
-   "in": "E-LIS Repository (University of Naples Federico II)",
-   "url": "http://eprints.rclis.org/23855/1/Vieira_Passos_Rockiki.pdf",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -34416,21 +34501,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-86ABD7",
-   "title": "JOGOS ELETRÔNICOS MULTI-PLATAFORMA: COMPREENDENDO AS PLATAFORMAS DE JOGO E SEUS JOGOS ATRAVÉS DE UMA ANÁLISE EM DESIGN",
-   "author": "Leite, Leonardo Cardarelli",
-   "date": "2006-03-22",
-   "kind": "thesis",
-   "lang": "pt",
-   "doi": "10.17771/pucrio.acad.8600",
-   "url": "https://doi.org/10.17771/pucrio.acad.8600",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-06AEE2",
    "title": "Proceedings of the second computing women congress: Student Papers",
    "author": "Hinze, Annika; Jung, Doris; Cunningham, Sally Jo",
@@ -34931,21 +35001,6 @@
    "relevance": "unchecked"
   },
   {
-   "id": "L-FAE743",
-   "title": "The Construction of Ludic Space",
-   "author": "Adams, Ernest",
-   "date": "2003-01-01",
-   "kind": "article",
-   "lang": "en",
-   "doi": "10.26503/dl.v2003i1.94",
-   "url": "https://doi.org/10.26503/dl.v2003i1.94",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
    "id": "L-9321EB",
    "title": "Live Life to the Power of PS2: Locating the Digital Games Industry in the New Media Environment",
    "author": "Kerr, Aphra",
@@ -35018,21 +35073,6 @@
    "in": "Ethnologies",
    "doi": "10.7202/006656ar",
    "url": "https://doi.org/10.7202/006656ar",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unchecked"
-  },
-  {
-   "id": "L-FAC791",
-   "title": "The Pleasure of the Playable Text: Towards an Aesthetic Theory of Computer Games",
-   "author": "Lauteren, Georg",
-   "date": "2002-01-01",
-   "kind": "article",
-   "lang": "en",
-   "doi": "10.26503/dl.v2002i1.13",
-   "url": "https://doi.org/10.26503/dl.v2002i1.13",
    "tags": [
     "to be checked",
     "mention spacewar!"
