@@ -11763,6 +11763,37 @@
    "tags": [
     "passing discussion"
    ]
+  },
+  {
+   "id": "L-2C42A8",
+   "title": "Game on",
+   "author": "Wootton, James R.",
+   "date": "2018",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "Physics World 31(12)",
+   "doi": "10.1088/2058-7058/31/12/30",
+   "note": "Takes Spacewar! as the model for quantum computer games: the makers' three aims, the fight against the star's gravity as play with physics, and freely shared code spurring hacker culture.",
+   "url": "https://doi.org/10.1088/2058-7058/31/12/30",
+   "tags": [
+    "section on Spacewar!"
+   ]
+  },
+  {
+   "id": "L-DFAB68",
+   "title": "Assembling Auras: Towards a Methodology for the Preservation and Study of Video Games as Cultural Heritage Artefacts",
+   "author": "Guay-Bélanger, Dany",
+   "date": "2022-07",
+   "kind": "article",
+   "lang": "en",
+   "in": "Games and Culture 17(5)",
+   "pages": "659-678",
+   "doi": "10.1177/15554120211020381",
+   "note": "A footnote dates Spacewar! from a first version in late 1961 to completion in spring 1962, and says that it, over earlier examples such as Tennis for Two, launched video gaming as a medium.",
+   "url": "https://doi.org/10.1177/15554120211020381",
+   "tags": [
+    "passing discussion"
+   ]
   }
  ]
 }
