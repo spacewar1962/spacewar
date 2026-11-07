@@ -1057,6 +1057,20 @@
    "relevance": "about"
   },
   {
+   "id": "L-E8EEF5",
+   "title": "One, Two, Three, Four I Declare a Space War",
+   "date": "2014-08",
+   "kind": "magazine",
+   "lang": "en",
+   "in": "They Create Worlds",
+   "note": "Extended history of the game drawing on Levy, Graetz and the author's own interview with Wiitanen.",
+   "url": "https://videogamehistorian.wordpress.com/2014/08/",
+   "tags": [
+    "about Spacewar!"
+   ],
+   "relevance": "about"
+  },
+  {
    "id": "L-09CF21",
    "title": "One, Two, Three, Four I Declare a Space War",
    "date": "2014-08-07",
@@ -1416,6 +1430,23 @@
    "relevance": "about"
   },
   {
+   "id": "L-0E2B0E",
+   "title": "The Origin of Spacewar (MIT 150 Books entry)",
+   "date": "2011-05-07",
+   "kind": "web page",
+   "lang": "en",
+   "in": "MIT Libraries, 150 Books",
+   "publisher": "MIT Libraries",
+   "note": "Exhibit entry citing J. Martin Graetz, 'The Origin of Spacewar', Creative Computing, August 1981. Says Graetz, Wiitanen and Russell created it at MIT around 1961-1962.",
+   "licence": "CC BY-NC unless otherwise noted (MIT Libraries content)",
+   "url": "https://libraries.mit.edu/150books/2011/05/07/1981/",
+   "tags": [
+    "about Spacewar!"
+   ],
+   "relevance": "about",
+   "author": "MIT Libraries"
+  },
+  {
    "id": "L-8C5ADA",
    "title": "Fifty years later, video game pioneer Steve Russell shows off Spacewar! (video interview)",
    "author": "Takahashi, Dean",
@@ -1661,23 +1692,6 @@
     "about Spacewar!"
    ],
    "relevance": "about"
-  },
-  {
-   "id": "L-0E2B0E",
-   "title": "The Origin of Spacewar (MIT 150 Books entry)",
-   "date": "1983",
-   "kind": "web page",
-   "lang": "en",
-   "in": "Video & Arcade Games",
-   "publisher": "Creative Computing",
-   "note": "Reprint under the byline J.M. Graetz, who names himself as one of the participants. Sections include the heavy star and the 1962 DECUS paper titled SPACEWAR! Real-Time Capability of the PDP-1.",
-   "licence": "CC BY-NC unless otherwise noted (MIT Libraries content)",
-   "url": "https://libraries.mit.edu/150books/2011/05/07/1981/",
-   "tags": [
-    "about Spacewar!"
-   ],
-   "relevance": "about",
-   "author": "Graetz, J. M."
   },
   {
    "id": "L-3CB601",
@@ -9228,6 +9242,23 @@
    "url": "https://doi.org/10.5204/mcj.86",
    "tags": [
     "passing discussion"
+   ],
+   "relevance": "mention"
+  },
+  {
+   "id": "L-9A96A3",
+   "title": "The case for research in game engine architecture",
+   "author": "Anderson, Eike Falk; Engel, Steffen; Comninos, Peter P.; McLoughlin, Leigh",
+   "date": "2008-11-03",
+   "kind": "article",
+   "lang": "en",
+   "in": "Conference on Future Play",
+   "doi": "10.1145/1496984.1497031",
+   "url": "https://doi.org/10.1145/1496984.1497031",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
    ],
    "relevance": "mention"
   },
@@ -18550,6 +18581,37 @@
    "relevance": "unread"
   },
   {
+   "id": "L-18C69D",
+   "title": "Replayed: Essential Writings on Software Preservation and Game Histories",
+   "author": "Lowood, Henry",
+   "date": "2023",
+   "kind": "book",
+   "publisher": "Johns Hopkins University Press",
+   "isbn": "9781421445953",
+   "doi": "10.56021/9781421445953",
+   "url": "https://muse.jhu.edu/book/110656",
+   "tags": [
+    "to be checked",
+    "title confirmed, passage not seen"
+   ],
+   "relevance": "unread"
+  },
+  {
+   "id": "L-8031D0",
+   "title": "The Apple II Age: How the Computer Became Personal",
+   "author": "Nooney, Laine",
+   "date": "2023",
+   "kind": "book",
+   "publisher": "University of Chicago Press",
+   "isbn": "9780226816524",
+   "url": "https://doi.org/10.7208/chicago/9780226816531.001.0001",
+   "tags": [
+    "to be checked",
+    "title confirmed, passage not seen"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-15A07A",
    "title": "Spor Psikolojisinde Kişilik ve Performans",
    "author": "Ünver, Deniz",
@@ -20273,21 +20335,6 @@
    "in": "Socioloski pregled",
    "doi": "10.5937/socpreg57-44334",
    "url": "https://doi.org/10.5937/socpreg57-44334",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
-   "id": "L-51ECB7",
-   "title": "Time and Space in Video Games",
-   "author": "Federico Alvarez Igarzábal",
-   "date": "2023-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "OAPEN (The OAPEN Foundation)",
-   "url": "https://library.oapen.org/handle/20.500.12657/111326",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -22708,22 +22755,6 @@
    "relevance": "unread"
   },
   {
-   "id": "L-6C842F",
-   "title": "Creative Game Design Training Requirements",
-   "author": "Raudyah Md Tap; Nor Azan Mat Zin; Hafiz Mohd Sarim",
-   "date": "2021-02-04",
-   "kind": "article",
-   "lang": "en",
-   "in": "International Journal on Advanced Science Engineering and Information Technology",
-   "doi": "10.18517/ijaseit.11.1.10270",
-   "url": "https://doi.org/10.18517/ijaseit.11.1.10270",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
    "id": "L-CE8382",
    "title": "Constructing A 3d Game With Unity 3d Game Engine",
    "author": "Boyraz, Gizem; Kirci, Pınar",
@@ -23141,22 +23172,6 @@
    "lang": "es",
    "doi": "10.24275/uama.4391.8886",
    "url": "https://doi.org/10.24275/uama.4391.8886",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
-   "id": "L-6F6043",
-   "title": "Dans les profondeurs du code",
-   "author": "Angelo Careri",
-   "date": "2021-01-01",
-   "kind": "article",
-   "lang": "fr",
-   "in": "Techniques & culture",
-   "doi": "10.4000/tc.15635",
-   "url": "https://doi.org/10.4000/tc.15635",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -24679,6 +24694,22 @@
    "relevance": "unread"
   },
   {
+   "id": "L-E94363",
+   "title": "They Create Worlds: The Story of the People and Companies That Shaped the Video Game Industry, Vol. I: 1971-1982",
+   "author": "Smith, Alexander",
+   "date": "2019-11-19",
+   "kind": "book",
+   "publisher": "CRC Press",
+   "isbn": "9781138389908",
+   "doi": "10.1201/9780429423642",
+   "url": "https://doi.org/10.1201/9780429423642",
+   "tags": [
+    "to be checked",
+    "title confirmed, passage not seen"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-657DE5",
    "title": "Investigating sexual harassment in online video games: How personality and context factors are related to toxic sexual behaviors against fellow players",
    "author": "Tang, Wai Yen; Reer, Felix; Quandt, Thorsten",
@@ -25716,22 +25747,6 @@
    "relevance": "unread"
   },
   {
-   "id": "L-32F0D1",
-   "title": "Taking College Esports Seriously",
-   "author": "Nyle Sky Kauweloa; Jenifer Sunrise Winter",
-   "date": "2019-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "Hawaii International Conference on System Sciences (HICSS)",
-   "doi": "10.24251/hicss.2019.295",
-   "url": "https://doi.org/10.24251/hicss.2019.295",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
    "id": "L-9AD64C",
    "title": "13. Laborious playgrounds : Citizen science games as new modes of work/play in the digital age",
    "author": "Fizek, Sonia; Dippel, Anne",
@@ -26365,6 +26380,7 @@
    "url": "https://lup.lub.lu.se/record/4528af61-1f97-4d38-8470-a13a4849ad3c",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unread"
@@ -28286,22 +28302,6 @@
    "relevance": "unread"
   },
   {
-   "id": "L-3DA922",
-   "title": "Sommaire",
-   "author": "Emmanuel Lazard; Pierre-Éric Mounier-Kuhn",
-   "date": "2016-04-05",
-   "kind": "chapter",
-   "lang": "fr",
-   "in": "EDP Sciences eBooks",
-   "doi": "10.1051/978-2-7598-1993-5.toc",
-   "url": "https://doi.org/10.1051/978-2-7598-1993-5.toc",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
    "id": "L-EF872D",
    "title": "Approaches to the videogames and its incidence on the subjectivities of latin american gamers",
    "author": "Merlano, Alvaro Acevedo; Lizarazo, Jessica Alejandra Chaux",
@@ -28838,32 +28838,17 @@
    "relevance": "unread"
   },
   {
-   "id": "L-515C14",
-   "title": "“Ruinensehnsucht” – Longing for Decay in Computer Games",
-   "author": "Mathias Fuchs",
-   "date": "2016-01-01",
-   "kind": "article",
-   "lang": "en",
-   "doi": "10.26503/dl.v2016i1.806",
-   "url": "https://doi.org/10.26503/dl.v2016i1.806",
+   "id": "L-1E5346",
+   "title": "Coin-Operated Americans: Rebooting Boyhood at the Video Game Arcade",
+   "author": "Kocurek, Carly A.",
+   "date": "2015",
+   "kind": "book",
+   "publisher": "University of Minnesota Press",
+   "isbn": "9780816691821",
+   "url": "https://doi.org/10.5749/minnesota/9780816691821.001.0001",
    "tags": [
     "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
-   "id": "L-1AD008",
-   "title": "Playing War",
-   "author": "Matthew Thomas Payne",
-   "date": "2016-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "Directory of Open access Books (OAPEN Foundation)",
-   "url": "https://library.oapen.org/handle/20.500.12657/89473",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
+    "title confirmed, passage not seen"
    ],
    "relevance": "unread"
   },
@@ -29716,6 +29701,21 @@
    "relevance": "unread"
   },
   {
+   "id": "L-BABA9C",
+   "title": "Game After: A Cultural Study of Video Game Afterlife",
+   "author": "Guins, Raiford",
+   "date": "2014",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "isbn": "9780262320177",
+   "url": "https://openlibrary.org/books/OL29707171M",
+   "tags": [
+    "to be checked",
+    "title confirmed, passage not seen"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-623AF0",
    "title": "Gry wideo a przekład: nowe pole badań w obrębie tłumaczenia audiowizualnego",
    "author": "Drab, Ewa",
@@ -30544,6 +30544,21 @@
    "relevance": "unread"
   },
   {
+   "id": "L-AB17A1",
+   "title": "Computer Games and the Social Imaginary",
+   "author": "Kirkpatrick, Graeme",
+   "date": "2013",
+   "kind": "book",
+   "publisher": "Polity Press",
+   "isbn": "9780745641102",
+   "url": "https://openlibrary.org/books/OL26000209M",
+   "tags": [
+    "to be checked",
+    "title confirmed, passage not seen"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-7159EF",
    "title": "När datamaskinerna tar över : datorerna och framtiden i Sveriges Television, 1979–1980",
    "author": "Persson, Patrik",
@@ -31291,6 +31306,21 @@
    "tags": [
     "to be checked",
     "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
+   "id": "L-4C754E",
+   "title": "Before the Crash: Early Video Game History",
+   "author": "Wolf, Mark J. P.",
+   "date": "2012",
+   "kind": "book",
+   "publisher": "Wayne State University Press",
+   "isbn": "9780814334508",
+   "url": "https://openlibrary.org/books/OL25197861M",
+   "tags": [
+    "to be checked",
+    "title confirmed, passage not seen"
    ],
    "relevance": "unread"
   },
@@ -33245,6 +33275,22 @@
    "relevance": "unread"
   },
   {
+   "id": "L-AFF75F",
+   "title": "Videogames in Computer Space: The Complex History of Pong",
+   "author": "Lowood, Henry",
+   "date": "2009-07",
+   "kind": "article",
+   "in": "IEEE Annals of the History of Computing vol. 31 no. 3",
+   "pages": "5-19",
+   "doi": "10.1109/MAHC.2009.53",
+   "url": "https://doi.org/10.1109/MAHC.2009.53",
+   "tags": [
+    "to be checked",
+    "title confirmed, passage not seen"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-7471D3",
    "title": "How Japanese is Wii? The Reception and Localization of Japanese Video Games in America",
    "author": "Huang, Xiangyi",
@@ -33543,22 +33589,6 @@
    "lang": "pt",
    "doi": "10.47749/t/unicamp.2008.441109",
    "url": "https://doi.org/10.47749/t/unicamp.2008.441109",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
-   "id": "L-9A96A3",
-   "title": "The case for research in game engine architecture",
-   "author": "Anderson, Eike Falk; Engel, Steffen; Comninos, Peter P.; McLoughlin, Leigh",
-   "date": "2008-11-03",
-   "kind": "article",
-   "lang": "en",
-   "in": "Conference on Future Play",
-   "doi": "10.1145/1496984.1497031",
-   "url": "https://doi.org/10.1145/1496984.1497031",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -35278,19 +35308,6 @@
     "mention spacewar!"
    ],
    "relevance": "unread"
-  },
-  {
-   "id": "L-E8EEF5",
-   "title": "One, Two, Three, Four I Declare a Space War",
-   "date": "2014-08",
-   "kind": "magazine",
-   "lang": "en",
-   "in": "They Create Worlds",
-   "note": "Extended history of the game drawing on Levy, Graetz and the author's own interview with Wiitanen.",
-   "url": "https://videogamehistorian.wordpress.com/2014/08/",
-   "tags": [
-    "about Spacewar!"
-   ]
   }
  ]
 }
