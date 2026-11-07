@@ -3247,7 +3247,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-2F4EE5.jpg"
+   "thumb": "library/thumbs/L-2F4EE5.jpg",
+   "author": "Lowood, Henry; Guins, Raiford"
   },
   {
    "id": "L-54E98D",
@@ -3541,22 +3542,6 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-A3629A.jpg"
-  },
-  {
-   "id": "L-352A8C",
-   "title": "The innovators: how a group of inventors, hackers, geniuses, and geeks created the digital revolution",
-   "author": "Isaacson, Walter",
-   "date": "2014",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Simon & Schuster",
-   "isbn": "9781476708690",
-   "note": "Section titled Steve Russell and Spacewar on the game as a product of MIT hacker culture, drawn from interviews with Russell and Brand; also covers Bushnell meeting it on the PDP-1 at Utah.",
-   "url": "https://archive.org/details/innovatorshowgro0000isaa_r9i3",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-352A8C.jpg"
   },
   {
    "id": "L-C38410",
@@ -4319,21 +4304,6 @@
    "thumb": "library/thumbs/L-86E840.jpg"
   },
   {
-   "id": "L-50EB62",
-   "title": "Digital youth, innovation, and the unexpected",
-   "date": "2008",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "MIT Press",
-   "isbn": "9780262134958",
-   "note": "A chapter treats Spacewar! as a showcase for PDP-1 graphics reported to the DEC users' community; cites Graetz and Brand.",
-   "url": "https://archive.org/details/digitalyouthinno0000unse",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-50EB62.jpg"
-  },
-  {
    "id": "L-558182",
    "title": "My friends",
    "author": "Open University TU100/Block 4",
@@ -4832,22 +4802,6 @@
    ]
   },
   {
-   "id": "L-750FBD",
-   "title": "Inventing modern America",
-   "author": "Brown, David E.",
-   "date": "2002",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "MIT Press",
-   "isbn": "9780262025089",
-   "note": "Profile of Bushnell: Spacewar created on MIT's PDP-1, copies reaching universities, its popularity among computer scientists, and his plan to sell it.",
-   "url": "https://archive.org/details/inventingmoderna00brow_0",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-750FBD.jpg"
-  },
-  {
    "id": "L-53F17F",
    "title": "Digital deli: the comprehensive, user-lovable menu of computer lore, culture, lifestyles, and fancy",
    "date": "1984",
@@ -4919,21 +4873,6 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-323EEA.jpg"
-  },
-  {
-   "id": "L-BE398E",
-   "title": "Where were you when?: [remembering 180 extraordinary events]",
-   "author": "Harrison, Ian",
-   "date": "2005",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Collins & Brown",
-   "isbn": "9781843402992",
-   "url": "https://archive.org/details/wherewereyouwhen0000harr_r7p9",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-BE398E.jpg"
   },
   {
    "id": "L-396A3A",
@@ -5093,21 +5032,6 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-612432.jpg"
-  },
-  {
-   "id": "L-90C10D",
-   "title": "Death by video game: danger, pleasure, and obsession on the virtual frontline",
-   "author": "Parkin, Simon",
-   "date": "2017",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Melville House",
-   "isbn": "9781612196206",
-   "url": "https://archive.org/details/deathbyvideogame0000park",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-90C10D.jpg"
   },
   {
    "id": "L-CCD0C5",
@@ -5399,20 +5323,6 @@
    "thumb": "library/thumbs/L-C1C2EA.jpg"
   },
   {
-   "id": "L-80A895",
-   "title": "The hippie dictionary: a cultural encyclopedia (and phraseicon) of the 1960s and 1970s",
-   "author": "McCleary, John Bassett",
-   "date": "2004",
-   "kind": "encyclopaedia",
-   "lang": "en",
-   "publisher": "Ten Speed Press",
-   "isbn": "1580085474",
-   "url": "https://archive.org/details/hippiedictionary0000mccl",
-   "tags": [
-    "found by full-text search, not read"
-   ]
-  },
-  {
    "id": "L-658C95",
    "title": "Computer",
    "author": "Atkinson, Paul",
@@ -5501,38 +5411,6 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-7B1BE2.jpg"
-  },
-  {
-   "id": "L-AD9B15",
-   "title": "Fun Inc.: why games are the 21st century's most serious business",
-   "author": "Chatfield, Tom",
-   "date": "2010",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Virgin Books",
-   "isbn": "9780753519851",
-   "note": "Recounts Russell's design criteria for Spacewar!, its effect on PDP-1 users, and interactive objects on screen.",
-   "url": "https://archive.org/details/funincwhygamesar0000chat",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-AD9B15.jpg"
-  },
-  {
-   "id": "L-6027C6",
-   "title": "Fun Inc: why games are the twenty-first century's most serious business",
-   "author": "Chatfield, Tom",
-   "date": "2011",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Virgin Books",
-   "isbn": "9780753519455",
-   "note": "Recounts Russell's design criteria for Spacewar!, its effect on PDP-1 users, and interactive objects on screen.",
-   "url": "https://archive.org/details/funincwhygamesar0000chat_j2u0",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-6027C6.jpg"
   },
   {
    "id": "L-2987DA",
@@ -5902,22 +5780,6 @@
    "thumb": "library/thumbs/L-705188.jpg"
   },
   {
-   "id": "L-C2945D",
-   "title": "Idea man: a memoir by the co-founder of Microsoft",
-   "author": "Allen, Paul",
-   "date": "2011",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Portfolio Penguin",
-   "isbn": "9780141969381",
-   "note": "Paul Allen's memoir recalls Spacewar on a PDP-1 as the first truly interactive computer game. Spacewar! at 36, 47.",
-   "url": "https://archive.org/details/ideamanmemoirbyc0000alle_a2z7",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-C2945D.jpg"
-  },
-  {
    "id": "L-714FB5",
    "title": "Software engineering and computer games",
    "author": "Rucker, Rudy v. B. (Rudy von Bitter)",
@@ -5992,21 +5854,6 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-245C4F.jpg"
-  },
-  {
-   "id": "L-076AEF",
-   "title": "The age of spiritual machines: how we will live, work and think in the new age of intelligent machines",
-   "author": "Kurzweil, Ray",
-   "date": "1999",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Orion Business",
-   "isbn": "9780752820781",
-   "url": "https://archive.org/details/ageofspiritualma0000kurz_s3h8",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-076AEF.jpg"
   },
   {
    "id": "L-DC8A43",
@@ -6100,7 +5947,7 @@
   },
   {
    "id": "L-EAED8C",
-   "title": "10 PRINT CHR&#36;(205.5+RND(1));: GOTO 10",
+   "title": "10 PRINT CHR$(205.5+RND(1));: GOTO 10",
    "author": "Montfort, Nick",
    "date": "2014",
    "kind": "book",
@@ -6109,9 +5956,10 @@
    "isbn": "9780262526746",
    "url": "https://archive.org/details/10printchr3620550000mont",
    "tags": [
-    "found by full-text search, not read"
+    "passing discussion"
    ],
-   "thumb": "library/thumbs/L-EAED8C.jpg"
+   "thumb": "library/thumbs/L-EAED8C.jpg",
+   "note": "Names Tennis for Two and Spacewar, crediting Russell, Graetz, Kotok and others, as early videogames in the modern sense. Spacewar! at 87 (index)."
   },
   {
    "id": "L-C6FEB4",
@@ -10229,33 +10077,6 @@
    ]
   },
   {
-   "id": "L-33A9BD",
-   "title": "10 PRINT CHR$(205.5+RND(1)); : GOTO 10",
-   "author": "Montfort, Nick; Baudoin, Patsy; Bell, John; Bogost, Ian; Douglass, Jeremy; Marino, Mark C.; Mateas, Michael; Reas, Casey; Sample, Mark; Vawter, Noah",
-   "date": "2012",
-   "kind": "book",
-   "publisher": "MIT Press",
-   "note": "Names Tennis for Two and Spacewar, crediting Russell, Graetz, Kotok and others, as early videogames in the modern sense. Spacewar! at 87 (index).",
-   "url": "https://ieeexplore.ieee.org/document/6462115/",
-   "tags": [
-    "passing discussion"
-   ]
-  },
-  {
-   "id": "L-899456",
-   "title": "Debugging Game History: A Critical Lexicon",
-   "author": "Lowood, Henry; Guins, Raiford",
-   "date": "2016",
-   "kind": "book",
-   "publisher": "MIT Press",
-   "note": "Several entries: Russell's reported pinball remark, a passage headed The Watershed of Spacewar! in the AI entry, Bushnell's failure to commercialise it, and its addictive popularity citing Minsky.",
-   "url": "https://ieeexplore.ieee.org/document/7580252/",
-   "tags": [
-    "section on Spacewar!"
-   ],
-   "thumb": "library/thumbs/L-899456.jpg"
-  },
-  {
    "id": "L-7DB59E",
    "title": "Development of a computer technology lecture",
    "author": "Harmer, Don S.",
@@ -11843,6 +11664,102 @@
    "doi": "10.1109/MSPEC.2021.9475389",
    "note": "Reviews the PiDP-8/I replica kit. Spacewar! is the notable preloaded game, started from the front panel switches and played through a Processing program that emulates a vector display; a photo shows it running.",
    "url": "https://spectrum.ieee.org/put-the-classic-pdp8-minicomputer-on-your-shelf",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-75DEC3",
+   "title": "“Press ( ) to jump”: control mechanisms in computer and video games",
+   "author": "Schmidt, Miron",
+   "date": "2026-04-24",
+   "kind": "article",
+   "lang": "en",
+   "in": "PAIDIA – Zeitschrift für Computerspielforschung",
+   "note": "Describes Russell's 1962 Spacewar! controller, citing Graetz: two double-throw switches for the ship and a firing button, unlike later joysticks, though its switched axes and fire button carry over into them.",
+   "url": "https://paidia.de/control-mechanisms-in-computer-and-video-games/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-67052F",
+   "title": "Anatomie der Spiele - Game Design als angewandte Kulturtechnikforschung",
+   "author": "Huber, Simon",
+   "date": "2026-10-16",
+   "kind": "article",
+   "lang": "de",
+   "in": "PAIDIA – Zeitschrift für Computerspielforschung",
+   "note": "Gives the MIT computer scientists running Spacewar! on a radar screen as the historical case of play as hacking, misuse of military equipment for entertainment, and so as the first video game.",
+   "url": "https://paidia.de/anatomie-der-spiele-game-design-als-angewandte-kulturtechnikforschung/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-A83E72",
+   "title": "Computerspiele (Computer(Spiele)) – Referenzen, Zitate und Rekursionen des Computers als Spiel",
+   "author": "Höltgen, Stefan",
+   "date": "2017-07-27",
+   "kind": "article",
+   "lang": "de",
+   "in": "PAIDIA – Zeitschrift für Computerspielforschung",
+   "note": "Contrasts Spacewar!, software on a real DEC PDP-1, with its rebuild Computer Space (1971), a pure logic game in TTL hardware, which carries the word computer only in its title.",
+   "url": "https://paidia.de/computerspiele-computerspiele-referenzen-zitate-und-rekursionen-des-computers-als-spiel/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-AEA2B1",
+   "title": "Das magische Panoptikum: Technologien der Überwachung zum Zweck des Spiels — eine computerarchäologische Analyse",
+   "author": "Höltgen, Stefan",
+   "date": "2020-06-25",
+   "kind": "article",
+   "lang": "de",
+   "in": "PAIDIA – Zeitschrift für Computerspielforschung",
+   "note": "Says the PDP-1's speed let MIT students implement Spacewar! with moving graphics and interrupt-driven interaction, and a note says the interrupt handling can be traced in the source code, citing a GitHub gist.",
+   "url": "https://paidia.de/das-magische-panoptikum/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-671878",
+   "title": "MISSION CONTROL: An Operator's Manual for Compulibratories",
+   "author": "Irvine, Dean",
+   "kind": "article",
+   "lang": "en",
+   "in": "Amodern",
+   "note": "Borrows Brand's 1972 Rolling Stone distinction, drawn from the makers of Spacewar, between planners and hackers to read Earle Birney's collaboration with programmers on the computer poem Space Conquest.",
+   "licence": "Creative Commons Attribution-Non-Commercial 3.0 Unported",
+   "url": "https://amodern.net/article/mission-control/",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-4D1872",
+   "title": "Collecting, Preserving, and Interpreting the History of Electronic Games: An Interview with Jon-Paul C. Dyson",
+   "kind": "article",
+   "lang": "en",
+   "in": "American Journal of Play 10(1)",
+   "note": "Says Spacewar! (1962), often cited as the first video game, reflected popular shooting games and interest in space and science fiction during the space race.",
+   "url": "https://www.museumofplay.org/app/uploads/2021/06/10-1-interview-dyson.pdf",
+   "tags": [
+    "passing discussion"
+   ]
+  },
+  {
+   "id": "L-EAA69E",
+   "title": "Play It Again, Pac-Man",
+   "author": "Bernstein, Charles",
+   "date": "1991-09",
+   "kind": "article",
+   "lang": "en",
+   "in": "Postmodern Culture 2(1)",
+   "note": "Gives Spacewar, developed on MIT mainframes in the late 1950s as he dates it, as the first video game and a byproduct of strategic R&D, and ties the secrecy of the controlling ROM to that scenario.",
+   "url": "https://www.pomoculture.org/2013/09/26/play-it-again-pac-man/",
    "tags": [
     "passing discussion"
    ]
