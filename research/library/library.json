@@ -621,13 +621,14 @@
    "date": "2021-03-17",
    "kind": "web page",
    "lang": "en",
-   "in": "They Create Worlds (videogamehistorian.wordpress.com)",
-   "note": "Revises the chronology using Landsteiner's dating of 2B and McKenzie's deposition logs; dates programming to January 1962 and questions whether hyperspace was present at the Parents' Weekend debut.",
+   "in": "They Create Worlds",
+   "note": "Disputes the usual chronology: Russell was not at MIT, and coding began in January 1962 after the display arrived on 29 December 1961. Uses Brand, Graetz, Levy, Landsteiner's code, interviews, McKenzie's deposition logs and The Tech.",
    "url": "https://videogamehistorian.wordpress.com/2021/03/17/worldly-wednesdays-a-timeline-of-spacewar/",
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "author": "Smith, Alexander"
   },
   {
    "id": "L-920A94",
@@ -1061,13 +1062,14 @@
    "date": "2014-08-07",
    "kind": "web page",
    "lang": "en",
-   "in": "They Create Worlds (videogamehistorian.wordpress.com)",
-   "note": "Origins from Wiitanen's proposal to Russell's coding, TMRC additions, the 1962 open house debut, spread to Stanford and Minnesota, with corrections to earlier histories such as Russell's affiliations.",
+   "in": "They Create Worlds",
+   "note": "Traces the 1961-62 creation on the PDP-1, crediting Wiitanen, Graetz, Russell and the model railroad club hackers, then the spread to Stanford, Minnesota and DEC, drawing on Levy, Graetz, Landsteiner, and Goldberg and Monnens.",
    "url": "https://videogamehistorian.wordpress.com/2014/08/07/one-two-three-four-i-declare-a-space-war/",
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "author": "Smith, Alexander"
   },
   {
    "id": "L-2E3A0B",
@@ -1414,22 +1416,6 @@
    "relevance": "about"
   },
   {
-   "id": "L-0E2B0E",
-   "title": "The Origin of Spacewar (MIT 150 Books entry)",
-   "date": "2011-05-07",
-   "kind": "web page",
-   "lang": "en",
-   "in": "MIT Libraries, 150 Books",
-   "publisher": "MIT Libraries",
-   "note": "Library exhibit entry on Graetz's 1981 Creative Computing article, summarising the Hingham Institute, the aims for the PDP-1, Samson's star map and the showing at MIT's Science Open House.",
-   "licence": "CC BY-NC unless otherwise noted (MIT Libraries content)",
-   "url": "https://libraries.mit.edu/150books/2011/05/07/1981/",
-   "tags": [
-    "about Spacewar!"
-   ],
-   "relevance": "about"
-  },
-  {
    "id": "L-8C5ADA",
    "title": "Fifty years later, video game pioneer Steve Russell shows off Spacewar! (video interview)",
    "author": "Takahashi, Dean",
@@ -1677,6 +1663,23 @@
    "relevance": "about"
   },
   {
+   "id": "L-0E2B0E",
+   "title": "The Origin of Spacewar (MIT 150 Books entry)",
+   "date": "1983",
+   "kind": "web page",
+   "lang": "en",
+   "in": "Video & Arcade Games",
+   "publisher": "Creative Computing",
+   "note": "Reprint under the byline J.M. Graetz, who names himself as one of the participants. Sections include the heavy star and the 1962 DECUS paper titled SPACEWAR! Real-Time Capability of the PDP-1.",
+   "licence": "CC BY-NC unless otherwise noted (MIT Libraries content)",
+   "url": "https://libraries.mit.edu/150books/2011/05/07/1981/",
+   "tags": [
+    "about Spacewar!"
+   ],
+   "relevance": "about",
+   "author": "Graetz, J. M."
+  },
+  {
    "id": "L-3CB601",
    "title": "The Origin of Spacewar! (reprint), Video & Arcade Games vol. 1 no. 1",
    "date": "1983",
@@ -1684,12 +1687,13 @@
    "lang": "en",
    "in": "Video & Arcade Games",
    "publisher": "Creative Computing",
-   "note": "Reprint of Graetz's account in Creative Computing's games magazine. A second scan is at Creative_Computing_Video_Arcade_Games_01_spring83. Spacewar! at scan leaves 79-85.",
+   "note": "Reprint under the byline J.M. Graetz, who names himself as one of the participants. Sections include the heavy star and the 1962 DECUS paper titled SPACEWAR! Real-Time Capability of the PDP-1.",
    "url": "https://archive.org/details/Video_Arcade_Games_Vol_1_No_1_1983-09_Creative_Computing_US",
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "author": "Graetz, J. M."
   },
   {
    "id": "L-867F0C",
@@ -2550,7 +2554,7 @@
    "lang": "en",
    "publisher": "Yellow Ant",
    "isbn": "9780956507204",
-   "note": "Opening history: Graetz on choosing spaceships, the two-player duel, control boxes replacing the PDP-1's 18 switches, completion by spring 1962, and Tuck's coin-operated Galaxy Game; also a gameography entry.",
+   "note": "Opening history: the $120,000 PDP-1, control boxes replacing 18 uncomfortable switches, completion by spring 1962, Tuck playing it in an AI lab in 1966 and building a faithful version unlike Bushnell's. Gameography entry.",
    "url": "https://archive.org/details/replayhistoryofv0000dono",
    "tags": [
     "section on Spacewar!"
@@ -2561,35 +2565,18 @@
   {
    "id": "L-B65A12",
    "title": "Racing the beam: the Atari Video computer system",
-   "author": "Montfort, Nick",
+   "author": "Montfort, Nick; Bogost, Ian",
    "date": "2009",
    "kind": "book",
    "lang": "en",
-   "publisher": "The MIT Press",
+   "publisher": "MIT Press",
    "isbn": "9780262012577",
-   "note": "Recurrent comparison: Bushnell discovering it at Utah, its 1962 PDP-1 display, two-player structure against Atari VCS design, and its relation to Star Castle and Space Wars. A ludography credits Russell, Graetz and Wiitanen. Spacewar! at 5, 7, 8, 31, 51-52, 84-86.",
+   "note": "Bushnell meets Spacewar at Utah in 1962 on a PDP-1 and spends a decade seeking a cheaper version. Compared with Pong as a two-player game. Ludography credits Russell, Graetz and Wiitanen.",
    "url": "https://archive.org/details/racingbeamatariv0000mont",
    "tags": [
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-B65A12.jpg",
-   "relevance": "section"
-  },
-  {
-   "id": "L-61C46E",
-   "title": "Games of empire: global capitalism and video games",
-   "author": "Dyer-Witheford, Nick",
-   "date": "2009",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "University of Minnesota Press",
-   "isbn": "9780816666102",
-   "note": "Treats Russell's game, made on a PDP-1, as the ur-video game over Higinbotham's and Baer's, and quotes Brand on it being 'part of no one's grand scheme' and on computer power to the people.",
-   "url": "https://archive.org/details/gamesofempireglo0000dyer",
-   "tags": [
-    "section on Spacewar!"
-   ],
-   "thumb": "library/thumbs/L-61C46E.jpg",
    "relevance": "section"
   },
   {
@@ -2646,12 +2633,12 @@
   {
    "id": "L-8BFC08",
    "title": "The video game explosion: a history from PONG to Playstation and beyond",
-   "date": "2008",
+   "date": "2007-11-30",
    "kind": "book",
    "lang": "en",
    "publisher": "Greenwood Press",
    "isbn": "9780313338687",
-   "note": "Edited by Wolf. Calls it the most famous mainframe game, by Russell, Graetz and Kotok at MIT around 1962, with hyperspace, copied and adapted across computers; also relates Cinematronics' and Vectorbeam's 1977 arcade games to it.",
+   "note": "Edited history. Calls Spacewar! the most famous mainframe game, written by Russell, Graetz and Kotok for the PDP-1, shown at a 1962 open house and copied widely; Bushnell's smaller version; Cinematronics and Vectorbeam copies. Timeline entry. Spacewar! at 13, 33 (index under Russell, Stephen R.).",
    "url": "https://archive.org/details/videogameexplosi0000unse",
    "tags": [
     "section on Spacewar!"
@@ -2685,7 +2672,7 @@
    "kind": "book",
    "publisher": "University of Chicago Press",
    "isbn": "0226817415",
-   "note": "Reads Brand's Rolling Stone piece as linking computer research to New Communalist ideals: October 1972 visit with photographer Annie Leibovitz, the Intergalactic Spacewar Olympics, and hackers rather than planners making the game.",
+   "note": "Reads Brand's Rolling Stone piece as tying computer research to New Communalist ideals: Brand and photographer Annie Leibovitz's October 1972 visit, the Intergalactic Spacewar Olympics, and hackers rather than planners as its makers.",
    "url": "https://archive.org/details/fromcountercultu0000turn",
    "tags": [
     "section on Spacewar!"
@@ -2700,9 +2687,9 @@
    "date": "2005",
    "kind": "book",
    "lang": "en",
-   "publisher": "Penguin Books",
-   "isbn": "9780143036760",
-   "note": "Describes the game at MIT as a classic collaborative hack, Russell's departure and the cult following, Bushnell's encounter with it, and Brand's Rolling Stone article on the computer scene. Cites Graetz.",
+   "publisher": "Viking",
+   "isbn": "0670033820",
+   "note": "Describes Spacewar, in which players fired projectiles at each other, Russell being handed a sine-cosine routine, and Brand's Rolling Stone article on the game scene. Spacewar! at xiii, 61, 86-87, 103, 179, 184, 218-20 (index).",
    "url": "https://archive.org/details/whatdormousesaid0000mark",
    "tags": [
     "section on Spacewar!"
@@ -2727,23 +2714,6 @@
    "relevance": "section"
   },
   {
-   "id": "L-E24231",
-   "title": "Videogames",
-   "author": "Newman, James (James A.)",
-   "date": "2004",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Routledge",
-   "isbn": "9780415281911",
-   "url": "https://archive.org/details/videogames0000newm",
-   "tags": [
-    "section on Spacewar!"
-   ],
-   "thumb": "library/thumbs/L-E24231.jpg",
-   "note": "Discusses the debated birth of videogames with Russell's Spacewar as the most cited modern case, players contending with inertia and gravity, and lists a Java version and Graetz.",
-   "relevance": "section"
-  },
-  {
    "id": "L-783417",
    "title": "Supercade: a visual history of the videogame age 1971-1984",
    "author": "Burnham, Van",
@@ -2752,7 +2722,7 @@
    "lang": "en",
    "publisher": "MIT Press",
    "isbn": "0262524201",
-   "note": "Reprints Graetz's 'The Origin of Spacewar!' (copyright 1981, with permission), including 'The Hackers Meet Spacewar!' and the control boxes, beside a Montfort piece on TMRC and a Spacewar! game entry.",
+   "note": "Reprints 'The Origin of Spacewar!' by J.M. Graetz, with its sections on the control boxes and the heavy star, and places the program as an MIT hack and space-combat simulation.",
    "url": "https://archive.org/details/supercadevisualh0000burn",
    "tags": [
     "section on Spacewar!"
@@ -2761,20 +2731,21 @@
    "relevance": "section"
   },
   {
-   "id": "L-D25FA0",
-   "title": "A history of modern computing",
-   "author": "Ceruzzi, Paul E.",
+   "id": "L-77563F",
+   "title": "The video game theory reader",
    "date": "2003",
    "kind": "book",
-   "publisher": "MIT Press",
-   "isbn": "9780262532037",
-   "note": "Uses Brand's 1972 Rolling Stone article: people at a Stanford lab playing Spacewar on a PDP-10, the game as a view of computing far from the mainframe, ahead of the personal computer.",
-   "url": "https://archive.org/details/historyofmodernc00ceru_0",
+   "lang": "en",
+   "publisher": "Routledge",
+   "isbn": "0415965780",
+   "url": "https://archive.org/details/videogametheoryr0000unse",
    "tags": [
     "section on Spacewar!"
    ],
-   "thumb": "library/thumbs/L-D25FA0.jpg",
-   "relevance": "section"
+   "thumb": "library/thumbs/L-77563F.jpg",
+   "relevance": "section",
+   "author": "Wolf, Mark J. P.; Perron, Bernard",
+   "note": "Edited volume. Chapters call it commonly considered the first real video game (1962), place the first avatars in its player-controlled ships, and say Russell wanted it to absorb the user in an experiential simulation."
   },
   {
    "id": "L-54E98D",
@@ -2818,7 +2789,7 @@
    "lang": "en",
    "publisher": "University of Texas Press",
    "isbn": "0292791488",
-   "note": "Wolf's history describes the game by Russell, Graetz and others on the PDP-1, its two ships, drawing on Graetz. A note on Baer's preface says PDP-1s cost $120,000 and few had access; another discusses patents.",
+   "note": "Edited volume. Wolf takes the account from Graetz (1981) and places it at the Hingham Institute in 1962. Baer's preface asks whether Russell and his associates invented video games given there was no raster, and mentions Bushnell's arcade idea.",
    "url": "https://archive.org/details/mediumofvideogam0000unse_b7m6",
    "tags": [
     "section on Spacewar!"
@@ -2836,7 +2807,7 @@
    "lang": "en",
    "publisher": "Prima Publishing",
    "isbn": "0761536434",
-   "note": "Chapter 'Forgotten Fathers' opens with a Russell epigraph, then covers TMRC members revising Spacewar, dedicated control boxes on the PDP-1, and earlier interactive programs. A timeline dates the game to 1961. Spacewar! at 16.",
+   "note": "Chapter 'Forgotten Fathers' opens with a Russell epigraph and covers Tech Model Railroad Club members. Notes two earlier interactive programs using switches. Its timeline dates Spacewar to 1961 as the first interactive computer game, with Bushnell's arcade version from 1970. Spacewar! at 16 (number printed beside the 'Forgotten Fathers' chapter opening in the scan text).",
    "url": "https://archive.org/details/ultimatehistoryo0000kent",
    "tags": [
     "section on Spacewar!"
@@ -2913,13 +2884,13 @@
   {
    "id": "L-7982AD",
    "title": "Joystick nation: how videogames ate our quarters, won our hearts, and rewired our minds",
-   "author": "Herz, J. C. (Jessie Cameron)",
+   "author": "Herz, J. C.",
    "date": "1997",
    "kind": "book",
    "lang": "en",
-   "publisher": "Little, Brown, and Co",
-   "isbn": "0316360074",
-   "note": "Calls it the ur-videogame, tells of Russell's friends polishing it on study breaks and the first joypad, copies on every research computer by the mid-1960s, and Computer Space as a variation on it.",
+   "publisher": "Little, Brown, and Co.",
+   "isbn": "9780316360074",
+   "note": "Says sixties programmers played it, for some their first sight of a computer, and that people demonstrated machines with it. Quotes Russell on his pride that it hooked so many; calls him the granddaddy of videogames.",
    "url": "https://archive.org/details/joysticknationho0000herz",
    "tags": [
     "section on Spacewar!"
@@ -3134,6 +3105,22 @@
    "publisher": "Aalto University",
    "note": "Bachelor's thesis on game space. Takes Spacewar! as a leading candidate for the first represented game space, discusses the star map as both mechanical and narrative via Graetz, and tells Samson's Game Transfer anecdote. Spacewar! at PDF pp. 14, 35.",
    "url": "https://aaltodoc.aalto.fi/handle/123456789/132145",
+   "tags": [
+    "section on Spacewar!"
+   ],
+   "relevance": "section"
+  },
+  {
+   "id": "L-084398",
+   "title": "The Game That Never Ends: How Lawyers Shape the Videogame Industry",
+   "author": "Mailland, Julien",
+   "date": "2024",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "isbn": "9780262549394",
+   "note": "Treats Spacewar! as prior art in the Odyssey patent litigation: courts considered the 1962 game by MIT hackers. Describes it as a mainframe program that spread freely and cites Brand. Spacewar! at 46 (index, on prior art of Spacewar!).",
+   "licence": "CC BY-NC-ND 4.0",
+   "url": "https://archive.org/details/mit_press_book_9780262380294",
    "tags": [
     "section on Spacewar!"
    ],
@@ -3915,13 +3902,14 @@
    "lang": "en",
    "publisher": "MIT Press",
    "isbn": "9780262034197",
-   "note": "Edited by Guins and Lowood. Several entries touch it: Russell's reported pinball remark, a subsection 'The Watershed of Spacewar!' after the rise of AI, Bushnell's failure to commercialise it, and how it represented players.",
+   "note": "Edited volume. Entries give Russell's reported pinball remark, a subsection 'The Watershed of Spacewar!' after the founding of AI, Bushnell's failure to commercialise it, and a note on its popularity citing Minsky (1988) and Crogan (2008).",
    "url": "https://archive.org/details/isbn_9780262034197",
    "tags": [
     "section on Spacewar!"
    ],
    "author": "Lowood, Henry; Guins, Raiford",
-   "relevance": "section"
+   "relevance": "section",
+   "doi": "10.7551/mitpress/10087.001.0001"
   },
   {
    "id": "L-14816A",
@@ -4556,6 +4544,23 @@
    "in": "Gamasutra / Game Developer",
    "note": "Announcement quoting Jeffrey Fleming's feature, the first in a Gamasutra and IGDA Preservation SIG series on the Digital Game Canon; covers the Hingham group and Jack Dennis's terms for computer time.",
    "url": "https://www.gamedeveloper.com/game-platforms/feature-i-spacewar-i-and-the-birth-of-digital-game-culture-",
+   "tags": [
+    "section on Spacewar!"
+   ],
+   "relevance": "section"
+  },
+  {
+   "id": "L-3D4098",
+   "title": "A Brief Biography of Computer Games",
+   "author": "Lowood, Henry",
+   "date": "2006",
+   "kind": "chapter",
+   "in": "Playing Video Games: Motives, Responses, and Consequences",
+   "publisher": "Lawrence Erlbaum Associates",
+   "pages": "27-46",
+   "doi": "10.4324/9780203873700-4",
+   "note": "Section 'Parents: Early Computer Games' starts with Spacewar!, quotes Edwards and Graetz (1962) on players joining a new sport, and uses a report of the 1972 Olympics at Stanford on players forming around the game.",
+   "url": "https://doi.org/10.4324/9780203873700-4",
    "tags": [
     "section on Spacewar!"
    ],
@@ -6144,15 +6149,32 @@
    "doi": "10.18574/nyu/9780814741153.001.0001"
   },
   {
+   "id": "L-61C46E",
+   "title": "Games of empire: global capitalism and video games",
+   "author": "Dyer-Witheford, Nick; de Peuter, Greig",
+   "date": "2009",
+   "kind": "book",
+   "lang": "en",
+   "publisher": "University of Minnesota Press",
+   "isbn": "9780816666102",
+   "note": "Ranks Russell's 1961 game, made on a PDP-1, above Higinbotham's and Baer's work as the ur-video game. Quotes Brand that it was part of no one's grand scheme and announced computer power to the people.",
+   "url": "https://archive.org/details/gamesofempireglo0000dyer",
+   "tags": [
+    "passing discussion"
+   ],
+   "thumb": "library/thumbs/L-61C46E.jpg",
+   "relevance": "mention"
+  },
+  {
    "id": "L-6F2B8D",
    "title": "Expressive processing: digital fictions, computer games, and software studies",
    "author": "Wardrip-Fruin, Noah",
    "date": "2009",
    "kind": "book",
    "lang": "en",
-   "publisher": "The MIT Press",
+   "publisher": "MIT Press",
    "isbn": "9780262013437",
-   "note": "One passage: widely considered the first modern video game, custom controllers at MIT, gravity and navigation compared with Pong's single-line movement. A ludography entry credits Russell, Samson, Edwards, Graetz, Kotok, Piner and Saunders.",
+   "note": "Calls it widely considered the first modern video game, created on a PDP-1 at MIT, and contrasts its gravity and navigation across the screen with Pong's movement along a line. Credited to Russell, Samson, Edwards et al. 1962.",
    "url": "https://archive.org/details/expressiveproces0000ward",
    "tags": [
     "passing discussion"
@@ -6192,6 +6214,40 @@
    ],
    "thumb": "library/thumbs/L-683C6E.jpg",
    "note": "Says Computer Space was almost an exact copy of the game written by TMRC members in 1961 for the PDP-1, with a screen rendering. Spacewar! at 14.",
+   "relevance": "mention"
+  },
+  {
+   "id": "L-E24231",
+   "title": "Videogames",
+   "author": "Newman, James (James A.)",
+   "date": "2004",
+   "kind": "book",
+   "lang": "en",
+   "publisher": "Routledge",
+   "isbn": "9780415281911",
+   "url": "https://archive.org/details/videogames0000newm",
+   "tags": [
+    "passing discussion"
+   ],
+   "thumb": "library/thumbs/L-E24231.jpg",
+   "note": "Treats the birth date of videogames as debated, with Russell's Spacewar at MIT the most cited modern case. Players contended with inertia and gravity. Lists a Java version. A 2013 edition also exists.",
+   "relevance": "mention",
+   "doi": "10.4324/9780203642900"
+  },
+  {
+   "id": "L-D25FA0",
+   "title": "A history of modern computing",
+   "author": "Ceruzzi, Paul E.",
+   "date": "2003",
+   "kind": "book",
+   "publisher": "MIT Press",
+   "isbn": "9780262532037",
+   "note": "Uses Brand's Rolling Stone article: people at a laboratory playing Spacewar on a PDP-10, shortly before personal computers reached the market, and what the game showed about computing.",
+   "url": "https://archive.org/details/historyofmodernc00ceru_0",
+   "tags": [
+    "passing discussion"
+   ],
+   "thumb": "library/thumbs/L-D25FA0.jpg",
    "relevance": "mention"
   },
   {
@@ -11775,21 +11831,6 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-D1D6B7.jpg",
-   "relevance": "unread"
-  },
-  {
-   "id": "L-77563F",
-   "title": "The video game theory reader",
-   "date": "2003",
-   "kind": "book",
-   "lang": "en",
-   "publisher": "Routledge",
-   "isbn": "0415965780",
-   "url": "https://archive.org/details/videogametheoryr0000unse",
-   "tags": [
-    "found by full-text search, not read"
-   ],
-   "thumb": "library/thumbs/L-77563F.jpg",
    "relevance": "unread"
   },
   {
@@ -20239,6 +20280,21 @@
    "relevance": "unread"
   },
   {
+   "id": "L-51ECB7",
+   "title": "Time and Space in Video Games",
+   "author": "Federico Alvarez Igarzábal",
+   "date": "2023-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "OAPEN (The OAPEN Foundation)",
+   "url": "https://library.oapen.org/handle/20.500.12657/111326",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-5974BD",
    "title": "The popularity of E-sports and the logic behind the growth",
    "author": "Li, Zhewen",
@@ -22062,6 +22118,7 @@
    "url": "https://doi.org/10.5281/zenodo.5566462",
    "tags": [
     "to be checked",
+    "names the word, context unclear",
     "mention spacewar!"
    ],
    "relevance": "unread"
@@ -22651,6 +22708,22 @@
    "relevance": "unread"
   },
   {
+   "id": "L-6C842F",
+   "title": "Creative Game Design Training Requirements",
+   "author": "Raudyah Md Tap; Nor Azan Mat Zin; Hafiz Mohd Sarim",
+   "date": "2021-02-04",
+   "kind": "article",
+   "lang": "en",
+   "in": "International Journal on Advanced Science Engineering and Information Technology",
+   "doi": "10.18517/ijaseit.11.1.10270",
+   "url": "https://doi.org/10.18517/ijaseit.11.1.10270",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-CE8382",
    "title": "Constructing A 3d Game With Unity 3d Game Engine",
    "author": "Boyraz, Gizem; Kirci, Pınar",
@@ -23068,6 +23141,22 @@
    "lang": "es",
    "doi": "10.24275/uama.4391.8886",
    "url": "https://doi.org/10.24275/uama.4391.8886",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
+   "id": "L-6F6043",
+   "title": "Dans les profondeurs du code",
+   "author": "Angelo Careri",
+   "date": "2021-01-01",
+   "kind": "article",
+   "lang": "fr",
+   "in": "Techniques & culture",
+   "doi": "10.4000/tc.15635",
+   "url": "https://doi.org/10.4000/tc.15635",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -25620,6 +25709,22 @@
    "lang": "fr",
    "in": "ArODES (HES-SO (https://www.hes-so.ch/))",
    "url": "http://arodes.hes-so.ch/record/5204",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
+   "id": "L-32F0D1",
+   "title": "Taking College Esports Seriously",
+   "author": "Nyle Sky Kauweloa; Jenifer Sunrise Winter",
+   "date": "2019-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "Hawaii International Conference on System Sciences (HICSS)",
+   "doi": "10.24251/hicss.2019.295",
+   "url": "https://doi.org/10.24251/hicss.2019.295",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -28181,6 +28286,22 @@
    "relevance": "unread"
   },
   {
+   "id": "L-3DA922",
+   "title": "Sommaire",
+   "author": "Emmanuel Lazard; Pierre-Éric Mounier-Kuhn",
+   "date": "2016-04-05",
+   "kind": "chapter",
+   "lang": "fr",
+   "in": "EDP Sciences eBooks",
+   "doi": "10.1051/978-2-7598-1993-5.toc",
+   "url": "https://doi.org/10.1051/978-2-7598-1993-5.toc",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
    "id": "L-EF872D",
    "title": "Approaches to the videogames and its incidence on the subjectivities of latin american gamers",
    "author": "Merlano, Alvaro Acevedo; Lizarazo, Jessica Alejandra Chaux",
@@ -28312,6 +28433,21 @@
    "lang": "en",
    "in": "UWSpace (University of Waterloo)",
    "url": "http://hdl.handle.net/10012/10189",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
+   "id": "L-4C1D7B",
+   "title": "Ageing and Technology",
+   "date": "2016-01-20",
+   "kind": "book",
+   "lang": "en",
+   "in": "transcript Verlag eBooks",
+   "doi": "10.1515/9783839429570",
+   "url": "https://doi.org/10.1515/9783839429570",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -28695,6 +28831,36 @@
    "lang": "en",
    "in": "Nelson Mandela University Research Repository",
    "url": "http://hdl.handle.net/10948/13193",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
+   "id": "L-515C14",
+   "title": "“Ruinensehnsucht” – Longing for Decay in Computer Games",
+   "author": "Mathias Fuchs",
+   "date": "2016-01-01",
+   "kind": "article",
+   "lang": "en",
+   "doi": "10.26503/dl.v2016i1.806",
+   "url": "https://doi.org/10.26503/dl.v2016i1.806",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ],
+   "relevance": "unread"
+  },
+  {
+   "id": "L-1AD008",
+   "title": "Playing War",
+   "author": "Matthew Thomas Payne",
+   "date": "2016-01-01",
+   "kind": "article",
+   "lang": "en",
+   "in": "Directory of Open access Books (OAPEN Foundation)",
+   "url": "https://library.oapen.org/handle/20.500.12657/89473",
    "tags": [
     "to be checked",
     "mention spacewar!"
@@ -35114,150 +35280,16 @@
    "relevance": "unread"
   },
   {
-   "id": "L-3D4098",
-   "title": "A Brief Biography of Computer Games",
-   "author": "Lowood, Henry",
-   "date": "2006",
-   "kind": "chapter",
-   "in": "Playing Video Games: Motives, Responses, and Consequences",
-   "publisher": "Lawrence Erlbaum Associates",
-   "pages": "27-46",
-   "doi": "10.4324/9780203873700-4",
-   "note": "Section 'Parents: Early Computer Games' starts with Spacewar!, quotes Edwards and Graetz (1962) on players joining a new sport, and uses a report of the 1972 Olympics at Stanford on players forming around the game.",
-   "url": "https://doi.org/10.4324/9780203873700-4",
-   "tags": [
-    "section on Spacewar!"
-   ]
-  },
-  {
-   "id": "L-084398",
-   "title": "The Game That Never Ends: How Lawyers Shape the Videogame Industry",
-   "author": "Mailland, Julien",
-   "date": "2024",
-   "kind": "book",
-   "publisher": "MIT Press",
-   "isbn": "9780262549394",
-   "note": "Treats Spacewar! as prior art in the Odyssey patent litigation: courts considered the 1962 game by MIT hackers. Describes it as a mainframe program that spread freely and cites Brand. Spacewar! at 46 (index, on prior art of Spacewar!).",
-   "licence": "CC BY-NC-ND 4.0",
-   "url": "https://archive.org/details/mit_press_book_9780262380294",
-   "tags": [
-    "section on Spacewar!"
-   ]
-  },
-  {
-   "id": "L-32F0D1",
-   "title": "Taking College Esports Seriously",
-   "author": "Nyle Sky Kauweloa; Jenifer Sunrise Winter",
-   "date": "2019-01-01",
-   "kind": "article",
+   "id": "L-E8EEF5",
+   "title": "One, Two, Three, Four I Declare a Space War",
+   "date": "2014-08",
+   "kind": "magazine",
    "lang": "en",
-   "in": "Hawaii International Conference on System Sciences (HICSS)",
-   "doi": "10.24251/hicss.2019.295",
-   "url": "https://doi.org/10.24251/hicss.2019.295",
+   "in": "They Create Worlds",
+   "note": "Extended history of the game drawing on Levy, Graetz and the author's own interview with Wiitanen.",
+   "url": "https://videogamehistorian.wordpress.com/2014/08/",
    "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ]
-  },
-  {
-   "id": "L-3DA922",
-   "title": "Sommaire",
-   "author": "Emmanuel Lazard; Pierre-Éric Mounier-Kuhn",
-   "date": "2016-04-05",
-   "kind": "chapter",
-   "lang": "fr",
-   "in": "EDP Sciences eBooks",
-   "doi": "10.1051/978-2-7598-1993-5.toc",
-   "url": "https://doi.org/10.1051/978-2-7598-1993-5.toc",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ]
-  },
-  {
-   "id": "L-6F6043",
-   "title": "Dans les profondeurs du code",
-   "author": "Angelo Careri",
-   "date": "2021-01-01",
-   "kind": "article",
-   "lang": "fr",
-   "in": "Techniques & culture",
-   "doi": "10.4000/tc.15635",
-   "url": "https://doi.org/10.4000/tc.15635",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ]
-  },
-  {
-   "id": "L-6C842F",
-   "title": "Creative Game Design Training Requirements",
-   "author": "Raudyah Md Tap; Nor Azan Mat Zin; Hafiz Mohd Sarim",
-   "date": "2021-02-04",
-   "kind": "article",
-   "lang": "en",
-   "in": "International Journal on Advanced Science Engineering and Information Technology",
-   "doi": "10.18517/ijaseit.11.1.10270",
-   "url": "https://doi.org/10.18517/ijaseit.11.1.10270",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ]
-  },
-  {
-   "id": "L-515C14",
-   "title": "“Ruinensehnsucht” – Longing for Decay in Computer Games",
-   "author": "Mathias Fuchs",
-   "date": "2016-01-01",
-   "kind": "article",
-   "lang": "en",
-   "doi": "10.26503/dl.v2016i1.806",
-   "url": "https://doi.org/10.26503/dl.v2016i1.806",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ]
-  },
-  {
-   "id": "L-51ECB7",
-   "title": "Time and Space in Video Games",
-   "author": "Federico Alvarez Igarzábal",
-   "date": "2023-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "OAPEN (The OAPEN Foundation)",
-   "url": "https://library.oapen.org/handle/20.500.12657/111326",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ]
-  },
-  {
-   "id": "L-4C1D7B",
-   "title": "Ageing and Technology",
-   "date": "2016-01-20",
-   "kind": "book",
-   "lang": "en",
-   "in": "transcript Verlag eBooks",
-   "doi": "10.1515/9783839429570",
-   "url": "https://doi.org/10.1515/9783839429570",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ]
-  },
-  {
-   "id": "L-1AD008",
-   "title": "Playing War",
-   "author": "Matthew Thomas Payne",
-   "date": "2016-01-01",
-   "kind": "article",
-   "lang": "en",
-   "in": "Directory of Open access Books (OAPEN Foundation)",
-   "url": "https://library.oapen.org/handle/20.500.12657/89473",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
+    "about Spacewar!"
    ]
   }
  ]
