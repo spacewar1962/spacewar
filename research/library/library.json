@@ -120,7 +120,8 @@
    "url": "https://archive.org/details/2015MonnensGoldberg",
    "source": "Internet Archive, 2015MonnensGoldberg",
    "in": "Kinephanos Revue d études des médias et de culture populaire",
-   "relevance": "about"
+   "relevance": "about",
+   "key": 1
   },
   {
    "id": "L-493678",
@@ -201,7 +202,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 16
   },
   {
    "id": "L-647A66",
@@ -411,7 +413,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 13
   },
   {
    "id": "L-60F602",
@@ -598,7 +601,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 15
   },
   {
    "id": "L-566654",
@@ -628,7 +632,8 @@
     "about Spacewar!"
    ],
    "relevance": "about",
-   "author": "Smith, Alexander"
+   "author": "Smith, Alexander",
+   "key": 6
   },
   {
    "id": "L-920A94",
@@ -719,7 +724,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 14
   },
   {
    "id": "L-C070ED",
@@ -789,7 +795,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 21
   },
   {
    "id": "L-A8213D",
@@ -939,7 +946,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 9
   },
   {
    "id": "L-2C7AE6",
@@ -1054,21 +1062,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
-  },
-  {
-   "id": "L-E8EEF5",
-   "title": "One, Two, Three, Four I Declare a Space War",
-   "date": "2014-08",
-   "kind": "magazine",
-   "lang": "en",
-   "in": "They Create Worlds",
-   "note": "Extended history of the game drawing on Levy, Graetz and the author's own interview with Wiitanen.",
-   "url": "https://videogamehistorian.wordpress.com/2014/08/",
-   "tags": [
-    "about Spacewar!"
-   ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 4
   },
   {
    "id": "L-09CF21",
@@ -1083,7 +1078,8 @@
     "about Spacewar!"
    ],
    "relevance": "about",
-   "author": "Smith, Alexander"
+   "author": "Smith, Alexander",
+   "key": 7
   },
   {
    "id": "L-2E3A0B",
@@ -1158,7 +1154,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 12
   },
   {
    "id": "L-F4A48A",
@@ -1474,7 +1471,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 11
   },
   {
    "id": "L-827FF8",
@@ -1605,7 +1603,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "about"
+   "relevance": "about",
+   "key": 10
   },
   {
    "id": "L-0C4E9B",
@@ -1707,7 +1706,8 @@
     "about Spacewar!"
    ],
    "relevance": "about",
-   "author": "Graetz, J. M."
+   "author": "Graetz, J. M.",
+   "key": 2
   },
   {
    "id": "L-867F0C",
@@ -2574,7 +2574,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-68D535.jpg",
-   "relevance": "section"
+   "relevance": "section",
+   "key": 18
   },
   {
    "id": "L-B65A12",
@@ -2659,7 +2660,8 @@
    ],
    "thumb": "library/thumbs/L-8BFC08.jpg",
    "author": "Wolf, Mark J. P.",
-   "relevance": "section"
+   "relevance": "section",
+   "key": 20
   },
   {
    "id": "L-C2F012",
@@ -2827,7 +2829,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-351E6D.jpg",
-   "relevance": "section"
+   "relevance": "section",
+   "key": 19
   },
   {
    "id": "L-73A0D0",
@@ -2993,7 +2996,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-E5A593.jpg",
-   "relevance": "section"
+   "relevance": "section",
+   "key": 3
   },
   {
    "id": "L-18A428",
@@ -4546,7 +4550,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "relevance": "section"
+   "relevance": "section",
+   "key": 17
   },
   {
    "id": "L-904831",
@@ -6753,6 +6758,23 @@
    "relevance": "mention"
   },
   {
+   "id": "L-71DE09",
+   "title": "DEVELOPMENT OF THE APPLICATION «INTELLECTUAL GAME»",
+   "author": "ФГАОУ ВО «Северо-Восточный федеральный университет им. М.К. Аммосова, Колледж инфраструктурных технологий,; Efimova, Sayara Stepanovna",
+   "date": "2024-01-01",
+   "kind": "chapter",
+   "lang": "no",
+   "in": "ICSP «NEW SCIENCE» eBooks",
+   "doi": "10.46916/07102024-978-5-00215-541-5",
+   "url": "https://doi.org/10.46916/07102024-978-5-00215-541-5",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
+   ],
+   "relevance": "mention"
+  },
+  {
    "id": "L-41E604",
    "title": "Jeux vidéo et informatique",
    "author": "Djaouti, Damien",
@@ -8389,6 +8411,23 @@
    "url": "https://openalex.org/W237373724",
    "tags": [
     "passing discussion"
+   ],
+   "relevance": "mention"
+  },
+  {
+   "id": "L-63D29B",
+   "title": "L’intrigue en trois dimensions",
+   "author": "Krichane, Selim",
+   "date": "2014-01-01",
+   "kind": "article",
+   "lang": "fr",
+   "in": "Cahiers de narratologie",
+   "doi": "10.4000/narratologie.7014",
+   "url": "https://doi.org/10.4000/narratologie.7014",
+   "tags": [
+    "passing discussion",
+    "checked: names Spacewar!",
+    "mention spacewar!"
    ],
    "relevance": "mention"
   },
@@ -17782,22 +17821,6 @@
    "relevance": "unread"
   },
   {
-   "id": "L-71DE09",
-   "title": "DEVELOPMENT OF THE APPLICATION «INTELLECTUAL GAME»",
-   "author": "ФГАОУ ВО «Северо-Восточный федеральный университет им. М.К. Аммосова, Колледж инфраструктурных технологий,; Efimova, Sayara Stepanovna",
-   "date": "2024-01-01",
-   "kind": "chapter",
-   "lang": "no",
-   "in": "ICSP «NEW SCIENCE» eBooks",
-   "doi": "10.46916/07102024-978-5-00215-541-5",
-   "url": "https://doi.org/10.46916/07102024-978-5-00215-541-5",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
    "id": "L-C9D85A",
    "title": "Game Mods: Design, Theory and Criticism",
    "author": "Champion, Erik Malcolm",
@@ -24707,7 +24730,8 @@
     "to be checked",
     "title confirmed, passage not seen"
    ],
-   "relevance": "unread"
+   "relevance": "unread",
+   "key": 5
   },
   {
    "id": "L-657DE5",
@@ -30089,22 +30113,6 @@
    "relevance": "unread"
   },
   {
-   "id": "L-63D29B",
-   "title": "L’intrigue en trois dimensions",
-   "author": "Krichane, Selim",
-   "date": "2014-01-01",
-   "kind": "article",
-   "lang": "fr",
-   "in": "Cahiers de narratologie",
-   "doi": "10.4000/narratologie.7014",
-   "url": "https://doi.org/10.4000/narratologie.7014",
-   "tags": [
-    "to be checked",
-    "mention spacewar!"
-   ],
-   "relevance": "unread"
-  },
-  {
    "id": "L-48C42D",
    "title": "AURAL (RE)POSITIONING AND THE AESTHETICS OF REALISM IN FIRST-PERSON SHOOTER GAMES",
    "author": "LaLiberty, Ryan",
@@ -33288,7 +33296,8 @@
     "to be checked",
     "title confirmed, passage not seen"
    ],
-   "relevance": "unread"
+   "relevance": "unread",
+   "key": 8
   },
   {
    "id": "L-7471D3",
