@@ -1568,8 +1568,7 @@
    "kind": "news",
    "lang": "en",
    "in": "San Jose Mercury News",
-   "pages": "3E",
-   "note": "Syndicated version of Markoff's New York Times feature, with Peter DaSilva's photograph, on Russell and the game's fortieth anniversary.",
+   "note": "Syndicated version of Markoff's New York Times feature, with Peter DaSilva's photograph, on Russell and the game's fortieth anniversary. Page 3E.",
    "url": "https://www.ed-thelen.org/comp-hist/PDP-1-SpaceWar-Article.html",
    "tags": [
     "about Spacewar!"
@@ -1736,7 +1735,8 @@
    "tags": [
     "about Spacewar!"
    ],
-   "relevance": "high"
+   "relevance": "high",
+   "date": "2014"
   },
   {
    "id": "L-BB8665",
@@ -2338,7 +2338,8 @@
    ],
    "file": "library/files/L-BCDABA.pdf",
    "source": "https://etheses.whiterose.ac.uk/id/eprint/17634/1/TOM_RODGERS_THESIS_FINAL%202.pdf",
-   "relevance": "medium"
+   "relevance": "medium",
+   "date": "2016-12-01"
   },
   {
    "id": "L-BB66E3",
@@ -2727,7 +2728,8 @@
     "section on Spacewar!"
    ],
    "thumb": "library/thumbs/L-EAFE21.jpg",
-   "relevance": "medium"
+   "relevance": "medium",
+   "contributor": "eds Raessens, Joost; Goldstein, Jeffrey H"
   },
   {
    "id": "L-783417",
@@ -3677,7 +3679,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "relevance": "medium"
+   "relevance": "medium",
+   "author": "Milburn, Colin"
   },
   {
    "id": "L-B1794C",
@@ -5243,7 +5246,8 @@
    "tags": [
     "section on Spacewar!"
    ],
-   "relevance": "medium"
+   "relevance": "medium",
+   "date": "2011"
   },
   {
    "id": "L-A139FC",
@@ -5565,9 +5569,8 @@
    "lang": "pt",
    "in": "Signos do Consumo",
    "publisher": "Universidade de Sao Paulo, Agencia USP de Gestao da Informacao Academica (AGUIA)",
-   "pages": "e198043",
    "doi": "10.11606/issn.1984-5057.v14i2e198043",
-   "note": "Portuguese article describing Spacewar by Russell on a PDP-1 in 1962 as first computer game, a battle between two rockets. Spacewar! at PDF p. 3.",
+   "note": "Portuguese article describing Spacewar by Russell on a PDP-1 in 1962 as first computer game, a battle between two rockets. Spacewar! at PDF p. 3. Article e198043.",
    "licence": "CC BY-NC-SA 4.0",
    "url": "https://doi.org/10.11606/issn.1984-5057.v14i2e198043",
    "tags": [
@@ -5743,9 +5746,8 @@
    "lang": "pt",
    "in": "Revista FAMECOS",
    "publisher": "EDIPUCRS",
-   "pages": "e29118",
    "doi": "10.15448/1980-3729.2019.1.29118",
-   "note": "Portuguese article on digital culture treating Russell and the creation of Spacewar! to test the PDP-1 as an emblematic case of hacker origins.",
+   "note": "Portuguese article on digital culture treating Russell and the creation of Spacewar! to test the PDP-1 as an emblematic case of hacker origins. Article e29118.",
    "licence": "CC BY 4.0",
    "url": "https://doi.org/10.15448/1980-3729.2019.1.29118",
    "tags": [
@@ -10389,7 +10391,8 @@
     "checked: names Spacewar!",
     "mention spacewar!"
    ],
-   "relevance": "low"
+   "relevance": "low",
+   "contributor": "eds Carla Viana Dendasck; Cláudio Alberto Gellis de Mattos Dias; Devanildo Braz Da Silva; Monica Aparecida Bortolotti"
   },
   {
    "id": "L-D3DDAA",
@@ -10702,8 +10705,8 @@
     "checked: names Spacewar!",
     "mention spacewar!"
    ],
-   "author": "Bajdak, Andrzej (ed.); Spyra, Zbigniew (ed.)",
-   "relevance": "low"
+   "relevance": "low",
+   "contributor": "eds Bajdak, Andrzej; Spyra, Zbigniew"
   },
   {
    "id": "L-C8E111",
@@ -10836,7 +10839,7 @@
   {
    "id": "L-B55C87",
    "title": "ВКЛАД ЗВЕЗДНОЙ ИКОНОГРАФИИ В ПРОСТРАНСТВЕННУЮ ПРОБЛЕМАТИКУ КОМПЬЮТЕРНЫХ ИГР: СЛУЧАЙ ИГР-ХОРРОРОВ",
-   "author": "Baychelier, Guillaume (trans. Borovikov, Anton)",
+   "author": "Baychelier, Guillaume",
    "date": "2022",
    "kind": "article",
    "lang": "ru",
@@ -10846,7 +10849,8 @@
    "tags": [
     "passing discussion"
    ],
-   "relevance": "low"
+   "relevance": "low",
+   "contributor": "translated by Borovikov, Anton"
   },
   {
    "id": "L-64477C",
@@ -17065,7 +17069,6 @@
    "kind": "article",
    "lang": "de",
    "in": "AugenBlick. Marburger Hefte zur Medienwissenschaft, no. 46, ed. Peter Riedel",
-   "pages": "PDF p. 23",
    "note": "'Killer games', aesthetics of virtual violence. An article sketching the technical history of violence in games starts from Spacewar! by Wiitanen, Graetz and Russell, completed 1962 to make the PDP-1 playable. Spacewar! at PDF p. 23.",
    "url": "https://mediarep.org/server/api/core/bitstreams/f11b97ae-6045-4a81-8e3b-797af1414137/content",
    "tags": [
@@ -18691,7 +18694,8 @@
    "tags": [
     "passing discussion"
    ],
-   "relevance": "low"
+   "relevance": "low",
+   "date": "2026"
   },
   {
    "id": "L-A1B06C",
@@ -18704,7 +18708,8 @@
    "tags": [
     "passing discussion"
    ],
-   "relevance": "low"
+   "relevance": "low",
+   "date": "2021"
   },
   {
    "id": "L-671878",
@@ -18719,7 +18724,8 @@
    "tags": [
     "passing discussion"
    ],
-   "relevance": "low"
+   "relevance": "low",
+   "date": "2015"
   },
   {
    "id": "L-4D1872",
@@ -18919,7 +18925,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-EC4DDF.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "CQ Researcher"
   },
   {
    "id": "L-43CC2D",
@@ -18952,7 +18959,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-E9360F.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Totten, Christopher W."
   },
   {
    "id": "L-80EABC",
@@ -18984,7 +18992,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-86E840.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Grant, August E.; Meadows, Jennifer Harman"
   },
   {
    "id": "L-76BE2D",
@@ -19179,7 +19188,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-DF6714.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Ryan, Marie-Laure; Emerson, Lori; Robertson, Benjamin J."
   },
   {
    "id": "L-6F8852",
@@ -19261,7 +19271,7 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-5ADEE1.jpg",
-   "author": "The Editors of Salem Press",
+   "author": "Salem Press",
    "relevance": "unchecked"
   },
   {
@@ -19357,7 +19367,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-19D464.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Kapell, Matthew; Elliott, Andrew B. R"
   },
   {
    "id": "L-79C9B7",
@@ -19420,7 +19431,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-34AD39.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Ray, Michael"
   },
   {
    "id": "L-A619C4",
@@ -19451,7 +19463,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-6B2E23.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Maison d'ailleurs (Yverdon-les-Bains, Suisse)"
   },
   {
    "id": "L-57E3C1",
@@ -19677,7 +19690,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-DF9316.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Ferguson Publishing"
   },
   {
    "id": "L-8FD139",
@@ -19772,7 +19786,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-BBC169.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Guinness World Records"
   },
   {
    "id": "L-24F8E2",
@@ -19819,7 +19834,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-8128FD.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Ferguson Publishing"
   },
   {
    "id": "L-7B1BE2",
@@ -19850,7 +19866,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-A427B3.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Kelley, J. K."
   },
   {
    "id": "L-D333ED",
@@ -20109,7 +20126,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-9829DE.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Congressional Quarterly"
   },
   {
    "id": "L-AEC497",
@@ -20239,7 +20257,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-FF5AB5.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Rutter, Jason; Bryce, Jo"
   },
   {
    "id": "L-CEE0A9",
@@ -20336,7 +20355,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-61E111.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Rabin, Steve"
   },
   {
    "id": "L-755741",
@@ -20416,7 +20436,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-81B1C4.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Compton, Shanna"
   },
   {
    "id": "L-F8A44F",
@@ -20448,7 +20469,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-2C998E.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Wardrip-Fruin, Noah; Montfort, Nick"
   },
   {
    "id": "L-D1D6B7",
@@ -20514,7 +20536,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-C6FEB4.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Bates, Bob"
   },
   {
    "id": "L-E75C54",
@@ -20708,7 +20731,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-48D0B0.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Moschovitis, Christos J. P."
   },
   {
    "id": "L-2D7B42",
@@ -20788,7 +20812,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-7113A9.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Hayward, Philip"
   },
   {
    "id": "L-827258",
@@ -20819,7 +20844,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-612432.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Druckrey, Timothy; Stainback, Charles"
   },
   {
    "id": "L-A3629A",
@@ -20852,7 +20878,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-7C3A5B.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Time-Life Books"
   },
   {
    "id": "L-854087",
@@ -20934,7 +20961,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-B80448.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Winston, Patrick Henry; Prendergast, Karen A"
   },
   {
    "id": "L-400A2B",
@@ -20949,7 +20977,8 @@
     "found by full-text search, not read"
    ],
    "thumb": "library/thumbs/L-400A2B.jpg",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Dravnieks, Dzintar E; Becker, Ira"
   },
   {
    "id": "L-AEC52F",
@@ -20995,7 +21024,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Zagal, José P.; Edwards, Benj"
   },
   {
    "id": "L-9246EE",
@@ -21130,7 +21160,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Coward-Gibbs, Matt"
   },
   {
    "id": "L-ECAE6B",
@@ -21295,7 +21326,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Schreibman, Susan; Siemens, Raymond George; Unsworth, John"
   },
   {
    "id": "L-CAA681",
@@ -21547,7 +21579,8 @@
    "tags": [
     "found by full-text search, not read"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Wolf, Mark J. P."
   },
   {
    "id": "L-945041",
@@ -22114,7 +22147,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Wing, Carlin"
   },
   {
    "id": "L-FA6A1C",
@@ -22578,7 +22612,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Røssaak, Eivind"
   },
   {
    "id": "L-34FED9",
@@ -23223,7 +23258,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Tinn, Honghong"
   },
   {
    "id": "L-FFF2A9",
@@ -23549,7 +23585,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Krapp, Peter"
   },
   {
    "id": "L-67E26F",
@@ -23628,7 +23665,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Boellstorff, Tom; Soderman, Braxton"
   },
   {
    "id": "L-1B4A84",
@@ -24717,7 +24755,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Barr, Pippin"
   },
   {
    "id": "L-0C6143",
@@ -25064,7 +25103,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Carla Viana Dendasck; Cláudio Alberto Gellis de Mattos Dias; Devanildo Braz Da Silva; Monica Aparecida Bortolotti"
   },
   {
    "id": "L-A5F09C",
@@ -25079,7 +25119,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Carla Viana Dendasck; Cláudio Alberto Gellis de Mattos Dias; Devanildo Braz Da Silva; Monica Aparecida Bortolotti"
   },
   {
    "id": "L-C31354",
@@ -25540,7 +25581,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Kagen, Melissa"
   },
   {
    "id": "L-40909B",
@@ -28527,7 +28569,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Glas, René; Lammes, Sybille; de Lange, Michiel; Raessens, Joost; de Vries, Imar"
   },
   {
    "id": "L-A76074",
@@ -28931,7 +28974,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Milburn, Colin"
   },
   {
    "id": "L-507053",
@@ -29037,7 +29081,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Milburn, Colin"
   },
   {
    "id": "L-53412B",
@@ -30545,7 +30590,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Domínguez-Rué, Emma; Nierling, Linda"
   },
   {
    "id": "L-1A3247",
@@ -30576,8 +30622,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "author": "Domínguez-Rué, Emma (ed.); Nierling, Linda (ed.)",
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "contributor": "eds Domínguez-Rué, Emma; Nierling, Linda"
   },
   {
    "id": "L-BD391A",
@@ -32467,7 +32513,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Manovich, Lev"
   },
   {
    "id": "L-E51904",
@@ -32724,7 +32771,8 @@
     "to be checked",
     "mention spacewar!"
    ],
-   "relevance": "unchecked"
+   "relevance": "unchecked",
+   "author": "Montfort, Nick; Baudoin, Patsy; Bell, John; Bogost, Ian; Douglass, Jeremy; Marino, Mark C.; Mateas, Michael; Reas, Casey; Sample, Mark; Vawter, Noah"
   },
   {
    "id": "L-F2D32F",
@@ -35877,6 +35925,20 @@
     "mention spacewar!"
    ],
    "relevance": "unchecked"
+  },
+  {
+   "id": "L-27C208",
+   "title": "Notes",
+   "date": "2025-11-11",
+   "kind": "article",
+   "lang": "en",
+   "in": "The MIT Press eBooks",
+   "doi": "10.7551/mitpress/14957.003.0010",
+   "url": "https://doi.org/10.7551/mitpress/14957.003.0010",
+   "tags": [
+    "to be checked",
+    "mention spacewar!"
+   ]
   }
  ]
 }
